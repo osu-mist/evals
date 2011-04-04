@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.sample.jsp.portlet;
+package edu.osu.cws.pass.portlet;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;

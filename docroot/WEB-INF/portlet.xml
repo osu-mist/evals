@@ -4,7 +4,7 @@
 	<portlet>
 		<portlet-name>pass</portlet-name>
 		<display-name>PASS</display-name>
-		<portlet-class>com.sample.jsp.portlet.JSPPortlet</portlet-class>
+		<portlet-class>edu.osu.cws.pass.portlet.JSPPortlet</portlet-class>
 		<init-param>
 			<name>view-jsp</name>
 			<value>/view.jsp</value>
