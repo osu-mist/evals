@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin-package PUBLIC "-//Liferay//DTD Plugin Package 5.2.0//EN" "http://www.liferay.com/dtd/liferay-plugin-package_5_2_0.dtd">
+
+<plugin-package>
+    <name>PASS</name>
+    <module-id>osu/pass/5.2.3.1/war</module-id>
+    <types>
+        <type>portlet</type>
+    </types>
+    <short-description>
+        This plugin is a Performance Review portlet.
+    </short-description>
+    <change-log></change-log>
+    <page-url>http://oregonstate.edu/cws</page-url>
+    <author>Jose Cedeno</author>
+    <licenses>
+        <license osi-approved="true">MIT</license>
+    </licenses>
+    <liferay-versions>
+        <liferay-version>5.2.0+</liferay-version>
+    </liferay-versions>
+</plugin-package>
