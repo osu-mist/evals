@@ -1,9 +1,11 @@
 package edu.osu.cws.pass.portlet;
 
-import edu.osu.cws.pass.models.CriterionArea;
+import edu.osu.cws.pass.util.Criteria;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
 /**
  * Actions class used to map user form actions to respective class methods.
@@ -39,11 +41,17 @@ public class Actions {
      * Takes the request object and passes the employeeType to the hibernate util class.
      * It returns an array of CriterionArea POJO.
      *
-     * @param actionRequest
-     * @param actionResponse
+     * @param renderRequest
+     * @param renderResponse
+     * @return List
      */
-    public CriterionArea[] listCriteria(ActionRequest actionRequest, ActionResponse actionResponse) {
-        return new CriterionArea[2];
+    public void listCriteria(RenderRequest renderRequest, RenderResponse renderResponse) {
+        int appointmentTypeID = Criteria.DEFAULT_APPOINTMENT_TYPE;
+        if (renderRequest.getParameter("appointmentTypeID") != null) {
+            appointmentTypeID = Integer.parseInt(renderRequest.getParameter("appointmentTypeID"));
+        }
+
+        renderRequest.setAttribute("criteria", new Criteria().list(appointmentTypeID));
     }
 
     /**
