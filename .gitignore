@@ -1,0 +1,5 @@
+docroot/WEB-INF/classes/
+*~
+*.swp
+hibernate-dev.cfg.xml
+hibernate-test.cfg.xml
