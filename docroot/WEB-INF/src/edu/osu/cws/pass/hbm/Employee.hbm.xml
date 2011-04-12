@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false" >
+
+    <class name="edu.osu.cws.pass.models.Employee" table="employees">
+        <id name="id" column="pidm" type="int"/>
+
+        <property name="firstName"/>
+        <property name="middleName"/>
+        <property name="lastName"/>
+        <property name="osuid"/>
+        <property name="onid"/>
+        <property name="preferredEmail"/>
+        <property name="copySupervisor" type="boolean"/>
+        <property name="active"/>
+    </class>
+
+</hibernate-mapping>

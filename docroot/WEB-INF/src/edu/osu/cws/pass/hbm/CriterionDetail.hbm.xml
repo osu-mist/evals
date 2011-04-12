@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false" >
+
+    <class name="edu.osu.cws.pass.models.CriterionDetail" table="criteria_details">
+        <id name="id" type="int">
+            <generator class="increment" />
+        </id>
+
+        <property name="createDate" type="timestamp"/>
+        <property name="description" type="text"/>
+
+        <many-to-one name="areaID" class="edu.osu.cws.pass.models.CriterionArea" not-null="true"/>
+        <many-to-one name="createdBy" class="edu.osu.cws.pass.models.Employee" not-null="true"/>
+    </class>
+
+</hibernate-mapping>

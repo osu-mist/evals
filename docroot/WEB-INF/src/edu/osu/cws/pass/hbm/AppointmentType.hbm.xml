@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false" >
+
+    <class name="edu.osu.cws.pass.models.AppointmentType" table="appointment_types">
+        <id name="id" type="int">
+            <generator class="increment" />
+        </id>
+
+        <property name="name"/>
+    </class>
+
+</hibernate-mapping>

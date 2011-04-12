@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false" >
+
+    <class name="edu.osu.cws.pass.models.CriterionArea" table="criteria_areas">
+        <id name="id" type="int">
+            <generator class="native" />
+        </id>
+        <property name="name"/>
+        <property name="sequence"/>
+        <property name="createDate" type="timestamp" />
+        <property name="deleteDate" type="timestamp" />
+
+        <many-to-one name="appointmentTypeID" class="edu.osu.cws.pass.models.AppointmentType" not-null="true"/>
+        <many-to-one name="createdBy" class="edu.osu.cws.pass.models.Employee" not-null="true"/>
+        <many-to-one name="deletedBy" class="edu.osu.cws.pass.models.Employee" not-null="false"/>
+        <many-to-one name="originalID" column="originalID" class="edu.osu.cws.pass.models.CriterionArea" not-null="false" unique="true"/>
+        <set name="details" inverse="true" sort="natural">
+            <key column="areaID"/>
+            <one-to-many class="edu.osu.cws.pass.models.CriterionDetail"/>
+
+        </set>
+    </class>
+
+</hibernate-mapping>
