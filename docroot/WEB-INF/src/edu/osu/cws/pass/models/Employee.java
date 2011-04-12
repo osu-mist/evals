@@ -4,7 +4,7 @@
 package edu.osu.cws.pass.models;
 
 public class Employee {
-    private long pidm;
+    private int id;
 
     private String firstName;
 
@@ -18,16 +18,16 @@ public class Employee {
 
     private String preferredEmail;
 
-    private String copySupervisor;
+    private Boolean copySupervisor;
 
-    private boolean active;
+    private Boolean active;
 
-    public long getPidm() {
-        return pidm;
+    public int getId() {
+        return id;
     }
 
-    private void setPidm(long pidm) {
-        this.pidm = pidm;
+    private void setId(int pidm) {
+        this.id = pidm;
     }
 
     public String getFirstName() {
@@ -78,11 +78,11 @@ public class Employee {
         this.preferredEmail = preferredEmail;
     }
 
-    public String getCopySupervisor() {
+    public Boolean getCopySupervisor() {
         return copySupervisor;
     }
 
-    public void setCopySupervisor(String copySupervisor) {
+    public void setCopySupervisor(Boolean copySupervisor) {
         this.copySupervisor = copySupervisor;
     }
 

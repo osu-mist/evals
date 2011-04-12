@@ -6,25 +6,30 @@
 package edu.osu.cws.pass.models;
 
 import java.util.Date;
+import java.util.Set;
 
 public class CriterionArea {
 
 
-    private long id;
+    private int id;
 
     private String name;
 
-    private long employeeTypeID;
+    private AppointmentType appointmentTypeID;
+
+    private CriterionArea originalID;
 
     private int sequence;
 
-    private Date created;
+    private Date createDate;
 
-    private long createdBy;
+    private Employee createdBy;
 
-    private Date deleted;
+    private Date deleteDate;
 
-    private long deletedBy;
+    private Employee deletedBy;
+
+    private Set details;
 
     public CriterionArea() { }
 
@@ -46,11 +51,11 @@ public class CriterionArea {
         return new String[2];
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    private void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -62,12 +67,20 @@ public class CriterionArea {
         this.name = name;
     }
 
-    public long getEmployeeTypeID() {
-        return employeeTypeID;
+    public AppointmentType getAppointmentTypeID() {
+        return appointmentTypeID;
     }
 
-    public void setEmployeeTypeID(long employeeTypeID) {
-        this.employeeTypeID = employeeTypeID;
+    public void setAppointmentTypeID(AppointmentType appointmentTypeID) {
+        this.appointmentTypeID = appointmentTypeID;
+    }
+
+    public CriterionArea getOriginalID() {
+        return originalID;
+    }
+
+    public void setOriginalID(CriterionArea originalID) {
+        this.originalID = originalID;
     }
 
     public int getSequence() {
@@ -78,35 +91,43 @@ public class CriterionArea {
         this.sequence = sequence;
     }
 
-    public Date getCreated() {
-        return created;
+    public Date getCreateDate() {
+        return createDate;
     }
 
-    public void setCreated(Date created) {
-        this.created = created;
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 
-    public long getCreatedBy() {
+    public Employee getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(long createdBy) {
+    public void setCreatedBy(Employee createdBy) {
         this.createdBy = createdBy;
     }
 
-    public Date getDeleted() {
-        return deleted;
+    public Date getDeleteDate() {
+        return deleteDate;
     }
 
-    public void setDeleted(Date deleted) {
-        this.deleted = deleted;
+    public void setDeleteDate(Date deleteDate) {
+        this.deleteDate = deleteDate;
     }
 
-    public long getDeletedBy() {
+    public Employee getDeletedBy() {
         return deletedBy;
     }
 
-    public void setDeletedBy(long deletedBy) {
+    public void setDeletedBy(Employee deletedBy) {
         this.deletedBy = deletedBy;
+    }
+
+    public Set getDetails() {
+        return details;
+    }
+
+    public void setDetails(Set details) {
+        this.details = details;
     }
 }

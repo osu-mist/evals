@@ -8,15 +8,15 @@ import java.util.Date;
 
 public class CriterionDetail {
 
-    private long id;
+    private int id;
 
-    private long areaID;
+    private CriterionArea areaID;
 
     private String description;
 
-    private Date created;
+    private Date createDate;
 
-    private long createdBy;
+    private Employee createdBy;
 
     public CriterionDetail() {}
 
@@ -29,19 +29,19 @@ public class CriterionDetail {
         return new String[2];
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    private void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public long getAreaID() {
+    public CriterionArea getAreaID() {
         return areaID;
     }
 
-    public void setAreaID(long areaID) {
+    public void setAreaID(CriterionArea areaID) {
         this.areaID = areaID;
     }
 
@@ -53,19 +53,19 @@ public class CriterionDetail {
         this.description = description;
     }
 
-    public Date getCreated() {
-        return created;
+    public Date getCreateDate() {
+        return createDate;
     }
 
-    public void setCreated(Date created) {
-        this.created = created;
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 
-    public long getCreatedBy() {
+    public Employee getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(long createdBy) {
+    public void setCreatedBy(Employee createdBy) {
         this.createdBy = createdBy;
     }
 }
