@@ -7,8 +7,18 @@ package edu.osu.cws.pass.util;
 
 import edu.osu.cws.pass.models.CriterionArea;
 import edu.osu.cws.pass.models.CriterionDetail;
+import org.hibernate.Session;
+import edu.osu.cws.pass.util.*;
+
+import java.util.List;
 
 public class Criteria {
+
+    /**
+     * The default appointment type to use when displaying criteria information.
+     */
+    public static final int DEFAULT_APPOINTMENT_TYPE = 1;
+
     /**
      * Takes the CriterionArea and CriterionDetail POJO objects, performs validation
      * and calls the respective hibernate method to save to db if passed validation.
@@ -43,8 +53,14 @@ public class Criteria {
      * @param employeeTypeID
      * @return criterias        Array of CriterionAreas
      */
-    public CriterionArea[] list(long employeeTypeID) {
-        return new CriterionArea[2];
+    public List list(long employeeTypeID) {
+        Session hsession = null;
+
+        hsession = HibernateUtil.getSessionFactory().getCurrentSession();
+        hsession.beginTransaction();
+        List result = hsession.createQuery("from edu.osu.cws.pass.models.CriterionArea").list();
+        hsession.getTransaction().commit();
+        return result;
     }
 
     /**
