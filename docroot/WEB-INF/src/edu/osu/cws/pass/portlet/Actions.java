@@ -45,13 +45,16 @@ public class Actions {
      * @param renderResponse
      * @return List
      */
-    public void listCriteria(RenderRequest renderRequest, RenderResponse renderResponse) {
+    public String listCriteria(RenderRequest renderRequest, RenderResponse renderResponse) {
         int appointmentTypeID = Criteria.DEFAULT_APPOINTMENT_TYPE;
         if (renderRequest.getParameter("appointmentTypeID") != null) {
             appointmentTypeID = Integer.parseInt(renderRequest.getParameter("appointmentTypeID"));
         }
 
         renderRequest.setAttribute("criteria", new Criteria().list(appointmentTypeID));
+
+        return "/jsp/criteria/list.jsp";
+
     }
 
     /**
