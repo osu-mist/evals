@@ -51,6 +51,16 @@ public class CriterionArea {
         return new String[2];
     }
 
+    /**
+     * Returns the most recent criterion_detail. The sorting is done by the
+     * db using the createDate field.
+     *
+     * @return  The most recently created CriterionDetail for the CriterionArea
+     */
+    public CriterionDetail getCurrentDetail() {
+        return (CriterionDetail) details.toArray()[0];
+    }
+
     public int getId() {
         return id;
     }

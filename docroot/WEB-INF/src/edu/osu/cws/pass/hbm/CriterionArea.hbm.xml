@@ -16,7 +16,7 @@
         <many-to-one name="createdBy" class="edu.osu.cws.pass.models.Employee" not-null="true"/>
         <many-to-one name="deletedBy" class="edu.osu.cws.pass.models.Employee" not-null="false"/>
         <many-to-one name="originalID" column="originalID" class="edu.osu.cws.pass.models.CriterionArea" not-null="false" unique="true"/>
-        <set name="details" inverse="true" sort="natural">
+        <set name="details" inverse="true" order-by="createDate DESC">
             <key column="areaID"/>
             <one-to-many class="edu.osu.cws.pass.models.CriterionDetail"/>
 
