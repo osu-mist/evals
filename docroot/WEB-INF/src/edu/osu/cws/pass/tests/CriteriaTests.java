@@ -13,6 +13,7 @@ import edu.osu.cws.pass.models.Employee;
 import edu.osu.cws.pass.util.Criteria;
 import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
@@ -21,9 +22,9 @@ import java.util.*;
 @Test
 public class CriteriaTests {
 
-    CriterionArea criteriaObject = new CriterionArea();
-    CriterionDetail criteriaDetailObject = new CriterionDetail();
-    Criteria criterion = new Criteria();
+    CriterionArea criterionObject;
+    CriterionDetail criteriaDetailObject;
+    Criteria criteriaObject;
 
     /**
      * This setup method is run before this class gets executed in order to
@@ -37,13 +38,24 @@ public class CriteriaTests {
     }
 
     /**
+     * This method is run before each one of the test methods gets executed. It
+     * just resets the various criteria objects used in the tests to new values.
+     */
+    @BeforeMethod
+    public void initializeObjects() {
+        criterionObject = new CriterionArea();
+        criteriaDetailObject = new CriterionDetail();
+        criteriaObject = new Criteria();
+    }
+
+    /**
      * Tests that fetching a list of active criteria for classified employees
      * works correctly. It checks that the correct associated CriterionDetail
      * are fetched as well.
      */
     @Test(groups = {"unittest"})
     public void returnActiveCriteriaForClassified() {
-        List activeCriteriaList = criterion.list(Criteria.DEFAULT_APPOINTMENT_TYPE);
+        List activeCriteriaList = criteriaObject.list(Criteria.DEFAULT_APPOINTMENT_TYPE);
         CriterionArea expectedCriteria = new CriterionArea();
         CriterionArea expectedCriteria2 = new CriterionArea();
         CriterionDetail expectedDetails = new CriterionDetail();

@@ -38,8 +38,20 @@ public class CriterionArea {
      *
      * @return errors
      */
-    public String[] validateName() {
-        return new String[2];
+    public boolean validateName() {
+        ArrayList<String> nameErrors = new ArrayList<String>();
+
+        // If there were any previous validation errors remove them.
+        this.errors.remove("name");
+        if (this.name == null || this.name.equals("")) {
+            nameErrors.add("criteria-name-required");
+        }
+
+        if (nameErrors.size() > 0) {
+            this.errors.put("name", nameErrors);
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -47,8 +59,46 @@ public class CriterionArea {
      *
      * @return errors
      */
-    public String[] validateSequence() {
-        return new String[2];
+    public boolean validateSequence() {
+        ArrayList<String> sequenceErrors = new ArrayList<String>();
+
+        // If there were any previous validation errors remove them.
+        this.errors.remove("sequence");
+        if (this.sequence == 0) {
+            sequenceErrors.add("criteria-sequence-required");
+        } else if (this.sequence < 1) {
+            sequenceErrors.add("criteria-sequence-invalid");
+        }
+
+        if (sequenceErrors.size() > 0) {
+            this.errors.put("sequence", sequenceErrors);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Method called by util Hibernate classes to make sure that there is a
+     * valid appointment type set.
+     *
+     * @return
+     */
+    public boolean validateAppointmentTypeID() {
+        ArrayList<String> appointmentErrors = new ArrayList<String>();
+
+        // If there were any previous validation errors remove them.
+        this.errors.remove("appointmentType");
+        if (this.appointmentTypeID == null) {
+            appointmentErrors.add("criteria-appointment-type-required");
+        } else if (this.appointmentTypeID.getId() == 0) {
+            appointmentErrors.add("criteria-appointment-type-required");
+        }
+
+        if (appointmentErrors.size() > 0) {
+            this.errors.put("appointmentType", appointmentErrors);
+            return false;
+        }
+        return true;
     }
 
     /**
