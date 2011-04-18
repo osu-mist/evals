@@ -3,7 +3,7 @@
  */
 package edu.osu.cws.pass.models;
 
-public class BusinessCenter {
+public class BusinessCenter extends Pass {
     private int id;
 
     private String name;

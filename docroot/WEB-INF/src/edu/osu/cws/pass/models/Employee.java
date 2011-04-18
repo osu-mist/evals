@@ -3,7 +3,7 @@
  */
 package edu.osu.cws.pass.models;
 
-public class Employee {
+public class Employee extends Pass {
     private int id;
 
     private String firstName;

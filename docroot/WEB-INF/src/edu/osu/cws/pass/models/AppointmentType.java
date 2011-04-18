@@ -6,7 +6,7 @@
 package edu.osu.cws.pass.models;
 
 
-public class AppointmentType {
+public class AppointmentType extends Pass {
     private int id;
 
     private String name;

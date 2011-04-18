@@ -5,10 +5,12 @@
 
 package edu.osu.cws.pass.models;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
-public class CriterionArea {
+public class CriterionArea extends Pass {
 
 
     private int id;
@@ -29,7 +31,7 @@ public class CriterionArea {
 
     private Employee deletedBy;
 
-    private Set details;
+    private Set details = new HashSet();
 
     public CriterionArea() { }
 

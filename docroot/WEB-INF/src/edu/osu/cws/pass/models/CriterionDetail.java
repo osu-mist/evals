@@ -4,9 +4,11 @@
  */
 package edu.osu.cws.pass.models;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
-public class CriterionDetail {
+public class CriterionDetail extends Pass {
 
     private int id;
 
