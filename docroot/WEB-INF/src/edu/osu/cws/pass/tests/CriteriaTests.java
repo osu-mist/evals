@@ -3,7 +3,6 @@
  */
 package edu.osu.cws.pass.tests;
 
-import com.liferay.portal.kernel.dao.orm.Criterion;
 import edu.osu.cws.pass.models.AppointmentType;
 import edu.osu.cws.pass.models.CriterionArea;
 import edu.osu.cws.pass.models.CriterionDetail;
@@ -112,31 +111,125 @@ public class CriteriaTests {
      */
     @Test(groups = {"unittest"})
     public void returnCurrentDetailsForCriterion() {
-        Session hsession = null;
-
-        hsession = HibernateUtil.getSessionFactory().getCurrentSession();
-        hsession.beginTransaction();
+        Session hsession = HibernateUtil.getSessionFactory().getCurrentSession();
+        Transaction tx = hsession.beginTransaction();
         CriterionArea result = (CriterionArea) hsession.load(CriterionArea.class, 1);
+        tx.commit();
 
         Assert.assertEquals(2, result.getDetails().size());
         Assert.assertEquals(result.getCurrentDetail().getDescription(),
                 "How will you increase your communication skills?");
     }
 
+
+    /**
+     * Tests that criteria area names are required.
+     */
+    @Test(groups = {"unittest"})
+    public void shouldRequireAName() {
+        criterionObject.setName(null);
+        assert !criterionObject.validateName() : "Name should be required";
+        assert criterionObject.getErrors().containsKey("name") : "Missing name error msg";
+
+        criterionObject.setName("");
+        assert !criterionObject.validateName() : "Name should be required";
+        assert criterionObject.getErrors().containsKey("name") : "Missing name error msg";
+
+        criterionObject.setName("technical skills");
+        assert criterionObject.validateName() : "Name is provided, validation should pass";
+        assert !criterionObject.getErrors().containsKey("name") : "No name error msg should be present";
+    }
+
+    /**
+     * Tests that criteria sequence is required.
+     */
+    @Test(groups = {"unittest"})
+    public void shouldRequireASequence() {
+        assert !criterionObject.validateSequence() : "Sequence should be required";
+        assert criterionObject.getErrors().containsKey("sequence") : "Missing sequence error msg";
+
+        criterionObject.setSequence(-1);
+        assert !criterionObject.validateSequence(): "Sequence should be greater than 1";
+        assert criterionObject.getErrors().containsKey("sequence") : "Missing sequence error msg";
+
+
+        criterionObject.setSequence(1);
+        assert criterionObject.validateSequence(): "Sequence should validate";
+        assert !criterionObject.getErrors().containsKey("sequence") : "No sequence error msg should be present";
+    }
+
+    /**
+     * Tests that a valid appointment type is associated to the CriterionArea Object.
+     */
+    @Test(groups = {"unittest"})
+    public void shouldRequireAppointmentType() {
+        assert !criterionObject.validateAppointmentTypeID() :
+                "A valid appointment type should be required";
+        assert criterionObject.getErrors().containsKey("appointmentType") :
+                "Missing sequence error msg";
+
+        AppointmentType type = new AppointmentType();
+        criterionObject.setAppointmentTypeID(type);
+        assert !criterionObject.validateAppointmentTypeID():
+                "A valid appointment type should be required";
+        assert criterionObject.getErrors().containsKey("appointmentType") :
+                "Missing sequence error msg";
+
+        type.setId(1);
+        type.setName("Classified");
+        criterionObject.setAppointmentTypeID(type);
+        assert criterionObject.validateAppointmentTypeID():
+                "Appointment type should validate";
+        assert !criterionObject.getErrors().containsKey("appointmentType") :
+                "No appointmentType error msg should be present";
+
+    }
+
+    /**
+     * Tests that a valid description is given to the CriterionDetail object.
+     */
+    @Test(groups = {"unitttest"})
+    public void shouldRequireDescription() {
+        assert !criteriaDetailObject.validateDescription() :
+                "A valid description should be required";
+        assert criteriaDetailObject.getErrors().containsKey("description") :
+                "Missing description error msg";
+
+//        criteriaDetailObject.setDescription("");
+//        criteriaDetailObject.validateDescription() :
+//                "A valid description should be required";
+//        criteriaDetailObject.getErrors().containsKey("")
+
+
+    }
+
     /**
      * Tests that saving a new Criteria object works correctly. The save method returns boolean
      * based on success of the operation.
      */
-/*    @Test(groups = {"unittest", "pending"})
+    @Test(groups = {"unittest", "pending"})
     public void addNewCriteria() {
-        criteriaObject.setName("Communication");
-        criteriaDetailObject.setDescription("How do you plan to improve your communication skills?");
-        criteriaObject.setAppointmentTypeID(new AppointmentType());
-        criteriaObject.setCreatedBy(new Employee());
+        Session hsession = HibernateUtil.getSessionFactory().getCurrentSession();
+        Transaction tx = hsession.beginTransaction();
+        Employee createdBy = (Employee) hsession.load(Employee.class, 12345);
+        AppointmentType type = (AppointmentType) hsession.load(AppointmentType.class, 1);
 
-        //Assert.assertTrue(criteriaObject.save());
+        criterionObject.setName("Communication");
+        criteriaDetailObject.setDescription("How do you plan to improve your communication skills?");
+        criterionObject.setAppointmentTypeID(type);
+        criterionObject.setSequence(1);
+        criterionObject.setCreatedBy(createdBy);
+
+        assert criterionObject.validate() : "Criteria should be valid";
+        assert criteriaDetailObject.validate() : "Criteria details should be valid";
+
+        hsession.save(criterionObject);
+        criterionObject.addDetails(criteriaDetailObject);
+        hsession.save(criterionObject);
+        tx.commit();
+        //Assert.assertTrue(criterionObject.save());
         //Assert.assertTrue(criteriaDetailObject.save());
-    }*/
+    }
 
     /**
      * Tests that after editing a field in the
@@ -147,15 +240,15 @@ public class CriteriaTests {
         long newRevisionId = 0;
         long oldRevisionId = 1;
         //@todo: get criteria object with id = 3
-        //criteriaObject.read((long) 3);
+        //criterionObject.read((long) 3);
 
-//        oldRevisionId = criteriaObject.getCriteriaDetailsID();
+//        oldRevisionId = criterionObject.getCriteriaDetailsID();
 
         criteriaDetailObject.setDescription("What is your plan to improve communication skills?");
         //criteriaDetailObject.save();
 
 
-        //newRevisionId = criteriaObject.getCriteriaDetailsID();
+        //newRevisionId = criterionObject.getCriteriaDetailsID();
 
         assertFalse(oldRevisionId == newRevisionId);
     }
@@ -167,17 +260,17 @@ public class CriteriaTests {
      */
 /*    @Test(groups = {"unittest", "pending"})
     public void editTypoInCriteria() {
-//        criteriaObject.read((long) 3);
+//        criterionObject.read((long) 3);
         long newRevisionId = 0;
         long oldRevisionId = 0;
 
-//        long oldRevisionId = criteriaObject.getCriteriaDetailsID();
+//        long oldRevisionId = criterionObject.getCriteriaDetailsID();
 
         criteriaDetailObject.setDescription("What is your plan to improve communication skills?");
 //        criteriaDetailObject.setPropagateChanges(true);
-//        criteriaObject.save();
+//        criterionObject.save();
 
-//        long newRevisionId = criteriaObject.getCriteriaDetailsID();
+//        long newRevisionId = criterionObject.getCriteriaDetailsID();
 
         Assert.assertEquals(oldRevisionId,newRevisionId);
     }*/
@@ -188,12 +281,12 @@ public class CriteriaTests {
      */
 /*    @Test(groups = {"unittest", "pending"})
     public void disableCriteria() {
-//        criteriaObject.read((long) 1);
-//        Assert.assertEquals(criteriaObject.isDisabled(), false);
-        criteriaObject.setDeleteDate(new Date());
-//        criteriaObject.save();
+//        criterionObject.read((long) 1);
+//        Assert.assertEquals(criterionObject.isDisabled(), false);
+        criterionObject.setDeleteDate(new Date());
+//        criterionObject.save();
 
-//        criteriaObject.read(1);
-//        Assert.assertEquals(criteriaObject.isDisabled(), true);
+//        criterionObject.read(1);
+//        Assert.assertEquals(criterionObject.isDisabled(), true);
     }*/
 }

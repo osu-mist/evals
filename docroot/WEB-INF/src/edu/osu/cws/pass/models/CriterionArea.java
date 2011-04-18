@@ -192,4 +192,16 @@ public class CriterionArea extends Pass {
     public void setDetails(Set details) {
         this.details = details;
     }
+
+    /**
+     * This method is not needed by hibernate, but it is a helper method used to add CriterionDetail
+     * to the details HashSet.
+     *
+     * @param detail
+     */
+    public void addDetails(CriterionDetail detail) {
+        detail.setAreaID(this);
+        this.details.add(detail);
+    }
+
 }

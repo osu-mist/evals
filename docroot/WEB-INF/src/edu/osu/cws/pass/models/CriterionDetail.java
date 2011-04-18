@@ -27,8 +27,21 @@ public class CriterionDetail extends Pass {
      *
      * @return errors
      */
-    public String[] validateDescription() {
-        return new String[2];
+    public boolean validateDescription() {
+        ArrayList<String> descriptionErrors = new ArrayList<String>();
+
+        // If there were any previous validation errors remove them.
+        this.errors.remove("description");
+        if (this.description == null || this.description.equals("")) {
+            descriptionErrors.add("criteria-description-required");
+        }
+
+        if (descriptionErrors.size() > 0) {
+            this.errors.put("description", descriptionErrors);
+            return false;
+        }
+
+        return true;
     }
 
     public int getId() {
@@ -70,4 +83,5 @@ public class CriterionDetail extends Pass {
     public void setCreatedBy(Employee createdBy) {
         this.createdBy = createdBy;
     }
+
 }
