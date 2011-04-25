@@ -13,9 +13,9 @@ import java.util.Set;
 public class CriterionArea extends Pass {
 
 
-    private int id;
+    private int id = 0;
 
-    private String name;
+    private String name = "";
 
     private AppointmentType appointmentTypeID;
 

@@ -10,11 +10,11 @@ import java.util.HashMap;
 
 public class CriterionDetail extends Pass {
 
-    private int id;
+    private int id = 0;
 
     private CriterionArea areaID;
 
-    private String description;
+    private String description = "";
 
     private Date createDate;
 
