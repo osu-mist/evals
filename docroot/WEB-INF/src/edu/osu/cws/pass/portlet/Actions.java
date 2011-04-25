@@ -2,10 +2,10 @@ package edu.osu.cws.pass.portlet;
 
 import edu.osu.cws.pass.util.Criteria;
 
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
+import javax.portlet.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Actions class used to map user form actions to respective class methods.
@@ -78,5 +78,28 @@ public class Actions {
      */
     public void updateCriteriaSequence(ActionRequest actionRequest, ActionResponse actionResponse) {
 
+    }
+    /**
+     * Returns a map with information on the currently logged on user.
+     *
+     * @param request
+     * @return
+     */
+    private Map getLoggedOnUser(PortletRequest request) {
+        Map userInfo = (Map)request.getAttribute(PortletRequest.USER_INFO);
+        return userInfo;
+    }
+
+    /**
+     * Returns the username of the currently logged on user. If there is no valid username, it
+     * returns an empty string.
+     *
+     * @param request
+     * @return username
+     */
+    private String getLoggedOnUsername(PortletRequest request) {
+        Map userInfo = getLoggedOnUser(request);
+
+        return (userInfo == null) ? "" : (String) userInfo.get("user.login.id");
     }
 }
