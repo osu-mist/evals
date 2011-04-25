@@ -7,9 +7,12 @@ package edu.osu.cws.pass.util;
 
 import edu.osu.cws.pass.models.CriterionArea;
 import edu.osu.cws.pass.models.CriterionDetail;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import edu.osu.cws.pass.util.*;
+import org.hibernate.Transaction;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class Criteria {
@@ -27,8 +30,23 @@ public class Criteria {
      * @param details   CriterionDetail POJO
      * @return errors   An array of error messages, but empty array on success.
      */
-    public String[] add(CriterionArea area, CriterionDetail details) {
-        return new String[2];
+    public boolean add(CriterionArea area, CriterionDetail details) {
+        // validate both objects individually and then check for errors
+        area.validate();
+        details.validate();
+
+        if (area.getErrors().size() > 0 || details.getErrors().size() > 0) {
+            return false;
+        }
+
+        Session hsession = HibernateUtil.getSessionFactory().getCurrentSession();
+        Transaction tx = hsession.beginTransaction();
+        hsession.save(area);
+        area.addDetails(details);
+        hsession.save(details);
+        tx.commit();
+        return true;
+
     }
 
     /**
@@ -53,13 +71,13 @@ public class Criteria {
      * @param employeeTypeID
      * @return criterias        Array of CriterionAreas
      */
-    public List list(long employeeTypeID) {
+    public List list(int employeeTypeID) {
         Session hsession = null;
 
         hsession = HibernateUtil.getSessionFactory().getCurrentSession();
-        hsession.beginTransaction();
+        Transaction tx = hsession.beginTransaction();
         List result = hsession.createQuery("from edu.osu.cws.pass.models.CriterionArea").list();
-        hsession.getTransaction().commit();
+        tx.commit();
         return result;
     }
 
@@ -85,4 +103,31 @@ public class Criteria {
         return new String[2];
     }
 
+    /**
+     * Figures out the next available sequence for a CriterionArea of a specific appointment type.
+     * The next available sequence is usually is size of criteria list + 1.
+     * @param appointmentTypeId
+     * @return
+     */
+    public int getNextSequence(int appointmentTypeId) {
+        int availableSequence = 0;
+        Session hsession = null;
+
+        hsession = HibernateUtil.getSessionFactory().getCurrentSession();
+        Transaction tx = hsession.beginTransaction();
+        Query countQry = hsession.createQuery("select count(*) from edu.osu.cws.pass.models.CriterionArea " +
+                "where appointmentTypeID = :appointmentTypeId");
+
+        countQry.setInteger("appointmentTypeId", appointmentTypeId);
+        countQry.setMaxResults(1);
+        Iterator results = countQry.list().iterator();
+
+        if (results.hasNext()) {
+            availableSequence =  Integer.parseInt(results.next().toString());
+        }
+
+        tx.commit();
+        return ++availableSequence;
+
+    }
 }

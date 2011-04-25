@@ -2,9 +2,14 @@
 
 <%
 List criteria = (List) renderRequest.getAttribute("criteria");
+
+PortletURL addCriteriaURL = renderResponse.createRenderURL();
+addCriteriaURL.setWindowState(WindowState.NORMAL);
+addCriteriaURL.setParameter("action", "addCriteria");
 %>
 
 <h2>Evaluation Criteria</h2>
+<liferay-ui:success key="criteria-saved" message="criteria-saved" />
 
 <div class="separator"></div>
 <table class="taglib-search-iterator">
@@ -24,5 +29,12 @@ List criteria = (List) renderRequest.getAttribute("criteria");
         <td><a href="#">Edit</a> <a href="#">Delete</a>
     </tr>
 </c:forEach>
+
+<liferay-ui:icon
+    image="add_article"
+    url="<%= addCriteriaURL.toString() %>"
+    label="true"
+    message="Add Evaluation Criteria"
+/>
 
 </table>

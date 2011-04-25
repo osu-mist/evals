@@ -8,6 +8,7 @@ package edu.osu.cws.pass.portlet;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.pass.util.HibernateUtil;
 
 import java.io.IOException;
@@ -16,13 +17,7 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
-import javax.portlet.GenericPortlet;
-import javax.portlet.PortletException;
-import javax.portlet.PortletRequestDispatcher;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
+import javax.portlet.*;
 
 /**
  * <a href="JSPPortlet.java.html"><b><i>View Source</i></b></a>
@@ -87,34 +82,77 @@ public class JSPPortlet extends GenericPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-        viewJSP = JSP_DEFAULT_HOME;
-        Method actionMethod;
-        String action = renderRequest.getParameter("action");
-        if (action != null) {
-            try {
-                actionMethod = Actions.class.getDeclaredMethod(action, RenderRequest.class, RenderResponse.class);
-                viewJSP = (String) actionMethod.invoke(actionClass, renderRequest, renderResponse);
-            } catch (NoSuchMethodException e) {
-                StringWriter writerStr = new StringWriter();
-                    PrintWriter myPrinter = new PrintWriter(writerStr);
-                    e.printStackTrace(myPrinter);
-                    String stackTraceStr = writerStr.toString();
-                _log.error("action method: " + action + " not found" + stackTraceStr);
-            } catch (InvocationTargetException e) {
-                _log.error("failed to call method: " + action);
-            } catch (IllegalAccessException e) {
-                _log.error("failed to call method: " + action);
-            }
+        _log.error("doView called action = "+ ParamUtil.getString(renderRequest, "action"));
+
+        // The skip-delegate parameter is set by processAction. This allow us to set the jsp
+        // path and all the logic/data we need in processAction without being overwritten by
+        // doView.
+        if (!skipDoView) {
+            delegate(renderRequest, renderResponse);
         }
 
-        _log.debug("viewJSP in doView: "+viewJSP);
         include(viewJSP, renderRequest, renderResponse);
 	}
 
 	public void processAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws IOException, PortletException {
+        _log.error("processAction called action = " + ParamUtil.getString(actionRequest, "action"));
+        // We set the skipDoView property, to tell the doView that the processing is done
+        // by the processAction method.
+        skipDoView = true;
+        delegate(actionRequest, actionResponse);
 	}
+
+
+    /**
+     * Delegate method will call the respective method in the Actions class and pass the request
+     * and response objects. The method called in Actions is based on the "action" parameter value.
+     * The delegated methods in Actions class return the path to the jsp file that should be loaded.
+     * Those methods also set any parameters needed by the jsp files.
+     *
+     * @param request
+     * @param response
+     */
+    public void delegate(PortletRequest request, PortletResponse response) {
+        Method actionMethod;
+        String action;
+        viewJSP = JSP_DEFAULT_HOME;
+
+        // The portlet action can be set by the action/renderURLs using "action" as the parameter
+        // name or using the viewAction property from the Actions class.
+        action = (viewAction.equals("")) ? ParamUtil.getString(request, "action") : viewAction;
+        viewAction = "";
+
+        if (!action.equals("")) {
+            try {
+                actionMethod = Actions.class.getDeclaredMethod(action, PortletRequest.class,
+                        PortletResponse.class, JSPPortlet.class);
+                viewJSP = (String) actionMethod.invoke(actionClass, request, response, this);
+            } catch (NoSuchMethodException e) {
+                StringWriter writerStr = new StringWriter();
+                PrintWriter myPrinter = new PrintWriter(writerStr);
+                e.printStackTrace(myPrinter);
+                String stackTraceStr = writerStr.toString();
+                _log.error("action method: " + action + " not found" + stackTraceStr);
+            } catch (InvocationTargetException e) {
+                StringWriter writerStr = new StringWriter();
+                PrintWriter myPrinter = new PrintWriter(writerStr);
+                e.printStackTrace(myPrinter);
+                String stackTraceStr = writerStr.toString();
+                _log.error("failed to call method: " + action + stackTraceStr);
+            } catch (IllegalAccessException e) {
+                StringWriter writerStr = new StringWriter();
+                PrintWriter myPrinter = new PrintWriter(writerStr);
+                e.printStackTrace(myPrinter);
+                String stackTraceStr = writerStr.toString();
+                _log.error("failed to call method: " + action + stackTraceStr);
+            }
+        }
+
+        _log.debug("viewJSP in delegate: "+viewJSP);
+
+    }
 
 	protected void include(
 			String path, RenderRequest renderRequest,
@@ -138,7 +176,11 @@ public class JSPPortlet extends GenericPortlet {
 
     private static final String JSP_DEFAULT_HOME = "/jsp/home/start.jsp";
 
-	private static Log _log = LogFactoryUtil.getLog(JSPPortlet.class);
+    public boolean skipDoView = false;
+
+    public String viewAction = "";
+
+	private static Log _log = LogFactoryUtil.getLog(Actions.class);
     private Actions actionClass = new Actions();
 
 }

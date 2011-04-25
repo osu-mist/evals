@@ -92,7 +92,7 @@ public class CriteriaTests {
         expected.add(expectedCriteria);
         expected.add(expectedCriteria2);
 
-        Assert.assertEquals(expected.size(), activeCriteriaList.size());
+        Assert.assertEquals(activeCriteriaList.size(), expected.size());
         for (int i = 0; i < expected.size(); i++) {
             fakeCriteria = (CriterionArea) expected.get(i);
             dbCriteria = (CriterionArea) activeCriteriaList.get(i);
@@ -116,7 +116,7 @@ public class CriteriaTests {
         CriterionArea result = (CriterionArea) hsession.load(CriterionArea.class, 1);
         tx.commit();
 
-        Assert.assertEquals(2, result.getDetails().size());
+        Assert.assertEquals(result.getDetails().size(), 2);
         Assert.assertEquals(result.getCurrentDetail().getDescription(),
                 "How will you increase your communication skills?");
     }
@@ -203,32 +203,53 @@ public class CriteriaTests {
 
     }
 
+    @Test(groups={"unittest"})
+    public void shouldValidateAllFields() {
+        Session hsession = HibernateUtil.getSessionFactory().getCurrentSession();
+        Transaction tx = hsession.beginTransaction();
+        Employee createdBy = (Employee) hsession.load(Employee.class, 12345);
+        AppointmentType type = (AppointmentType) hsession.load(AppointmentType.class, 1);
+        tx.commit();
+
+        criterionObject.setName("");
+        criteriaDetailObject.setDescription("");
+        criteriaDetailObject.setCreatedBy(createdBy);
+        criterionObject.setAppointmentTypeID(type);
+        criterionObject.setSequence(1);
+        criterionObject.setCreatedBy(createdBy);
+        assert !criterionObject.validate() : "All fields in CriterionArea should check validation";
+        assert !criteriaDetailObject.validate() : "All fields in CriterionDetail should check validation";
+
+    }
+
     /**
      * Tests that saving a new Criteria object works correctly. The save method returns boolean
      * based on success of the operation.
      */
-    @Test(groups = {"unittest", "pending"})
+    @Test(groups = {"unittest"})
     public void addNewCriteria() {
         Session hsession = HibernateUtil.getSessionFactory().getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         Employee createdBy = (Employee) hsession.load(Employee.class, 12345);
         AppointmentType type = (AppointmentType) hsession.load(AppointmentType.class, 1);
+        tx.commit();
 
         criterionObject.setName("Communication");
         criteriaDetailObject.setDescription("How do you plan to improve your communication skills?");
+        criteriaDetailObject.setCreatedBy(createdBy);
         criterionObject.setAppointmentTypeID(type);
         criterionObject.setSequence(1);
         criterionObject.setCreatedBy(createdBy);
 
-        assert criterionObject.validate() : "Criteria should be valid";
-        assert criteriaDetailObject.validate() : "Criteria details should be valid";
+        assert criteriaObject.add(criterionObject, criteriaDetailObject) : "Valid data should save";
+    }
 
-        hsession.save(criterionObject);
-        criterionObject.addDetails(criteriaDetailObject);
-        hsession.save(criterionObject);
-        tx.commit();
-        //Assert.assertTrue(criterionObject.save());
-        //Assert.assertTrue(criteriaDetailObject.save());
+    @Test (groups = {"unittest"})
+    public void shouldReturnNextAvailableSequence() {
+
+        assert criteriaObject.getNextSequence(Criteria.DEFAULT_APPOINTMENT_TYPE) == 5 :
+                "Incorrect calculation of next sequence";
+
     }
 
     /**
