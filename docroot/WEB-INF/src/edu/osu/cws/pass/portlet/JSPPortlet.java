@@ -65,7 +65,6 @@ public class JSPPortlet extends GenericPortlet {
 		throws IOException, PortletException {
 
 		include(helpJSP, renderRequest, renderResponse);
-        HibernateUtil.getSessionFactory().close();
 	}
 
     /**

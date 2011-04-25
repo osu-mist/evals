@@ -1,5 +1,6 @@
 package edu.osu.cws.pass.util;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
@@ -70,7 +71,7 @@ public class HibernateUtil {
      *
      * @return  sessionFactory
      */
-    public static SessionFactory getSessionFactory() {
+    private static SessionFactory getSessionFactory() {
         try {
             if (sessionFactory == null) {
                 sessionFactory = buildSessionFactory();
@@ -92,6 +93,17 @@ public class HibernateUtil {
      */
     public static void setEnvironment(short env) {
         environment = env;
+    }
+
+    /**
+     * This method returns the current Hibernate Session. It relies on the
+     * private getSessionFactory method.
+     *
+     * @return
+     */
+    public static Session getCurrentSession() {
+        return getSessionFactory().getCurrentSession();
+
     }
     
 

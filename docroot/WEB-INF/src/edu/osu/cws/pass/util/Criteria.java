@@ -39,7 +39,7 @@ public class Criteria {
             return false;
         }
 
-        Session hsession = HibernateUtil.getSessionFactory().getCurrentSession();
+        Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         hsession.save(area);
         area.addDetails(details);
@@ -74,7 +74,7 @@ public class Criteria {
     public List list(int employeeTypeID) {
         Session hsession = null;
 
-        hsession = HibernateUtil.getSessionFactory().getCurrentSession();
+        hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         List result = hsession.createQuery("from edu.osu.cws.pass.models.CriterionArea").list();
         tx.commit();
@@ -113,7 +113,7 @@ public class Criteria {
         int availableSequence = 0;
         Session hsession = null;
 
-        hsession = HibernateUtil.getSessionFactory().getCurrentSession();
+        hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         Query countQry = hsession.createQuery("select count(*) from edu.osu.cws.pass.models.CriterionArea " +
                 "where appointmentTypeID = :appointmentTypeId");

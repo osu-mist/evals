@@ -16,7 +16,7 @@ public class Employees {
      * @return  Employee
      */
     public Employee findByOnid(String username) {
-        Session hsession = HibernateUtil.getSessionFactory().getCurrentSession();
+        Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         List employees = hsession.createQuery(
                 "from edu.osu.cws.pass.models.Employee where onid = ? and active = 1")

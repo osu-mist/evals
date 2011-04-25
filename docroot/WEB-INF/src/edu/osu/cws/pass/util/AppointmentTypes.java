@@ -14,7 +14,7 @@ public class AppointmentTypes {
      * @return
      */
     public List list() {
-        Session hsession = HibernateUtil.getSessionFactory().getCurrentSession();
+        Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         List result = hsession.createQuery("from edu.osu.cws.pass.models.AppointmentType").list();
         tx.commit();
@@ -28,7 +28,7 @@ public class AppointmentTypes {
      * @return
      */
     public AppointmentType findById(int id) {
-        Session hsession = HibernateUtil.getSessionFactory().getCurrentSession();
+        Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         AppointmentType appointmentType =
                 (AppointmentType) hsession.load(AppointmentType.class, id);

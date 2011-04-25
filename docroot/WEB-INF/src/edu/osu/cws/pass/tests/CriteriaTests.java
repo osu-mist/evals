@@ -111,7 +111,7 @@ public class CriteriaTests {
      */
     @Test(groups = {"unittest"})
     public void returnCurrentDetailsForCriterion() {
-        Session hsession = HibernateUtil.getSessionFactory().getCurrentSession();
+        Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         CriterionArea result = (CriterionArea) hsession.load(CriterionArea.class, 1);
         tx.commit();
@@ -205,7 +205,7 @@ public class CriteriaTests {
 
     @Test(groups={"unittest"})
     public void shouldValidateAllFields() {
-        Session hsession = HibernateUtil.getSessionFactory().getCurrentSession();
+        Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         Employee createdBy = (Employee) hsession.load(Employee.class, 12345);
         AppointmentType type = (AppointmentType) hsession.load(AppointmentType.class, 1);
@@ -228,7 +228,7 @@ public class CriteriaTests {
      */
     @Test(groups = {"unittest"})
     public void addNewCriteria() {
-        Session hsession = HibernateUtil.getSessionFactory().getCurrentSession();
+        Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         Employee createdBy = (Employee) hsession.load(Employee.class, 12345);
         AppointmentType type = (AppointmentType) hsession.load(AppointmentType.class, 1);
