@@ -9,6 +9,18 @@
 			<name>view-jsp</name>
 			<value>/view.jsp</value>
 		</init-param>
+        <init-param>
+            <name>home-jsp</name>
+            <value>/jsp/home/start.jsp</value>
+        </init-param>
+        <init-param>
+            <name>criteria-add-jsp</name>
+            <value>/jsp/criteria/add.jsp</value>
+        </init-param>
+        <init-param>
+            <name>criteria-list-jsp</name>
+            <value>/jsp/criteria/list.jsp</value>
+        </init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
 			<mime-type>text/html</mime-type>

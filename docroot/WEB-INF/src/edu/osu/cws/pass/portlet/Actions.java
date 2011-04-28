@@ -37,7 +37,7 @@ public class Actions {
     public String addCritera(ActionRequest actionRequest, ActionResponse actionResponse) {
 //        @todo: takes the request object and create the POJO objects
 //        @todo: calls the hibernate method createNewCriterion passing on the POJOs
-        return "/jsp/criteria/add.jsp";
+        return "criteria-list-jsp";
     }
 */
 
@@ -102,7 +102,7 @@ public class Actions {
         request.setAttribute("criterionArea", criterionArea);
         request.setAttribute("criterionDetail", criterionDetail);
 
-        return "/jsp/criteria/add.jsp";
+        return "criteria-add-jsp";
     }
 
     /**
@@ -135,7 +135,7 @@ public class Actions {
             _log.error("Hibernate exception - " + e.getMessage());
         }
 
-        return "/jsp/criteria/list.jsp";
+        return "criteria-list-jsp";
     }
 
     /**

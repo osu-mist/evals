@@ -27,10 +27,29 @@ import javax.portlet.*;
  */
 public class JSPPortlet extends GenericPortlet {
 
+	protected String viewJSP;
+
+    /**
+     * Specifies whether or not we skip doView method. This is set to true, when the
+     * processAction method has been called.
+     */
+    public boolean skipDoView = false;
+
+    /**
+     * Helper Liferay object to store error messages into the server's log file
+     */
+	private static Log _log = LogFactoryUtil.getLog(Actions.class);
+
+    /**
+     * The actions class
+     */
+    private Actions actionClass = new Actions();
+
     public void init() throws PortletException {
-		editJSP = getInitParameter("edit-jsp");
-		helpJSP = getInitParameter("help-jsp");
-		viewJSP = JSP_DEFAULT_HOME;
+        //@todo: copy the line below to store the config paths to jsp files
+        //editJSP = getInitParameter("edit-jsp");
+
+		viewJSP = getInitParameter("home-jsp");
         HibernateUtil.setEnvironment(HibernateUtil.DEVELOPMENT);
 	}
 
@@ -46,25 +65,6 @@ public class JSPPortlet extends GenericPortlet {
 		else {
 			super.doDispatch(renderRequest, renderResponse);
 		}
-	}
-
-	public void doEdit(
-			RenderRequest renderRequest, RenderResponse renderResponse)
-		throws IOException, PortletException {
-
-		if (renderRequest.getPreferences() == null) {
-			super.doEdit(renderRequest, renderResponse);
-		}
-		else {
-			include(editJSP, renderRequest, renderResponse);
-		}
-	}
-
-	public void doHelp(
-			RenderRequest renderRequest, RenderResponse renderResponse)
-		throws IOException, PortletException {
-
-		include(helpJSP, renderRequest, renderResponse);
 	}
 
     /**
@@ -97,6 +97,7 @@ public class JSPPortlet extends GenericPortlet {
 	public void processAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws IOException, PortletException {
+
         _log.error("processAction called action = " + ParamUtil.getString(actionRequest, "action"));
         // We set the skipDoView property, to tell the doView that the processing is done
         // by the processAction method.
@@ -117,7 +118,7 @@ public class JSPPortlet extends GenericPortlet {
     public void delegate(PortletRequest request, PortletResponse response) {
         Method actionMethod;
         String action;
-        viewJSP = JSP_DEFAULT_HOME;
+        viewJSP = getInitParameter("home-jsp");
 
         // The portlet action can be set by the action/renderURLs using "action" as the parameter
         // name
@@ -128,6 +129,8 @@ public class JSPPortlet extends GenericPortlet {
                 actionMethod = Actions.class.getDeclaredMethod(action, PortletRequest.class,
                         PortletResponse.class, JSPPortlet.class);
                 viewJSP = (String) actionMethod.invoke(actionClass, request, response, this);
+                // The action methods return the init-param of the path, we then need to grab the value
+                viewJSP = getInitParameter(viewJSP);
             } catch (NoSuchMethodException e) {
                 StringWriter writerStr = new StringWriter();
                 PrintWriter myPrinter = new PrintWriter(writerStr);
@@ -168,16 +171,4 @@ public class JSPPortlet extends GenericPortlet {
 			portletRequestDispatcher.include(renderRequest, renderResponse);
 		}
 	}
-
-	protected String editJSP;
-	protected String helpJSP;
-	protected String viewJSP;
-
-    private static final String JSP_DEFAULT_HOME = "/jsp/home/start.jsp";
-
-    public boolean skipDoView = false;
-
-	private static Log _log = LogFactoryUtil.getLog(Actions.class);
-    private Actions actionClass = new Actions();
-
 }
