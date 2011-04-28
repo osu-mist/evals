@@ -5,20 +5,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
-import edu.osu.cws.pass.models.AppointmentType;
-import edu.osu.cws.pass.models.CriterionArea;
-import edu.osu.cws.pass.models.CriterionDetail;
-import edu.osu.cws.pass.models.Employee;
+import edu.osu.cws.pass.models.*;
 import edu.osu.cws.pass.util.AppointmentTypes;
 import edu.osu.cws.pass.util.Criteria;
 import edu.osu.cws.pass.util.Employees;
-import edu.osu.cws.pass.util.HibernateUtil;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.HibernateException;
 
 import javax.portlet.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -61,6 +54,10 @@ public class Actions {
         CriterionArea criterionArea = new CriterionArea();
         CriterionDetail criterionDetail = new CriterionDetail();
 
+        // The processing for this action is done by processAction, we can skip the doView method in the
+        // portlet class.
+        portlet.skipDoView = true;
+
         //@todo: remove debug line below
 //        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
 //            _log.error(entry.getKey() + "/" + entry.getValue()[0]);
@@ -75,30 +72,30 @@ public class Actions {
             _log.error("Actions.addCriteria setting values for new form");
         } else {
             _log.error("Actions.addCriteria trying to save data");
+            _log.error("area name = "+ ParamUtil.getString(request, "name"));
+            _log.error("description name = " + ParamUtil.getString(request, "description"));
+
             AppointmentType appointmentType = appointmentTypes.findById(
                     ParamUtil.getInteger(request, "appointmentTypeID")
             );
             Employee createdBy = employees.findByOnid(getLoggedOnUsername(request));
 
-            _log.error("area name = "+ ParamUtil.getString(request, "name"));
             criterionArea.setName(ParamUtil.getString(request, "name"));
-            criterionArea.setSequence(criteriaArea.getNextSequence(Criteria.DEFAULT_APPOINTMENT_TYPE));
             criterionArea.setAppointmentTypeID(appointmentType);
-            criterionArea.setCreatedBy(createdBy);
-            _log.error("description name = " + ParamUtil.getString(request, "description"));
             criterionDetail.setDescription(ParamUtil.getString(request, "description"));
-            criterionDetail.setCreatedBy(createdBy);
 
-            if (criteriaArea.add(criterionArea, criterionDetail)) {
-                _log.error("criteriaArea add success");
-                SessionMessages.add(request, "criteria-saved");
-                portlet.skipDoView = false;
-                portlet.viewAction = "listCriteria";
-                return "/jsp/criteria/list.jsp";
-            } else {
-                _log.error("criteriaArea add fail");
-                this.addErrorsToSession(request, criterionArea.getErrorKeys());
-                this.addErrorsToSession(request, criterionDetail.getErrorKeys());
+            try {
+                if (criteriaArea.add(criterionArea, criterionDetail, getLoggedOnUsername(request))) {
+                    _log.error("criteriaArea add success");
+                    SessionMessages.add(request, "criteria-saved");
+                    return listCriteria(request, response, portlet);
+                }
+            } catch (ModelException e) {
+//                SessionErrors.add(request, e.getMessage());
+//                request.setAttribute("validation-error", e.getMessage());
+                addErrorsToRequest(request, e.getMessage());
+            } catch (HibernateException e) {
+                _log.error("Hibernate exception - " + e.getMessage());
             }
         }
 
@@ -130,8 +127,13 @@ public class Actions {
     public String listCriteria(PortletRequest request, PortletResponse response, JSPPortlet portlet) {
         int appointmentTypeID = ParamUtil.getInteger(request, "appointmentTypeID", Criteria.DEFAULT_APPOINTMENT_TYPE);
 
-        List foo = new Criteria().list(appointmentTypeID);
-        request.setAttribute("criteria", foo);
+        try {
+            request.setAttribute("criteria", new Criteria().list(appointmentTypeID));
+        } catch (ModelException e) {
+            SessionErrors.add(request, e.getMessage());
+        } catch (HibernateException e) {
+            _log.error("Hibernate exception - " + e.getMessage());
+        }
 
         return "/jsp/criteria/list.jsp";
     }
@@ -160,16 +162,13 @@ public class Actions {
     }
 
     /**
-     * Takes an ArrayList of errors and adds them to the session as errors.
+     * Takes an string error message and sets in the session.
      *
      * @param request
-     * @param errorKeys
+     * @param errorMsg
      */
-    private void addErrorsToSession(PortletRequest request, ArrayList<String> errorKeys) {
-        for (String errorKey : errorKeys) {
-            _log.error("adding errorKey: "+errorKey);
-            SessionErrors.add(request, "error-"+errorKey);
-        }
+    private void addErrorsToRequest(PortletRequest request, String errorMsg) {
+        request.setAttribute("errorMsg", errorMsg);
     }
 
     /**

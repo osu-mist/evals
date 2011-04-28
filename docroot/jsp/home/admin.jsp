@@ -1,5 +1,3 @@
-<%@ include file="/jsp/init.jsp" %>
-
 <%
 PortletURL criteriaListURL = renderResponse.createRenderURL();
 criteriaListURL.setWindowState(WindowState.NORMAL);

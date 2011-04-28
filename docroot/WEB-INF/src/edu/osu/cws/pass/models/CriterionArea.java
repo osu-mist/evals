@@ -33,6 +33,31 @@ public class CriterionArea extends Pass {
 
     private Set details = new HashSet();
 
+    /**
+     * Validation error message for name is public because the add.jsp
+     * needs to access this static variable in order to do js validation
+     */
+    public static final String nameRequired =
+            "Please enter an area name for the evaluation criteria";
+
+    /**
+     * Validation error message for Sequence
+     */
+    private static final String sequenceRequired =
+            "Please provide a sequence for the evaluation criteria";
+
+    /**
+     * Validation error message for Sequence
+     */
+    private static final String sequenceInvalid =
+            "Evaluation criteria sequence should be greater than 1";
+
+    /**
+     * Validation error message for Sequence
+     */
+    private static final String appointmentTypeRequired =
+            "Please select an appointment type";
+
     public CriterionArea() { }
 
     /**
@@ -46,7 +71,7 @@ public class CriterionArea extends Pass {
         // If there were any previous validation errors remove them.
         this.errors.remove("name");
         if (this.name == null || this.name.equals("")) {
-            nameErrors.add("criteria-name-required");
+            nameErrors.add(nameRequired);
         }
 
         if (nameErrors.size() > 0) {
@@ -67,9 +92,9 @@ public class CriterionArea extends Pass {
         // If there were any previous validation errors remove them.
         this.errors.remove("sequence");
         if (this.sequence == 0) {
-            sequenceErrors.add("criteria-sequence-required");
+            sequenceErrors.add(sequenceRequired);
         } else if (this.sequence < 1) {
-            sequenceErrors.add("criteria-sequence-invalid");
+            sequenceErrors.add(sequenceInvalid);
         }
 
         if (sequenceErrors.size() > 0) {
@@ -91,9 +116,9 @@ public class CriterionArea extends Pass {
         // If there were any previous validation errors remove them.
         this.errors.remove("appointmentType");
         if (this.appointmentTypeID == null) {
-            appointmentErrors.add("criteria-appointment-type-required");
+            appointmentErrors.add(appointmentTypeRequired);
         } else if (this.appointmentTypeID.getId() == 0) {
-            appointmentErrors.add("criteria-appointment-type-required");
+            appointmentErrors.add(appointmentTypeRequired);
         }
 
         if (appointmentErrors.size() > 0) {

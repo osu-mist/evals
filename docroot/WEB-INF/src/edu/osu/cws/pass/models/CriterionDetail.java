@@ -20,6 +20,13 @@ public class CriterionDetail extends Pass {
 
     private Employee createdBy;
 
+    /**
+     * descriptionRequired static variable is public because add.jsp needs to
+     * access it to provide js validation
+     */
+    public static final String descriptionRequired =
+            "Please enter an evaluation criteria description";
+
     public CriterionDetail() {}
 
     /**
@@ -33,7 +40,7 @@ public class CriterionDetail extends Pass {
         // If there were any previous validation errors remove them.
         this.errors.remove("description");
         if (this.description == null || this.description.equals("")) {
-            descriptionErrors.add("criteria-description-required");
+            descriptionErrors.add(descriptionRequired);
         }
 
         if (descriptionErrors.size() > 0) {

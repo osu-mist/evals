@@ -5,6 +5,7 @@
  */
 package edu.osu.cws.pass.models;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 
 import java.lang.reflect.Field;
@@ -25,7 +26,7 @@ public class Pass {
      */
     protected HashMap errors = new HashMap();
 
-    public boolean validate() {
+    public boolean validate() throws ModelException {
         String validateMethodName;
 
         for (Field field : this.getClass().getDeclaredFields()) {
@@ -41,8 +42,10 @@ public class Pass {
 //                _log.error("failed to call validation methods - IllegalAccessException");
             }
         }
-
-        return this.errors.size() == 0;
+        if (this.errors.size() > 0) {
+            throw new ModelException(StringUtils.join(getErrorKeys(), "\n"));
+        }
+        return true;
     }
 
 

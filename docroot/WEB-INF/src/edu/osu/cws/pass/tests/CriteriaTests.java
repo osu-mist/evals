@@ -3,12 +3,9 @@
  */
 package edu.osu.cws.pass.tests;
 
-import edu.osu.cws.pass.models.AppointmentType;
-import edu.osu.cws.pass.models.CriterionArea;
-import edu.osu.cws.pass.models.CriterionDetail;
+import edu.osu.cws.pass.models.*;
 
 
-import edu.osu.cws.pass.models.Employee;
 import edu.osu.cws.pass.util.Criteria;
 import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
@@ -48,12 +45,38 @@ public class CriteriaTests {
     }
 
     /**
+     * TestNG Dataprovider, returns an array of CriterionArea and CriteriondDetailObject
+     *
+     * @return
+     */
+    @DataProvider(name = "criteria")
+    public Object[][] createData1() {
+        initializeObjects();
+        Session hsession = HibernateUtil.getCurrentSession();
+        Transaction tx = hsession.beginTransaction();
+        Employee createdBy = (Employee) hsession.load(Employee.class, 12345);
+        AppointmentType type = (AppointmentType) hsession.load(AppointmentType.class, 1);
+        tx.commit();
+
+        criterionObject.setName("Some valid name");
+        criteriaDetailObject.setDescription("Some valid description");
+        criteriaDetailObject.setCreatedBy(createdBy);
+        criterionObject.setAppointmentTypeID(type);
+        criterionObject.setSequence(1);
+        criterionObject.setCreatedBy(createdBy);
+
+        return new Object[][] {
+                { criterionObject, criteriaDetailObject }
+        };
+    }
+
+    /**
      * Tests that fetching a list of active criteria for classified employees
      * works correctly. It checks that the correct associated CriterionDetail
      * are fetched as well.
      */
     @Test(groups = {"unittest"})
-    public void returnActiveCriteriaForClassified() {
+    public void returnActiveCriteriaForClassified() throws ModelException {
         List activeCriteriaList = criteriaObject.list(Criteria.DEFAULT_APPOINTMENT_TYPE);
         CriterionArea expectedCriteria = new CriterionArea();
         CriterionArea expectedCriteria2 = new CriterionArea();
@@ -203,22 +226,27 @@ public class CriteriaTests {
 
     }
 
-    @Test(groups={"unittest"})
-    public void shouldValidateAllFields() {
-        Session hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
-        Employee createdBy = (Employee) hsession.load(Employee.class, 12345);
-        AppointmentType type = (AppointmentType) hsession.load(AppointmentType.class, 1);
-        tx.commit();
+    @Test(groups={"unittest"}, expectedExceptions = {ModelException.class}, dataProvider = "criteria")
+    public void shouldValidateAllAreaFields(CriterionArea area, CriterionDetail details)
+            throws ModelException {
 
-        criterionObject.setName("");
-        criteriaDetailObject.setDescription("");
-        criteriaDetailObject.setCreatedBy(createdBy);
-        criterionObject.setAppointmentTypeID(type);
-        criterionObject.setSequence(1);
-        criterionObject.setCreatedBy(createdBy);
-        assert !criterionObject.validate() : "All fields in CriterionArea should check validation";
-        assert !criteriaDetailObject.validate() : "All fields in CriterionDetail should check validation";
+        area.setName("");
+        area.setSequence(0);
+        area.setAppointmentTypeID(new AppointmentType());
+        assert !area.validate() : "All fields in CriterionArea should check validation";
+    }
+
+    /**
+     * @param area
+     * @param details
+     * @throws ModelException
+     */
+    @Test(groups={"unittest"}, expectedExceptions = {ModelException.class}, dataProvider = "criteria")
+    public void shouldValidateAllCriteriaDetails(CriterionArea area, CriterionDetail details)
+            throws ModelException {
+
+        details.setDescription("");
+        assert !details.validate() : "All fields in CriterionDetail should check validation";
 
     }
 
@@ -227,7 +255,7 @@ public class CriteriaTests {
      * based on success of the operation.
      */
     @Test(groups = {"unittest"})
-    public void addNewCriteria() {
+    public void addNewCriteria() throws ModelException {
         Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         Employee createdBy = (Employee) hsession.load(Employee.class, 12345);
@@ -236,12 +264,11 @@ public class CriteriaTests {
 
         criterionObject.setName("Communication");
         criteriaDetailObject.setDescription("How do you plan to improve your communication skills?");
-        criteriaDetailObject.setCreatedBy(createdBy);
         criterionObject.setAppointmentTypeID(type);
         criterionObject.setSequence(1);
-        criterionObject.setCreatedBy(createdBy);
 
-        assert criteriaObject.add(criterionObject, criteriaDetailObject) : "Valid data should save";
+        assert criteriaObject.add(criterionObject, criteriaDetailObject, "cedenoj") :
+                    "Valid data should save";
     }
 
     @Test (groups = {"unittest"})

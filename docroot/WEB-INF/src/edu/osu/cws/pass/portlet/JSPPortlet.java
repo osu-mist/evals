@@ -89,6 +89,7 @@ public class JSPPortlet extends GenericPortlet {
         if (!skipDoView) {
             delegate(renderRequest, renderResponse);
         }
+        skipDoView = false;
 
         include(viewJSP, renderRequest, renderResponse);
 	}
@@ -119,9 +120,8 @@ public class JSPPortlet extends GenericPortlet {
         viewJSP = JSP_DEFAULT_HOME;
 
         // The portlet action can be set by the action/renderURLs using "action" as the parameter
-        // name or using the viewAction property from the Actions class.
-        action = (viewAction.equals("")) ? ParamUtil.getString(request, "action") : viewAction;
-        viewAction = "";
+        // name
+        action =  ParamUtil.getString(request, "action");
 
         if (!action.equals("")) {
             try {
@@ -176,8 +176,6 @@ public class JSPPortlet extends GenericPortlet {
     private static final String JSP_DEFAULT_HOME = "/jsp/home/start.jsp";
 
     public boolean skipDoView = false;
-
-    public String viewAction = "";
 
 	private static Log _log = LogFactoryUtil.getLog(Actions.class);
     private Actions actionClass = new Actions();

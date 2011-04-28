@@ -9,21 +9,11 @@ List appointmentTypes = (List) renderRequest.getAttribute("appointmentTypes");
 PortletURL addCriteriaURL = renderResponse.createActionURL();
 addCriteriaURL.setWindowState(WindowState.NORMAL);
 addCriteriaURL.setParameter("action", "addCriteria");
-
-//int criterionAreaId = ParamUtil.getInteger(renderRequest, "criterionAreaId");
-//CriterionArea criterionArea = (CriterionArea) renderRequest.getAttribute("criterionArea");
-//CriterionDetail criterionDetail = (CriterionDetail) renderRequest.getAttribute("criterionDetail");
-//String description = criterionDetail.getDescription();
-
 %>
 
 <h2>Add an Evaluation Criteria for Classified</h2>
 
-<liferay-ui:error key="error-criteria-name-required" message="criteria-name-required" />
-<liferay-ui:error key="error-criteria-description-required" message="criteria-description-required" />
-
-
-<form action="<%= addCriteriaURL.toString() %>" name="<portlet:namespace />fm" method="post">
+<form action="<%= addCriteriaURL.toString() %>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
 
 <input name="<portlet:namespace />criterionAreaId" type="hidden" value="${criterionArea.id}" />
 
@@ -33,7 +23,7 @@ addCriteriaURL.setParameter("action", "addCriteria");
             <liferay-ui:message key="name" />
         </td>
         <td>
-            <input type="text" name="<portlet:namespace />name" value="${criterionArea.name}" />
+            <input type="text" id="<portlet:namespace />name" name="<portlet:namespace />name" value="${criterionArea.name}" />
         </td>
     </tr>
     <tr>
@@ -63,3 +53,25 @@ addCriteriaURL.setParameter("action", "addCriteria");
     onClick="location.href = '<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>" />';" />
 
 </form>
+
+<script type="text/javascript">
+jQuery(document).ready(function() {
+  jQuery("#<portlet:namespace />fm").submit(function() {
+    var errors = "";
+    if (jQuery("#<portlet:namespace />name").val() == "") {
+      errors = "<li><%= CriterionArea.nameRequired %></li>";
+    }
+    if (jQuery("#<portlet:namespace />description").val() == "") {
+      errors += "<li><%= CriterionDetail.descriptionRequired %></li>"
+    }
+    if (errors != "") {
+      jQuery("#<portlet:namespace />flash").html(
+        '<span class="portlet-msg-error"><ul>'+errors+'</ul></span>'
+      );
+      return false;
+    }
+
+    return true;
+  });
+});
+</script>

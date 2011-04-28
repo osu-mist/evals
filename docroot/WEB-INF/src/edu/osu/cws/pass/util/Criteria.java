@@ -7,6 +7,9 @@ package edu.osu.cws.pass.util;
 
 import edu.osu.cws.pass.models.CriterionArea;
 import edu.osu.cws.pass.models.CriterionDetail;
+import edu.osu.cws.pass.models.Employee;
+import edu.osu.cws.pass.models.ModelException;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import edu.osu.cws.pass.util.*;
@@ -16,6 +19,8 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Criteria {
+
+    private Employees employees = new Employees();
 
     /**
      * The default appointment type to use when displaying criteria information.
@@ -28,9 +33,19 @@ public class Criteria {
      *
      * @param area      CriterionArea POJO
      * @param details   CriterionDetail POJO
+     * @param onid      Username of logged in user
      * @return errors   An array of error messages, but empty array on success.
+     * @throws edu.osu.cws.pass.models.ModelException
      */
-    public boolean add(CriterionArea area, CriterionDetail details) {
+    public boolean add(CriterionArea area, CriterionDetail details, String onid)
+            throws ModelException {
+        int sequence = getNextSequence(area.getAppointmentTypeID().getId());
+        Employee createdBy = employees.findByOnid(onid);
+
+        area.setCreatedBy(createdBy);
+        area.setSequence(sequence);
+        details.setCreatedBy(createdBy);
+
         // validate both objects individually and then check for errors
         area.validate();
         details.validate();
@@ -39,11 +54,11 @@ public class Criteria {
             return false;
         }
 
-        Session hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
-        hsession.save(area);
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+        session.save(area);
         area.addDetails(details);
-        hsession.save(details);
+        session.save(details);
         tx.commit();
         return true;
 
@@ -59,26 +74,42 @@ public class Criteria {
      * @param area      CriterionArea POJO
      * @param details   CriterionDetail POJO
      * @return errors   An array of error messages, but empty array on success.
+     * @throws edu.osu.cws.pass.models.ModelException
      */
-    public String[] edit(CriterionArea area, CriterionDetail details) {
+    public String[] edit(CriterionArea area, CriterionDetail details)
+            throws ModelException {
         return new String[2];
     }
 
     /**
-     * Takes an employeeTypeID and uses hibernate to fetch the CriterionArea POJOs. If
-     * there are none, it returns an empty CriterionArea array.
+     * Takes an employeeTypeID, gets a Hibernate session object and calls a private method
+     * to call the private method that just uses Hibernate to fetch the list of criteria.
      *
      * @param employeeTypeID
-     * @return criterias        Array of CriterionAreas
+     * @return criteria        List of CriterionAreas
+     * @throws edu.osu.cws.pass.models.ModelException
      */
-    public List list(int employeeTypeID) {
-        Session hsession = null;
+    public List list(int employeeTypeID) throws ModelException {
+        Session session = null;
+        session = HibernateUtil.getCurrentSession();
+        return this.list(employeeTypeID, session);
+    }
 
-        hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
-        List result = hsession.createQuery("from edu.osu.cws.pass.models.CriterionArea").list();
+    /**
+     * Takes an employeeTypeID, a Hibernate session and uses Hibernate to fetch the list of
+     * CriterionArea.
+     *
+     * @param employeeTypeID
+     * @param session
+     * @return criteria     List of CriterionAreas
+     * @throws org.hibernate.HibernateException
+     */
+    private List list(int employeeTypeID, Session session) throws HibernateException {
+        Transaction tx = session.beginTransaction();
+        List result = session.createQuery("from edu.osu.cws.pass.models.CriterionArea").list();
         tx.commit();
         return result;
+
     }
 
     /**
