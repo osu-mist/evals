@@ -46,9 +46,6 @@ public class JSPPortlet extends GenericPortlet {
     private Actions actionClass = new Actions();
 
     public void init() throws PortletException {
-        //@todo: copy the line below to store the config paths to jsp files
-        //editJSP = getInitParameter("edit-jsp");
-
 		viewJSP = getInitParameter("home-jsp");
         HibernateUtil.setEnvironment(HibernateUtil.DEVELOPMENT);
 	}

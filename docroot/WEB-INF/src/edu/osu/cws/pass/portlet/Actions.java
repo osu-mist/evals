@@ -28,22 +28,6 @@ public class Actions {
      * Takes the request object and creates POJO objects. Then it calls the respective
      * Hibernate util classes passing the POJOs to handle the saving of data and
      * validation.
-     *
-     * @param actionRequest
-     * @param actionResponse
-     * @return jsp
-     */
-/*
-    public String addCritera(ActionRequest actionRequest, ActionResponse actionResponse) {
-//        @todo: takes the request object and create the POJO objects
-//        @todo: calls the hibernate method createNewCriterion passing on the POJOs
-        return "criteria-list-jsp";
-    }
-*/
-
-    /**
-     * This method is called when the user wants to add a Criteria. It is used
-     *
      * @param request
      * @param response
      * @param portlet
@@ -57,11 +41,6 @@ public class Actions {
         // The processing for this action is done by processAction, we can skip the doView method in the
         // portlet class.
         portlet.skipDoView = true;
-
-        //@todo: remove debug line below
-//        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-//            _log.error(entry.getKey() + "/" + entry.getValue()[0]);
-//        }
 
         // Fetch list of appointment types to use in add form
         request.setAttribute("appointmentTypes", new AppointmentTypes().list());
