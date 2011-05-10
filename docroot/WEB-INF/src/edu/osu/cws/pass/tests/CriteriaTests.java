@@ -61,7 +61,7 @@ public class CriteriaTests {
         criterionObject.setName("Some valid name");
         criteriaDetailObject.setDescription("Some valid description");
         criteriaDetailObject.setCreatedBy(createdBy);
-        criterionObject.setAppointmentTypeID(type);
+        criterionObject.setAppointmentType(type);
         criterionObject.setSequence(1);
         criterionObject.setCreatedBy(createdBy);
 
@@ -93,7 +93,7 @@ public class CriteriaTests {
 
         expectedCriteria.setId(1);
         expectedCriteria.setName("COMMUNICATION SKILLS");
-        expectedCriteria.setAppointmentTypeID(type);
+        expectedCriteria.setAppointmentType(type);
         expectedCriteria.setSequence(1);
         expectedCriteria.setCreatedBy(new Employee());
         expectedCriteria.setDetails(new HashSet<CriterionDetail>());
@@ -103,7 +103,7 @@ public class CriteriaTests {
 
         expectedCriteria2.setId(2);
         expectedCriteria2.setName("TECHNICAL SKILLS");
-        expectedCriteria2.setAppointmentTypeID(type);
+        expectedCriteria2.setAppointmentType(type);
         expectedCriteria2.setSequence(2);
         expectedCriteria2.setCreatedBy(new Employee());
         expectedCriteria2.setDetails(new HashSet<CriterionDetail>());
@@ -186,22 +186,22 @@ public class CriteriaTests {
      */
     @Test(groups = {"unittest"})
     public void shouldRequireAppointmentType() {
-        assert !criterionObject.validateAppointmentTypeID() :
+        assert !criterionObject.validateAppointmentType() :
                 "A valid appointment type should be required";
         assert criterionObject.getErrors().containsKey("appointmentType") :
                 "Missing sequence error msg";
 
         AppointmentType type = new AppointmentType();
-        criterionObject.setAppointmentTypeID(type);
-        assert !criterionObject.validateAppointmentTypeID():
+        criterionObject.setAppointmentType(type);
+        assert !criterionObject.validateAppointmentType():
                 "A valid appointment type should be required";
         assert criterionObject.getErrors().containsKey("appointmentType") :
                 "Missing sequence error msg";
 
         type.setId(1);
         type.setName("Classified");
-        criterionObject.setAppointmentTypeID(type);
-        assert criterionObject.validateAppointmentTypeID():
+        criterionObject.setAppointmentType(type);
+        assert criterionObject.validateAppointmentType():
                 "Appointment type should validate";
         assert !criterionObject.getErrors().containsKey("appointmentType") :
                 "No appointmentType error msg should be present";
@@ -225,7 +225,7 @@ public class CriteriaTests {
 
         area.setName("");
         area.setSequence(0);
-        area.setAppointmentTypeID(new AppointmentType());
+        area.setAppointmentType(new AppointmentType());
         assert !area.validate() : "All fields in CriterionArea should check validation";
     }
 
@@ -257,7 +257,7 @@ public class CriteriaTests {
 
         criterionObject.setName("Communication");
         criteriaDetailObject.setDescription("How do you plan to improve your communication skills?");
-        criterionObject.setAppointmentTypeID(type);
+        criterionObject.setAppointmentType(type);
         criterionObject.setSequence(1);
 
         assert criteriaObject.add(criterionObject, criteriaDetailObject, "cedenoj") :

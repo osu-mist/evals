@@ -10,7 +10,6 @@ import edu.osu.cws.pass.models.CriterionDetail;
 import edu.osu.cws.pass.models.Employee;
 import edu.osu.cws.pass.models.ModelException;
 import org.hibernate.*;
-import edu.osu.cws.pass.util.*;
 
 import java.util.Iterator;
 import java.util.List;
@@ -36,7 +35,7 @@ public class Criteria {
      */
     public boolean add(CriterionArea area, CriterionDetail details, String onid)
             throws ModelException {
-        int sequence = getNextSequence(area.getAppointmentTypeID().getId());
+        int sequence = getNextSequence(area.getAppointmentType().getId());
         Employee createdBy = employees.findByOnid(onid);
 
         area.setCreatedBy(createdBy);

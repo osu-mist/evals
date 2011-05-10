@@ -55,7 +55,7 @@ public class Actions {
             );
 
             criterionArea.setName(ParamUtil.getString(request, "name"));
-            criterionArea.setAppointmentTypeID(appointmentType);
+            criterionArea.setAppointmentType(appointmentType);
             criterionDetail.setDescription(ParamUtil.getString(request, "description"));
 
             try {

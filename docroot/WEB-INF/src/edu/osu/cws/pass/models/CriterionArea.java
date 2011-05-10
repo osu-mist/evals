@@ -17,7 +17,7 @@ public class CriterionArea extends Pass {
 
     private String name = "";
 
-    private AppointmentType appointmentTypeID;
+    private AppointmentType appointmentType;
 
     private CriterionArea originalID;
 
@@ -110,14 +110,14 @@ public class CriterionArea extends Pass {
      *
      * @return
      */
-    public boolean validateAppointmentTypeID() {
+    public boolean validateAppointmentType() {
         ArrayList<String> appointmentErrors = new ArrayList<String>();
 
         // If there were any previous validation errors remove them.
         this.errors.remove("appointmentType");
-        if (this.appointmentTypeID == null) {
+        if (this.appointmentType == null) {
             appointmentErrors.add(appointmentTypeRequired);
-        } else if (this.appointmentTypeID.getId() == 0) {
+        } else if (this.appointmentType.getId() == 0) {
             appointmentErrors.add(appointmentTypeRequired);
         }
 
@@ -154,12 +154,12 @@ public class CriterionArea extends Pass {
         this.name = name;
     }
 
-    public AppointmentType getAppointmentTypeID() {
-        return appointmentTypeID;
+    public AppointmentType getAppointmentType() {
+        return appointmentType;
     }
 
-    public void setAppointmentTypeID(AppointmentType appointmentTypeID) {
-        this.appointmentTypeID = appointmentTypeID;
+    public void setAppointmentType(AppointmentType appointmentType) {
+        this.appointmentType = appointmentType;
     }
 
     public CriterionArea getOriginalID() {
