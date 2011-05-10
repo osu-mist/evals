@@ -217,13 +217,6 @@ public class CriteriaTests {
                 "A valid description should be required";
         assert criteriaDetailObject.getErrors().containsKey("description") :
                 "Missing description error msg";
-
-//        criteriaDetailObject.setDescription("");
-//        criteriaDetailObject.validateDescription() :
-//                "A valid description should be required";
-//        criteriaDetailObject.getErrors().containsKey("")
-
-
     }
 
     @Test(groups={"unittest"}, expectedExceptions = {ModelException.class}, dataProvider = "criteria")

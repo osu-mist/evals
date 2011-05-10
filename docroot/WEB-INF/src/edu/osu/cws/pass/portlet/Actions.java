@@ -50,14 +50,9 @@ public class Actions {
         if (ParamUtil.getString(request, "criterionAreaId").equals("")) {
             _log.error("Actions.addCriteria setting values for new form");
         } else {
-            _log.error("Actions.addCriteria trying to save data");
-            _log.error("area name = "+ ParamUtil.getString(request, "name"));
-            _log.error("description name = " + ParamUtil.getString(request, "description"));
-
             AppointmentType appointmentType = appointmentTypes.findById(
                     ParamUtil.getInteger(request, "appointmentTypeID")
             );
-            Employee createdBy = employees.findByOnid(getLoggedOnUsername(request));
 
             criterionArea.setName(ParamUtil.getString(request, "name"));
             criterionArea.setAppointmentTypeID(appointmentType);
@@ -70,8 +65,6 @@ public class Actions {
                     return listCriteria(request, response, portlet);
                 }
             } catch (ModelException e) {
-//                SessionErrors.add(request, e.getMessage());
-//                request.setAttribute("validation-error", e.getMessage());
                 addErrorsToRequest(request, e.getMessage());
             } catch (HibernateException e) {
                 _log.error("Hibernate exception - " + e.getMessage());
