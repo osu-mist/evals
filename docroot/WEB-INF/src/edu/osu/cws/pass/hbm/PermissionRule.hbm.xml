@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false" >
+
+    <class name="edu.osu.cws.pass.models.PermissionRule" table="permission_rules">
+        <id name="id" type="int">
+            <generator class="native" />
+        </id>
+
+        <property name="status" length="32"/>
+        <property name="role" length="45"/>
+        <property name="goals" length="1"/>
+        <property name="results" length="1"/>
+        <property name="resultComments" length="1"/>
+        <property name="evaluation" length="1"/>
+        <property name="review" length="1"/>
+        <property name="saveDraft" length="45"/>
+        <property name="requireModification" length="45"/>
+        <property name="submit" length="45"/>
+        <property name="actionRequired" length="45"/>
+    </class>
+
+</hibernate-mapping>
