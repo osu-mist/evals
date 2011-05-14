@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false" >
+
+    <class name="edu.osu.cws.pass.models.Job" table="jobs">
+        <id name="id" type="int">
+            <generator class="native" />
+        </id>
+
+        <property name="positionNumber" type="string" length="8"/>
+        <property name="suffix" type="string" length="2"/>
+        <property name="jobEcls" type="string" length="45"/>
+        <property name="beginDate" type="date"/>
+        <property name="endDate" type="date"/>
+        <property name="positionClass" type="string" length="45"/>
+        <property name="tsOrgCode" type="string" length="45"/>
+        <property name="orgCodeDescription" type="string" length="45"/>
+
+        <many-to-one name="employeePidm" class="edu.osu.cws.pass.models.Employee" not-null="true"/>
+        <many-to-one name="supervisorPidm" class="edu.osu.cws.pass.models.Employee" not-null="true"/>
+        <many-to-one name="appointmentType" class="edu.osu.cws.pass.models.AppointmentType" column="appointmentTypeID" not-null="true"/>
+        <many-to-one name="businessCenterID" class="edu.osu.cws.pass.models.BusinessCenter" not-null="true"/>
+
+    </class>
+
+</hibernate-mapping>
