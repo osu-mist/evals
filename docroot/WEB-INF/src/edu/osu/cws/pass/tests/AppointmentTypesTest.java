@@ -12,7 +12,7 @@ import java.util.List;
 @Test
 public class AppointmentTypesTest {
 
-    AppointmentTypes appointmentTypes;
+    AppointmentTypes appointmentTypes = new AppointmentTypes();
 
     @BeforeClass
     public void setUp() {
@@ -26,9 +26,9 @@ public class AppointmentTypesTest {
 
     @Test(groups = {"unittest"})
     public void testList() {
-        List appointmentTypes = this.appointmentTypes.list();
-        assert appointmentTypes.size() == 1 : "Invalid number of appointment types.";
-        AppointmentType type = (AppointmentType) appointmentTypes.get(0);
+        List types = appointmentTypes.list();
+        assert types.size() == 1 : "Invalid number of appointment types.";
+        AppointmentType type = (AppointmentType) types.get(0);
         assert type.getName().equals("Classified") : "Invalid appointment type";
     }
 }
