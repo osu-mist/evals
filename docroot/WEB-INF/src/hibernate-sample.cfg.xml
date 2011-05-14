@@ -10,17 +10,13 @@ This is a sample hibernate configuration file. You have to copy this file to
 <hibernate-configuration>
     <session-factory>
         <!-- MySQL -->
-
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
         <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
         <property name="hibernate.connection.url">jdbc:mysql://hostname:3306/dbname?useUnicode=true&amp;characterEncoding=UTF-8</property>
         <property name="hibernate.connection.username">secret</property>
         <property name="hibernate.connection.password">password</property>
 
-        <!-- Sessions and transactions -->
-        <!-- Sessions and transactions -->
         <!-- Use the C3P0 connection pool provider -->
-
         <property name="hibernate.c3p0.min_size">5</property>
         <property name="hibernate.c3p0.max_size">20</property>
         <property name="hibernate.c3p0.timeout">300</property>
@@ -30,7 +26,6 @@ This is a sample hibernate configuration file. You have to copy this file to
 
 
         <property name="current_session_context_class">thread</property>
-
 
         <!-- Disable second-level cache. -->
         <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
@@ -42,15 +37,22 @@ This is a sample hibernate configuration file. You have to copy this file to
         <property name="show_sql">true</property>
 
         <!-- Drop and re-create the database schema on startup -->
-
         <property name="hbm2ddl.auto">update</property>
         <property name="hbm2ddl.auto">validate</property>
 
         <!-- Mappings -->
+        <mapping resource="edu/osu/cws/pass/hbm/Admin.hbm.xml" />
         <mapping resource="edu/osu/cws/pass/hbm/AppointmentType.hbm.xml" />
         <mapping resource="edu/osu/cws/pass/hbm/BusinessCenter.hbm.xml" />
         <mapping resource="edu/osu/cws/pass/hbm/CriterionArea.hbm.xml" />
         <mapping resource="edu/osu/cws/pass/hbm/CriterionDetail.hbm.xml" />
         <mapping resource="edu/osu/cws/pass/hbm/Employee.hbm.xml" />
+        <mapping resource="edu/osu/cws/pass/hbm/Job.hbm.xml"/>
+        <mapping resource="edu/osu/cws/pass/hbm/Appraisal.hbm.xml"/>
+        <mapping resource="edu/osu/cws/pass/hbm/Assessment.hbm.xml"/>
+        <mapping resource="edu/osu/cws/pass/hbm/AssessmentLog.hbm.xml"/>
+        <mapping resource="edu/osu/cws/pass/hbm/EmailType.hbm.xml"/>
+        <mapping resource="edu/osu/cws/pass/hbm/AppraisalStep.hbm.xml"/>
+        <mapping resource="edu/osu/cws/pass/hbm/PermissionRule.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>
