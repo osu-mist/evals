@@ -1,0 +1,65 @@
+package edu.osu.cws.pass.models;
+
+public class AppraisalStep extends Pass {
+    private int id;
+
+    private String action;
+
+    private AppointmentType appointmentType;
+
+    private String originalStatus;
+
+    private String newStatus;
+
+    private EmailType emailType;
+
+    public AppraisalStep() { }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public AppointmentType getAppointmentType() {
+        return appointmentType;
+    }
+
+    public void setAppointmentType(AppointmentType appointmentType) {
+        this.appointmentType = appointmentType;
+    }
+
+    public String getOriginalStatus() {
+        return originalStatus;
+    }
+
+    public void setOriginalStatus(String originalStatus) {
+        this.originalStatus = originalStatus;
+    }
+
+    public String getNewStatus() {
+        return newStatus;
+    }
+
+    public void setNewStatus(String newStatus) {
+        this.newStatus = newStatus;
+    }
+
+    public EmailType getEmailType() {
+        return emailType;
+    }
+
+    public void setEmailType(EmailType emailType) {
+        this.emailType = emailType;
+    }
+}

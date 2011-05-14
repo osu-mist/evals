@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false" >
+
+    <class name="edu.osu.cws.pass.models.AppraisalStep" table="appraisal_steps">
+        <id name="id" type="int">
+            <generator class="native" />
+        </id>
+
+        <property name="action" length="45"/>
+        <property name="originalStatus" length="32"/>
+        <property name="newStatus" length="32"/>
+        <many-to-one name="appointmentType" class="edu.osu.cws.pass.models.AppointmentType" column="appointmentTypeID" not-null="true"/>
+        <many-to-one name="emailType" class="edu.osu.cws.pass.models.EmailType" column="emailTypeID" not-null="true"/>
+    </class>
+</hibernate-mapping>
