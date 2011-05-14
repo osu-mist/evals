@@ -8,6 +8,8 @@ public class BusinessCenter extends Pass {
 
     private String name;
 
+    public BusinessCenter() { }
+
     public int getId() {
         return id;
     }
