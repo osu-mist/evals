@@ -12,15 +12,14 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.testng.Assert;
 import org.testng.annotations.*;
-
 import java.util.*;
 
 @Test
 public class CriteriaTests {
 
-    CriterionArea criterionObject;
-    CriterionDetail criteriaDetailObject;
-    Criteria criteriaObject;
+    CriterionArea criterionObject = new CriterionArea();
+    CriterionDetail criteriaDetailObject = new CriterionDetail();
+    Criteria criteriaObject = new Criteria();
 
     /**
      * This setup method is run before this class gets executed in order to
@@ -28,9 +27,14 @@ public class CriteriaTests {
      * the testing db for tests.
      *
      */
-    @BeforeClass
+//    @BeforeClass
+    @BeforeMethod
     public void setUp() {
         HibernateUtil.setEnvironment(HibernateUtil.TESTING);
+        DBUnit dbunit = new DBUnit();
+        try {
+            dbunit.seedDatabase();
+        } catch (Exception e) {}
     }
 
     /**
@@ -42,6 +46,7 @@ public class CriteriaTests {
         criterionObject = new CriterionArea();
         criteriaDetailObject = new CriterionDetail();
         criteriaObject = new Criteria();
+        setUp();
     }
 
     /**
@@ -77,6 +82,7 @@ public class CriteriaTests {
      */
     @Test(groups = {"unittest"})
     public void returnActiveCriteriaForClassified() throws ModelException {
+        setUp();
         List activeCriteriaList = criteriaObject.list(Criteria.DEFAULT_APPOINTMENT_TYPE);
         CriterionArea expectedCriteria = new CriterionArea();
         CriterionArea expectedCriteria2 = new CriterionArea();
@@ -168,6 +174,7 @@ public class CriteriaTests {
      */
     @Test(groups = {"unittest"})
     public void shouldRequireASequence() {
+        criterionObject.setSequence(0);
         assert !criterionObject.validateSequence() : "Sequence should be required";
         assert criterionObject.getErrors().containsKey("sequence") : "Missing sequence error msg";
 
@@ -186,6 +193,7 @@ public class CriteriaTests {
      */
     @Test(groups = {"unittest"})
     public void shouldRequireAppointmentType() {
+        criterionObject.setAppointmentType(null);
         assert !criterionObject.validateAppointmentType() :
                 "A valid appointment type should be required";
         assert criterionObject.getErrors().containsKey("appointmentType") :
@@ -266,8 +274,8 @@ public class CriteriaTests {
 
     @Test (groups = {"unittest"})
     public void shouldReturnNextAvailableSequence() {
-
-        assert criteriaObject.getNextSequence(Criteria.DEFAULT_APPOINTMENT_TYPE) == 5 :
+        setUp();
+        assert criteriaObject.getNextSequence(Criteria.DEFAULT_APPOINTMENT_TYPE) == 3 :
                 "Incorrect calculation of next sequence";
 
     }
