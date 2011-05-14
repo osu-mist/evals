@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false" >
+
+    <class name="edu.osu.cws.pass.models.Appraisal" table="appraisals">
+        <id name="id" type="int">
+            <generator class="native" />
+        </id>
+
+        <property name="startDate" type="date"/>
+        <property name="endDate" type="date"/>
+        <property name="goalApprovedDate" type="timestamp"/>
+        <property name="goalComments" type="text"/>
+        <property name="resultSubmitDate" type="timestamp"/>
+        <property name="evaluation" type="text"/>
+        <property name="rating" type="int" length="1"/>
+        <property name="hrApprovedDate" type="timestamp"/>
+        <property name="hrComments" type="text"/>
+        <property name="createDate" type="timestamp"/>
+        <property name="modifiedDate" type="timestamp"/>
+        <property name="employeeComments" type="text"/>
+        <property name="employeeSignedDate" type="timestamp"/>
+        <property name="emailType" length="45"/>
+        <property name="emailDate" type="date"/>
+        <property name="emailCount" type="int"/>
+        <property name="closeOutDate" type="timestamp"/>
+        <property name="closeOutReason" type="text"/>
+        <property name="status" length="45"/>
+
+        <many-to-one name="job" class="edu.osu.cws.pass.models.Job" column="jobID" not-null="true"/>
+        <many-to-one name="goalApprover" class="edu.osu.cws.pass.models.Employee" column="goalApproverID" not-null="false"/>
+        <many-to-one name="hrApprover" class="edu.osu.cws.pass.models.Employee" column="hrApproverID" not-null="false"/>
+        <many-to-one name="closeOutBy" class="edu.osu.cws.pass.models.Employee" not-null="false"/>
+    </class>
+
+</hibernate-mapping>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false" >
+
+    <class name="edu.osu.cws.pass.models.Assessment" table="assessments">
+        <id name="id" type="int">
+            <generator class="native" />
+        </id>
+
+        <property name="goal" type="text"/>
+        <property name="employeeResult" type="text"/>
+        <property name="supervisorResult" type="text"/>
+        <property name="createDate" type="timestamp"/>
+        <property name="modifiedDate" type="timestamp"/>
+
+        <many-to-one name="appraisal" class="edu.osu.cws.pass.models.Appraisal" column="appraisalID" not-null="true"/>
+        <many-to-one name="criterionDetail" class="edu.osu.cws.pass.models.CriterionDetail" column="criterionDetailID" not-null="true"/>
+    </class>
+
+</hibernate-mapping>

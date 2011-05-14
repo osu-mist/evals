@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false" >
+
+    <class name="edu.osu.cws.pass.models.AssessmentLog" table="assessment_logs">
+        <id name="id" type="int">
+            <generator class="native" />
+        </id>
+
+        <property name="content" type="text"/>
+        <property name="createDate" type="timestamp"/>
+
+        <many-to-one name="assessment" class="edu.osu.cws.pass.models.Assessment" column="assessmentID" not-null="true"/>
+        <many-to-one name="author" class="edu.osu.cws.pass.models.Employee" column="authorPidm" not-null="true"/>
+    </class>
+
+</hibernate-mapping>
