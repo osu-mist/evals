@@ -1,6 +1,8 @@
 package edu.osu.cws.pass.models;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Assessment extends Pass {
     private int id;
@@ -19,7 +21,16 @@ public class Assessment extends Pass {
 
     private Date modifiedDate;
 
+    private Set<AssessmentLog> assessmentLogs = new HashSet<AssessmentLog>();
+
     public Assessment() { }
+
+    public AssessmentLog getLastAssessmentLog() {
+        if (assessmentLogs.size() == 0) {
+            return new AssessmentLog();
+        }
+        return (AssessmentLog) assessmentLogs.toArray()[0];
+    }
 
     public int getId() {
         return id;
@@ -83,5 +94,18 @@ public class Assessment extends Pass {
 
     public void setModifiedDate(Date modifiedDate) {
         this.modifiedDate = modifiedDate;
+    }
+
+    public Set<AssessmentLog> getAssessmentLogs() {
+        return assessmentLogs;
+    }
+
+    public void setAssessmentLogs(Set<AssessmentLog> assessmentLogs) {
+        this.assessmentLogs = assessmentLogs;
+    }
+
+    public void addAssessmentLog(AssessmentLog assessmentLog) {
+        assessmentLog.setAssessment(this);
+        this.assessmentLogs.add(assessmentLog);
     }
 }

@@ -5,7 +5,7 @@ import java.util.Date;
 public class AssessmentLog extends Pass {
     private int id;
 
-    private String content;
+    private String content = "";
 
     private Employee author;
 

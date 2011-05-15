@@ -2,6 +2,8 @@ package edu.osu.cws.pass.models;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Appraisal extends Pass {
     private int id;
@@ -83,6 +85,8 @@ public class Appraisal extends Pass {
     private Employee closeOutBy;
 
     private String closeOutReason;
+
+    private Set<Assessment> assessments = new HashSet<Assessment>();
 
     private static final String jobRequired =
             "Please provide a valid job";
@@ -306,4 +310,16 @@ public class Appraisal extends Pass {
         this.closeOutReason = closeOutReason;
     }
 
+    public Set<Assessment> getAssessments() {
+        return assessments;
+    }
+
+    public void setAssessments(Set<Assessment> assessments) {
+        this.assessments = assessments;
+    }
+
+    public void addAssessment(Assessment assessment) {
+        assessment.setAppraisal(this);
+        this.assessments.add(assessment);
+    }
 }
