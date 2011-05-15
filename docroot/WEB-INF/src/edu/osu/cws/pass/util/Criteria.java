@@ -85,7 +85,7 @@ public class Criteria {
      * @return criteria        List of CriterionAreas
      * @throws edu.osu.cws.pass.models.ModelException
      */
-    public List list(int employeeTypeID) throws ModelException {
+    public List<CriterionArea> list(int employeeTypeID) throws ModelException {
         Session session = null;
         session = HibernateUtil.getCurrentSession();
         return this.list(employeeTypeID, session);
@@ -100,7 +100,7 @@ public class Criteria {
      * @return criteria     List of CriterionAreas
      * @throws org.hibernate.HibernateException
      */
-    private List list(int employeeTypeID, Session session) throws HibernateException {
+    private List<CriterionArea> list(int employeeTypeID, Session session) throws HibernateException {
         Transaction tx = session.beginTransaction();
         List result = session.createQuery("from edu.osu.cws.pass.models.CriterionArea").list();
         tx.commit();

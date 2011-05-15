@@ -22,6 +22,7 @@ public class AppointmentTypesTest {
     @BeforeMethod
     public void initializeObjects() {
         appointmentTypes = new AppointmentTypes();
+        setUp();
     }
 
     @Test(groups = {"unittest"})
