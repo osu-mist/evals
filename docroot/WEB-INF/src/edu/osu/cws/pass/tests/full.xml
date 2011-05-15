@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <admins id="1" employeeID="12345" isMaster="true" isBackupMaster="false" createDate="2011-05-14 07:41:11.0" createdBy="12345" modifiedDate="2011-05-14 07:41:11.0"/>
+  <admins id="2" employeeID="12467" isMaster="false" isBackupMaster="true" createDate="2011-05-14 07:41:11.0" createdBy="12345" modifiedDate="2011-05-14 07:41:11.0"/>
+  <appointment_types id="1" name="Classified"/>
+  <appraisal_steps id="1" action="submit" appointmentTypeID="1" originalStatus="goals-due" newStatus="goals-submitted" emailTypeID="goals-submitted"/>
+  <appraisal_steps id="2" action="require-modification" appointmentTypeID="1" originalStatus="goals-submitted" newStatus="goals-require-modification" emailTypeID="goals-require-modification"/>
+  <appraisals/>
+  <assessment_logs/>
+  <assessments/>
+  <business_centers id="1" name="UABC"/>
+  <criteria_areas id="1" name="COMMUNICATION SKILLS" appointmentTypeID="1" sequence="1" createDate="2011-04-10 20:16:48.0" createdBy="12345" deleteDate="2011-04-10 20:16:48.0"/>
+  <criteria_areas id="2" name="TECHNICAL SKILLS" appointmentTypeID="1" sequence="2" createDate="2011-04-11 09:57:08.0" createdBy="12345" deleteDate="2011-04-11 09:57:08.0"/>
+  <criteria_details id="1" areaID="1" description="How will you improve your communication?" createDate="2011-04-11 10:00:19.0" createdBy="12345"/>
+  <criteria_details id="2" areaID="2" description="What training will you obtain this year?" createDate="2011-04-11 10:31:58.0" createdBy="12345"/>
+  <criteria_details id="3" areaID="1" description="How will you increase your communication skills?" createDate="2011-04-12 14:30:23.0" createdBy="12345"/>
+  <email_types type="goals-submitted" recipients="employee"/>
+  <email_types type="goals-require-modification" recipients="employee"/>
+  <employees pidm="12345" firstName="Jose" middleName="Daniel" lastName="Cedeno" osuid="931421234" onid="cedenoj" preferredEmail="jose.cedeno@oregonstate.edu" copySupervisor="false" active="true"/>
+  <employees pidm="12467" firstName="Joan" lastName="Lu" osuid="931421234" onid="luf" preferredEmail="joan.lu@oregonstate.edu" copySupervisor="false" active="true"/>
+  <hr_reviewers/>
+  <jobs id="1" employeePidm="12345" supervisorPidm="12467" positionNumber="1234" suffix="00" jobEcls="kjlkjlk" appointmentTypeID="1" beginDate="2011-05-14" positionClass="foobar" businessCenterID="1" tsOrgCode="test" orgCodeDescription="testing"/>
+  <permission_rules id="1" status="goals-due" role="employee" goals="e" actionRequired="goals-due"/>
+  <permission_rules id="2" status="goals-due" role="immediate-supervisor" goals="e"/>
+  <status/>
+  <system_configurations/>
+</dataset>

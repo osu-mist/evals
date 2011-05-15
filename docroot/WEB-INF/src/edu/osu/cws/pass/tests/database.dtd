@@ -1,0 +1,198 @@
+<!ELEMENT dataset (
+    admins*,
+    appointment_types*,
+    appraisal_steps*,
+    appraisals*,
+    assessment_logs*,
+    assessments*,
+    business_centers*,
+    criteria_areas*,
+    criteria_details*,
+    email_types*,
+    employees*,
+    hr_reviewers*,
+    jobs*,
+    permission_rules*,
+    status*,
+    system_configurations*)>
+
+<!ELEMENT admins EMPTY>
+<!ATTLIST admins
+    id CDATA #REQUIRED
+    employeeID CDATA #REQUIRED
+    isMaster CDATA #REQUIRED
+    isBackupMaster CDATA #REQUIRED
+    createDate CDATA #REQUIRED
+    createdBy CDATA #REQUIRED
+    modifiedDate CDATA #IMPLIED
+>
+
+<!ELEMENT appointment_types EMPTY>
+<!ATTLIST appointment_types
+    id CDATA #REQUIRED
+    name CDATA #REQUIRED
+>
+
+<!ELEMENT appraisal_steps EMPTY>
+<!ATTLIST appraisal_steps
+    id CDATA #REQUIRED
+    action CDATA #REQUIRED
+    appointmentTypeID CDATA #REQUIRED
+    originalStatus CDATA #REQUIRED
+    newStatus CDATA #REQUIRED
+    emailTypeID CDATA #REQUIRED
+>
+
+<!ELEMENT appraisals EMPTY>
+<!ATTLIST appraisals
+    id CDATA #REQUIRED
+    status CDATA #REQUIRED
+    startDate CDATA #REQUIRED
+    endDate CDATA #REQUIRED
+    jobID CDATA #REQUIRED
+    goalApproverID CDATA #IMPLIED
+    goalApprovedDate CDATA #IMPLIED
+    goalComments CDATA #IMPLIED
+    resultSubmitDate CDATA #IMPLIED
+    evaluation CDATA #IMPLIED
+    rating CDATA #IMPLIED
+    hrApproverID CDATA #IMPLIED
+    hrApprovedDate CDATA #IMPLIED
+    hrComments CDATA #IMPLIED
+    createDate CDATA #REQUIRED
+    modifiedDate CDATA #IMPLIED
+    employeeComments CDATA #IMPLIED
+    employeeSignedDate CDATA #IMPLIED
+    emailType CDATA #IMPLIED
+    emailDate CDATA #IMPLIED
+    emailCount CDATA #IMPLIED
+    closeOutBy CDATA #IMPLIED
+    closeOutDate CDATA #IMPLIED
+    closeOutReason CDATA #IMPLIED
+>
+
+<!ELEMENT assessment_logs EMPTY>
+<!ATTLIST assessment_logs
+    id CDATA #REQUIRED
+    content CDATA #REQUIRED
+    assessmentID CDATA #REQUIRED
+    authorPidm CDATA #REQUIRED
+    createDate CDATA #REQUIRED
+>
+
+<!ELEMENT assessments EMPTY>
+<!ATTLIST assessments
+    id CDATA #REQUIRED
+    appraisalID CDATA #REQUIRED
+    goal CDATA #REQUIRED
+    employeeResult CDATA #REQUIRED
+    supervisorResult CDATA #REQUIRED
+    criterionDetailID CDATA #REQUIRED
+    createDate CDATA #REQUIRED
+    modifiedDate CDATA #REQUIRED
+>
+
+<!ELEMENT business_centers EMPTY>
+<!ATTLIST business_centers
+    id CDATA #REQUIRED
+    name CDATA #REQUIRED
+>
+
+<!ELEMENT criteria_areas EMPTY>
+<!ATTLIST criteria_areas
+    id CDATA #REQUIRED
+    name CDATA #REQUIRED
+    appointmentTypeID CDATA #REQUIRED
+    sequence CDATA #REQUIRED
+    originalID CDATA #IMPLIED
+    createDate CDATA #REQUIRED
+    createdBy CDATA #REQUIRED
+    deleteDate CDATA #IMPLIED
+    deletedBy CDATA #IMPLIED
+>
+
+<!ELEMENT criteria_details EMPTY>
+<!ATTLIST criteria_details
+    id CDATA #REQUIRED
+    areaID CDATA #REQUIRED
+    description CDATA #REQUIRED
+    createDate CDATA #REQUIRED
+    createdBy CDATA #REQUIRED
+>
+
+<!ELEMENT email_types EMPTY>
+<!ATTLIST email_types
+    type CDATA #REQUIRED
+    recipients CDATA #REQUIRED
+>
+
+<!ELEMENT employees EMPTY>
+<!ATTLIST employees
+    pidm CDATA #REQUIRED
+    firstName CDATA #REQUIRED
+    middleName CDATA #IMPLIED
+    lastName CDATA #REQUIRED
+    osuid CDATA #REQUIRED
+    onid CDATA #REQUIRED
+    preferredEmail CDATA #REQUIRED
+    copySupervisor CDATA #REQUIRED
+    active CDATA #REQUIRED
+>
+
+<!ELEMENT hr_reviewers EMPTY>
+<!ATTLIST hr_reviewers
+    id CDATA #REQUIRED
+    employeeID CDATA #REQUIRED
+    businessCenterID CDATA #REQUIRED
+>
+
+<!ELEMENT jobs EMPTY>
+<!ATTLIST jobs
+    id CDATA #REQUIRED
+    employeePidm CDATA #REQUIRED
+    supervisorPidm CDATA #REQUIRED
+    positionNumber CDATA #REQUIRED
+    suffix CDATA #REQUIRED
+    jobEcls CDATA #REQUIRED
+    appointmentTypeID CDATA #REQUIRED
+    beginDate CDATA #REQUIRED
+    endDate CDATA #IMPLIED
+    positionClass CDATA #REQUIRED
+    businessCenterID CDATA #REQUIRED
+    tsOrgCode CDATA #REQUIRED
+    orgCodeDescription CDATA #REQUIRED
+>
+
+<!ELEMENT permission_rules EMPTY>
+<!ATTLIST permission_rules
+    id CDATA #REQUIRED
+    status CDATA #REQUIRED
+    role CDATA #REQUIRED
+    goals CDATA #IMPLIED
+    results CDATA #IMPLIED
+    resultComments CDATA #IMPLIED
+    evaluation CDATA #IMPLIED
+    review CDATA #IMPLIED
+    saveDraft CDATA #IMPLIED
+    requireModification CDATA #IMPLIED
+    submit CDATA #IMPLIED
+    actionRequired CDATA #IMPLIED
+>
+
+<!ELEMENT status EMPTY>
+<!ATTLIST status
+    status CDATA #REQUIRED
+>
+
+<!ELEMENT system_configurations EMPTY>
+<!ATTLIST system_configurations
+    id CDATA #REQUIRED
+    code CDATA #REQUIRED
+    name CDATA #REQUIRED
+    description CDATA #REQUIRED
+    value CDATA #REQUIRED
+    scopeID CDATA #REQUIRED
+    bizID CDATA #IMPLIED
+    modifiedBy CDATA #REQUIRED
+>
+
