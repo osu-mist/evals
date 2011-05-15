@@ -7,6 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.testng.annotations.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Test
@@ -29,10 +30,10 @@ public class AdminsTest {
     }
 
     public void shouldListAdmins() {
-        List adminsList = admins.list();
+        HashMap adminsList = admins.list();
         assert adminsList.size() == 2 : "Invalid list of admins";
-        assert ((Admin) adminsList.get(0)).getId() == 1 : "Invalid admin in list";
-        assert ((Admin) adminsList.get(1)).getId() == 2 : "Invalid admin in list";
+        assert adminsList.containsKey(12345) : "Invalid admin in list";
+        assert adminsList.containsKey(12467) : "Invalid admin in list";
 
     }
 }
