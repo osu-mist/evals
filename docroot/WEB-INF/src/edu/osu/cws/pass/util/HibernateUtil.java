@@ -32,6 +32,22 @@ public class HibernateUtil {
      */
     public static final short PRODUCTION = 2;
 
+    /**
+     * Config value - name of hibernate development xml config file.
+     */
+    public static final String DEVELOPMENT_CONFIG = "hibernate-dev.cfg.xml";
+
+    /**
+     * Config value - name of hibernate test xml config file.
+     */
+    public static final String TEST_CONFIG = "hibernate-test.cfg.xml";
+
+    /**
+     * Config value - path to hibernate xml config files from the root of the
+     * portlet. This value is used by DBUnit.java
+     */
+    public static final String CONFIG_PATH = "docroot/WEB-INF/src/";
+
 
     /**
      * Method used to create the Hibernate session. This method is private to ensure
@@ -41,17 +57,15 @@ public class HibernateUtil {
      */
     private static SessionFactory buildSessionFactory() {
         String configUsed;
-        String developmentConfig = "hibernate-dev.cfg.xml";
-        String testConfig = "hibernate-test.cfg.xml";
 
         // Determine which config environment we are in and use the respective config file
         switch (environment) {
             case TESTING:
-                configUsed = testConfig;
+                configUsed = TEST_CONFIG;
                 break;
             case DEVELOPMENT:
             default:
-                configUsed = developmentConfig;
+                configUsed = DEVELOPMENT_CONFIG;
                 break;
         }
 
