@@ -43,7 +43,6 @@ This is a sample hibernate configuration file. You have to copy this file to
         <!-- Mappings -->
         <mapping resource="edu/osu/cws/pass/hbm/Admin.hbm.xml" />
         <mapping resource="edu/osu/cws/pass/hbm/AppointmentType.hbm.xml" />
-        <mapping resource="edu/osu/cws/pass/hbm/BusinessCenter.hbm.xml" />
         <mapping resource="edu/osu/cws/pass/hbm/CriterionArea.hbm.xml" />
         <mapping resource="edu/osu/cws/pass/hbm/CriterionDetail.hbm.xml" />
         <mapping resource="edu/osu/cws/pass/hbm/Employee.hbm.xml" />
@@ -54,5 +53,6 @@ This is a sample hibernate configuration file. You have to copy this file to
         <mapping resource="edu/osu/cws/pass/hbm/EmailType.hbm.xml"/>
         <mapping resource="edu/osu/cws/pass/hbm/AppraisalStep.hbm.xml"/>
         <mapping resource="edu/osu/cws/pass/hbm/PermissionRule.hbm.xml"/>
+        <mapping resource="edu/osu/cws/pass/hbm/Reviewer.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>

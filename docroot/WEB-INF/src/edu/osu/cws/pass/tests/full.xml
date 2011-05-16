@@ -18,7 +18,8 @@
   <email_types type="goals-require-modification" recipients="employee"/>
   <employees pidm="12345" firstName="Jose" middleName="Daniel" lastName="Cedeno" osuid="931421234" onid="cedenoj" preferredEmail="jose.cedeno@oregonstate.edu" copySupervisor="false" active="true"/>
   <employees pidm="12467" firstName="Joan" lastName="Lu" osuid="931421234" onid="luf" preferredEmail="joan.lu@oregonstate.edu" copySupervisor="false" active="true"/>
-  <reviewers/>
+  <reviewers id="1" employeePidm="12345" businessCenterName="UABC"/>
+  <reviewers id="2" employeePidm="12467" businessCenterName="UABC"/>
   <jobs id="1" employeePidm="12345" supervisorPidm="12467" positionNumber="1234" suffix="00" jobEcls="kjlkjlk" appointmentTypeID="1" beginDate="2011-05-14" positionClass="foobar" businessCenterName="UABC" tsOrgCode="test" orgCodeDescription="testing"/>
   <permission_rules id="1" status="goals-due" role="employee" goals="e" actionRequired="goals-due"/>
   <permission_rules id="2" status="goals-due" role="immediate-supervisor" goals="e"/>
