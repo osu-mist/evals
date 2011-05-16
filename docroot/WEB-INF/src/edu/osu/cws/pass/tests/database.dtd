@@ -10,9 +10,9 @@
     criteria_details*,
     email_types*,
     employees*,
-    hr_reviewers*,
     jobs*,
     permission_rules*,
+    reviewers*,
     status*,
     system_configurations*)>
 
@@ -94,7 +94,6 @@
 
 <!ELEMENT business_centers EMPTY>
 <!ATTLIST business_centers
-    id CDATA #REQUIRED
     name CDATA #REQUIRED
 >
 
@@ -139,13 +138,6 @@
     active CDATA #REQUIRED
 >
 
-<!ELEMENT hr_reviewers EMPTY>
-<!ATTLIST hr_reviewers
-    id CDATA #REQUIRED
-    employeeID CDATA #REQUIRED
-    businessCenterID CDATA #REQUIRED
->
-
 <!ELEMENT jobs EMPTY>
 <!ATTLIST jobs
     id CDATA #REQUIRED
@@ -158,7 +150,7 @@
     beginDate CDATA #REQUIRED
     endDate CDATA #IMPLIED
     positionClass CDATA #REQUIRED
-    businessCenterID CDATA #REQUIRED
+    businessCenterName CDATA #REQUIRED
     tsOrgCode CDATA #REQUIRED
     orgCodeDescription CDATA #REQUIRED
 >
@@ -177,6 +169,13 @@
     requireModification CDATA #IMPLIED
     submit CDATA #IMPLIED
     actionRequired CDATA #IMPLIED
+>
+
+<!ELEMENT reviewers EMPTY>
+<!ATTLIST reviewers
+    id CDATA #REQUIRED
+    employeeID CDATA #REQUIRED
+    businessCenterName CDATA #REQUIRED
 >
 
 <!ELEMENT status EMPTY>

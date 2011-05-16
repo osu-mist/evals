@@ -26,11 +26,11 @@ public class Job extends Pass {
 
     private String positionClass;
 
-    private BusinessCenter businessCenterID;
-
     private String tsOrgCode;
 
     private String orgCodeDescription;
+
+    private String businessCenterName;
 
     public int getId() {
         return id;
@@ -112,14 +112,6 @@ public class Job extends Pass {
         this.positionClass = positionClass;
     }
 
-    public BusinessCenter getBusinessCenterID() {
-        return businessCenterID;
-    }
-
-    public void setBusinessCenterID(BusinessCenter businessCenterID) {
-        this.businessCenterID = businessCenterID;
-    }
-
     public String getTsOrgCode() {
         return tsOrgCode;
     }
@@ -134,5 +126,13 @@ public class Job extends Pass {
 
     public void setOrgCodeDescription(String orgCodeDescription) {
         this.orgCodeDescription = orgCodeDescription;
+    }
+
+    public String getBusinessCenterName() {
+        return businessCenterName;
+    }
+
+    public void setBusinessCenterName(String businessCenterName) {
+        this.businessCenterName = businessCenterName;
     }
 }
