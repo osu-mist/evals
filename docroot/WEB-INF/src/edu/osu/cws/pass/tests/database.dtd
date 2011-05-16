@@ -84,12 +84,12 @@
 <!ATTLIST assessments
     id CDATA #REQUIRED
     appraisalID CDATA #REQUIRED
-    goal CDATA #REQUIRED
-    employeeResult CDATA #REQUIRED
-    supervisorResult CDATA #REQUIRED
+    goal CDATA #IMPLIED
+    employeeResult CDATA #IMPLIED
+    supervisorResult CDATA #IMPLIED
     criterionDetailID CDATA #REQUIRED
     createDate CDATA #REQUIRED
-    modifiedDate CDATA #REQUIRED
+    modifiedDate CDATA #IMPLIED
 >
 
 <!ELEMENT business_centers EMPTY>
