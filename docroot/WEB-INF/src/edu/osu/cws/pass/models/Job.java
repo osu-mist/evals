@@ -10,7 +10,9 @@ public class Job extends Pass {
 
     private Employee employeePidm;
 
-    private Employee supervisorPidm;
+    private Job supervisor;
+
+    private String positionTitle;
 
     private String positionNumber;
 
@@ -48,12 +50,20 @@ public class Job extends Pass {
         this.employeePidm = employeePidm;
     }
 
-    public Employee getSupervisorPidm() {
-        return supervisorPidm;
+    public Job getSupervisor() {
+        return supervisor;
     }
 
-    public void setSupervisorPidm(Employee supervisorPidm) {
-        this.supervisorPidm = supervisorPidm;
+    public void setSupervisor(Job supervisor) {
+        this.supervisor = supervisor;
+    }
+
+    public String getPositionTitle() {
+        return positionTitle;
+    }
+
+    public void setPositionTitle(String positionTitle) {
+        this.positionTitle = positionTitle;
     }
 
     public String getPositionNumber() {

@@ -8,6 +8,7 @@
             <generator class="native" />
         </id>
 
+        <property name="positionTitle" type="string" length="255"/>
         <property name="positionNumber" type="string" length="8"/>
         <property name="suffix" type="string" length="2"/>
         <property name="jobEcls" type="string" length="45"/>
@@ -19,7 +20,9 @@
         <property name="businessCenterName" type="string" length="4"/>
 
         <many-to-one name="employeePidm" class="edu.osu.cws.pass.models.Employee" not-null="true"/>
-        <many-to-one name="supervisorPidm" class="edu.osu.cws.pass.models.Employee" not-null="true"/>
+        <many-to-one name="supervisor" class="edu.osu.cws.pass.models.Job"
+                     column="supervisorJobID"
+                     not-null="false"/>
         <many-to-one name="appointmentType" class="edu.osu.cws.pass.models.AppointmentType"
                      column="appointmentTypeID" not-null="true"/>
     </class>
