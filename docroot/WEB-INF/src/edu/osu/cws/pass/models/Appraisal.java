@@ -1,5 +1,6 @@
 package edu.osu.cws.pass.models;
 
+import javax.jnlp.IntegrationService;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -49,7 +50,7 @@ public class Appraisal extends Pass {
     /**
      * Rating given to the employee during the evaluation step
      */
-    private int rating;
+    private Integer rating;
 
     /**
      * Business center employee approving the supervisor's evaluation
@@ -78,7 +79,7 @@ public class Appraisal extends Pass {
 
     private Date emailDate;
 
-    private int emailCount;
+    private Integer emailCount;
 
     private Date closeOutDate;
 
@@ -190,11 +191,11 @@ public class Appraisal extends Pass {
         this.evaluation = evaluation;
     }
 
-    public int getRating() {
+    public Integer getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(Integer rating) {
         this.rating = rating;
     }
 
@@ -278,11 +279,11 @@ public class Appraisal extends Pass {
         this.emailDate = emailDate;
     }
 
-    public int getEmailCount() {
+    public Integer getEmailCount() {
         return emailCount;
     }
 
-    public void setEmailCount(int emailCount) {
+    public void setEmailCount(Integer emailCount) {
         this.emailCount = emailCount;
     }
 

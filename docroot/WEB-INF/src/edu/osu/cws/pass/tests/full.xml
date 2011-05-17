@@ -5,7 +5,22 @@
   <appointment_types id="1" name="Classified"/>
   <appraisal_steps id="1" action="submit" appointmentTypeID="1" originalStatus="goals-due" newStatus="goals-submitted" emailTypeID="goals-submitted"/>
   <appraisal_steps id="2" action="require-modification" appointmentTypeID="1" originalStatus="goals-submitted" newStatus="goals-require-modification" emailTypeID="goals-require-modification"/>
-  <appraisals/>
+  <appraisals id="1"
+              startDate="2011-05-14"
+              endDate="2012-05-14"
+              emailDate="2011-05-16"
+              status="goals-due"
+              jobID="1"
+              createDate="2011-05-01"
+  />
+  <appraisals id="2"
+                startDate="2010-05-14"
+                endDate="2011-05-10"
+                emailDate="2011-03-16"
+                status="results-due"
+                jobID="1"
+                createDate="2010-05-01"
+  />
   <assessment_logs/>
   <assessments/>
   <business_centers name="UABC"/>
@@ -20,7 +35,44 @@
   <employees pidm="12467" firstName="Joan" lastName="Lu" osuid="931421234" onid="luf" preferredEmail="joan.lu@oregonstate.edu" copySupervisor="false" active="true"/>
   <reviewers id="1" employeePidm="12345" businessCenterName="UABC"/>
   <reviewers id="2" employeePidm="12467" businessCenterName="UABC"/>
-  <jobs id="1" employeePidm="12345" supervisorPidm="12467" positionNumber="1234" suffix="00" jobEcls="kjlkjlk" appointmentTypeID="1" beginDate="2011-05-14" positionClass="foobar" businessCenterName="UABC" tsOrgCode="test" orgCodeDescription="testing"/>
+  <jobs id="1"
+        employeePidm="12345"
+        supervisorJobID="3"
+        positionTitle="coffee barrista"
+        positionNumber="1234"
+        suffix="00"
+        jobEcls="kjlkjlk"
+        appointmentTypeID="1"
+        beginDate="2011-05-14"
+        positionClass="foobar"
+        businessCenterName="UABC"
+        tsOrgCode="test"
+        orgCodeDescription="testing"/>
+  <jobs id="2"
+        employeePidm="12345"
+        supervisorJobID="3"
+        positionTitle="baggel maker"
+        positionNumber="1234"
+        suffix="00"
+        jobEcls="kjlkjlk"
+        appointmentTypeID="1"
+        beginDate="2011-05-14"
+        positionClass="foobar"
+        businessCenterName="UABC"
+        tsOrgCode="test"
+        orgCodeDescription="testing"/>
+  <jobs id="3"
+        employeePidm="12467"
+        positionTitle="MU Supervisor"
+        positionNumber="1234"
+        suffix="00"
+        jobEcls="kjlkjlk"
+        appointmentTypeID="1"
+        beginDate="2011-05-14"
+        positionClass="foobar"
+        businessCenterName="UABC"
+        tsOrgCode="test"
+        orgCodeDescription="testing"/>
   <permission_rules id="1" status="goals-due" role="employee" goals="e" actionRequired="goals-due"/>
   <permission_rules id="2" status="goals-due" role="immediate-supervisor" goals="e"/>
   <status/>

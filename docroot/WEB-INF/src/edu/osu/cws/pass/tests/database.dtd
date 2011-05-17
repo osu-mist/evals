@@ -142,7 +142,7 @@
 <!ATTLIST jobs
     id CDATA #REQUIRED
     employeePidm CDATA #REQUIRED
-    supervisorPidm CDATA #REQUIRED
+    supervisorJobID CDATA #REQUIRED
     positionNumber CDATA #REQUIRED
     suffix CDATA #REQUIRED
     jobEcls CDATA #REQUIRED

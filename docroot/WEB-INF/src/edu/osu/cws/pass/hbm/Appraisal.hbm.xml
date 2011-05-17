@@ -14,7 +14,7 @@
         <property name="goalComments" type="text"/>
         <property name="resultSubmitDate" type="timestamp"/>
         <property name="evaluation" type="text"/>
-        <property name="rating" type="int" length="1"/>
+        <property name="rating" type="java.lang.Integer" length="1"/>
         <property name="hrApprovedDate" type="timestamp"/>
         <property name="hrComments" type="text"/>
         <property name="createDate" type="timestamp"/>
@@ -23,7 +23,7 @@
         <property name="employeeSignedDate" type="timestamp"/>
         <property name="emailType" length="45"/>
         <property name="emailDate" type="date"/>
-        <property name="emailCount" type="int"/>
+        <property name="emailCount" type="java.lang.Integer"/>
         <property name="closeOutDate" type="timestamp"/>
         <property name="closeOutReason" type="text"/>
         <property name="status" length="45"/>
