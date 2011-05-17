@@ -137,6 +137,40 @@ public class Appraisals {
         return result;
     }
 
+    /**
+     * Returns a List of team's active appraisals for the given supervisor's pidm.
+     *
+     * @param pidm
+     * @return
+     */
+    public List<HashMap> getMyTeamsActiveAppraisals(Integer pidm) {
+        Session session = HibernateUtil.getCurrentSession();
+        return this.getMyTeamsActiveAppraisals(pidm, session);
+    }
+
+    /**
+     * Returns a list of hashmap that includes the job title, employee name, status,
+     * start/end date and appointment type of the jobs' the employee supervises.
+     *
+     * @param pidm      Supervisor's pidm.
+     * @return List of Hashmaps that contains the jobs this employee supervises.
+     */
+    private List<HashMap> getMyTeamsActiveAppraisals(Integer pidm, Session session) {
+        Transaction tx = session.beginTransaction();
+        String query = "select new map(id as id, job.positionTitle as positionTitle, " +
+                "concat(job.employeePidm.lastName, ', ', job.employeePidm.firstName) as employeeName, " +
+                "job.appointmentType.name as appointmentTypeName, startDate as startDate, " +
+                "endDate as endDate, status as status) " +
+                "from edu.osu.cws.pass.models.Appraisal where job.supervisor.employeePidm.id = :pidm " +
+                "and status not in ('completed', 'closed') ";
+        List result =  session.createQuery(query).setInteger("pidm", pidm).list();
+
+        tx.commit();
+        return result;
+    }
+
+
+
     public void setLoggedInUser(Employee loggedInUser) {
         this.loggedInUser = loggedInUser;
     }

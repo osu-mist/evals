@@ -254,5 +254,28 @@ public class AppraisalsTest {
         }
     }
 
+    @Test(groups = "unittest")
+    public void shouldFindAllTeamActiveAppraisals() {
+        int pidm = 12467;
+        List<HashMap> teamActiveAppraisals = appraisals.getMyTeamsActiveAppraisals(pidm);
+        assert teamActiveAppraisals.size() == 2 : "Invalid size of team active appraisals";
+        for (HashMap ap : teamActiveAppraisals) {
+            assert ap.get("id") != new Integer(0) :
+                    "id should be present in list of team appraisals";
+            //@todo: should this be use jobTitle instead? check my notes
+            assert ap.get("positionTitle") != null : "" +
+                    "job title should be present in list of team appraisals";
+            assert ap.get("startDate") != null :
+                    "start date should be present in list of team appraisals";
+            assert ap.get("endDate") != null :
+                    "end date should be present in list of team appraisals";
+            assert ap.get("status") != null :
+                    "status should be present in list of team appraisals";
+            assert ap.get("employeeName") != null :
+                    "employee name should be present in list of team appraisals";
+            assert ap.get("appointmentTypeName") != null :
+                    "appointment type name should be present in list of team appraisals";
+        }
     }
+
 }
