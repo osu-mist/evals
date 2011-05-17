@@ -11,7 +11,10 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 public class AppraisalsTest {
 
@@ -116,6 +119,7 @@ public class AppraisalsTest {
      * not allowed.
      *
      * @param modifiedAppraisal
+     * @throws edu.osu.cws.pass.models.ModelException If there is a problem validation data
      */
     @Test(groups = {"unitttest"})
     public void updateAppraisalModelData()
@@ -233,6 +237,22 @@ public class AppraisalsTest {
             assert assessment.getAssessmentLogs().size() == 2 :
                     "Appraisal assessment goals should have a new log";
         }
+    }
+
+    @Test(groups = "unittest")
+    public void shouldFindAllEmployeeActiveAppraisals() {
+        int pidm = 12345;
+        ArrayList<HashMap> myActiveAppraisals = appraisals.getAllMyActiveAppraisals(pidm);
+        assert myActiveAppraisals.size() == 2 : "Invalid size of active appraisals";
+        for (HashMap ap : myActiveAppraisals) {
+            assert ap.get("id") != new Integer(0) : "id should be present in list of appraisals";
+            //@todo: should this be use jobTitle instead? check my notes
+            assert ap.get("positionTitle") != null : "job title should be present in list of appraisals";
+            assert ap.get("startDate") != null : "start date should be present in list of appraisals";
+            assert ap.get("endDate") != null : "end date should be present in list of appraisals";
+            assert ap.get("status") != null : "status should be present in list of appraisals";
+        }
+    }
 
     }
 }

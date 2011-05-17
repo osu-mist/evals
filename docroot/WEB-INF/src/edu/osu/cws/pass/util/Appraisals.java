@@ -4,8 +4,7 @@ import edu.osu.cws.pass.models.*;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class Appraisals {
     private Employee loggedInUser;
@@ -101,7 +100,45 @@ public class Appraisals {
         return true;
     }
 
+    /**
+     * Returns a list of active appraisals for all the jobs that the current pidm holds.
+     * The fields that are returned in the appraisal are:
+     *      appraisalID
+     *      positionTitle
+     *      startDate
+     *      endDate
+     *      status;
+     *
+     * @param pidm
+     * @return
+     */
+    public ArrayList<HashMap> getAllMyActiveAppraisals(int pidm) {
+        Session session = HibernateUtil.getCurrentSession();
+        return this.getAllMyActiveAppraisals(pidm, session);
+    }
+
+    /**
+     * Returns a HashMap
+     * @param pidm
+     * @param session
+     * @return
+     */
+    private ArrayList<HashMap> getAllMyActiveAppraisals(int pidm, Session session) {
+        Transaction tx = session.beginTransaction();
+        //@todo: the query below should have a where clause => job.employee.id = pidm
+        String query = "select new map( id as id, job.positionTitle as positionTitle, " +
+                "startDate as startDate, endDate as endDate, status as status)" +
+                " from edu.osu.cws.pass.models.Appraisal where " +
+                " job.employeePidm.id = :pidm and status not in ('completed', 'closed')";
+        ArrayList<HashMap> result = (ArrayList<HashMap>) session.createQuery(query)
+                .setInteger("pidm", pidm)
+                .list();
+        tx.commit();
+        return result;
+    }
+
     public void setLoggedInUser(Employee loggedInUser) {
         this.loggedInUser = loggedInUser;
     }
 }
+
