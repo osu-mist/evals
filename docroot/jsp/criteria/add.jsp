@@ -39,7 +39,7 @@ addCriteriaURL.setParameter("action", "addCriteria");
         <td><select name="<portlet:namespace />appointmentTypeID">
             <c:forEach var="appointmentType" items="${appointmentTypes}">
                 <option value="${appointmentType.id}"
-                    ${(appointmentType.id == criterionArea.appointmentTypeID.id)? 'selected="selected"': ''}>
+                    ${(appointmentType.id == criterionArea.appointmentType.id)? 'selected="selected"': ''}>
                     ${appointmentType.name}</option>
 
             </c:forEach>
