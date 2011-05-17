@@ -9,13 +9,15 @@ package edu.osu.cws.pass.portlet;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import edu.osu.cws.pass.util.HibernateUtil;
+import edu.osu.cws.pass.util.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 import javax.portlet.*;
 
@@ -27,7 +29,16 @@ import javax.portlet.*;
  */
 public class JSPPortlet extends GenericPortlet {
 
+    /**
+     * String used to store the view jsp used by the
+     * doView method.
+     */
 	protected String viewJSP;
+
+    private PermissionRules permissionRules = new PermissionRules();
+    private AppraisalSteps appraisalSteps = new AppraisalSteps();
+    private Admins admins = new Admins();
+    private Reviewers reviewers = new Reviewers();
 
     /**
      * Specifies whether or not we skip doView method. This is set to true, when the
@@ -48,6 +59,12 @@ public class JSPPortlet extends GenericPortlet {
     public void init() throws PortletException {
 		viewJSP = getInitParameter("home-jsp");
         HibernateUtil.setEnvironment(HibernateUtil.DEVELOPMENT);
+        getPortletContext().setAttribute("permissionRules", permissionRules.list());
+        getPortletContext().setAttribute("appraisalSteps", appraisalSteps.list());
+        getPortletContext().setAttribute("reviewers", reviewers.list());
+        getPortletContext().setAttribute("admins", admins.list());
+        loadResourceBundle();
+        //@todo: load properties file in portlet context
 	}
 
 	public void doDispatch(
@@ -129,28 +146,45 @@ public class JSPPortlet extends GenericPortlet {
                 // The action methods return the init-param of the path, we then need to grab the value
                 viewJSP = getInitParameter(viewJSP);
             } catch (NoSuchMethodException e) {
-                StringWriter writerStr = new StringWriter();
-                PrintWriter myPrinter = new PrintWriter(writerStr);
-                e.printStackTrace(myPrinter);
-                String stackTraceStr = writerStr.toString();
-                _log.error("action method: " + action + " not found" + stackTraceStr);
+                _log.error("action method: " + action + " not found" + stackTraceString(e));
             } catch (InvocationTargetException e) {
-                StringWriter writerStr = new StringWriter();
-                PrintWriter myPrinter = new PrintWriter(writerStr);
-                e.printStackTrace(myPrinter);
-                String stackTraceStr = writerStr.toString();
-                _log.error("failed to call method: " + action + stackTraceStr);
+                _log.error("failed to call method: " + action + stackTraceString(e));
             } catch (IllegalAccessException e) {
-                StringWriter writerStr = new StringWriter();
-                PrintWriter myPrinter = new PrintWriter(writerStr);
-                e.printStackTrace(myPrinter);
-                String stackTraceStr = writerStr.toString();
-                _log.error("failed to call method: " + action + stackTraceStr);
+                _log.error("failed to call method: " + action + stackTraceString(e));
             }
         }
 
         _log.debug("viewJSP in delegate: "+viewJSP);
+        _log.error("request get locale => "+request.getLocale().toString());
 
+    }
+
+    /**
+     * Takes care of loading the resource bundle Language.properties into the
+     * portletContext.
+     */
+    private void loadResourceBundle() {
+        ResourceBundle resources;
+        try {
+            resources = ResourceBundle.getBundle("edu.osu.cws.pass.portlet.Language");
+            getPortletContext().setAttribute("resourceBundle", resources);
+        } catch (MissingResourceException e) {
+            _log.error("failed to load resource bundle" + stackTraceString(e));
+        }
+    }
+
+    /**
+     * Simple method that takes in an exception and returns the stacktrace as a string. We
+     * need this so that if we get an exception, we can send it to the luminis log.
+     *
+     * @param e     Exception
+     * @return  String stack trace
+     */
+    private String stackTraceString(Exception e) {
+        StringWriter writerStr = new StringWriter();
+        PrintWriter myPrinter = new PrintWriter(writerStr);
+        e.printStackTrace(myPrinter);
+        return writerStr.toString();
     }
 
 	protected void include(
