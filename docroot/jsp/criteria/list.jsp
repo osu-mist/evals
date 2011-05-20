@@ -8,7 +8,7 @@ addCriteriaURL.setWindowState(WindowState.NORMAL);
 addCriteriaURL.setParameter("action", "addCriteria");
 %>
 
-<h2>Evaluation Criteria</h2>
+<h2><liferay-ui:message key="Criteria" /></h2>
 <liferay-ui:success key="criteria-saved" message="criteria-saved" />
 
 <div class="separator"></div>
@@ -26,7 +26,7 @@ addCriteriaURL.setParameter("action", "addCriteria");
     >
         <td>${criterion.name}</td>
         <td>${criterion.currentDetail.description}</td>
-        <td><a href="#">Edit</a> <a href="#">Delete</a>
+        <td><a href="#">Edit</a> <a href="#">Delete</a></td>
     </tr>
 </c:forEach>
 
