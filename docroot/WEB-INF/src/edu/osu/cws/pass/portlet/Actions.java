@@ -7,12 +7,13 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.pass.util.AppointmentTypes;
+import edu.osu.cws.pass.util.Appraisals;
 import edu.osu.cws.pass.util.Criteria;
 import edu.osu.cws.pass.util.Employees;
 import org.hibernate.HibernateException;
 
 import javax.portlet.*;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Actions class used to map user form actions to respective class methods.
@@ -23,6 +24,10 @@ public class Actions {
     private Employees employees = new Employees();
 
     private AppointmentTypes appointmentTypes = new AppointmentTypes();
+
+    private PortletContext portletContext;
+
+    private Appraisals appraisals = new Appraisals();
 
     /**
      * Takes the request object and creates POJO objects. Then it calls the respective
@@ -134,6 +139,33 @@ public class Actions {
     }
 
     /**
+     * Takes care of grabbing all the information needed to display the home view sections
+     * (req. actions, my appraisals, my team, reviews and admins) and sets the information
+     * in the request object.
+     *
+     * @param request
+     * @param response
+     */
+    public String displayHomeView(PortletRequest request, PortletResponse response,
+                                  JSPPortlet portlet) {
+        _log.error("in displayHomeView");
+        String username = getLoggedOnUsername(request);
+        Employee employee = employees.findByOnid(username);
+
+        request.setAttribute("myActiveAppraisals",
+                appraisals.getAllMyActiveAppraisals(employee.getId()));
+        _log.error("my active appraisals size = "+appraisals.getAllMyActiveAppraisals(employee.getId()).size());
+        request.setAttribute("myTeamsActiveAppraisals",
+                appraisals.getMyTeamsActiveAppraisals(employee.getId()));
+        request.setAttribute("reviewer", getReviewer(employee.getId()));
+        request.setAttribute("admin", getAdmin(employee.getId()));
+
+        request.setAttribute("requiredActions", getRequiredActions(request));
+
+        return "home-jsp";
+    }
+
+    /**
      * Takes an string error message and sets in the session.
      *
      * @param request
@@ -165,5 +197,149 @@ public class Actions {
         Map userInfo = getLoggedOnUser(request);
 
         return (userInfo == null) ? "" : (String) userInfo.get("user.login.id");
+    }
+
+    public void setPortletContext(PortletContext portletContext) {
+        this.portletContext = portletContext;
+    }
+
+    /**
+     * Takes in a pidm, and looks up in the reviewers HashMap stored in the portlet context
+     * to figure out if the current logged in user is a reviewer. If yes, then we return the
+     * Reviewer object if not, it returns false.
+     *
+     * @param pidm  Pidm of currently logged in user
+     * @return Reviewer
+     */
+    private Reviewer getReviewer(int pidm) {
+        HashMap<Integer, Reviewer> reviewerMap =
+                (HashMap<Integer, Reviewer>) portletContext.getAttribute("reviewers");
+
+        if (reviewerMap.containsKey(pidm)) {
+            return reviewerMap.get(pidm);
+
+        }
+        return null;
+    }
+
+    /**
+     * Takes in a pidm, and looks up in the admins HashMap stored in the portlet context
+     * to figure out if the current logged in user is a reviewer. If yes, then we return the
+     * Admin object if not, it returns false.
+     *
+     * @return Admin
+     */
+    private Admin getAdmin(int pidm) {
+        HashMap<Integer, Admin> adminMap =
+                (HashMap<Integer, Admin>) portletContext.getAttribute("admins");
+
+        if (adminMap.containsKey(pidm)) {
+            return adminMap.get(pidm);
+
+        }
+        return null;
+    }
+
+    /**
+     * Using the request object, it fetches the list of employee appraisals and supervisor
+     * appraisals and finds out if there are any actions required for them. It also checks
+     * to see if the user is a reviewer and it gets the action required for the reviewer.
+     *
+     * @param request
+     */
+    public ArrayList<RequiredAction> getRequiredActions(PortletRequest request) {
+        ArrayList<RequiredAction> requiredActions = new ArrayList<RequiredAction>();
+        RequiredAction reviewerAction;
+        Reviewer reviewer;
+        Employee loggedInEmployee = employees.findByOnid(getLoggedOnUsername(request));
+
+        ArrayList<HashMap> myActiveAppraisals = (ArrayList<HashMap>)
+                request.getAttribute("myActiveAppraisals");
+        requiredActions.addAll(getAppraisalActions(myActiveAppraisals, "employee"));
+
+        ArrayList<HashMap> supervisorActions = (ArrayList<HashMap>)
+                request.getAttribute("myTeamsActiveAppraisals");
+        requiredActions.addAll(getAppraisalActions(supervisorActions, "supervisor"));
+
+        reviewer = getReviewer(loggedInEmployee.getId());
+        if (reviewer != null) {
+            reviewerAction = getReviewerAction(reviewer.getBusinessCenterName());
+            if (reviewerAction != null) {
+                requiredActions.add(reviewerAction);
+            }
+        }
+        return requiredActions;
+    }
+
+
+    /**
+     * Returns a list of actions required for the given user and role, based on the
+     * list of appraisals passed in. If the user and role have no appraisal actions,
+     * it returns an empty ArrayList.
+     *
+     * @param appraisalList
+     * @param role
+     * @return
+     */
+    public ArrayList<RequiredAction> getAppraisalActions(List<HashMap> appraisalList, String role) {
+        HashMap permissionRuleMap = (HashMap) portletContext.getAttribute("permissionRules");
+        ArrayList<RequiredAction> outList = new ArrayList<RequiredAction>();
+        String actionKey = "";
+        String anchorText = "";
+        RequiredAction actionReq;
+        HashMap<String, String> anchorParams;
+
+        for (HashMap<String, String> appraisalMap : appraisalList) {
+            //get the status, compose the key "status"-"role"
+            actionKey = appraisalMap.get("status")+"-"+role;
+
+            // Get the appropriate permissionrule object from the permissionRuleMap
+            PermissionRule rule = (PermissionRule) permissionRuleMap.get(actionKey);
+            if (rule != null && rule.getActionRequired() != null
+                    && rule.getActionRequired().equals("")) {
+                // compose a requiredAction object and add it to the outList.
+                anchorParams = new HashMap<String, String>();
+                anchorText = buildAnchorText(rule.getActionRequired(), appraisalMap);
+                anchorParams.put("action", anchorText);
+                anchorParams.put("id", appraisalMap.get("id"));
+
+                actionReq = new RequiredAction();
+                actionReq.setParameters(anchorParams);
+                actionReq.setAnchorText(anchorText);
+                outList.add(actionReq);
+            }
+        }
+        return outList;
+    }
+
+    /**
+     * Takes a resource bundle key and returns the formatted actionRequired anchor text.
+     * @param key
+     * @return
+     */
+    private String buildAnchorText(String key, HashMap<String, String> appraisalMap) {
+        ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
+        return resource.getString(key);
+        //@todo: put a bunch of if statements to replace the variables in the anchor text
+    }
+
+    /**
+     * Returns the required action for the business center reviewer.
+     *
+     * @param businessCenterName
+     * @return
+     */
+    private RequiredAction getReviewerAction(String businessCenterName) {
+        //@todo: call getReviewCount(bcName) to get an array of the appraisal objects that are due for review for the business center.
+        //	If hibernate getReviewCounts returns 0,
+        //	    Return null
+        //	Instantiate an RequiredAction object action with the following values:
+        //	    anchorText: key=ReviewAction, value in the resource bundle should be "You have {0} appraisals to review", where the {0} is the counts obtained earlier.
+        //	    Parameters:
+        //   	    Action=displayReviewList
+        // 	        bcName=<bcName>
+        //	return the action object.
+
+        return new RequiredAction();
     }
 }

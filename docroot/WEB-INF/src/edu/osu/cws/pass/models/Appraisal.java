@@ -1,6 +1,5 @@
 package edu.osu.cws.pass.models;
 
-import javax.jnlp.IntegrationService;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;

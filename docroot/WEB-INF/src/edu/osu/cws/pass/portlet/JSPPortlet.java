@@ -130,13 +130,14 @@ public class JSPPortlet extends GenericPortlet {
      * @param response
      */
     public void delegate(PortletRequest request, PortletResponse response) {
+        actionClass.setPortletContext(getPortletContext());
         Method actionMethod;
         String action;
         viewJSP = getInitParameter("home-jsp");
 
         // The portlet action can be set by the action/renderURLs using "action" as the parameter
         // name
-        action =  ParamUtil.getString(request, "action");
+        action =  ParamUtil.getString(request, "action", "displayHomeView");
 
         if (!action.equals("")) {
             try {
@@ -155,8 +156,6 @@ public class JSPPortlet extends GenericPortlet {
         }
 
         _log.debug("viewJSP in delegate: "+viewJSP);
-        _log.error("request get locale => "+request.getLocale().toString());
-
     }
 
     /**
