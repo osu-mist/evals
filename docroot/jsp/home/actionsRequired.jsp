@@ -4,7 +4,7 @@
     <h2><liferay-ui:message key="actions-required" /></h2>
     <ul>
         <c:forEach var="reqAction" items="${requiredActions}">
-            <li><a href="<portlet:actionURL>
+            <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
             <c:forEach var="params" items="${reqAction.parameters}">
                 <portlet:param name="${params.key}" value="${params.value}"/>
             </c:forEach>

@@ -1,11 +1,5 @@
 <jsp:useBean id="myTeamsActiveAppraisals" class="java.util.ArrayList" scope="request" />
 
-<%
-myAppraisalURL = renderResponse.createRenderURL();
-myAppraisalURL.setWindowState(WindowState.MAXIMIZED);
-myAppraisalURL.setParameter("action", "displayAppraisal");
-%>
-
 <div id="<portlet:namespace/>accordionMenuMyTeam" class="accordion-menu">
     <div class="accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>MyTeam');">
         <table>
@@ -31,11 +25,6 @@ myAppraisalURL.setParameter("action", "displayAppraisal");
                     <th><liferay-ui:message key="status" /></th>
                 </tr>
                 <c:forEach var="shortAppraisal" items="${myTeamsActiveAppraisals}" varStatus="loopStatus">
-                <%
-                    appraisalMap = (java.util.HashMap) pageContext.getAttribute("shortAppraisal");
-                    myAppraisalURL.setParameter("id", appraisalMap.get("id").toString());
-                %>
-
                     <tr class="${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}"
                         onmouseover="this.className = 'portlet-section-body-hover results-row hover';"
                         onmouseout="this.className = '${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}';"
@@ -45,8 +34,10 @@ myAppraisalURL.setParameter("action", "displayAppraisal");
                         <td><fmt:formatDate value="${shortAppraisal.startDate}" pattern="yyyy"/> -
                             <fmt:formatDate value="${shortAppraisal.endDate}" pattern="yyyy"/>
                         </td>
-                        <td><a href="<%= myAppraisalURL.toString() %>">
-                        <liferay-ui:message key="${shortAppraisal.status}" /></a>
+                        <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
+                            <portlet:param name="id" value="${shortAppraisal.id}"/>
+                            <portlet:param  name="action" value="displayAppraisal"/>
+                           </portlet:actionURL>"><liferay-ui:message key="${shortAppraisal.status}" /></a>
                         </td>
                     </tr>
                 </c:forEach>
