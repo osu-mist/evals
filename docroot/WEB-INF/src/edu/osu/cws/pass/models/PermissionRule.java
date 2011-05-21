@@ -9,6 +9,8 @@ public class PermissionRule extends Pass {
 
     private String goals;
 
+    private String requiredModification;
+
     private String results;
 
     private String resultComments;
@@ -16,6 +18,8 @@ public class PermissionRule extends Pass {
     private String evaluation;
 
     private String review;
+
+    private String employeeResponse;
 
     private String saveDraft;
 
@@ -59,6 +63,14 @@ public class PermissionRule extends Pass {
         this.goals = goals;
     }
 
+    public String getRequiredModification() {
+        return requiredModification;
+    }
+
+    public void setRequiredModification(String requiredModification) {
+        this.requiredModification = requiredModification;
+    }
+
     public String getResults() {
         return results;
     }
@@ -97,6 +109,14 @@ public class PermissionRule extends Pass {
 
     public void setSaveDraft(String saveDraft) {
         this.saveDraft = saveDraft;
+    }
+
+    public String getEmployeeResponse() {
+        return employeeResponse;
+    }
+
+    public void setEmployeeResponse(String employeeResponse) {
+        this.employeeResponse = employeeResponse;
     }
 
     public String getRequireModification() {

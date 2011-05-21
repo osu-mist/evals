@@ -13,6 +13,7 @@ import edu.osu.cws.pass.util.Employees;
 import org.hibernate.HibernateException;
 
 import javax.portlet.*;
+import java.text.MessageFormat;
 import java.util.*;
 
 /**
@@ -154,7 +155,6 @@ public class Actions {
 
         request.setAttribute("myActiveAppraisals",
                 appraisals.getAllMyActiveAppraisals(employee.getId()));
-        _log.error("my active appraisals size = "+appraisals.getAllMyActiveAppraisals(employee.getId()).size());
         request.setAttribute("myTeamsActiveAppraisals",
                 appraisals.getMyTeamsActiveAppraisals(employee.getId()));
         request.setAttribute("reviewer", getReviewer(employee.getId()));
@@ -252,14 +252,16 @@ public class Actions {
         RequiredAction reviewerAction;
         Reviewer reviewer;
         Employee loggedInEmployee = employees.findByOnid(getLoggedOnUsername(request));
+        ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
+
 
         ArrayList<HashMap> myActiveAppraisals = (ArrayList<HashMap>)
                 request.getAttribute("myActiveAppraisals");
-        requiredActions.addAll(getAppraisalActions(myActiveAppraisals, "employee"));
+        requiredActions.addAll(getAppraisalActions(myActiveAppraisals, "employee", resource));
 
         ArrayList<HashMap> supervisorActions = (ArrayList<HashMap>)
                 request.getAttribute("myTeamsActiveAppraisals");
-        requiredActions.addAll(getAppraisalActions(supervisorActions, "supervisor"));
+        requiredActions.addAll(getAppraisalActions(supervisorActions, "supervisor", resource));
 
         reviewer = getReviewer(loggedInEmployee.getId());
         if (reviewer != null) {
@@ -277,11 +279,13 @@ public class Actions {
      * list of appraisals passed in. If the user and role have no appraisal actions,
      * it returns an empty ArrayList.
      *
-     * @param appraisalList
-     * @param role
-     * @return
+     * @param appraisalList     List of appraisals to check for actions required
+     * @param role              Role of the currently logged in user
+     * @param resource          Resource bundle to pass in to RequiredAction bean
+     * @return  outList
      */
-    public ArrayList<RequiredAction> getAppraisalActions(List<HashMap> appraisalList, String role) {
+    public ArrayList<RequiredAction> getAppraisalActions(List<HashMap> appraisalList,
+                                                         String role, ResourceBundle resource) {
         HashMap permissionRuleMap = (HashMap) portletContext.getAttribute("permissionRules");
         ArrayList<RequiredAction> outList = new ArrayList<RequiredAction>();
         String actionKey = "";
@@ -296,31 +300,19 @@ public class Actions {
             // Get the appropriate permissionrule object from the permissionRuleMap
             PermissionRule rule = (PermissionRule) permissionRuleMap.get(actionKey);
             if (rule != null && rule.getActionRequired() != null
-                    && rule.getActionRequired().equals("")) {
+                    && !rule.getActionRequired().equals("")) {
                 // compose a requiredAction object and add it to the outList.
                 anchorParams = new HashMap<String, String>();
-                anchorText = buildAnchorText(rule.getActionRequired(), appraisalMap);
-                anchorParams.put("action", anchorText);
+                anchorParams.put("action", "displayAppraisal");
                 anchorParams.put("id", appraisalMap.get("id"));
 
                 actionReq = new RequiredAction();
                 actionReq.setParameters(anchorParams);
-                actionReq.setAnchorText(anchorText);
+                actionReq.setAnchorText(rule.getActionRequired(), appraisalMap, resource);
                 outList.add(actionReq);
             }
         }
         return outList;
-    }
-
-    /**
-     * Takes a resource bundle key and returns the formatted actionRequired anchor text.
-     * @param key
-     * @return
-     */
-    private String buildAnchorText(String key, HashMap<String, String> appraisalMap) {
-        ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
-        return resource.getString(key);
-        //@todo: put a bunch of if statements to replace the variables in the anchor text
     }
 
     /**

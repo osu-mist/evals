@@ -1,6 +1,5 @@
 package edu.osu.cws.pass.tests;
 
-import com.sun.tools.javac.util.DefaultFileManager;
 import edu.osu.cws.pass.util.HibernateUtil;
 import edu.osu.cws.pass.util.PermissionRules;
 import org.testng.annotations.BeforeClass;
