@@ -13,7 +13,6 @@ import edu.osu.cws.pass.util.Employees;
 import org.hibernate.HibernateException;
 
 import javax.portlet.*;
-import java.text.MessageFormat;
 import java.util.*;
 
 /**
@@ -56,9 +55,7 @@ public class Actions {
         if (ParamUtil.getString(request, "criterionAreaId").equals("")) {
             _log.error("Actions.addCriteria setting values for new form");
         } else {
-            AppointmentType appointmentType = appointmentTypes.findById(
-                    ParamUtil.getInteger(request, "appointmentTypeID")
-            );
+            String appointmentType = ParamUtil.getString(request, "appointmentTypeID");
 
             criterionArea.setName(ParamUtil.getString(request, "name"));
             criterionArea.setAppointmentType(appointmentType);
@@ -103,10 +100,10 @@ public class Actions {
      * @return jsp
      */
     public String listCriteria(PortletRequest request, PortletResponse response, JSPPortlet portlet) {
-        int appointmentTypeID = ParamUtil.getInteger(request, "appointmentTypeID", Criteria.DEFAULT_APPOINTMENT_TYPE);
+        String appointmentType = ParamUtil.getString(request, "appointmentType", Criteria.DEFAULT_APPOINTMENT_TYPE);
 
         try {
-            request.setAttribute("criteria", new Criteria().list(appointmentTypeID));
+            request.setAttribute("criteria", new Criteria().list(appointmentType));
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
         } catch (HibernateException e) {

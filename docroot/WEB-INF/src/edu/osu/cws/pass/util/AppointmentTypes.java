@@ -21,19 +21,4 @@ public class AppointmentTypes {
         return result;
     }
 
-    /**
-     * Fetches an appointment type object based on the given id
-     *
-     * @param id
-     * @return
-     */
-    public AppointmentType findById(int id) {
-        Session hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
-        AppointmentType appointmentType =
-                (AppointmentType) hsession.load(AppointmentType.class, id);
-        tx.commit();
-
-        return appointmentType;
-    }
 }

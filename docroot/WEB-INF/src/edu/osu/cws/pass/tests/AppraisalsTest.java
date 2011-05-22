@@ -217,7 +217,7 @@ public class AppraisalsTest {
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assessment.setGoal("first edit of goal");
         }
-        appraisals.setLoggedInUser(modifiedAppraisal.getJob().getEmployeePidm());
+        appraisals.setLoggedInUser(modifiedAppraisal.getJob().getEmployee());
         appraisals.updateAppraisal(modifiedAppraisal);
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assert assessment.getGoal() != null :
@@ -247,8 +247,7 @@ public class AppraisalsTest {
         assert myActiveAppraisals.size() == 2 : "Invalid size of active appraisals";
         for (HashMap ap : myActiveAppraisals) {
             assert ap.get("id") != new Integer(0) : "id should be present in list of appraisals";
-            //@todo: should this be use jobTitle instead? check my notes
-            assert ap.get("positionTitle") != null : "job title should be present in list of appraisals";
+            assert ap.get("jobTitle") != null : "job title should be present in list of appraisals";
             assert ap.get("startDate") != null : "start date should be present in list of appraisals";
             assert ap.get("endDate") != null : "end date should be present in list of appraisals";
             assert ap.get("status") != null : "status should be present in list of appraisals";
@@ -264,7 +263,7 @@ public class AppraisalsTest {
             assert ap.get("id") != new Integer(0) :
                     "id should be present in list of team appraisals";
             //@todo: should this be use jobTitle instead? check my notes
-            assert ap.get("positionTitle") != null : "" +
+            assert ap.get("jobTitle") != null : "" +
                     "job title should be present in list of team appraisals";
             assert ap.get("startDate") != null :
                     "start date should be present in list of team appraisals";
@@ -274,7 +273,7 @@ public class AppraisalsTest {
                     "status should be present in list of team appraisals";
             assert ap.get("employeeName") != null :
                     "employee name should be present in list of team appraisals";
-            assert ap.get("appointmentTypeName") != null :
+            assert ap.get("appointmentType") != null :
                     "appointment type name should be present in list of team appraisals";
         }
     }

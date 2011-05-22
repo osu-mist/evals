@@ -10,7 +10,9 @@
 
         <property name="businessCenterName" type="string" length="4"/>
 
-        <many-to-one name="employee" class="edu.osu.cws.pass.models.Employee" column="employeePidm" not-null="true"/>
+        <many-to-one name="employee" class="edu.osu.cws.pass.models.Employee"
+                     column="employeePidm"
+                     not-null="true"/>
     </class>
 
 </hibernate-mapping>

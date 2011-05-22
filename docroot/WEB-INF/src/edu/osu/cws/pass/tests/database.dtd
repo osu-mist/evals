@@ -29,7 +29,6 @@
 
 <!ELEMENT appointment_types EMPTY>
 <!ATTLIST appointment_types
-    id CDATA #REQUIRED
     name CDATA #REQUIRED
 >
 
@@ -37,7 +36,7 @@
 <!ATTLIST appraisal_steps
     id CDATA #REQUIRED
     action CDATA #REQUIRED
-    appointmentTypeID CDATA #REQUIRED
+    appointmentType CDATA #REQUIRED
     originalStatus CDATA #REQUIRED
     newStatus CDATA #REQUIRED
     emailTypeID CDATA #REQUIRED
@@ -101,7 +100,7 @@
 <!ATTLIST criteria_areas
     id CDATA #REQUIRED
     name CDATA #REQUIRED
-    appointmentTypeID CDATA #REQUIRED
+    appointmentType CDATA #REQUIRED
     sequence CDATA #REQUIRED
     originalID CDATA #IMPLIED
     createDate CDATA #REQUIRED
@@ -143,10 +142,10 @@
     id CDATA #REQUIRED
     employeePidm CDATA #REQUIRED
     supervisorJobID CDATA #REQUIRED
-    positionNumber CDATA #REQUIRED
+    jobNumber CDATA #REQUIRED
     suffix CDATA #REQUIRED
     jobEcls CDATA #REQUIRED
-    appointmentTypeID CDATA #REQUIRED
+    appointmentType CDATA #REQUIRED
     beginDate CDATA #REQUIRED
     endDate CDATA #IMPLIED
     positionClass CDATA #REQUIRED

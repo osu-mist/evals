@@ -17,7 +17,7 @@ public class CriterionArea extends Pass {
 
     private String name = "";
 
-    private AppointmentType appointmentType;
+    private String appointmentType;
 
     private CriterionArea originalID;
 
@@ -117,7 +117,7 @@ public class CriterionArea extends Pass {
         this.errors.remove("appointmentType");
         if (this.appointmentType == null) {
             appointmentErrors.add(appointmentTypeRequired);
-        } else if (this.appointmentType.getId() == 0) {
+        } else if (this.appointmentType.equals("")) {
             appointmentErrors.add(appointmentTypeRequired);
         }
 
@@ -154,11 +154,11 @@ public class CriterionArea extends Pass {
         this.name = name;
     }
 
-    public AppointmentType getAppointmentType() {
+    public String getAppointmentType() {
         return appointmentType;
     }
 
-    public void setAppointmentType(AppointmentType appointmentType) {
+    public void setAppointmentType(String appointmentType) {
         this.appointmentType = appointmentType;
     }
 

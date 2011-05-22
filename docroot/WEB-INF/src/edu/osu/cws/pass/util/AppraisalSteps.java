@@ -28,7 +28,7 @@ public class AppraisalSteps {
 
         while (stepIterator.hasNext()) {
             step = (AppraisalStep) stepIterator.next();
-            key = step.getAction()+"-"+step.getAppointmentType().getName()+"-"+
+            key = step.getAction()+"-"+step.getAppointmentType()+"-"+
                     step.getOriginalStatus();
             stepsMap.put(key, step);
         }

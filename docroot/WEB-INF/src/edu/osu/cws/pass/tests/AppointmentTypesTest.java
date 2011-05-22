@@ -30,6 +30,6 @@ public class AppointmentTypesTest {
         List types = appointmentTypes.list();
         assert types.size() == 1 : "Invalid number of appointment types.";
         AppointmentType type = (AppointmentType) types.get(0);
-        assert type.getName().equals("Classified") : "Invalid appointment type";
+        assert type.getName().equals("classified") : "Invalid appointment type";
     }
 }

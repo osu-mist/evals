@@ -38,8 +38,8 @@ addCriteriaURL.setParameter("action", "addCriteria");
         <td><liferay-ui:message key="appointmentType" />
         <td><select name="<portlet:namespace />appointmentTypeID">
             <c:forEach var="appointmentType" items="${appointmentTypes}">
-                <option value="${appointmentType.id}"
-                    ${(appointmentType.id == criterionArea.appointmentType.id)? 'selected="selected"': ''}>
+                <option value="${appointmentType.name}"
+                    ${(appointmentType.name == criterionArea.appointmentType)? 'selected="selected"': ''}>
                     ${appointmentType.name}</option>
 
             </c:forEach>

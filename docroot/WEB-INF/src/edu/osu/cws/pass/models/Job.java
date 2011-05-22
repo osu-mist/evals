@@ -8,19 +8,19 @@ import java.util.Date;
 public class Job extends Pass {
     private int id;
 
-    private Employee employeePidm;
+    private Employee employee;
 
     private Job supervisor;
 
-    private String positionTitle;
+    private String jobTitle;
 
-    private String positionNumber;
+    private String jobNumber;
 
     private String suffix;
 
     private String jobEcls;
 
-    private AppointmentType appointmentType;
+    private String appointmentType;
 
     private Date beginDate;
 
@@ -42,12 +42,12 @@ public class Job extends Pass {
         this.id = id;
     }
 
-    public Employee getEmployeePidm() {
-        return employeePidm;
+    public Employee getEmployee() {
+        return employee;
     }
 
-    public void setEmployeePidm(Employee employeePidm) {
-        this.employeePidm = employeePidm;
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
     }
 
     public Job getSupervisor() {
@@ -58,20 +58,20 @@ public class Job extends Pass {
         this.supervisor = supervisor;
     }
 
-    public String getPositionTitle() {
-        return positionTitle;
+    public String getJobTitle() {
+        return jobTitle;
     }
 
-    public void setPositionTitle(String positionTitle) {
-        this.positionTitle = positionTitle;
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
     }
 
-    public String getPositionNumber() {
-        return positionNumber;
+    public String getJobNumber() {
+        return jobNumber;
     }
 
-    public void setPositionNumber(String positionNumber) {
-        this.positionNumber = positionNumber;
+    public void setJobNumber(String jobNumber) {
+        this.jobNumber = jobNumber;
     }
 
     public String getSuffix() {
@@ -90,11 +90,11 @@ public class Job extends Pass {
         this.jobEcls = jobEcls;
     }
 
-    public AppointmentType getAppointmentType() {
+    public String getAppointmentType() {
         return appointmentType;
     }
 
-    public void setAppointmentType(AppointmentType appointmentType) {
+    public void setAppointmentType(String appointmentType) {
         this.appointmentType = appointmentType;
     }
 

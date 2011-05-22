@@ -8,8 +8,8 @@
             <generator class="native" />
         </id>
 
-        <property name="positionTitle" type="string" length="255"/>
-        <property name="positionNumber" type="string" length="8"/>
+        <property name="jobTitle" type="string" length="255"/>
+        <property name="jobNumber" type="string" length="8"/>
         <property name="suffix" type="string" length="2"/>
         <property name="jobEcls" type="string" length="45"/>
         <property name="beginDate" type="date"/>
@@ -18,13 +18,14 @@
         <property name="tsOrgCode" type="string" length="45"/>
         <property name="orgCodeDescription" type="string" length="45"/>
         <property name="businessCenterName" type="string" length="4"/>
+        <property name="appointmentType" length="45"/>
 
-        <many-to-one name="employeePidm" class="edu.osu.cws.pass.models.Employee" not-null="false"/>
+        <many-to-one name="employee" class="edu.osu.cws.pass.models.Employee"
+                     column="employeePidm"
+                     not-null="false"/>
         <many-to-one name="supervisor" class="edu.osu.cws.pass.models.Job"
                      column="supervisorJobID"
                      not-null="false"/>
-        <many-to-one name="appointmentType" class="edu.osu.cws.pass.models.AppointmentType"
-                     column="appointmentTypeID" not-null="true"/>
     </class>
 
 </hibernate-mapping>

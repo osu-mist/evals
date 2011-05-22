@@ -5,10 +5,7 @@
  */
 package edu.osu.cws.pass.util;
 
-import edu.osu.cws.pass.models.CriterionArea;
-import edu.osu.cws.pass.models.CriterionDetail;
-import edu.osu.cws.pass.models.Employee;
-import edu.osu.cws.pass.models.ModelException;
+import edu.osu.cws.pass.models.*;
 import org.hibernate.*;
 
 import java.util.Iterator;
@@ -21,7 +18,7 @@ public class Criteria {
     /**
      * The default appointment type to use when displaying criteria information.
      */
-    public static final int DEFAULT_APPOINTMENT_TYPE = 1;
+    public static final String DEFAULT_APPOINTMENT_TYPE = AppointmentType.CLASSIFIED;
 
     /**
      * Takes the CriterionArea and CriterionDetail POJO objects, performs validation
@@ -35,7 +32,7 @@ public class Criteria {
      */
     public boolean add(CriterionArea area, CriterionDetail details, String onid)
             throws ModelException {
-        int sequence = getNextSequence(area.getAppointmentType().getId());
+        int sequence = getNextSequence(area.getAppointmentType());
         Employee createdBy = employees.findByOnid(onid);
 
         area.setCreatedBy(createdBy);
@@ -78,31 +75,33 @@ public class Criteria {
     }
 
     /**
-     * Takes an employeeTypeID, gets a Hibernate session object and calls a private method
+     * Takes an appointmentType, gets a Hibernate session object and calls a private method
      * to call the private method that just uses Hibernate to fetch the list of criteria.
      *
-     * @param employeeTypeID
+     * @param appointmentType
      * @return criteria        List of CriterionAreas
      * @throws edu.osu.cws.pass.models.ModelException
      */
-    public List<CriterionArea> list(int employeeTypeID) throws ModelException {
+    public List<CriterionArea> list(String appointmentType) throws ModelException {
         Session session = null;
         session = HibernateUtil.getCurrentSession();
-        return this.list(employeeTypeID, session);
+        return this.list(appointmentType, session);
     }
 
     /**
-     * Takes an employeeTypeID, a Hibernate session and uses Hibernate to fetch the list of
+     * Takes an appointmentType, a Hibernate session and uses Hibernate to fetch the list of
      * CriterionArea.
      *
-     * @param employeeTypeID
+     * @param appointmentType
      * @param session
      * @return criteria     List of CriterionAreas
      * @throws org.hibernate.HibernateException
      */
-    private List<CriterionArea> list(int employeeTypeID, Session session) throws HibernateException {
+    private List<CriterionArea> list(String appointmentType, Session session) throws HibernateException {
         Transaction tx = session.beginTransaction();
-        List result = session.createQuery("from edu.osu.cws.pass.models.CriterionArea").list();
+        List result = session.createQuery("from edu.osu.cws.pass.models.CriterionArea where " +
+                "appointmentType = :appointmentType").setString("appointmentType", appointmentType)
+                .list();
         tx.commit();
         return result;
 
@@ -133,19 +132,19 @@ public class Criteria {
     /**
      * Figures out the next available sequence for a CriterionArea of a specific appointment type.
      * The next available sequence is usually is size of criteria list + 1.
-     * @param appointmentTypeId
+     * @param appointmentType
      * @return
      */
-    public int getNextSequence(int appointmentTypeId) {
+    public int getNextSequence(String appointmentType) {
         int availableSequence = 0;
         Session hsession = null;
 
         hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         Query countQry = hsession.createQuery("select count(*) from edu.osu.cws.pass.models.CriterionArea " +
-                "where appointmentTypeID = :appointmentTypeId");
+                "where appointmentType = :appointmentType");
 
-        countQry.setInteger("appointmentTypeId", appointmentTypeId);
+        countQry.setString("appointmentType", appointmentType);
         countQry.setMaxResults(1);
         Iterator results = countQry.list().iterator();
 

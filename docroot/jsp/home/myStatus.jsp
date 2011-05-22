@@ -28,7 +28,7 @@
                         onmouseover="this.className = 'portlet-section-body-hover results-row hover';"
                         onmouseout="this.className = '${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}';"
                     >
-                        <td>${shortAppraisal.positionTitle}</td>
+                        <td>${shortAppraisal.jobTitle}</td>
                         <td><fmt:formatDate value="${shortAppraisal.startDate}" pattern="yyyy"/> -
                             <fmt:formatDate value="${shortAppraisal.endDate}" pattern="yyyy"/>
                         </td>

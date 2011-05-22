@@ -30,7 +30,7 @@
                         onmouseout="this.className = '${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}';"
                     >
                         <td>${shortAppraisal.employeeName}</td>
-                        <td><liferay-ui:message key="${shortAppraisal.appointmentTypeName}" /></td>
+                        <td><liferay-ui:message key="${shortAppraisal.appointmentType}" /></td>
                         <td><fmt:formatDate value="${shortAppraisal.startDate}" pattern="yyyy"/> -
                             <fmt:formatDate value="${shortAppraisal.endDate}" pattern="yyyy"/>
                         </td>

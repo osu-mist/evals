@@ -57,10 +57,10 @@ public class CriteriaTests {
     @DataProvider(name = "criteria")
     public Object[][] createData1() {
         initializeObjects();
+        String type = AppointmentType.CLASSIFIED;
         Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         Employee createdBy = (Employee) hsession.load(Employee.class, 12345);
-        AppointmentType type = (AppointmentType) hsession.load(AppointmentType.class, 1);
         tx.commit();
 
         criterionObject.setName("Some valid name");
@@ -94,8 +94,7 @@ public class CriteriaTests {
         CriterionDetail fakeDetails;
         CriterionDetail dbDetails;
 
-        AppointmentType type = new AppointmentType();
-        type.setName("Classified");
+        String type = AppointmentType.CLASSIFIED;
 
         expectedCriteria.setId(1);
         expectedCriteria.setName("COMMUNICATION SKILLS");
@@ -199,15 +198,13 @@ public class CriteriaTests {
         assert criterionObject.getErrors().containsKey("appointmentType") :
                 "Missing sequence error msg";
 
-        AppointmentType type = new AppointmentType();
-        criterionObject.setAppointmentType(type);
+        String type = AppointmentType.CLASSIFIED;
+        criterionObject.setAppointmentType("");
         assert !criterionObject.validateAppointmentType():
                 "A valid appointment type should be required";
         assert criterionObject.getErrors().containsKey("appointmentType") :
                 "Missing sequence error msg";
 
-        type.setId(1);
-        type.setName("Classified");
         criterionObject.setAppointmentType(type);
         assert criterionObject.validateAppointmentType():
                 "Appointment type should validate";
@@ -233,7 +230,7 @@ public class CriteriaTests {
 
         area.setName("");
         area.setSequence(0);
-        area.setAppointmentType(new AppointmentType());
+        area.setAppointmentType(AppointmentType.CLASSIFIED);
         assert !area.validate() : "All fields in CriterionArea should check validation";
     }
 
@@ -260,7 +257,7 @@ public class CriteriaTests {
         Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         Employee createdBy = (Employee) hsession.load(Employee.class, 12345);
-        AppointmentType type = (AppointmentType) hsession.load(AppointmentType.class, 1);
+        String type = AppointmentType.CLASSIFIED;
         tx.commit();
 
         criterionObject.setName("Communication");

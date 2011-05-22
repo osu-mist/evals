@@ -34,7 +34,7 @@ public class Appraisals {
         appraisal.setCreateDate(new Date());
 
         if (appraisal.validate()) {
-            List<CriterionArea> criteriaList = criteria.list(job.getAppointmentType().getId());
+            List<CriterionArea> criteriaList = criteria.list(job.getAppointmentType());
             Session session = HibernateUtil.getCurrentSession();
             Transaction tx = session.beginTransaction();
             session.save(appraisal);
@@ -105,7 +105,7 @@ public class Appraisals {
      * Returns a list of active appraisals for all the jobs that the current pidm holds.
      * The fields that are returned in the appraisal are:
      *      appraisalID
-     *      positionTitle
+     *      jobTitle
      *      startDate
      *      endDate
      *      status;
@@ -127,10 +127,10 @@ public class Appraisals {
     private ArrayList<HashMap> getAllMyActiveAppraisals(int pidm, Session session) {
         Transaction tx = session.beginTransaction();
         //@todo: the query below should have a where clause => job.employee.id = pidm
-        String query = "select new map( id as id, job.positionTitle as positionTitle, " +
+        String query = "select new map( id as id, job.jobTitle as jobTitle, " +
                 "startDate as startDate, endDate as endDate, status as status)" +
                 " from edu.osu.cws.pass.models.Appraisal where " +
-                " job.employeePidm.id = :pidm and status not in ('completed', 'closed')";
+                " job.employee.id = :pidm and status not in ('completed', 'closed')";
         ArrayList<HashMap> result = (ArrayList<HashMap>) session.createQuery(query)
                 .setInteger("pidm", pidm)
                 .list();
@@ -158,11 +158,11 @@ public class Appraisals {
      */
     private List<HashMap> getMyTeamsActiveAppraisals(Integer pidm, Session session) {
         Transaction tx = session.beginTransaction();
-        String query = "select new map(id as id, job.positionTitle as positionTitle, " +
-                "concat(job.employeePidm.lastName, ', ', job.employeePidm.firstName) as employeeName, " +
-                "job.appointmentType.name as appointmentTypeName, startDate as startDate, " +
+        String query = "select new map(id as id, job.jobTitle as jobTitle, " +
+                "concat(job.employee.lastName, ', ', job.employee.firstName) as employeeName, " +
+                "job.appointmentType as appointmentType, startDate as startDate, " +
                 "endDate as endDate, status as status) " +
-                "from edu.osu.cws.pass.models.Appraisal where job.supervisor.employeePidm.id = :pidm " +
+                "from edu.osu.cws.pass.models.Appraisal where job.supervisor.employee.id = :pidm " +
                 "and status not in ('completed', 'closed') ";
         List result =  session.createQuery(query).setInteger("pidm", pidm).list();
 
@@ -182,12 +182,12 @@ public class Appraisals {
     public String getRole(Appraisal appraisal, int pidm) throws ModelException {
         Session session = HibernateUtil.getCurrentSession();
         Job supervisor;
-        if (pidm == appraisal.getJob().getEmployeePidm().getId()) {
+        if (pidm == appraisal.getJob().getEmployee().getId()) {
             return "employee";
         }
 
         supervisor = jobs.getSupervisor(appraisal.getJob());
-        if (supervisor != null && pidm == supervisor.getEmployeePidm().getId()) {
+        if (supervisor != null && pidm == supervisor.getEmployee().getId()) {
             return "supervisor";
         }
 

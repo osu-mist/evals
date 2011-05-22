@@ -51,7 +51,7 @@ public class RequiredAction {
                 key.equals("action-required-signature-past-due")
             ) {
             pattern = resource.getString(key);
-            anchorText = MessageFormat.format(pattern, appraisalMap.get("positionTitle"), reviewPeriod);
+            anchorText = MessageFormat.format(pattern, appraisalMap.get("jobTitle"), reviewPeriod);
 
         }
 

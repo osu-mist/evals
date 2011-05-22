@@ -5,7 +5,7 @@ public class AppraisalStep extends Pass {
 
     private String action;
 
-    private AppointmentType appointmentType;
+    private String appointmentType;
 
     private String originalStatus;
 
@@ -31,11 +31,11 @@ public class AppraisalStep extends Pass {
         this.action = action;
     }
 
-    public AppointmentType getAppointmentType() {
+    public String getAppointmentType() {
         return appointmentType;
     }
 
-    public void setAppointmentType(AppointmentType appointmentType) {
+    public void setAppointmentType(String appointmentType) {
         this.appointmentType = appointmentType;
     }
 
