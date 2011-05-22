@@ -12,6 +12,7 @@ public class Appraisals {
     private Appraisal appraisal = new Appraisal();
     private CriterionArea criterionArea = new CriterionArea();
     private Criteria criteria = new Criteria();
+    private Jobs jobs = new Jobs();
 
     /**
      * This method creates an appraisal for the given job by calling the Hibernate
@@ -169,7 +170,45 @@ public class Appraisals {
         return result;
     }
 
+    /**
+     * Returns the role (employee, supervisor, immediate supervisor or reviewer) of the pidm
+     * in the given appraisal. Return empty string if the pidm does not have any role on the
+     * appraisal.
+     *
+     * @param appraisal     appraisal to check role in
+     * @param pidm          pidm of the user to check
+     * @return role
+     */
+    public String getRole(Appraisal appraisal, int pidm) throws ModelException {
+        Session session = HibernateUtil.getCurrentSession();
+        Job supervisor;
+        if (pidm == appraisal.getJob().getEmployeePidm().getId()) {
+            return "employee";
+        }
 
+        supervisor = jobs.getSupervisor(appraisal.getJob());
+        if (supervisor != null && pidm == supervisor.getEmployeePidm().getId()) {
+            return "supervisor";
+        }
+
+        Transaction tx = session.beginTransaction();
+        String query = "from edu.osu.cws.pass.models.Reviewer where " +
+                "businessCenterName = :businessCenterName and employee.active = 1";
+        List reviewerList = session.createQuery(query)
+                .setString("businessCenterName", appraisal.getJob().getBusinessCenterName())
+                .list();
+        tx.commit();
+
+        if (reviewerList.size() != 0) {
+            return "reviewer";
+        }
+
+        if (jobs.isUpperSupervisor(appraisal.getJob(), pidm)) {
+            return "upper-supervisor";
+        }
+
+        return "";
+    }
 
     public void setLoggedInUser(Employee loggedInUser) {
         this.loggedInUser = loggedInUser;

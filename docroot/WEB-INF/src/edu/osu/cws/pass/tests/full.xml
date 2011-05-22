@@ -33,8 +33,12 @@
   <email_types type="goals-require-modification" recipients="employee"/>
   <employees pidm="12345" firstName="Jose" middleName="Daniel" lastName="Cedeno" osuid="931421234" onid="cedenoj" preferredEmail="jose.cedeno@oregonstate.edu" copySupervisor="false" active="true"/>
   <employees pidm="12467" firstName="Joan" lastName="Lu" osuid="931421234" onid="luf" preferredEmail="joan.lu@oregonstate.edu" copySupervisor="false" active="true"/>
-  <reviewers id="1" employeePidm="12345" businessCenterName="UABC"/>
-  <reviewers id="2" employeePidm="12467" businessCenterName="UABC"/>
+  <employees pidm="787812" firstName="Clark" lastName="Barlow" osuid="12345678" onid="barlowc" preferredEmail="test@orst.edu" copySupervisor="false" active="true"/>
+  <employees pidm="8712359" firstName="Lois" lastName="Barlow" osuid="12345678" onid="barlowc" preferredEmail="test@orst.edu" copySupervisor="false" active="true"/>
+  <employees pidm="990871" firstName="Megan" lastName="Barlow" osuid="12345678" onid="barlowc" preferredEmail="test@orst.edu" copySupervisor="false" active="true"/>
+
+  <reviewers id="1" employeePidm="787812" businessCenterName="UABC"/>
+  <reviewers id="2" employeePidm="8712359" businessCenterName="UABC"/>
   <jobs id="1"
         employeePidm="12345"
         supervisorJobID="3"
@@ -64,6 +68,56 @@
   <jobs id="3"
         employeePidm="12467"
         positionTitle="MU Supervisor"
+        positionNumber="1234"
+        suffix="00"
+        jobEcls="kjlkjlk"
+        appointmentTypeID="1"
+        beginDate="2011-05-14"
+        positionClass="foobar"
+        businessCenterName="UABC"
+        tsOrgCode="test"
+        orgCodeDescription="testing"/>
+  <jobs id="4"
+        employeePidm="12345"
+        supervisorJobID="5"
+        positionTitle="Bartender"
+        positionNumber="1234"
+        suffix="00"
+        jobEcls="kjlkjlk"
+        appointmentTypeID="1"
+        beginDate="2011-05-14"
+        positionClass="foobar"
+        businessCenterName="UABC"
+        tsOrgCode="test"
+        orgCodeDescription="testing"/>
+  <jobs id="5"
+        supervisorJobID="6"
+        positionTitle="Bartender supervisor"
+        positionNumber="1234"
+        suffix="00"
+        jobEcls="kjlkjlk"
+        appointmentTypeID="1"
+        beginDate="2011-05-14"
+        positionClass="foobar"
+        businessCenterName="UABC"
+        tsOrgCode="test"
+        orgCodeDescription="testing"/>
+  <jobs id="6"
+        employeePidm="8712359"
+        supervisorJobID="7"
+        positionTitle="Bartender supervisor"
+        positionNumber="1234"
+        suffix="00"
+        jobEcls="kjlkjlk"
+        appointmentTypeID="1"
+        beginDate="2011-05-14"
+        positionClass="foobar"
+        businessCenterName="UABC"
+        tsOrgCode="test"
+        orgCodeDescription="testing"/>
+  <jobs id="7"
+        employeePidm="990871"
+        positionTitle="Bar owner"
         positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"

@@ -19,7 +19,7 @@
         <property name="orgCodeDescription" type="string" length="45"/>
         <property name="businessCenterName" type="string" length="4"/>
 
-        <many-to-one name="employeePidm" class="edu.osu.cws.pass.models.Employee" not-null="true"/>
+        <many-to-one name="employeePidm" class="edu.osu.cws.pass.models.Employee" not-null="false"/>
         <many-to-one name="supervisor" class="edu.osu.cws.pass.models.Job"
                      column="supervisorJobID"
                      not-null="false"/>

@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+@Test
 public class AppraisalsTest {
 
     Appraisal appraisal = new Appraisal();
@@ -276,6 +277,34 @@ public class AppraisalsTest {
             assert ap.get("appointmentTypeName") != null :
                     "appointment type name should be present in list of team appraisals";
         }
+    }
+
+    public void shouldReturnEmptyStringWhenPidmHasNoRole() throws ModelException {
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+        Appraisal appraisal = (Appraisal) session.load(Appraisal.class, 1);
+        tx.commit();
+
+        int invalidPidm = 1111;
+        assert appraisals.getRole(appraisal, invalidPidm).equals("");
+    }
+
+    public void shouldDetectEmployeeRoleInAppraisal() throws ModelException {
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+        Appraisal appraisal = (Appraisal) session.load(Appraisal.class, 1);
+        tx.commit();
+
+        assert appraisals.getRole(appraisal, 12345).equals("employee");
+    }
+
+    public void shouldDetectReviewerRoleInAppraisal() throws ModelException {
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+        Appraisal appraisal = (Appraisal) session.load(Appraisal.class, 1);
+        tx.commit();
+
+        assert appraisals.getRole(appraisal, 787812).equals("reviewer");
     }
 
 }
