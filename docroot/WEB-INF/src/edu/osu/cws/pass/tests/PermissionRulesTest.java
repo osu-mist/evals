@@ -20,12 +20,10 @@ public class PermissionRulesTest {
      *
      */
     @BeforeClass
-    public void setUp() {
+    public void setUp() throws Exception {
         HibernateUtil.setEnvironment(HibernateUtil.TESTING);
-/*        DBUnit dbunit = new DBUnit();
-        try {
-            dbunit.seedDatabase();
-        } catch (Exception e) {}*/
+        DBUnit dbunit = new DBUnit();
+        dbunit.seedDatabase();
     }
 
     @Test(groups = {"unittest"})

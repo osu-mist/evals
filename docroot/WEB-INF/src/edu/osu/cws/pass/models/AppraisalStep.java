@@ -7,8 +7,6 @@ public class AppraisalStep extends Pass {
 
     private String appointmentType;
 
-    private String originalStatus;
-
     private String newStatus;
 
     private EmailType emailType;
@@ -37,14 +35,6 @@ public class AppraisalStep extends Pass {
 
     public void setAppointmentType(String appointmentType) {
         this.appointmentType = appointmentType;
-    }
-
-    public String getOriginalStatus() {
-        return originalStatus;
-    }
-
-    public void setOriginalStatus(String originalStatus) {
-        this.originalStatus = originalStatus;
     }
 
     public String getNewStatus() {

@@ -7,5 +7,7 @@
         <id name="type" type="string"/>
 
         <property name="recipients" length="64"/>
+        <property name="cc" length="64"/>
+        <property name="bcc" length="64"/>
     </class>
 </hibernate-mapping>

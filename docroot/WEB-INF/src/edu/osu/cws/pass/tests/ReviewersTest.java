@@ -18,12 +18,10 @@ public class ReviewersTest {
      *
      */
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
         HibernateUtil.setEnvironment(HibernateUtil.TESTING);
         DBUnit dbunit = new DBUnit();
-        try {
-            dbunit.seedDatabase();
-        } catch (Exception e) {}
+        dbunit.seedDatabase();
     }
 
     @Test(groups = {"unittest"})

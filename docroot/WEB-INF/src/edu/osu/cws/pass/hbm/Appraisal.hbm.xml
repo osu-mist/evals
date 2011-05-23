@@ -19,19 +19,23 @@
         <property name="hrComments" type="text"/>
         <property name="createDate" type="timestamp"/>
         <property name="modifiedDate" type="timestamp"/>
-        <property name="employeeComments" type="text"/>
+        <property name="employeeResponse" type="text"/>
         <property name="employeeSignedDate" type="timestamp"/>
         <property name="emailType" length="45"/>
         <property name="emailDate" type="date"/>
         <property name="emailCount" type="java.lang.Integer"/>
         <property name="closeOutDate" type="timestamp"/>
         <property name="closeOutReason" type="text"/>
-        <property name="status" length="45"/>
+        <property name="status" length="32"/>
+        <property name="reopenedDate" type="timestamp"/>
+        <property name="reopenReason" type="text"/>
+        <property name="originalStatus" length="32"/>
 
         <many-to-one name="job" class="edu.osu.cws.pass.models.Job" column="jobID" not-null="true"/>
         <many-to-one name="goalApprover" class="edu.osu.cws.pass.models.Employee" column="goalApproverID" not-null="false"/>
         <many-to-one name="hrApprover" class="edu.osu.cws.pass.models.Employee" column="hrApproverID" not-null="false"/>
         <many-to-one name="closeOutBy" class="edu.osu.cws.pass.models.Employee" not-null="false"/>
+        <many-to-one name="reopenedBy" class="edu.osu.cws.pass.models.Employee" not-null="false"/>
         <set name="assessments" inverse="true">
             <key column="appraisalID"/>
             <one-to-many class="edu.osu.cws.pass.models.Assessment" />

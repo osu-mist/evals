@@ -49,7 +49,7 @@ This is a sample hibernate configuration file. You have to copy this file to
         <mapping resource="edu/osu/cws/pass/hbm/Job.hbm.xml"/>
         <mapping resource="edu/osu/cws/pass/hbm/Appraisal.hbm.xml"/>
         <mapping resource="edu/osu/cws/pass/hbm/Assessment.hbm.xml"/>
-        <mapping resource="edu/osu/cws/pass/hbm/AssessmentLog.hbm.xml"/>
+        <mapping resource="edu/osu/cws/pass/hbm/GoalLog.hbm.xml"/>
         <mapping resource="edu/osu/cws/pass/hbm/EmailType.hbm.xml"/>
         <mapping resource="edu/osu/cws/pass/hbm/AppraisalStep.hbm.xml"/>
         <mapping resource="edu/osu/cws/pass/hbm/PermissionRule.hbm.xml"/>

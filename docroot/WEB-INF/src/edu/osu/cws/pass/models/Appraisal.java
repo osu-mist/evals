@@ -70,7 +70,7 @@ public class Appraisal extends Pass {
 
     private Date modifiedDate;
 
-    private String employeeComments;
+    private String employeeResponse;
 
     private Date employeeSignedDate;
 
@@ -85,6 +85,14 @@ public class Appraisal extends Pass {
     private Employee closeOutBy;
 
     private String closeOutReason;
+
+    private Employee reopenedBy;
+
+    private Date reopenedDate;
+
+    private String reopenReason;
+
+    private String originalStatus;
 
     private Set<Assessment> assessments = new HashSet<Assessment>();
 
@@ -246,12 +254,12 @@ public class Appraisal extends Pass {
         this.modifiedDate = modifiedDate;
     }
 
-    public String getEmployeeComments() {
-        return employeeComments;
+    public String getEmployeeResponse() {
+        return employeeResponse;
     }
 
-    public void setEmployeeComments(String employeeComments) {
-        this.employeeComments = employeeComments;
+    public void setEmployeeResponse(String employeeResponse) {
+        this.employeeResponse = employeeResponse;
     }
 
     public Date getEmployeeSignedDate() {
@@ -321,5 +329,37 @@ public class Appraisal extends Pass {
     public void addAssessment(Assessment assessment) {
         assessment.setAppraisal(this);
         this.assessments.add(assessment);
+    }
+
+    public Employee getReopenedBy() {
+        return reopenedBy;
+    }
+
+    public void setReopenedBy(Employee reopenedBy) {
+        this.reopenedBy = reopenedBy;
+    }
+
+    public Date getReopenedDate() {
+        return reopenedDate;
+    }
+
+    public void setReopenedDate(Date reopenedDate) {
+        this.reopenedDate = reopenedDate;
+    }
+
+    public String getReopenReason() {
+        return reopenReason;
+    }
+
+    public void setReopenReason(String reopenReason) {
+        this.reopenReason = reopenReason;
+    }
+
+    public String getOriginalStatus() {
+        return originalStatus;
+    }
+
+    public void setOriginalStatus(String originalStatus) {
+        this.originalStatus = originalStatus;
     }
 }

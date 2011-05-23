@@ -21,15 +21,15 @@ public class Assessment extends Pass {
 
     private Date modifiedDate;
 
-    private Set<AssessmentLog> assessmentLogs = new HashSet<AssessmentLog>();
+    private Set<GoalLog> goalLogs = new HashSet<GoalLog>();
 
     public Assessment() { }
 
-    public AssessmentLog getLastAssessmentLog() {
-        if (assessmentLogs.size() == 0) {
-            return new AssessmentLog();
+    public GoalLog getLastAssessmentLog() {
+        if (goalLogs.size() == 0) {
+            return new GoalLog();
         }
-        return (AssessmentLog) assessmentLogs.toArray()[0];
+        return (GoalLog) goalLogs.toArray()[0];
     }
 
     public int getId() {
@@ -96,16 +96,16 @@ public class Assessment extends Pass {
         this.modifiedDate = modifiedDate;
     }
 
-    public Set<AssessmentLog> getAssessmentLogs() {
-        return assessmentLogs;
+    public Set<GoalLog> getGoalLogs() {
+        return goalLogs;
     }
 
-    public void setAssessmentLogs(Set<AssessmentLog> assessmentLogs) {
-        this.assessmentLogs = assessmentLogs;
+    public void setGoalLogs(Set<GoalLog> goalLogs) {
+        this.goalLogs = goalLogs;
     }
 
-    public void addAssessmentLog(AssessmentLog assessmentLog) {
-        assessmentLog.setAssessment(this);
-        this.assessmentLogs.add(assessmentLog);
+    public void addAssessmentLog(GoalLog goalLog) {
+        goalLog.setAssessment(this);
+        this.goalLogs.add(goalLog);
     }
 }

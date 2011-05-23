@@ -19,19 +19,19 @@ public class AppraisalStepsTest {
      *
      */
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
         HibernateUtil.setEnvironment(HibernateUtil.TESTING);
         DBUnit dbunit = new DBUnit();
-        try {
-            dbunit.seedDatabase();
-        } catch (Exception e) {}
+        dbunit.seedDatabase();
     }
 
     @Test(groups = {"unittest"})
     public void shouldListAllSteps() {
         HashMap steps = appraisalSteps.list();
-        assert steps.containsKey("submit-classified-goals-due") : "Missing step in hashmap";
-        assert steps.containsKey("require-modification-classified-goals-submitted") : "Missing step in hashmap";
+        //@todo: does the test below make sense without the original status in the appraisal_step
+        // table?
+        assert steps.containsKey("submit-classified") : "Missing step in hashmap";
+        assert steps.containsKey("require-modification-classified") : "Missing step in hashmap";
         assert steps.size() == 2 :
                 "AppraisalSteps.list() should find all appraisalSteps";
 

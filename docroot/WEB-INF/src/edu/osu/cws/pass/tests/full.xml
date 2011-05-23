@@ -3,8 +3,8 @@
   <admins id="1" employeeID="12345" isMaster="true" isBackupMaster="false" createDate="2011-05-14 07:41:11.0" createdBy="12345" modifiedDate="2011-05-14 07:41:11.0"/>
   <admins id="2" employeeID="12467" isMaster="false" isBackupMaster="true" createDate="2011-05-14 07:41:11.0" createdBy="12345" modifiedDate="2011-05-14 07:41:11.0"/>
   <appointment_types name="classified"/>
-  <appraisal_steps id="1" action="submit" appointmentType="classified" originalStatus="goals-due" newStatus="goals-submitted" emailTypeID="goals-submitted"/>
-  <appraisal_steps id="2" action="require-modification" appointmentType="classified" originalStatus="goals-submitted" newStatus="goals-require-modification" emailTypeID="goals-require-modification"/>
+  <appraisal_steps id="1" action="submit" appointmentType="classified" newStatus="goals-submitted" emailTypeID="goals-submitted"/>
+  <appraisal_steps id="2" action="require-modification" appointmentType="classified" newStatus="goals-require-modification" emailTypeID="goals-require-modification"/>
   <appraisals id="1"
               startDate="2011-05-14"
               endDate="2012-05-14"
@@ -21,7 +21,7 @@
                 jobID="1"
                 createDate="2010-05-01"
   />
-  <assessment_logs/>
+  <goals_logs/>
   <assessments/>
   <business_centers name="UABC"/>
   <criteria_areas id="1" name="COMMUNICATION SKILLS" appointmentType="classified" sequence="1" createDate="2011-04-10 20:16:48.0" createdBy="12345" deleteDate="2011-04-10 20:16:48.0"/>

@@ -1,19 +1,13 @@
 package edu.osu.cws.pass.tests;
 
-import edu.osu.cws.pass.models.Employee;
 import edu.osu.cws.pass.models.Job;
 import edu.osu.cws.pass.models.ModelException;
-import edu.osu.cws.pass.util.Employees;
 import edu.osu.cws.pass.util.HibernateUtil;
 import edu.osu.cws.pass.util.Jobs;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import sun.awt.geom.AreaOp;
-
-import java.util.List;
 
 @Test
 public class JobsTest {
@@ -21,12 +15,10 @@ public class JobsTest {
     Jobs jobs = new Jobs();
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
         HibernateUtil.setEnvironment(HibernateUtil.TESTING);
         DBUnit dbunit = new DBUnit();
-        try {
-            dbunit.seedDatabase();
-        } catch (Exception e) {}
+        dbunit.seedDatabase();
     }
 
     public void shouldFindSupervisorIfNoDirectSupervisor() throws ModelException{

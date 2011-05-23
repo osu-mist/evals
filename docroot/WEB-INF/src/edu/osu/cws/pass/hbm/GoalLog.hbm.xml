@@ -3,13 +3,14 @@
 
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
-    <class name="edu.osu.cws.pass.models.AssessmentLog" table="assessment_logs">
+    <class name="edu.osu.cws.pass.models.GoalLog" table="goals_logs">
         <id name="id" type="int">
             <generator class="native" />
         </id>
 
         <property name="content" type="text"/>
         <property name="createDate" type="timestamp"/>
+        <property name="type" length="45"/>
 
         <many-to-one name="assessment" class="edu.osu.cws.pass.models.Assessment" column="assessmentID" not-null="true"/>
         <many-to-one name="author" class="edu.osu.cws.pass.models.Employee" column="authorPidm" not-null="true"/>

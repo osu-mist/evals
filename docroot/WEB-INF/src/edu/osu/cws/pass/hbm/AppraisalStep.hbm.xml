@@ -9,7 +9,6 @@
         </id>
 
         <property name="action" length="45"/>
-        <property name="originalStatus" length="32"/>
         <property name="newStatus" length="32"/>
         <property name="appointmentType" length="45"/>
         <many-to-one name="emailType" class="edu.osu.cws.pass.models.EmailType" column="emailTypeID" not-null="true"/>

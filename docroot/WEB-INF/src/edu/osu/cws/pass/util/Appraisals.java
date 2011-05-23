@@ -66,7 +66,7 @@ public class Appraisals {
     public boolean updateAppraisal(Appraisal modifiedAppraisal) throws ModelException {
         String originalGoalText;
         String newGoalText;
-        AssessmentLog assessmentLog;
+        GoalLog goalLog;
 
         // Validate the data first before we try to save anything
         modifiedAppraisal.validate();
@@ -89,12 +89,12 @@ public class Appraisals {
             originalGoalText = assessment.getLastAssessmentLog().getContent();
             newGoalText = assessment.getGoal();
             if (!originalGoalText.equals(newGoalText) && newGoalText != null) {
-                assessmentLog = new AssessmentLog();
-                assessmentLog.setCreateDate(new Date());
-                assessmentLog.setAuthor(loggedInUser);
-                assessmentLog.setContent(newGoalText);
-                assessment.addAssessmentLog(assessmentLog);
-                session.save(assessmentLog);
+                goalLog = new GoalLog();
+                goalLog.setCreateDate(new Date());
+                goalLog.setAuthor(loggedInUser);
+                goalLog.setContent(newGoalText);
+                assessment.addAssessmentLog(goalLog);
+                session.save(goalLog);
             }
         }
         tx.commit();

@@ -2,7 +2,7 @@ package edu.osu.cws.pass.models;
 
 import java.util.Date;
 
-public class AssessmentLog extends Pass {
+public class GoalLog extends Pass {
     private int id;
 
     private String content = "";
@@ -13,7 +13,13 @@ public class AssessmentLog extends Pass {
 
     private Date createDate;
 
-    public AssessmentLog() { }
+    /**
+     * Defaults to null, which will be for normal goals. the value is new for new
+     * goals, used for goalsReactivated.
+     */
+    private String type;
+
+    public GoalLog() { }
 
     public int getId() {
         return id;
@@ -53,5 +59,13 @@ public class AssessmentLog extends Pass {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

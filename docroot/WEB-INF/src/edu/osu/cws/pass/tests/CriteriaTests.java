@@ -29,12 +29,10 @@ public class CriteriaTests {
      */
 //    @BeforeClass
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
         HibernateUtil.setEnvironment(HibernateUtil.TESTING);
         DBUnit dbunit = new DBUnit();
-        try {
-            dbunit.seedDatabase();
-        } catch (Exception e) {}
+        dbunit.seedDatabase();
     }
 
     /**
@@ -42,7 +40,7 @@ public class CriteriaTests {
      * just resets the various criteria objects used in the tests to new values.
      */
     @BeforeMethod
-    public void initializeObjects() {
+    public void initializeObjects() throws Exception {
         criterionObject = new CriterionArea();
         criteriaDetailObject = new CriterionDetail();
         criteriaObject = new Criteria();
@@ -55,7 +53,7 @@ public class CriteriaTests {
      * @return
      */
     @DataProvider(name = "criteria")
-    public Object[][] createData1() {
+    public Object[][] createData1() throws Exception {
         initializeObjects();
         String type = AppointmentType.CLASSIFIED;
         Session hsession = HibernateUtil.getCurrentSession();
@@ -81,7 +79,7 @@ public class CriteriaTests {
      * are fetched as well.
      */
     @Test(groups = {"unittest"})
-    public void returnActiveCriteriaForClassified() throws ModelException {
+    public void returnActiveCriteriaForClassified() throws ModelException, Exception {
         setUp();
         List activeCriteriaList = criteriaObject.list(Criteria.DEFAULT_APPOINTMENT_TYPE);
         CriterionArea expectedCriteria = new CriterionArea();
@@ -270,7 +268,7 @@ public class CriteriaTests {
     }
 
     @Test (groups = {"unittest"})
-    public void shouldReturnNextAvailableSequence() {
+    public void shouldReturnNextAvailableSequence() throws Exception {
         setUp();
         assert criteriaObject.getNextSequence(Criteria.DEFAULT_APPOINTMENT_TYPE) == 3 :
                 "Incorrect calculation of next sequence";

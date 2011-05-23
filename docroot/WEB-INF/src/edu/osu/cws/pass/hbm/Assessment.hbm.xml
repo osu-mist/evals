@@ -16,9 +16,9 @@
 
         <many-to-one name="appraisal" class="edu.osu.cws.pass.models.Appraisal" column="appraisalID" not-null="true"/>
         <many-to-one name="criterionDetail" class="edu.osu.cws.pass.models.CriterionDetail" column="criterionDetailID" not-null="true"/>
-        <set name="assessmentLogs" inverse="true" order-by="createDate DESC">
+        <set name="goalLogs" inverse="true" order-by="createDate DESC">
             <key column="assessmentID"/>
-            <one-to-many class="edu.osu.cws.pass.models.AssessmentLog"/>
+            <one-to-many class="edu.osu.cws.pass.models.GoalLog"/>
         </set>
     </class>
 

@@ -31,12 +31,10 @@ public class AppraisalsTest {
      */
     @BeforeClass
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
         HibernateUtil.setEnvironment(HibernateUtil.TESTING);
         DBUnit dbunit = new DBUnit();
-        try {
-            dbunit.seedDatabase();
-        } catch (Exception e) {}
+        dbunit.seedDatabase();
     }
 
     /**
@@ -104,7 +102,7 @@ public class AppraisalsTest {
         updatedAppraisal.setHrApprovedDate(new Date());
         updatedAppraisal.setReviewStatusID("review id");
         updatedAppraisal.setHrComments("hr comments text");
-        updatedAppraisal.setEmployeeComments("employee comments");
+        updatedAppraisal.setEmployeeResponse("employee comments");
         updatedAppraisal.setEmployeeSignedDate(new Date());
         updatedAppraisal.setEmailType("submit-goals");
         updatedAppraisal.setEmailCount(5);
@@ -119,7 +117,6 @@ public class AppraisalsTest {
      * This method tests that the updateAppraisal throws an exception when an extra field is being updated that is
      * not allowed.
      *
-     * @param modifiedAppraisal
      * @throws edu.osu.cws.pass.models.ModelException If there is a problem validation data
      */
     @Test(groups = {"unitttest"})
@@ -222,7 +219,7 @@ public class AppraisalsTest {
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assert assessment.getGoal() != null :
                     "Appraisal assessments goals failed to save";
-            assert assessment.getAssessmentLogs().size() == 1 :
+            assert assessment.getGoalLogs().size() == 1 :
                     "Appraisal assessment goals should have a new log";
         }
 
@@ -235,7 +232,7 @@ public class AppraisalsTest {
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assert assessment.getGoal().equals("second edit of goal") :
                     "Appraisal assessments goals failed to save";
-            assert assessment.getAssessmentLogs().size() == 2 :
+            assert assessment.getGoalLogs().size() == 2 :
                     "Appraisal assessment goals should have a new log";
         }
     }
