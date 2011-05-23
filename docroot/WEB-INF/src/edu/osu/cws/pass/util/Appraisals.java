@@ -190,9 +190,11 @@ public class Appraisals {
 
         Transaction tx = session.beginTransaction();
         String query = "from edu.osu.cws.pass.models.Reviewer where " +
-                "businessCenterName = :businessCenterName and employee.active = 1";
+                "businessCenterName = :businessCenterName and employee.id = :pidm " +
+                "and employee.active = 1";
         List reviewerList = session.createQuery(query)
                 .setString("businessCenterName", appraisal.getJob().getBusinessCenterName())
+                .setInteger("pidm", pidm)
                 .list();
         tx.commit();
 
