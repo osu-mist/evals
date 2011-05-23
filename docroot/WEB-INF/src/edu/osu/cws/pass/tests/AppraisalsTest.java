@@ -11,10 +11,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Test
 public class AppraisalsTest {
@@ -123,7 +120,10 @@ public class AppraisalsTest {
     public void updateAppraisalModelData()
             throws ModelException {
         Appraisal modifiedAppraisal = loadAppraisalSaveList();
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
         appraisals.updateAppraisal(modifiedAppraisal);
+        tx.commit();
         assert modifiedAppraisal.getModifiedDate() != null :
                 "Appraisal with just appraisal values failed to save";
     }
@@ -155,24 +155,23 @@ public class AppraisalsTest {
         return updatedAppraisal;
     }
 
-    /**
-     * Returns an appraisal object with some data and assessment results.
-     *
-     * @return
-     * @throws ModelException
-     */
-    public Appraisal loadAppraisalGoals() throws ModelException {
+    @Test(groups = {"unittest"})
+    public void shouldUpdateAppraisalWithResults()
+            throws ModelException {
+
+        // Create the appraisal for this test
         Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         Job job = (Job) hsession.load(Job.class, 1);
         tx.commit();
-
         int appraisalID =  appraisals.createAppraisal(job);
+
+        // Grab the freshly created appraisal from the db before we start
+        // updating the properties.
+        employee = employees.findByOnid("luf");
         hsession = HibernateUtil.getCurrentSession();
         tx = hsession.beginTransaction();
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
-        tx.commit();
-        employee = employees.findByOnid("luf");
 
         updatedAppraisal.setGoalApprover(employee);
         updatedAppraisal.setGoalApprovedDate(new Date());
@@ -185,15 +184,12 @@ public class AppraisalsTest {
             assessment.setEmployeeResult("employee results txt");
             assessment.setSupervisorResult("supervisor results txt");
         }
-        return updatedAppraisal;
-    }
 
-    @Test(groups = {"unittest"})
-    public void shouldUpdateAppraisalWithResults()
-            throws ModelException {
-        Appraisal modifiedAppraisal = loadAppraisalGoals();
-        appraisals.updateAppraisal(modifiedAppraisal);
-        for (Assessment assessment : modifiedAppraisal.getAssessments()) {
+        appraisals.updateAppraisal(updatedAppraisal);
+        tx.commit();
+
+
+        for (Assessment assessment : updatedAppraisal.getAssessments()) {
             assert assessment.getEmployeeResult() != null :
                     "Appraisal assessments employee result failed to save";
             assert assessment.getSupervisorResult() != null :
@@ -215,7 +211,10 @@ public class AppraisalsTest {
             assessment.setGoal("first edit of goal");
         }
         appraisals.setLoggedInUser(modifiedAppraisal.getJob().getEmployee());
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
         appraisals.updateAppraisal(modifiedAppraisal);
+        tx.commit();
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assert assessment.getGoal() != null :
                     "Appraisal assessments goals failed to save";
@@ -228,7 +227,10 @@ public class AppraisalsTest {
             assessment.setGoal("second edit of goal");
         }
         appraisals.setLoggedInUser(new Employees().findByOnid("luf"));
+        session = HibernateUtil.getCurrentSession();
+        tx = session.beginTransaction();
         appraisals.updateAppraisal(modifiedAppraisal);
+        tx.commit();
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assert assessment.getGoal().equals("second edit of goal") :
                     "Appraisal assessments goals failed to save";

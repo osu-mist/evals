@@ -3,7 +3,9 @@
 
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
-    <class name="edu.osu.cws.pass.models.Appraisal" table="appraisals">
+    <class name="edu.osu.cws.pass.models.Appraisal" table="appraisals"
+           dynamic-insert="true"
+           dynamic-update="true">
         <id name="id" type="int">
             <generator class="native" />
         </id>
@@ -31,11 +33,19 @@
         <property name="reopenReason" type="text"/>
         <property name="originalStatus" length="32"/>
 
-        <many-to-one name="job" class="edu.osu.cws.pass.models.Job" column="jobID" not-null="true"/>
-        <many-to-one name="goalApprover" class="edu.osu.cws.pass.models.Employee" column="goalApproverID" not-null="false"/>
-        <many-to-one name="hrApprover" class="edu.osu.cws.pass.models.Employee" column="hrApproverID" not-null="false"/>
-        <many-to-one name="closeOutBy" class="edu.osu.cws.pass.models.Employee" not-null="false"/>
-        <many-to-one name="reopenedBy" class="edu.osu.cws.pass.models.Employee" not-null="false"/>
+        <many-to-one name="job" class="edu.osu.cws.pass.models.Job"
+                     column="jobID"
+                     not-null="true"/>
+        <many-to-one name="goalApprover" class="edu.osu.cws.pass.models.Employee"
+                     column="goalApproverID"
+                     not-null="false"/>
+        <many-to-one name="hrApprover" class="edu.osu.cws.pass.models.Employee"
+                     column="hrApproverID"
+                     not-null="false"/>
+        <many-to-one name="closeOutBy" class="edu.osu.cws.pass.models.Employee"
+                     not-null="false"/>
+        <many-to-one name="reopenedBy" class="edu.osu.cws.pass.models.Employee"
+                     not-null="false"/>
         <set name="assessments" inverse="true">
             <key column="appraisalID"/>
             <one-to-many class="edu.osu.cws.pass.models.Assessment" />

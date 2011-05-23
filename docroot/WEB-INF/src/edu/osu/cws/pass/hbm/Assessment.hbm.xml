@@ -3,7 +3,9 @@
 
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
-    <class name="edu.osu.cws.pass.models.Assessment" table="assessments">
+    <class name="edu.osu.cws.pass.models.Assessment" table="assessments"
+           dynamic-insert="true"
+           dynamic-update="true">
         <id name="id" type="int">
             <generator class="native" />
         </id>
@@ -14,8 +16,12 @@
         <property name="createDate" type="timestamp"/>
         <property name="modifiedDate" type="timestamp"/>
 
-        <many-to-one name="appraisal" class="edu.osu.cws.pass.models.Appraisal" column="appraisalID" not-null="true"/>
-        <many-to-one name="criterionDetail" class="edu.osu.cws.pass.models.CriterionDetail" column="criterionDetailID" not-null="true"/>
+        <many-to-one name="appraisal" class="edu.osu.cws.pass.models.Appraisal"
+                     column="appraisalID"
+                     not-null="true"/>
+        <many-to-one name="criterionDetail" class="edu.osu.cws.pass.models.CriterionDetail"
+                     column="criterionDetailID"
+                     not-null="true"/>
         <set name="goalLogs" inverse="true" order-by="createDate DESC">
             <key column="assessmentID"/>
             <one-to-many class="edu.osu.cws.pass.models.GoalLog"/>

@@ -76,9 +76,7 @@ public class Appraisals {
 
         // Try to save the data
         Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
         modifiedAppraisal.setModifiedDate(new Date());
-        int originalAppraisalID = modifiedAppraisal.getId();
         session.saveOrUpdate(modifiedAppraisal);
 
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
@@ -97,7 +95,6 @@ public class Appraisals {
                 session.save(goalLog);
             }
         }
-        tx.commit();
         return true;
     }
 
