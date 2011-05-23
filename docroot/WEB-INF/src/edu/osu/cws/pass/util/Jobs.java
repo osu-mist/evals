@@ -55,8 +55,8 @@ public class Jobs {
         // Iterate over the supervising chain. If the supervisor has no employee associated
         // or if the supervisor pidm doesn't match what we're looking for go up the supervising
         // chain.
-        while (currentNode.getEmployee() == null ||
-                currentNode.getEmployee().getId() != pidm) {
+        while (currentNode != null &&
+                (currentNode.getEmployee() == null || currentNode.getEmployee().getId() != pidm)) {
             currentNode = currentNode.getSupervisor();
         }
 
