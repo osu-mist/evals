@@ -5,10 +5,6 @@
 		<portlet-name>pass</portlet-name>
 		<display-name>PASS</display-name>
 		<portlet-class>edu.osu.cws.pass.portlet.JSPPortlet</portlet-class>
-		<init-param>
-			<name>view-jsp</name>
-			<value>/view.jsp</value>
-		</init-param>
         <init-param>
             <name>home-jsp</name>
             <value>/jsp/home/start.jsp</value>
@@ -21,6 +17,10 @@
             <name>criteria-list-jsp</name>
             <value>/jsp/criteria/list.jsp</value>
         </init-param>
+        <init-param>
+			<name>appraisal-jsp</name>
+			<value>/jsp/appraisals/appraisal.jsp</value>
+		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
 			<mime-type>text/html</mime-type>

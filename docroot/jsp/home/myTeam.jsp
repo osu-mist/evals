@@ -20,7 +20,7 @@
             <table class="taglib-search-iterator">
                 <tr class="portlet-section-header results-header">
                     <th><liferay-ui:message key="name" /></th>
-                    <th><liferay-ui:message key="appointmentType" /></th>
+                    <th><liferay-ui:message key="appointment-type" /></th>
                     <th><liferay-ui:message key="reviewPeriod" /></th>
                     <th><liferay-ui:message key="status" /></th>
                 </tr>

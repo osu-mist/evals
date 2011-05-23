@@ -34,6 +34,15 @@ public class Job extends Pass {
 
     private String businessCenterName;
 
+    /**
+     * This property holds the job of the current supervisor. If
+     * this.supervisor.employee != null, then currentSupervisor holds
+     * the same value as this.supervisor. Otherwise currentSupervisor
+     * holds whatever is the next supervisor up the chain that has an
+     * employee associated to it.
+     */
+    private Job currentSupervisor;
+
     public int getId() {
         return id;
     }
@@ -144,5 +153,13 @@ public class Job extends Pass {
 
     public void setBusinessCenterName(String businessCenterName) {
         this.businessCenterName = businessCenterName;
+    }
+
+    public Job getCurrentSupervisor() {
+        return currentSupervisor;
+    }
+
+    public void setCurrentSupervisor(Job currentSupervisor) {
+        this.currentSupervisor = currentSupervisor;
     }
 }

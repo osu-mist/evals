@@ -210,6 +210,35 @@ public class Appraisals {
         return "";
     }
 
+    /**
+     * This method is just a wrapper for session.get. It returns the appraisal that
+     * matches the id.
+     *
+     * @param id
+     * @return
+     */
+    public Appraisal getAppraisal(int id) throws ModelException {
+        Session session = HibernateUtil.getCurrentSession();
+        appraisal = getAppraisal(id, session);
+        appraisal.getJob().setCurrentSupervisor(jobs.getSupervisor(appraisal.getJob()));
+        return appraisal;
+    }
+
+    /**
+     * This method is just a wrapper for getAppraisal(int id). It performs the hibernate
+     * call to retrieve the appraisal.
+     *
+     * @param id
+     * @param session
+     * @return
+     */
+    private Appraisal getAppraisal(int id, Session session) {
+        Transaction tx = session.beginTransaction();
+        appraisal = (Appraisal) session.get(Appraisal.class, id);
+        tx.commit();
+        return appraisal;
+    }
+
     public void setLoggedInUser(Employee loggedInUser) {
         this.loggedInUser = loggedInUser;
     }

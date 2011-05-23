@@ -52,9 +52,7 @@ public class Actions {
 
         // When the criterionAreaId == null means that the user clicks on the Add Criteria
         // link. Otherwise the form was submitted
-        if (ParamUtil.getString(request, "criterionAreaId").equals("")) {
-            _log.error("Actions.addCriteria setting values for new form");
-        } else {
+        if (!ParamUtil.getString(request, "criterionAreaId").equals("")) {
             String appointmentType = ParamUtil.getString(request, "appointmentTypeID");
 
             criterionArea.setName(ParamUtil.getString(request, "name"));
@@ -63,7 +61,6 @@ public class Actions {
 
             try {
                 if (criteriaArea.add(criterionArea, criterionDetail, getLoggedOnUsername(request))) {
-                    _log.error("criteriaArea add success");
                     SessionMessages.add(request, "criteria-saved");
                     return listCriteria(request, response, portlet);
                 }
@@ -105,7 +102,7 @@ public class Actions {
         try {
             request.setAttribute("criteria", new Criteria().list(appointmentType));
         } catch (ModelException e) {
-            SessionErrors.add(request, e.getMessage());
+            addErrorsToRequest(request, e.getMessage());
         } catch (HibernateException e) {
             _log.error("Hibernate exception - " + e.getMessage());
         }
@@ -143,10 +140,11 @@ public class Actions {
      *
      * @param request
      * @param response
+     * @param portlet
+     * @return
      */
     public String displayHomeView(PortletRequest request, PortletResponse response,
                                   JSPPortlet portlet) {
-        _log.error("in displayHomeView");
         String username = getLoggedOnUsername(request);
         Employee employee = employees.findByOnid(username);
 
@@ -160,6 +158,54 @@ public class Actions {
         request.setAttribute("requiredActions", getRequiredActions(request));
 
         return "home-jsp";
+    }
+
+    /**
+     * Handles displaying the appraisal when a user clicks on it. It loads the appraisal
+     * object along with the respective permissionRule.
+     *
+     * @param request
+     * @param response
+     * @param portlet
+     * @return jsp file to render
+     */
+    public String displayAppraisal(PortletRequest request, PortletResponse response,
+                                  JSPPortlet portlet) {
+        String role = "";
+        Appraisal appraisal = new Appraisal();
+        int appraisalID = ParamUtil.getInteger(request, "id");
+        Employee currentlyLoggedOnUser = employees.findByOnid(getLoggedOnUsername(request));
+        Boolean showForm = false;
+
+        try {
+            appraisal = appraisals.getAppraisal(appraisalID);
+            role = appraisals.getRole(appraisal, currentlyLoggedOnUser.getId());
+        } catch (ModelException e) {
+            SessionErrors.add(request, e.getMessage());
+        }
+
+        String permissionKey = appraisal.getStatus()+"-"+ role;
+        HashMap permissionRules = (HashMap) portletContext.getAttribute("permissionRules");
+        PermissionRule permRule = (PermissionRule) permissionRules.get(permissionKey);
+
+
+        // Check to see if the logged in user has permission to access the appraisal
+        if (!permissionRules.containsKey(permissionKey)) {
+            SessionErrors.add(request, "appraisal-permission-denied");
+            return "home-jsp";
+        }
+
+        // Set flag whether or not the html form to update the appraisal needs to be displayed
+        if (permRule.getSaveDraft() != null && permRule.getSubmit() != null
+                && permRule.getRequireModification() != null) {
+            showForm = true;
+        }
+
+        request.setAttribute("appraisal", appraisal);
+        request.setAttribute("permissionRule", permRule);
+        request.setAttribute("showForm", showForm);
+
+        return "appraisal-jsp";
     }
 
     /**

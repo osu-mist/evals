@@ -22,6 +22,12 @@ public class Employee extends Pass {
 
     private Boolean active;
 
+    public String getName() {
+        return lastName + ", " + firstName;
+    }
+
+    public Employee() { }
+
     public int getId() {
         return id;
     }

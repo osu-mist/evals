@@ -35,7 +35,7 @@ addCriteriaURL.setParameter("action", "addCriteria");
         </td>
     </tr>
     <tr>
-        <td><liferay-ui:message key="appointmentType" />
+        <td><liferay-ui:message key="appointment-type" />
         <td><select name="<portlet:namespace />appointmentTypeID">
             <c:forEach var="appointmentType" items="${appointmentTypes}">
                 <option value="${appointmentType.name}"
