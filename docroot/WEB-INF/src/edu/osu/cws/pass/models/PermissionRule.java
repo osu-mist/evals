@@ -9,6 +9,8 @@ public class PermissionRule extends Pass {
 
     private String goals;
 
+    private String newGoals;
+
     private String requiredModification;
 
     private String results;
@@ -61,6 +63,14 @@ public class PermissionRule extends Pass {
 
     public void setGoals(String goals) {
         this.goals = goals;
+    }
+
+    public String getNewGoals() {
+        return newGoals;
+    }
+
+    public void setNewGoals(String newGoals) {
+        this.newGoals = newGoals;
     }
 
     public String getRequiredModification() {

@@ -11,6 +11,7 @@
         <property name="status" length="32"/>
         <property name="role" length="45"/>
         <property name="goals" length="1"/>
+        <property name="newGoals" length="1"/>
         <property name="requiredModification" length="1"/>
         <property name="results" length="1"/>
         <property name="resultComments" length="1"/>
