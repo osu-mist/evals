@@ -10,6 +10,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.pass.util.*;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -35,6 +37,12 @@ public class JSPPortlet extends GenericPortlet {
      */
 	protected String viewJSP;
 
+    /**
+     * Name of default properties file that is loaded the first time the
+     * portlet is loaded.
+     */
+    private static final String defaultProperties = "default.properties";
+
     private PermissionRules permissionRules = new PermissionRules();
     private AppraisalSteps appraisalSteps = new AppraisalSteps();
     private Admins admins = new Admins();
@@ -49,7 +57,7 @@ public class JSPPortlet extends GenericPortlet {
     /**
      * Helper Liferay object to store error messages into the server's log file
      */
-	private static Log _log = LogFactoryUtil.getLog(Actions.class);
+	private static Log _log = LogFactoryUtil.getLog(JSPPortlet.class);
 
     /**
      * The actions class
@@ -58,16 +66,9 @@ public class JSPPortlet extends GenericPortlet {
 
     public void init() throws PortletException {
 		viewJSP = getInitParameter("home-jsp");
-        HibernateUtil.setEnvironment(HibernateUtil.DEVELOPMENT);
-        getPortletContext().setAttribute("permissionRules", permissionRules.list());
-        getPortletContext().setAttribute("appraisalSteps", appraisalSteps.list());
-        getPortletContext().setAttribute("reviewers", reviewers.list());
-        getPortletContext().setAttribute("admins", admins.list());
-        loadResourceBundle();
-        //@todo: load properties file in portlet context
 	}
 
-	public void doDispatch(
+    public void doDispatch(
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
@@ -95,7 +96,9 @@ public class JSPPortlet extends GenericPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-        _log.error("doView called action = "+ ParamUtil.getString(renderRequest, "action"));
+        portletSetup(renderRequest);
+        _log.error("doView called action = " + ParamUtil.getString(renderRequest, "action"));
+
 
         // The skip-delegate parameter is set by processAction. This allow us to set the jsp
         // path and all the logic/data we need in processAction without being overwritten by
@@ -111,6 +114,7 @@ public class JSPPortlet extends GenericPortlet {
 	public void processAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws IOException, PortletException {
+        portletSetup(actionRequest);
 
         _log.error("processAction called action = " + ParamUtil.getString(actionRequest, "action"));
         // We set the skipDoView property, to tell the doView that the processing is done
@@ -186,7 +190,52 @@ public class JSPPortlet extends GenericPortlet {
         return writerStr.toString();
     }
 
-	protected void include(
+    /**
+     * Takes care of initializing portlet variables and storing them in the portletContext.
+     * Some of these variables are: permissionRules, appraisalSteps, reviewers, admins and
+     * environment properties. This method is called everytime a doView, processAction or
+     * serveResource are called, but the code inside only executes the first time.
+     *
+     * @param request
+     */
+    private void portletSetup(PortletRequest request) {
+        if (getPortletContext().getAttribute("environmentProp") == null) {
+            loadEnvironmentProperties(request);
+            getPortletContext().setAttribute("permissionRules", permissionRules.list());
+            getPortletContext().setAttribute("appraisalSteps", appraisalSteps.list());
+            getPortletContext().setAttribute("reviewers", reviewers.list());
+            getPortletContext().setAttribute("admins", admins.list());
+            loadResourceBundle();
+        }
+    }
+
+    /**
+     * Loads default.properties and then overrides properties by trying to load
+     * properties file: hostname.properties. The config object is then stored
+     * in the portletContext.
+     *
+     * @param request
+     */
+    private void loadEnvironmentProperties(PortletRequest request) {
+        String propertyFile = request.getServerName() +".properties";
+        PropertiesConfiguration config = new PropertiesConfiguration();
+
+        // First load default.properties. Then try to load hostname.properties
+        try {
+            config.load(defaultProperties);
+            _log.error("Loaded - default.properties");
+            config.load(propertyFile);
+            _log.error("Loaded - " + propertyFile);
+        } catch (ConfigurationException e) {
+            _log.error("Failed to load one or more configuration files");
+        } finally {
+            // Set the Hibernate config file and store properties in portletContext
+            HibernateUtil.setConfig(config.getString("hibernate-cfg-file"));
+            getPortletContext().setAttribute("environmentProp", config);
+        }
+    }
+
+    protected void include(
 			String path, RenderRequest renderRequest,
 			RenderResponse renderResponse)
 		throws IOException, PortletException {

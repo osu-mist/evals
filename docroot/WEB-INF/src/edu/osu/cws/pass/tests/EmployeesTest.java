@@ -12,17 +12,6 @@ public class EmployeesTest {
     Employees employees = new Employees();
 
     /**
-     * This setup method is run before this class gets executed in order to
-     * set the Hibernate environment to TESTING. This will ensure that we use
-     * the testing db for tests.
-     *
-     */
-    @BeforeClass
-    public void setUp() {
-        HibernateUtil.setEnvironment(HibernateUtil.TESTING);
-    }
-
-    /**
      * Given a username, it should be able to find the active employee.
      *
      */

@@ -30,7 +30,6 @@ public class CriteriaTests {
 //    @BeforeClass
     @BeforeMethod
     public void setUp() throws Exception {
-        HibernateUtil.setEnvironment(HibernateUtil.TESTING);
         DBUnit dbunit = new DBUnit();
         dbunit.seedDatabase();
     }

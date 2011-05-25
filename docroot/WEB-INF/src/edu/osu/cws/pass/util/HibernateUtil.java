@@ -9,35 +9,6 @@ public class HibernateUtil {
     private static SessionFactory sessionFactory;
 
     /**
-     * Static variable used to keep track of what hibernate config file the java
-     * class should be using.
-     */
-    private static short environment = 0;
-
-    /**
-     * Constant used to define the environment variable. The development constant
-     * tells this class to use hibernate-dev.cfg.xml as the configuration file.
-     */
-    public static final short DEVELOPMENT = 0;
-
-     /**
-     * Constant used to define the environment variable. The development constant
-     * tells this class to use hibernate-test.cfg.xml as the configuration file.
-     */
-    public static final short TESTING = 1;
-
-    /**
-     * @todo: We need to figure out how we are going to deal with the hibernate configuration
-     * in production environment.
-     */
-    public static final short PRODUCTION = 2;
-
-    /**
-     * Config value - name of hibernate development xml config file.
-     */
-    public static final String DEVELOPMENT_CONFIG = "hibernate-dev.cfg.xml";
-
-    /**
      * Config value - name of hibernate test xml config file.
      */
     public static final String TEST_CONFIG = "hibernate-test.cfg.xml";
@@ -50,28 +21,21 @@ public class HibernateUtil {
 
 
     /**
+     * Static variable used to keep track of what hibernate config file the java
+     * class should be using. By default it uses the test configuration db.
+     */
+    private static String config = TEST_CONFIG;
+
+    /**
      * Method used to create the Hibernate session. This method is private to ensure
      * it is only called once during the initialization of the sessionFactory property.
      *
      * @return          Hibenate's session
      */
     private static SessionFactory buildSessionFactory() {
-        String configUsed;
-
-        // Determine which config environment we are in and use the respective config file
-        switch (environment) {
-            case TESTING:
-                configUsed = TEST_CONFIG;
-                break;
-            case DEVELOPMENT:
-            default:
-                configUsed = DEVELOPMENT_CONFIG;
-                break;
-        }
-
         try {
             // Create the SessionFactory from hibernate.cfg.xml
-            return new Configuration().configure(configUsed).buildSessionFactory();
+            return new Configuration().configure(config).buildSessionFactory();
 
         } catch (Throwable ex) {
             // Make sure you log the exception, as it might be swallowed
@@ -99,14 +63,13 @@ public class HibernateUtil {
     }
 
     /**
-     * Use this method to set the environment which determines what hibernate config file
-     * to use. Possible variables are: HibernateUtil.DEVELOPMENT, HibernateUtil.TESTING and
-     * HibernateUtil.PRODUCTION.
+     * Use this method to set the name of the hibernate configuration file to load. This
+     * method is called by JSPPortlet.portletSetup.
      *
-     * @param env   The environment to use
+     * @param configName
      */
-    public static void setEnvironment(short env) {
-        environment = env;
+    public static void setConfig(String configName) {
+        config = configName;
     }
 
     /**

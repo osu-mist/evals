@@ -14,15 +14,9 @@ public class AppointmentTypesTest {
 
     AppointmentTypes appointmentTypes = new AppointmentTypes();
 
-    @BeforeClass
-    public void setUp() {
-        HibernateUtil.setEnvironment(HibernateUtil.TESTING);
-    }
-
     @BeforeMethod
     public void initializeObjects() {
         appointmentTypes = new AppointmentTypes();
-        setUp();
     }
 
     @Test(groups = {"unittest"})

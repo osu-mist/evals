@@ -39,6 +39,12 @@ public class DBUnit {
     private static final String SEED_FILE = "docroot/WEB-INF/src/edu/osu/cws/pass/tests/full.xml";
 
     /**
+     * Config value - name of hibernate development xml config file used to grab dtd.
+     */
+    public static final String DEVELOPMENT_CONFIG = "hibernate-dev.cfg.xml";
+
+
+    /**
      * Hashmap used to store the db credentials to access the test db
      */
     private HashMap<String, String> testDBCredentials = new HashMap<String, String>();
@@ -144,7 +150,7 @@ public class DBUnit {
      */
     private void readConfigs() {
         this.devDBCredentials = readConfigFile(HibernateUtil.CONFIG_PATH +
-                HibernateUtil.DEVELOPMENT_CONFIG);
+                DBUnit.DEVELOPMENT_CONFIG);
         this.testDBCredentials = readConfigFile(HibernateUtil.CONFIG_PATH +
                 HibernateUtil.TEST_CONFIG);
     }
