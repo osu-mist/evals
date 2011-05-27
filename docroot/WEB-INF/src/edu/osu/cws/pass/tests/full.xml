@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <dataset>
-  <admins id="1" employeeID="12345" isMaster="true" isBackupMaster="false" createDate="2011-05-14 07:41:11.0" createdBy="12345" modifiedDate="2011-05-14 07:41:11.0"/>
-  <admins id="2" employeeID="12467" isMaster="false" isBackupMaster="true" createDate="2011-05-14 07:41:11.0" createdBy="12345" modifiedDate="2011-05-14 07:41:11.0"/>
+  <admins id="1" employeeID="12345" isMaster="true" isBackupMaster="false" createDate="2011-05-14 07:41:11.0" creatorID="12345" modifiedDate="2011-05-14 07:41:11.0" scope="hr"/>
+  <admins id="2" employeeID="12467" isMaster="false" isBackupMaster="true" createDate="2011-05-14 07:41:11.0" creatorID="12345" modifiedDate="2011-05-14 07:41:11.0" scope="hr"/>
   <appointment_types name="classified"/>
-  <appraisal_steps id="1" action="submit" appointmentType="classified" newStatus="goals-submitted" emailTypeID="goals-submitted"/>
-  <appraisal_steps id="2" action="require-modification" appointmentType="classified" newStatus="goals-require-modification" emailTypeID="goals-require-modification"/>
+  <appraisal_steps id="1" action="submit" appointmentType="classified" newStatus="goals-submitted" emailType="goals-submitted"/>
+  <appraisal_steps id="2" action="require-modification" appointmentType="classified" newStatus="goals-require-modification" emailType="goals-require-modification"/>
   <appraisals id="1"
               startDate="2011-05-14"
               endDate="2012-05-14"
@@ -12,6 +12,7 @@
               status="goals-due"
               jobID="1"
               createDate="2011-05-01"
+              type="annual"
   />
   <appraisals id="2"
                 startDate="2010-05-14"
@@ -20,30 +21,31 @@
                 status="results-due"
                 jobID="1"
                 createDate="2010-05-01"
+                type="annual"
   />
   <goals_logs/>
   <assessments/>
   <business_centers name="UABC"/>
-  <criteria_areas id="1" name="COMMUNICATION SKILLS" appointmentType="classified" sequence="1" createDate="2011-04-10 20:16:48.0" createdBy="12345" deleteDate="2011-04-10 20:16:48.0"/>
-  <criteria_areas id="2" name="TECHNICAL SKILLS" appointmentType="classified" sequence="2" createDate="2011-04-11 09:57:08.0" createdBy="12345" deleteDate="2011-04-11 09:57:08.0"/>
-  <criteria_details id="1" areaID="1" description="How will you improve your communication?" createDate="2011-04-11 10:00:19.0" createdBy="12345"/>
-  <criteria_details id="2" areaID="2" description="What training will you obtain this year?" createDate="2011-04-11 10:31:58.0" createdBy="12345"/>
-  <criteria_details id="3" areaID="1" description="How will you increase your communication skills?" createDate="2011-04-12 14:30:23.0" createdBy="12345"/>
-  <email_types type="goals-submitted" recipients="employee"/>
-  <email_types type="goals-require-modification" recipients="employee"/>
-  <employees pidm="12345" firstName="Jose" middleName="Daniel" lastName="Cedeno" osuid="931421234" onid="cedenoj" preferredEmail="jose.cedeno@oregonstate.edu" copySupervisor="false" active="true"/>
-  <employees pidm="12467" firstName="Joan" lastName="Lu" osuid="931421234" onid="luf" preferredEmail="joan.lu@oregonstate.edu" copySupervisor="false" active="true"/>
-  <employees pidm="787812" firstName="Clark" lastName="Barlow" osuid="12345678" onid="barlowc" preferredEmail="test@orst.edu" copySupervisor="false" active="true"/>
-  <employees pidm="8712359" firstName="Lois" lastName="Barlow" osuid="12345678" onid="barlowc" preferredEmail="test@orst.edu" copySupervisor="false" active="true"/>
-  <employees pidm="990871" firstName="Megan" lastName="Barlow" osuid="12345678" onid="barlowc" preferredEmail="test@orst.edu" copySupervisor="false" active="true"/>
+  <criteria_areas id="1" name="COMMUNICATION SKILLS" appointmentType="classified" sequence="1" createDate="2011-04-10 20:16:48.0" creatorID="12345" deleteDate="2011-04-10 20:16:48.0"/>
+  <criteria_areas id="2" name="TECHNICAL SKILLS" appointmentType="classified" sequence="2" createDate="2011-04-11 09:57:08.0" creatorID="12345" deleteDate="2011-04-11 09:57:08.0"/>
+  <criteria_details id="1" areaID="1" description="How will you improve your communication?" createDate="2011-04-11 10:00:19.0" creatorID="12345"/>
+  <criteria_details id="2" areaID="2" description="What training will you obtain this year?" createDate="2011-04-11 10:31:58.0" creatorID="12345"/>
+  <criteria_details id="3" areaID="1" description="How will you increase your communication skills?" createDate="2011-04-12 14:30:23.0" creatorID="12345"/>
+  <email_types type="goals-submitted" mailTo="employee"/>
+  <email_types type="goals-require-modification" mailTo="employee"/>
+  <employees pidm="12345" firstName="Jose" middleName="Daniel" lastName="Cedeno" osuid="931421234" onid="cedenoj" email="jose.cedeno@oregonstate.edu" copySupervisor="false" active="true"/>
+  <employees pidm="12467" firstName="Joan" lastName="Lu" osuid="931421234" onid="luf" email="joan.lu@oregonstate.edu" copySupervisor="false" active="true"/>
+  <employees pidm="787812" firstName="Clark" lastName="Barlow" osuid="12345678" onid="barlowc" email="test@orst.edu" copySupervisor="false" active="true"/>
+  <employees pidm="8712359" firstName="Lois" lastName="Barlow" osuid="12345678" onid="barlowc" email="test@orst.edu" copySupervisor="false" active="true"/>
+  <employees pidm="990871" firstName="Megan" lastName="Barlow" osuid="12345678" onid="barlowc" email="test@orst.edu" copySupervisor="false" active="true"/>
 
-  <reviewers id="1" employeePidm="787812" businessCenterName="UABC"/>
-  <reviewers id="2" employeePidm="8712359" businessCenterName="UABC"/>
+  <reviewers id="1" employeeID="787812" businessCenterName="UABC"/>
+  <reviewers id="2" employeeID="8712359" businessCenterName="UABC"/>
   <jobs id="1"
-        employeePidm="12345"
+        employeeID="12345"
         supervisorJobID="3"
         jobTitle="coffee barrista"
-        jobNumber="1234"
+        positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"
         appointmentType="classified"
@@ -51,12 +53,13 @@
         positionClass="foobar"
         businessCenterName="UABC"
         tsOrgCode="test"
+        status="A"
         orgCodeDescription="testing"/>
   <jobs id="2"
-        employeePidm="12345"
+        employeeID="12345"
         supervisorJobID="3"
         jobTitle="baggel maker"
-        jobNumber="1234"
+        positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"
         appointmentType="classified"
@@ -64,11 +67,12 @@
         positionClass="foobar"
         businessCenterName="UABC"
         tsOrgCode="test"
+        status="A"
         orgCodeDescription="testing"/>
   <jobs id="3"
-        employeePidm="12467"
+        employeeID="12467"
         jobTitle="MU Supervisor"
-        jobNumber="1234"
+        positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"
         appointmentType="classified"
@@ -76,12 +80,13 @@
         positionClass="foobar"
         businessCenterName="UABC"
         tsOrgCode="test"
+        status="A"
         orgCodeDescription="testing"/>
   <jobs id="4"
-        employeePidm="12345"
+        employeeID="12345"
         supervisorJobID="5"
         jobTitle="Bartender"
-        jobNumber="1234"
+        positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"
         appointmentType="classified"
@@ -89,11 +94,12 @@
         positionClass="foobar"
         businessCenterName="UABC"
         tsOrgCode="test"
+        status="A"
         orgCodeDescription="testing"/>
   <jobs id="5"
         supervisorJobID="6"
         jobTitle="Bartender supervisor"
-        jobNumber="1234"
+        positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"
         appointmentType="classified"
@@ -101,12 +107,13 @@
         positionClass="foobar"
         businessCenterName="UABC"
         tsOrgCode="test"
+        status="A"
         orgCodeDescription="testing"/>
   <jobs id="6"
-        employeePidm="8712359"
+        employeeID="8712359"
         supervisorJobID="7"
         jobTitle="Bartender supervisor"
-        jobNumber="1234"
+        positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"
         appointmentType="classified"
@@ -114,11 +121,12 @@
         positionClass="foobar"
         businessCenterName="UABC"
         tsOrgCode="test"
+        status="A"
         orgCodeDescription="testing"/>
   <jobs id="7"
-        employeePidm="990871"
+        employeeID="990871"
         jobTitle="Bar owner"
-        jobNumber="1234"
+        positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"
         appointmentType="classified"
@@ -126,6 +134,7 @@
         positionClass="foobar"
         businessCenterName="UABC"
         tsOrgCode="test"
+        status="A"
         orgCodeDescription="testing"/>
   <permission_rules id="1" status="goals-due" role="employee" goals="e" actionRequired="goals-due"/>
   <permission_rules id="2" status="goals-due" role="immediate-supervisor" goals="e"/>
