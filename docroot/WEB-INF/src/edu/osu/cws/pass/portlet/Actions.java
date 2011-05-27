@@ -6,11 +6,10 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.pass.models.*;
-import edu.osu.cws.pass.util.AppointmentTypes;
-import edu.osu.cws.pass.util.Appraisals;
-import edu.osu.cws.pass.util.Criteria;
-import edu.osu.cws.pass.util.Employees;
+import edu.osu.cws.pass.util.*;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import javax.portlet.*;
 import java.util.*;
@@ -183,14 +182,10 @@ public class Actions {
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
         }
-
-        String permissionKey = appraisal.getStatus()+"-"+ role;
-        HashMap permissionRules = (HashMap) portletContext.getAttribute("permissionRules");
-        PermissionRule permRule = (PermissionRule) permissionRules.get(permissionKey);
-
+        PermissionRule permRule = getAppraisalPermissionRule(currentlyLoggedOnUser, appraisal);
 
         // Check to see if the logged in user has permission to access the appraisal
-        if (!permissionRules.containsKey(permissionKey)) {
+        if (permRule == null) {
             SessionErrors.add(request, "appraisal-permission-denied");
             return "home-jsp";
         }
@@ -206,6 +201,183 @@ public class Actions {
         request.setAttribute("showForm", showForm);
 
         return "appraisal-jsp";
+    }
+
+    /**
+     * Handles updating the appraisal form.
+     *
+     * @param request
+     * @param response
+     * @param portlet
+     * @return
+     */
+    public String updateAppraisal(PortletRequest request, PortletResponse response,
+                                  JSPPortlet portlet) {
+        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+            _log.error(entry.getKey() + "/" + entry.getValue()[0]);
+
+        }
+
+        int id = ParamUtil.getInteger(request, "id", 0);
+        Employee currentlyLoggedOnUser = employees.findByOnid(getLoggedOnUsername(request));
+
+        if (id == 0) {
+            SessionErrors.add(request, "appraisal-does-not-exist");
+            return "home-jsp";
+        }
+
+        try {
+            Session session = HibernateUtil.getCurrentSession();
+            Transaction tx = session.beginTransaction();
+            Appraisal appraisal = (Appraisal) session.get(Appraisal.class, id);
+            PermissionRule permRule = getAppraisalPermissionRule(currentlyLoggedOnUser, appraisal);
+
+            // Check to see if the logged in user has permission to access the appraisal
+            if (permRule == null) {
+                SessionErrors.add(request, "appraisal-permission-denied");
+                return "home-jsp";
+            }
+            // update appraisal & assessment fields based on permission rules
+            appraisals.setLoggedInUser(currentlyLoggedOnUser);
+            setAppraisalFields(request, appraisal, permRule);
+
+
+            //@todo: validate appraisal
+
+            // save changes to db
+            appraisals.updateAppraisal(appraisal);
+            tx.commit();
+
+            // If appraisalStep.getEmailType() is not null
+                // Send the email  //design in another module, not for the June demo.
+        } catch (ModelException e) {
+
+        }
+
+        return displayHomeView(request, response, portlet);
+    }
+
+    /**
+     * Figures out the current user role in the appraisal and returns the respective permission
+     * rule for that user role and action in the appraisal.
+     *
+     * @param currentlyLoggedOnUser
+     * @param appraisal
+     * @return
+     */
+    private PermissionRule getAppraisalPermissionRule(Employee currentlyLoggedOnUser, Appraisal appraisal) {
+        HashMap permissionRules = new HashMap();
+        String permissionKey = "";
+        try {
+            String role = appraisals.getRole(appraisal, currentlyLoggedOnUser.getId());
+            permissionKey = appraisal.getStatus()+"-"+ role;
+            permissionRules = (HashMap) portletContext.getAttribute("permissionRules");
+        } catch (Exception e) {
+            _log.error("failed to load appraisal role ");
+
+        }
+        _log.error(permissionKey);
+        return (PermissionRule) permissionRules.get(permissionKey);
+    }
+
+    /**
+     * Handles updating the appraisal fields in the appraisal and assessment objects.
+     *
+     * @param request
+     * @param appraisal
+     * @param permRule
+     */
+    private void setAppraisalFields(PortletRequest request, Appraisal appraisal, PermissionRule permRule) {
+        String paramaterKey = "";
+
+        // Save Goals
+        if (permRule.getGoals() != null && permRule.getGoals().equals("e")) {
+            for (Assessment assessment : appraisal.getAssessments()) {
+                paramaterKey = "appraisal.goal." + Integer.toString(assessment.getId());
+                assessment.setGoal(request.getParameter(paramaterKey));
+            }
+        }
+        // Save goalComments
+        if (permRule.getGoalComments() != null && permRule.getGoalComments().equals("e")) {
+            appraisal.setGoalsComments(request.getParameter("appraisal.goalsComment"));
+        }
+        // Save employee results
+        if (permRule.getResults() != null && permRule.getResults().equals("e")) {
+            for (Assessment assessment : appraisal.getAssessments()) {
+                paramaterKey = "appraisal.employeeResult." + Integer.toString(assessment.getId());
+                assessment.setEmployeeResult(request.getParameter(paramaterKey));
+            }
+        }
+        // Save Supervisor Results
+        if (permRule.getSupervisorResults() != null && permRule.getSupervisorResults().equals("e")) {
+            for (Assessment assessment : appraisal.getAssessments()) {
+                paramaterKey = "appraisal.supervisorResult." + Integer.toString(assessment.getId());
+                assessment.setSupervisorResult(request.getParameter(paramaterKey));
+            }
+        }
+        // Save evaluation
+        if (permRule.getEvaluation() != null && permRule.getEvaluation().equals("e")) {
+            appraisal.setEvaluation(request.getParameter("appraisal.evaluation"));
+            appraisal.setRating(Integer.parseInt(request.getParameter("appraisal.rating")));
+        }
+        // Save review
+        if (permRule.getReview() != null && permRule.getReview().equals("e")) {
+            appraisal.setReview("appraisal.review");
+        }
+        // Save employee response
+        if (permRule.getEmployeeResponse() != null && permRule.getEmployeeResponse().equals("e")) {
+            appraisal.setEmployeeResponse(request.getParameter("appraisal.employeeResponse"));
+        }
+
+        // If the appraisalStep object has a new status, update the appraisal object
+        AppraisalStep appraisalStep = getAppraisalStepKey(request,
+                appraisal.getJob().getAppointmentType(), permRule);
+        if (appraisalStep != null &&
+                !appraisalStep.getNewStatus().equals(appraisal.getStatus())) {
+            _log.error("found appraisalStep "+appraisalStep.toString());
+            appraisal.setStatus(appraisalStep.getNewStatus());
+        }
+
+        //@todo: based on the action submit button pressed, we'll want to set different meatadata fields
+        //@todo: don't forget to include other fields such as addedBy, modifiedBy, approvedDate
+        // such as reviewerID, goalApproverID, submitDate, etc.
+    }
+
+    /**
+     * Figures out the appraisal step key for the button that the user pressed when the appraisal
+     * form was submitted.
+     *
+     * @param request
+     * @param appointmentType
+     * @param permRule
+     * @return
+     */
+    private AppraisalStep getAppraisalStepKey(PortletRequest request, String appointmentType,
+                                              PermissionRule permRule) {
+        AppraisalStep appraisalStep;
+        String appraisalStepKey;
+        HashMap appraisalSteps = (HashMap) portletContext.getAttribute("appraisalSteps");
+        ArrayList<String> appraisalButtons = new ArrayList<String>();
+        if (permRule.getSaveDraft() != null) {
+            appraisalButtons.add(permRule.getSaveDraft());
+        }
+        if (permRule.getRequireModification() != null) {
+            appraisalButtons.add(permRule.getRequireModification());
+        }
+        if (permRule.getSubmit() != null) {
+            appraisalButtons.add(permRule.getSubmit());
+        }
+
+        for (String button : appraisalButtons) {
+            appraisalStepKey = button + "-" + appointmentType;
+            appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
+            _log.error("appraisalStepKey = "+appraisalStepKey);
+            if (appraisalStep != null) {
+                return appraisalStep;
+            }
+        }
+
+        return null;
     }
 
     /**

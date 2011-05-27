@@ -14,6 +14,18 @@
 </c:choose>
 
 <c:choose>
+    <c:when test="${permissionRule.newGoals == 'e'}">
+        <p><strong><liferay-ui:message key="appraisal-newGoals" /></strong></p>
+        <liferay-ui:input-textarea param="appraisal.newGoal.${assessment.id}"
+            defaultValue="${assessment.newGoal}" />
+    </c:when>
+    <c:when test="${permissionRule.newGoals == 'v'}">
+        <p><strong><liferay-ui:message key="appraisal-newGoals" /></strong></p>
+        <c:out value="${assessment.newGoal}" />
+    </c:when>
+</c:choose>
+
+<c:choose>
     <c:when test="${permissionRule.results == 'e'}">
         <p><strong><liferay-ui:message key="appraisal-employee-result" /></strong></p>
         <liferay-ui:input-textarea param="assessment.employeeResult.${assessment.id}"
