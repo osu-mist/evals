@@ -26,12 +26,12 @@
 </c:choose>
 
 <c:choose>
-    <c:when test="${permissionRule.resultComments == 'e'}">
+    <c:when test="${permissionRule.supervisorResults == 'e'}">
         <p><strong><liferay-ui:message key="appraisal-result-comments" /></strong></p>
         <liferay-ui:input-textarea param="assessment.supervisorResult.${assessment.id}"
             defaultValue="${assessment.supervisorResult}" />
     </c:when>
-    <c:when test="${permissionRule.resultComments == 'v'}">
+    <c:when test="${permissionRule.supervisorResults == 'v'}">
         <p><strong><liferay-ui:message key="appraisal-result-comments" /></strong></p>
         <c:out value="${assessment.supervisorResult}" />
     </c:when>

@@ -19,6 +19,10 @@ public class GoalLog extends Pass {
      */
     private String type;
 
+    public static final String NEW_GOAL_TYPE = "new";
+
+    public static final String DEFAULT_GOAL_TYPE = null;
+
     public GoalLog() { }
 
     public int getId() {

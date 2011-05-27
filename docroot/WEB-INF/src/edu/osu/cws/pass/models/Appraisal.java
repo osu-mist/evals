@@ -21,6 +21,8 @@ public class Appraisal extends Pass {
      */
     private Date startDate;
 
+    private Date goalsSubmitDate;
+
     /**
      * The end of the date period for the appraisal.
      */
@@ -29,14 +31,16 @@ public class Appraisal extends Pass {
     /**
      * The employee's supervisor that approves the employee's goals
      */
-    private Employee goalApprover;
+    private Employee evaluator;
 
     private Date goalApprovedDate;
+
+    private Employee goalsApprover;
 
     /**
      * Comments entered by the supervisor regarding the employee's goals
      */
-    private String goalComments;
+    private String goalsComments;
 
     private Date resultSubmitDate;
 
@@ -54,9 +58,9 @@ public class Appraisal extends Pass {
     /**
      * Business center employee approving the supervisor's evaluation
      */
-    private Employee hrApprover;
+    private Employee reviewer;
 
-    private Date hrApprovedDate;
+    private Date reviewSubmitDate;
 
     private String reviewStatusID;
 
@@ -64,7 +68,9 @@ public class Appraisal extends Pass {
      * Comments/feedback that business center provides to supervisor's
      * evaluation.
      */
-    private String hrComments;
+    private String review;
+
+    private Date respondedDate;
 
     private Date createDate;
 
@@ -73,6 +79,18 @@ public class Appraisal extends Pass {
     private String employeeResponse;
 
     private Date employeeSignedDate;
+
+    private Date signatureRequestedDate;
+
+    private String type;
+
+    private Date evaluation2Date;
+
+    private Date review2Date;
+
+    private Employee evaluator2;
+
+    private Employee reviewer2;
 
     private String emailType;
 
@@ -98,6 +116,12 @@ public class Appraisal extends Pass {
 
     private static final String jobRequired =
             "Please provide a valid job";
+
+    public static final String TYPE_ANNUAL = "annual";
+
+    public static final String TYPE_TRIAL = "trial";
+
+    public static final String TYPE_SPECIAL = "special";
 
     public Appraisal() { }
 
@@ -158,12 +182,20 @@ public class Appraisal extends Pass {
         this.endDate = endDate;
     }
 
-    public Employee getGoalApprover() {
-        return goalApprover;
+    public Date getGoalsSubmitDate() {
+        return goalsSubmitDate;
     }
 
-    public void setGoalApprover(Employee goalApprover) {
-        this.goalApprover = goalApprover;
+    public void setGoalsSubmitDate(Date goalsSubmitDate) {
+        this.goalsSubmitDate = goalsSubmitDate;
+    }
+
+    public Employee getEvaluator() {
+        return evaluator;
+    }
+
+    public void setEvaluator(Employee evaluator) {
+        this.evaluator = evaluator;
     }
 
     public Date getGoalApprovedDate() {
@@ -174,12 +206,20 @@ public class Appraisal extends Pass {
         this.goalApprovedDate = goalApprovedDate;
     }
 
-    public String getGoalComments() {
-        return goalComments;
+    public Employee getGoalsApprover() {
+        return goalsApprover;
     }
 
-    public void setGoalComments(String goalComments) {
-        this.goalComments = goalComments;
+    public void setGoalsApprover(Employee goalsApprover) {
+        this.goalsApprover = goalsApprover;
+    }
+
+    public String getGoalsComments() {
+        return goalsComments;
+    }
+
+    public void setGoalsComments(String goalsComments) {
+        this.goalsComments = goalsComments;
     }
 
     public Date getResultSubmitDate() {
@@ -206,20 +246,20 @@ public class Appraisal extends Pass {
         this.rating = rating;
     }
 
-    public Employee getHrApprover() {
-        return hrApprover;
+    public Employee getReviewer() {
+        return reviewer;
     }
 
-    public void setHrApprover(Employee hrApprover) {
-        this.hrApprover = hrApprover;
+    public void setReviewer(Employee reviewer) {
+        this.reviewer = reviewer;
     }
 
-    public Date getHrApprovedDate() {
-        return hrApprovedDate;
+    public Date getReviewSubmitDate() {
+        return reviewSubmitDate;
     }
 
-    public void setHrApprovedDate(Date hrApprovedDate) {
-        this.hrApprovedDate = hrApprovedDate;
+    public void setReviewSubmitDate(Date reviewSubmitDate) {
+        this.reviewSubmitDate = reviewSubmitDate;
     }
 
     public String getReviewStatusID() {
@@ -230,12 +270,20 @@ public class Appraisal extends Pass {
         this.reviewStatusID = reviewStatusID;
     }
 
-    public String getHrComments() {
-        return hrComments;
+    public String getReview() {
+        return review;
     }
 
-    public void setHrComments(String hrComments) {
-        this.hrComments = hrComments;
+    public void setReview(String review) {
+        this.review = review;
+    }
+
+    public Date getRespondedDate() {
+        return respondedDate;
+    }
+
+    public void setRespondedDate(Date respondedDate) {
+        this.respondedDate = respondedDate;
     }
 
     public Date getCreateDate() {
@@ -268,6 +316,54 @@ public class Appraisal extends Pass {
 
     public void setEmployeeSignedDate(Date employeeSignedDate) {
         this.employeeSignedDate = employeeSignedDate;
+    }
+
+    public Date getSignatureRequestedDate() {
+        return signatureRequestedDate;
+    }
+
+    public void setSignatureRequestedDate(Date signatureRequestedDate) {
+        this.signatureRequestedDate = signatureRequestedDate;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Date getEvaluation2Date() {
+        return evaluation2Date;
+    }
+
+    public void setEvaluation2Date(Date evaluation2Date) {
+        this.evaluation2Date = evaluation2Date;
+    }
+
+    public Date getReview2Date() {
+        return review2Date;
+    }
+
+    public void setReview2Date(Date review2Date) {
+        this.review2Date = review2Date;
+    }
+
+    public Employee getEvaluator2() {
+        return evaluator2;
+    }
+
+    public void setEvaluator2(Employee evaluator2) {
+        this.evaluator2 = evaluator2;
+    }
+
+    public Employee getReviewer2() {
+        return reviewer2;
+    }
+
+    public void setReviewer2(Employee reviewer2) {
+        this.reviewer2 = reviewer2;
     }
 
     public String getEmailType() {

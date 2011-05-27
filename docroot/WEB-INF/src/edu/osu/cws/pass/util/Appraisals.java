@@ -18,11 +18,12 @@ public class Appraisals {
      * This method creates an appraisal for the given job by calling the Hibernate
      * class. It returns the id of the created appraisal.
      *
-     * @param job
+     * @param job   Job for this appraisal
+     * @param type  Type of appraisal: trial, annual or special
      * @return appraisal.id
      * @throws ModelException
      */
-    public int createAppraisal(Job job) throws ModelException {
+    public int createAppraisal(Job job, String type) throws ModelException {
         CriterionDetail detail;
         Assessment assessment;
 
@@ -32,6 +33,7 @@ public class Appraisals {
         appraisal.setStartDate(new Date());
         appraisal.setEndDate(new Date());
         appraisal.setCreateDate(new Date());
+        appraisal.setType(type);
 
         if (appraisal.validate()) {
             List<CriterionArea> criteriaList = criteria.list(job.getAppointmentType());
@@ -65,7 +67,9 @@ public class Appraisals {
      */
     public boolean updateAppraisal(Appraisal modifiedAppraisal) throws ModelException {
         String originalGoalText;
-        String newGoalText;
+        String updatedGoalTextGoalText;
+        String originalNewGoalText;
+        String updatedNewGoalText;
         GoalLog goalLog;
 
         // Validate the data first before we try to save anything
@@ -84,13 +88,28 @@ public class Appraisals {
             session.saveOrUpdate(assessment);
 
             // Create new assessment log if necessary
-            originalGoalText = assessment.getLastAssessmentLog().getContent();
-            newGoalText = assessment.getGoal();
-            if (!originalGoalText.equals(newGoalText) && newGoalText != null) {
+            originalGoalText = assessment.getLastGoalLog(GoalLog.DEFAULT_GOAL_TYPE).getContent();
+            updatedGoalTextGoalText = assessment.getGoal();
+            //@todo: use a hash instead of comparing these two long text fields
+            if (!originalGoalText.equals(updatedGoalTextGoalText) && updatedGoalTextGoalText != null) {
                 goalLog = new GoalLog();
                 goalLog.setCreateDate(new Date());
                 goalLog.setAuthor(loggedInUser);
-                goalLog.setContent(newGoalText);
+                goalLog.setContent(updatedGoalTextGoalText);
+                assessment.addAssessmentLog(goalLog);
+                session.save(goalLog);
+            }
+
+
+            originalNewGoalText = assessment.getLastGoalLog(GoalLog.NEW_GOAL_TYPE).getContent();
+            updatedNewGoalText = assessment.getGoal();
+            //@todo: use a hash instead of comparing these two long text fields
+            if (!originalNewGoalText.equals(updatedNewGoalText) && updatedNewGoalText != null) {
+                goalLog = new GoalLog();
+                goalLog.setCreateDate(new Date());
+                goalLog.setAuthor(loggedInUser);
+                goalLog.setContent(updatedNewGoalText);
+                goalLog.setType(GoalLog.NEW_GOAL_TYPE);
                 assessment.addAssessmentLog(goalLog);
                 session.save(goalLog);
             }
@@ -151,6 +170,7 @@ public class Appraisals {
      * start/end date and appointment type of the jobs' the employee supervises.
      *
      * @param pidm      Supervisor's pidm.
+     * @param session
      * @return List of Hashmaps that contains the jobs this employee supervises.
      */
     private List<HashMap> getMyTeamsActiveAppraisals(Integer pidm, Session session) {
@@ -175,6 +195,7 @@ public class Appraisals {
      * @param appraisal     appraisal to check role in
      * @param pidm          pidm of the user to check
      * @return role
+     * @throws edu.osu.cws.pass.models.ModelException
      */
     public String getRole(Appraisal appraisal, int pidm) throws ModelException {
         Session session = HibernateUtil.getCurrentSession();
@@ -215,6 +236,7 @@ public class Appraisals {
      *
      * @param id
      * @return
+     * @throws edu.osu.cws.pass.models.ModelException
      */
     public Appraisal getAppraisal(int id) throws ModelException {
         Session session = HibernateUtil.getCurrentSession();

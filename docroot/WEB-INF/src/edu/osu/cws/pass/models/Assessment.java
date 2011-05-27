@@ -13,6 +13,8 @@ public class Assessment extends Pass {
 
     private String goal;
 
+    private String newGoals;
+
     private String employeeResult;
 
     private String supervisorResult;
@@ -25,11 +27,22 @@ public class Assessment extends Pass {
 
     public Assessment() { }
 
-    public GoalLog getLastAssessmentLog() {
-        if (goalLogs.size() == 0) {
-            return new GoalLog();
+    /**
+     * This method returns the last GoalLog for either a regular
+     * goal entered during the goals due/past due period or the goals
+     * that are appended afterwards: "new".
+     *
+     * @param type Either GoalLog.DEFAULT_GOAL_TYPE or GoalLog.NEW_GOAL_TYPE
+     * @return
+     */
+    public GoalLog getLastGoalLog(String type) {
+        for (GoalLog goalLog : goalLogs) {
+            if ((goalLog.getType() == null && type == null) ||
+                    (goalLog.getType() != null && goalLog.getType().equals(type))) {
+                return goalLog;
+            }
         }
-        return (GoalLog) goalLogs.toArray()[0];
+        return new GoalLog();
     }
 
     public int getId() {
@@ -62,6 +75,14 @@ public class Assessment extends Pass {
 
     public void setGoal(String goal) {
         this.goal = goal;
+    }
+
+    public String getNewGoals() {
+        return newGoals;
+    }
+
+    public void setNewGoals(String newGoals) {
+        this.newGoals = newGoals;
     }
 
     public String getEmployeeResult() {

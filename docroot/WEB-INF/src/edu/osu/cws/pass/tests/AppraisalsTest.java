@@ -40,7 +40,7 @@ public class AppraisalsTest {
      */
     @Test(groups = {"unittest"}, dataProvider = "job")
     public void shouldCreateAnAppraisal(Job job) throws Exception {
-        assert appraisals.createAppraisal(job) != 0 :
+        assert appraisals.createAppraisal(job, Appraisal.TYPE_ANNUAL) != 0 :
                 "Appraisals.createAppraisal should return id of appraisal";
     }
 
@@ -48,7 +48,7 @@ public class AppraisalsTest {
     public void appraisalShouldRequireValidJob() throws Exception {
         Job invalidJob = new Job();
 
-        assert appraisals.createAppraisal(invalidJob) != 0 :
+        assert appraisals.createAppraisal(invalidJob, Appraisal.TYPE_ANNUAL) != 0 :
                 "Appraisals.createAppraisal should require valid Job";
     }
 
@@ -79,7 +79,7 @@ public class AppraisalsTest {
         Job job = (Job) hsession.load(Job.class, 1);
         tx.commit();
 
-        int appraisalID =  appraisals.createAppraisal(job);
+        int appraisalID =  appraisals.createAppraisal(job, Appraisal.TYPE_ANNUAL);
         hsession = HibernateUtil.getCurrentSession();
         tx = hsession.beginTransaction();
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
@@ -88,16 +88,16 @@ public class AppraisalsTest {
         employee = employees.findByOnid("luf");
         updatedAppraisal.setId(appraisalID);
 
-        updatedAppraisal.setGoalApprover(employee);
+        updatedAppraisal.setEvaluator(employee);
         updatedAppraisal.setGoalApprovedDate(new Date());
-        updatedAppraisal.setGoalComments("goal comments data");
+        updatedAppraisal.setGoalsComments("goal comments data");
         updatedAppraisal.setResultSubmitDate(new Date());
         updatedAppraisal.setEvaluation("evaluation text");
         updatedAppraisal.setRating(1);
-        updatedAppraisal.setHrApprover(employee);
-        updatedAppraisal.setHrApprovedDate(new Date());
+        updatedAppraisal.setReviewer(employee);
+        updatedAppraisal.setReviewSubmitDate(new Date());
         updatedAppraisal.setReviewStatusID("review id");
-        updatedAppraisal.setHrComments("hr comments text");
+        updatedAppraisal.setReview("hr comments text");
         updatedAppraisal.setEmployeeResponse("employee comments");
         updatedAppraisal.setEmployeeSignedDate(new Date());
         updatedAppraisal.setEmailType("submit-goals");
@@ -133,16 +133,16 @@ public class AppraisalsTest {
         Job job = (Job) hsession.load(Job.class, 1);
         tx.commit();
 
-        int appraisalID =  appraisals.createAppraisal(job);
+        int appraisalID =  appraisals.createAppraisal(job, Appraisal.TYPE_ANNUAL);
         hsession = HibernateUtil.getCurrentSession();
         tx = hsession.beginTransaction();
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
         tx.commit();
         employee = employees.findByOnid("luf");
 
-        updatedAppraisal.setGoalApprover(employee);
+        updatedAppraisal.setEvaluator(employee);
         updatedAppraisal.setGoalApprovedDate(new Date());
-        updatedAppraisal.setGoalComments("goal comments data");
+        updatedAppraisal.setGoalsComments("goal comments data");
         updatedAppraisal.setResultSubmitDate(new Date());
         updatedAppraisal.setEvaluation("evaluation text");
         updatedAppraisal.setRating(1);
@@ -163,7 +163,7 @@ public class AppraisalsTest {
         Transaction tx = hsession.beginTransaction();
         Job job = (Job) hsession.load(Job.class, 1);
         tx.commit();
-        int appraisalID =  appraisals.createAppraisal(job);
+        int appraisalID =  appraisals.createAppraisal(job, Appraisal.TYPE_ANNUAL);
 
         // Grab the freshly created appraisal from the db before we start
         // updating the properties.
@@ -172,9 +172,9 @@ public class AppraisalsTest {
         tx = hsession.beginTransaction();
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
 
-        updatedAppraisal.setGoalApprover(employee);
+        updatedAppraisal.setEvaluator(employee);
         updatedAppraisal.setGoalApprovedDate(new Date());
-        updatedAppraisal.setGoalComments("goal comments data");
+        updatedAppraisal.setGoalsComments("goal comments data");
         updatedAppraisal.setResultSubmitDate(new Date());
         updatedAppraisal.setEvaluation("evaluation text");
         updatedAppraisal.setRating(1);
@@ -217,7 +217,7 @@ public class AppraisalsTest {
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assert assessment.getGoal() != null :
                     "Appraisal assessments goals failed to save";
-            assert assessment.getGoalLogs().size() == 1 :
+            assert assessment.getGoalLogs().size() == 2 :
                     "Appraisal assessment goals should have a new log";
         }
 
@@ -233,7 +233,7 @@ public class AppraisalsTest {
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assert assessment.getGoal().equals("second edit of goal") :
                     "Appraisal assessments goals failed to save";
-            assert assessment.getGoalLogs().size() == 2 :
+            assert assessment.getGoalLogs().size() == 4 :
                     "Appraisal assessment goals should have a new log";
         }
     }

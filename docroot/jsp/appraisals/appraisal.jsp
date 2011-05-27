@@ -6,7 +6,7 @@
 <h2><liferay-ui:message key="appraisal-classified-title" /></h2>
 <%@ include file="/jsp/appraisals/info.jsp"%>
 
-<c:if test="${not empty permissionRule.saveDraft && not empty permissionRule.requireModification && not empty permissionRule.submit}">
+<c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}">
 <form class="appraisal" action="<portlet:actionURL windowState="<%= WindowState.NORMAL.toString() %>">
     <portlet:param name="action" value="updateAppraisal" />
     </portlet:actionURL>" method="post" name="<portlet:namespace />request_form">
@@ -39,6 +39,6 @@
 <input type="submit" value="<liferay-ui:message key="${permissionRule.submit}" />">
 </c:if>
 
-<c:if test="${not empty permissionRule.saveDraft && not empty permissionRule.requireModification && not empty permissionRule.submit}">
+<c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}">
 </form>
 </c:if>

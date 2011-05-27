@@ -12,8 +12,8 @@
     <tr>
         <th><liferay-ui:message key="appointment-type" />:</th>
         <td><liferay-ui:message key="${appraisal.job.appointmentType}"  /></td>
-        <th><liferay-ui:message key="job-no" />:</th>
-        <td><c:out value="${appraisal.job.jobNumber}" /></td>
+        <th><liferay-ui:message key="position-no" />:</th>
+        <td><c:out value="${appraisal.job.positionNumber}" /></td>
         <th><liferay-ui:message key="job-start-date"  />:</th>
         <td><c:out value="${appraisal.job.beginDate}" /></td>
         <th><liferay-ui:message key="supervisor" />:</th>

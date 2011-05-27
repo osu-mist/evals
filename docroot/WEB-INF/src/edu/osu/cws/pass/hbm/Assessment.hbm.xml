@@ -11,6 +11,7 @@
         </id>
 
         <property name="goal" type="text"/>
+        <property name="newGoals" type="text"/>
         <property name="employeeResult" type="text"/>
         <property name="supervisorResult" type="text"/>
         <property name="createDate" type="timestamp"/>
