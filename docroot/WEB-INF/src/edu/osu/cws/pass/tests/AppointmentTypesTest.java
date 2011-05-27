@@ -15,8 +15,10 @@ public class AppointmentTypesTest {
     AppointmentTypes appointmentTypes = new AppointmentTypes();
 
     @BeforeMethod
-    public void initializeObjects() {
+    public void initializeObjects() throws Exception {
         appointmentTypes = new AppointmentTypes();
+        DBUnit dbunit = new DBUnit();
+        dbunit.seedDatabase();
     }
 
     @Test(groups = {"unittest"})
