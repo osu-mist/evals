@@ -25,11 +25,11 @@ public class CriterionArea extends Pass {
 
     private Date createDate;
 
-    private Employee createdBy;
+    private Employee creator;
 
     private Date deleteDate;
 
-    private Employee deletedBy;
+    private Employee deleter;
 
     private Set details = new HashSet();
 
@@ -186,12 +186,12 @@ public class CriterionArea extends Pass {
         this.createDate = createDate;
     }
 
-    public Employee getCreatedBy() {
-        return createdBy;
+    public Employee getCreator() {
+        return creator;
     }
 
-    public void setCreatedBy(Employee createdBy) {
-        this.createdBy = createdBy;
+    public void setCreator(Employee creator) {
+        this.creator = creator;
     }
 
     public Date getDeleteDate() {
@@ -202,12 +202,12 @@ public class CriterionArea extends Pass {
         this.deleteDate = deleteDate;
     }
 
-    public Employee getDeletedBy() {
-        return deletedBy;
+    public Employee getDeleter() {
+        return deleter;
     }
 
-    public void setDeletedBy(Employee deletedBy) {
-        this.deletedBy = deletedBy;
+    public void setDeleter(Employee deleter) {
+        this.deleter = deleter;
     }
 
     public Set getDetails() {

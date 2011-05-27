@@ -6,7 +6,6 @@ package edu.osu.cws.pass.models;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 public class CriterionDetail extends Pass {
 
@@ -18,7 +17,7 @@ public class CriterionDetail extends Pass {
 
     private Date createDate;
 
-    private Employee createdBy;
+    private Employee creator;
 
     /**
      * descriptionRequired static variable is public because add.jsp needs to
@@ -83,12 +82,12 @@ public class CriterionDetail extends Pass {
         this.createDate = createDate;
     }
 
-    public Employee getCreatedBy() {
-        return createdBy;
+    public Employee getCreator() {
+        return creator;
     }
 
-    public void setCreatedBy(Employee createdBy) {
-        this.createdBy = createdBy;
+    public void setCreator(Employee creator) {
+        this.creator = creator;
     }
 
 }

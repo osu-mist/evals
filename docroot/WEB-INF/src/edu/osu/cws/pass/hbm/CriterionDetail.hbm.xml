@@ -12,7 +12,9 @@
         <property name="description" type="text"/>
 
         <many-to-one name="areaID" class="edu.osu.cws.pass.models.CriterionArea" not-null="true"/>
-        <many-to-one name="createdBy" class="edu.osu.cws.pass.models.Employee" not-null="true"/>
+        <many-to-one name="creator" class="edu.osu.cws.pass.models.Employee"
+                     column="creatorID"
+                     not-null="true"/>
     </class>
 
 </hibernate-mapping>

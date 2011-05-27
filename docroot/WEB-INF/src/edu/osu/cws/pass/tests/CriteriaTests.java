@@ -57,15 +57,15 @@ public class CriteriaTests {
         String type = AppointmentType.CLASSIFIED;
         Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
-        Employee createdBy = (Employee) hsession.load(Employee.class, 12345);
+        Employee creator = (Employee) hsession.load(Employee.class, 12345);
         tx.commit();
 
         criterionObject.setName("Some valid name");
         criteriaDetailObject.setDescription("Some valid description");
-        criteriaDetailObject.setCreatedBy(createdBy);
+        criteriaDetailObject.setCreator(creator);
         criterionObject.setAppointmentType(type);
         criterionObject.setSequence(1);
-        criterionObject.setCreatedBy(createdBy);
+        criterionObject.setCreator(creator);
 
         return new Object[][] {
                 { criterionObject, criteriaDetailObject }
@@ -97,7 +97,7 @@ public class CriteriaTests {
         expectedCriteria.setName("COMMUNICATION SKILLS");
         expectedCriteria.setAppointmentType(type);
         expectedCriteria.setSequence(1);
-        expectedCriteria.setCreatedBy(new Employee());
+        expectedCriteria.setCreator(new Employee());
         expectedCriteria.setDetails(new HashSet<CriterionDetail>());
         expectedDetails.setId(1);
         expectedDetails.setDescription("How will you improve your communication?");
@@ -107,7 +107,7 @@ public class CriteriaTests {
         expectedCriteria2.setName("TECHNICAL SKILLS");
         expectedCriteria2.setAppointmentType(type);
         expectedCriteria2.setSequence(2);
-        expectedCriteria2.setCreatedBy(new Employee());
+        expectedCriteria2.setCreator(new Employee());
         expectedCriteria2.setDetails(new HashSet<CriterionDetail>());
         expectedDetails2.setId(2);
         expectedDetails2.setDescription("What training will you obtain this year?");

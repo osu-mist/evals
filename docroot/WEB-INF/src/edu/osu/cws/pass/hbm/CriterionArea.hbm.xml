@@ -13,8 +13,12 @@
         <property name="deleteDate" type="timestamp" />
         <property name="appointmentType" length="45"/>
 
-        <many-to-one name="createdBy" class="edu.osu.cws.pass.models.Employee" not-null="true"/>
-        <many-to-one name="deletedBy" class="edu.osu.cws.pass.models.Employee" not-null="false"/>
+        <many-to-one name="creator" class="edu.osu.cws.pass.models.Employee"
+                     column="creatorID"
+                     not-null="true"/>
+        <many-to-one name="deleter" class="edu.osu.cws.pass.models.Employee"
+                     column="deleterID"
+                     not-null="false"/>
         <many-to-one name="originalID" column="originalID" class="edu.osu.cws.pass.models.CriterionArea" not-null="false" unique="true"/>
         <set name="details" inverse="true" order-by="createDate DESC">
             <key column="areaID"/>

@@ -33,11 +33,11 @@ public class Criteria {
     public boolean add(CriterionArea area, CriterionDetail details, String onid)
             throws ModelException {
         int sequence = getNextSequence(area.getAppointmentType());
-        Employee createdBy = employees.findByOnid(onid);
+        Employee creator = employees.findByOnid(onid);
 
-        area.setCreatedBy(createdBy);
+        area.setCreator(creator);
         area.setSequence(sequence);
-        details.setCreatedBy(createdBy);
+        details.setCreator(creator);
 
         // validate both objects individually and then check for errors
         area.validate();
