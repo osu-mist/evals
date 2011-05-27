@@ -11,11 +11,11 @@ public class PermissionRule extends Pass {
 
     private String newGoals;
 
-    private String requiredModification;
+    private String goalComments;
 
     private String results;
 
-    private String resultComments;
+    private String supervisorResults;
 
     private String evaluation;
 
@@ -73,12 +73,12 @@ public class PermissionRule extends Pass {
         this.newGoals = newGoals;
     }
 
-    public String getRequiredModification() {
-        return requiredModification;
+    public String getGoalComments() {
+        return goalComments;
     }
 
-    public void setRequiredModification(String requiredModification) {
-        this.requiredModification = requiredModification;
+    public void setGoalComments(String goalComments) {
+        this.goalComments = goalComments;
     }
 
     public String getResults() {
@@ -89,12 +89,12 @@ public class PermissionRule extends Pass {
         this.results = results;
     }
 
-    public String getResultComments() {
-        return resultComments;
+    public String getSupervisorResults() {
+        return supervisorResults;
     }
 
-    public void setResultComments(String resultComments) {
-        this.resultComments = resultComments;
+    public void setSupervisorResults(String supervisorResults) {
+        this.supervisorResults = supervisorResults;
     }
 
     public String getEvaluation() {
