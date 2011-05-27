@@ -8,8 +8,9 @@
             <generator class="native" />
         </id>
 
+        <property name="status" type="string" length="1"/>
         <property name="jobTitle" type="string" length="255"/>
-        <property name="jobNumber" type="string" length="8"/>
+        <property name="positionNumber" type="string" length="8"/>
         <property name="suffix" type="string" length="2"/>
         <property name="jobEcls" type="string" length="45"/>
         <property name="beginDate" type="date"/>
@@ -21,7 +22,7 @@
         <property name="appointmentType" length="45"/>
 
         <many-to-one name="employee" class="edu.osu.cws.pass.models.Employee"
-                     column="employeePidm"
+                     column="employeeID"
                      not-null="false"/>
         <many-to-one name="supervisor" class="edu.osu.cws.pass.models.Job"
                      column="supervisorJobID"

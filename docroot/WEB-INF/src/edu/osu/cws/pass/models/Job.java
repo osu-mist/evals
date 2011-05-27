@@ -12,9 +12,11 @@ public class Job extends Pass {
 
     private Job supervisor;
 
+    private String status;
+
     private String jobTitle;
 
-    private String jobNumber;
+    private String positionNumber;
 
     private String suffix;
 
@@ -67,6 +69,14 @@ public class Job extends Pass {
         this.supervisor = supervisor;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public String getJobTitle() {
         return jobTitle;
     }
@@ -75,12 +85,12 @@ public class Job extends Pass {
         this.jobTitle = jobTitle;
     }
 
-    public String getJobNumber() {
-        return jobNumber;
+    public String getPositionNumber() {
+        return positionNumber;
     }
 
-    public void setJobNumber(String jobNumber) {
-        this.jobNumber = jobNumber;
+    public void setPositionNumber(String positionNumber) {
+        this.positionNumber = positionNumber;
     }
 
     public String getSuffix() {

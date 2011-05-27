@@ -2,11 +2,12 @@ package edu.osu.cws.pass.util;
 
 import edu.osu.cws.pass.models.Job;
 import edu.osu.cws.pass.models.ModelException;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 public class Jobs {
 
-    public Job getSupervisor(Job job) throws ModelException {
+    public Job getSupervisor(Job job) throws ModelException, HibernateException {
         Session session = HibernateUtil.getCurrentSession();
         return this.getSupervisor(job, session);
     }
