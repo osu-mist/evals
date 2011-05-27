@@ -16,7 +16,7 @@ public class Employee extends Pass {
 
     private String onid;
 
-    private String preferredEmail;
+    private String email;
 
     private Boolean copySupervisor;
 
@@ -76,12 +76,12 @@ public class Employee extends Pass {
         this.onid = onid;
     }
 
-    public String getPreferredEmail() {
-        return preferredEmail;
+    public String getEmail() {
+        return email;
     }
 
-    public void setPreferredEmail(String preferredEmail) {
-        this.preferredEmail = preferredEmail;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Boolean getCopySupervisor() {
