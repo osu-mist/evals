@@ -3,7 +3,7 @@ package edu.osu.cws.pass.models;
 public class EmailType extends Pass {
     private String type;
 
-    private String recipients;
+    private String mailTo;
 
     private String cc;
 
@@ -19,12 +19,12 @@ public class EmailType extends Pass {
         this.type = type;
     }
 
-    public String getRecipients() {
-        return recipients;
+    public String getMailTo() {
+        return mailTo;
     }
 
-    public void setRecipients(String recipients) {
-        this.recipients = recipients;
+    public void setMailTo(String mailTo) {
+        this.mailTo = mailTo;
     }
 
     public String getCc() {
