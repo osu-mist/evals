@@ -27,8 +27,8 @@ public class ReviewersTest {
     public void shouldListReviewers() {
         HashMap reviewersList = reviewers.list();
         assert reviewersList.size() == 2 : "Invalid list of reviewers";
-        assert reviewersList.containsKey(12345) : "Missing reviewer from list";
-        assert reviewersList.containsKey(12467) : "Missing reviewer from list";
+        assert reviewersList.containsKey(787812) : "Missing reviewer from list";
+        assert reviewersList.containsKey(8712359) : "Missing reviewer from list";
 
     }
 }

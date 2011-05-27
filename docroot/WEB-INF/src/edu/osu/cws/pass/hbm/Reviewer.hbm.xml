@@ -11,7 +11,7 @@
         <property name="businessCenterName" type="string" length="4"/>
 
         <many-to-one name="employee" class="edu.osu.cws.pass.models.Employee"
-                     column="employeePidm"
+                     column="employeeID"
                      not-null="true"/>
     </class>
 
