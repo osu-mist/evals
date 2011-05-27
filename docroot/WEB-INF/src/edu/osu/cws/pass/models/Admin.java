@@ -8,7 +8,7 @@ public class Admin extends Pass {
 
     private Employee employee;
 
-    private Employee createdBy;
+    private Employee creator;
 
     private Date createDate;
 
@@ -17,6 +17,11 @@ public class Admin extends Pass {
     private boolean isMaster;
 
     private boolean isBackupMaster;
+
+    /**
+     * The value for scope will be: hr, uabac, etc.
+     */
+    private String scope;
 
     public Admin() { }
 
@@ -36,12 +41,12 @@ public class Admin extends Pass {
         this.employee = employee;
     }
 
-    public Employee getCreatedBy() {
-        return createdBy;
+    public Employee getCreator() {
+        return creator;
     }
 
-    public void setCreatedBy(Employee createdBy) {
-        this.createdBy = createdBy;
+    public void setCreator(Employee creator) {
+        this.creator = creator;
     }
 
     public Date getCreateDate() {
@@ -74,5 +79,13 @@ public class Admin extends Pass {
 
     public void setIsBackupMaster(boolean backupMaster) {
         isBackupMaster = backupMaster;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
     }
 }

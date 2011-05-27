@@ -12,9 +12,10 @@
         <property name="modifiedDate" type="timestamp"/>
         <property name="isMaster" type="boolean"/>
         <property name="isBackupMaster" type="boolean"/>
+        <property name="scope"/>
 
         <many-to-one name="employee" class="edu.osu.cws.pass.models.Employee" column="employeeID" not-null="true"/>
-        <many-to-one name="createdBy" class="edu.osu.cws.pass.models.Employee" not-null="true"/>
+        <many-to-one name="creator" class="edu.osu.cws.pass.models.Employee" column="creatorID" not-null="true"/>
     </class>
 
 </hibernate-mapping>
