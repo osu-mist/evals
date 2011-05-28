@@ -33,6 +33,8 @@ public class Appraisal extends Pass {
      */
     private Employee evaluator;
 
+    private Date evaluationSubmitDate;
+
     private Date goalApprovedDate;
 
     private Employee goalsApprover;
@@ -196,6 +198,14 @@ public class Appraisal extends Pass {
 
     public void setEvaluator(Employee evaluator) {
         this.evaluator = evaluator;
+    }
+
+    public Date getEvaluationSubmitDate() {
+        return evaluationSubmitDate;
+    }
+
+    public void setEvaluationSubmitDate(Date evaluationSubmitDate) {
+        this.evaluationSubmitDate = evaluationSubmitDate;
     }
 
     public Date getGoalApprovedDate() {
