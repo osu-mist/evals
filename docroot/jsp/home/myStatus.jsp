@@ -19,7 +19,7 @@
         <c:if test="${!empty myActiveAppraisals}">
             <table class="taglib-search-iterator">
                 <tr class="portlet-section-header results-header">
-                    <th><liferay-ui:message key="jobTitle" /></th>
+                    <th><liferay-ui:message key="job-title" /></th>
                     <th><liferay-ui:message key="reviewPeriod" /></th>
                     <th><liferay-ui:message key="status" /></th>
                 </tr>

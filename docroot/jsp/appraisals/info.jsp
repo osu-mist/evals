@@ -2,7 +2,7 @@
     <tr>
         <th><liferay-ui:message key="employee" />:</th>
         <td><c:out value="${appraisal.job.employee.name}" /></td>
-        <th><liferay-ui:message key="jobTitle" />:</th>
+        <th><liferay-ui:message key="job-title" />:</th>
         <td><c:out value="${appraisal.job.jobTitle}" /></td>
         <th><liferay-ui:message key="reviewPeriod" />:</th>
         <td><c:out value="${appraisal.startDate}-${appraisal.endDate}" /></td>

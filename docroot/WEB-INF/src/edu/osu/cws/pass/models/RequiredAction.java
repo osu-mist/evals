@@ -79,6 +79,19 @@ public class RequiredAction {
         }
     }
 
+    /**
+     * Takes in a resource bundle key, the review count and the resource bundle to
+     * generate the anchorText used by the reviewer actions.
+     *
+     * @param key
+     * @param reviewCount
+     * @param resource
+     */
+    public void setAnchorText(String key, int reviewCount, ResourceBundle resource) {
+        String pattern = resource.getString(key);
+        anchorText = MessageFormat.format(pattern, reviewCount);
+    }
+
     public HashMap<String, String> getParameters() {
         return parameters;
     }

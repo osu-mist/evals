@@ -159,6 +159,23 @@ public class Actions {
     }
 
     /**
+     * Handles displaying a list of pending reviews for a given business center.
+     *
+     * @param request
+     * @param response
+     * @param portlet
+     * @return
+     */
+    public String displayReviewList(PortletRequest request, PortletResponse response,
+                                  JSPPortlet portlet) {
+        String businessCenterName = ParamUtil.getString(request, "businessCenterName");
+        ArrayList<HashMap> reviews = appraisals.getReviews(businessCenterName);
+        request.setAttribute("reviews", reviews);
+
+        return "review-list-jsp";
+    }
+
+    /**
      * Handles displaying the appraisal when a user clicks on it. It loads the appraisal
      * object along with the respective permissionRule.
      *
@@ -318,6 +335,9 @@ public class Actions {
         if (permRule.getEvaluation() != null && permRule.getEvaluation().equals("e")) {
             appraisal.setEvaluation(request.getParameter("appraisal.evaluation"));
             appraisal.setRating(Integer.parseInt(request.getParameter("appraisal.rating")));
+            if (request.getParameter(permRule.getSubmit()) != null) {
+                appraisal.setEvaluationSubmitDate(new Date());
+            }
         }
         // Save review
         if (permRule.getReview() != null && permRule.getReview().equals("e")) {
@@ -468,7 +488,6 @@ public class Actions {
 
         if (adminMap.containsKey(pidm)) {
             return adminMap.get(pidm);
-
         }
         return null;
     }
@@ -498,7 +517,7 @@ public class Actions {
 
         reviewer = getReviewer(loggedInEmployee.getId());
         if (reviewer != null) {
-            reviewerAction = getReviewerAction(reviewer.getBusinessCenterName());
+            reviewerAction = getReviewerAction(reviewer.getBusinessCenterName(), resource);
             if (reviewerAction != null) {
                 requiredActions.add(reviewerAction);
             }
@@ -522,7 +541,6 @@ public class Actions {
         HashMap permissionRuleMap = (HashMap) portletContext.getAttribute("permissionRules");
         ArrayList<RequiredAction> outList = new ArrayList<RequiredAction>();
         String actionKey = "";
-        String anchorText = "";
         RequiredAction actionReq;
         HashMap<String, String> anchorParams;
 
@@ -552,19 +570,22 @@ public class Actions {
      * Returns the required action for the business center reviewer.
      *
      * @param businessCenterName
+     * @param resource
      * @return
      */
-    private RequiredAction getReviewerAction(String businessCenterName) {
-        //@todo: call getReviewCount(bcName) to get an array of the appraisal objects that are due for review for the business center.
-        //	If hibernate getReviewCounts returns 0,
-        //	    Return null
-        //	Instantiate an RequiredAction object action with the following values:
-        //	    anchorText: key=ReviewAction, value in the resource bundle should be "You have {0} appraisals to review", where the {0} is the counts obtained earlier.
-        //	    Parameters:
-        //   	    Action=displayReviewList
-        // 	        bcName=<bcName>
-        //	return the action object.
+    private RequiredAction getReviewerAction(String businessCenterName, ResourceBundle resource) {
+        int reviewCount = appraisals.getReviewCount(businessCenterName);
+        RequiredAction requiredAction = new RequiredAction();
+        if (reviewCount == 0) {
+            return null;
+        }
 
-        return new RequiredAction();
+        HashMap<String, String> parameters = new HashMap<String, String>();
+        parameters.put("action", "displayReviewList");
+        parameters.put("businessCenterName", businessCenterName);
+        requiredAction.setAnchorText("action-required-review", reviewCount, resource);
+        requiredAction.setParameters(parameters);
+
+        return requiredAction;
     }
 }

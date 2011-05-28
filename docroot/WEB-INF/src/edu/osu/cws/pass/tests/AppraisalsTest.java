@@ -304,4 +304,28 @@ public class AppraisalsTest {
         assert appraisals.getRole(appraisal, 787812).equals("reviewer");
     }
 
+    public void shouldOnlyIncludeReviewDueOrReviewPastDueInAppraisalReviewList() {
+        for (HashMap appraisal : appraisals.getReviews("UABC")) {
+            assert appraisal.get("status").equals("review-due")
+                    || appraisal.get("status").equals("review-past-due");
+        }
+    }
+
+    public void getReviewsShouldIncludeOnlyNeededFields() {
+        for (HashMap appraisal : appraisals.getReviews("UABC")) {
+            assert appraisal.containsKey("id") : "Missing appraisalID";
+            assert appraisal.containsKey("employeeName") : "Missing employeeName";
+            assert appraisal.containsKey("jobTitle") : "Missing jobTitle";
+            assert appraisal.containsKey("status") : "Missing status";
+            assert appraisal.containsKey("evaluationSubmitDate") : "Missing evaluationSubmitDate";
+            assert appraisal.keySet().size() == 5 :
+                    "Incorrect amount of values returned by getReviews";
+        }
+    }
+
+    public void shouldReturnCorrectReviewCount() {
+        assert appraisals.getReviewCount("UABC") == 2;
+        assert appraisals.getReviewCount("foobar") == 0;
+    }
+
 }

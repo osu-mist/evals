@@ -21,6 +21,10 @@
 			<name>appraisal-jsp</name>
 			<value>/jsp/appraisals/appraisal.jsp</value>
 		</init-param>
+        <init-param>
+            <name>review-list-jsp</name>
+            <value>/jsp/appraisals/reviewList.jsp</value>
+        </init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
 			<mime-type>text/html</mime-type>

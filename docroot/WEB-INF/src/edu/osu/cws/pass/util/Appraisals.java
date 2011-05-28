@@ -260,6 +260,57 @@ public class Appraisals {
         return appraisal;
     }
 
+    public ArrayList<HashMap> getReviews(String businessCenterName) {
+        Session session = HibernateUtil.getCurrentSession();
+        return getReviews(businessCenterName, session);
+    }
+
+
+    /**
+     * Returns an ArrayList of HashMaps which contain data about appraisals pending
+     * review. This method is used to display a list of pending reviews in the displayReview
+     * actions method.
+     *
+     * @param businessCenterName
+     * @param session
+     * @return
+     */
+    private ArrayList<HashMap> getReviews(String businessCenterName, Session session) {
+        Transaction tx = session.beginTransaction();
+        String query = "select new map(id as id, job.jobTitle as jobTitle, " +
+                "concat(job.employee.lastName, ', ', job.employee.firstName) as employeeName, " +
+                "evaluationSubmitDate as evaluationSubmitDate, status as status) " +
+                "from edu.osu.cws.pass.models.Appraisal where job.businessCenterName = :bc " +
+                "and status in ('review-due', 'review-past-due') and job.endDate is NULL";
+
+        ArrayList<HashMap> result =  (ArrayList<HashMap>) session.createQuery(query)
+                .setString("bc", businessCenterName).list();
+        tx.commit();
+        return result;
+    }
+
+    /**
+     * Returns a count of the pending reviews for a given business center.
+     *
+     * @param businessCenterName
+     * @return
+     */
+    public int getReviewCount(String businessCenterName) {
+        Session session = HibernateUtil.getCurrentSession();
+        return getReviewCount(businessCenterName, session);
+    }
+
+    private int getReviewCount(String businessCenterName, Session session) {
+        Transaction tx = session.beginTransaction();
+        int count = session.createQuery("from edu.osu.cws.pass.models.Appraisal " +
+                "where status in ('review-due', 'review-past-due') " +
+                "and job.businessCenterName = :bcName and job.endDate is NULL")
+                .setString("bcName", businessCenterName)
+                .list().size();
+        tx.commit();
+        return count;
+    }
+
     public void setLoggedInUser(Employee loggedInUser) {
         this.loggedInUser = loggedInUser;
     }
