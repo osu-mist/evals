@@ -10,6 +10,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.pass.util.*;
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
@@ -218,20 +219,26 @@ public class JSPPortlet extends GenericPortlet {
      */
     private void loadEnvironmentProperties(PortletRequest request) {
         String propertyFile = request.getServerName() +".properties";
-        PropertiesConfiguration config = new PropertiesConfiguration();
+        CompositeConfiguration config = new CompositeConfiguration();
 
-        // First load default.properties. Then try to load hostname.properties
+        // First load hostname.properties. Then try to load default.properties
         try {
-            config.load(defaultProperties);
-            _log.error("Loaded - default.properties");
-            config.load(propertyFile);
-            _log.error("Loaded - " + propertyFile);
+            config.addConfiguration(new PropertiesConfiguration(propertyFile));
+            _log.error(propertyFile + " - loaded");
         } catch (ConfigurationException e) {
-            _log.error("Failed to load one or more configuration files");
+            _log.error("Failed to load server specific properties file - " + propertyFile);
         } finally {
-            // Set the Hibernate config file and store properties in portletContext
-            HibernateUtil.setConfig(config.getString("hibernate-cfg-file"));
-            getPortletContext().setAttribute("environmentProp", config);
+            try {
+                config.addConfiguration(new PropertiesConfiguration(defaultProperties));
+                _log.error(defaultProperties + " - loaded");
+
+                // Set the Hibernate config file and store properties in portletContext
+                _log.error("using hibernate cfg file - "+config.getString("hibernate-cfg-file"));
+                HibernateUtil.setConfig(config.getString("hibernate-cfg-file"));
+                getPortletContext().setAttribute("environmentProp", config);
+            } catch (ConfigurationException e) {
+                _log.error("failed to load default properties file - " + defaultProperties);
+            }
         }
     }
 
