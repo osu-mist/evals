@@ -30,10 +30,9 @@ public class Criteria {
      * @return errors   An array of error messages, but empty array on success.
      * @throws edu.osu.cws.pass.models.ModelException
      */
-    public boolean add(CriterionArea area, CriterionDetail details, String onid)
+    public boolean add(CriterionArea area, CriterionDetail details, Employee creator)
             throws ModelException {
         int sequence = getNextSequence(area.getAppointmentType());
-        Employee creator = employees.findByOnid(onid);
 
         area.setCreator(creator);
         area.setSequence(sequence);

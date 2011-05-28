@@ -262,7 +262,7 @@ public class CriteriaTests {
         criterionObject.setAppointmentType(type);
         criterionObject.setSequence(1);
 
-        assert criteriaObject.add(criterionObject, criteriaDetailObject, "cedenoj") :
+        assert criteriaObject.add(criterionObject, criteriaDetailObject, createdBy) :
                     "Valid data should save";
     }
 

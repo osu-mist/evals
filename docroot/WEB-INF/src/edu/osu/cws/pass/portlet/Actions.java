@@ -59,7 +59,7 @@ public class Actions {
             criterionDetail.setDescription(ParamUtil.getString(request, "description"));
 
             try {
-                if (criteriaArea.add(criterionArea, criterionDetail, getLoggedOnUsername(request))) {
+                if (criteriaArea.add(criterionArea, criterionDetail, getLoggedOnUser(request))) {
                     SessionMessages.add(request, "criteria-saved");
                     return listCriteria(request, response, portlet);
                 }
@@ -144,8 +144,7 @@ public class Actions {
      */
     public String displayHomeView(PortletRequest request, PortletResponse response,
                                   JSPPortlet portlet) {
-        String username = getLoggedOnUsername(request);
-        Employee employee = employees.findByOnid(username);
+        Employee employee = getLoggedOnUser(request);
 
         request.setAttribute("myActiveAppraisals",
                 appraisals.getAllMyActiveAppraisals(employee.getId()));
@@ -173,7 +172,7 @@ public class Actions {
         String role = "";
         Appraisal appraisal = new Appraisal();
         int appraisalID = ParamUtil.getInteger(request, "id");
-        Employee currentlyLoggedOnUser = employees.findByOnid(getLoggedOnUsername(request));
+        Employee currentlyLoggedOnUser = getLoggedOnUser(request);
         Boolean showForm = false;
 
         try {
@@ -219,7 +218,7 @@ public class Actions {
         }
 
         int id = ParamUtil.getInteger(request, "id", 0);
-        Employee currentlyLoggedOnUser = employees.findByOnid(getLoggedOnUsername(request));
+        Employee currentlyLoggedOnUser = getLoggedOnUser(request);
 
         if (id == 0) {
             SessionErrors.add(request, "appraisal-does-not-exist");
@@ -391,12 +390,31 @@ public class Actions {
     }
 
     /**
+     * Returns an Employee object of the currently logged on user. First it looks in
+     * the PortletSession if it's not there it fetches the Employee object and stores
+     * it there.
+     *
+     * @param request
+     * @return
+     */
+    private Employee getLoggedOnUser(PortletRequest request) {
+        PortletSession session = request.getPortletSession();
+        Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
+        if (loggedOnUser == null) {
+            loggedOnUser = employees.findByOnid(getLoggedOnUsername(request));
+            session.setAttribute("loggedUser", loggedOnUser);
+        }
+
+        return loggedOnUser;
+    }
+
+    /**
      * Returns a map with information on the currently logged on user.
      *
      * @param request
      * @return
      */
-    private Map getLoggedOnUser(PortletRequest request) {
+    private Map getLoggedOnUserMap(PortletRequest request) {
         Map userInfo = (Map)request.getAttribute(PortletRequest.USER_INFO);
         return userInfo;
     }
@@ -409,7 +427,7 @@ public class Actions {
      * @return username
      */
     private String getLoggedOnUsername(PortletRequest request) {
-        Map userInfo = getLoggedOnUser(request);
+        Map userInfo = getLoggedOnUserMap(request);
 
         return (userInfo == null) ? "" : (String) userInfo.get("user.login.id");
     }
@@ -466,7 +484,7 @@ public class Actions {
         ArrayList<RequiredAction> requiredActions = new ArrayList<RequiredAction>();
         RequiredAction reviewerAction;
         Reviewer reviewer;
-        Employee loggedInEmployee = employees.findByOnid(getLoggedOnUsername(request));
+        Employee loggedInEmployee = getLoggedOnUser(request);
         ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
 
 
