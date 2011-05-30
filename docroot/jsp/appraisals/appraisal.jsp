@@ -43,7 +43,7 @@
     <c:when test="${permissionRule.employeeResponse == 'e'}">
         <p><strong><liferay-ui:message key="appraisal-employee-response" /></strong></p>
         <liferay-ui:input-textarea param="appraisal.employeeResponse"
-            defaultValue="${appraisal.employeeResponse}" />
+            defaultValue="${appraisal.employeeResponse}" /><br />
     </c:when>
     <c:when test="${permissionRule.employeeResponse == 'v'}">
         <p><strong><liferay-ui:message key="appraisal-employee-response" /></strong></p>
