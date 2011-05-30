@@ -12,42 +12,40 @@
 
     <fieldset>
         <caption><strong>Check one category</strong></caption>
-        <ol>
-            <li><input type="radio" name="<portlet:namespace />rating" value="1"
-            <c:if test="${appraisal.rating == 1}">
-                "checked"
-            </c:if>
-            <c:if test="${permissionRule.evaluation == 'v'}">
-                "disabled"
-            </c:if> />
-            <liferay-ui:message key="appraisal-rating-1" /></li>
+        1. <input type="radio" name="<portlet:namespace />rating" value="1"
+        <c:if test="${appraisal.rating == 1}">
+            "checked"
+        </c:if>
+        <c:if test="${permissionRule.evaluation == 'v'}">
+            "disabled"
+        </c:if> />
+        <liferay-ui:message key="appraisal-rating-1" /><br />
 
-            <li><input type="radio" name="<portlet:namespace />rating" value="2"
-            <c:if test="${appraisal.rating == 2}">
-                "checked"
-            </c:if>
-            <c:if test="${permissionRule.evaluation == 'v'}">
-                "disabled"
-            </c:if> />
-            <liferay-ui:message key="appraisal-rating-2" /></li>
+        2. <input type="radio" name="<portlet:namespace />rating" value="2"
+        <c:if test="${appraisal.rating == 2}">
+            "checked"
+        </c:if>
+        <c:if test="${permissionRule.evaluation == 'v'}">
+            "disabled"
+        </c:if> />
+        <liferay-ui:message key="appraisal-rating-2" /><br />
 
-            <li><input type="radio" name="<portlet:namespace />rating" value="3"
-            <c:if test="${appraisal.rating == 3}">
-                "checked"
-            </c:if>
-            <c:if test="${permissionRule.evaluation == 'v'}">
-                "disabled"
-            </c:if> />
-            <liferay-ui:message key="appraisal-rating-3" /></li>
+        3. <input type="radio" name="<portlet:namespace />rating" value="3"
+        <c:if test="${appraisal.rating == 3}">
+            "checked"
+        </c:if>
+        <c:if test="${permissionRule.evaluation == 'v'}">
+            "disabled"
+        </c:if> />
+        <liferay-ui:message key="appraisal-rating-3" /><br />
 
-            <li><input type="radio" name="<portlet:namespace />rating" value="4"
-            <c:if test="${appraisal.rating == 4}">
-                "checked"
-            </c:if>
-            <c:if test="${permissionRule.evaluation == 'v'}">
-                "disabled"
-            </c:if> />
-            <liferay-ui:message key="appraisal-rating-4" /></li>
-        </ol>
+        4. <input type="radio" name="<portlet:namespace />rating" value="4"
+        <c:if test="${appraisal.rating == 4}">
+            "checked"
+        </c:if>
+        <c:if test="${permissionRule.evaluation == 'v'}">
+            "disabled"
+        </c:if> />
+        <liferay-ui:message key="appraisal-rating-4" /><br />
     </fieldset>
 </div><!-- end evaluation -->
