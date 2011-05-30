@@ -186,19 +186,21 @@ public class Actions {
      */
     public String displayAppraisal(PortletRequest request, PortletResponse response,
                                   JSPPortlet portlet) {
-        String role = "";
         Appraisal appraisal = new Appraisal();
         int appraisalID = ParamUtil.getInteger(request, "id");
         Employee currentlyLoggedOnUser = getLoggedOnUser(request);
         Boolean showForm = false;
+        PermissionRule permRule = null;
 
         try {
+            Session session = HibernateUtil.getCurrentSession();
+            Transaction tx = session.beginTransaction();
             appraisal = appraisals.getAppraisal(appraisalID);
-            role = appraisals.getRole(appraisal, currentlyLoggedOnUser.getId());
+            permRule = getAppraisalPermissionRule(currentlyLoggedOnUser, appraisal);
+            tx.commit();
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
         }
-        PermissionRule permRule = getAppraisalPermissionRule(currentlyLoggedOnUser, appraisal);
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
@@ -341,7 +343,7 @@ public class Actions {
         }
         // Save review
         if (permRule.getReview() != null && permRule.getReview().equals("e")) {
-            appraisal.setReview("appraisal.review");
+            appraisal.setReview(request.getParameter("appraisal.review"));
         }
         // Save employee response
         if (permRule.getEmployeeResponse() != null && permRule.getEmployeeResponse().equals("e")) {

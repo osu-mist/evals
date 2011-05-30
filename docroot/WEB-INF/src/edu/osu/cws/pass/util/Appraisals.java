@@ -209,7 +209,6 @@ public class Appraisals {
             return "supervisor";
         }
 
-        Transaction tx = session.beginTransaction();
         String query = "from edu.osu.cws.pass.models.Reviewer where " +
                 "businessCenterName = :businessCenterName and employee.id = :pidm " +
                 "and employee.active = 1";
@@ -217,7 +216,6 @@ public class Appraisals {
                 .setString("businessCenterName", appraisal.getJob().getBusinessCenterName())
                 .setInteger("pidm", pidm)
                 .list();
-        tx.commit();
 
         if (reviewerList.size() != 0) {
             return "reviewer";
@@ -254,9 +252,7 @@ public class Appraisals {
      * @return
      */
     private Appraisal getAppraisal(int id, Session session) {
-        Transaction tx = session.beginTransaction();
         appraisal = (Appraisal) session.get(Appraisal.class, id);
-        tx.commit();
         return appraisal;
     }
 
