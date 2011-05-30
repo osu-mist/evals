@@ -388,11 +388,15 @@ public class Actions {
         }
 
         for (String button : appraisalButtons) {
-            appraisalStepKey = button + "-" + appointmentType;
-            appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
-            _log.error("appraisalStepKey = "+appraisalStepKey);
-            if (appraisalStep != null) {
-                return appraisalStep;
+            // If this button is the one the user clicked, use it to look up the
+            // appraisalStepKey
+            if (!ParamUtil.getString(request, button).equals("")) {
+                appraisalStepKey = button + "-" + appointmentType;
+                appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
+                _log.error("appraisalStepKey = "+appraisalStepKey);
+                if (appraisalStep != null) {
+                    return appraisalStep;
+                }
             }
         }
 
