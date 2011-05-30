@@ -320,14 +320,14 @@ public class Actions {
         // Save employee results
         if (permRule.getResults() != null && permRule.getResults().equals("e")) {
             for (Assessment assessment : appraisal.getAssessments()) {
-                paramaterKey = "appraisal.employeeResult." + Integer.toString(assessment.getId());
+                paramaterKey = "assessment.employeeResult." + Integer.toString(assessment.getId());
                 assessment.setEmployeeResult(request.getParameter(paramaterKey));
             }
         }
         // Save Supervisor Results
         if (permRule.getSupervisorResults() != null && permRule.getSupervisorResults().equals("e")) {
             for (Assessment assessment : appraisal.getAssessments()) {
-                paramaterKey = "appraisal.supervisorResult." + Integer.toString(assessment.getId());
+                paramaterKey = "assessment.supervisorResult." + Integer.toString(assessment.getId());
                 assessment.setSupervisorResult(request.getParameter(paramaterKey));
             }
         }
