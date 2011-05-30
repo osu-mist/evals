@@ -27,7 +27,7 @@
 
 <c:choose>
     <c:when test="${permissionRule.results == 'e'}">
-        <p><strong><liferay-ui:message key="appraisal-employee-result" /></strong></p>
+        <p><strong><liferay-ui:message key="appraisal-employee-results" /></strong></p>
         <liferay-ui:input-textarea param="assessment.employeeResult.${assessment.id}"
             defaultValue="${assessment.employeeResult}" />
     </c:when>
