@@ -23,7 +23,7 @@
     <c:when test="${permissionRule.goalComments == 'e'}">
         <p><strong><liferay-ui:message key="appraisal-goals-comments" /></strong></p>
         <liferay-ui:input-textarea param="appraisal.goalsComments"
-            defaultValue="${appraisal.goalsComments}" />
+            defaultValue="${appraisal.goalsComments}" /><br />
     </c:when>
     <c:when test="${permissionRule.goalComments == 'v'}">
         <p><strong><liferay-ui:message key="appraisal-goals-comments" /></strong></p>
@@ -51,6 +51,7 @@
     </c:when>
 </c:choose>
 
+<br />
 <c:if test="${not empty permissionRule.saveDraft}">
 <input name="${permissionRule.saveDraft}" type="submit" value="<liferay-ui:message key="${permissionRule.saveDraft}" />">
 </c:if>

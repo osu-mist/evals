@@ -102,7 +102,7 @@ public class Appraisals {
 
 
             originalNewGoalText = assessment.getLastGoalLog(GoalLog.NEW_GOAL_TYPE).getContent();
-            updatedNewGoalText = assessment.getGoal();
+            updatedNewGoalText = assessment.getNewGoals();
             //@todo: use a hash instead of comparing these two long text fields
             if (!originalNewGoalText.equals(updatedNewGoalText) && updatedNewGoalText != null) {
                 goalLog = new GoalLog();

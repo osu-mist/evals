@@ -323,9 +323,16 @@ public class Actions {
                 assessment.setGoal(request.getParameter(paramaterKey));
             }
         }
+        // Save newGoals
+        if (permRule.getNewGoals() != null && permRule.getNewGoals().equals("e")) {
+            for (Assessment assessment : appraisal.getAssessments()) {
+                paramaterKey = "appraisal.newGoal." + Integer.toString(assessment.getId());
+                assessment.setNewGoals(request.getParameter(paramaterKey));
+            }
+        }
         // Save goalComments
         if (permRule.getGoalComments() != null && permRule.getGoalComments().equals("e")) {
-            appraisal.setGoalsComments(request.getParameter("appraisal.goalsComment"));
+            appraisal.setGoalsComments(request.getParameter("appraisal.goalsComments"));
         }
         // Save employee results
         if (permRule.getResults() != null && permRule.getResults().equals("e")) {
