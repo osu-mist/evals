@@ -4,3 +4,4 @@
 <%@ include file="/jsp/home/myStatus.jsp" %>
 <%@ include file="/jsp/home/myTeam.jsp" %>
 <%@ include file="/jsp/home/admin.jsp" %>
+<%@ include file="/jsp/home/switchUser.jsp" %>
