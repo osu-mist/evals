@@ -38,7 +38,7 @@ public class RequiredAction {
      */
     public void setAnchorText(String key, HashMap appraisalMap, ResourceBundle resource) {
         String pattern = "";
-        String reviewPeriod = MessageFormat.format("{0,date,yyyy}-{1,date,yyyy}",
+        String reviewPeriod = MessageFormat.format("{0,date,MM/yyyy} - {1,date,MM/yyyy}",
                 new Object[]{appraisalMap.get("startDate"), appraisalMap.get("endDate")});
 
         if (key.equals("action-required-goals-due") ||

@@ -29,8 +29,8 @@
                         onmouseout="this.className = '${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}';"
                     >
                         <td>${shortAppraisal.jobTitle}</td>
-                        <td><fmt:formatDate value="${shortAppraisal.startDate}" pattern="yyyy"/> -
-                            <fmt:formatDate value="${shortAppraisal.endDate}" pattern="yyyy"/>
+                        <td><fmt:formatDate value="${shortAppraisal.startDate}" pattern="MM/yyyy"/> -
+                            <fmt:formatDate value="${shortAppraisal.endDate}" pattern="MM/yyyy"/>
                         </td>
                         <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
                             <portlet:param name="id" value="${shortAppraisal.id}"/>
