@@ -56,6 +56,7 @@
   <employees pidm="787812" firstName="Clark" lastName="Barlow" osuid="12345678" onid="barlowc" email="test@orst.edu" copySupervisor="false" active="true"/>
   <employees pidm="8712359" firstName="Lois" lastName="Barlow" osuid="12345678" onid="barlowc" email="test@orst.edu" copySupervisor="false" active="true"/>
   <employees pidm="990871" firstName="Megan" lastName="Barlow" osuid="12345678" onid="barlowc" email="test@orst.edu" copySupervisor="false" active="true"/>
+  <employees pidm="56198" firstName="Jess" lastName="Smith" osuid="12345678" onid="testing" email="test@orst.edu" copySupervisor="false" active="false"/>
 
   <reviewers id="1" employeeID="787812" businessCenterName="UABC"/>
   <reviewers id="2" employeeID="8712359" businessCenterName="UABC"/>
@@ -143,6 +144,20 @@
         orgCodeDescription="testing"/>
   <jobs id="7"
         employeeID="990871"
+        jobTitle="Bar owner"
+        positionNumber="1234"
+        suffix="00"
+        jobEcls="kjlkjlk"
+        appointmentType="classified"
+        beginDate="2011-05-14"
+        positionClass="foobar"
+        businessCenterName="UABC"
+        tsOrgCode="test"
+        status="A"
+        orgCodeDescription="testing"/>
+  <jobs id="8"
+        employeeID="56198"
+        supervisorJobID="1"
         jobTitle="Bar owner"
         positionNumber="1234"
         suffix="00"

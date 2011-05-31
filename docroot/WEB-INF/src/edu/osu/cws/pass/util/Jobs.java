@@ -4,6 +4,9 @@ import edu.osu.cws.pass.models.Job;
 import edu.osu.cws.pass.models.ModelException;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+
+import java.util.List;
 
 public class Jobs {
 
@@ -68,6 +71,24 @@ public class Jobs {
         }
 
         return false;
+    }
+
+    /**
+     * Determines whether a person has any job which is a supervising job.
+     *
+     * @param pidm  pidm of employee to check
+     * @return isSupervisor
+     */
+    public boolean isSupervisor(int pidm) {
+        String query = "select count(*) from edu.osu.cws.pass.models.Job where endDate IS NULL " +
+                "AND supervisor.employee.id = :pidm AND employee.active = 1";
+
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+        int employeeCount = ((Long) session.createQuery(query).setInteger("pidm", pidm)
+                .iterate().next()).intValue();
+        tx.commit();
+        return employeeCount > 0;
     }
 
 }

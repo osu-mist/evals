@@ -50,4 +50,9 @@ public class JobsTest {
 
         assert !jobs.isUpperSupervisor(job, pidm) : "should not have found an upper supervisor";
     }
+
+    public void shouldCorrectlyDetectEmployeeSupervisor() {
+        assert jobs.isSupervisor(990871) : "isSupervisor() should count employees correctly";
+        assert !jobs.isSupervisor(12345) : "isSupervisor() should not count inactive employees";
+    }
 }

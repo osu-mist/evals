@@ -22,6 +22,8 @@ public class Actions {
 
     private Employees employees = new Employees();
 
+    private Jobs jobs = new Jobs();
+
     private AppointmentTypes appointmentTypes = new AppointmentTypes();
 
     private PortletContext portletContext;
@@ -148,8 +150,14 @@ public class Actions {
 
         request.setAttribute("myActiveAppraisals",
                 appraisals.getAllMyActiveAppraisals(employee.getId()));
-        request.setAttribute("myTeamsActiveAppraisals",
-                appraisals.getMyTeamsActiveAppraisals(employee.getId()));
+        if (jobs.isSupervisor(employee.getId())) {
+            request.setAttribute("myTeamsActiveAppraisals",
+                    appraisals.getMyTeamsActiveAppraisals(employee.getId()));
+            request.setAttribute("isSupervisor", true);
+        } else {
+            request.setAttribute("isSupervisor", false);
+        }
+
         request.setAttribute("reviewer", getReviewer(employee.getId()));
         request.setAttribute("admin", getAdmin(employee.getId()));
 
@@ -517,9 +525,12 @@ public class Actions {
                 request.getAttribute("myActiveAppraisals");
         requiredActions.addAll(getAppraisalActions(myActiveAppraisals, "employee", resource));
 
-        ArrayList<HashMap> supervisorActions = (ArrayList<HashMap>)
-                request.getAttribute("myTeamsActiveAppraisals");
-        requiredActions.addAll(getAppraisalActions(supervisorActions, "supervisor", resource));
+        // add supervisor required actions, if user has team's active appraisals
+        if (request.getAttribute("myTeamsActiveAppraisals") != null) {
+            ArrayList<HashMap> supervisorActions = (ArrayList<HashMap>)
+                    request.getAttribute("myTeamsActiveAppraisals");
+            requiredActions.addAll(getAppraisalActions(supervisorActions, "supervisor", resource));
+        }
 
         reviewer = getReviewer(loggedInEmployee.getId());
         if (reviewer != null) {
