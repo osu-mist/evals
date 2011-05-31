@@ -432,11 +432,11 @@ public class Actions {
      * @return
      */
     private Employee getLoggedOnUser(PortletRequest request) {
-        PortletSession session = request.getPortletSession();
+        PortletSession session = request.getPortletSession(true);
         Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
         if (loggedOnUser == null) {
             loggedOnUser = employees.findByOnid(getLoggedOnUsername(request));
-            session.setAttribute("loggedUser", loggedOnUser);
+            session.setAttribute("loggedOnUser", loggedOnUser);
         }
 
         return loggedOnUser;
