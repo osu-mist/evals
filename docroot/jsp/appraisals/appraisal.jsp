@@ -7,9 +7,11 @@
 <%@ include file="/jsp/appraisals/info.jsp"%>
 
 <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}">
-<form class="appraisal" action="<portlet:actionURL windowState="<%= WindowState.NORMAL.toString() %>">
+<form class="appraisal" id="<portlet:namespace />fm"
+    action="<portlet:actionURL windowState="<%= WindowState.NORMAL.toString() %>">
     <portlet:param name="action" value="updateAppraisal" />
     </portlet:actionURL>" method="post" name="<portlet:namespace />request_form">
+
     <input type="hidden" name="id" value="${appraisal.id}"/>
 </c:if>
 
@@ -40,6 +42,15 @@ ${fn:replace(appraisal.goalsComments, "
     <%@ include file="/jsp/appraisals/review.jsp"%>
 </c:if>
 
+<c:if test="${not empty permissionRule.employeeResponse}">
+    <input type="checkbox"  name="<portlet:namespace />sign-appraisal"
+        id="<portlet:namespace />sign-appraisal"
+        <c:if test="${not empty appraisal.employeeSignedDate}">
+            checked="checked" disabled="disabled"
+        </c:if>
+    >
+    <liferay-ui:message key="appraisal-acknowledge-read"/></input>
+</c:if>
 <c:choose>
     <c:when test="${permissionRule.employeeResponse == 'e'}">
         <p><strong><liferay-ui:message key="appraisal-employee-response" /></strong></p>
@@ -68,4 +79,24 @@ ${fn:replace(appraisal.employeeResponse, "
 
 <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}">
 </form>
+
+<script type="text/javascript">
+jQuery(document).ready(function() {
+  jQuery("#<portlet:namespace />fm").submit(function() {
+    var errors = "";
+    if (jQuery("#<portlet:namespace />sign-appraisal").length > 0 &&
+            !jQuery("#<portlet:namespace />sign-appraisal").is(':checked')) {
+      errors = "<li><%= Appraisal.signatureRequired %></li>";
+    }
+    if (errors != "") {
+      jQuery("#<portlet:namespace />flash").html(
+        '<span class="portlet-msg-error"><ul>'+errors+'</ul></span>'
+      );
+      return false;
+    }
+
+    return true;
+  });
+});
+</script>
 </c:if>
