@@ -205,6 +205,12 @@ public class Actions {
             Transaction tx = session.beginTransaction();
             appraisal = appraisals.getAppraisal(appraisalID);
             permRule = getAppraisalPermissionRule(currentlyLoggedOnUser, appraisal);
+
+            // setting the user role so that for demo purposes we can check permissions
+            // using role in jsp
+            //@todo: remove line below after demo
+            request.setAttribute("userRole",
+                appraisals.getRole(appraisal, currentlyLoggedOnUser.getId()));
             tx.commit();
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
@@ -225,14 +231,6 @@ public class Actions {
         request.setAttribute("appraisal", appraisal);
         request.setAttribute("permissionRule", permRule);
         request.setAttribute("showForm", showForm);
-
-        // hack of permissions for demo
-        try {
-        request.setAttribute("userRole",
-                appraisals.getRole(appraisal, currentlyLoggedOnUser.getId()));
-        } catch (ModelException e) {
-            SessionErrors.add(request, "appraisal-permission-denied");
-        }
 
         return "appraisal-jsp";
     }
