@@ -40,6 +40,14 @@ ${fn:replace(appraisal.goalsComments, "
     <%@ include file="/jsp/appraisals/review.jsp"%>
 </c:if>
 
+<c:if test="${not empty permissionRule.employeeResponse}">
+    <input type="checkbox"  name="<portlet:namespace />sign-appraisal"
+    <c:if test="${not empty appraisal.employeeSignedDate}">
+        checked="checked" disabled="disabled"
+    </c:if>
+    >
+    <liferay-ui:message key="appraisal-acknowledge-read"/></input>
+</c:if>
 <c:choose>
     <c:when test="${permissionRule.employeeResponse == 'e'}">
         <p><strong><liferay-ui:message key="appraisal-employee-response" /></strong></p>
