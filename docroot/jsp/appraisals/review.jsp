@@ -6,7 +6,8 @@
                 defaultValue="${appraisal.review}" />
         </c:when>
         <c:when test="${permissionRule.review == 'v'}">
-            <c:out value="${appraisal.review}" />
+${fn:replace(appraisal.review, "
+", "<br />")}
         </c:when>
     </c:choose>
 </div><!-- end review -->
