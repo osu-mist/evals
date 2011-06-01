@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Assessment extends Pass {
+public class Assessment extends Pass implements Comparable<Assessment> {
     private int id;
 
     private Appraisal appraisal;
@@ -128,5 +128,27 @@ public class Assessment extends Pass {
     public void addAssessmentLog(GoalLog goalLog) {
         goalLog.setAssessment(this);
         this.goalLogs.add(goalLog);
+    }
+
+    public int compareTo(Assessment otherAssessment) {
+        final int BEFORE = -1;
+        final int EQUAL = 0;
+        final int AFTER = 1;
+
+        if (this == otherAssessment) {
+            return EQUAL;
+        }
+
+        if (this.getCriterionDetail().getAreaID().getSequence() <
+                otherAssessment.getCriterionDetail().getAreaID().getSequence()) {
+            return BEFORE;
+        }
+
+        if (this.getCriterionDetail().getAreaID().getSequence() >
+                otherAssessment.getCriterionDetail().getAreaID().getSequence()) {
+            return AFTER;
+        }
+
+        return EQUAL;
     }
 }

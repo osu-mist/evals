@@ -14,7 +14,7 @@
 </c:if>
 
 <div id="appraisal-criteria">
-<c:forEach var="assessment" items="${appraisal.assessments}" varStatus="loopStatus">
+<c:forEach var="assessment" items="${appraisal.sortedAssessments}" varStatus="loopStatus">
     <%@ include file="/jsp/appraisals/criteria.jsp"%>
 </c:forEach>
 </div>

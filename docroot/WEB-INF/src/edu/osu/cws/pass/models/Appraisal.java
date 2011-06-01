@@ -1,9 +1,6 @@
 package edu.osu.cws.pass.models;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Appraisal extends Pass {
     private int id;
@@ -142,6 +139,18 @@ public class Appraisal extends Pass {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns a sorted list of assessments. The assessment pojo class
+     * implements comparable interface which makes this easy.
+     *
+     * @return
+     */
+    public List getSortedAssessments() {
+        List sortedAssessments = new ArrayList(assessments);
+        Collections.sort(sortedAssessments);
+        return sortedAssessments;
     }
 
     public int getId() {
