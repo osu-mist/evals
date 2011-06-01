@@ -9,7 +9,8 @@
     </c:when>
     <c:when test="${permissionRule.goals == 'v'}">
         <p><strong><liferay-ui:message key="appraisal-goals" /></strong></p>
-        <c:out value="${assessment.goal}" />
+${fn:replace(assessment.goal, "
+", "<br />")}
     </c:when>
 </c:choose>
 
@@ -21,7 +22,8 @@
     </c:when>
     <c:when test="${permissionRule.newGoals == 'v'}">
         <p><strong><liferay-ui:message key="appraisal-newGoals" /></strong></p>
-        <c:out value="${assessment.newGoal}" />
+${fn:replace(assessment.newGoal, "
+", "<br />")}
     </c:when>
 </c:choose>
 
@@ -33,7 +35,8 @@
     </c:when>
     <c:when test="${permissionRule.results == 'v'}">
         <p><strong><liferay-ui:message key="appraisal-employee-results" /></strong></p>
-        <c:out value="${assessment.employeeResult}" />
+${fn:replace(assessment.employeeResult, "
+", "<br />")}
     </c:when>
 </c:choose>
 
@@ -45,6 +48,7 @@
     </c:when>
     <c:when test="${permissionRule.supervisorResults == 'v'}">
         <p><strong><liferay-ui:message key="appraisal-result-comments" /></strong></p>
-        <c:out value="${assessment.supervisorResult}" />
+${fn:replace(assessment.supervisorResult, "
+", "<br />")}
     </c:when>
 </c:choose>
