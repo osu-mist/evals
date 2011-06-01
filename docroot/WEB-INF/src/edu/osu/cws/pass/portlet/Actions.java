@@ -322,6 +322,13 @@ public class Actions {
                 paramaterKey = "appraisal.goal." + Integer.toString(assessment.getId());
                 assessment.setGoal(request.getParameter(paramaterKey));
             }
+            if (request.getParameter("submit-goals") != null) {
+                appraisal.setGoalsSubmitDate(new Date());
+            }
+            if (request.getParameter("approve-goals") != null) {
+                appraisal.setGoalApprovedDate(new Date());
+                appraisal.setGoalsApprover(getLoggedOnUser(request));
+            }
         }
         // Save newGoals
         if (permRule.getNewGoals() != null && permRule.getNewGoals().equals("e")) {
@@ -348,21 +355,38 @@ public class Actions {
                 assessment.setSupervisorResult(request.getParameter(paramaterKey));
             }
         }
+        if (request.getParameter("submit-results") != null) {
+            appraisal.setResultSubmitDate(new Date());
+        }
         // Save evaluation
         if (permRule.getEvaluation() != null && permRule.getEvaluation().equals("e")) {
             appraisal.setEvaluation(request.getParameter("appraisal.evaluation"));
             appraisal.setRating(Integer.parseInt(request.getParameter("appraisal.rating")));
             if (request.getParameter(permRule.getSubmit()) != null) {
                 appraisal.setEvaluationSubmitDate(new Date());
+                appraisal.setEvaluator(getLoggedOnUser(request));
             }
         }
         // Save review
         if (permRule.getReview() != null && permRule.getReview().equals("e")) {
             appraisal.setReview(request.getParameter("appraisal.review"));
+            if (request.getParameter("submit-appraisal") != null) {
+                appraisal.setReviewer(getLoggedOnUser(request));
+                appraisal.setReviewSubmitDate(new Date());
+            }
+        }
+        if (request.getParameter("sign-appraisal") != null) {
+            appraisal.setEmployeeSignedDate(new Date());
+        }
+        if (request.getParameter("release-appraisal") != null) {
+            appraisal.setSignatureRequestedDate(new Date());
         }
         // Save employee response
         if (permRule.getEmployeeResponse() != null && permRule.getEmployeeResponse().equals("e")) {
             appraisal.setEmployeeResponse(request.getParameter("appraisal.employeeResponse"));
+            if (request.getParameter("submit-response") != null) {
+                appraisal.setRespondedDate(new Date());
+            }
         }
 
         // If the appraisalStep object has a new status, update the appraisal object
