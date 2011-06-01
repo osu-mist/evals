@@ -226,6 +226,14 @@ public class Actions {
         request.setAttribute("permissionRule", permRule);
         request.setAttribute("showForm", showForm);
 
+        // hack of permissions for demo
+        try {
+        request.setAttribute("userRole",
+                appraisals.getRole(appraisal, currentlyLoggedOnUser.getId()));
+        } catch (ModelException e) {
+            SessionErrors.add(request, "appraisal-permission-denied");
+        }
+
         return "appraisal-jsp";
     }
 

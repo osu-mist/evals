@@ -10,7 +10,19 @@
             <fmt:formatDate value="${appraisal.endDate}" pattern="MM/yyyy"/>
         </td>
         <th><liferay-ui:message key="status" />:</th>
-        <td><liferay-ui:message key="${appraisal.status}" /></td>
+        <td>
+            <c:choose>
+                <c:when test="${userRole == 'employee' && (appraisal.status == 'appraisal-due'
+                    || appraisal.status == 'appraisal-past-due'  || appraisal.status == 'review-due'
+                    || appraisal.status == 'review-past-due' || appraisal.status == 'release-due'
+                    || appraisal.status == 'release-past-due')}">
+               <liferay-ui:message key="in-review"/>
+                </c:when>
+                <c:otherwise>
+                    <liferay-ui:message key="${appraisal.status}" />
+                </c:otherwise>
+            </c:choose>
+        </td>
     </tr>
     <tr>
         <th><liferay-ui:message key="appointment-type" />:</th>

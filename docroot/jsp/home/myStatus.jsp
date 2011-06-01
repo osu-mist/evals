@@ -35,7 +35,21 @@
                         <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
                             <portlet:param name="id" value="${shortAppraisal.id}"/>
                             <portlet:param  name="action" value="displayAppraisal"/>
-                           </portlet:actionURL>"><liferay-ui:message key="${shortAppraisal.status}" /></a>
+                           </portlet:actionURL>">
+                           <c:choose>
+                                <c:when test="${shortAppraisal.status == 'appraisal-due'
+                                    || shortAppraisal.status == 'appraisal-past-due'
+                                    || shortAppraisal.status == 'review-due'
+                                    || shortAppraisal.status == 'review-past-due'
+                                    || shortAppraisal.status == 'release-due'
+                                    || shortAppraisal.status == 'release-past-due'}">
+                               <liferay-ui:message key="in-review"/>
+                                </c:when>
+                                <c:otherwise>
+                                    <liferay-ui:message key="${shortAppraisal.status}" />
+                                </c:otherwise>
+                            </c:choose>
+                           </a>
                         </td>
                     </tr>
                 </c:forEach>
