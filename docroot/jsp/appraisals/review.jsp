@@ -1,4 +1,4 @@
-<div class="review">
+<div class="pass-review">
     <h4><liferay-ui:message key="appraisal-review"/></h4>
     <c:choose>
         <c:when test="${permissionRule.review == 'e'}">
@@ -6,8 +6,7 @@
                 defaultValue="${appraisal.review}" />
         </c:when>
         <c:when test="${permissionRule.review == 'v'}">
-${fn:replace(appraisal.review, "
-", "<br />")}
+<p class="pass-form-text">${appraisal.review}</p>
         </c:when>
     </c:choose>
 </div><!-- end review -->
