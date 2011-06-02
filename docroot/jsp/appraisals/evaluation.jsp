@@ -1,4 +1,4 @@
-<div class="evaluation">
+<div class="pass-evaluation">
     <h4><liferay-ui:message key="appraisal-summary"/></h4>
     <c:choose>
         <c:when test="${permissionRule.evaluation == 'e'}">
@@ -6,13 +6,13 @@
                 defaultValue="${appraisal.evaluation}" />
         </c:when>
         <c:when test="${permissionRule.evaluation == 'v'}">
-${fn:replace(appraisal.evaluation, "
-", "<br />")}
+<p class="pass-form-text">${fn:replace(appraisal.evaluation, "
+", "<br />")}</p>
         </c:when>
     </c:choose>
 
+    <strong><strong>Check one category</strong></strong><br />
     <fieldset>
-        <caption><strong>Check one category</strong></caption><br />
         1. <input type="radio" name="<portlet:namespace />appraisal.rating" value="1"
         <c:if test="${appraisal.rating == 1}">
             checked="checked"

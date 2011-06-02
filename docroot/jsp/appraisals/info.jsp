@@ -1,4 +1,4 @@
-<table id="appraisalInfo">
+<table class="appraisal-info">
     <tr>
         <th><liferay-ui:message key="employee" />:</th>
         <td><c:out value="${appraisal.job.employee.name}" /></td>
