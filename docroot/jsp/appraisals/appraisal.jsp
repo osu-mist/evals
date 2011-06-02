@@ -30,8 +30,7 @@
         </c:when>
         <c:when test="${permissionRule.goalComments == 'v'}">
             <p><strong><liferay-ui:message key="appraisal-goals-comments" /></strong></p>
-    <p class="pass-form-text">${fn:replace(appraisal.goalsComments, "
-", "<br />")}</p>
+    <p class="pass-form-text">${appraisal.goalsComments}</p>
         </c:when>
     </c:choose>
 
@@ -61,8 +60,7 @@
             </c:when>
             <c:when test="${permissionRule.employeeResponse == 'v'}">
                 <p><strong><liferay-ui:message key="appraisal-employee-response" /></strong></p>
-        <p class="pass-form-text">${fn:replace(appraisal.employeeResponse, "
-", "<br />")}</p>
+        <p class="pass-form-text">${appraisal.employeeResponse}</p>
             </c:when>
         </c:choose>
     </div>

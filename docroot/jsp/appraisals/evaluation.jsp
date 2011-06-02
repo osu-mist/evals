@@ -6,8 +6,7 @@
                 defaultValue="${appraisal.evaluation}" />
         </c:when>
         <c:when test="${permissionRule.evaluation == 'v'}">
-<p class="pass-form-text">${fn:replace(appraisal.evaluation, "
-", "<br />")}</p>
+<p class="pass-form-text">${appraisal.evaluation}</p>
         </c:when>
     </c:choose>
 

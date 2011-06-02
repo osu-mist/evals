@@ -10,8 +10,4 @@
         <taglib-uri>http://java.sun.com/jstl/fmt_rt</taglib-uri>
         <taglib-location>/WEB-INF/tld/fmt-rt.tld</taglib-location>
     </taglib>
-    <taglib>
-        <taglib-uri>http://java.sun.com/jsp/jstl/functions</taglib-uri>
-        <taglib-location>/WEB-INF/tld/fn.tld</taglib-location>
-    </taglib>
 </web-app>
