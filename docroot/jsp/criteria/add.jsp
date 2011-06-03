@@ -13,46 +13,48 @@ addCriteriaURL.setParameter("action", "addCriteria");
 
 <h2>Add an Evaluation Criteria for Classified</h2>
 
-<form action="<%= addCriteriaURL.toString() %>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
+<div id="pass-add-criteria">
+    <form action="<%= addCriteriaURL.toString() %>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
 
-<input name="<portlet:namespace />criterionAreaId" type="hidden" value="${criterionArea.id}" />
+    <input name="<portlet:namespace />criterionAreaId" type="hidden" value="${criterionArea.id}" />
 
-<table class="lfr-table">
-    <tr>
-        <td>
-            <liferay-ui:message key="name" />
-        </td>
-        <td>
-            <input type="text" id="<portlet:namespace />name" name="<portlet:namespace />name" value="${criterionArea.name}" />
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <liferay-ui:message key="description" />
-        </td>
-        <td>
-            <liferay-ui:input-textarea param="description" defaultValue="${criterionDetail.description}"/>
-        </td>
-    </tr>
-    <tr>
-        <td><liferay-ui:message key="appointment-type" />
-        <td><select name="<portlet:namespace />appointmentTypeID">
-            <c:forEach var="appointmentType" items="${appointmentTypes}">
-                <option value="${appointmentType.name}"
-                    ${(appointmentType.name == criterionArea.appointmentType)? 'selected="selected"': ''}>
-                    ${appointmentType.name}</option>
+    <table class="lfr-table">
+        <tr>
+            <td>
+                <liferay-ui:message key="name" />
+            </td>
+            <td width="80%">
+                <input type="text" id="<portlet:namespace />name" name="<portlet:namespace />name" value="${criterionArea.name}" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <liferay-ui:message key="description" />
+            </td>
+            <td>
+                <liferay-ui:input-textarea param="description" defaultValue="${criterionDetail.description}"/>
+            </td>
+        </tr>
+        <tr>
+            <td><liferay-ui:message key="appointment-type" />
+            <td><select name="<portlet:namespace />appointmentTypeID">
+                <c:forEach var="appointmentType" items="${appointmentTypes}">
+                    <option value="${appointmentType.name}"
+                        ${(appointmentType.name == criterionArea.appointmentType)? 'selected="selected"': ''}>
+                        ${appointmentType.name}</option>
 
-            </c:forEach>
-            </select>
+                </c:forEach>
+                </select>
 
-    </tr>
-</table>
-<br />
-<input type="submit" value="<liferay-ui:message key="save" />" />
-<input type="button" value="<liferay-ui:message key="cancel" />"
-    onClick="location.href = '<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>" />';" />
+        </tr>
+    </table>
+    <br />
+    <input type="submit" value="<liferay-ui:message key="save" />" />
+    <input type="button" value="<liferay-ui:message key="cancel" />"
+        onClick="location.href = '<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>" />';" />
 
-</form>
+    </form>
+</div>
 
 <script type="text/javascript">
 jQuery(document).ready(function() {
