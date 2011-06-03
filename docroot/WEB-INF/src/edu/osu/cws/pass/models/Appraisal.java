@@ -81,6 +81,8 @@ public class Appraisal extends Pass {
 
     private Date signatureRequestedDate;
 
+    private Date supervisorRebuttalRead;
+
     private String type;
 
     private Date evaluation2Date;
@@ -350,6 +352,14 @@ public class Appraisal extends Pass {
 
     public void setSignatureRequestedDate(Date signatureRequestedDate) {
         this.signatureRequestedDate = signatureRequestedDate;
+    }
+
+    public Date getSupervisorRebuttalRead() {
+        return supervisorRebuttalRead;
+    }
+
+    public void setSupervisorRebuttalRead(Date supervisorRebuttalRead) {
+        this.supervisorRebuttalRead = supervisorRebuttalRead;
     }
 
     public String getType() {

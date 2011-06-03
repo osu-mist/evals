@@ -74,6 +74,17 @@
             </c:when>
 
         </c:choose>
+
+        <c:choose>
+            <c:when test="${permissionRule.rebuttalRead == 'e'}">
+                <input type="checkbox" id="<portlet:namespace />appraisal.readRebuttal">
+                    <liferay-ui:message key="appraisal-supervisor-ack-read-rebuttal" />
+            </c:when>
+            <c:when test="${permissionRule.rebuttalRead == 'v'}">
+            <input type="checkbox" id="<portlet:namespace />appraisal.readRebuttal" disabled="disabled"
+                checked="checked"/> <liferay-ui:message key="appraisal-supervisor-ack-read-rebuttal" />
+            </c:when>
+        </c:choose>
     </div>
 
     <br />

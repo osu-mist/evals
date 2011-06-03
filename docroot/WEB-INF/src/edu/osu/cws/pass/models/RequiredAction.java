@@ -64,7 +64,8 @@ public class RequiredAction {
                 key.equals("action-required-response-evaluation-due") ||
                 key.equals("action-required-response-evaluation-past-due") ||
                 key.equals("action-requited-2nd-release-due") ||
-                key.equals("action-requited-2nd-release-past-due")
+                key.equals("action-requited-2nd-release-past-due") ||
+                key.equals("action-required-supervisor-rebuttal-read")
             ) {
             pattern = resource.getString(key);
             anchorText = MessageFormat.format(pattern, appraisalMap.get("employeeName"),

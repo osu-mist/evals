@@ -457,6 +457,11 @@ public class Actions {
                 !appraisalStep.getNewStatus().equals(appraisal.getStatus())) {
             _log.error("found appraisalStep "+appraisalStep.toString());
             appraisal.setStatus(appraisalStep.getNewStatus());
+            if (request.getParameter("sign-appraisal") != null &&
+                    appraisal.getEmployeeResponse() != null &&
+                    !appraisal.getEmployeeResponse().equals("")) {
+                appraisal.setStatus("rebuttal-submitted");
+            }
         }
 
         //@todo: based on the action submit button pressed, we'll want to set different meatadata fields

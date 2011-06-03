@@ -36,6 +36,7 @@
         <property name="reopenReason" type="text"/>
         <property name="originalStatus" length="32"/>
         <property name="signatureRequestedDate" type="timestamp"/>
+        <property name="supervisorRebuttalRead" type="timestamp"/>
         <property name="type"/>
         <property name="evaluation2Date" type="timestamp"/>
         <property name="review2Date" type="timestamp"/>

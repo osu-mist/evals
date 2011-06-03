@@ -18,6 +18,7 @@
         <property name="evaluation" length="1"/>
         <property name="review" length="1"/>
         <property name="employeeResponse" length="1"/>
+        <property name="rebuttalRead" length="1"/>
         <property name="saveDraft" length="45"/>
         <property name="requireModification" length="45"/>
         <property name="submit" length="45"/>

@@ -23,6 +23,8 @@ public class PermissionRule extends Pass {
 
     private String employeeResponse;
 
+    private String rebuttalRead;
+
     private String saveDraft;
 
     private String requireModification;
@@ -123,6 +125,14 @@ public class PermissionRule extends Pass {
 
     public String getEmployeeResponse() {
         return employeeResponse;
+    }
+
+    public String getRebuttalRead() {
+        return rebuttalRead;
+    }
+
+    public void setRebuttalRead(String rebuttalRead) {
+        this.rebuttalRead = rebuttalRead;
     }
 
     public void setEmployeeResponse(String employeeResponse) {
