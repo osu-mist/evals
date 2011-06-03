@@ -49,7 +49,11 @@ public class Actions {
         portlet.skipDoView = true;
 
         // Fetch list of appointment types to use in add form
-        request.setAttribute("appointmentTypes", new AppointmentTypes().list());
+        try {
+            request.setAttribute("appointmentTypes", new AppointmentTypes().list());
+        } catch (Exception e) {
+            _log.error("unexpected Exception - " + e.getMessage());
+        }
 
         // When the criterionAreaId == null means that the user clicks on the Add Criteria
         // link. Otherwise the form was submitted
@@ -69,6 +73,8 @@ public class Actions {
                 addErrorsToRequest(request, e.getMessage());
             } catch (HibernateException e) {
                 _log.error("Hibernate exception - " + e.getMessage());
+            } catch (Exception e) {
+                _log.error("unexpected Exception - " + e.getMessage());
             }
         }
 
@@ -106,6 +112,8 @@ public class Actions {
             addErrorsToRequest(request, e.getMessage());
         } catch (HibernateException e) {
             _log.error("Hibernate exception - " + e.getMessage());
+        } catch (Exception e) {
+            _log.error("unexpected Exception - " + e.getMessage());
         }
 
         return "criteria-list-jsp";
@@ -148,14 +156,18 @@ public class Actions {
                                   JSPPortlet portlet) {
         Employee employee = getLoggedOnUser(request);
 
-        request.setAttribute("myActiveAppraisals",
-                appraisals.getAllMyActiveAppraisals(employee.getId()));
-        if (jobs.isSupervisor(employee.getId())) {
-            request.setAttribute("myTeamsActiveAppraisals",
-                    appraisals.getMyTeamsActiveAppraisals(employee.getId()));
-            request.setAttribute("isSupervisor", true);
-        } else {
-            request.setAttribute("isSupervisor", false);
+        try {
+            request.setAttribute("myActiveAppraisals",
+                    appraisals.getAllMyActiveAppraisals(employee.getId()));
+            if (jobs.isSupervisor(employee.getId())) {
+                request.setAttribute("myTeamsActiveAppraisals",
+                        appraisals.getMyTeamsActiveAppraisals(employee.getId()));
+                request.setAttribute("isSupervisor", true);
+            } else {
+                request.setAttribute("isSupervisor", false);
+            }
+        } catch (Exception e) {
+            _log.error("unexpected Exception - " + e.getMessage());
         }
 
         request.setAttribute("reviewer", getReviewer(employee.getId()));
@@ -177,7 +189,12 @@ public class Actions {
     public String displayReviewList(PortletRequest request, PortletResponse response,
                                   JSPPortlet portlet) {
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
-        ArrayList<HashMap> reviews = appraisals.getReviews(businessCenterName);
+        ArrayList<HashMap> reviews = new ArrayList<HashMap>();
+        try {
+            reviews = appraisals.getReviews(businessCenterName);
+        } catch (Exception e) {
+            _log.error("unexpected Exception - " + e.getMessage());
+        }
         request.setAttribute("reviews", reviews);
 
         return "review-list-jsp";
@@ -193,15 +210,15 @@ public class Actions {
      * @return jsp file to render
      */
     public String displayAppraisal(PortletRequest request, PortletResponse response,
-                                  JSPPortlet portlet) {
+                                  JSPPortlet portlet) throws Exception {
         Appraisal appraisal = new Appraisal();
         int appraisalID = ParamUtil.getInteger(request, "id");
         Employee currentlyLoggedOnUser = getLoggedOnUser(request);
         Boolean showForm = false;
         PermissionRule permRule = null;
 
+        Session session = HibernateUtil.getCurrentSession();
         try {
-            Session session = HibernateUtil.getCurrentSession();
             Transaction tx = session.beginTransaction();
             appraisal = appraisals.getAppraisal(appraisalID);
             permRule = getAppraisalPermissionRule(currentlyLoggedOnUser, appraisal);
@@ -214,6 +231,9 @@ public class Actions {
             tx.commit();
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
+        } catch (Exception e) {
+            session.close();
+            throw e;
         }
 
         // Check to see if the logged in user has permission to access the appraisal
@@ -244,7 +264,7 @@ public class Actions {
      * @return
      */
     public String updateAppraisal(PortletRequest request, PortletResponse response,
-                                  JSPPortlet portlet) {
+                                  JSPPortlet portlet) throws Exception {
         for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
             _log.error(entry.getKey() + "/" + entry.getValue()[0]);
 
@@ -258,8 +278,8 @@ public class Actions {
             return "home-jsp";
         }
 
+        Session session = HibernateUtil.getCurrentSession();
         try {
-            Session session = HibernateUtil.getCurrentSession();
             Transaction tx = session.beginTransaction();
             Appraisal appraisal = (Appraisal) session.get(Appraisal.class, id);
             PermissionRule permRule = getAppraisalPermissionRule(currentlyLoggedOnUser, appraisal);
@@ -284,6 +304,9 @@ public class Actions {
                 // Send the email  //design in another module, not for the June demo.
         } catch (ModelException e) {
 
+        } catch (Exception e) {
+            session.close();
+            throw e;
         }
 
         return displayHomeView(request, response, portlet);
@@ -472,7 +495,11 @@ public class Actions {
         PortletSession session = request.getPortletSession(true);
         Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
         if (loggedOnUser == null) {
-            loggedOnUser = employees.findByOnid(getLoggedOnUsername(request));
+            try {
+                loggedOnUser = employees.findByOnid(getLoggedOnUsername(request));
+            } catch (Exception e) {
+                _log.error("unexpected Exception - " + e.getMessage());
+            }
             session.setAttribute("loggedOnUser", loggedOnUser);
         }
 
@@ -628,7 +655,12 @@ public class Actions {
      * @return
      */
     private RequiredAction getReviewerAction(String businessCenterName, ResourceBundle resource) {
-        int reviewCount = appraisals.getReviewCount(businessCenterName);
+        int reviewCount = 0;
+        try {
+            reviewCount = appraisals.getReviewCount(businessCenterName);
+        } catch (Exception e) {
+            _log.error("unexpected Exception - " + e.getMessage());
+        }
         RequiredAction requiredAction = new RequiredAction();
         if (reviewCount == 0) {
             return null;

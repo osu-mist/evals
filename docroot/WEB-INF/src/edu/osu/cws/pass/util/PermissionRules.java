@@ -19,17 +19,21 @@ public class PermissionRules {
      *
      * @return ruleMap
      */
-    public HashMap list() {
+    public HashMap list() throws Exception {
         HashMap ruleMap = new HashMap();
         PermissionRule rule;
         String key;
         Session session = HibernateUtil.getCurrentSession();
-        Iterator rulesIterator = this.list(session).iterator();
-
-        while (rulesIterator.hasNext()) {
-            rule = (PermissionRule) rulesIterator.next();
-            key = rule.getStatus()+"-"+rule.getRole();
-            ruleMap.put(key, rule);
+        try {
+            Iterator rulesIterator = this.list(session).iterator();
+            while (rulesIterator.hasNext()) {
+                rule = (PermissionRule) rulesIterator.next();
+                key = rule.getStatus()+"-"+rule.getRole();
+                ruleMap.put(key, rule);
+            }
+        } catch (Exception e){
+            session.close();
+            throw e;
         }
 
         return ruleMap;

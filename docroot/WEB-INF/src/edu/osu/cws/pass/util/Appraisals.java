@@ -23,7 +23,7 @@ public class Appraisals {
      * @return appraisal.id
      * @throws ModelException
      */
-    public int createAppraisal(Job job, String type) throws ModelException {
+    public int createAppraisal(Job job, String type) throws ModelException, Exception {
         CriterionDetail detail;
         Assessment assessment;
 
@@ -38,20 +38,24 @@ public class Appraisals {
         if (appraisal.validate()) {
             List<CriterionArea> criteriaList = criteria.list(job.getAppointmentType());
             Session session = HibernateUtil.getCurrentSession();
-            Transaction tx = session.beginTransaction();
-            session.save(appraisal);
+            try {
+                Transaction tx = session.beginTransaction();
+                session.save(appraisal);
 
-            // Create assessment and associate it to appraisal
-            for (CriterionArea criterion : criteriaList) {
-                detail = criterion.getCurrentDetail();
-                assessment = new Assessment();
-                assessment.setCriterionDetail(detail);
-                assessment.setAppraisal(appraisal);
-                assessment.setCreateDate(new Date());
-                session.save(assessment);
+                // Create assessment and associate it to appraisal
+                for (CriterionArea criterion : criteriaList) {
+                    detail = criterion.getCurrentDetail();
+                    assessment = new Assessment();
+                    assessment.setCriterionDetail(detail);
+                    assessment.setAppraisal(appraisal);
+                    assessment.setCreateDate(new Date());
+                    session.save(assessment);
 
+                }
+                tx.commit();
+            } finally {
+                session.close();
             }
-            tx.commit();
         }
 
         return appraisal.getId();
@@ -129,9 +133,16 @@ public class Appraisals {
      * @param pidm
      * @return
      */
-    public ArrayList<HashMap> getAllMyActiveAppraisals(int pidm) {
+    public ArrayList<HashMap> getAllMyActiveAppraisals(int pidm) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return this.getAllMyActiveAppraisals(pidm, session);
+        ArrayList<HashMap> myActiveAppraisals;
+        try {
+            myActiveAppraisals = this.getAllMyActiveAppraisals(pidm, session);
+        } catch (Exception e){
+            session.close();
+            throw e;
+        }
+        return myActiveAppraisals;
     }
 
     /**
@@ -160,9 +171,16 @@ public class Appraisals {
      * @param pidm
      * @return
      */
-    public List<HashMap> getMyTeamsActiveAppraisals(Integer pidm) {
+    public List<HashMap> getMyTeamsActiveAppraisals(Integer pidm) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return this.getMyTeamsActiveAppraisals(pidm, session);
+        List<HashMap> teamActiveAppraisals;
+        try {
+            teamActiveAppraisals = this.getMyTeamsActiveAppraisals(pidm, session);
+        } catch (Exception e){
+            session.close();
+            throw e;
+        }
+        return teamActiveAppraisals;
     }
 
     /**
@@ -197,7 +215,7 @@ public class Appraisals {
      * @return role
      * @throws edu.osu.cws.pass.models.ModelException
      */
-    public String getRole(Appraisal appraisal, int pidm) throws ModelException {
+    public String getRole(Appraisal appraisal, int pidm) throws ModelException, Exception {
         Session session = HibernateUtil.getCurrentSession();
         Job supervisor;
         if (pidm == appraisal.getJob().getEmployee().getId()) {
@@ -236,7 +254,7 @@ public class Appraisals {
      * @return
      * @throws edu.osu.cws.pass.models.ModelException
      */
-    public Appraisal getAppraisal(int id) throws ModelException {
+    public Appraisal getAppraisal(int id) throws ModelException, Exception {
         Session session = HibernateUtil.getCurrentSession();
         appraisal = getAppraisal(id, session);
         appraisal.getJob().setCurrentSupervisor(jobs.getSupervisor(appraisal.getJob()));
@@ -256,9 +274,16 @@ public class Appraisals {
         return appraisal;
     }
 
-    public ArrayList<HashMap> getReviews(String businessCenterName) {
+    public ArrayList<HashMap> getReviews(String businessCenterName) throws Exception {
+        ArrayList<HashMap> reviewList;
         Session session = HibernateUtil.getCurrentSession();
-        return getReviews(businessCenterName, session);
+        try {
+            reviewList = getReviews(businessCenterName, session);
+        } catch (Exception e){
+            session.close();
+            throw e;
+        }
+        return reviewList;
     }
 
 
@@ -291,9 +316,16 @@ public class Appraisals {
      * @param businessCenterName
      * @return
      */
-    public int getReviewCount(String businessCenterName) {
+    public int getReviewCount(String businessCenterName) throws Exception {
+        int reviewCount = 0;
         Session session = HibernateUtil.getCurrentSession();
-        return getReviewCount(businessCenterName, session);
+        try {
+            reviewCount = getReviewCount(businessCenterName, session);
+        } catch (Exception e){
+            session.close();
+            throw e;
+        }
+        return reviewCount;
     }
 
     private int getReviewCount(String businessCenterName, Session session) {

@@ -13,11 +13,17 @@ public class AppointmentTypes {
      *
      * @return
      */
-    public List list() {
+    public List list() throws Exception {
+        List result;
         Session hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
-        List result = hsession.createQuery("from edu.osu.cws.pass.models.AppointmentType").list();
-        tx.commit();
+        try {
+            Transaction tx = hsession.beginTransaction();
+            result = hsession.createQuery("from edu.osu.cws.pass.models.AppointmentType").list();
+            tx.commit();
+        } catch (Exception e){
+            hsession.close();
+            throw e;
+        }
         return result;
     }
 

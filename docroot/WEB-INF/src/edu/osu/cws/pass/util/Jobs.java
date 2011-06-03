@@ -10,9 +10,16 @@ import java.util.List;
 
 public class Jobs {
 
-    public Job getSupervisor(Job job) throws ModelException, HibernateException {
+    public Job getSupervisor(Job job) throws ModelException, HibernateException, Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return this.getSupervisor(job, session);
+        Job supervisorJob = null;
+        try {
+            supervisorJob = this.getSupervisor(job, session);
+        } catch (Exception e){
+            session.close();
+            throw e;
+        }
+        return supervisorJob;
     }
 
     /**
@@ -79,15 +86,21 @@ public class Jobs {
      * @param pidm  pidm of employee to check
      * @return isSupervisor
      */
-    public boolean isSupervisor(int pidm) {
+    public boolean isSupervisor(int pidm) throws Exception {
         String query = "select count(*) from edu.osu.cws.pass.models.Job where endDate IS NULL " +
                 "AND supervisor.employee.id = :pidm AND employee.active = 1";
 
         Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        int employeeCount = ((Long) session.createQuery(query).setInteger("pidm", pidm)
-                .iterate().next()).intValue();
-        tx.commit();
+        int employeeCount = 0;
+        try {
+            Transaction tx = session.beginTransaction();
+            employeeCount = ((Long) session.createQuery(query).setInteger("pidm", pidm)
+                    .iterate().next()).intValue();
+            tx.commit();
+        } catch (Exception e){
+            session.close();
+            throw e;
+        }
         return employeeCount > 0;
     }
 
