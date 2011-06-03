@@ -79,34 +79,4 @@ public class Employees {
 
         return employee;
     }
-
-    /**
-     * Returns a list of employees that are active. This is used by the demo and can be
-     * removed after the demo is done.
-     *
-     * @return
-     */
-    public ArrayList<Employee> list() {
-        Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        ArrayList<Employee> employees = (ArrayList<Employee>) session
-                .createQuery("from edu.osu.cws.pass.models.Employee where active = 1").list();
-
-        return employees;
-    }
-
-    /**
-     * Returns employee object that matches the given pidm.
-     *
-     * @param pidm
-     * @return
-     */
-    public Employee findEmployee(int pidm) {
-        Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        Employee employee = (Employee) session.get(Employee.class, pidm);
-        tx.commit();
-
-        return employee;
-    }
 }

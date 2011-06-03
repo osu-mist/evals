@@ -166,6 +166,12 @@ public class Actions {
             } else {
                 request.setAttribute("isSupervisor", false);
             }
+
+            // set Employee  and employees object(s) - used by demo
+            // @todo: remove after demo
+            request.setAttribute("employees", employees.list());
+            request.setAttribute("employee", employee);
+            // end of remove section for demo
         } catch (Exception e) {
             _log.error("unexpected Exception - " + e.getMessage());
         }
@@ -175,11 +181,6 @@ public class Actions {
 
         request.setAttribute("requiredActions", getRequiredActions(request));
 
-        // set Employee  and employees object(s) - used by demo
-        // @todo: remove after demo
-        request.setAttribute("employees", employees.list());
-        request.setAttribute("employee", employee);
-        // end of remove section for demo
 
         return "home-jsp";
     }
@@ -198,7 +199,12 @@ public class Actions {
                                   JSPPortlet portlet) {
         PortletSession session = request.getPortletSession(true);
         int employeeID = Integer.parseInt(ParamUtil.getString(request, "employee.id"));
-        Employee employee = employees.findEmployee(employeeID);
+        Employee employee = new Employee();
+        try {
+            employee = employees.findEmployee(employeeID);
+        } catch (Exception e) {
+            _log.error("unexpected exception - " + e.getMessage());
+        }
         session.setAttribute("loggedOnUser", employee);
 
         return displayHomeView(request, response, portlet);
