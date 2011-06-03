@@ -6,7 +6,7 @@
                 defaultValue="${appraisal.review}" />
         </c:when>
         <c:when test="${permissionRule.review == 'v'}">
-<p class="pass-form-text">${appraisal.review}</p>
+<p class="pass-form-text"><%= formAppraisal.getReview().replaceAll("\n", "<br />") %></p>
         </c:when>
     </c:choose>
 </div><!-- end review -->
