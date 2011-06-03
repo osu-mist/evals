@@ -19,11 +19,16 @@ public class Admins {
      *
      * @return ruleMap
      */
-    public HashMap<Integer, Admin> list() {
+    public HashMap<Integer, Admin> list() throws Exception {
         HashMap<Integer, Admin> admins = new HashMap<Integer, Admin>();
         Session session = HibernateUtil.getCurrentSession();
-        for (Admin admin : this.list(session)) {
-            admins.put(admin.getEmployee().getId(),  admin);
+        try {
+            for (Admin admin : this.list(session)) {
+                admins.put(admin.getEmployee().getId(),  admin);
+            }
+        } catch (Exception e) {
+            session.close();
+            throw e;
         }
         return admins;
     }

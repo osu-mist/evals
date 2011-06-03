@@ -19,17 +19,22 @@ public class AppraisalSteps {
      *
      * @return ruleMap
      */
-    public HashMap list() {
+    public HashMap list() throws Exception {
         HashMap stepsMap = new HashMap();
         AppraisalStep step;
         String key;
         Session session = HibernateUtil.getCurrentSession();
-        Iterator stepIterator = this.list(session).iterator();
+        try {
+            Iterator stepIterator = this.list(session).iterator();
 
-        while (stepIterator.hasNext()) {
-            step = (AppraisalStep) stepIterator.next();
-            key = step.getAction()+"-"+step.getAppointmentType();
-            stepsMap.put(key, step);
+            while (stepIterator.hasNext()) {
+                step = (AppraisalStep) stepIterator.next();
+                key = step.getAction()+"-"+step.getAppointmentType();
+                stepsMap.put(key, step);
+            }
+        } catch (Exception e) {
+            session.close();
+            throw e;
         }
 
         return stepsMap;

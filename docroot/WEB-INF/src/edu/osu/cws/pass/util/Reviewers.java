@@ -17,12 +17,18 @@ public class Reviewers {
      *
      * @return ruleMap
      */
-    public HashMap<Integer, Reviewer> list() {
+    public HashMap<Integer, Reviewer> list() throws Exception {
         HashMap<Integer, Reviewer> reviewers = new HashMap<Integer, Reviewer>();
         Session session = HibernateUtil.getCurrentSession();
-        for (Reviewer reviewer : this.list(session)) {
-            reviewers.put(reviewer.getEmployee().getId(), reviewer);
+        try {
+            for (Reviewer reviewer : this.list(session)) {
+                reviewers.put(reviewer.getEmployee().getId(), reviewer);
+            }
+        } catch (Exception e){
+            session.close();
+            throw e;
         }
+
         return reviewers;
     }
 

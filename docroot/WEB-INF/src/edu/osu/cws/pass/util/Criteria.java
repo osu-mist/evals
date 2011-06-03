@@ -26,12 +26,12 @@ public class Criteria {
      *
      * @param area      CriterionArea POJO
      * @param details   CriterionDetail POJO
-     * @param onid      Username of logged in user
+     * @param creator      Username of logged in user
      * @return errors   An array of error messages, but empty array on success.
      * @throws edu.osu.cws.pass.models.ModelException
      */
     public boolean add(CriterionArea area, CriterionDetail details, Employee creator)
-            throws ModelException {
+            throws ModelException, Exception {
         int sequence = getNextSequence(area.getAppointmentType());
 
         area.setCreator(creator);
@@ -47,11 +47,16 @@ public class Criteria {
         }
 
         Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        session.save(area);
-        area.addDetails(details);
-        session.save(details);
-        tx.commit();
+        try {
+            Transaction tx = session.beginTransaction();
+            session.save(area);
+            area.addDetails(details);
+            session.save(details);
+            tx.commit();
+        } catch (Exception e){
+            session.close();
+            throw e;
+        }
         return true;
 
     }
@@ -81,10 +86,16 @@ public class Criteria {
      * @return criteria        List of CriterionAreas
      * @throws edu.osu.cws.pass.models.ModelException
      */
-    public List<CriterionArea> list(String appointmentType) throws ModelException {
-        Session session = null;
-        session = HibernateUtil.getCurrentSession();
-        return this.list(appointmentType, session);
+    public List<CriterionArea> list(String appointmentType) throws ModelException, Exception {
+        List<CriterionArea> criteriaList;
+        Session session = HibernateUtil.getCurrentSession();
+        try {
+            criteriaList = this.list(appointmentType, session);
+        } catch (Exception e){
+            session.close();
+            throw e;
+        }
+        return criteriaList;
     }
 
     /**
@@ -134,24 +145,27 @@ public class Criteria {
      * @param appointmentType
      * @return
      */
-    public int getNextSequence(String appointmentType) {
+    public int getNextSequence(String appointmentType) throws Exception {
         int availableSequence = 0;
-        Session hsession = null;
+        Session hsession = HibernateUtil.getCurrentSession();
+        try {
+            Transaction tx = hsession.beginTransaction();
+            Query countQry = hsession.createQuery("select count(*) from edu.osu.cws.pass.models.CriterionArea " +
+                    "where appointmentType = :appointmentType");
 
-        hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
-        Query countQry = hsession.createQuery("select count(*) from edu.osu.cws.pass.models.CriterionArea " +
-                "where appointmentType = :appointmentType");
+            countQry.setString("appointmentType", appointmentType);
+            countQry.setMaxResults(1);
+            Iterator results = countQry.list().iterator();
 
-        countQry.setString("appointmentType", appointmentType);
-        countQry.setMaxResults(1);
-        Iterator results = countQry.list().iterator();
+            if (results.hasNext()) {
+                availableSequence =  Integer.parseInt(results.next().toString());
+            }
 
-        if (results.hasNext()) {
-            availableSequence =  Integer.parseInt(results.next().toString());
+            tx.commit();
+        } catch (Exception e){
+            hsession.close();
+            throw e;
         }
-
-        tx.commit();
         return ++availableSequence;
 
     }
