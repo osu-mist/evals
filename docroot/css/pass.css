@@ -3,9 +3,33 @@
     margin-top:0em;
 }
 
+/* Add/Edit Criteria */
+#pass-add-criteria {
+    width:100%;
+    margin:0 1em 1em 0;
+}
+#pass-add-criteria input[type="text"], #pass-add-criteria textarea {
+    width:95%;
+}
+#pass-add-criteria input[type="submit"] {
+    margin-right:1.5em;
+}
+#pass-add-criteria table {
+    padding-bottom:1.5em;
+    width:100%;
+}
+#pass-add-criteria td {
+    padding-top:0.5em;
+}
+
+
 /* Appraisal Form */
 #pass-appraisal-form {
     width:100%;
+    margin-right:1.5em;
+}
+#pass-appraisal-form textarea {
+width: 99%;
 }
 #pass-appraisal-form table.appraisal-info {
     width:100%;
