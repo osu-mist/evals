@@ -1,4 +1,5 @@
 <%@ include file="/jsp/init.jsp"%>
+<% Appraisal formAppraisal = (Appraisal) request.getAttribute("appraisal"); %>
 
 <jsp:useBean id="appraisal" class="edu.osu.cws.pass.models.Appraisal" scope="request" />
 <jsp:useBean id="permissionRule" class="edu.osu.cws.pass.models.PermissionRule" scope="request" />
@@ -30,7 +31,7 @@
         </c:when>
         <c:when test="${permissionRule.goalComments == 'v'}">
             <p><strong><liferay-ui:message key="appraisal-goals-comments" /></strong></p>
-    <p class="pass-form-text">${appraisal.goalsComments}</p>
+    <p class="pass-form-text"><%= formAppraisal.getGoalsComments().replaceAll("\n", "<br />") %></p>
         </c:when>
     </c:choose>
 
@@ -60,7 +61,7 @@
             </c:when>
             <c:when test="${permissionRule.employeeResponse == 'v'}">
                 <p><strong><liferay-ui:message key="appraisal-employee-response" /></strong></p>
-        <p class="pass-form-text">${appraisal.employeeResponse}</p>
+        <p class="pass-form-text"><%= formAppraisal.getEmployeeResponse().replaceAll("\n", "<br />") %></p>
             </c:when>
         </c:choose>
     </div>
