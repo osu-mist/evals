@@ -45,9 +45,9 @@
 
     <div class="pass-employee-response">
         <c:if test="${not empty permissionRule.employeeResponse}">
-            <input type="checkbox"  name="<portlet:namespace />sign-appraisal"
-                id="<portlet:namespace />sign-appraisal"
-                <c:if test="${not empty appraisal.employeeSignedDate}">
+            <input type="checkbox"  name="<portlet:namespace />acknowledge-read-appraisal"
+                id="<portlet:namespace />acknowledge-read-appraisal"
+                <c:if test="${appraisal.status != 'signature-due'}">
                     checked="checked" disabled="disabled"
                 </c:if>
             >
@@ -111,9 +111,10 @@
 
       jQuery("#<portlet:namespace />fm").submit(function() {
         var errors = "";
-        if (jQuery("#<portlet:namespace />sign-appraisal").length > 0 &&
-                !jQuery("#<portlet:namespace />sign-appraisal").is(':checked')) {
+        if (jQuery("#<portlet:namespace />acknowledge-read-appraisal").length > 0 &&
+                !jQuery("#<portlet:namespace />acknowledge-read-appraisal").is(':checked')) {
           errors = "<li><%= Appraisal.signatureRequired %></li>";
+          alert("<%= Appraisal.signatureRequired %>");
         }
         if (errors != "") {
           jQuery("#<portlet:namespace />flash").html(
