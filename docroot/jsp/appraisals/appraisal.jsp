@@ -55,14 +55,24 @@
         </c:if>
         <c:choose>
             <c:when test="${permissionRule.employeeResponse == 'e'}">
+                <c:if test="${empty appraisal.employeeResponse}">
+                    <br />
+                    <input type="submit" id="<portlet:namespace />show-rebuttal"
+                        value="<liferay-ui:message key="appraisal-want-rebuttal" />" />
+                    <div class="pass-hide pass-appraisal-rebuttal">
+                </c:if>
                 <p><strong><liferay-ui:message key="appraisal-employee-response" /></strong></p>
                 <liferay-ui:input-textarea param="appraisal.employeeResponse"
                     defaultValue="${appraisal.employeeResponse}" /><br />
+                <c:if test="${empty appraisal.employeeResponse}">
+                    </div><!-- end pass-hide-->
+                </c:if>
             </c:when>
-            <c:when test="${permissionRule.employeeResponse == 'v'}">
+            <c:when test="${permissionRule.employeeResponse == 'v' && not empty appraisal.employeeResponse}">
                 <p><strong><liferay-ui:message key="appraisal-employee-response" /></strong></p>
         <p class="pass-form-text"><%= formAppraisal.getEmployeeResponse().replaceAll("\n", "<br />") %></p>
             </c:when>
+
         </c:choose>
     </div>
 
@@ -86,6 +96,8 @@
 
     <script type="text/javascript">
     jQuery(document).ready(function() {
+      jQuery("pass-appraisal-rebuttal").hide();
+
       jQuery("#<portlet:namespace />fm").submit(function() {
         var errors = "";
         if (jQuery("#<portlet:namespace />sign-appraisal").length > 0 &&
@@ -100,6 +112,11 @@
         }
 
         return true;
+      });
+      jQuery("#<portlet:namespace />show-rebuttal").click(function() {
+        jQuery("#<portlet:namespace />show-rebuttal").hide();
+        jQuery(".pass-appraisal-rebuttal").show();
+        return false;
       });
     });
     </script>
