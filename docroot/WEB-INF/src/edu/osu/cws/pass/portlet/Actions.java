@@ -18,7 +18,7 @@ import java.util.*;
  * Actions class used to map user form actions to respective class methods.
  */
 public class Actions {
-    private static Log _log = LogFactoryUtil.getLog(JSPPortlet.class);
+    private static Log _log = LogFactoryUtil.getLog(Actions.class);
 
     private Employees employees = new Employees();
 
