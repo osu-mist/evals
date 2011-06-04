@@ -3,14 +3,14 @@
     <c:choose>
         <c:when test="${permissionRule.evaluation == 'e'}">
             <liferay-ui:input-textarea param="appraisal.evaluation"
-                defaultValue="${appraisal.evaluation}" />
+                defaultValue="${appraisal.evaluation}" /><br />
         </c:when>
         <c:when test="${permissionRule.evaluation == 'v'}">
 <p class="pass-form-text"><%= formAppraisal.getEvaluation().replaceAll("\n", "<br />") %></p>
         </c:when>
     </c:choose>
 
-    <strong><strong>Check one category</strong></strong><br />
+    <strong><strong>Select a rating</strong></strong><br />
     <fieldset>
         1. <input type="radio" name="<portlet:namespace />appraisal.rating" value="1"
         <c:if test="${appraisal.rating == 1}">
