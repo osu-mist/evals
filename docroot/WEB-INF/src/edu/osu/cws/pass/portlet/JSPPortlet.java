@@ -200,13 +200,17 @@ public class JSPPortlet extends GenericPortlet {
      * @param request
      */
     private void portletSetup(PortletRequest request) {
-        if (getPortletContext().getAttribute("environmentProp") == null) {
-            loadEnvironmentProperties(request);
-            getPortletContext().setAttribute("permissionRules", permissionRules.list());
-            getPortletContext().setAttribute("appraisalSteps", appraisalSteps.list());
-            getPortletContext().setAttribute("reviewers", reviewers.list());
-            getPortletContext().setAttribute("admins", admins.list());
-            loadResourceBundle();
+        try {
+            if (getPortletContext().getAttribute("environmentProp") == null) {
+                loadEnvironmentProperties(request);
+                getPortletContext().setAttribute("permissionRules", permissionRules.list());
+                getPortletContext().setAttribute("appraisalSteps", appraisalSteps.list());
+                getPortletContext().setAttribute("reviewers", reviewers.list());
+                getPortletContext().setAttribute("admins", admins.list());
+                loadResourceBundle();
+            }
+        } catch (Exception e) {
+            _log.error("failed run portletSetup");
         }
     }
 
