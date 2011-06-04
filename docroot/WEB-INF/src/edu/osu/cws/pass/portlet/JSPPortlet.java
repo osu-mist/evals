@@ -184,7 +184,7 @@ public class JSPPortlet extends GenericPortlet {
      * @param e     Exception
      * @return  String stack trace
      */
-    private String stackTraceString(Exception e) {
+    public static String stackTraceString(Exception e) {
         StringWriter writerStr = new StringWriter();
         PrintWriter myPrinter = new PrintWriter(writerStr);
         e.printStackTrace(myPrinter);

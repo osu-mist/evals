@@ -52,7 +52,7 @@ public class Actions {
         try {
             request.setAttribute("appointmentTypes", new AppointmentTypes().list());
         } catch (Exception e) {
-            _log.error("unexpected Exception - " + e.getMessage());
+            _log.error("unexpected Exception - " + JSPPortlet.stackTraceString(e));
         }
 
         // When the criterionAreaId == null means that the user clicks on the Add Criteria
@@ -72,9 +72,9 @@ public class Actions {
             } catch (ModelException e) {
                 addErrorsToRequest(request, e.getMessage());
             } catch (HibernateException e) {
-                _log.error("Hibernate exception - " + e.getMessage());
+                _log.error("Hibernate exception - " + JSPPortlet.stackTraceString(e));
             } catch (Exception e) {
-                _log.error("unexpected Exception - " + e.getMessage());
+                _log.error("unexpected Exception - " + JSPPortlet.stackTraceString(e));
             }
         }
 
@@ -111,9 +111,9 @@ public class Actions {
         } catch (ModelException e) {
             addErrorsToRequest(request, e.getMessage());
         } catch (HibernateException e) {
-            _log.error("Hibernate exception - " + e.getMessage());
+            _log.error("Hibernate exception - " + JSPPortlet.stackTraceString(e));
         } catch (Exception e) {
-            _log.error("unexpected Exception - " + e.getMessage());
+            _log.error("unexpected Exception - " + JSPPortlet.stackTraceString(e));
         }
 
         return "criteria-list-jsp";
@@ -173,7 +173,7 @@ public class Actions {
             request.setAttribute("employee", employee);
             // end of remove section for demo
         } catch (Exception e) {
-            _log.error("unexpected Exception - " + e.getMessage());
+            _log.error("unexpected Exception - " + JSPPortlet.stackTraceString(e));
         }
 
         request.setAttribute("reviewer", getReviewer(employee.getId()));
@@ -203,7 +203,7 @@ public class Actions {
         try {
             employee = employees.findEmployee(employeeID);
         } catch (Exception e) {
-            _log.error("unexpected exception - " + e.getMessage());
+            _log.error("unexpected exception - " + JSPPortlet.stackTraceString(e));
         }
         session.setAttribute("loggedOnUser", employee);
 
@@ -225,7 +225,7 @@ public class Actions {
         try {
             reviews = appraisals.getReviews(businessCenterName);
         } catch (Exception e) {
-            _log.error("unexpected Exception - " + e.getMessage());
+            _log.error("unexpected Exception - " + JSPPortlet.stackTraceString(e));
         }
         request.setAttribute("reviews", reviews);
 
@@ -535,7 +535,7 @@ public class Actions {
             try {
                 loggedOnUser = employees.findByOnid(getLoggedOnUsername(request));
             } catch (Exception e) {
-                _log.error("unexpected Exception - " + e.getMessage());
+                _log.error("unexpected Exception - " + JSPPortlet.stackTraceString(e));
             }
             session.setAttribute("loggedOnUser", loggedOnUser);
         }
@@ -696,7 +696,7 @@ public class Actions {
         try {
             reviewCount = appraisals.getReviewCount(businessCenterName);
         } catch (Exception e) {
-            _log.error("unexpected Exception - " + e.getMessage());
+            _log.error("unexpected Exception - " + JSPPortlet.stackTraceString(e));
         }
         RequiredAction requiredAction = new RequiredAction();
         if (reviewCount == 0) {
