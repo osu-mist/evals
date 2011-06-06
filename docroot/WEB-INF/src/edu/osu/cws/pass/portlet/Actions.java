@@ -381,7 +381,9 @@ public class Actions {
         if (permRule.getGoals() != null && permRule.getGoals().equals("e")) {
             for (Assessment assessment : appraisal.getAssessments()) {
                 paramaterKey = "appraisal.goal." + Integer.toString(assessment.getId());
-                assessment.setGoal(request.getParameter(paramaterKey));
+                if (request.getParameter(paramaterKey) != null) {
+                    assessment.setGoal(request.getParameter(paramaterKey));
+                }
             }
             if (request.getParameter("submit-goals") != null) {
                 appraisal.setGoalsSubmitDate(new Date());
@@ -400,20 +402,26 @@ public class Actions {
         }
         // Save goalComments
         if (permRule.getGoalComments() != null && permRule.getGoalComments().equals("e")) {
-            appraisal.setGoalsComments(request.getParameter("appraisal.goalsComments"));
+            if (request.getParameter("appraisal.goalsComments") != null) {
+                appraisal.setGoalsComments(request.getParameter("appraisal.goalsComments"));
+            }
         }
         // Save employee results
         if (permRule.getResults() != null && permRule.getResults().equals("e")) {
             for (Assessment assessment : appraisal.getAssessments()) {
                 paramaterKey = "assessment.employeeResult." + Integer.toString(assessment.getId());
-                assessment.setEmployeeResult(request.getParameter(paramaterKey));
+                if (request.getParameter(paramaterKey) != null) {
+                    assessment.setEmployeeResult(request.getParameter(paramaterKey));
+                }
             }
         }
         // Save Supervisor Results
         if (permRule.getSupervisorResults() != null && permRule.getSupervisorResults().equals("e")) {
             for (Assessment assessment : appraisal.getAssessments()) {
                 paramaterKey = "assessment.supervisorResult." + Integer.toString(assessment.getId());
-                assessment.setSupervisorResult(request.getParameter(paramaterKey));
+                if (request.getParameter(paramaterKey) != null) {
+                    assessment.setSupervisorResult(request.getParameter(paramaterKey));
+                }
             }
         }
         if (request.getParameter("submit-results") != null) {
@@ -421,8 +429,12 @@ public class Actions {
         }
         // Save evaluation
         if (permRule.getEvaluation() != null && permRule.getEvaluation().equals("e")) {
-            appraisal.setEvaluation(request.getParameter("appraisal.evaluation"));
-            appraisal.setRating(Integer.parseInt(request.getParameter("appraisal.rating")));
+            if (request.getParameter("appraisal.evaluation") != null) {
+                appraisal.setEvaluation(request.getParameter("appraisal.evaluation"));
+            }
+            if (request.getParameter("appraisal.rating") != null) {
+                appraisal.setRating(Integer.parseInt(request.getParameter("appraisal.rating")));
+            }
             if (request.getParameter(permRule.getSubmit()) != null) {
                 appraisal.setEvaluationSubmitDate(new Date());
                 appraisal.setEvaluator(getLoggedOnUser(request));
@@ -430,7 +442,9 @@ public class Actions {
         }
         // Save review
         if (permRule.getReview() != null && permRule.getReview().equals("e")) {
-            appraisal.setReview(request.getParameter("appraisal.review"));
+            if (request.getParameter("appraisal.review") != null) {
+                appraisal.setReview(request.getParameter("appraisal.review"));
+            }
             if (request.getParameter("submit-appraisal") != null) {
                 appraisal.setReviewer(getLoggedOnUser(request));
                 appraisal.setReviewSubmitDate(new Date());
