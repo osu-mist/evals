@@ -4,7 +4,6 @@ import edu.osu.cws.pass.models.Employee;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Employees {
@@ -37,46 +36,5 @@ public class Employees {
         }
         return employee;
 
-    }
-
-    /**
-     * Returns a list of employees that are active. This is used by the demo and can be
-     * removed after the demo is done.
-     *
-     * @return
-     */
-    public ArrayList<Employee> list() throws Exception {
-        ArrayList<Employee> employees = new ArrayList<Employee>();
-        Session session = HibernateUtil.getCurrentSession();
-        try {
-            Transaction tx = session.beginTransaction();
-            employees = (ArrayList<Employee>) session
-                    .createQuery("from edu.osu.cws.pass.models.Employee where active = 1").list();
-        } catch (Exception e){
-            session.close();
-            throw e;
-        }
-
-        return employees;
-    }
-
-    /**
-     * Returns employee object that matches the given pidm.
-     *
-     * @param pidm
-     * @return
-     */
-    public Employee findEmployee(int pidm) throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        Employee employee = new Employee();
-        try {
-            Transaction tx = session.beginTransaction();
-            employee = (Employee) session.get(Employee.class, pidm);
-            tx.commit();
-        } catch (Exception e){
-            session.close();
-        }
-
-        return employee;
     }
 }

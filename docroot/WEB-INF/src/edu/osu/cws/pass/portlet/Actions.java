@@ -166,12 +166,6 @@ public class Actions {
             } else {
                 request.setAttribute("isSupervisor", false);
             }
-
-            // set Employee  and employees object(s) - used by demo
-            // @todo: remove after demo
-            request.setAttribute("employees", employees.list());
-            request.setAttribute("employee", employee);
-            // end of remove section for demo
         } catch (Exception e) {
             _log.error("unexpected Exception - " + JSPPortlet.stackTraceString(e));
         }
@@ -183,31 +177,6 @@ public class Actions {
 
 
         return "home-jsp";
-    }
-
-    /**
-     * Handles switching the logged in user for demo purposes. This can be
-     * deleted after the demo. It updates the loggedOnUser attribute in the
-     * portletSession which is used by all the actions methods.
-     *
-     * @param request
-     * @param response
-     * @param portlet
-     * @return
-     */
-    public String demoSwitchUser(PortletRequest request, PortletResponse response,
-                                  JSPPortlet portlet) {
-        PortletSession session = request.getPortletSession(true);
-        int employeeID = Integer.parseInt(ParamUtil.getString(request, "employee.id"));
-        Employee employee = new Employee();
-        try {
-            employee = employees.findEmployee(employeeID);
-        } catch (Exception e) {
-            _log.error("unexpected exception - " + JSPPortlet.stackTraceString(e));
-        }
-        session.setAttribute("loggedOnUser", employee);
-
-        return displayHomeView(request, response, portlet);
     }
 
     /**
