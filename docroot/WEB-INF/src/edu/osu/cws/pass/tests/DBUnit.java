@@ -41,7 +41,7 @@ public class DBUnit {
     /**
      * Config value - name of hibernate development xml config file used to grab dtd.
      */
-    public static final String DEVELOPMENT_CONFIG = "hibernate-dev.cfg.xml";
+    public static final String DEVELOPMENT_CONFIG = "hibernate-luminis-dev.cfg.xml";
 
 
     /**

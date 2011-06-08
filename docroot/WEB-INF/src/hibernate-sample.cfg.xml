@@ -3,8 +3,12 @@
 
 <!--
 This is a sample hibernate configuration file. You have to copy this file to
-    docroot/WEB-INF/src/hibernate-dev.cfg.xml
+    docroot/WEB-INF/src/hibernate-hostname.cfg.xml
     docroot/WEB-INF/src/hibernate-test.cfg.xml
+
+Then make sure you update the hostname specific properties file and specify the
+name of the hibernate configuration file.
+    docroot/WEB-INF/src/hostname.properties
 -->
 
 <hibernate-configuration>
