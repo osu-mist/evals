@@ -10,6 +10,7 @@ import edu.osu.cws.pass.models.*;
 import edu.osu.cws.pass.util.Mailer;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
+import edu.osu.cws.util.ExceptionHandler;
 
 import javax.portlet.*;
 import java.util.*;
@@ -446,6 +447,30 @@ public class Actions {
     public void setPassConfiguration() throws Exception {
         portletContext.setAttribute("configurations", configurationMgr.mapByName());
         portletContext.setAttribute("configurationsList", configurationMgr.list());
+    }
+
+    /*
+     * Handles switching the logged in user for demo purposes. This can be
+     * deleted after the demo. It updates the loggedOnUser attribute in the
+     * portletSession which is used by all the actions methods.
+     *
+     * @param request
+     * @param response
+     * @param portlet
+     * @return
+     */
+    public String demoSwitchUser(PortletRequest request, PortletResponse response) throws Exception {
+        PortletSession session = request.getPortletSession(true);
+        int employeeID = Integer.parseInt(ParamUtil.getString(request, "employee.id"));
+        Employee employee = new Employee();
+        try {
+            employee = employeeMgr.findById(employeeID);
+        } catch (Exception e) {
+            _log.error("unexpected exception - " + ExceptionHandler.stackTraceString(e));
+        }
+        session.setAttribute("loggedOnUser", employee);
+
+        return displayHomeView(request, response);
     }
 
     /**
