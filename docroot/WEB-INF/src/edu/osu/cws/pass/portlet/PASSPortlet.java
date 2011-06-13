@@ -50,12 +50,6 @@ public class PASSPortlet extends GenericPortlet {
     private Reviewers reviewers = new Reviewers();
 
     /**
-     * Specifies whether or not we skip doView method. This is set to true, when the
-     * processAction method has been called.
-     */
-    public boolean skipDoView = false;
-
-    /**
      * Helper Liferay object to store error messages into the server's log file
      */
 	private static Log _log = LogFactoryUtil.getLog(PASSPortlet.class);
@@ -92,31 +86,29 @@ public class PASSPortlet extends GenericPortlet {
 	public void doView(
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
+        _log.error("doView value of viewJSP = "+viewJSP);
 
         portletSetup(renderRequest);
         _log.error("doView called action = " + ParamUtil.getString(renderRequest, "action"));
 
 
-        // The skip-delegate parameter is set by processAction. This allow us to set the jsp
-        // path and all the logic/data we need in processAction without being overwritten by
-        // doView.
-        if (!skipDoView) {
+        // If processAction's delegate method was called, it set the viewJSP property to some
+        // jsp value, if viewJSP is null, it means processAction was not called.
+        if (viewJSP == null) {
             delegate(renderRequest, renderResponse);
         }
-        skipDoView = false;
 
         include(viewJSP, renderRequest, renderResponse);
+        viewJSP = null;
 	}
 
 	public void processAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws IOException, PortletException {
+        _log.error("processaction value of viewJSP = "+viewJSP);
         portletSetup(actionRequest);
 
         _log.error("processAction called action = " + ParamUtil.getString(actionRequest, "action"));
-        // We set the skipDoView property, to tell the doView that the processing is done
-        // by the processAction method.
-        skipDoView = true;
         delegate(actionRequest, actionResponse);
 	}
 
@@ -143,8 +135,8 @@ public class PASSPortlet extends GenericPortlet {
         if (!action.equals("")) {
             try {
                 actionMethod = Actions.class.getDeclaredMethod(action, PortletRequest.class,
-                        PortletResponse.class, PASSPortlet.class);
-                viewJSP = (String) actionMethod.invoke(actionClass, request, response, this);
+                        PortletResponse.class);
+                viewJSP = (String) actionMethod.invoke(actionClass, request, response);
                 // The action methods return the init-param of the path, we then need to grab the value
                 viewJSP = getInitParameter(viewJSP);
             } catch (NoSuchMethodException e) {

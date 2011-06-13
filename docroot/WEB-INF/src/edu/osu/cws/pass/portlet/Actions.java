@@ -36,18 +36,12 @@ public class Actions {
      * validation.
      * @param request
      * @param response
-     * @param portlet
      * @return jsp
      */
-    public String addCriteria(PortletRequest request, PortletResponse response, PASSPortlet portlet) {
+    public String addCriteria(PortletRequest request, PortletResponse response) {
         Criteria criteriaArea= new Criteria();
         CriterionArea criterionArea = new CriterionArea();
         CriterionDetail criterionDetail = new CriterionDetail();
-
-        // The processing for this action is done by processAction, we can skip the doView method in the
-        // portlet class.
-        portlet.skipDoView = true;
-
         // Fetch list of appointment types to use in add form
         try {
             request.setAttribute("appointmentTypes", new AppointmentTypes().list());
@@ -67,7 +61,7 @@ public class Actions {
             try {
                 if (criteriaArea.add(criterionArea, criterionDetail, getLoggedOnUser(request))) {
                     SessionMessages.add(request, "criteria-saved");
-                    return listCriteria(request, response, portlet);
+                    return listCriteria(request, response);
                 }
             } catch (ModelException e) {
                 addErrorsToRequest(request, e.getMessage());
@@ -103,7 +97,7 @@ public class Actions {
      * @param response
      * @return jsp
      */
-    public String listCriteria(PortletRequest request, PortletResponse response, PASSPortlet portlet) {
+    public String listCriteria(PortletRequest request, PortletResponse response) {
         String appointmentType = ParamUtil.getString(request, "appointmentType", Criteria.DEFAULT_APPOINTMENT_TYPE);
 
         try {
@@ -149,11 +143,9 @@ public class Actions {
      *
      * @param request
      * @param response
-     * @param portlet
      * @return
      */
-    public String displayHomeView(PortletRequest request, PortletResponse response,
-                                  PASSPortlet portlet) {
+    public String displayHomeView(PortletRequest request, PortletResponse response) {
         Employee employee = getLoggedOnUser(request);
 
         try {
@@ -184,11 +176,9 @@ public class Actions {
      *
      * @param request
      * @param response
-     * @param portlet
      * @return
      */
-    public String displayReviewList(PortletRequest request, PortletResponse response,
-                                  PASSPortlet portlet) {
+    public String displayReviewList(PortletRequest request, PortletResponse response) {
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
         ArrayList<HashMap> reviews = new ArrayList<HashMap>();
         try {
@@ -207,11 +197,9 @@ public class Actions {
      *
      * @param request
      * @param response
-     * @param portlet
      * @return jsp file to render
      */
-    public String displayAppraisal(PortletRequest request, PortletResponse response,
-                                  PASSPortlet portlet) throws Exception {
+    public String displayAppraisal(PortletRequest request, PortletResponse response) throws Exception {
         Appraisal appraisal = new Appraisal();
         int appraisalID = ParamUtil.getInteger(request, "id");
         Employee currentlyLoggedOnUser = getLoggedOnUser(request);
@@ -261,11 +249,9 @@ public class Actions {
      *
      * @param request
      * @param response
-     * @param portlet
      * @return
      */
-    public String updateAppraisal(PortletRequest request, PortletResponse response,
-                                  PASSPortlet portlet) throws Exception {
+    public String updateAppraisal(PortletRequest request, PortletResponse response) throws Exception {
         for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
             _log.error(entry.getKey() + "/" + entry.getValue()[0]);
 
@@ -310,7 +296,7 @@ public class Actions {
             throw e;
         }
 
-        return displayHomeView(request, response, portlet);
+        return displayHomeView(request, response);
     }
 
     /**
