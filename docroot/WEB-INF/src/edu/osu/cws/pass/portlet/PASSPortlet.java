@@ -65,10 +65,6 @@ public class PASSPortlet extends GenericPortlet {
      */
     private Actions actionClass = new Actions();
 
-    public void init() throws PortletException {
-		viewJSP = getInitParameter("home-jsp");
-	}
-
     public void doDispatch(
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
