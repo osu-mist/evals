@@ -25,12 +25,12 @@ import java.util.ResourceBundle;
 import javax.portlet.*;
 
 /**
- * <a href="JSPPortlet.java.html"><b><i>View Source</i></b></a>
+ * <a href="PASSPortlet.java.html"><b><i>View Source</i></b></a>
  *
  * @author Brian Wing Shun Chan
  *
  */
-public class JSPPortlet extends GenericPortlet {
+public class PASSPortlet extends GenericPortlet {
 
     /**
      * String used to store the view jsp used by the
@@ -58,7 +58,7 @@ public class JSPPortlet extends GenericPortlet {
     /**
      * Helper Liferay object to store error messages into the server's log file
      */
-	private static Log _log = LogFactoryUtil.getLog(JSPPortlet.class);
+	private static Log _log = LogFactoryUtil.getLog(PASSPortlet.class);
 
     /**
      * The actions class
@@ -147,7 +147,7 @@ public class JSPPortlet extends GenericPortlet {
         if (!action.equals("")) {
             try {
                 actionMethod = Actions.class.getDeclaredMethod(action, PortletRequest.class,
-                        PortletResponse.class, JSPPortlet.class);
+                        PortletResponse.class, PASSPortlet.class);
                 viewJSP = (String) actionMethod.invoke(actionClass, request, response, this);
                 // The action methods return the init-param of the path, we then need to grab the value
                 viewJSP = getInitParameter(viewJSP);

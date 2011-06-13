@@ -39,7 +39,7 @@ public class Actions {
      * @param portlet
      * @return jsp
      */
-    public String addCriteria(PortletRequest request, PortletResponse response, JSPPortlet portlet) {
+    public String addCriteria(PortletRequest request, PortletResponse response, PASSPortlet portlet) {
         Criteria criteriaArea= new Criteria();
         CriterionArea criterionArea = new CriterionArea();
         CriterionDetail criterionDetail = new CriterionDetail();
@@ -52,7 +52,7 @@ public class Actions {
         try {
             request.setAttribute("appointmentTypes", new AppointmentTypes().list());
         } catch (Exception e) {
-            _log.error("unexpected Exception - " + JSPPortlet.stackTraceString(e));
+            _log.error("unexpected Exception - " + PASSPortlet.stackTraceString(e));
         }
 
         // When the criterionAreaId == null means that the user clicks on the Add Criteria
@@ -72,9 +72,9 @@ public class Actions {
             } catch (ModelException e) {
                 addErrorsToRequest(request, e.getMessage());
             } catch (HibernateException e) {
-                _log.error("Hibernate exception - " + JSPPortlet.stackTraceString(e));
+                _log.error("Hibernate exception - " + PASSPortlet.stackTraceString(e));
             } catch (Exception e) {
-                _log.error("unexpected Exception - " + JSPPortlet.stackTraceString(e));
+                _log.error("unexpected Exception - " + PASSPortlet.stackTraceString(e));
             }
         }
 
@@ -103,7 +103,7 @@ public class Actions {
      * @param response
      * @return jsp
      */
-    public String listCriteria(PortletRequest request, PortletResponse response, JSPPortlet portlet) {
+    public String listCriteria(PortletRequest request, PortletResponse response, PASSPortlet portlet) {
         String appointmentType = ParamUtil.getString(request, "appointmentType", Criteria.DEFAULT_APPOINTMENT_TYPE);
 
         try {
@@ -111,9 +111,9 @@ public class Actions {
         } catch (ModelException e) {
             addErrorsToRequest(request, e.getMessage());
         } catch (HibernateException e) {
-            _log.error("Hibernate exception - " + JSPPortlet.stackTraceString(e));
+            _log.error("Hibernate exception - " + PASSPortlet.stackTraceString(e));
         } catch (Exception e) {
-            _log.error("unexpected Exception - " + JSPPortlet.stackTraceString(e));
+            _log.error("unexpected Exception - " + PASSPortlet.stackTraceString(e));
         }
 
         return "criteria-list-jsp";
@@ -153,7 +153,7 @@ public class Actions {
      * @return
      */
     public String displayHomeView(PortletRequest request, PortletResponse response,
-                                  JSPPortlet portlet) {
+                                  PASSPortlet portlet) {
         Employee employee = getLoggedOnUser(request);
 
         try {
@@ -167,7 +167,7 @@ public class Actions {
                 request.setAttribute("isSupervisor", false);
             }
         } catch (Exception e) {
-            _log.error("unexpected Exception - " + JSPPortlet.stackTraceString(e));
+            _log.error("unexpected Exception - " + PASSPortlet.stackTraceString(e));
         }
 
         request.setAttribute("reviewer", getReviewer(employee.getId()));
@@ -188,13 +188,13 @@ public class Actions {
      * @return
      */
     public String displayReviewList(PortletRequest request, PortletResponse response,
-                                  JSPPortlet portlet) {
+                                  PASSPortlet portlet) {
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
         ArrayList<HashMap> reviews = new ArrayList<HashMap>();
         try {
             reviews = appraisals.getReviews(businessCenterName);
         } catch (Exception e) {
-            _log.error("unexpected Exception - " + JSPPortlet.stackTraceString(e));
+            _log.error("unexpected Exception - " + PASSPortlet.stackTraceString(e));
         }
         request.setAttribute("reviews", reviews);
 
@@ -211,7 +211,7 @@ public class Actions {
      * @return jsp file to render
      */
     public String displayAppraisal(PortletRequest request, PortletResponse response,
-                                  JSPPortlet portlet) throws Exception {
+                                  PASSPortlet portlet) throws Exception {
         Appraisal appraisal = new Appraisal();
         int appraisalID = ParamUtil.getInteger(request, "id");
         Employee currentlyLoggedOnUser = getLoggedOnUser(request);
@@ -265,7 +265,7 @@ public class Actions {
      * @return
      */
     public String updateAppraisal(PortletRequest request, PortletResponse response,
-                                  JSPPortlet portlet) throws Exception {
+                                  PASSPortlet portlet) throws Exception {
         for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
             _log.error(entry.getKey() + "/" + entry.getValue()[0]);
 
@@ -518,7 +518,7 @@ public class Actions {
             try {
                 loggedOnUser = employees.findByOnid(getLoggedOnUsername(request));
             } catch (Exception e) {
-                _log.error("unexpected Exception - " + JSPPortlet.stackTraceString(e));
+                _log.error("unexpected Exception - " + PASSPortlet.stackTraceString(e));
             }
             session.setAttribute("loggedOnUser", loggedOnUser);
         }
@@ -679,7 +679,7 @@ public class Actions {
         try {
             reviewCount = appraisals.getReviewCount(businessCenterName);
         } catch (Exception e) {
-            _log.error("unexpected Exception - " + JSPPortlet.stackTraceString(e));
+            _log.error("unexpected Exception - " + PASSPortlet.stackTraceString(e));
         }
         RequiredAction requiredAction = new RequiredAction();
         if (reviewCount == 0) {

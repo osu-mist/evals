@@ -64,7 +64,7 @@ public class HibernateUtil {
 
     /**
      * Use this method to set the name of the hibernate configuration file to load. This
-     * method is called by JSPPortlet.portletSetup.
+     * method is called by PASSPortlet.portletSetup.
      *
      * @param configName
      */
