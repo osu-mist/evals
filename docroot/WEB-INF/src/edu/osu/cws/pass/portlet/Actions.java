@@ -7,8 +7,6 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.pass.util.*;
-import edu.osu.cws.util.ExceptionHandler;
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -42,6 +40,7 @@ public class Actions {
      * @param request   PortletRequest
      * @param response  PortletResponse
      * @return jsp      JSP file to display (defined in portlet.xml)
+     * @throws Exception
      */
     public String addCriteria(PortletRequest request, PortletResponse response) throws Exception {
         Criteria criteriaArea= new Criteria();
@@ -335,7 +334,8 @@ public class Actions {
      * @param appraisal
      * @param permRule
      */
-    private void setAppraisalFields(PortletRequest request, Appraisal appraisal, PermissionRule permRule) {
+    private void setAppraisalFields(PortletRequest request, Appraisal appraisal, PermissionRule permRule)
+            throws Exception{
         String paramaterKey = "";
 
         // Save Goals
@@ -500,18 +500,15 @@ public class Actions {
      * the PortletSession if it's not there it fetches the Employee object and stores
      * it there.
      *
-     * @param request
+     * @param request   PortletRequest
      * @return
+     * @throws Exception
      */
-    private Employee getLoggedOnUser(PortletRequest request) {
+    private Employee getLoggedOnUser(PortletRequest request) throws Exception {
         PortletSession session = request.getPortletSession(true);
         Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
         if (loggedOnUser == null) {
-            try {
                 loggedOnUser = employees.findByOnid(getLoggedOnUsername(request));
-            } catch (Exception e) {
-                _log.error("unexpected Exception - " + ExceptionHandler.stackTraceString(e));
-            }
             session.setAttribute("loggedOnUser", loggedOnUser);
         }
 
