@@ -539,6 +539,12 @@ public class Actions {
         return (userInfo == null) ? "" : (String) userInfo.get("user.login.id");
     }
 
+    /**
+     * Sets the porletContext field. This method is called by the delegate and portletSetup
+     * methods in PASSPortlet.
+     *
+     * @param portletContext
+     */
     public void setPortletContext(PortletContext portletContext) {
         this.portletContext = portletContext;
     }
