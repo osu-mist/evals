@@ -10,14 +10,11 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.pass.util.*;
+import edu.osu.cws.util.ExceptionHandler;
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -86,16 +83,21 @@ public class PASSPortlet extends GenericPortlet {
 	public void doView(
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
-        _log.error("doView value of viewJSP = "+viewJSP);
 
-        portletSetup(renderRequest);
-        _log.error("doView called action = " + ParamUtil.getString(renderRequest, "action"));
+        try {
+            portletSetup(renderRequest);
 
-
-        // If processAction's delegate method was called, it set the viewJSP property to some
-        // jsp value, if viewJSP is null, it means processAction was not called.
-        if (viewJSP == null) {
-            delegate(renderRequest, renderResponse);
+            // If processAction's delegate method was called, it set the viewJSP property to some
+            // jsp value, if viewJSP is null, it means processAction was not called and we need to
+            // call delegate
+            if (viewJSP == null) {
+                delegate(renderRequest, renderResponse);
+            }
+        } catch (Exception e) {
+            CompositeConfiguration props = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
+            ExceptionHandler eh = new ExceptionHandler(e, _log, props, "PASS");
+            eh.handleException();
+            viewJSP = getInitParameter("error-jsp");
         }
 
         include(viewJSP, renderRequest, renderResponse);
@@ -105,11 +107,16 @@ public class PASSPortlet extends GenericPortlet {
 	public void processAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws IOException, PortletException {
-        _log.error("processaction value of viewJSP = "+viewJSP);
-        portletSetup(actionRequest);
 
-        _log.error("processAction called action = " + ParamUtil.getString(actionRequest, "action"));
-        delegate(actionRequest, actionResponse);
+        try {
+            portletSetup(actionRequest);
+            delegate(actionRequest, actionResponse);
+        } catch (Exception e) {
+            CompositeConfiguration props = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
+            ExceptionHandler eh = new ExceptionHandler(e, _log, props, "PASS");
+            eh.handleException();
+            viewJSP = getInitParameter("error-jsp");
+        }
 	}
 
 
@@ -126,7 +133,7 @@ public class PASSPortlet extends GenericPortlet {
         actionClass.setPortletContext(getPortletContext());
         Method actionMethod;
         String action;
-        viewJSP = getInitParameter("home-jsp");
+        viewJSP = "home-jsp";
 
         // The portlet action can be set by the action/renderURLs using "action" as the parameter
         // name
@@ -136,17 +143,20 @@ public class PASSPortlet extends GenericPortlet {
             try {
                 actionMethod = Actions.class.getDeclaredMethod(action, PortletRequest.class,
                         PortletResponse.class);
+
+                // The action methods return the init-param of the path
                 viewJSP = (String) actionMethod.invoke(actionClass, request, response);
-                // The action methods return the init-param of the path, we then need to grab the value
-                viewJSP = getInitParameter(viewJSP);
-            } catch (NoSuchMethodException e) {
-                _log.error("action method: " + action + " not found" + stackTraceString(e));
-            } catch (InvocationTargetException e) {
-                _log.error("failed to call method: " + action + stackTraceString(e));
-            } catch (IllegalAccessException e) {
-                _log.error("failed to call method: " + action + stackTraceString(e));
+            } catch (Exception e) {
+                CompositeConfiguration props = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
+                ExceptionHandler eh = new ExceptionHandler(e, _log, props, "PASS");
+                eh.handleException();
+                viewJSP = "error-jsp";
             }
         }
+
+        // viewJSP holds an init parameter that maps to a jsp file
+        viewJSP = getInitParameter(viewJSP);
+
 
         _log.debug("viewJSP in delegate: "+viewJSP);
     }
@@ -155,28 +165,10 @@ public class PASSPortlet extends GenericPortlet {
      * Takes care of loading the resource bundle Language.properties into the
      * portletContext.
      */
-    private void loadResourceBundle() {
+    private void loadResourceBundle() throws MissingResourceException{
         ResourceBundle resources;
-        try {
-            resources = ResourceBundle.getBundle("edu.osu.cws.pass.portlet.Language");
-            getPortletContext().setAttribute("resourceBundle", resources);
-        } catch (MissingResourceException e) {
-            _log.error("failed to load resource bundle" + stackTraceString(e));
-        }
-    }
-
-    /**
-     * Simple method that takes in an exception and returns the stacktrace as a string. We
-     * need this so that if we get an exception, we can send it to the luminis log.
-     *
-     * @param e     Exception
-     * @return  String stack trace
-     */
-    public static String stackTraceString(Exception e) {
-        StringWriter writerStr = new StringWriter();
-        PrintWriter myPrinter = new PrintWriter(writerStr);
-        e.printStackTrace(myPrinter);
-        return writerStr.toString();
+        resources = ResourceBundle.getBundle("edu.osu.cws.pass.portlet.Language");
+        getPortletContext().setAttribute("resourceBundle", resources);
     }
 
     /**
@@ -186,19 +178,16 @@ public class PASSPortlet extends GenericPortlet {
      * serveResource are called, but the code inside only executes the first time.
      *
      * @param request
+     * @throws Exception
      */
-    private void portletSetup(PortletRequest request) {
-        try {
-            if (getPortletContext().getAttribute("environmentProp") == null) {
-                loadEnvironmentProperties(request);
-                getPortletContext().setAttribute("permissionRules", permissionRules.list());
-                getPortletContext().setAttribute("appraisalSteps", appraisalSteps.list());
-                getPortletContext().setAttribute("reviewers", reviewers.list());
-                getPortletContext().setAttribute("admins", admins.list());
-                loadResourceBundle();
-            }
-        } catch (Exception e) {
-            _log.error("failed run portletSetup");
+    private void portletSetup(PortletRequest request) throws Exception {
+        if (getPortletContext().getAttribute("environmentProp") == null) {
+            loadEnvironmentProperties(request);
+            getPortletContext().setAttribute("permissionRules", permissionRules.list());
+            getPortletContext().setAttribute("appraisalSteps", appraisalSteps.list());
+            getPortletContext().setAttribute("reviewers", reviewers.list());
+            getPortletContext().setAttribute("admins", admins.list());
+            loadResourceBundle();
         }
     }
 
@@ -208,30 +197,28 @@ public class PASSPortlet extends GenericPortlet {
      * in the portletContext.
      *
      * @param request
+     * @throws Exception
      */
-    private void loadEnvironmentProperties(PortletRequest request) {
+    private void loadEnvironmentProperties(PortletRequest request) throws Exception {
         String propertyFile = request.getServerName() +".properties";
         CompositeConfiguration config = new CompositeConfiguration();
 
         // First load hostname.properties. Then try to load default.properties
-        try {
-            config.addConfiguration(new PropertiesConfiguration(propertyFile));
+        PropertiesConfiguration propConfig =  new PropertiesConfiguration(propertyFile);
+        if (propConfig.getFile().exists()) {
+            config.addConfiguration(propConfig);
             _log.error(propertyFile + " - loaded");
-        } catch (ConfigurationException e) {
-            _log.error("Failed to load server specific properties file - " + propertyFile);
-        } finally {
-            try {
-                config.addConfiguration(new PropertiesConfiguration(defaultProperties));
-                _log.error(defaultProperties + " - loaded");
-
-                // Set the Hibernate config file and store properties in portletContext
-                _log.error("using hibernate cfg file - "+config.getString("hibernate-cfg-file"));
-                HibernateUtil.setConfig(config.getString("hibernate-cfg-file"));
-                getPortletContext().setAttribute("environmentProp", config);
-            } catch (ConfigurationException e) {
-                _log.error("failed to load default properties file - " + defaultProperties);
-            }
+        } else {
+            _log.error(propertyFile + " - not found");
         }
+
+        config.addConfiguration(new PropertiesConfiguration(defaultProperties));
+        _log.error(defaultProperties + " - loaded");
+
+        // Set the Hibernate config file and store properties in portletContext
+        _log.error("using hibernate cfg file - "+config.getString("hibernate-cfg-file"));
+        HibernateUtil.setConfig(config.getString("hibernate-cfg-file"));
+        getPortletContext().setAttribute("environmentProp", config);
     }
 
     protected void include(

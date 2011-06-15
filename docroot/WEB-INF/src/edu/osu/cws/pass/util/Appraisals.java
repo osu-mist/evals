@@ -21,9 +21,9 @@ public class Appraisals {
      * @param job   Job for this appraisal
      * @param type  Type of appraisal: trial, annual or special
      * @return appraisal.id
-     * @throws ModelException
+     * @throws Exception
      */
-    public int createAppraisal(Job job, String type) throws ModelException, Exception {
+    public int createAppraisal(Job job, String type) throws Exception {
         CriterionDetail detail;
         Assessment assessment;
 
@@ -132,6 +132,7 @@ public class Appraisals {
      *
      * @param pidm
      * @return
+     * @throws Exception
      */
     public ArrayList<HashMap> getAllMyActiveAppraisals(int pidm) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
@@ -213,9 +214,9 @@ public class Appraisals {
      * @param appraisal     appraisal to check role in
      * @param pidm          pidm of the user to check
      * @return role
-     * @throws edu.osu.cws.pass.models.ModelException
+     * @throws Exception
      */
-    public String getRole(Appraisal appraisal, int pidm) throws ModelException, Exception {
+    public String getRole(Appraisal appraisal, int pidm) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Job supervisor;
         if (pidm == appraisal.getJob().getEmployee().getId()) {
@@ -248,13 +249,13 @@ public class Appraisals {
 
     /**
      * This method is just a wrapper for session.get. It returns the appraisal that
-     * matches the id.
+     * matches the id. It also adds the currentSupervisor to the appraisal object.
      *
      * @param id
      * @return
-     * @throws edu.osu.cws.pass.models.ModelException
+     * @throws Exception
      */
-    public Appraisal getAppraisal(int id) throws ModelException, Exception {
+    public Appraisal getAppraisal(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         appraisal = getAppraisal(id, session);
         appraisal.getJob().setCurrentSupervisor(jobs.getSupervisor(appraisal.getJob()));
@@ -315,6 +316,7 @@ public class Appraisals {
      *
      * @param businessCenterName
      * @return
+     * @throws Exception
      */
     public int getReviewCount(String businessCenterName) throws Exception {
         int reviewCount = 0;

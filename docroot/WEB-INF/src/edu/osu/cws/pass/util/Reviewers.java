@@ -1,8 +1,6 @@
 package edu.osu.cws.pass.util;
 
-import edu.osu.cws.pass.models.Admin;
 import edu.osu.cws.pass.models.Reviewer;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -37,9 +35,9 @@ public class Reviewers {
      *
      * @param session
      * @return
-     * @throws org.hibernate.HibernateException
+     * @throws Exception
      */
-    public List<Reviewer> list(Session session) throws HibernateException {
+    public List<Reviewer> list(Session session) throws Exception {
         Transaction tx = session.beginTransaction();
         List<Reviewer> result = session.createQuery("from edu.osu.cws.pass.models.Reviewer").list();
         tx.commit();

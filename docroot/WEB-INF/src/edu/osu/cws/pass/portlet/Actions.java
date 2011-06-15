@@ -7,7 +7,8 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.pass.util.*;
-import org.hibernate.HibernateException;
+import edu.osu.cws.util.ExceptionHandler;
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -34,20 +35,17 @@ public class Actions {
      * Takes the request object and creates POJO objects. Then it calls the respective
      * Hibernate util classes passing the POJOs to handle the saving of data and
      * validation.
-     * @param request
-     * @param response
-     * @return jsp
+     * @param request   PortletRequest
+     * @param response  PortletResponse
+     * @return jsp      JSP file to display (defined in portlet.xml)
      */
-    public String addCriteria(PortletRequest request, PortletResponse response) {
+    public String addCriteria(PortletRequest request, PortletResponse response) throws Exception {
         Criteria criteriaArea= new Criteria();
         CriterionArea criterionArea = new CriterionArea();
         CriterionDetail criterionDetail = new CriterionDetail();
+
         // Fetch list of appointment types to use in add form
-        try {
-            request.setAttribute("appointmentTypes", new AppointmentTypes().list());
-        } catch (Exception e) {
-            _log.error("unexpected Exception - " + PASSPortlet.stackTraceString(e));
-        }
+        request.setAttribute("appointmentTypes", new AppointmentTypes().list());
 
         // When the criterionAreaId == null means that the user clicks on the Add Criteria
         // link. Otherwise the form was submitted
@@ -65,10 +63,6 @@ public class Actions {
                 }
             } catch (ModelException e) {
                 addErrorsToRequest(request, e.getMessage());
-            } catch (HibernateException e) {
-                _log.error("Hibernate exception - " + PASSPortlet.stackTraceString(e));
-            } catch (Exception e) {
-                _log.error("unexpected Exception - " + PASSPortlet.stackTraceString(e));
             }
         }
 
@@ -93,21 +87,18 @@ public class Actions {
      * Takes the request object and passes the employeeType to the hibernate util class.
      * It returns an array of CriterionArea POJO.
      *
-     * @param request
-     * @param response
-     * @return jsp
+     * @param request   PortletRequest
+     * @param response  PortletResponse
+     * @return jsp      JSP file to display (defined in portlet.xml)
+     * @throws Exception
      */
-    public String listCriteria(PortletRequest request, PortletResponse response) {
+    public String listCriteria(PortletRequest request, PortletResponse response) throws  Exception {
         String appointmentType = ParamUtil.getString(request, "appointmentType", Criteria.DEFAULT_APPOINTMENT_TYPE);
 
         try {
             request.setAttribute("criteria", new Criteria().list(appointmentType));
         } catch (ModelException e) {
             addErrorsToRequest(request, e.getMessage());
-        } catch (HibernateException e) {
-            _log.error("Hibernate exception - " + PASSPortlet.stackTraceString(e));
-        } catch (Exception e) {
-            _log.error("unexpected Exception - " + PASSPortlet.stackTraceString(e));
         }
 
         return "criteria-list-jsp";
@@ -141,25 +132,22 @@ public class Actions {
      * (req. actions, my appraisals, my team, reviews and admins) and sets the information
      * in the request object.
      *
-     * @param request
-     * @param response
-     * @return
+     * @param request   PortletRequest
+     * @param response  PortletResponse
+     * @return jsp      JSP file to display (defined in portlet.xml)
+     * @throws Exception
      */
-    public String displayHomeView(PortletRequest request, PortletResponse response) {
+    public String displayHomeView(PortletRequest request, PortletResponse response) throws Exception {
         Employee employee = getLoggedOnUser(request);
 
-        try {
-            request.setAttribute("myActiveAppraisals",
-                    appraisals.getAllMyActiveAppraisals(employee.getId()));
-            if (jobs.isSupervisor(employee.getId())) {
-                request.setAttribute("myTeamsActiveAppraisals",
-                        appraisals.getMyTeamsActiveAppraisals(employee.getId()));
-                request.setAttribute("isSupervisor", true);
-            } else {
-                request.setAttribute("isSupervisor", false);
-            }
-        } catch (Exception e) {
-            _log.error("unexpected Exception - " + PASSPortlet.stackTraceString(e));
+        request.setAttribute("myActiveAppraisals",
+                appraisals.getAllMyActiveAppraisals(employee.getId()));
+        if (jobs.isSupervisor(employee.getId())) {
+            request.setAttribute("myTeamsActiveAppraisals",
+                    appraisals.getMyTeamsActiveAppraisals(employee.getId()));
+            request.setAttribute("isSupervisor", true);
+        } else {
+            request.setAttribute("isSupervisor", false);
         }
 
         request.setAttribute("reviewer", getReviewer(employee.getId()));
@@ -174,18 +162,14 @@ public class Actions {
     /**
      * Handles displaying a list of pending reviews for a given business center.
      *
-     * @param request
-     * @param response
-     * @return
+     * @param request   PortletRequest
+     * @param response  PortletResponse
+     * @return jsp      JSP file to display (defined in portlet.xml)
+     * @throws Exception
      */
-    public String displayReviewList(PortletRequest request, PortletResponse response) {
+    public String displayReviewList(PortletRequest request, PortletResponse response) throws Exception {
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
-        ArrayList<HashMap> reviews = new ArrayList<HashMap>();
-        try {
-            reviews = appraisals.getReviews(businessCenterName);
-        } catch (Exception e) {
-            _log.error("unexpected Exception - " + PASSPortlet.stackTraceString(e));
-        }
+        ArrayList<HashMap> reviews = appraisals.getReviews(businessCenterName);
         request.setAttribute("reviews", reviews);
 
         return "review-list-jsp";
@@ -195,9 +179,10 @@ public class Actions {
      * Handles displaying the appraisal when a user clicks on it. It loads the appraisal
      * object along with the respective permissionRule.
      *
-     * @param request
-     * @param response
-     * @return jsp file to render
+     * @param request   PortletRequest
+     * @param response  PortletResponse
+     * @return jsp      JSP file to display (defined in portlet.xml)
+     * @throws Exception
      */
     public String displayAppraisal(PortletRequest request, PortletResponse response) throws Exception {
         Appraisal appraisal = new Appraisal();
@@ -247,9 +232,10 @@ public class Actions {
     /**
      * Handles updating the appraisal form.
      *
-     * @param request
-     * @param response
-     * @return
+     * @param request   PortletRequest
+     * @param response  PortletResponse
+     * @return jsp      JSP file to display (defined in portlet.xml)
+     * @throws Exception
      */
     public String updateAppraisal(PortletRequest request, PortletResponse response) throws Exception {
         for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
@@ -307,18 +293,13 @@ public class Actions {
      * @param appraisal
      * @return
      */
-    private PermissionRule getAppraisalPermissionRule(Employee currentlyLoggedOnUser, Appraisal appraisal) {
-        HashMap permissionRules = new HashMap();
+    private PermissionRule getAppraisalPermissionRule(Employee currentlyLoggedOnUser, Appraisal appraisal)
+            throws Exception {
         String permissionKey = "";
-        try {
-            String role = appraisals.getRole(appraisal, currentlyLoggedOnUser.getId());
-            permissionKey = appraisal.getStatus()+"-"+ role;
-            permissionRules = (HashMap) portletContext.getAttribute("permissionRules");
-        } catch (Exception e) {
-            _log.error("failed to load appraisal role ");
+        String role = appraisals.getRole(appraisal, currentlyLoggedOnUser.getId());
+        permissionKey = appraisal.getStatus()+"-"+ role;
+        HashMap permissionRules = (HashMap) portletContext.getAttribute("permissionRules");
 
-        }
-        _log.error(permissionKey);
         return (PermissionRule) permissionRules.get(permissionKey);
     }
 
@@ -504,7 +485,7 @@ public class Actions {
             try {
                 loggedOnUser = employees.findByOnid(getLoggedOnUsername(request));
             } catch (Exception e) {
-                _log.error("unexpected Exception - " + PASSPortlet.stackTraceString(e));
+                _log.error("unexpected Exception - " + ExceptionHandler.stackTraceString(e));
             }
             session.setAttribute("loggedOnUser", loggedOnUser);
         }
@@ -582,8 +563,10 @@ public class Actions {
      * to see if the user is a reviewer and it gets the action required for the reviewer.
      *
      * @param request
+     * @return ArrayList<RequiredAction>
+     * @throws Exception
      */
-    public ArrayList<RequiredAction> getRequiredActions(PortletRequest request) {
+    public ArrayList<RequiredAction> getRequiredActions(PortletRequest request) throws Exception {
         ArrayList<RequiredAction> requiredActions = new ArrayList<RequiredAction>();
         RequiredAction reviewerAction;
         Reviewer reviewer;
@@ -660,13 +643,10 @@ public class Actions {
      * @param resource
      * @return
      */
-    private RequiredAction getReviewerAction(String businessCenterName, ResourceBundle resource) {
-        int reviewCount = 0;
-        try {
-            reviewCount = appraisals.getReviewCount(businessCenterName);
-        } catch (Exception e) {
-            _log.error("unexpected Exception - " + PASSPortlet.stackTraceString(e));
-        }
+    private RequiredAction getReviewerAction(String businessCenterName, ResourceBundle resource)
+            throws Exception {
+        int reviewCount = appraisals.getReviewCount(businessCenterName);
+
         RequiredAction requiredAction = new RequiredAction();
         if (reviewCount == 0) {
             return null;

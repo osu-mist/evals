@@ -14,6 +14,7 @@ public class Employees {
      *
      * @param username      Onid username
      * @return  Employee
+     * @throws Exception
      */
     public Employee findByOnid(String username) throws Exception {
         Session hsession = HibernateUtil.getCurrentSession();

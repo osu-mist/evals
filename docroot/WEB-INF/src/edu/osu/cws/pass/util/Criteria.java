@@ -28,10 +28,10 @@ public class Criteria {
      * @param details   CriterionDetail POJO
      * @param creator      Username of logged in user
      * @return errors   An array of error messages, but empty array on success.
-     * @throws edu.osu.cws.pass.models.ModelException
+     * @throws Exception
      */
     public boolean add(CriterionArea area, CriterionDetail details, Employee creator)
-            throws ModelException, Exception {
+            throws Exception {
         int sequence = getNextSequence(area.getAppointmentType());
 
         area.setCreator(creator);
@@ -105,9 +105,9 @@ public class Criteria {
      * @param appointmentType
      * @param session
      * @return criteria     List of CriterionAreas
-     * @throws org.hibernate.HibernateException
+     * @throws Exception
      */
-    private List<CriterionArea> list(String appointmentType, Session session) throws HibernateException {
+    private List<CriterionArea> list(String appointmentType, Session session) throws Exception {
         Transaction tx = session.beginTransaction();
         List result = session.createQuery("from edu.osu.cws.pass.models.CriterionArea where " +
                 "appointmentType = :appointmentType").setString("appointmentType", appointmentType)

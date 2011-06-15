@@ -2,7 +2,6 @@ package edu.osu.cws.pass.util;
 
 import edu.osu.cws.pass.models.Job;
 import edu.osu.cws.pass.models.ModelException;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -10,7 +9,15 @@ import java.util.List;
 
 public class Jobs {
 
-    public Job getSupervisor(Job job) throws ModelException, HibernateException, Exception {
+    /**
+     * Given a job, it finds the matching supervisor even if the direct supervising
+     * job has no employee associated to it.
+     *
+     * @param job
+     * @return
+     * @throws Exception
+     */
+    public Job getSupervisor(Job job) throws  Exception {
         Session session = HibernateUtil.getCurrentSession();
         Job supervisorJob = null;
         try {
@@ -85,6 +92,7 @@ public class Jobs {
      *
      * @param pidm  pidm of employee to check
      * @return isSupervisor
+     * @throws Exception
      */
     public boolean isSupervisor(int pidm) throws Exception {
         String query = "select count(*) from edu.osu.cws.pass.models.Job where endDate IS NULL " +

@@ -1,8 +1,6 @@
 package edu.osu.cws.pass.util;
 
 import edu.osu.cws.pass.models.Admin;
-import edu.osu.cws.pass.models.AppraisalStep;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -38,9 +36,9 @@ public class Admins {
      *
      * @param session
      * @return
-     * @throws org.hibernate.HibernateException
+     * @throws Exception
      */
-    public List<Admin> list(Session session) throws HibernateException {
+    public List<Admin> list(Session session) throws Exception {
         Transaction tx = session.beginTransaction();
         List<Admin> result = session.createQuery("from edu.osu.cws.pass.models.Admin").list();
         tx.commit();

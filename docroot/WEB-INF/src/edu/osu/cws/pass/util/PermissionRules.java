@@ -1,7 +1,6 @@
 package edu.osu.cws.pass.util;
 
 import edu.osu.cws.pass.models.PermissionRule;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -18,6 +17,7 @@ public class PermissionRules {
      * the hashmap key.
      *
      * @return ruleMap
+     * @throws Exception
      */
     public HashMap list() throws Exception {
         HashMap ruleMap = new HashMap();
@@ -44,9 +44,9 @@ public class PermissionRules {
      *
      * @param session
      * @return
-     * @throws HibernateException
+     * @throws Exception
      */
-    public List list(Session session) throws HibernateException {
+    public List list(Session session) throws Exception {
         Transaction tx = session.beginTransaction();
         List result = session.createQuery("from edu.osu.cws.pass.models.PermissionRule").list();
         tx.commit();

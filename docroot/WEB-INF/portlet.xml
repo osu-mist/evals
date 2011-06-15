@@ -10,6 +10,10 @@
             <value>/jsp/home/start.jsp</value>
         </init-param>
         <init-param>
+            <name>error-jsp</name>
+            <value>/jsp/error.jsp</value>
+        </init-param>
+        <init-param>
             <name>criteria-add-jsp</name>
             <value>/jsp/criteria/add.jsp</value>
         </init-param>

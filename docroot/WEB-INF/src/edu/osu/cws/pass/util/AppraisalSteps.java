@@ -1,8 +1,6 @@
 package edu.osu.cws.pass.util;
 
 import edu.osu.cws.pass.models.AppraisalStep;
-import edu.osu.cws.pass.models.PermissionRule;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -45,9 +43,9 @@ public class AppraisalSteps {
      *
      * @param session
      * @return
-     * @throws org.hibernate.HibernateException
+     * @throws Exception
      */
-    public List list(Session session) throws HibernateException {
+    public List list(Session session) throws Exception {
         Transaction tx = session.beginTransaction();
         List result = session.createQuery("from edu.osu.cws.pass.models.AppraisalStep").list();
         tx.commit();
