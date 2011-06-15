@@ -27,6 +27,10 @@ public class Actions {
 
     private AppointmentTypes appointmentTypes = new AppointmentTypes();
 
+    private Admins admins = new Admins();
+
+    private Reviewers reviewers = new Reviewers();
+
     private PortletContext portletContext;
 
     private Appraisals appraisals = new Appraisals();
@@ -158,6 +162,27 @@ public class Actions {
 
         return "home-jsp";
     }
+
+    /**
+     * Updates the admins List in the portletContext. This method is called by
+     * PassPortlet.portletSetup and by Actions.addAdmin methods.
+     *
+     * @throws Exception
+     */
+    public void setPassAdmins() throws Exception {
+        portletContext.setAttribute("admins", admins.list());
+    }
+
+    /**
+     * Updates the reviewers List in the portletContext. This method is called by
+     * PassPortlet.portletSetup and by Actions.addReviewer methods.
+     *
+     * @throws Exception
+     */
+    public void setPassReviewers() throws Exception {
+        portletContext.setAttribute("reviewers", reviewers.list());
+    }
+
 
     /**
      * Handles displaying a list of pending reviews for a given business center.

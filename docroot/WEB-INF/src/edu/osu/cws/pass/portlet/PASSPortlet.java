@@ -43,8 +43,6 @@ public class PASSPortlet extends GenericPortlet {
 
     private PermissionRules permissionRules = new PermissionRules();
     private AppraisalSteps appraisalSteps = new AppraisalSteps();
-    private Admins admins = new Admins();
-    private Reviewers reviewers = new Reviewers();
 
     /**
      * Helper Liferay object to store error messages into the server's log file
@@ -185,9 +183,11 @@ public class PASSPortlet extends GenericPortlet {
             loadEnvironmentProperties(request);
             getPortletContext().setAttribute("permissionRules", permissionRules.list());
             getPortletContext().setAttribute("appraisalSteps", appraisalSteps.list());
-            getPortletContext().setAttribute("reviewers", reviewers.list());
-            getPortletContext().setAttribute("admins", admins.list());
             loadResourceBundle();
+
+            actionClass.setPortletContext(getPortletContext());
+            actionClass.setPassAdmins();
+            actionClass.setPassReviewers();
         }
     }
 
