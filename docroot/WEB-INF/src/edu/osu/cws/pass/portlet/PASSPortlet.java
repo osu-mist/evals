@@ -84,37 +84,32 @@ public class PASSPortlet extends GenericPortlet {
 
         try {
             portletSetup(renderRequest);
-
-            // If processAction's delegate method was called, it set the viewJSP property to some
-            // jsp value, if viewJSP is null, it means processAction was not called and we need to
-            // call delegate
-            if (viewJSP == null) {
-                delegate(renderRequest, renderResponse);
-            }
         } catch (Exception e) {
-            CompositeConfiguration props = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
-            ExceptionHandler eh = new ExceptionHandler(e, _log, props, "PASS");
-            eh.handleException();
-            viewJSP = getInitParameter("error-jsp");
+            handlePASSException(e, true);
+        }
+
+        // If processAction's delegate method was called, it set the viewJSP property to some
+        // jsp value, if viewJSP is null, it means processAction was not called and we need to
+        // call delegate
+        if (viewJSP == null) {
+            delegate(renderRequest, renderResponse);
         }
 
         include(viewJSP, renderRequest, renderResponse);
         viewJSP = null;
 	}
 
-	public void processAction(
+    public void processAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws IOException, PortletException {
 
         try {
             portletSetup(actionRequest);
-            delegate(actionRequest, actionResponse);
         } catch (Exception e) {
-            CompositeConfiguration props = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
-            ExceptionHandler eh = new ExceptionHandler(e, _log, props, "PASS");
-            eh.handleException();
-            viewJSP = getInitParameter("error-jsp");
+            handlePASSException(e, true);
         }
+
+        delegate(actionRequest, actionResponse);
 	}
 
 
@@ -124,13 +119,13 @@ public class PASSPortlet extends GenericPortlet {
      * The delegated methods in Actions class return the path to the jsp file that should be loaded.
      * Those methods also set any parameters needed by the jsp files.
      *
-     * @param request
-     * @param response
+     * @param request   PortletRequest
+     * @param response  PortletResponse
      */
     public void delegate(PortletRequest request, PortletResponse response) {
-        actionClass.setPortletContext(getPortletContext());
         Method actionMethod;
         String action;
+        actionClass.setPortletContext(getPortletContext());
         viewJSP = "home-jsp";
 
         // The portlet action can be set by the action/renderURLs using "action" as the parameter
@@ -145,10 +140,7 @@ public class PASSPortlet extends GenericPortlet {
                 // The action methods return the init-param of the path
                 viewJSP = (String) actionMethod.invoke(actionClass, request, response);
             } catch (Exception e) {
-                CompositeConfiguration props = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
-                ExceptionHandler eh = new ExceptionHandler(e, _log, props, "PASS");
-                eh.handleException();
-                viewJSP = "error-jsp";
+                handlePASSException(e, false);
             }
         }
 
@@ -162,10 +154,10 @@ public class PASSPortlet extends GenericPortlet {
     /**
      * Takes care of loading the resource bundle Language.properties into the
      * portletContext.
+     * @throws java.util.MissingResourceException
      */
     private void loadResourceBundle() throws MissingResourceException{
-        ResourceBundle resources;
-        resources = ResourceBundle.getBundle("edu.osu.cws.pass.portlet.Language");
+        ResourceBundle resources = ResourceBundle.getBundle("edu.osu.cws.pass.portlet.Language");
         getPortletContext().setAttribute("resourceBundle", resources);
     }
 
@@ -219,6 +211,24 @@ public class PASSPortlet extends GenericPortlet {
         _log.error("using hibernate cfg file - "+config.getString("hibernate-cfg-file"));
         HibernateUtil.setConfig(config.getString("hibernate-cfg-file"));
         getPortletContext().setAttribute("environmentProp", config);
+    }
+
+    /**
+     * Takes care of handling portletSetup errors. This method is called by doView,
+     * processAction and delegate's catch block.
+     *
+     * @param e Exception
+     * @param getInitParam  Whether or not to use getInitParameter when setting viewJSP
+     */
+    private void handlePASSException(Exception e, boolean getInitParam) {
+        CompositeConfiguration props = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
+        ExceptionHandler eh = new ExceptionHandler(e, _log, props, "PASS");
+        eh.handleException();
+        if (getInitParam) {
+            viewJSP = getInitParameter("error-jsp");
+        } else {
+            viewJSP = "error-jsp";
+        }
     }
 
     protected void include(
