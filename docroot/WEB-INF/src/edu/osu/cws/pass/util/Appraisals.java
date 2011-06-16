@@ -15,6 +15,18 @@ public class Appraisals {
     private HashMap appraisalSteps;
     private HashMap permissionRules;
 
+    // Holds a list of appraisal status that are hidden from the employee and
+    // instead we display in-review
+    private ArrayList<String> statusHiddenFromEmployee = new ArrayList<String>();
+
+    public Appraisals() {
+        statusHiddenFromEmployee.add("appraisal-due");
+        statusHiddenFromEmployee.add("appraisal-past-due");
+        statusHiddenFromEmployee.add("review-due");
+        statusHiddenFromEmployee.add("review-past-due");
+        statusHiddenFromEmployee.add("release-due");
+        statusHiddenFromEmployee.add("release-past-due");
+    }
 
     /**
      * This method creates an appraisal for the given job by calling the Hibernate
@@ -338,6 +350,30 @@ public class Appraisals {
         return (PermissionRule) permissionRules.get(permissionKey);
     }
 
+    /**
+     * Wrapper method for getAppraisalPermissionRule(appraisal). It starts a session and
+     * transaction and calls that method.
+     *
+     * @param appraisal
+     * @param startSession
+     * @return
+     * @throws Exception
+     */
+    public PermissionRule getAppraisalPermissionRule(Appraisal appraisal, boolean startSession)
+            throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        PermissionRule permissionRule;
+        try {
+            Transaction tx = session.beginTransaction();
+            permissionRule = getAppraisalPermissionRule(appraisal);
+            tx.commit();
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+
+        return permissionRule;
+    }
 
     /**
      * Returns a list of active appraisals for all the jobs that the current pidm holds.
@@ -474,9 +510,31 @@ public class Appraisals {
      * @throws Exception
      */
     public Appraisal getAppraisal(int id) throws Exception {
+        int userID = loggedInUser.getId();
+        String userRole;
+        String appraisalStatus;
+
         Session session = HibernateUtil.getCurrentSession();
-        appraisal = getAppraisal(id, session);
-        appraisal.getJob().setCurrentSupervisor(jobs.getSupervisor(appraisal.getJob()));
+        try {
+            Transaction tx = session.beginTransaction();
+            appraisal = getAppraisal(id, session);
+            userRole = getRole(appraisal, userID);
+            appraisalStatus = appraisal.getStatus();
+            tx.commit();
+
+            appraisal.getJob().setCurrentSupervisor(jobs.getSupervisor(appraisal.getJob()));
+
+            if (userRole.equals("employee") && statusHiddenFromEmployee.contains(appraisalStatus)) {
+                appraisal.setRoleBasedStatus("in-review");
+            } else {
+                appraisal.setRoleBasedStatus(appraisal.getStatus());
+            }
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+
+
         return appraisal;
     }
 

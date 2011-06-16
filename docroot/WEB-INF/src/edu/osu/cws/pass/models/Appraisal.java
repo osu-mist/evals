@@ -115,6 +115,13 @@ public class Appraisal extends Pass {
 
     private Set<Assessment> assessments = new HashSet<Assessment>();
 
+    /**
+     * Property that holds the appraisal status displayed based on the user status
+     * For example, an employee gets to see in-review vs supervisor sees appraisal
+     * submitted.
+     */
+    private String roleBasedStatus;
+
     private static final String jobRequired =
             "Please provide a valid job";
 
@@ -493,5 +500,13 @@ public class Appraisal extends Pass {
 
     public void setOriginalStatus(String originalStatus) {
         this.originalStatus = originalStatus;
+    }
+
+    public String getRoleBasedStatus() {
+        return roleBasedStatus;
+    }
+
+    public void setRoleBasedStatus(String roleBasedStatus) {
+        this.roleBasedStatus = roleBasedStatus;
     }
 }

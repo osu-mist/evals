@@ -215,26 +215,9 @@ public class Actions {
         appraisals.setLoggedInUser(currentlyLoggedOnUser);
         appraisals.setPermissionRules((HashMap) portletContext.getAttribute("permissionRules"));
         Boolean showForm = false;
-        PermissionRule permRule = null;
 
-        Session session = HibernateUtil.getCurrentSession();
-        try {
-            Transaction tx = session.beginTransaction();
-            appraisal = appraisals.getAppraisal(appraisalID);
-            permRule = appraisals.getAppraisalPermissionRule(appraisal);
-
-            // setting the user role so that for demo purposes we can check permissions
-            // using role in jsp
-            //@todo: remove line below after demo
-            request.setAttribute("userRole",
-                appraisals.getRole(appraisal, currentlyLoggedOnUser.getId()));
-            tx.commit();
-        } catch (ModelException e) {
-            SessionErrors.add(request, e.getMessage());
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        appraisal = appraisals.getAppraisal(appraisalID);
+        PermissionRule permRule = appraisals.getAppraisalPermissionRule(appraisal, true);
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
