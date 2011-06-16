@@ -46,21 +46,25 @@ public class Actions {
         Criteria criteriaArea= new Criteria();
         CriterionArea criterionArea = new CriterionArea();
         CriterionDetail criterionDetail = new CriterionDetail();
+        Employee loggedOnUser = getLoggedOnUser(request);
 
         // Fetch list of appointment types to use in add form
         request.setAttribute("appointmentTypes", new AppointmentTypes().list());
 
         // When the criterionAreaId == null means that the user clicks on the Add Criteria
         // link. Otherwise the form was submitted
-        if (!ParamUtil.getString(request, "criterionAreaId").equals("")) {
+        String criterionAreaId = ParamUtil.getString(request, "criterionAreaId");
+        if (!criterionAreaId.equals("")) {
             String appointmentType = ParamUtil.getString(request, "appointmentTypeID");
+            String name = ParamUtil.getString(request, "name");
+            String description = ParamUtil.getString(request, "description");
 
-            criterionArea.setName(ParamUtil.getString(request, "name"));
+            criterionArea.setName(name);
             criterionArea.setAppointmentType(appointmentType);
-            criterionDetail.setDescription(ParamUtil.getString(request, "description"));
+            criterionDetail.setDescription(description);
 
             try {
-                if (criteriaArea.add(criterionArea, criterionDetail, getLoggedOnUser(request))) {
+                if (criteriaArea.add(criterionArea, criterionDetail, loggedOnUser)) {
                     SessionMessages.add(request, "criteria-saved");
                     return listCriteria(request, response);
                 }
@@ -96,10 +100,12 @@ public class Actions {
      * @throws Exception
      */
     public String listCriteria(PortletRequest request, PortletResponse response) throws  Exception {
-        String appointmentType = ParamUtil.getString(request, "appointmentType", Criteria.DEFAULT_APPOINTMENT_TYPE);
+        String appointmentType = ParamUtil.getString(request, "appointmentType",
+                Criteria.DEFAULT_APPOINTMENT_TYPE);
 
         try {
-            request.setAttribute("criteria", new Criteria().list(appointmentType));
+            List<CriterionArea> criterionList = new Criteria().list(appointmentType);
+            request.setAttribute("criteria", criterionList);
         } catch (ModelException e) {
             addErrorsToRequest(request, e.getMessage());
         }
@@ -142,19 +148,20 @@ public class Actions {
      */
     public String displayHomeView(PortletRequest request, PortletResponse response) throws Exception {
         Employee employee = getLoggedOnUser(request);
+        int employeeId = employee.getId();
 
-        request.setAttribute("myActiveAppraisals",
-                appraisals.getAllMyActiveAppraisals(employee.getId()));
-        if (jobs.isSupervisor(employee.getId())) {
-            request.setAttribute("myTeamsActiveAppraisals",
-                    appraisals.getMyTeamsActiveAppraisals(employee.getId()));
+        ArrayList<HashMap> allMyActiveAppraisals = appraisals.getAllMyActiveAppraisals(employeeId);
+        request.setAttribute("myActiveAppraisals", allMyActiveAppraisals);
+        if (jobs.isSupervisor(employeeId)) {
+            List<HashMap> myTeamsActiveAppraisals = appraisals.getMyTeamsActiveAppraisals(employeeId);
+            request.setAttribute("myTeamsActiveAppraisals", myTeamsActiveAppraisals);
             request.setAttribute("isSupervisor", true);
         } else {
             request.setAttribute("isSupervisor", false);
         }
 
-        request.setAttribute("reviewer", getReviewer(employee.getId()));
-        request.setAttribute("admin", getAdmin(employee.getId()));
+        request.setAttribute("reviewer", getReviewer(employeeId));
+        request.setAttribute("admin", getAdmin(employeeId));
 
         request.setAttribute("requiredActions", getRequiredActions(request));
 
@@ -209,14 +216,14 @@ public class Actions {
      * @throws Exception
      */
     public String displayAppraisal(PortletRequest request, PortletResponse response) throws Exception {
-        Appraisal appraisal = new Appraisal();
         int appraisalID = ParamUtil.getInteger(request, "id");
         Employee currentlyLoggedOnUser = getLoggedOnUser(request);
         appraisals.setLoggedInUser(currentlyLoggedOnUser);
-        appraisals.setPermissionRules((HashMap) portletContext.getAttribute("permissionRules"));
+        HashMap permissionRules = (HashMap) portletContext.getAttribute("permissionRules");
+        appraisals.setPermissionRules(permissionRules);
         Boolean showForm = false;
 
-        appraisal = appraisals.getAppraisal(appraisalID);
+        Appraisal appraisal = appraisals.getAppraisal(appraisalID);
         PermissionRule permRule = appraisals.getAppraisalPermissionRule(appraisal, true);
 
         // Check to see if the logged in user has permission to access the appraisal
@@ -253,15 +260,18 @@ public class Actions {
         }
 
         int id = ParamUtil.getInteger(request, "id", 0);
-        Employee currentlyLoggedOnUser = getLoggedOnUser(request);
-        appraisals.setLoggedInUser(currentlyLoggedOnUser);
-        appraisals.setPermissionRules((HashMap) portletContext.getAttribute("permissionRules"));
-        appraisals.setAppraisalSteps((HashMap) portletContext.getAttribute("appraisalSteps"));
-
         if (id == 0) {
             SessionErrors.add(request, "appraisal-does-not-exist");
             return "home-jsp";
         }
+
+        HashMap permissionRules = (HashMap) portletContext.getAttribute("permissionRules");
+        HashMap appraisalSteps = (HashMap) portletContext.getAttribute("appraisalSteps");
+        Employee currentlyLoggedOnUser = getLoggedOnUser(request);
+
+        appraisals.setLoggedInUser(currentlyLoggedOnUser);
+        appraisals.setPermissionRules(permissionRules);
+        appraisals.setAppraisalSteps(appraisalSteps);
 
         try {
             appraisals.processUpdateRequest(request.getParameterMap(), id);
@@ -296,7 +306,8 @@ public class Actions {
         PortletSession session = request.getPortletSession(true);
         Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
         if (loggedOnUser == null) {
-                loggedOnUser = employees.findByOnid(getLoggedOnUsername(request));
+            String loggedOnUsername = getLoggedOnUsername(request);
+            loggedOnUser = employees.findByOnid(loggedOnUsername);
             session.setAttribute("loggedOnUser", loggedOnUser);
         }
 
@@ -310,8 +321,7 @@ public class Actions {
      * @return
      */
     private Map getLoggedOnUserMap(PortletRequest request) {
-        Map userInfo = (Map)request.getAttribute(PortletRequest.USER_INFO);
-        return userInfo;
+        return (Map)request.getAttribute(PortletRequest.USER_INFO);
     }
 
     /**
@@ -351,7 +361,6 @@ public class Actions {
 
         if (reviewerMap.containsKey(pidm)) {
             return reviewerMap.get(pidm);
-
         }
         return null;
     }
@@ -361,6 +370,7 @@ public class Actions {
      * to figure out if the current logged in user is a reviewer. If yes, then we return the
      * Admin object if not, it returns false.
      *
+     * @param pidm
      * @return Admin
      */
     private Admin getAdmin(int pidm) {
@@ -384,26 +394,32 @@ public class Actions {
      */
     public ArrayList<RequiredAction> getRequiredActions(PortletRequest request) throws Exception {
         ArrayList<RequiredAction> requiredActions = new ArrayList<RequiredAction>();
+        ArrayList<RequiredAction> employeeRequiredActions;
+        ArrayList<RequiredAction> supervisorRequiredActions;
+        ArrayList<HashMap> myActiveAppraisals;
+        ArrayList<HashMap> supervisorActions;
         RequiredAction reviewerAction;
         Reviewer reviewer;
         Employee loggedInEmployee = getLoggedOnUser(request);
+        int employeeID = loggedInEmployee.getId();
         ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
 
 
-        ArrayList<HashMap> myActiveAppraisals = (ArrayList<HashMap>)
-                request.getAttribute("myActiveAppraisals");
-        requiredActions.addAll(getAppraisalActions(myActiveAppraisals, "employee", resource));
+        myActiveAppraisals = (ArrayList<HashMap>) request.getAttribute("myActiveAppraisals");
+        employeeRequiredActions = getAppraisalActions(myActiveAppraisals, "employee", resource);
+        requiredActions.addAll(employeeRequiredActions);
 
         // add supervisor required actions, if user has team's active appraisals
         if (request.getAttribute("myTeamsActiveAppraisals") != null) {
-            ArrayList<HashMap> supervisorActions = (ArrayList<HashMap>)
-                    request.getAttribute("myTeamsActiveAppraisals");
-            requiredActions.addAll(getAppraisalActions(supervisorActions, "supervisor", resource));
+            supervisorActions = (ArrayList<HashMap>) request.getAttribute("myTeamsActiveAppraisals");
+            supervisorRequiredActions = getAppraisalActions(supervisorActions, "supervisor", resource);
+            requiredActions.addAll(supervisorRequiredActions);
         }
 
-        reviewer = getReviewer(loggedInEmployee.getId());
+        reviewer = getReviewer(employeeID);
         if (reviewer != null) {
-            reviewerAction = getReviewerAction(reviewer.getBusinessCenterName(), resource);
+            String businessCenterName = reviewer.getBusinessCenterName();
+            reviewerAction = getReviewerAction(businessCenterName, resource);
             if (reviewerAction != null) {
                 requiredActions.add(reviewerAction);
             }
@@ -436,8 +452,9 @@ public class Actions {
 
             // Get the appropriate permissionrule object from the permissionRuleMap
             PermissionRule rule = (PermissionRule) permissionRuleMap.get(actionKey);
-            if (rule != null && rule.getActionRequired() != null
-                    && !rule.getActionRequired().equals("")) {
+            String actionRequired = rule.getActionRequired();
+            if (rule != null && actionRequired != null
+                    && !actionRequired.equals("")) {
                 // compose a requiredAction object and add it to the outList.
                 anchorParams = new HashMap<String, String>();
                 anchorParams.put("action", "displayAppraisal");
@@ -445,7 +462,7 @@ public class Actions {
 
                 actionReq = new RequiredAction();
                 actionReq.setParameters(anchorParams);
-                actionReq.setAnchorText(rule.getActionRequired(), appraisalMap, resource);
+                actionReq.setAnchorText(actionRequired, appraisalMap, resource);
                 outList.add(actionReq);
             }
         }
@@ -458,6 +475,7 @@ public class Actions {
      * @param businessCenterName
      * @param resource
      * @return
+     * @throws Exception
      */
     private RequiredAction getReviewerAction(String businessCenterName, ResourceBundle resource)
             throws Exception {

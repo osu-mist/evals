@@ -50,7 +50,8 @@ public class Appraisals {
         appraisal.setType(type);
 
         if (appraisal.validate()) {
-            List<CriterionArea> criteriaList = criteria.list(job.getAppointmentType());
+            String appointmentType = job.getAppointmentType();
+            List<CriterionArea> criteriaList = criteria.list(appointmentType);
             Session session = HibernateUtil.getCurrentSession();
             try {
                 Transaction tx = session.beginTransaction();
@@ -189,7 +190,8 @@ public class Appraisals {
         // Save Goals
         if (permRule.getGoals() != null && permRule.getGoals().equals("e")) {
             for (Assessment assessment : appraisal.getAssessments()) {
-                parameterKey = "appraisal.goal." + Integer.toString(assessment.getId());
+                String assessmentID = Integer.toString(assessment.getId());
+                parameterKey = "appraisal.goal." + assessmentID;
                 if (request.get(parameterKey) != null) {
                     assessment.setGoal(request.get(parameterKey)[0]);
                 }
@@ -205,7 +207,8 @@ public class Appraisals {
         // Save newGoals
         if (permRule.getNewGoals() != null && permRule.getNewGoals().equals("e")) {
             for (Assessment assessment : appraisal.getAssessments()) {
-                parameterKey = "appraisal.newGoal." + Integer.toString(assessment.getId());
+                String assessmentID = Integer.toString(assessment.getId());
+                parameterKey = "appraisal.newGoal." + assessmentID;
                 assessment.setNewGoals(request.get(parameterKey)[0]);
             }
         }
@@ -218,7 +221,8 @@ public class Appraisals {
         // Save employee results
         if (permRule.getResults() != null && permRule.getResults().equals("e")) {
             for (Assessment assessment : appraisal.getAssessments()) {
-                parameterKey = "assessment.employeeResult." + Integer.toString(assessment.getId());
+                String assessmentID = Integer.toString(assessment.getId());
+                parameterKey = "assessment.employeeResult." + assessmentID;
                 if (request.get(parameterKey) != null) {
                     assessment.setEmployeeResult(request.get(parameterKey)[0]);
                 }
@@ -227,7 +231,8 @@ public class Appraisals {
         // Save Supervisor Results
         if (permRule.getSupervisorResults() != null && permRule.getSupervisorResults().equals("e")) {
             for (Assessment assessment : appraisal.getAssessments()) {
-                parameterKey = "assessment.supervisorResult." + Integer.toString(assessment.getId());
+                String assessmentID = Integer.toString(assessment.getId());
+                parameterKey = "assessment.supervisorResult." + assessmentID;
                 if (request.get(parameterKey) != null) {
                     assessment.setSupervisorResult(request.get(parameterKey)[0]);
                 }
@@ -274,22 +279,18 @@ public class Appraisals {
         }
 
         // If the appraisalStep object has a new status, update the appraisal object
-        AppraisalStep appraisalStep = getAppraisalStepKey(request,
-                appraisal.getJob().getAppointmentType(), permRule);
-        if (appraisalStep != null &&
-                !appraisalStep.getNewStatus().equals(appraisal.getStatus())) {
+        String appointmentType = appraisal.getJob().getAppointmentType();
+        AppraisalStep appraisalStep = getAppraisalStepKey(request, appointmentType, permRule);
+        String newStatus = appraisalStep.getNewStatus();
+        if (appraisalStep != null && !newStatus.equals(appraisal.getStatus())) {
 //            _log.error("found appraisalStep "+appraisalStep.toString());
-            appraisal.setStatus(appraisalStep.getNewStatus());
+            appraisal.setStatus(newStatus);
+            String employeeResponse = appraisal.getEmployeeResponse();
             if (request.get("sign-appraisal") != null &&
-                    appraisal.getEmployeeResponse() != null &&
-                    !appraisal.getEmployeeResponse().equals("")) {
+                    employeeResponse != null && !employeeResponse.equals("")) {
                 appraisal.setStatus("rebuttal-submitted");
             }
         }
-
-        //@todo: based on the action submit button pressed, we'll want to set different meatadata fields
-        //@todo: don't forget to include other fields such as addedBy, modifiedBy, approvedDate
-        // such as reviewerID, goalApproverID, submitDate, etc.
     }
 
 
@@ -522,7 +523,8 @@ public class Appraisals {
             appraisalStatus = appraisal.getStatus();
             tx.commit();
 
-            appraisal.getJob().setCurrentSupervisor(jobs.getSupervisor(appraisal.getJob()));
+            Job supervisorJob = jobs.getSupervisor(appraisal.getJob());
+            appraisal.getJob().setCurrentSupervisor(supervisorJob);
 
             if (userRole.equals("employee") && statusHiddenFromEmployee.contains(appraisalStatus)) {
                 appraisal.setRoleBasedStatus("in-review");
