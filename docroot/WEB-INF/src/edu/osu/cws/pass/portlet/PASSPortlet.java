@@ -111,7 +111,10 @@ public class PASSPortlet extends GenericPortlet {
 
         delegate(actionRequest, actionResponse);
 	}
+         public void serveResource(ResourceRequest request, ResourceResponse response)
+         throws PortletException, IOException {
 
+         }
 
     /**
      * Delegate method will call the respective method in the Actions class and pass the request

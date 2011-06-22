@@ -4,7 +4,7 @@
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
     <class name="edu.osu.cws.pass.models.AppointmentType" table="appointment_types">
-        <id name="name"/>
+        <id name="name" column="NAME"/>
     </class>
 
 </hibernate-mapping>

@@ -99,7 +99,6 @@ public class Appraisals {
 
         // Try to save the data
         Session session = HibernateUtil.getCurrentSession();
-        modifiedAppraisal.setModifiedDate(new Date());
         session.saveOrUpdate(modifiedAppraisal);
 
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
@@ -272,7 +271,7 @@ public class Appraisals {
         }
         // Save employee response
         if (permRule.getEmployeeResponse() != null && permRule.getEmployeeResponse().equals("e")) {
-            appraisal.setEmployeeResponse(request.get("appraisal.employeeResponse")[0]);
+            appraisal.setRebuttal(request.get("appraisal.rebuttal")[0]);
             if (request.get("submit-response") != null) {
                 appraisal.setRespondedDate(new Date());
             }
@@ -285,7 +284,7 @@ public class Appraisals {
         if (appraisalStep != null && !newStatus.equals(appraisal.getStatus())) {
 //            _log.error("found appraisalStep "+appraisalStep.toString());
             appraisal.setStatus(newStatus);
-            String employeeResponse = appraisal.getEmployeeResponse();
+            String employeeResponse = appraisal.getRebuttal();
             if (request.get("sign-appraisal") != null &&
                     employeeResponse != null && !employeeResponse.equals("")) {
                 appraisal.setStatus("rebuttal-submitted");

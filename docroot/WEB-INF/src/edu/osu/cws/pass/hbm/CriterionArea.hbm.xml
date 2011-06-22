@@ -4,24 +4,27 @@
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
     <class name="edu.osu.cws.pass.models.CriterionArea" table="criteria_areas">
-        <id name="id" type="int">
+        <id name="id" type="int" column="ID">
             <generator class="native" />
         </id>
-        <property name="name"/>
-        <property name="sequence"/>
-        <property name="createDate" type="timestamp" />
-        <property name="deleteDate" type="timestamp" />
-        <property name="appointmentType" length="45"/>
+        <property name="name" column="NAME"/>
+        <property name="sequence" column="SEQUENCE"/>
+        <property name="createDate" type="timestamp" column="CREATE_DATE"/>
+        <property name="deleteDate" type="timestamp" column="DELETE_DATE"/>
+        <property name="appointmentType" length="45" column="APPOINTMENT_TYPE"/>
 
         <many-to-one name="creator" class="edu.osu.cws.pass.models.Employee"
-                     column="creatorID"
+                     column="CREATOR_PIDM"
                      not-null="true"/>
         <many-to-one name="deleter" class="edu.osu.cws.pass.models.Employee"
-                     column="deleterID"
+                     column="DELETER_PIDM"
                      not-null="false"/>
-        <many-to-one name="originalID" column="originalID" class="edu.osu.cws.pass.models.CriterionArea" not-null="false" unique="true"/>
+        <many-to-one name="originalID" class="edu.osu.cws.pass.models.CriterionArea"
+                     column="ORIGINAL_ID"
+                     not-null="false"
+                     unique="true"/>
         <set name="details" inverse="true" order-by="createDate DESC">
-            <key column="areaID"/>
+            <key column="AREA_ID"/>
             <one-to-many class="edu.osu.cws.pass.models.CriterionDetail"/>
 
         </set>

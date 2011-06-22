@@ -4,10 +4,10 @@
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
     <class name="edu.osu.cws.pass.models.EmailType" table="email_types">
-        <id name="type" type="string"/>
+        <id name="type" type="string" column="TYPE"/>
 
-        <property name="mailTo" length="64"/>
-        <property name="cc" length="64"/>
-        <property name="bcc" length="64"/>
+        <property name="mailTo" length="64" column="MAILTO"/>
+        <property name="cc" length="64" column="CC"/>
+        <property name="bcc" length="64" column="BCC"/>
     </class>
 </hibernate-mapping>

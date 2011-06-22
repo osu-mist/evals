@@ -98,10 +98,8 @@ public class AppraisalsTest {
         updatedAppraisal.setReviewSubmitDate(new Date());
         updatedAppraisal.setReviewStatusID("review id");
         updatedAppraisal.setReview("hr comments text");
-        updatedAppraisal.setEmployeeResponse("employee comments");
+        updatedAppraisal.setRebuttal("employee comments");
         updatedAppraisal.setEmployeeSignedDate(new Date());
-        updatedAppraisal.setEmailType("submit-goals");
-        updatedAppraisal.setEmailCount(5);
         updatedAppraisal.setCloseOutDate(new Date());
         updatedAppraisal.setCloseOutBy(employee);
         updatedAppraisal.setCloseOutReason("close out reason");

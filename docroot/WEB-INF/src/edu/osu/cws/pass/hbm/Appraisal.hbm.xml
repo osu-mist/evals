@@ -6,67 +6,63 @@
     <class name="edu.osu.cws.pass.models.Appraisal" table="appraisals"
            dynamic-insert="true"
            dynamic-update="true">
-        <id name="id" type="int">
+        <id name="id" type="int" column="ID">
             <generator class="native" />
         </id>
 
-        <property name="startDate" type="date"/>
-        <property name="endDate" type="date"/>
-        <property name="goalsSubmitDate" type="timestamp"/>
-        <property name="goalApprovedDate" type="timestamp"/>
-        <property name="goalsComments" type="text"/>
-        <property name="resultSubmitDate" type="timestamp"/>
-        <property name="evaluation" type="text"/>
+        <property name="startDate" type="date" column="START_DATE"/>
+        <property name="endDate" type="date" column="END_DATE"/>
+        <property name="goalsSubmitDate" type="timestamp" column="GOALS_SUBMIT_DATE"/>
+        <property name="goalApprovedDate" type="timestamp" column="GOALS_APPROVED_DATE"/>
+        <property name="goalsComments" type="text" column="GOALS_COMMENTS"/>
+        <property name="resultSubmitDate" type="timestamp" column="RESULT_SUBMIT_DATE"/>
+        <property name="evaluation" type="text" column="EVALUATION"/>
         <property name="evaluationSubmitDate" type="timestamp"/>
-        <property name="rating" type="java.lang.Integer" length="1"/>
-        <property name="reviewSubmitDate" type="timestamp"/>
-        <property name="review" type="text"/>
-        <property name="createDate" type="timestamp"/>
-        <property name="modifiedDate" type="timestamp"/>
-        <property name="employeeResponse" type="text"/>
-        <property name="respondedDate" type="timestamp"/>
-        <property name="employeeSignedDate" type="timestamp"/>
-        <property name="emailType" length="45"/>
-        <property name="emailDate" type="date"/>
-        <property name="emailCount" type="java.lang.Integer"/>
-        <property name="closeOutDate" type="timestamp"/>
-        <property name="closeOutReason" type="text"/>
-        <property name="status" length="32"/>
-        <property name="reopenedDate" type="timestamp"/>
-        <property name="reopenReason" type="text"/>
-        <property name="originalStatus" length="32"/>
+        <property name="rating" type="java.lang.Integer" length="1" column="RATING"/>
+        <property name="reviewSubmitDate" type="timestamp" column="REVIEW_SUBMIT_DATE"/>
+        <property name="review" type="text" column="REVIEW"/>
+        <property name="createDate" type="timestamp" column="CREATE_DATE"/>
+        <property name="rebuttal" type="text" column="REBUTTAL"/>
+        <property name="rebuttalDate" type="timestamp" column="REBUTTAL_DATE"/>
+        <property name="employeeSignedDate" type="timestamp" column="EMPLOYEE_SIGNED_DATE"/>
+        <property name="closeOutDate" type="timestamp" column="CLOSEOUT_DATE"/>
+        <property name="closeOutReason" type="text" column="CLOSEOUT_REASON"/>
+        <property name="status" length="32" column="STATUS"/>
+        <property name="reopenedDate" type="timestamp" column="REOPENED_DATE"/>
+        <property name="reopenReason" type="text" column="REOPEN_REASON"/>
+        <property name="originalStatus" length="32" column="ORIGINAL_STATUS"/>
         <property name="signatureRequestedDate" type="timestamp"/>
-        <property name="supervisorRebuttalRead" type="timestamp"/>
-        <property name="type"/>
-        <property name="evaluation2Date" type="timestamp"/>
-        <property name="review2Date" type="timestamp"/>
+        <property name="supervisorRebuttalRead" type="timestamp" column="SUPERVISOR_REBUTTAL_READ"/>
+        <property name="type" column="TYPE"/>
+        <property name="evaluation2Date" type="timestamp" column="EVALUATION2_DATE"/>
+        <property name="review2Date" type="timestamp" column="REVIEW2_DATE"/>
 
         <many-to-one name="job" class="edu.osu.cws.pass.models.Job"
                      column="jobID"
                      not-null="true"/>
         <many-to-one name="goalsApprover" class="edu.osu.cws.pass.models.Employee"
-                     column="goalsApproverID"
+                     column="GOALS_APPROVER_PIDM"
                      not-null="false"/>
         <many-to-one name="evaluator" class="edu.osu.cws.pass.models.Employee"
-                     column="evaluatorID"
+                     column="EVALUATOR_PIDM"
                      not-null="false"/>
         <many-to-one name="reviewer" class="edu.osu.cws.pass.models.Employee"
-                     column="reviewerID"
+                     column="REVIEWER_PIDM"
                      not-null="false"/>
         <many-to-one name="closeOutBy" class="edu.osu.cws.pass.models.Employee"
-                     column="closeOutID"
+                     column="CLOSEOUT_PIDM"
                      not-null="false"/>
         <many-to-one name="reopenedBy" class="edu.osu.cws.pass.models.Employee"
-                     column="reopenerID"
+                     column="REOPENER_PIDM"
                      not-null="false"/>
         <many-to-one name="evaluator2" class="edu.osu.cws.pass.models.Employee"
-                     column="evaluator2ID"
+                     column="EVALUATOR2_PIDM"
                      not-null="false"/>
         <many-to-one name="reviewer2" class="edu.osu.cws.pass.models.Employee"
-                     column="reviwer2ID"
+                     column="REVIEWER2_PIDM"
                      not-null="false"/>
         <set name="assessments" inverse="true">
-            <key column="appraisalID"/>
+            <key column="APPRAISAL_ID"/>
             <one-to-many class="edu.osu.cws.pass.models.Assessment" />
         </set>
     </class>

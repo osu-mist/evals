@@ -4,16 +4,20 @@
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
     <class name="edu.osu.cws.pass.models.GoalLog" table="goals_logs">
-        <id name="id" type="int">
+        <id name="id" type="int" column="ID">
             <generator class="native" />
         </id>
 
-        <property name="content" type="text"/>
-        <property name="createDate" type="timestamp"/>
-        <property name="type" length="45"/>
+        <property name="content" type="text" column="CONTENT"/>
+        <property name="createDate" type="timestamp" column="CREATE_DATE"/>
+        <property name="type" length="45" column="TYPE"/>
 
-        <many-to-one name="assessment" class="edu.osu.cws.pass.models.Assessment" column="assessmentID" not-null="true"/>
-        <many-to-one name="author" class="edu.osu.cws.pass.models.Employee" column="authorID" not-null="true"/>
+        <many-to-one name="assessment" class="edu.osu.cws.pass.models.Assessment"
+                     column="ASSESSMENT_ID"
+                     not-null="true"/>
+        <many-to-one name="author" class="edu.osu.cws.pass.models.Employee"
+                     column="AUTHOR_PIDM"
+                     not-null="true"/>
     </class>
 
 </hibernate-mapping>

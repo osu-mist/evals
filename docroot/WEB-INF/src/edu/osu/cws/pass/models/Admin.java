@@ -16,8 +16,6 @@ public class Admin extends Pass {
 
     private boolean isMaster;
 
-    private boolean isBackupMaster;
-
     /**
      * The value for scope will be: hr, uabac, etc.
      */
@@ -71,14 +69,6 @@ public class Admin extends Pass {
 
     public void setIsMaster(boolean master) {
         isMaster = master;
-    }
-
-    public boolean getIsBackupMaster() {
-        return isBackupMaster;
-    }
-
-    public void setIsBackupMaster(boolean backupMaster) {
-        isBackupMaster = backupMaster;
     }
 
     public String getScope() {

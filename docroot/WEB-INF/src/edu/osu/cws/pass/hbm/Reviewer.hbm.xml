@@ -4,14 +4,14 @@
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
     <class name="edu.osu.cws.pass.models.Reviewer" table="reviewers">
-        <id name="id" type="int">
+        <id name="id" type="int" column="ID">
             <generator class="native" />
         </id>
 
-        <property name="businessCenterName" type="string" length="4"/>
+        <property name="businessCenterName" type="string" length="4" column="BUSINESS_CENTER_NAME"/>
 
         <many-to-one name="employee" class="edu.osu.cws.pass.models.Employee"
-                     column="employeeID"
+                     column="EMPLOYEE_PIDM"
                      not-null="true"/>
     </class>
 

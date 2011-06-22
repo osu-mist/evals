@@ -4,13 +4,15 @@
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
     <class name="edu.osu.cws.pass.models.AppraisalStep" table="appraisal_steps">
-        <id name="id" type="int">
+        <id name="id" type="int" column="ID">
             <generator class="native" />
         </id>
 
-        <property name="action" length="45"/>
-        <property name="newStatus" length="32"/>
-        <property name="appointmentType" length="45"/>
-        <many-to-one name="emailType" class="edu.osu.cws.pass.models.EmailType" column="emailType" not-null="true"/>
+        <property name="action" length="45" column="ACTION"/>
+        <property name="newStatus" length="32" column="NEW_STATUS"/>
+        <property name="appointmentType" length="45" column="APPOINTMENT_TYPE"/>
+        <many-to-one name="emailType" class="edu.osu.cws.pass.models.EmailType"
+                     column="EMAIL_TYPE"
+                     not-null="true"/>
     </class>
 </hibernate-mapping>

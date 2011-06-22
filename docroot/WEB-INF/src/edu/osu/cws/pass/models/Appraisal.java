@@ -73,9 +73,9 @@ public class Appraisal extends Pass {
 
     private Date createDate;
 
-    private Date modifiedDate;
+    private String rebuttal;
 
-    private String employeeResponse;
+    private Date rebuttalDate;
 
     private Date employeeSignedDate;
 
@@ -92,12 +92,6 @@ public class Appraisal extends Pass {
     private Employee evaluator2;
 
     private Employee reviewer2;
-
-    private String emailType;
-
-    private Date emailDate;
-
-    private Integer emailCount;
 
     private Date closeOutDate;
 
@@ -329,20 +323,20 @@ public class Appraisal extends Pass {
         this.createDate = createDate;
     }
 
-    public Date getModifiedDate() {
-        return modifiedDate;
+    public String getRebuttal() {
+        return rebuttal;
     }
 
-    public void setModifiedDate(Date modifiedDate) {
-        this.modifiedDate = modifiedDate;
+    public void setRebuttal(String rebuttal) {
+        this.rebuttal = rebuttal;
     }
 
-    public String getEmployeeResponse() {
-        return employeeResponse;
+    public Date getRebuttalDate() {
+        return rebuttalDate;
     }
 
-    public void setEmployeeResponse(String employeeResponse) {
-        this.employeeResponse = employeeResponse;
+    public void setRebuttalDate(Date rebuttalDate) {
+        this.rebuttalDate = rebuttalDate;
     }
 
     public Date getEmployeeSignedDate() {
@@ -407,30 +401,6 @@ public class Appraisal extends Pass {
 
     public void setReviewer2(Employee reviewer2) {
         this.reviewer2 = reviewer2;
-    }
-
-    public String getEmailType() {
-        return emailType;
-    }
-
-    public void setEmailType(String emailType) {
-        this.emailType = emailType;
-    }
-
-    public Date getEmailDate() {
-        return emailDate;
-    }
-
-    public void setEmailDate(Date emailDate) {
-        this.emailDate = emailDate;
-    }
-
-    public Integer getEmailCount() {
-        return emailCount;
-    }
-
-    public void setEmailCount(Integer emailCount) {
-        this.emailCount = emailCount;
     }
 
     public Date getCloseOutDate() {

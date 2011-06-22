@@ -6,25 +6,25 @@
     <class name="edu.osu.cws.pass.models.Assessment" table="assessments"
            dynamic-insert="true"
            dynamic-update="true">
-        <id name="id" type="int">
+        <id name="id" type="int" column="ID">
             <generator class="native" />
         </id>
 
-        <property name="goal" type="text"/>
-        <property name="newGoals" type="text"/>
-        <property name="employeeResult" type="text"/>
-        <property name="supervisorResult" type="text"/>
-        <property name="createDate" type="timestamp"/>
-        <property name="modifiedDate" type="timestamp"/>
+        <property name="goal" type="text" column="GOAL"/>
+        <property name="newGoals" type="text" column="NEW_GOALS"/>
+        <property name="employeeResult" type="text" column="EMPLOYEE_RESULT"/>
+        <property name="supervisorResult" type="text" column="SUPERVISOR_RESULT"/>
+        <property name="createDate" type="timestamp" column="CREATE_DATE"/>
+        <property name="modifiedDate" type="timestamp" column="MODIFIED_DATE"/>
 
         <many-to-one name="appraisal" class="edu.osu.cws.pass.models.Appraisal"
-                     column="appraisalID"
+                     column="APPRAISAL_ID"
                      not-null="true"/>
         <many-to-one name="criterionDetail" class="edu.osu.cws.pass.models.CriterionDetail"
-                     column="criterionDetailID"
+                     column="CRITERION_DETAIL_ID"
                      not-null="true"/>
         <set name="goalLogs" inverse="true" order-by="createDate DESC">
-            <key column="assessmentID"/>
+            <key column="ASSESSMENT_ID"/>
             <one-to-many class="edu.osu.cws.pass.models.GoalLog"/>
         </set>
     </class>

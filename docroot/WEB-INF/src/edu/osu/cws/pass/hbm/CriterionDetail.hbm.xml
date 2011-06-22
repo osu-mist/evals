@@ -4,16 +4,18 @@
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
     <class name="edu.osu.cws.pass.models.CriterionDetail" table="criteria_details">
-        <id name="id" type="int">
+        <id name="id" type="int" column="ID">
             <generator class="increment" />
         </id>
 
-        <property name="createDate" type="timestamp"/>
-        <property name="description" type="text"/>
+        <property name="createDate" type="timestamp" column="CREATE_DATE"/>
+        <property name="description" type="text" column="DESCRIPTION"/>
 
-        <many-to-one name="areaID" class="edu.osu.cws.pass.models.CriterionArea" not-null="true"/>
+        <many-to-one name="areaID" class="edu.osu.cws.pass.models.CriterionArea"
+                     not-null="true"
+                     column="AREA_ID"/>
         <many-to-one name="creator" class="edu.osu.cws.pass.models.Employee"
-                     column="creatorID"
+                     column="CREATOR_PIDM"
                      not-null="true"/>
     </class>
 

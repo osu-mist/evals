@@ -55,22 +55,22 @@
         </c:if>
         <c:choose>
             <c:when test="${permissionRule.employeeResponse == 'e'}">
-                <c:if test="${empty appraisal.employeeResponse}">
+                <c:if test="${empty appraisal.rebuttal}">
                     <br />
                     <input type="submit" id="<portlet:namespace />show-rebuttal"
                         value="<liferay-ui:message key="appraisal-want-rebuttal" />" />
                     <div class="pass-hide pass-appraisal-rebuttal">
                 </c:if>
                 <p><strong><liferay-ui:message key="appraisal-employee-response" /></strong></p>
-                <liferay-ui:input-textarea param="appraisal.employeeResponse"
-                    defaultValue="${appraisal.employeeResponse}" /><br />
-                <c:if test="${empty appraisal.employeeResponse}">
+                <liferay-ui:input-textarea param="appraisal.rebuttal"
+                    defaultValue="${appraisal.rebuttal}" /><br />
+                <c:if test="${empty appraisal.rebuttal}">
                     </div><!-- end pass-hide-->
                 </c:if>
             </c:when>
-            <c:when test="${permissionRule.employeeResponse == 'v' && not empty appraisal.employeeResponse}">
+            <c:when test="${permissionRule.employeeResponse == 'v' && not empty appraisal.rebuttal}">
                 <p><strong><liferay-ui:message key="appraisal-employee-response" /></strong></p>
-        <p class="pass-form-text"><%= formAppraisal.getEmployeeResponse().replaceAll("\n", "<br />") %></p>
+        <p class="pass-form-text"><%= formAppraisal.getRebuttal().replaceAll("\n", "<br />") %></p>
             </c:when>
 
         </c:choose>

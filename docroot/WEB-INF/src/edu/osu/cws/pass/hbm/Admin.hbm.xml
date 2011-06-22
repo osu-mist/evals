@@ -4,18 +4,21 @@
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
     <class name="edu.osu.cws.pass.models.Admin" table="admins">
-        <id name="id" type="int">
+        <id name="id" type="int" column="ID">
             <generator class="native" />
         </id>
 
-        <property name="createDate" type="timestamp"/>
-        <property name="modifiedDate" type="timestamp"/>
-        <property name="isMaster" type="boolean"/>
-        <property name="isBackupMaster" type="boolean"/>
-        <property name="scope"/>
+        <property name="createDate" type="timestamp" column="CREATE_DATE"/>
+        <property name="modifiedDate" type="timestamp" column="MODIFIED_DATE"/>
+        <property name="isMaster" type="boolean" column="IS_MASTER"/>
+        <property name="scope" column="SCOPE"/>
 
-        <many-to-one name="employee" class="edu.osu.cws.pass.models.Employee" column="employeeID" not-null="true"/>
-        <many-to-one name="creator" class="edu.osu.cws.pass.models.Employee" column="creatorID" not-null="true"/>
+        <many-to-one name="employee" class="edu.osu.cws.pass.models.Employee"
+                     column="EMPLOYEE_PIDM"
+                     not-null="true"/>
+        <many-to-one name="creator" class="edu.osu.cws.pass.models.Employee"
+                     column="CREATOR_PIDM"
+                     not-null="true"/>
     </class>
 
 </hibernate-mapping>
