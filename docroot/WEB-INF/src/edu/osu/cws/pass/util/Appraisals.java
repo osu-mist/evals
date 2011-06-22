@@ -68,8 +68,9 @@ public class Appraisals {
 
                 }
                 tx.commit();
-            } finally {
+            } catch (Exception e){
                 session.close();
+                throw e;
             }
         }
 
