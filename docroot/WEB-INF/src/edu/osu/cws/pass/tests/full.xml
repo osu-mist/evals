@@ -2,9 +2,9 @@
 <dataset>
   <admins ID="1" EMPLOYEE_PIDM="12345" IS_MASTER="true" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0" SCOPE="hr"/>
   <admins ID="2" EMPLOYEE_PIDM="12467" IS_MASTER="false" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0" SCOPE="hr"/>
-  <appointment_types NAME="classified"/>
-  <appraisal_steps ID="1" ACTION="submit" APPOINTMENT_TYPE="classified" NEW_STATUS="goals-submitted" EMAIL_TYPE="goals-submitted"/>
-  <appraisal_steps ID="2" ACTION="require-modification" APPOINTMENT_TYPE="classified" NEW_STATUS="goals-require-modification" EMAIL_TYPE="goals-require-modification"/>
+  <appointment_types NAME="Classified"/>
+  <appraisal_steps ID="1" ACTION="submit" APPOINTMENT_TYPE="Classified" NEW_STATUS="goals-submitted" EMAIL_TYPE="goals-submitted"/>
+  <appraisal_steps ID="2" ACTION="require-modification" APPOINTMENT_TYPE="Classified" NEW_STATUS="goals-require-modification" EMAIL_TYPE="goals-require-modification"/>
   <appraisals ID="1"
               START_DATE="2011-05-14"
               END_DATE="2012-05-14"
@@ -40,8 +40,8 @@
   <goals_logs/>
   <assessments/>
   <business_centers NAME="UABC"/>
-  <criteria_areas ID="1" NAME="COMMUNICATION SKILLS" APPOINTMENT_TYPE="classified" SEQUENCE="1" CREATE_DATE="2011-04-10 20:16:48.0" CREATOR_PIDM="12345" DELETE_DATE="2011-04-10 20:16:48.0"/>
-  <criteria_areas ID="2" NAME="TECHNICAL SKILLS" APPOINTMENT_TYPE="classified" SEQUENCE="2" CREATE_DATE="2011-04-11 09:57:08.0" CREATOR_PIDM="12345" DELETE_DATE="2011-04-11 09:57:08.0"/>
+  <criteria_areas ID="1" NAME="COMMUNICATION SKILLS" APPOINTMENT_TYPE="Classified" SEQUENCE="1" CREATE_DATE="2011-04-10 20:16:48.0" CREATOR_PIDM="12345" DELETE_DATE="2011-04-10 20:16:48.0"/>
+  <criteria_areas ID="2" NAME="TECHNICAL SKILLS" APPOINTMENT_TYPE="Classified" SEQUENCE="2" CREATE_DATE="2011-04-11 09:57:08.0" CREATOR_PIDM="12345" DELETE_DATE="2011-04-11 09:57:08.0"/>
   <criteria_details ID="1" AREA_ID="1" DESCRIPTION="How will you improve your communication?" CREATE_DATE="2011-04-11 10:00:19.0" CREATOR_PIDM="12345"/>
   <criteria_details ID="2" AREA_ID="2" DESCRIPTION="What training will you obtain this year?" CREATE_DATE="2011-04-11 10:31:58.0" CREATOR_PIDM="12345"/>
   <criteria_details ID="3" AREA_ID="1" DESCRIPTION="How will you increase your communication skills?" CREATE_DATE="2011-04-12 14:30:23.0" CREATOR_PIDM="12345"/>
@@ -63,7 +63,7 @@
         positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"
-        appointmentType="classified"
+        appointmentType="Classified"
         beginDate="2011-05-14"
         positionClass="foobar"
         businessCenterName="UABC"
@@ -77,7 +77,7 @@
         positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"
-        appointmentType="classified"
+        appointmentType="Classified"
         beginDate="2011-05-14"
         positionClass="foobar"
         businessCenterName="UABC"
@@ -90,7 +90,7 @@
         positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"
-        appointmentType="classified"
+        appointmentType="Classified"
         beginDate="2011-05-14"
         positionClass="foobar"
         businessCenterName="UABC"
@@ -104,7 +104,7 @@
         positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"
-        appointmentType="classified"
+        appointmentType="Classified"
         beginDate="2011-05-14"
         positionClass="foobar"
         businessCenterName="UABC"
@@ -117,7 +117,7 @@
         positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"
-        appointmentType="classified"
+        appointmentType="Classified"
         beginDate="2011-05-14"
         positionClass="foobar"
         businessCenterName="UABC"
@@ -131,7 +131,7 @@
         positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"
-        appointmentType="classified"
+        appointmentType="Classified"
         beginDate="2011-05-14"
         positionClass="foobar"
         businessCenterName="UABC"
@@ -144,7 +144,7 @@
         positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"
-        appointmentType="classified"
+        appointmentType="Classified"
         beginDate="2011-05-14"
         positionClass="foobar"
         businessCenterName="UABC"
@@ -158,7 +158,7 @@
         positionNumber="1234"
         suffix="00"
         jobEcls="kjlkjlk"
-        appointmentType="classified"
+        appointmentType="Classified"
         beginDate="2011-05-14"
         positionClass="foobar"
         businessCenterName="UABC"
@@ -168,5 +168,4 @@
   <permission_rules ID="1" STATUS="goals-due" ROLE="employee" GOALS="e" ACTION_REQUIRED="goals-due"/>
   <permission_rules ID="2" STATUS="goals-due" ROLE="immediate-supervisor" GOALS="e"/>
   <status/>
-  <system_configurations/>
 </dataset>

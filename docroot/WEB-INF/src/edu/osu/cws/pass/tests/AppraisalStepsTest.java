@@ -29,8 +29,8 @@ public class AppraisalStepsTest {
         HashMap steps = appraisalSteps.list();
         //@todo: does the test below make sense without the original status in the appraisal_step
         // table?
-        assert steps.containsKey("submit-classified") : "Missing step in hashmap";
-        assert steps.containsKey("require-modification-classified") : "Missing step in hashmap";
+        assert steps.containsKey("submit-Classified") : "Missing step in hashmap";
+        assert steps.containsKey("require-modification-Classified") : "Missing step in hashmap";
         assert steps.size() == 2 :
                 "AppraisalSteps.list() should find all appraisalSteps";
 

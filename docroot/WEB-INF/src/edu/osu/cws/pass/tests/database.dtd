@@ -13,8 +13,7 @@
     jobs*,
     permission_rules*,
     reviewers*,
-    status*,
-    system_configurations*)>
+    status*)>
 
 <!ELEMENT admins EMPTY>
 <!ATTLIST admins
@@ -181,16 +180,3 @@
 <!ATTLIST status
     status CDATA #REQUIRED
 >
-
-<!ELEMENT system_configurations EMPTY>
-<!ATTLIST system_configurations
-    id CDATA #REQUIRED
-    code CDATA #REQUIRED
-    name CDATA #REQUIRED
-    description CDATA #REQUIRED
-    value CDATA #REQUIRED
-    scopeID CDATA #REQUIRED
-    bizID CDATA #IMPLIED
-    modifiedBy CDATA #REQUIRED
->
-
