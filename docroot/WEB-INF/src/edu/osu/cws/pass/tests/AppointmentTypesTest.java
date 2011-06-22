@@ -22,7 +22,7 @@ public class AppointmentTypesTest {
     }
 
     @Test(groups = {"unittest"})
-    public void testList() {
+    public void testList() throws Exception {
         List types = appointmentTypes.list();
         assert types.size() == 1 : "Invalid number of appointment types.";
         AppointmentType type = (AppointmentType) types.get(0);

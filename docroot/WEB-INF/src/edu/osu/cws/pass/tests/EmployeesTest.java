@@ -16,7 +16,7 @@ public class EmployeesTest {
      *
      */
     @Test(groups = {"unittest"})
-    public void shouldFindAUserByUsername() {
+    public void shouldFindAUserByUsername() throws Exception {
         Employee employee = employees.findByOnid("cedenoj");
 
         assert employee != null : "The employee object should not be null";

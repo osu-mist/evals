@@ -26,7 +26,7 @@ public class AdminsTest {
         dbunit.seedDatabase();
     }
 
-    public void shouldListAdmins() {
+    public void shouldListAdmins() throws Exception {
         HashMap adminsList = admins.list();
         assert adminsList.size() == 2 : "Invalid list of admins";
         assert adminsList.containsKey(12345) : "Invalid admin in list";

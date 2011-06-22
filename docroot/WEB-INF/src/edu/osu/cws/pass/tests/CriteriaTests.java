@@ -250,7 +250,7 @@ public class CriteriaTests {
      * based on success of the operation.
      */
     @Test(groups = {"unittest"})
-    public void addNewCriteria() throws ModelException {
+    public void addNewCriteria() throws Exception {
         Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         Employee createdBy = (Employee) hsession.load(Employee.class, 12345);

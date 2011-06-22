@@ -73,7 +73,7 @@ public class AppraisalsTest {
      *
      * @return
      */
-    public Appraisal loadAppraisalSaveList() throws ModelException {
+    public Appraisal loadAppraisalSaveList() throws Exception {
         Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         Job job = (Job) hsession.load(Job.class, 1);
@@ -117,7 +117,7 @@ public class AppraisalsTest {
      */
     @Test(groups = {"unitttest"})
     public void updateAppraisalModelData()
-            throws ModelException {
+            throws Exception {
         Appraisal modifiedAppraisal = loadAppraisalSaveList();
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
@@ -127,7 +127,7 @@ public class AppraisalsTest {
                 "Appraisal with just appraisal values failed to save";
     }
 
-    public Appraisal loadAppraisalAssessments() throws ModelException {
+    public Appraisal loadAppraisalAssessments() throws Exception {
         Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
         Job job = (Job) hsession.load(Job.class, 1);
@@ -156,7 +156,7 @@ public class AppraisalsTest {
 
     @Test(groups = {"unittest"})
     public void shouldUpdateAppraisalWithResults()
-            throws ModelException {
+            throws Exception {
 
         // Create the appraisal for this test
         Session hsession = HibernateUtil.getCurrentSession();
@@ -201,7 +201,7 @@ public class AppraisalsTest {
      * Edits an appraisal twice and checks to make sure that the goals are logged.
      */
     public void shouldCreateGoalLog()
-            throws ModelException {
+            throws Exception {
 
         Appraisal modifiedAppraisal = loadAppraisalAssessments();
 
@@ -239,7 +239,7 @@ public class AppraisalsTest {
     }
 
     @Test(groups = "unittest")
-    public void shouldFindAllEmployeeActiveAppraisals() {
+    public void shouldFindAllEmployeeActiveAppraisals() throws Exception {
         int pidm = 12345;
         ArrayList<HashMap> myActiveAppraisals = appraisals.getAllMyActiveAppraisals(pidm);
         assert myActiveAppraisals.size() == 2 : "Invalid size of active appraisals";
@@ -253,7 +253,7 @@ public class AppraisalsTest {
     }
 
     @Test(groups = "unittest")
-    public void shouldFindAllTeamActiveAppraisals() {
+    public void shouldFindAllTeamActiveAppraisals() throws Exception {
         int pidm = 12467;
         List<HashMap> teamActiveAppraisals = appraisals.getMyTeamsActiveAppraisals(pidm);
         assert teamActiveAppraisals.size() == 2 : "Invalid size of team active appraisals";
@@ -276,7 +276,7 @@ public class AppraisalsTest {
         }
     }
 
-    public void shouldReturnEmptyStringWhenPidmHasNoRole() throws ModelException {
+    public void shouldReturnEmptyStringWhenPidmHasNoRole() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
         Appraisal appraisal = (Appraisal) session.load(Appraisal.class, 1);
@@ -286,7 +286,7 @@ public class AppraisalsTest {
         assert appraisals.getRole(appraisal, invalidPidm).equals("");
     }
 
-    public void shouldDetectEmployeeRoleInAppraisal() throws ModelException {
+    public void shouldDetectEmployeeRoleInAppraisal() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
         Appraisal appraisal = (Appraisal) session.load(Appraisal.class, 1);
@@ -295,7 +295,7 @@ public class AppraisalsTest {
         assert appraisals.getRole(appraisal, 12345).equals("employee");
     }
 
-    public void shouldDetectReviewerRoleInAppraisal() throws ModelException {
+    public void shouldDetectReviewerRoleInAppraisal() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
         Appraisal appraisal = (Appraisal) session.load(Appraisal.class, 1);
@@ -304,14 +304,14 @@ public class AppraisalsTest {
         assert appraisals.getRole(appraisal, 787812).equals("reviewer");
     }
 
-    public void shouldOnlyIncludeReviewDueOrReviewPastDueInAppraisalReviewList() {
+    public void shouldOnlyIncludeReviewDueOrReviewPastDueInAppraisalReviewList() throws Exception {
         for (HashMap appraisal : appraisals.getReviews("UABC")) {
             assert appraisal.get("status").equals("review-due")
                     || appraisal.get("status").equals("review-past-due");
         }
     }
 
-    public void getReviewsShouldIncludeOnlyNeededFields() {
+    public void getReviewsShouldIncludeOnlyNeededFields() throws Exception {
         for (HashMap appraisal : appraisals.getReviews("UABC")) {
             assert appraisal.containsKey("id") : "Missing appraisalID";
             assert appraisal.containsKey("employeeName") : "Missing employeeName";
@@ -323,7 +323,7 @@ public class AppraisalsTest {
         }
     }
 
-    public void shouldReturnCorrectReviewCount() {
+    public void shouldReturnCorrectReviewCount() throws Exception {
         assert appraisals.getReviewCount("UABC") == 2;
         assert appraisals.getReviewCount("foobar") == 0;
     }

@@ -25,7 +25,7 @@ public class AppraisalStepsTest {
     }
 
     @Test(groups = {"unittest"})
-    public void shouldListAllSteps() {
+    public void shouldListAllSteps() throws Exception {
         HashMap steps = appraisalSteps.list();
         //@todo: does the test below make sense without the original status in the appraisal_step
         // table?

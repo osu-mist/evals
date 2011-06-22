@@ -20,7 +20,7 @@ public class JobsTest {
         dbunit.seedDatabase();
     }
 
-    public void shouldFindSupervisorIfNoDirectSupervisor() throws ModelException{
+    public void shouldFindSupervisorIfNoDirectSupervisor() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
         job = (Job) session.load(Job.class, 4);
@@ -51,7 +51,7 @@ public class JobsTest {
         assert !jobs.isUpperSupervisor(job, pidm) : "should not have found an upper supervisor";
     }
 
-    public void shouldCorrectlyDetectEmployeeSupervisor() {
+    public void shouldCorrectlyDetectEmployeeSupervisor() throws Exception {
         assert jobs.isSupervisor(990871) : "isSupervisor() should count employees correctly";
         assert !jobs.isSupervisor(12345) : "isSupervisor() should not count inactive employees";
     }
