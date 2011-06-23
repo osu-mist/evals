@@ -22,7 +22,7 @@ public class Employees {
         try {
             Transaction tx = hsession.beginTransaction();
             List employees = hsession.createQuery(
-                    "from edu.osu.cws.pass.models.Employee where onid = ? and active = 1")
+                    "from edu.osu.cws.pass.models.Employee where onid = ? and status = 'A'")
                     .setString(0, username)
                     .list();
             for (Object user : employees) {

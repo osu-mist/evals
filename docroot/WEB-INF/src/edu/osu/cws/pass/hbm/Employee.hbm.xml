@@ -3,17 +3,16 @@
 
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
-    <class name="edu.osu.cws.pass.models.Employee" table="employees">
-        <id name="id" column="pidm" type="int"/>
+    <class name="edu.osu.cws.pass.models.Employee" table="PYVPASE">
+        <id name="id" column="PYVPASE_PIDM" type="int"/>
 
-        <property name="firstName"/>
-        <property name="middleName"/>
-        <property name="lastName"/>
-        <property name="osuid"/>
-        <property name="onid"/>
-        <property name="email"/>
-        <property name="copySupervisor" type="boolean"/>
-        <property name="active"/>
+        <property name="firstName" column="PYVPASE_FIRST_NAME"/>
+        <property name="middleName" column="PYVPASE_MI"/>
+        <property name="lastName" column="PYVPASE_LAST_NAME"/>
+        <property name="osuid" column="PYVPASE_ID"/>
+        <property name="onid" column="PYVPASE_ONID_LOGIN"/>
+        <property name="email" column="PYVPASE_EMAIL"/>
+        <property name="status" length="1" column="PYVPASE_EMPL_STATUS"/>
     </class>
 
 </hibernate-mapping>

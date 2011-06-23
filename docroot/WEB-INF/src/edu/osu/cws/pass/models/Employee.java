@@ -18,15 +18,17 @@ public class Employee extends Pass {
 
     private String email;
 
-    private Boolean copySupervisor;
-
-    private Boolean active;
+    private String status;
 
     public String getName() {
         return lastName + ", " + firstName;
     }
 
     public Employee() { }
+
+    public Employee(int id) {
+        this.id = id;
+    }
 
     public int getId() {
         return id;
@@ -84,19 +86,11 @@ public class Employee extends Pass {
         this.email = email;
     }
 
-    public Boolean getCopySupervisor() {
-        return copySupervisor;
+    public String getStatus() {
+        return status;
     }
 
-    public void setCopySupervisor(Boolean copySupervisor) {
-        this.copySupervisor = copySupervisor;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

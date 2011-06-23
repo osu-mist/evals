@@ -140,7 +140,7 @@ public class Appraisal extends Pass {
         // If there were any previous validation errors remove them
         this.errors.remove("job");
 
-        if (this.job == null || this.job.getId() == 0) {
+        if (this.job == null || this.job.getEmployee() == null || this.job.getEmployee().getId() == 0) {
             jobErrors.add(jobRequired);
         }
 

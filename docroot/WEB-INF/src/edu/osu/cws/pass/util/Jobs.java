@@ -96,7 +96,7 @@ public class Jobs {
      */
     public boolean isSupervisor(int pidm) throws Exception {
         String query = "select count(*) from edu.osu.cws.pass.models.Job where endDate IS NULL " +
-                "AND supervisor.employee.id = :pidm AND employee.active = 1";
+                "AND supervisor.employee.id = :pidm AND employee.status = 'A'";
 
         Session session = HibernateUtil.getCurrentSession();
         int employeeCount = 0;

@@ -59,7 +59,7 @@ public class AppraisalsTest {
     public Object[][] loadJob() {
         Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
-        Job job = (Job) hsession.load(Job.class, 1);
+        Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         tx.commit();
 
         return new Object[][] {
@@ -126,7 +126,7 @@ public class AppraisalsTest {
     public Appraisal loadAppraisalAssessments() throws Exception {
         Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
-        Job job = (Job) hsession.load(Job.class, 1);
+        Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         tx.commit();
 
         int appraisalID =  appraisals.createAppraisal(job, Appraisal.TYPE_ANNUAL);
@@ -157,7 +157,7 @@ public class AppraisalsTest {
         // Create the appraisal for this test
         Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
-        Job job = (Job) hsession.load(Job.class, 1);
+        Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         tx.commit();
         int appraisalID =  appraisals.createAppraisal(job, Appraisal.TYPE_ANNUAL);
 

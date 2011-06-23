@@ -1,5 +1,6 @@
 package edu.osu.cws.pass.tests;
 
+import edu.osu.cws.pass.models.Employee;
 import edu.osu.cws.pass.models.Job;
 import edu.osu.cws.pass.models.ModelException;
 import edu.osu.cws.pass.util.HibernateUtil;
@@ -23,12 +24,12 @@ public class JobsTest {
     public void shouldFindSupervisorIfNoDirectSupervisor() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
-        job = (Job) session.load(Job.class, 4);
+        job = (Job) session.load(Job.class, new Job(new Employee(12345), "333", "00"));
         tx.commit();
 
         Job supervisor = jobs.getSupervisor(job);
         assert supervisor != null;
-        assert supervisor.getId() == 6 : "Incorrect supervisor found";
+        assert supervisor.getEmployee().getId() == 56198 : "Incorrect supervisor pidm found";
     }
 
     public void shouldFindUppserSupervisor() throws ModelException {

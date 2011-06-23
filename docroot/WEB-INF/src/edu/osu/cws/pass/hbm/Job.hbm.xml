@@ -3,30 +3,43 @@
 
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
-    <class name="edu.osu.cws.pass.models.Job" table="jobs">
-        <id name="id" type="int">
-            <generator class="native" />
-        </id>
+    <class name="edu.osu.cws.pass.models.Job" table="PYVPASJ">
+        <composite-id>
+            <key-many-to-one name="employee"
+                             class="edu.osu.cws.pass.models.Employee"
+                             column="PYVPASJ_PIDM"
+            />
+            <key-property name="positionNumber" column="PYVPASJ_POSN"/>
+            <key-property name="suffix" column="PYVPASJ_SUFF"/>
+        </composite-id>
 
-        <property name="status" type="string" length="1"/>
-        <property name="jobTitle" type="string" length="255"/>
-        <property name="positionNumber" type="string" length="8"/>
-        <property name="suffix" type="string" length="2"/>
-        <property name="jobEcls" type="string" length="45"/>
-        <property name="beginDate" type="date"/>
-        <property name="endDate" type="date"/>
+        <property name="status" type="string" length="1" column="PYVPASJ_STATUS"/>
+        <property name="jobTitle" type="string" length="255" column="PYVPASJ_DESC"/>
+        <!--<property name="positionNumber" type="string" length="8" column="PYVPASJ_POSN"/>-->
+        <!--<property name="suffix" type="string" length="2" column="PYVPASJ_SUFF"/>-->
+        <property name="jobEcls" type="string" length="45" column="PYVPASJ_ECLS_CODE"/>
+        <property name="beginDate" type="date" column="PYVPASJ_BEGIN_DATE"/>
+        <property name="endDate" type="date" column="PYVPASJ_END_DATE"/>
         <property name="positionClass" type="string" length="45"/>
-        <property name="tsOrgCode" type="string" length="45"/>
-        <property name="orgCodeDescription" type="string" length="45"/>
-        <property name="businessCenterName" type="string" length="4"/>
-        <property name="appointmentType" length="45"/>
+        <property name="tsOrgCode" type="string" length="45" column="PYVPASJ_ORGN_CODE_TS"/>
+        <property name="orgCodeDescription" type="string" length="45" column="PYVPASJ_ORGN_DESC"/>
+        <property name="businessCenterName" type="string" length="4" column="PYVPASJ_BCTR_TITLE"/>
+        <property name="appointmentType" length="45" column="PYVPASJ_APPOINTMENT_TYPE"/>
+        <property name="pclsCode" length="45" column="PYVPASJ_PCLS_CODE"/>
+        <property name="salaryGrade" length="45" column="PYVPASJ_SAL_GRADE"/>
+        <property name="salaryStep" length="3" column="PYVPASJ_SAL_STEP"/>
+        <property name="trialInd" length="45" column="PYVPASJ_TRIAL_IND"/>
+        <property name="annualInd" length="45" column="PYVPASJ_ANNUAL_IND"/>
+        <property name="evalDate" length="45" column="PYVPASJ_EVAL_DATE"/>
 
-        <many-to-one name="employee" class="edu.osu.cws.pass.models.Employee"
-                     column="employeeID"
-                     not-null="false"/>
-        <many-to-one name="supervisor" class="edu.osu.cws.pass.models.Job"
-                     column="supervisorJobID"
-                     not-null="false"/>
+        <!--<many-to-one name="employee" class="edu.osu.cws.pass.models.Employee"-->
+                     <!--column="PYVPASJ_PIDM"-->
+                     <!--not-null="false"/>-->
+        <many-to-one name="supervisor" class="edu.osu.cws.pass.models.Job" not-null="false">
+            <column name="PYVPASJ_SUPERVISOR_PIDM"/>
+            <column name="PYVPASJ_SUPERVISOR_POSN"/>
+            <column name="PYVPASJ_SUPERVISOR_SUFF"/>
+        </many-to-one>
     </class>
 
 </hibernate-mapping>

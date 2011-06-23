@@ -2,8 +2,6 @@ package edu.osu.cws.pass.tests;
 
 import edu.osu.cws.pass.models.Employee;
 import edu.osu.cws.pass.util.Employees;
-import edu.osu.cws.pass.util.HibernateUtil;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 @Test
@@ -21,7 +19,7 @@ public class EmployeesTest {
 
         assert employee != null : "The employee object should not be null";
         assert employee.getId() == 12345 : "Id should be valid";
-        assert employee.isActive() : "Employee should be active";
+        assert employee.getStatus().equals("A") : "Employee should be active";
 
 
     }

@@ -3,9 +3,10 @@
  */
 package edu.osu.cws.pass.models;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Job extends Pass {
+public class Job extends Pass implements Serializable {
     private int id;
 
     private Employee employee;
@@ -36,6 +37,18 @@ public class Job extends Pass {
 
     private String businessCenterName;
 
+    private String pclsCode;
+
+    private String salaryGrade;
+
+    private String salaryStep;
+
+    private String trialInd;
+
+    private String annualInd;
+
+    private String evalDate;
+
     /**
      * This property holds the job of the current supervisor. If
      * this.supervisor.employee != null, then currentSupervisor holds
@@ -44,6 +57,14 @@ public class Job extends Pass {
      * employee associated to it.
      */
     private Job currentSupervisor;
+
+    public Job() { }
+
+    public Job(Employee employee, String positionNumber, String suffix) {
+        this.employee = employee;
+        this.positionNumber = positionNumber;
+        this.suffix = suffix;
+    }
 
     public int getId() {
         return id;
@@ -171,5 +192,53 @@ public class Job extends Pass {
 
     public void setCurrentSupervisor(Job currentSupervisor) {
         this.currentSupervisor = currentSupervisor;
+    }
+
+    public String getPclsCode() {
+        return pclsCode;
+    }
+
+    public void setPclsCode(String pclsCode) {
+        this.pclsCode = pclsCode;
+    }
+
+    public String getSalaryGrade() {
+        return salaryGrade;
+    }
+
+    public void setSalaryGrade(String salaryGrade) {
+        this.salaryGrade = salaryGrade;
+    }
+
+    public String getSalaryStep() {
+        return salaryStep;
+    }
+
+    public void setSalaryStep(String salaryStep) {
+        this.salaryStep = salaryStep;
+    }
+
+    public String getTrialInd() {
+        return trialInd;
+    }
+
+    public void setTrialInd(String trialInd) {
+        this.trialInd = trialInd;
+    }
+
+    public String getAnnualInd() {
+        return annualInd;
+    }
+
+    public void setAnnualInd(String annualInd) {
+        this.annualInd = annualInd;
+    }
+
+    public String getEvalDate() {
+        return evalDate;
+    }
+
+    public void setEvalDate(String evalDate) {
+        this.evalDate = evalDate;
     }
 }
