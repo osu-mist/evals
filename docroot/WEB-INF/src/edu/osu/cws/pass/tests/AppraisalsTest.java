@@ -1,12 +1,11 @@
 package edu.osu.cws.pass.tests;
 
+import edu.osu.cws.pass.hibernate.AppraisalMgr;
+import edu.osu.cws.pass.hibernate.EmployeeMgr;
 import edu.osu.cws.pass.models.*;
-import edu.osu.cws.pass.util.Appraisals;
-import edu.osu.cws.pass.util.Employees;
 import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -17,8 +16,8 @@ import java.util.*;
 public class AppraisalsTest {
 
     Appraisal appraisal = new Appraisal();
-    Appraisals appraisals = new Appraisals();
-    Employees employees = new Employees();
+    AppraisalMgr appraisalMgr = new AppraisalMgr();
+    EmployeeMgr employeeMgr = new EmployeeMgr();
     Employee employee = new Employee();
     /**
      * This setup method is run before this class gets executed in order to
@@ -33,22 +32,22 @@ public class AppraisalsTest {
     }
 
     /**
-     * This method tests that the Appraisals class can create an appraisal given a Job object.
+     * This method tests that the AppraisalMgr class can create an appraisal given a Job object.
      *
      * @throws Exception
      */
     @Test(groups = {"unittest"}, dataProvider = "job")
     public void shouldCreateAnAppraisal(Job job) throws Exception {
-        assert appraisals.createAppraisal(job, Appraisal.TYPE_ANNUAL) != 0 :
-                "Appraisals.createAppraisal should return id of appraisal";
+        assert appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL) != 0 :
+                "AppraisalMgr.createAppraisal should return id of appraisal";
     }
 
     @Test(groups = {"unittest"},  expectedExceptions = ModelException.class)
     public void appraisalShouldRequireValidJob() throws Exception {
         Job invalidJob = new Job();
 
-        assert appraisals.createAppraisal(invalidJob, Appraisal.TYPE_ANNUAL) != 0 :
-                "Appraisals.createAppraisal should require valid Job";
+        assert appraisalMgr.createAppraisal(invalidJob, Appraisal.TYPE_ANNUAL) != 0 :
+                "AppraisalMgr.createAppraisal should require valid Job";
     }
 
     /**
@@ -78,13 +77,13 @@ public class AppraisalsTest {
         Job job = (Job) hsession.load(Job.class, 1);
         tx.commit();
 
-        int appraisalID =  appraisals.createAppraisal(job, Appraisal.TYPE_ANNUAL);
+        int appraisalID =  appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL);
         hsession = HibernateUtil.getCurrentSession();
         tx = hsession.beginTransaction();
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
         tx.commit();
 
-        employee = employees.findByOnid("luf");
+        employee = employeeMgr.findByOnid("luf");
         updatedAppraisal.setId(appraisalID);
 
         updatedAppraisal.setEvaluator(employee);
@@ -118,7 +117,7 @@ public class AppraisalsTest {
         Appraisal modifiedAppraisal = loadAppraisalSaveList();
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
-        appraisals.updateAppraisal(modifiedAppraisal);
+        appraisalMgr.updateAppraisal(modifiedAppraisal);
         tx.commit();
         // no exception means success
     }
@@ -129,12 +128,12 @@ public class AppraisalsTest {
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         tx.commit();
 
-        int appraisalID =  appraisals.createAppraisal(job, Appraisal.TYPE_ANNUAL);
+        int appraisalID =  appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL);
         hsession = HibernateUtil.getCurrentSession();
         tx = hsession.beginTransaction();
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
         tx.commit();
-        employee = employees.findByOnid("luf");
+        employee = employeeMgr.findByOnid("luf");
 
         updatedAppraisal.setEvaluator(employee);
         updatedAppraisal.setGoalApprovedDate(new Date());
@@ -159,11 +158,11 @@ public class AppraisalsTest {
         Transaction tx = hsession.beginTransaction();
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         tx.commit();
-        int appraisalID =  appraisals.createAppraisal(job, Appraisal.TYPE_ANNUAL);
+        int appraisalID =  appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL);
 
         // Grab the freshly created appraisal from the db before we start
         // updating the properties.
-        employee = employees.findByOnid("luf");
+        employee = employeeMgr.findByOnid("luf");
         hsession = HibernateUtil.getCurrentSession();
         tx = hsession.beginTransaction();
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
@@ -180,7 +179,7 @@ public class AppraisalsTest {
             assessment.setSupervisorResult("supervisor results txt");
         }
 
-        appraisals.updateAppraisal(updatedAppraisal);
+        appraisalMgr.updateAppraisal(updatedAppraisal);
         tx.commit();
 
 
@@ -205,10 +204,10 @@ public class AppraisalsTest {
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assessment.setGoal("first edit of goal");
         }
-        appraisals.setLoggedInUser(modifiedAppraisal.getJob().getEmployee());
+        appraisalMgr.setLoggedInUser(modifiedAppraisal.getJob().getEmployee());
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
-        appraisals.updateAppraisal(modifiedAppraisal);
+        appraisalMgr.updateAppraisal(modifiedAppraisal);
         tx.commit();
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assert assessment.getGoal() != null :
@@ -221,10 +220,10 @@ public class AppraisalsTest {
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assessment.setGoal("second edit of goal");
         }
-        appraisals.setLoggedInUser(new Employees().findByOnid("luf"));
+        appraisalMgr.setLoggedInUser(new EmployeeMgr().findByOnid("luf"));
         session = HibernateUtil.getCurrentSession();
         tx = session.beginTransaction();
-        appraisals.updateAppraisal(modifiedAppraisal);
+        appraisalMgr.updateAppraisal(modifiedAppraisal);
         tx.commit();
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assert assessment.getGoal().equals("second edit of goal") :
@@ -237,7 +236,7 @@ public class AppraisalsTest {
     @Test(groups = "unittest")
     public void shouldFindAllEmployeeActiveAppraisals() throws Exception {
         int pidm = 12345;
-        ArrayList<HashMap> myActiveAppraisals = appraisals.getAllMyActiveAppraisals(pidm);
+        ArrayList<HashMap> myActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(pidm);
         assert myActiveAppraisals.size() == 4 : "Invalid size of active appraisals";
         for (HashMap ap : myActiveAppraisals) {
             assert ap.get("id") != new Integer(0) : "id should be present in list of appraisals";
@@ -251,7 +250,7 @@ public class AppraisalsTest {
     @Test(groups = "unittest")
     public void shouldFindAllTeamActiveAppraisals() throws Exception {
         int pidm = 12467;
-        List<HashMap> teamActiveAppraisals = appraisals.getMyTeamsActiveAppraisals(pidm);
+        List<HashMap> teamActiveAppraisals = appraisalMgr.getMyTeamsActiveAppraisals(pidm);
         assert teamActiveAppraisals.size() == 4 : "Invalid size of team active appraisals";
         for (HashMap ap : teamActiveAppraisals) {
             assert ap.get("id") != new Integer(0) :
@@ -278,7 +277,7 @@ public class AppraisalsTest {
         Appraisal appraisal = (Appraisal) session.load(Appraisal.class, 1);
 
         int invalidPidm = 1111;
-        assert appraisals.getRole(appraisal, invalidPidm).equals("");
+        assert appraisalMgr.getRole(appraisal, invalidPidm).equals("");
         tx.commit();
     }
 
@@ -288,7 +287,7 @@ public class AppraisalsTest {
         Appraisal appraisal = (Appraisal) session.load(Appraisal.class, 1);
         tx.commit();
 
-        assert appraisals.getRole(appraisal, 12345).equals("employee");
+        assert appraisalMgr.getRole(appraisal, 12345).equals("employee");
     }
 
     public void shouldDetectReviewerRoleInAppraisal() throws Exception {
@@ -296,19 +295,19 @@ public class AppraisalsTest {
         Transaction tx = session.beginTransaction();
         Appraisal appraisal = (Appraisal) session.load(Appraisal.class, 1);
 
-        assert appraisals.getRole(appraisal, 787812).equals("reviewer");
+        assert appraisalMgr.getRole(appraisal, 787812).equals("reviewer");
         tx.commit();
     }
 
     public void shouldOnlyIncludeReviewDueOrReviewPastDueInAppraisalReviewList() throws Exception {
-        for (HashMap appraisal : appraisals.getReviews("UABC")) {
+        for (HashMap appraisal : appraisalMgr.getReviews("UABC")) {
             assert appraisal.get("status").equals("review-due")
                     || appraisal.get("status").equals("review-past-due");
         }
     }
 
     public void getReviewsShouldIncludeOnlyNeededFields() throws Exception {
-        for (HashMap appraisal : appraisals.getReviews("UABC")) {
+        for (HashMap appraisal : appraisalMgr.getReviews("UABC")) {
             assert appraisal.containsKey("id") : "Missing appraisalID";
             assert appraisal.containsKey("employeeName") : "Missing employeeName";
             assert appraisal.containsKey("jobTitle") : "Missing jobTitle";
@@ -320,8 +319,8 @@ public class AppraisalsTest {
     }
 
     public void shouldReturnCorrectReviewCount() throws Exception {
-        assert appraisals.getReviewCount("UABC") == 2;
-        assert appraisals.getReviewCount("foobar") == 0;
+        assert appraisalMgr.getReviewCount("UABC") == 2;
+        assert appraisalMgr.getReviewCount("foobar") == 0;
     }
 
 }

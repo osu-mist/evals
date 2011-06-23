@@ -1,13 +1,14 @@
-package edu.osu.cws.pass.util;
+package edu.osu.cws.pass.hibernate;
 
 import edu.osu.cws.pass.models.Job;
 import edu.osu.cws.pass.models.ModelException;
+import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.List;
 
-public class Jobs {
+public class JobMgr {
 
     /**
      * Given a job, it finds the matching supervisor even if the direct supervising

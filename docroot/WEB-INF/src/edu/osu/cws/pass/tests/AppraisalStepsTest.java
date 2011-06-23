@@ -1,16 +1,13 @@
 package edu.osu.cws.pass.tests;
 
-import edu.osu.cws.pass.util.AppraisalSteps;
-import edu.osu.cws.pass.util.HibernateUtil;
-import edu.osu.cws.pass.util.PermissionRules;
-import org.testng.annotations.BeforeClass;
+import edu.osu.cws.pass.hibernate.AppraisalStepMgr;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
 
 public class AppraisalStepsTest {
-    AppraisalSteps appraisalSteps = new AppraisalSteps();
+    AppraisalStepMgr appraisalStepMgr = new AppraisalStepMgr();
 
     /**
      * This setup method is run before this class gets executed in order to
@@ -26,13 +23,13 @@ public class AppraisalStepsTest {
 
     @Test(groups = {"unittest"})
     public void shouldListAllSteps() throws Exception {
-        HashMap steps = appraisalSteps.list();
+        HashMap steps = appraisalStepMgr.list();
         //@todo: does the test below make sense without the original status in the appraisal_step
         // table?
         assert steps.containsKey("submit-Classified") : "Missing step in hashmap";
         assert steps.containsKey("require-modification-Classified") : "Missing step in hashmap";
         assert steps.size() == 2 :
-                "AppraisalSteps.list() should find all appraisalSteps";
+                "AppraisalStepMgr.list() should find all appraisalSteps";
 
     }
 }

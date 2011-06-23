@@ -1,13 +1,14 @@
-package edu.osu.cws.pass.util;
+package edu.osu.cws.pass.hibernate;
 
 import edu.osu.cws.pass.models.Reviewer;
+import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.HashMap;
 import java.util.List;
 
-public class Reviewers {
+public class ReviewerMgr {
     /**
      * Uses list(session) method to grab a list of reviewers. Then
      * it creates a map of admins using "pidm" as the key and the

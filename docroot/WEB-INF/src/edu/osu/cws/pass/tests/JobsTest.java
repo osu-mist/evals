@@ -1,10 +1,10 @@
 package edu.osu.cws.pass.tests;
 
+import edu.osu.cws.pass.hibernate.JobMgr;
 import edu.osu.cws.pass.models.Employee;
 import edu.osu.cws.pass.models.Job;
 import edu.osu.cws.pass.models.ModelException;
 import edu.osu.cws.pass.util.HibernateUtil;
-import edu.osu.cws.pass.util.Jobs;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.testng.annotations.BeforeMethod;
@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 @Test
 public class JobsTest {
     Job job = new Job();
-    Jobs jobs = new Jobs();
+    JobMgr jobMgr = new JobMgr();
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -27,7 +27,7 @@ public class JobsTest {
         job = (Job) session.load(Job.class, new Job(new Employee(12345), "333", "00"));
         tx.commit();
 
-        Job supervisor = jobs.getSupervisor(job);
+        Job supervisor = jobMgr.getSupervisor(job);
         assert supervisor != null;
         assert supervisor.getEmployee().getId() == 56198 : "Incorrect supervisor pidm found";
     }
@@ -39,7 +39,7 @@ public class JobsTest {
         tx.commit();
         int pidm = 990871;
 
-        assert jobs.isUpperSupervisor(job, pidm) : "failed to find detect upper supervisor";
+        assert jobMgr.isUpperSupervisor(job, pidm) : "failed to find detect upper supervisor";
     }
 
     public void shouldNotFindUpperSupervisorForTopSupervisor() throws ModelException {
@@ -49,11 +49,11 @@ public class JobsTest {
         tx.commit();
         int pidm = 990871;
 
-        assert !jobs.isUpperSupervisor(job, pidm) : "should not have found an upper supervisor";
+        assert !jobMgr.isUpperSupervisor(job, pidm) : "should not have found an upper supervisor";
     }
 
     public void shouldCorrectlyDetectEmployeeSupervisor() throws Exception {
-        assert jobs.isSupervisor(990871) : "isSupervisor() should count employees correctly";
-        assert !jobs.isSupervisor(12345) : "isSupervisor() should not count inactive employees";
+        assert jobMgr.isSupervisor(990871) : "isSupervisor() should count employees correctly";
+        assert !jobMgr.isSupervisor(12345) : "isSupervisor() should not count inactive employees";
     }
 }

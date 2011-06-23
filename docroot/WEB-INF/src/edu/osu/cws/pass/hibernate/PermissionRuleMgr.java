@@ -1,6 +1,7 @@
-package edu.osu.cws.pass.util;
+package edu.osu.cws.pass.hibernate;
 
 import edu.osu.cws.pass.models.PermissionRule;
+import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -9,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class PermissionRules {
+public class PermissionRuleMgr {
 
     /**
      * Uses list(session) method to grab a list of PermissionRule. Then

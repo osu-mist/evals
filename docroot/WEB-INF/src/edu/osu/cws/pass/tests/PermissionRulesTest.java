@@ -1,17 +1,14 @@
 package edu.osu.cws.pass.tests;
 
-import edu.osu.cws.pass.util.HibernateUtil;
-import edu.osu.cws.pass.util.PermissionRules;
+import edu.osu.cws.pass.hibernate.PermissionRuleMgr;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Test
 public class PermissionRulesTest {
-    PermissionRules permissionRules = new PermissionRules();
+    PermissionRuleMgr permissionRuleMgr = new PermissionRuleMgr();
 
     /**
      * This setup method is run before this class gets executed in order to
@@ -27,11 +24,11 @@ public class PermissionRulesTest {
 
     @Test(groups = {"unittest"})
     public void shouldListAllPermissionRules() throws Exception {
-        HashMap rules = permissionRules.list();
+        HashMap rules = permissionRuleMgr.list();
         assert rules.containsKey("goals-due-employee") : "Invalid key in permissions rules";
         assert rules.containsKey("goals-due-immediate-supervisor") : "Invalid key in permissions rules";
         assert rules.size() == 2 :
-        "PermissionRules.list() should find all permission rules";
+        "PermissionRuleMgr.list() should find all permission rules";
 
     }
 }

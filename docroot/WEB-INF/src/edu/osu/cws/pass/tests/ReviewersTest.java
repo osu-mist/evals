@@ -1,7 +1,6 @@
 package edu.osu.cws.pass.tests;
 
-import edu.osu.cws.pass.util.HibernateUtil;
-import edu.osu.cws.pass.util.Reviewers;
+import edu.osu.cws.pass.hibernate.ReviewerMgr;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -9,7 +8,7 @@ import java.util.HashMap;
 
 @Test
 public class ReviewersTest {
-    Reviewers reviewers = new Reviewers();
+    ReviewerMgr reviewerMgr = new ReviewerMgr();
 
     /**
      * This setup method is run before this class gets executed in order to
@@ -25,7 +24,7 @@ public class ReviewersTest {
 
     @Test(groups = {"unittest"})
     public void shouldListReviewers() throws Exception {
-        HashMap reviewersList = reviewers.list();
+        HashMap reviewersList = reviewerMgr.list();
         assert reviewersList.size() == 2 : "Invalid list of reviewers";
         assert reviewersList.containsKey(787812) : "Missing reviewer from list";
         assert reviewersList.containsKey(8712359) : "Missing reviewer from list";

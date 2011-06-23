@@ -3,10 +3,10 @@
  */
 package edu.osu.cws.pass.tests;
 
+import edu.osu.cws.pass.hibernate.CriteriaMgr;
 import edu.osu.cws.pass.models.*;
 
 
-import edu.osu.cws.pass.util.Criteria;
 import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -19,7 +19,7 @@ public class CriteriaTests {
 
     CriterionArea criterionObject = new CriterionArea();
     CriterionDetail criteriaDetailObject = new CriterionDetail();
-    Criteria criteriaObject = new Criteria();
+    CriteriaMgr criteriaMgrObject = new CriteriaMgr();
 
     /**
      * This setup method is run before this class gets executed in order to
@@ -42,7 +42,7 @@ public class CriteriaTests {
     public void initializeObjects() throws Exception {
         criterionObject = new CriterionArea();
         criteriaDetailObject = new CriterionDetail();
-        criteriaObject = new Criteria();
+        criteriaMgrObject = new CriteriaMgr();
         setUp();
     }
 
@@ -80,7 +80,7 @@ public class CriteriaTests {
     @Test(groups = {"unittest"})
     public void returnActiveCriteriaForClassified() throws ModelException, Exception {
         setUp();
-        List activeCriteriaList = criteriaObject.list(Criteria.DEFAULT_APPOINTMENT_TYPE);
+        List activeCriteriaList = criteriaMgrObject.list(CriteriaMgr.DEFAULT_APPOINTMENT_TYPE);
         CriterionArea expectedCriteria = new CriterionArea();
         CriterionArea expectedCriteria2 = new CriterionArea();
         CriterionDetail expectedDetails = new CriterionDetail();
@@ -262,14 +262,14 @@ public class CriteriaTests {
         criterionObject.setAppointmentType(type);
         criterionObject.setSequence(1);
 
-        assert criteriaObject.add(criterionObject, criteriaDetailObject, createdBy) :
+        assert criteriaMgrObject.add(criterionObject, criteriaDetailObject, createdBy) :
                     "Valid data should save";
     }
 
     @Test (groups = {"unittest"})
     public void shouldReturnNextAvailableSequence() throws Exception {
         setUp();
-        assert criteriaObject.getNextSequence(Criteria.DEFAULT_APPOINTMENT_TYPE) == 3 :
+        assert criteriaMgrObject.getNextSequence(CriteriaMgr.DEFAULT_APPOINTMENT_TYPE) == 3 :
                 "Incorrect calculation of next sequence";
 
     }

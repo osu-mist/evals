@@ -1,12 +1,13 @@
-package edu.osu.cws.pass.util;
+package edu.osu.cws.pass.hibernate;
 
 import edu.osu.cws.pass.models.AppointmentType;
+import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.List;
 
-public class AppointmentTypes {
+public class AppointmentTypeMgr {
 
     /**
      * Uses hibernate to fetch and return a list of AppointmentType hibernate POJOs.

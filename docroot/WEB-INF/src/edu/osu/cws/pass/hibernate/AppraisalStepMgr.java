@@ -1,6 +1,7 @@
-package edu.osu.cws.pass.util;
+package edu.osu.cws.pass.hibernate;
 
 import edu.osu.cws.pass.models.AppraisalStep;
+import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -8,7 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-public class AppraisalSteps {
+public class AppraisalStepMgr {
 
     /**
      * Uses list(session) method to grab a list of AppraisalStep. Then

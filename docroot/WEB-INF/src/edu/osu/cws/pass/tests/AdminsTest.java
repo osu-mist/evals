@@ -1,18 +1,13 @@
 package edu.osu.cws.pass.tests;
 
-import edu.osu.cws.pass.models.Admin;
-import edu.osu.cws.pass.util.Admins;
-import edu.osu.cws.pass.util.HibernateUtil;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import edu.osu.cws.pass.hibernate.AdminMgr;
 import org.testng.annotations.*;
 
 import java.util.HashMap;
-import java.util.List;
 
 @Test
 public class AdminsTest {
-    Admins admins = new Admins();
+    AdminMgr adminMgr = new AdminMgr();
 
     /**
      * This setup method is run before this class gets executed in order to
@@ -27,7 +22,7 @@ public class AdminsTest {
     }
 
     public void shouldListAdmins() throws Exception {
-        HashMap adminsList = admins.list();
+        HashMap adminsList = adminMgr.list();
         assert adminsList.size() == 2 : "Invalid list of admins";
         assert adminsList.containsKey(12345) : "Invalid admin in list";
         assert adminsList.containsKey(12467) : "Invalid admin in list";

@@ -9,6 +9,8 @@ package edu.osu.cws.pass.portlet;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import edu.osu.cws.pass.hibernate.AppraisalStepMgr;
+import edu.osu.cws.pass.hibernate.PermissionRuleMgr;
 import edu.osu.cws.pass.util.*;
 import edu.osu.cws.util.ExceptionHandler;
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -41,8 +43,8 @@ public class PASSPortlet extends GenericPortlet {
      */
     private static final String defaultProperties = "default.properties";
 
-    private PermissionRules permissionRules = new PermissionRules();
-    private AppraisalSteps appraisalSteps = new AppraisalSteps();
+    private PermissionRuleMgr permissionRuleMgr = new PermissionRuleMgr();
+    private AppraisalStepMgr appraisalStepMgr = new AppraisalStepMgr();
 
     /**
      * Helper Liferay object to store error messages into the server's log file
@@ -166,7 +168,7 @@ public class PASSPortlet extends GenericPortlet {
 
     /**
      * Takes care of initializing portlet variables and storing them in the portletContext.
-     * Some of these variables are: permissionRules, appraisalSteps, reviewers, admins and
+     * Some of these variables are: permissionRuleMgr, appraisalStepMgr, reviewers, admins and
      * environment properties. This method is called everytime a doView, processAction or
      * serveResource are called, but the code inside only executes the first time.
      *
@@ -176,8 +178,8 @@ public class PASSPortlet extends GenericPortlet {
     private void portletSetup(PortletRequest request) throws Exception {
         if (getPortletContext().getAttribute("environmentProp") == null) {
             loadEnvironmentProperties(request);
-            getPortletContext().setAttribute("permissionRules", permissionRules.list());
-            getPortletContext().setAttribute("appraisalSteps", appraisalSteps.list());
+            getPortletContext().setAttribute("permissionRules", permissionRuleMgr.list());
+            getPortletContext().setAttribute("appraisalSteps", appraisalStepMgr.list());
             loadResourceBundle();
 
             actionClass.setPortletContext(getPortletContext());

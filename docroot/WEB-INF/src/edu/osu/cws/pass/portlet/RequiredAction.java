@@ -1,4 +1,4 @@
-package edu.osu.cws.pass.models;
+package edu.osu.cws.pass.portlet;
 
 
 import java.text.MessageFormat;

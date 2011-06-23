@@ -3,17 +3,18 @@
  * receives POJOs. It performs business logic with POJOs and uses Hibernate to save
  * them back to database if appropriate.
  */
-package edu.osu.cws.pass.util;
+package edu.osu.cws.pass.hibernate;
 
 import edu.osu.cws.pass.models.*;
+import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.*;
 
 import java.util.Iterator;
 import java.util.List;
 
-public class Criteria {
+public class CriteriaMgr {
 
-    private Employees employees = new Employees();
+    private EmployeeMgr employeeMgr = new EmployeeMgr();
 
     /**
      * The default appointment type to use when displaying criteria information.

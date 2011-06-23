@@ -1,17 +1,18 @@
-package edu.osu.cws.pass.util;
+package edu.osu.cws.pass.hibernate;
 
 import edu.osu.cws.pass.models.*;
+import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.*;
 
-public class Appraisals {
+public class AppraisalMgr {
     private Employee loggedInUser;
 
     private Appraisal appraisal = new Appraisal();
-    private Criteria criteria = new Criteria();
-    private Jobs jobs = new Jobs();
+    private CriteriaMgr criteriaMgr = new CriteriaMgr();
+    private JobMgr jobMgr = new JobMgr();
     private HashMap appraisalSteps;
     private HashMap permissionRules;
 
@@ -19,7 +20,7 @@ public class Appraisals {
     // instead we display in-review
     private ArrayList<String> statusHiddenFromEmployee = new ArrayList<String>();
 
-    public Appraisals() {
+    public AppraisalMgr() {
         statusHiddenFromEmployee.add("appraisal-due");
         statusHiddenFromEmployee.add("appraisal-past-due");
         statusHiddenFromEmployee.add("review-due");
@@ -51,7 +52,7 @@ public class Appraisals {
 
         if (appraisal.validate()) {
             String appointmentType = job.getAppointmentType();
-            List<CriterionArea> criteriaList = criteria.list(appointmentType);
+            List<CriterionArea> criteriaList = criteriaMgr.list(appointmentType);
             Session session = HibernateUtil.getCurrentSession();
             try {
                 Transaction tx = session.beginTransaction();
@@ -478,7 +479,7 @@ public class Appraisals {
             return "employee";
         }
 
-        supervisor = jobs.getSupervisor(appraisal.getJob());
+        supervisor = jobMgr.getSupervisor(appraisal.getJob());
         if (supervisor != null && pidm == supervisor.getEmployee().getId()) {
             return "supervisor";
         }
@@ -495,7 +496,7 @@ public class Appraisals {
             return "reviewer";
         }
 
-        if (jobs.isUpperSupervisor(appraisal.getJob(), pidm)) {
+        if (jobMgr.isUpperSupervisor(appraisal.getJob(), pidm)) {
             return "upper-supervisor";
         }
 
@@ -523,7 +524,7 @@ public class Appraisals {
             appraisalStatus = appraisal.getStatus();
             tx.commit();
 
-            Job supervisorJob = jobs.getSupervisor(appraisal.getJob());
+            Job supervisorJob = jobMgr.getSupervisor(appraisal.getJob());
             appraisal.getJob().setCurrentSupervisor(supervisorJob);
 
             if (userRole.equals("employee") && statusHiddenFromEmployee.contains(appraisalStatus)) {

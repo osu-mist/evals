@@ -5,10 +5,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
+import edu.osu.cws.pass.hibernate.*;
 import edu.osu.cws.pass.models.*;
-import edu.osu.cws.pass.util.*;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import javax.portlet.*;
 import java.util.*;
@@ -19,19 +17,19 @@ import java.util.*;
 public class Actions {
     private static Log _log = LogFactoryUtil.getLog(Actions.class);
 
-    private Employees employees = new Employees();
+    private EmployeeMgr employeeMgr = new EmployeeMgr();
 
-    private Jobs jobs = new Jobs();
+    private JobMgr jobMgr = new JobMgr();
 
-    private AppointmentTypes appointmentTypes = new AppointmentTypes();
+    private AppointmentTypeMgr appointmentTypeMgr = new AppointmentTypeMgr();
 
-    private Admins admins = new Admins();
+    private AdminMgr adminMgr = new AdminMgr();
 
-    private Reviewers reviewers = new Reviewers();
+    private ReviewerMgr reviewerMgr = new ReviewerMgr();
 
     private PortletContext portletContext;
 
-    private Appraisals appraisals = new Appraisals();
+    private AppraisalMgr appraisalMgr = new AppraisalMgr();
 
     /**
      * Takes the request object and creates POJO objects. Then it calls the respective
@@ -43,13 +41,13 @@ public class Actions {
      * @throws Exception
      */
     public String addCriteria(PortletRequest request, PortletResponse response) throws Exception {
-        Criteria criteriaArea= new Criteria();
+        CriteriaMgr criteriaMgrArea = new CriteriaMgr();
         CriterionArea criterionArea = new CriterionArea();
         CriterionDetail criterionDetail = new CriterionDetail();
         Employee loggedOnUser = getLoggedOnUser(request);
 
         // Fetch list of appointment types to use in add form
-        request.setAttribute("appointmentTypes", new AppointmentTypes().list());
+        request.setAttribute("appointmentTypes", new AppointmentTypeMgr().list());
 
         // When the criterionAreaId == null means that the user clicks on the Add Criteria
         // link. Otherwise the form was submitted
@@ -64,7 +62,7 @@ public class Actions {
             criterionDetail.setDescription(description);
 
             try {
-                if (criteriaArea.add(criterionArea, criterionDetail, loggedOnUser)) {
+                if (criteriaMgrArea.add(criterionArea, criterionDetail, loggedOnUser)) {
                     SessionMessages.add(request, "criteria-saved");
                     return listCriteria(request, response);
                 }
@@ -101,10 +99,10 @@ public class Actions {
      */
     public String listCriteria(PortletRequest request, PortletResponse response) throws  Exception {
         String appointmentType = ParamUtil.getString(request, "appointmentType",
-                Criteria.DEFAULT_APPOINTMENT_TYPE);
+                CriteriaMgr.DEFAULT_APPOINTMENT_TYPE);
 
         try {
-            List<CriterionArea> criterionList = new Criteria().list(appointmentType);
+            List<CriterionArea> criterionList = new CriteriaMgr().list(appointmentType);
             request.setAttribute("criteria", criterionList);
         } catch (ModelException e) {
             addErrorsToRequest(request, e.getMessage());
@@ -150,10 +148,10 @@ public class Actions {
         Employee employee = getLoggedOnUser(request);
         int employeeId = employee.getId();
 
-        ArrayList<HashMap> allMyActiveAppraisals = appraisals.getAllMyActiveAppraisals(employeeId);
+        ArrayList<HashMap> allMyActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(employeeId);
         request.setAttribute("myActiveAppraisals", allMyActiveAppraisals);
-        if (jobs.isSupervisor(employeeId)) {
-            List<HashMap> myTeamsActiveAppraisals = appraisals.getMyTeamsActiveAppraisals(employeeId);
+        if (jobMgr.isSupervisor(employeeId)) {
+            List<HashMap> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsActiveAppraisals(employeeId);
             request.setAttribute("myTeamsActiveAppraisals", myTeamsActiveAppraisals);
             request.setAttribute("isSupervisor", true);
         } else {
@@ -176,7 +174,7 @@ public class Actions {
      * @throws Exception
      */
     public void setPassAdmins() throws Exception {
-        portletContext.setAttribute("admins", admins.list());
+        portletContext.setAttribute("admins", adminMgr.list());
     }
 
     /**
@@ -186,7 +184,7 @@ public class Actions {
      * @throws Exception
      */
     public void setPassReviewers() throws Exception {
-        portletContext.setAttribute("reviewers", reviewers.list());
+        portletContext.setAttribute("reviewers", reviewerMgr.list());
     }
 
 
@@ -200,7 +198,7 @@ public class Actions {
      */
     public String displayReviewList(PortletRequest request, PortletResponse response) throws Exception {
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
-        ArrayList<HashMap> reviews = appraisals.getReviews(businessCenterName);
+        ArrayList<HashMap> reviews = appraisalMgr.getReviews(businessCenterName);
         request.setAttribute("reviews", reviews);
 
         return "review-list-jsp";
@@ -218,13 +216,13 @@ public class Actions {
     public String displayAppraisal(PortletRequest request, PortletResponse response) throws Exception {
         int appraisalID = ParamUtil.getInteger(request, "id");
         Employee currentlyLoggedOnUser = getLoggedOnUser(request);
-        appraisals.setLoggedInUser(currentlyLoggedOnUser);
+        appraisalMgr.setLoggedInUser(currentlyLoggedOnUser);
         HashMap permissionRules = (HashMap) portletContext.getAttribute("permissionRules");
-        appraisals.setPermissionRules(permissionRules);
+        appraisalMgr.setPermissionRules(permissionRules);
         Boolean showForm = false;
 
-        Appraisal appraisal = appraisals.getAppraisal(appraisalID);
-        PermissionRule permRule = appraisals.getAppraisalPermissionRule(appraisal, true);
+        Appraisal appraisal = appraisalMgr.getAppraisal(appraisalID);
+        PermissionRule permRule = appraisalMgr.getAppraisalPermissionRule(appraisal, true);
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
@@ -269,12 +267,12 @@ public class Actions {
         HashMap appraisalSteps = (HashMap) portletContext.getAttribute("appraisalSteps");
         Employee currentlyLoggedOnUser = getLoggedOnUser(request);
 
-        appraisals.setLoggedInUser(currentlyLoggedOnUser);
-        appraisals.setPermissionRules(permissionRules);
-        appraisals.setAppraisalSteps(appraisalSteps);
+        appraisalMgr.setLoggedInUser(currentlyLoggedOnUser);
+        appraisalMgr.setPermissionRules(permissionRules);
+        appraisalMgr.setAppraisalSteps(appraisalSteps);
 
         try {
-            appraisals.processUpdateRequest(request.getParameterMap(), id);
+            appraisalMgr.processUpdateRequest(request.getParameterMap(), id);
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
         }
@@ -307,7 +305,7 @@ public class Actions {
         Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
         if (loggedOnUser == null) {
             String loggedOnUsername = getLoggedOnUsername(request);
-            loggedOnUser = employees.findByOnid(loggedOnUsername);
+            loggedOnUser = employeeMgr.findByOnid(loggedOnUsername);
             session.setAttribute("loggedOnUser", loggedOnUser);
         }
 
@@ -479,7 +477,7 @@ public class Actions {
      */
     private RequiredAction getReviewerAction(String businessCenterName, ResourceBundle resource)
             throws Exception {
-        int reviewCount = appraisals.getReviewCount(businessCenterName);
+        int reviewCount = appraisalMgr.getReviewCount(businessCenterName);
 
         RequiredAction requiredAction = new RequiredAction();
         if (reviewCount == 0) {

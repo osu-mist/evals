@@ -1,9 +1,7 @@
 package edu.osu.cws.pass.tests;
 
+import edu.osu.cws.pass.hibernate.AppointmentTypeMgr;
 import edu.osu.cws.pass.models.AppointmentType;
-import edu.osu.cws.pass.util.AppointmentTypes;
-import edu.osu.cws.pass.util.HibernateUtil;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -12,18 +10,18 @@ import java.util.List;
 @Test
 public class AppointmentTypesTest {
 
-    AppointmentTypes appointmentTypes = new AppointmentTypes();
+    AppointmentTypeMgr appointmentTypeMgr = new AppointmentTypeMgr();
 
     @BeforeMethod
     public void initializeObjects() throws Exception {
-        appointmentTypes = new AppointmentTypes();
+        appointmentTypeMgr = new AppointmentTypeMgr();
         DBUnit dbunit = new DBUnit();
         dbunit.seedDatabase();
     }
 
     @Test(groups = {"unittest"})
     public void testList() throws Exception {
-        List types = appointmentTypes.list();
+        List types = appointmentTypeMgr.list();
         assert types.size() == 1 : "Invalid number of appointment types.";
         AppointmentType type = (AppointmentType) types.get(0);
         assert type.getName().equals("Classified") : "Invalid appointment type";
