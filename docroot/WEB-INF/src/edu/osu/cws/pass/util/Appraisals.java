@@ -282,7 +282,7 @@ public class Appraisals {
         String appointmentType = appraisal.getJob().getAppointmentType();
         AppraisalStep appraisalStep = getAppraisalStepKey(request, appointmentType, permRule);
         String newStatus = appraisalStep.getNewStatus();
-        if (appraisalStep != null && !newStatus.equals(appraisal.getStatus())) {
+        if (newStatus != null && !newStatus.equals(appraisal.getStatus())) {
 //            _log.error("found appraisalStep "+appraisalStep.toString());
             appraisal.setStatus(newStatus);
             String employeeResponse = appraisal.getRebuttal();
@@ -331,7 +331,7 @@ public class Appraisals {
             }
         }
 
-        return null;
+        return new AppraisalStep();
     }
 
 
@@ -485,7 +485,7 @@ public class Appraisals {
 
         String query = "from edu.osu.cws.pass.models.Reviewer where " +
                 "businessCenterName = :businessCenterName and employee.id = :pidm " +
-                "and employee.active = 1";
+                "and employee.status = 'A'";
         List reviewerList = session.createQuery(query)
                 .setString("businessCenterName", appraisal.getJob().getBusinessCenterName())
                 .setInteger("pidm", pidm)
