@@ -3,7 +3,7 @@
 
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
-    <class name="edu.osu.cws.pass.models.Job" table="PYVPASJ">
+    <class name="edu.osu.cws.pass.models.Job" table="PYVPASJ" mutable="false">
         <composite-id>
             <key-many-to-one name="employee"
                              class="edu.osu.cws.pass.models.Employee"

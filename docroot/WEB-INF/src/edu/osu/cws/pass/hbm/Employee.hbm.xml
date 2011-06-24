@@ -3,7 +3,7 @@
 
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
-    <class name="edu.osu.cws.pass.models.Employee" table="PYVPASE">
+    <class name="edu.osu.cws.pass.models.Employee" table="PYVPASE" mutable="false">
         <id name="id" column="PYVPASE_PIDM" type="int"/>
 
         <property name="firstName" column="PYVPASE_FIRST_NAME"/>
