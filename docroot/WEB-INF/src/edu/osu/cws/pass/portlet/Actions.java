@@ -41,6 +41,12 @@ public class Actions {
      * @throws Exception
      */
     public String addCriteria(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, "You do not have access to add criteria");
+            return displayHomeView(request, response);
+        }
+
         CriteriaMgr criteriaMgrArea = new CriteriaMgr();
         CriterionArea criterionArea = new CriterionArea();
         CriterionDetail criterionDetail = new CriterionDetail();
@@ -98,6 +104,12 @@ public class Actions {
      * @throws Exception
      */
     public String listCriteria(PortletRequest request, PortletResponse response) throws  Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, "You do not have access to list criteria");
+            return displayHomeView(request, response);
+        }
+
         String appointmentType = ParamUtil.getString(request, "appointmentType",
                 CriteriaMgr.DEFAULT_APPOINTMENT_TYPE);
 
@@ -197,6 +209,12 @@ public class Actions {
      * @throws Exception
      */
     public String displayReviewList(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserReviewer(request)) {
+            addErrorsToRequest(request, "You do not have access to review performance evaluation");
+            return displayHomeView(request, response);
+        }
+
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
         ArrayList<HashMap> reviews = appraisalMgr.getReviews(businessCenterName);
         request.setAttribute("reviews", reviews);
@@ -348,7 +366,7 @@ public class Actions {
     /**
      * Takes in a pidm, and looks up in the reviewers HashMap stored in the portlet context
      * to figure out if the current logged in user is a reviewer. If yes, then we return the
-     * Reviewer object if not, it returns false.
+     * Reviewer object if not, it returns null.
      *
      * @param pidm  Pidm of currently logged in user
      * @return Reviewer
@@ -379,6 +397,32 @@ public class Actions {
             return adminMap.get(pidm);
         }
         return null;
+    }
+
+    /**
+     * Returns true if the logged in user is admin, false otherwise.
+     *
+     * @param request
+     * @return boolean
+     * @throws Exception
+     */
+    private boolean isLoggedInUserAdmin(PortletRequest request) throws Exception {
+        int pidm = getLoggedOnUser(request).getId();
+
+        return getAdmin(pidm) != null;
+    }
+
+    /**
+     * Returns true if the logged in user is reviewer, false otherwise.
+     *
+     * @param request
+     * @return boolean
+     * @throws Exception
+     */
+    private boolean isLoggedInUserReviewer(PortletRequest request) throws Exception {
+        int pidm = getLoggedOnUser(request).getId();
+
+        return getReviewer(pidm) != null;
     }
 
     /**
