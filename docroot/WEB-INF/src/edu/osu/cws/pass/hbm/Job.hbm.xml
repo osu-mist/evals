@@ -20,12 +20,11 @@
         <property name="jobEcls" type="string" length="45" column="PYVPASJ_ECLS_CODE"/>
         <property name="beginDate" type="date" column="PYVPASJ_BEGIN_DATE"/>
         <property name="endDate" type="date" column="PYVPASJ_END_DATE"/>
-        <property name="positionClass" type="string" length="45"/>
+        <property name="positionClass" type="string" length="45" column="PYVPASJ_PCLS_CODE"/>
         <property name="tsOrgCode" type="string" length="45" column="PYVPASJ_ORGN_CODE_TS"/>
         <property name="orgCodeDescription" type="string" length="45" column="PYVPASJ_ORGN_DESC"/>
         <property name="businessCenterName" type="string" length="4" column="PYVPASJ_BCTR_TITLE"/>
         <property name="appointmentType" length="45" column="PYVPASJ_APPOINTMENT_TYPE"/>
-        <property name="pclsCode" length="45" column="PYVPASJ_PCLS_CODE"/>
         <property name="salaryGrade" length="45" column="PYVPASJ_SAL_GRADE"/>
         <property name="salaryStep" length="3" column="PYVPASJ_SAL_STEP"/>
         <property name="trialInd" length="45" column="PYVPASJ_TRIAL_IND"/>

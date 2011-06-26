@@ -37,8 +37,6 @@ public class Job extends Pass implements Serializable {
 
     private String businessCenterName;
 
-    private String pclsCode;
-
     private String salaryGrade;
 
     private String salaryStep;
@@ -192,14 +190,6 @@ public class Job extends Pass implements Serializable {
 
     public void setCurrentSupervisor(Job currentSupervisor) {
         this.currentSupervisor = currentSupervisor;
-    }
-
-    public String getPclsCode() {
-        return pclsCode;
-    }
-
-    public void setPclsCode(String pclsCode) {
-        this.pclsCode = pclsCode;
     }
 
     public String getSalaryGrade() {
