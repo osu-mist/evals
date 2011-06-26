@@ -31,11 +31,12 @@
         <property name="reopenedDate" type="timestamp" column="REOPENED_DATE"/>
         <property name="reopenReason" type="text" column="REOPEN_REASON"/>
         <property name="originalStatus" length="32" column="ORIGINAL_STATUS"/>
-        <property name="signatureRequestedDate" type="timestamp"/>
+        <property name="releaseDate" type="timestamp" column="RELEASE_DATE"/>
         <property name="supervisorRebuttalRead" type="timestamp" column="SUPERVISOR_REBUTTAL_READ"/>
         <property name="type" column="TYPE"/>
         <property name="evaluation2Date" type="timestamp" column="EVALUATION2_DATE"/>
         <property name="review2Date" type="timestamp" column="REVIEW2_DATE"/>
+        <property name="release2Date" type="timestamp" column="RELEASE2_DATE"/>
 
         <many-to-one name="job" class="edu.osu.cws.pass.models.Job" not-null="true">
             <column name="PYVPASJ_PIDM"/>

@@ -269,7 +269,7 @@ public class AppraisalMgr {
             appraisal.setEmployeeSignedDate(new Date());
         }
         if (request.get("release-appraisal") != null) {
-            appraisal.setSignatureRequestedDate(new Date());
+            appraisal.setReleaseDate(new Date());
         }
         // Save employee response
         if (permRule.getEmployeeResponse() != null && permRule.getEmployeeResponse().equals("e")) {

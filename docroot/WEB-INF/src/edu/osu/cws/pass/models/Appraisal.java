@@ -79,7 +79,7 @@ public class Appraisal extends Pass {
 
     private Date employeeSignedDate;
 
-    private Date signatureRequestedDate;
+    private Date releaseDate;
 
     private Date supervisorRebuttalRead;
 
@@ -88,6 +88,8 @@ public class Appraisal extends Pass {
     private Date evaluation2Date;
 
     private Date review2Date;
+
+    private Date release2Date;
 
     private Employee evaluator2;
 
@@ -347,12 +349,12 @@ public class Appraisal extends Pass {
         this.employeeSignedDate = employeeSignedDate;
     }
 
-    public Date getSignatureRequestedDate() {
-        return signatureRequestedDate;
+    public Date getReleaseDate() {
+        return releaseDate;
     }
 
-    public void setSignatureRequestedDate(Date signatureRequestedDate) {
-        this.signatureRequestedDate = signatureRequestedDate;
+    public void setReleaseDate(Date releaseDate) {
+        this.releaseDate = releaseDate;
     }
 
     public Date getSupervisorRebuttalRead() {
@@ -401,6 +403,14 @@ public class Appraisal extends Pass {
 
     public void setReviewer2(Employee reviewer2) {
         this.reviewer2 = reviewer2;
+    }
+
+    public Date getRelease2Date() {
+        return release2Date;
+    }
+
+    public void setRelease2Date(Date release2Date) {
+        this.release2Date = release2Date;
     }
 
     public Date getCloseOutDate() {
