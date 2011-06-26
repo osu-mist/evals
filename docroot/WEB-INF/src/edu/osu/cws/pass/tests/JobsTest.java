@@ -10,6 +10,8 @@ import org.hibernate.Transaction;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.List;
+
 @Test
 public class JobsTest {
     Job job = new Job();
@@ -55,5 +57,23 @@ public class JobsTest {
     public void shouldCorrectlyDetectEmployeeSupervisor() throws Exception {
         assert jobMgr.isSupervisor(990871) : "isSupervisor() should count employees correctly";
         assert !jobMgr.isSupervisor(12345) : "isSupervisor() should not count inactive employees";
+    }
+
+
+    /**
+     * Tests that the jobs view is not empty.
+     * Before you run this test method make sure that the beforeMethod in this class is commented out.
+     */
+    public void shouldHaveJobsInView() {
+        List<Job> results = jobMgr.list();
+        Job job;
+
+        // place a breakpoint below if you want to step through the records to make sure
+        // we are getting data from the view
+        for (int i = 0; i < 5; i++) {
+            job = results.get(i);
+            assert job != null;
+        }
+        assert results.size() > 0 : "The list of employees should not be empty";
     }
 }

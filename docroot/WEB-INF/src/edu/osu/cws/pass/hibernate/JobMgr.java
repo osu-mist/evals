@@ -6,6 +6,7 @@ import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class JobMgr {
@@ -113,4 +114,34 @@ public class JobMgr {
         return employeeCount > 0;
     }
 
+    /**
+     * Retrieves a list of Jobs from the database.
+     * @return
+     */
+    public List<Job> list() {
+        Session session = HibernateUtil.getCurrentSession();
+        List results = new ArrayList();
+        try {
+            results = this.list(session);
+
+        } catch (Exception e) {
+            session.close();
+        }
+
+        return results;
+    }
+
+    /**
+     * Retrieves a list of Jobs from the database.
+     *
+     * @param session
+     * @return
+     * @throws Exception
+     */
+    private List<Job> list(Session session) throws Exception {
+        Transaction tx = session.beginTransaction();
+        List<Job> result = session.createQuery("from edu.osu.cws.pass.models.Job").list();
+        tx.commit();
+        return result;
+    }
 }

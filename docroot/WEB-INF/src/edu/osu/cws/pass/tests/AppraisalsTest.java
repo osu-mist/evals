@@ -323,4 +323,17 @@ public class AppraisalsTest {
         assert appraisalMgr.getReviewCount("foobar") == 0;
     }
 
+    /**
+     * This test creates one appraisal for each job in the db.
+     *
+     * @throws Exception
+     */
+/*    public void createAppraisals() throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+        List<Job> results = (List<Job>) session.createQuery("from edu.osu.cws.pass.models.Job where status = 'A'").list();
+        for (Job job : results) {
+            appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL);
+        }
+    }*/
 }
