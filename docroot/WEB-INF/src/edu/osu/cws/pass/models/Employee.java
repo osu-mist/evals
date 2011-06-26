@@ -18,6 +18,12 @@ public class Employee extends Pass {
 
     private String email;
 
+    /**
+     * Possible values of status are:
+     * A - active,
+     * L - leave,
+     * T - terminated
+     */
     private String status;
 
     public String getName() {

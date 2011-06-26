@@ -13,7 +13,8 @@ public class JobMgr {
 
     /**
      * Given a job, it finds the matching supervisor even if the direct supervising
-     * job has no employee associated to it.
+     * job associated to it is not active. Return null is the job has no supervisor
+     * associated to it.
      *
      * @param job
      * @return
@@ -33,26 +34,28 @@ public class JobMgr {
 
     /**
      * Given a job, it finds the matching supervisor even if the direct supervising
-     * job has no employee associated to it.
+     * job associated to it is not active. Return null is the job has no supervisor
+     * associated to it.
      *
      * @param job   The job we are looking for a supervisor
      * @param session
      * @return supervisor job
      */
     private Job getSupervisor(Job job, Session session) {
-        Job currentNode = job.getSupervisor();
+        Job supervisorJob = job.getSupervisor();
 
-        if (currentNode == null) {
+        if (supervisorJob == null) {
             return null;
         }
 
         // Iterate up the supervising chain. If the current supervisor doesn't have an
-        // employee associated, look at the supervisor higher up
-        while (currentNode.getEmployee() == null) {
-            currentNode = currentNode.getSupervisor();
+        // active employee or supervisorJob associated, look at the supervisor higher up
+        while (supervisorJob != null && (!supervisorJob.getStatus().equals("A") ||
+                !supervisorJob.getEmployee().getStatus().equals("A"))) {
+            supervisorJob = supervisorJob.getSupervisor();
         }
 
-        return currentNode;
+        return supervisorJob;
     }
 
     /**
@@ -65,24 +68,27 @@ public class JobMgr {
      * @throws edu.osu.cws.pass.models.ModelException
      */
     public boolean isUpperSupervisor(Job job, int pidm) throws ModelException {
-        Job currentNode = job.getSupervisor();
+        Job supervisorJob = job.getSupervisor();
 
         // If the current job has no supervisor return false right away
-        if (currentNode == null) {
+        if (supervisorJob == null) {
             return false;
         }
 
         // Iterate over the supervising chain. If the supervisor has no employee associated
         // or if the supervisor pidm doesn't match what we're looking for go up the supervising
         // chain.
-        while (currentNode != null &&
-                (currentNode.getEmployee() == null || currentNode.getEmployee().getId() != pidm)) {
-            currentNode = currentNode.getSupervisor();
+        while (supervisorJob != null &&
+                (!supervisorJob.getStatus().equals("A")
+                        || !supervisorJob.getEmployee().getStatus().equals("A")
+                        || supervisorJob.getEmployee().getId() != pidm)) {
+            supervisorJob = supervisorJob.getSupervisor();
         }
 
-        if (currentNode == null || currentNode.getEmployee() == null) {
+        if (supervisorJob == null || !supervisorJob.getStatus().equals("A")
+                || !supervisorJob.getEmployee().getStatus().equals("A")) {
             return false;
-        } else if (currentNode.getEmployee().getId() == pidm) {
+        } else if (supervisorJob.getEmployee().getId() == pidm) {
             return true;
         }
 

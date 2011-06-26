@@ -13,6 +13,12 @@ public class Job extends Pass implements Serializable {
 
     private Job supervisor;
 
+    /**
+     * Possible values of status are:
+     * A - active,
+     * L - leave,
+     * T - terminated
+     */
     private String status;
 
     private String jobTitle;
