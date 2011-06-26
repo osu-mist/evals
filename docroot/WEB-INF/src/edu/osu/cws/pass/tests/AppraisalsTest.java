@@ -74,7 +74,7 @@ public class AppraisalsTest {
     public Appraisal loadAppraisalSaveList() throws Exception {
         Session hsession = HibernateUtil.getCurrentSession();
         Transaction tx = hsession.beginTransaction();
-        Job job = (Job) hsession.load(Job.class, 1);
+        Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         tx.commit();
 
         int appraisalID =  appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL);

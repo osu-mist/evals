@@ -31,13 +31,13 @@ public class JobsTest {
 
         Job supervisor = jobMgr.getSupervisor(job);
         assert supervisor != null;
-        assert supervisor.getEmployee().getId() == 56198 : "Incorrect supervisor pidm found";
+        assert supervisor.getEmployee().getId() == 12345 : "Incorrect supervisor pidm found";
     }
 
     public void shouldFindUppserSupervisor() throws ModelException {
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
-        job = (Job) session.load(Job.class, 4);
+        job = (Job) session.load(Job.class, new Job(new Employee(787812), "1234", "00"));
         tx.commit();
         int pidm = 990871;
 
@@ -47,7 +47,7 @@ public class JobsTest {
     public void shouldNotFindUpperSupervisorForTopSupervisor() throws ModelException {
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
-        job = (Job) session.load(Job.class, 7);
+        job = (Job) session.load(Job.class, new Job(new Employee(990871), "1234", "00"));
         tx.commit();
         int pidm = 990871;
 
@@ -66,13 +66,16 @@ public class JobsTest {
      */
     public void shouldHaveJobsInView() {
         List<Job> results = jobMgr.list();
-        Job job;
+        int i = 0;
 
         // place a breakpoint below if you want to step through the records to make sure
         // we are getting data from the view
-        for (int i = 0; i < 5; i++) {
-            job = results.get(i);
+        for (Job job : results) {
             assert job != null;
+            i++;
+            if (i >= 5) {
+                break;
+            }
         }
         assert results.size() > 0 : "The list of employees should not be empty";
     }
