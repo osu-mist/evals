@@ -124,14 +124,65 @@ public class Actions {
     }
 
     /**
-     * Takes the request object and uses the CriterionAreaID to call the hibernate util
-     * and have it delete the CriterionArea.
+     * Handles deleting an evaluation criteria. If the request a regular http request, it
+     * displays a confirm page. Once the user confirms the deletion, the criteria is deleted,
+     * the sequence is updated and the list of criteria is displayed again. If the request is
+     * AJAX, we remove the evaluation criteria.
      *
-     * @param actionRequest
-     * @param actionResponse
+     * @param request
+     * @param response
+     * @return String   If the request is ajax returns json, otherwise jsp file
+     * @throws Exception
      */
-    public void deleteCriteria(ActionRequest actionRequest, ActionResponse actionResponse) {
+    public String deleteCriteria(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, "You do not have access to list criteria");
+            return displayHomeView(request, response);
+        }
 
+        int criteriaID = ParamUtil.getInteger(request, "id");
+        CriteriaMgr criteriaMgrArea = new CriteriaMgr();
+        try {
+            Employee loggedOnUser = getLoggedOnUser(request);
+
+            // If the user clicks on the delete link the first time, use confirm page
+            if (request instanceof RenderRequest && response instanceof RenderResponse) {
+                CriterionArea criterion = criteriaMgrArea.get(criteriaID);
+                request.setAttribute("criterion", criterion);
+                return "criteria-delete-jsp";
+            }
+
+            // If user hits cancel, send them to list criteria page
+            if (!ParamUtil.getString(request, "cancel").equals("")) {
+                return listCriteria(request, response);
+            }
+            criteriaMgrArea.delete(criteriaID, loggedOnUser);
+            SessionMessages.add(request, "criteria-deleted");
+        } catch (ModelException e) {
+            addErrorsToRequest(request, e.getMessage());
+            if (isAJAX(request, response)) {
+                return e.getMessage();
+            }
+        }
+
+        if (isAJAX(request, response)) {
+            return "success";
+        }
+
+        return listCriteria(request, response);
+    }
+
+    /**
+     * Specifies whether or not the request is an AJAX request by checking whether or not
+     * request and response are instances of ResourceRequest and ResourceResponse.
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    private boolean isAJAX(PortletRequest request, PortletResponse response) {
+        return request instanceof ResourceRequest && response instanceof ResourceResponse;
     }
 
     /**

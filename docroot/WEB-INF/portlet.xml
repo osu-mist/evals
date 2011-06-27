@@ -22,6 +22,10 @@
             <value>/jsp/criteria/list.jsp</value>
         </init-param>
         <init-param>
+            <name>criteria-delete-jsp</name>
+            <value>/jsp/criteria/delete.jsp</value>
+        </init-param>
+        <init-param>
 			<name>appraisal-jsp</name>
 			<value>/jsp/appraisals/appraisal.jsp</value>
 		</init-param>

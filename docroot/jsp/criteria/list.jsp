@@ -10,6 +10,7 @@ addCriteriaURL.setParameter("action", "addCriteria");
 
 <h2><liferay-ui:message key="Criteria" /></h2>
 <liferay-ui:success key="criteria-saved" message="criteria-saved" />
+<liferay-ui:success key="criteria-saved" message="criteria-deleted" />
 
 <div class="separator"></div>
 <table class="taglib-search-iterator">
@@ -23,10 +24,16 @@ addCriteriaURL.setParameter("action", "addCriteria");
     <tr class="${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}"
         onmouseover="this.className = 'portlet-section-body-hover results-row hover';"
         onmouseout="this.className = '${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}';"
+        id="<portlet:namespace/>criterion-${criterion.id}"
     >
         <td>${criterion.name}</td>
         <td>${criterion.currentDetail.description}</td>
-        <td><a href="#">Edit</a> <a href="#">Delete</a></td>
+        <td><a href="#">Edit</a>
+        <a class="<portlet:namespace/>criterion-delete"
+            onclick="return <portlet:namespace/>delete(${criterion.id}, '${criterion.name}');" href="<portlet:renderURL>
+            <portlet:param name="id" value="${criterion.id}"/>
+            <portlet:param name="action" value="deleteCriteria"/>
+        </portlet:renderURL>"><liferay-ui:message key="delete"/></a></td>
     </tr>
 </c:forEach>
 
@@ -38,3 +45,33 @@ addCriteriaURL.setParameter("action", "addCriteria");
 />
 
 </table>
+
+<portlet:resourceURL var="deleteAJAXURL" id="deleteCriteria" escapeXml="false" />
+<script type="text/javascript">
+  function <portlet:namespace/>delete(id, name) {
+    var answer = confirm("<liferay-ui:message key="criteria-delete-confirm"/>: " + name + " ?");
+    if (answer == false) {
+      return false;
+    }
+    var querystring = {'id': id};
+    jQuery.ajax({
+      type: "POST",
+      url: "<%=renderResponse.encodeURL(deleteAJAXURL.toString())%>",
+      data: querystring,
+      success: function(msg) {
+        if (msg == "success") {
+          jQuery("#<portlet:namespace/>criterion-" + id).hide();
+          jQuery("#<portlet:namespace />flash").html(
+            '<span class="portlet-msg-success"><liferay-ui:message key="criteria-deleted"/></span>'
+          );
+        } else {
+          jQuery("#<portlet:namespace />flash").html(
+            '<span class="portlet-msg-error"><ul>'+msg+'</ul></span>'
+          );
+        }
+      }
+    });
+
+    return false;
+  }
+</script>

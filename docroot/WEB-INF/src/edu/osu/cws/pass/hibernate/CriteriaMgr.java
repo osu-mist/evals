@@ -9,6 +9,7 @@ import edu.osu.cws.pass.models.*;
 import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.*;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -101,7 +102,7 @@ public class CriteriaMgr {
 
     /**
      * Takes an appointmentType, a Hibernate session and uses Hibernate to fetch the list of
-     * CriterionArea.
+     * CriterionArea that are not deleted.
      *
      * @param appointmentType
      * @param session
@@ -111,7 +112,8 @@ public class CriteriaMgr {
     private List<CriterionArea> list(String appointmentType, Session session) throws Exception {
         Transaction tx = session.beginTransaction();
         List result = session.createQuery("from edu.osu.cws.pass.models.CriterionArea where " +
-                "appointmentType = :appointmentType").setString("appointmentType", appointmentType)
+                "appointmentType = :appointmentType AND deleteDate IS NULL ORDER BY sequence")
+                .setString("appointmentType", appointmentType)
                 .list();
         tx.commit();
         return result;
@@ -122,11 +124,49 @@ public class CriteriaMgr {
      * Takes an ID of the CriterionArea the user is trying to delete. If successful, an empty
      * array is returned, otherwise, the array will contain error messages.
      *
-     * @param ID
-     * @return errors   An array of errors if there was a problem trying to delete the CriterionArea
+     * @param id
+     * @param deleter   Admin User deleting criteria
+     * @throws Exception
+     * @return
      */
-    public String[] delete(long ID) {
-        return new String[2];
+    public boolean delete(int id, Employee deleter) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        CriterionArea criterion;
+        try {
+            Transaction tx = session.beginTransaction();
+            criterion = get(id, session);
+
+            // check that the criteria is valid
+            if (criterion == null || criterion.getDeleteDate() != null) {
+                throw new ModelException("Invalid Evaluation Criteria");
+            }
+
+            // delete criteria and save it back
+            criterion.setSequence(0);
+            criterion.setDeleteDate(new Date());
+            criterion.setDeleter(deleter);
+            session.update(criterion);
+            tx.commit();
+
+            // Update the sequence of evaluation criteria for the given appointment type
+            List<CriterionArea> results = list(criterion.getAppointmentType());
+            session = HibernateUtil.getCurrentSession();
+            tx = session.beginTransaction();
+            int sequence = 1;
+            for (CriterionArea seqCriterion : results) {
+                if (seqCriterion.getSequence() != sequence) {
+                    seqCriterion.setSequence(sequence);
+                }
+                session.update(seqCriterion);
+                sequence++;
+            }
+            tx.commit();
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+
+        return true;
     }
 
     /**
@@ -152,7 +192,7 @@ public class CriteriaMgr {
         try {
             Transaction tx = hsession.beginTransaction();
             Query countQry = hsession.createQuery("select count(*) from edu.osu.cws.pass.models.CriterionArea " +
-                    "where appointmentType = :appointmentType");
+                    "where appointmentType = :appointmentType AND deleteDate IS NULL");
 
             countQry.setString("appointmentType", appointmentType);
             countQry.setMaxResults(1);
@@ -169,5 +209,38 @@ public class CriteriaMgr {
         }
         return ++availableSequence;
 
+    }
+
+    /**
+     * Retrieves a CriterionArea object from the db
+     *
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public CriterionArea get(int id) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        CriterionArea criterion;
+        try {
+            Transaction tx = session.beginTransaction();
+            criterion = get(id, session);
+            tx.commit();
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+
+        return criterion;
+    }
+
+    /**
+     * Retrieves a CriterionArea object from the db
+     *
+     * @param id
+     * @param session
+     * @return
+     */
+    private CriterionArea get(int id, Session session) {
+        return (CriterionArea) session.get(CriterionArea.class, id);
     }
 }

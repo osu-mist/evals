@@ -17,6 +17,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -113,10 +114,37 @@ public class PASSPortlet extends GenericPortlet {
 
         delegate(actionRequest, actionResponse);
 	}
-         public void serveResource(ResourceRequest request, ResourceResponse response)
-         throws PortletException, IOException {
 
-         }
+    public void serveResource(ResourceRequest request, ResourceResponse response)
+            throws PortletException, IOException {
+        String result = "";
+        Method actionMethod;
+        String resourceID;
+        actionClass.setPortletContext(getPortletContext());
+
+        response.setContentType("text/html");
+        PrintWriter writer = response.getWriter();
+
+        // The logic below is similar to delegate method, but instead we
+        // need to return the value we get from Actions method instead of
+        // assign it to viewJSP
+        resourceID = request.getResourceID();
+        if (resourceID != null) {
+            try {
+                actionMethod = Actions.class.getDeclaredMethod(resourceID, PortletRequest.class,
+                        PortletResponse.class);
+
+                // The resourceID methods return the init-param of the path
+                result = (String) actionMethod.invoke(actionClass, request, response);
+            } catch (Exception e) {
+                handlePASSException(e, false);
+                result="There was an error performing your request";
+            }
+        } else {
+            result="There was an error performing your request";
+        }
+        writer.print(result);
+    }
 
     /**
      * Delegate method will call the respective method in the Actions class and pass the request

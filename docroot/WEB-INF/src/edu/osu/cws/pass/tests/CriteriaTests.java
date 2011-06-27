@@ -318,18 +318,25 @@ public class CriteriaTests {
         Assert.assertEquals(oldRevisionId,newRevisionId);
     }*/
 
-
     /**
-     * Tests that we can enable and disable a given criteria.
+     * Tests to make sure that we get a ModelException when we try to delete a non-existent criteria.
+     *
+     * @throws Exception
      */
-/*    @Test(groups = {"unittest", "pending"})
-    public void disableCriteria() {
-//        criterionObject.read((long) 1);
-//        Assert.assertEquals(criterionObject.isDisabled(), false);
-        criterionObject.setDeleteDate(new Date());
-//        criterionObject.save();
+    @Test(expectedExceptions = {ModelException.class})
+    public void shouldNotDeleteCriteriaThatDoesntExist() throws Exception {
+        criteriaMgrObject.delete(9999, new Employee(12345));
+    }
 
-//        criterionObject.read(1);
-//        Assert.assertEquals(criterionObject.isDisabled(), true);
-    }*/
+    @Test(expectedExceptions = {ModelException.class})
+    public void shouldNotDeleteAlreadyDeletedcriteria() throws Exception {
+        criteriaMgrObject.delete(3, new Employee(12345));
+    }
+
+    public void shouldDeleteCriteriaAndUpdateSequence() throws Exception {
+        criteriaMgrObject.delete(1, new Employee(12345));
+        assert criteriaMgrObject.list(AppointmentType.CLASSIFIED).size() == 1;
+        assert criteriaMgrObject.getNextSequence(AppointmentType.CLASSIFIED) == 2 :
+                "Invalid criteria sequence";
+    }
 }
