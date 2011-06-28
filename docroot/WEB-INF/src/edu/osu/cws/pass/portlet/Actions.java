@@ -84,14 +84,43 @@ public class Actions {
     }
 
     /**
-     * Takes the request object, fetches POJO object using hibernate. Sets new fields
-     * using setter methods on POJO. Calls hibernate method to save data back to db.
+     * Handles editing of an evaluation criteria. Checks user permission. Then calls CriteriaMgr
+     * to handle the editing.
      *
-     * @param actionRequest
-     * @param actionResponse
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
      */
-    public void editCritera(ActionRequest actionRequest, ActionResponse actionResponse) {
-//        @todo: takes the request object, fetches the
+    public String editCriteria(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, "You do not have access to edit criteria");
+            return displayHomeView(request, response);
+        }
+
+        CriteriaMgr criteriaMgr = new CriteriaMgr();
+        CriterionArea criterionArea = new CriterionArea();
+        CriterionDetail criterionDetail = new CriterionDetail();
+        try {
+            int criterionAreaId = ParamUtil.getInteger(request, "criterionAreaId");
+            if (request instanceof RenderRequest) {
+                criterionArea = criteriaMgr.get(criterionAreaId);
+                if (criterionArea != null) {
+                    criterionDetail = criterionArea.getCurrentDetail();
+                }
+            } else {
+                Employee loggedOnUser = getLoggedOnUser(request);
+                criteriaMgr.edit(request.getParameterMap(), criterionAreaId, loggedOnUser);
+                return listCriteria(request, response);
+            }
+        } catch (ModelException e) {
+            addErrorsToRequest(request, e.getMessage());
+        }
+
+        request.setAttribute("criterionArea", criterionArea);
+        request.setAttribute("criterionDetail", criterionDetail);
+        return "criteria-add-jsp";
     }
 
     /**

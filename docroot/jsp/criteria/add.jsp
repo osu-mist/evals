@@ -2,19 +2,23 @@
 
 <jsp:useBean id="criterionArea" class="edu.osu.cws.pass.models.CriterionArea" scope="request" />
 <jsp:useBean id="criterionDetail" class="edu.osu.cws.pass.models.CriterionDetail" scope="request" />
+<c:set var="action" value="addCriteria" scope="request"/>
+<c:set var="titleKey" value="criteria-add-classified" scope="request"/>
+<c:if test="${criterionArea.id != 0}">
+    <c:set var="action" value="editCriteria" scope="request"/>
+    <c:set var="titleKey" value="criteria-edit" scope="request"/>
+</c:if>
 
 <%
 List appointmentTypes = (List) renderRequest.getAttribute("appointmentTypes");
-
-PortletURL addCriteriaURL = renderResponse.createActionURL();
-addCriteriaURL.setWindowState(WindowState.NORMAL);
-addCriteriaURL.setParameter("action", "addCriteria");
 %>
 
-<h2>Add an Evaluation Criteria for Classified</h2>
+<h2><liferay-ui:message key="${titleKey}"/></h2>
 
 <div id="pass-add-criteria">
-    <form action="<%= addCriteriaURL.toString() %>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
+    <form action="<portlet:actionURL>
+        <portlet:param name="action" value="${action}"/>
+        </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
 
     <input name="<portlet:namespace />criterionAreaId" type="hidden" value="${criterionArea.id}" />
 
@@ -35,18 +39,30 @@ addCriteriaURL.setParameter("action", "addCriteria");
                 <liferay-ui:input-textarea param="description" defaultValue="${criterionDetail.description}"/>
             </td>
         </tr>
-        <tr>
-            <td><liferay-ui:message key="appointment-type" />
-            <td><select name="<portlet:namespace />appointmentTypeID">
-                <c:forEach var="appointmentType" items="${appointmentTypes}">
-                    <option value="${appointmentType.name}"
-                        ${(appointmentType.name == criterionArea.appointmentType)? 'selected="selected"': ''}>
-                        ${appointmentType.name}</option>
+        <c:if test="${action = 'addCriteria'}">
+            <tr>
+                <td><liferay-ui:message key="appointment-type" />
+                <td><select name="<portlet:namespace />appointmentTypeID">
+                    <c:forEach var="appointmentType" items="${appointmentTypes}">
+                        <option value="${appointmentType.name}"
+                            ${(appointmentType.name == criterionArea.appointmentType)? 'selected="selected"': ''}>
+                            ${appointmentType.name}</option>
 
-                </c:forEach>
-                </select>
+                    </c:forEach>
+                    </select>
+            </tr>
+        </c:if>
+        <c:if test="${action = 'editCriteria'}">
+            <tr>
+                <td colspan="2">
+                    <input type="checkbox" id="<portlet:namespace />propagateEdit"
+                    name="<portlet:namespace />propagateEdit"/> <label for="<portlet:namespace />propagateEdit">
+                    <liferay-ui:message key="criteria-propagate-edit" /></label>
+                </td>
+            </tr>
+        </c:if>
 
-        </tr>
+
     </table>
     <br />
     <input type="submit" value="<liferay-ui:message key="save" />" />

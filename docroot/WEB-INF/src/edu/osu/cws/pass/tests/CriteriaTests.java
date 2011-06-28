@@ -4,6 +4,7 @@
 package edu.osu.cws.pass.tests;
 
 import edu.osu.cws.pass.hibernate.CriteriaMgr;
+import edu.osu.cws.pass.hibernate.EmployeeMgr;
 import edu.osu.cws.pass.models.*;
 
 
@@ -275,48 +276,253 @@ public class CriteriaTests {
     }
 
     /**
-     * Tests that after editing a field in the
+     * Tests that when only the criteria name is modified in the editCriteria action,
+     * it creates two pojos, and the old criteria is set to deleted.
+     * @throws Exception
      */
-/*
-    @Test(groups = {"unittest", "pending"})
-    public void editCriteriaShouldCreateRevision() {
-        long newRevisionId = 0;
-        long oldRevisionId = 1;
-        //@todo: get criteria object with id = 3
-        //criterionObject.read((long) 3);
+    @Test(groups = {"unittest"})
+    public void editOnlyCriteriaNameShouldCreatesTwoNewPOJOs() throws Exception {
+        Map<String, String[]> request = new HashMap<String, String[]>();
+        String newCriterionName = "New Name For Criteria";
+        request.put("name", new String[] {newCriterionName});
+        request.put("criterionAreaId", new String[] {"1"});
+        request.put("description", new String[] {"How will you increase your communication skills?"});
 
-//        oldRevisionId = criterionObject.getCriteriaDetailsID();
+        int id = 1;
+        EmployeeMgr employeeMgr = new EmployeeMgr();
+        Employee employee = employeeMgr.findByOnid("cedenoj");
+        CriterionArea criterionArea =  criteriaMgrObject.get(id);
 
-        criteriaDetailObject.setDescription("What is your plan to improve communication skills?");
-        //criteriaDetailObject.save();
+        // grab old ids and properties to compare
+        int oldCriterionAreaID = criterionArea.getId();
+        int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
+        int oldSequence = criterionArea.getSequence();
 
+        criteriaMgrObject.edit(request, id, employee);
 
-        //newRevisionId = criterionObject.getCriteriaDetailsID();
+        // Double check that the deleted properties were set on pojo
+        criterionArea =  criteriaMgrObject.get(id);
+        assert criterionArea.getDeleteDate() != null : "Should have set deletedDate in old pojo";
+        assert criterionArea.getDeleter() != null : "Should have set deleter in old pojo";
 
-        assertFalse(oldRevisionId == newRevisionId);
+        // Sequence should not change
+        assert criterionArea.getSequence() == oldSequence : "Sequence should not change";
+
+        Session session = HibernateUtil.getCurrentSession();
+        try {
+            Transaction tx = session.beginTransaction();
+            criterionArea = (CriterionArea) session.
+                    createQuery("from edu.osu.cws.pass.models.CriterionArea WHERE name = :name")
+                    .setString("name", newCriterionName).list().get(0);
+            tx.commit();
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+
+        // Checks that two new pojos were created
+        assert oldCriterionAreaID != criterionArea.getId() :
+                "should have created a new criteria pojo";
+        assert oldCriterionDetailID != criterionArea.getCurrentDetail().getId() :
+                "should have created a new criteria detail pojo";
+        assert oldSequence == criterionArea.getSequence() : "Sequence should not change";
     }
-*/
 
     /**
-     * Tests that we can edit a criteria's property and the criteria ids remain the same
-     * thus propagating the changes to the existing assessments.
+     * Tests that when only the criteria description is modified in the editCriteria action,
+     * it creates one pojo for the description
+     * @throws Exception
      */
-/*    @Test(groups = {"unittest", "pending"})
-    public void editTypoInCriteria() {
-//        criterionObject.read((long) 3);
-        long newRevisionId = 0;
-        long oldRevisionId = 0;
+    @Test(groups = {"unittest"})
+    public void editOnlyCriteriaDescriptionShouldOnlyCreateNewDescriptionPOJO() throws Exception {
+        Map<String, String[]> request = new HashMap<String, String[]>();
+        String newCriterionName = "COMMUNICATION SKILLS";
+        request.put("name", new String[] {newCriterionName});
+        request.put("criterionAreaId", new String[] {"1"});
+        String newCriteriaDetail = "New Value for Criteria Description";
+        request.put("description", new String[] {newCriteriaDetail});
 
-//        long oldRevisionId = criterionObject.getCriteriaDetailsID();
+        int id = 1;
+        EmployeeMgr employeeMgr = new EmployeeMgr();
+        Employee employee = employeeMgr.findByOnid("cedenoj");
+        CriterionArea criterionArea =  criteriaMgrObject.get(id);
 
-        criteriaDetailObject.setDescription("What is your plan to improve communication skills?");
-//        criteriaDetailObject.setPropagateChanges(true);
-//        criterionObject.save();
+        // grab old ids and properties to compare
+        int oldCriterionAreaID = criterionArea.getId();
+        int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
+        int oldSequence = criterionArea.getSequence();
 
-//        long newRevisionId = criterionObject.getCriteriaDetailsID();
+        criteriaMgrObject.edit(request, id, employee);
 
-        Assert.assertEquals(oldRevisionId,newRevisionId);
-    }*/
+        // Double check that the deleted properties were set on pojo
+        criterionArea =  criteriaMgrObject.get(id);
+        assert criterionArea.getDeleteDate() == null : "Should not have set deletedDate in old pojo";
+        assert criterionArea.getDeleter() == null : "Should not have set deleter in old pojo";
+
+        // Sequence should not change
+        assert criterionArea.getSequence() == oldSequence : "Sequence should not change";
+
+        Session session = HibernateUtil.getCurrentSession();
+        try {
+            Transaction tx = session.beginTransaction();
+            criterionArea = (CriterionArea) session.
+                    createQuery("from edu.osu.cws.pass.models.CriterionArea WHERE name = :name")
+                    .setString("name", newCriterionName).list().get(0);
+            tx.commit();
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+
+        // Checks that two new pojos were created
+        assert oldCriterionAreaID == criterionArea.getId() :
+                "should not have created a new criteria pojo";
+        assert oldCriterionDetailID != criterionArea.getCurrentDetail().getId() :
+                "should have created a new criteria detail pojo";
+        assert oldSequence == criterionArea.getSequence() : "Sequence should not change";
+        assert criterionArea.getCurrentDetail().getDescription().equals(newCriteriaDetail);
+    }
+
+    /**
+     * Tests that when both criteria name and description are modified in the editCriteria action,
+     * it creates two pojos, and the old criteria is set to deleted.
+     * @throws Exception
+     */
+    @Test(groups = {"unittest"})
+    public void editBothCriteriaNameAndDescriptionShouldCreatesTwoNewPOJOs() throws Exception {
+        Map<String, String[]> request = new HashMap<String, String[]>();
+        String newCriterionName = "New Name For Criteria";
+        request.put("name", new String[] {newCriterionName});
+        request.put("criterionAreaId", new String[] {"1"});
+        String newDetailDescription = "New Value for Criteria Description";
+        request.put("description", new String[] {newDetailDescription});
+
+        int id = 1;
+        EmployeeMgr employeeMgr = new EmployeeMgr();
+        Employee employee = employeeMgr.findByOnid("cedenoj");
+        CriterionArea criterionArea =  criteriaMgrObject.get(id);
+
+        // grab old ids and properties to compare
+        int oldCriterionAreaID = criterionArea.getId();
+        int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
+        int oldSequence = criterionArea.getSequence();
+
+        criteriaMgrObject.edit(request, id, employee);
+
+        // Double check that the deleted properties were set on pojo
+        criterionArea =  criteriaMgrObject.get(id);
+        assert criterionArea.getDeleteDate() != null : "Should have set deletedDate in old pojo";
+        assert criterionArea.getDeleter() != null : "Should have set deleter in old pojo";
+
+        // Sequence should not change
+        assert criterionArea.getSequence() == oldSequence : "Sequence should not change";
+
+        Session session = HibernateUtil.getCurrentSession();
+        try {
+            Transaction tx = session.beginTransaction();
+            criterionArea = (CriterionArea) session.
+                    createQuery("from edu.osu.cws.pass.models.CriterionArea WHERE name = :name")
+                    .setString("name", newCriterionName).list().get(0);
+            tx.commit();
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+
+        // Checks that two new pojos were created
+        assert oldCriterionAreaID != criterionArea.getId() :
+                "should have created a new criteria pojo";
+        assert oldCriterionDetailID != criterionArea.getCurrentDetail().getId() :
+                "should have created a new criteria detail pojo";
+        assert oldSequence == criterionArea.getSequence() : "Sequence should not change";
+        assert criterionArea.getName().equals(newCriterionName) : "Should have updated name";
+        assert criterionArea.getCurrentDetail().
+                getDescription().equals(newDetailDescription);
+    }
+
+    /**
+     * Tests that when only the criteria description is modified in the editCriteria action,
+     * it creates one pojo for the description
+     * @throws Exception
+     */
+    @Test(groups = {"unittest"})
+    public void editCriteriaPropagateShouldOnlyPropagateOnOpenAppraisals() throws Exception {
+        Map<String, String[]> request = new HashMap<String, String[]>();
+        String newCriterionName = "COMMUNICATION SKILLS";
+        request.put("name", new String[] {newCriterionName});
+        request.put("criterionAreaId", new String[] {"1"});
+        String newCriteriaDetail = "New Value for Criteria Description";
+        request.put("description", new String[] {newCriteriaDetail});
+        request.put("propagateEdit", new String[] {"1"});
+
+        int id = 1;
+        EmployeeMgr employeeMgr = new EmployeeMgr();
+        Employee employee = employeeMgr.findByOnid("cedenoj");
+        CriterionArea criterionArea =  criteriaMgrObject.get(id);
+
+        // grab old ids and properties to compare
+        int oldCriterionAreaID = criterionArea.getId();
+        int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
+        int oldSequence = criterionArea.getSequence();
+
+        criteriaMgrObject.edit(request, id, employee);
+
+        // Double check that the deleted properties were set on pojo
+        criterionArea =  criteriaMgrObject.get(id);
+        assert criterionArea.getDeleteDate() == null : "Should not have set deletedDate in old pojo";
+        assert criterionArea.getDeleter() == null : "Should not have set deleter in old pojo";
+
+        // Sequence should not change
+        assert criterionArea.getSequence() == oldSequence : "Sequence should not change";
+
+        Session session = HibernateUtil.getCurrentSession();
+        try {
+            Transaction tx = session.beginTransaction();
+            criterionArea = (CriterionArea) session.
+                    createQuery("from edu.osu.cws.pass.models.CriterionArea WHERE name = :name")
+                    .setString("name", newCriterionName).list().get(0);
+            tx.commit();
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+
+        // Checks that two new pojos were created
+        assert oldCriterionAreaID == criterionArea.getId() :
+                "should not have created a new criteria pojo";
+        assert oldCriterionDetailID != criterionArea.getCurrentDetail().getId() :
+                "should have created a new criteria detail pojo";
+        assert oldSequence == criterionArea.getSequence() : "Sequence should not change";
+        assert criterionArea.getCurrentDetail().getDescription().equals(newCriteriaDetail);
+
+        session = HibernateUtil.getCurrentSession();
+        try {
+            Transaction tx = session.beginTransaction();
+            List<Assessment> results = (List<Assessment>) session.
+                    createQuery("from edu.osu.cws.pass.models.Assessment ORDER BY ID")
+                    .list();
+            tx.commit();
+
+            Assessment assessment = results.get(0);
+            assert assessment.getCriterionDetail().getId() != 3 :
+                    "Open Appraisals should have assessments' Criterion Detail ID modified";
+
+            assessment = results.get(1);
+            assert assessment.getCriterionDetail().getId() != 3 :
+                    "Open Appraisals should have assessments' Criterion Detail ID modified";
+
+            assessment = results.get(2);
+            assert assessment.getCriterionDetail().getId() == 3 :
+                    "Closed Appraisals should not have assessments' Criterion Detail ID modified";
+
+            assessment = results.get(3);
+            assert assessment.getCriterionDetail().getId() == 3 :
+                    "Completed Appraisals should not have assessments' Criterion Detail ID modified";
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+    }
 
     /**
      * Tests to make sure that we get a ModelException when we try to delete a non-existent criteria.

@@ -12,6 +12,7 @@ import org.hibernate.*;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class CriteriaMgr {
 
@@ -64,20 +65,159 @@ public class CriteriaMgr {
     }
 
     /**
-     * Takes the CriterionArea and CriterionDetail POJO objects, performs validation
-     * and calls the respective hibernate method to save to db if passed validation. If
-     * the change is minor, either the CriterionArea or CriterionDetail POJOs are edited.
-     * Otherwise if the description was changed a new CriterionDetail POJO is created, or
-     * if the name was changed a new CriterionArea and CriterionDetail POJOs are created.
-     *
-     * @param area      CriterionArea POJO
-     * @param details   CriterionDetail POJO
-     * @return errors   An array of error messages, but empty array on success.
-     * @throws edu.osu.cws.pass.models.ModelException
+     * Handles the editing of an evaluation criteria. Depending on what changed area, description
+     * or both there's different logic. It also handles propagating the changes to open assessments.
+     * @param request
+     * @param id
+     * @param loggedInUser
+     * @return
+     * @throws Exception
      */
-    public String[] edit(CriterionArea area, CriterionDetail details)
-            throws ModelException {
-        return new String[2];
+    public boolean edit(Map<String, String[]> request, int id, Employee loggedInUser) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        CriterionArea newCriterion = new CriterionArea();
+        CriterionDetail newDetails = new CriterionDetail();
+        CriterionArea criterion;
+
+        String description = request.get("description")[0];
+        String name = request.get("name")[0];
+        String propagateEdit = "";
+        if (request.get("propagateEdit") != null){
+            propagateEdit = "1";
+        }
+
+        try {
+            Transaction tx = session.beginTransaction();
+            criterion = get(id, session);
+
+            boolean areaChanged = false;
+            boolean descriptionChanged = false;
+            CriterionDetail currentDetail = criterion.getCurrentDetail();
+            String criterionDescription = currentDetail.getDescription();
+            int descHash = criterionDescription.hashCode();
+
+            int updatedDescHash = description.hashCode();
+
+            if (!criterion.getName().equals(name)) {
+                areaChanged = true;
+            }
+            if (descHash != updatedDescHash) {
+                descriptionChanged = true;
+            }
+
+            if (areaChanged && !descriptionChanged) {
+                // copy all the values from the old CriterionArea
+                copyCriterion(loggedInUser, newCriterion, criterion);
+                newCriterion.setName(name);
+
+                // copy all the values form the old CriterionDetail
+                copyDetails(loggedInUser, newDetails, criterion, criterionDescription);
+
+                // validate both new area + description
+                newCriterion.validate();
+                newDetails.validate();
+
+                // set old criteria as deleted
+                setCriteriaDeleteProperties(loggedInUser, criterion);
+
+                // save pojos
+                session.save(newCriterion);
+                session.update(criterion);
+                newCriterion.addDetails(newDetails);
+                session.save(newDetails);
+            } else if (!areaChanged && descriptionChanged) {
+                // copy all the values form the old CriterionDetail
+                copyDetails(loggedInUser, newDetails, criterion, description);
+
+                // validate both new area + description
+                newDetails.validate();
+
+                // save pojo
+                criterion.addDetails(newDetails);
+                session.save(newDetails);
+            } else if (areaChanged && descriptionChanged) {
+                // copy all the values from the old CriterionArea
+                copyCriterion(loggedInUser, newCriterion, criterion);
+                newCriterion.setName(name);
+
+                // copy all the values form the old CriterionDetail
+                copyDetails(loggedInUser, newDetails, criterion, description);
+
+                // validate both new area + description
+                newCriterion.validate();
+                newDetails.validate();
+
+                // set old criteria as deleted
+                setCriteriaDeleteProperties(loggedInUser, criterion);
+
+                // save pojos
+                session.save(newCriterion);
+                session.update(criterion);
+                newCriterion.addDetails(newDetails);
+                session.save(newDetails);
+            }
+            if (propagateEdit.equals("1") && (areaChanged || descriptionChanged)) {
+                String sqlUpdate = "UPDATE assessments a SET a.CRITERION_DETAIL_ID = :newDetail " +
+                        "WHERE a.CRITERION_DETAIL_ID = :oldDetail AND a.APPRAISAL_ID in ( " +
+                            "SELECT ID FROM appraisals WHERE STATUS not in ('completed', 'closed')" +
+                        ")";
+                session.createSQLQuery(sqlUpdate)
+                        .setInteger("newDetail", newDetails.getId())
+                        .setInteger("oldDetail", currentDetail.getId())
+                        .executeUpdate();
+            }
+            tx.commit();
+
+            //@todo: ajax
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+        return true;
+    }
+
+    /**
+     * Sets the deletedDate and deleter properties in the CriterionArea pojo. This is used by edit and
+     * delete.
+     *
+     * @param loggedInUser
+     * @param criterion
+     */
+    private void setCriteriaDeleteProperties(Employee loggedInUser, CriterionArea criterion) {
+        criterion.setDeleteDate(new Date());
+        criterion.setDeleter(loggedInUser);
+    }
+
+    /**
+     * Sets up the various values in newDetails using the rest of the parameters to create a copy of the
+     * criteria details.
+     *
+     * @param loggedInUser
+     * @param newDetails
+     * @param criterion
+     * @param criterionDescription
+     */
+    private void copyDetails(Employee loggedInUser, CriterionDetail newDetails, CriterionArea criterion, String criterionDescription) {
+        newDetails.setDescription(criterionDescription);
+        newDetails.setAreaID(criterion);
+        newDetails.setCreateDate(new Date());
+        newDetails.setCreator(loggedInUser);
+    }
+
+    /**
+     * Copies the data from criterion into newCriterion.
+     *
+     * @param loggedInUser
+     * @param newCriterion
+     * @param criterion
+     */
+    private void copyCriterion(Employee loggedInUser, CriterionArea newCriterion, CriterionArea criterion) {
+        newCriterion.setName(criterion.getName());
+        newCriterion.setSequence(criterion.getSequence());
+        newCriterion.setCreator(loggedInUser);
+        newCriterion.setAppointmentType(criterion.getAppointmentType());
+        newCriterion.setCreateDate(new Date());
+        newCriterion.setOriginalID(criterion);
     }
 
     /**
@@ -142,24 +282,9 @@ public class CriteriaMgr {
             }
 
             // delete criteria and save it back
-            criterion.setSequence(0);
-            criterion.setDeleteDate(new Date());
-            criterion.setDeleter(deleter);
-            session.update(criterion);
-            tx.commit();
+            setCriteriaDeleteProperties(deleter, criterion);
 
-            // Update the sequence of evaluation criteria for the given appointment type
-            List<CriterionArea> results = list(criterion.getAppointmentType());
-            session = HibernateUtil.getCurrentSession();
-            tx = session.beginTransaction();
-            int sequence = 1;
-            for (CriterionArea seqCriterion : results) {
-                if (seqCriterion.getSequence() != sequence) {
-                    seqCriterion.setSequence(sequence);
-                }
-                session.update(seqCriterion);
-                sequence++;
-            }
+            session.update(criterion);
             tx.commit();
         } catch (Exception e) {
             session.close();

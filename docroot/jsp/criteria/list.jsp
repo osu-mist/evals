@@ -28,7 +28,12 @@ addCriteriaURL.setParameter("action", "addCriteria");
     >
         <td>${criterion.name}</td>
         <td>${criterion.currentDetail.description}</td>
-        <td><a href="#">Edit</a>
+        <td>
+        <a class="<portlet:namespace/>criterion-edit"
+            onclick="return <portlet:namespace/>edit(${criterion.id});" href="<portlet:renderURL>
+            <portlet:param name="criterionAreaId" value="${criterion.id}"/>
+            <portlet:param name="action" value="editCriteria"/>
+        </portlet:renderURL>"><liferay-ui:message key="edit"/></a>
         <a class="<portlet:namespace/>criterion-delete"
             onclick="return <portlet:namespace/>delete(${criterion.id}, '${criterion.name}');" href="<portlet:renderURL>
             <portlet:param name="id" value="${criterion.id}"/>
