@@ -474,6 +474,32 @@ public class Actions {
     }
 
     /**
+     * Handles the user clicking on a link to reset the status of the open appraisal to set the status
+     * to goals-due or results-due.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String demoResetAppraisal(PortletRequest request, PortletResponse response) throws Exception {
+        int id = ParamUtil.getInteger(request, "id");
+        String status = ParamUtil.getString(request, "status");
+
+        if (id == 0 || status == null || status.equals("")) {
+            addErrorsToRequest(request, "Could not reset the appraisal. Invalid ID or Status.");
+        }
+
+        try {
+            appraisalMgr.updateAppraisalStatus(id, status);
+        } catch (Exception e) {
+            _log.error("unexpected exception - " + ExceptionHandler.stackTraceString(e));
+        }
+
+        return displayAppraisal(request, response);
+    }
+
+    /**
      * Handles displaying a list of pending reviews for a given business center.
      *
      * @param request   PortletRequest
