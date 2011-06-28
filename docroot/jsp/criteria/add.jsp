@@ -39,7 +39,7 @@ List appointmentTypes = (List) renderRequest.getAttribute("appointmentTypes");
                 <liferay-ui:input-textarea param="description" defaultValue="${criterionDetail.description}"/>
             </td>
         </tr>
-        <c:if test="${action = 'addCriteria'}">
+        <c:if test="${action == 'addCriteria'}">
             <tr>
                 <td><liferay-ui:message key="appointment-type" />
                 <td><select name="<portlet:namespace />appointmentTypeID">
@@ -52,7 +52,7 @@ List appointmentTypes = (List) renderRequest.getAttribute("appointmentTypes");
                     </select>
             </tr>
         </c:if>
-        <c:if test="${action = 'editCriteria'}">
+        <c:if test="${action == 'editCriteria'}">
             <tr>
                 <td colspan="2">
                     <input type="checkbox" id="<portlet:namespace />propagateEdit"
