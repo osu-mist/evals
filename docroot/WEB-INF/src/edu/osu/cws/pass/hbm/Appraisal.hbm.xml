@@ -17,7 +17,7 @@
         <property name="goalsComments" type="text" column="GOALS_COMMENTS"/>
         <property name="resultSubmitDate" type="timestamp" column="RESULT_SUBMIT_DATE"/>
         <property name="evaluation" type="text" column="EVALUATION"/>
-        <property name="evaluationSubmitDate" type="timestamp"/>
+        <property name="evaluationSubmitDate" type="timestamp" column="EVALUATION_SUBMIT_DATE"/>
         <property name="rating" type="java.lang.Integer" length="1" column="RATING"/>
         <property name="reviewSubmitDate" type="timestamp" column="REVIEW_SUBMIT_DATE"/>
         <property name="review" type="text" column="REVIEW"/>

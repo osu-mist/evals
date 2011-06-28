@@ -15,8 +15,6 @@
 
         <property name="status" type="string" length="1" column="PYVPASJ_STATUS"/>
         <property name="jobTitle" type="string" length="255" column="PYVPASJ_DESC"/>
-        <!--<property name="positionNumber" type="string" length="8" column="PYVPASJ_POSN"/>-->
-        <!--<property name="suffix" type="string" length="2" column="PYVPASJ_SUFF"/>-->
         <property name="jobEcls" type="string" length="45" column="PYVPASJ_ECLS_CODE"/>
         <property name="beginDate" type="date" column="PYVPASJ_BEGIN_DATE"/>
         <property name="endDate" type="date" column="PYVPASJ_END_DATE"/>
