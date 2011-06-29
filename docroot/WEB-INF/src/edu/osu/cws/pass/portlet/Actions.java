@@ -11,6 +11,7 @@ import edu.osu.cws.pass.util.Mailer;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
 import edu.osu.cws.util.ExceptionHandler;
+import org.apache.commons.configuration.CompositeConfiguration;
 
 import javax.portlet.*;
 import java.util.*;
@@ -1037,6 +1038,16 @@ public class Actions {
      * @return username
      */
     private String getLoggedOnUsername(PortletRequest request) {
+        // Demo Settings to always get the loggeed on username to a valid user
+        CompositeConfiguration config = (CompositeConfiguration)
+                portletContext.getAttribute("environmentProp");
+
+        String loggedOnUser = config.getString("logged-on-user");
+        if (loggedOnUser != null && !loggedOnUser.equals("")) {
+            return loggedOnUser;
+        }
+        // end demo settings
+
         Map userInfo = getLoggedOnUserMap(request);
 
         return (userInfo == null) ? "" : (String) userInfo.get("user.login.id");
