@@ -396,6 +396,9 @@ public class Actions {
         }
 
         ArrayList<Admin> adminsList = (ArrayList<Admin>) portletContext.getAttribute("adminsList");
+        int userId = getLoggedOnUser(request).getId();
+        Admin admin = getAdmin(userId);
+        request.setAttribute("isMaster", admin.getIsMaster());
         request.setAttribute("adminsList", adminsList);
         return "admin-list-jsp";
     }
@@ -410,7 +413,7 @@ public class Actions {
      */
     public String deleteAdmin(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!isLoggedInUserAdmin(request)) {
+        if (!isLoggedInUserMasterAdmin(request)) {
             addErrorsToRequest(request, "You do not have access to perform this action");
             return displayHomeView(request, response);
         }
@@ -451,7 +454,7 @@ public class Actions {
      */
     public String addAdmin(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!isLoggedInUserAdmin(request)) {
+        if (!isLoggedInUserMasterAdmin(request)) {
             addErrorsToRequest(request, "You do not have access to perform this action");
             return displayHomeView(request, response);
         }
@@ -581,6 +584,20 @@ public class Actions {
         int pidm = getLoggedOnUser(request).getId();
 
         return getAdmin(pidm) != null;
+    }
+
+    /**
+     * Returns true if the logged in user is a master admin, false otherwise.
+     *
+     * @param request
+     * @return boolean
+     * @throws Exception
+     */
+    private boolean isLoggedInUserMasterAdmin(PortletRequest request) throws Exception {
+        int pidm = getLoggedOnUser(request).getId();
+        Admin admin = getAdmin(pidm);
+
+        return admin != null && admin.getIsMaster();
     }
 
     /**

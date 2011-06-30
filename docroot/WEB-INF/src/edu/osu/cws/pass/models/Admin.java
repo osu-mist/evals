@@ -22,8 +22,11 @@ public class Admin extends Pass {
      */
     private String scope;
 
-    private static final String validEmployeeRequired =
-            "The username you entered does not exist or is inactive. Please provide a valid employee";
+    public static final String validEmployeeRequired =
+            "The username you entered does not exist or is inactive. Please provide a valid employee username.";
+
+    public static final String isMasterCannotBeEmpty =
+            "Please select the type of administrator.";
 
     /**
      * Check that the employee we are adding as admin is active.
