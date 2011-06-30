@@ -266,7 +266,8 @@ public class Actions {
      * @throws Exception
      */
     public void setPassAdmins() throws Exception {
-        portletContext.setAttribute("admins", adminMgr.list());
+        portletContext.setAttribute("admins", adminMgr.mapByEmployeeId());
+        portletContext.setAttribute("adminsList", adminMgr.list());
     }
 
     /**
@@ -378,6 +379,96 @@ public class Actions {
         return displayHomeView(request, response);
     }
 
+    /**
+     * Handles listing the admin users. It only performs error checking. The list of
+     * admins is already set by PASSPortlet.portletSetup, so we don't need to do
+     * anything else in this method.
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    public String listAdmin(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, "You do not have access to list admin users");
+            return displayHomeView(request, response);
+        }
+
+        ArrayList<Admin> adminsList = (ArrayList<Admin>) portletContext.getAttribute("adminsList");
+        request.setAttribute("adminsList", adminsList);
+        return "admin-list-jsp";
+    }
+
+    /**
+     * Handles deleting the admin user.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String deleteAdmin(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, "You do not have access to perform this action");
+            return displayHomeView(request, response);
+        }
+
+        int id = ParamUtil.getInteger(request, "id");
+        AdminMgr adminMgr = new AdminMgr();
+        try {
+
+            // If the user clicks on the delete link the first time, use confirm page
+            if (request instanceof RenderRequest && response instanceof RenderResponse) {
+                Admin admin = adminMgr.get(id);
+                request.setAttribute("admin", admin);
+                return "admin-delete-jsp";
+            }
+
+            // If user hits cancel, send them to list admin page
+            if (!ParamUtil.getString(request, "cancel").equals("")) {
+                return listAdmin(request, response);
+            }
+
+            adminMgr.delete(id);
+            setPassAdmins();
+            SessionMessages.add(request, "admin-deleted");
+        } catch (ModelException e) {
+            addErrorsToRequest(request, e.getMessage());
+        }
+
+        return listAdmin(request, response);
+    }
+
+    /**
+     * Handles adding an admin user.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String addAdmin(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, "You do not have access to perform this action");
+            return displayHomeView(request, response);
+        }
+
+        String onid = ParamUtil.getString(request, "onid");
+        String isMaster = ParamUtil.getString(request, "isAdmin");
+
+        try {
+            adminMgr.add(onid,  isMaster, getLoggedOnUser(request));
+            setPassAdmins();
+            SessionMessages.add(request, "admin-added");
+        } catch (Exception e) {
+            addErrorsToRequest(request, e.getMessage());
+        }
+
+        return listAdmin(request, response);
+    }
 
     /**
      * Takes an string error message and sets in the session.

@@ -25,7 +25,6 @@
     padding-top:0.5em;
 }
 
-
 /* Appraisal Form */
 #pass-appraisal-form {
     width:100%;
@@ -79,4 +78,17 @@ width: 99%;
 }
 #pass-appraisal-form div.pass-actions input {
     margin-right:1.5em;
+}
+
+/* Admin/Reviewer add */
+#pass-user-add {
+    margin-top: 1em 0;
+    width: 25em;
+    border: 1px solid #ccc;
+}
+#pass-user-add table {
+    width: 100%;
+}
+#pass-user-add input[type="submit"] {
+    margin-right:2em;
 }

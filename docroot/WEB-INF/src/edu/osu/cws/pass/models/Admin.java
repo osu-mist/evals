@@ -1,6 +1,7 @@
 package edu.osu.cws.pass.models;
 
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Admin extends Pass {
@@ -20,6 +21,30 @@ public class Admin extends Pass {
      * The value for scope will be: hr, uabac, etc.
      */
     private String scope;
+
+    private static final String validEmployeeRequired =
+            "The username you entered does not exist or is inactive. Please provide a valid employee";
+
+    /**
+     * Check that the employee we are adding as admin is active.
+     *
+     * @return
+     */
+    public boolean validateEmployee() {
+        ArrayList<String> employeeErrors = new ArrayList<String>();
+
+        // If there were any previous validation errors remove them.
+        this.errors.remove("employee");
+        if (this.employee == null || !this.employee.getStatus().equals("A")) {
+            employeeErrors.add(validEmployeeRequired);
+        }
+
+        if (employeeErrors.size() > 0) {
+            this.errors.put("employee", employeeErrors);
+            return false;
+        }
+        return true;
+    }
 
     public Admin() { }
 

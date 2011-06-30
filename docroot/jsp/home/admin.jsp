@@ -3,6 +3,10 @@
 PortletURL criteriaListURL = renderResponse.createRenderURL();
 criteriaListURL.setWindowState(WindowState.NORMAL);
 criteriaListURL.setParameter("action", "listCriteria");
+
+PortletURL adminListURL = renderResponse.createRenderURL();
+adminListURL.setWindowState(WindowState.NORMAL);
+adminListURL.setParameter("action", "listAdmin");
 %>
 
 <c:if test="${admin.id ne 0}">
@@ -23,13 +27,11 @@ criteriaListURL.setParameter("action", "listCriteria");
         </div>
         <div class="accordion-content" id="<portlet:namespace/>passAdmin" style="display: block;">
             <ul class="pass-menu-list">
-                <li><liferay-ui:icon
-                        image="page"
-                        message="Evaluation Criteria"
-                        url="<%= criteriaListURL.toString() %>"
-                        method="get"
-                    />
+                <li>
                     <a href="<%= criteriaListURL.toString() %>">Evaluation Criteria</a>
+                </li>
+                <li>
+                    <a href="<%= adminListURL.toString() %>"><liferay-ui:message key="admins-list-title"/></a>
                 </li>
             </ul>
         </div>
