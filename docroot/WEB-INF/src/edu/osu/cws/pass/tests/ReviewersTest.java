@@ -31,7 +31,7 @@ public class ReviewersTest {
     @Test(groups = {"unittest"})
     public void shouldListReviewers() throws Exception {
         HashMap reviewersList = reviewerMgr.mapByEmployeeId();
-        assert reviewersList.size() == 3 : "Invalid list of reviewers";
+        assert reviewersList.size() == 2 : "Invalid list of reviewers";
         assert reviewersList.containsKey(787812) : "Missing reviewer from list";
         assert reviewersList.containsKey(8712359) : "Missing reviewer from list";
     }
