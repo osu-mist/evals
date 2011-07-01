@@ -28,7 +28,7 @@ public class AdminsTest {
 
     public void shouldListAdmins() throws Exception {
         HashMap adminsList = adminMgr.mapByEmployeeId();
-        assert adminsList.size() == 2 : "Invalid list of admins";
+        assert adminsList.size() == 3 : "Invalid list of admins";
         assert adminsList.containsKey(12345) : "Invalid admin in list";
         assert adminsList.containsKey(12467) : "Invalid admin in list";
 

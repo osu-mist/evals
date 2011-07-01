@@ -30,7 +30,7 @@ public class ReviewersTest {
     @Test(groups = {"unittest"})
     public void shouldListReviewers() throws Exception {
         HashMap reviewersList = reviewerMgr.mapByEmployeeId();
-        assert reviewersList.size() == 2 : "Invalid list of reviewers";
+        assert reviewersList.size() == 3 : "Invalid list of reviewers";
         assert reviewersList.containsKey(787812) : "Missing reviewer from list";
         assert reviewersList.containsKey(8712359) : "Missing reviewer from list";
     }
@@ -63,7 +63,7 @@ public class ReviewersTest {
 
     @Test(expectedExceptions = {ModelException.class})
     public void shouldNotAddReviewerWhoIsAlreadyReviewerForThatBusinessCenter() throws Exception {
-        reviewerMgr.add("barlowc", "AABC");
+        reviewerMgr.add("barlowc3", "AABC");
     }
 
     public void shouldAddReviewerWhoIsAReviewerForDifferentBusinessCenter() throws Exception {
@@ -75,7 +75,7 @@ public class ReviewersTest {
 
     public void shouldAddReviewer() throws Exception {
         ArrayList<Reviewer> oldReviewersList = (ArrayList<Reviewer>) reviewerMgr.list();
-        reviewerMgr.add("barlowc", "UABC");
+        reviewerMgr.add("cedenoj", "UABC");
         ArrayList<Reviewer> newReviewerList = (ArrayList<Reviewer>) reviewerMgr.list();
         assert oldReviewersList.size() == newReviewerList.size() - 1;
     }
