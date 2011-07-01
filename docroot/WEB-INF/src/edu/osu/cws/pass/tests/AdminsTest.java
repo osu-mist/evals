@@ -85,6 +85,4 @@ public class AdminsTest {
         assert admin.getEmployee().getOnid().equals("barlowc");
 
     }
-
-    //@todo: write test for adminMgr.add
 }

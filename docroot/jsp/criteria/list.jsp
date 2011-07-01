@@ -10,7 +10,7 @@ addCriteriaURL.setParameter("action", "addCriteria");
 
 <h2><liferay-ui:message key="Criteria" /></h2>
 <liferay-ui:success key="criteria-saved" message="criteria-saved" />
-<liferay-ui:success key="criteria-saved" message="criteria-deleted" />
+<liferay-ui:success key="criteria-deleted" message="criteria-deleted" />
 
 <div class="separator"></div>
 <table class="taglib-search-iterator">

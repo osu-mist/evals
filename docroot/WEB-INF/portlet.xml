@@ -22,6 +22,14 @@
             <value>/jsp/admins/delete.jsp</value>
         </init-param>
         <init-param>
+            <name>reviewer-list-jsp</name>
+            <value>/jsp/reviewers/list.jsp</value>
+        </init-param>
+        <init-param>
+            <name>reviewer-delete-jsp</name>
+            <value>/jsp/reviewers/delete.jsp</value>
+        </init-param>
+        <init-param>
             <name>criteria-add-jsp</name>
             <value>/jsp/criteria/add.jsp</value>
         </init-param>

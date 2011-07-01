@@ -52,7 +52,7 @@ public class AdminMgr {
     }
 
     /**
-     * Retrieves a list of PermissionRule from the database.
+     * Retrieves a list of Admin from the database.
      *
      * @param session
      * @return

@@ -277,7 +277,8 @@ public class Actions {
      * @throws Exception
      */
     public void setPassReviewers() throws Exception {
-        portletContext.setAttribute("reviewers", reviewerMgr.list());
+        portletContext.setAttribute("reviewers", reviewerMgr.mapByEmployeeId());
+        portletContext.setAttribute("reviewersList", reviewerMgr.list());
     }
 
 
@@ -396,9 +397,7 @@ public class Actions {
         }
 
         ArrayList<Admin> adminsList = (ArrayList<Admin>) portletContext.getAttribute("adminsList");
-        int userId = getLoggedOnUser(request).getId();
-        Admin admin = getAdmin(userId);
-        request.setAttribute("isMaster", admin.getIsMaster());
+        request.setAttribute("isMaster", isLoggedInUserMasterAdmin(request));
         request.setAttribute("adminsList", adminsList);
         return "admin-list-jsp";
     }
@@ -471,6 +470,102 @@ public class Actions {
         }
 
         return listAdmin(request, response);
+    }
+
+    /**
+     * Handles listing the reviewer users. It only performs error checking. The list of
+     * reviewers is already set by PASSPortlet.portletSetup, so we don't need to do
+     * anything else in this method.
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    public String listReviewer(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, "You do not have access to perform this action");
+            return displayHomeView(request, response);
+        }
+
+        ArrayList<Reviewer> reviewersList = (ArrayList<Reviewer>) portletContext.getAttribute("reviewersList");
+        BusinessCenterMgr businessCenterMgr = new BusinessCenterMgr();
+        ArrayList<BusinessCenter> businessCenters = (ArrayList<BusinessCenter>) businessCenterMgr.list();
+
+        request.setAttribute("isMaster", isLoggedInUserMasterAdmin(request));
+        request.setAttribute("reviewersList", reviewersList);
+        request.setAttribute("businessCenters", businessCenters);
+        return "reviewer-list-jsp";
+    }
+
+    /**
+     * Handles deleting a reviewer user.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String deleteReviewer(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserMasterAdmin(request)) {
+            addErrorsToRequest(request, "You do not have access to perform this action");
+            return displayHomeView(request, response);
+        }
+
+        int id = ParamUtil.getInteger(request, "id");
+        ReviewerMgr reviewerMgr = new ReviewerMgr();
+        try {
+
+            // If the user clicks on the delete link the first time, use confirm page
+            if (request instanceof RenderRequest && response instanceof RenderResponse) {
+                Reviewer reviewer = reviewerMgr.get(id);
+                request.setAttribute("reviewer", reviewer);
+                return "reviewer-delete-jsp";
+            }
+
+            // If user hits cancel, send them to list admin page
+            if (!ParamUtil.getString(request, "cancel").equals("")) {
+                return listReviewer(request, response);
+            }
+
+            reviewerMgr.delete(id);
+            setPassReviewers();
+            SessionMessages.add(request, "reviewer-deleted");
+        } catch (ModelException e) {
+            addErrorsToRequest(request, e.getMessage());
+        }
+
+        return listReviewer(request, response);
+    }
+
+    /**
+     * Handles adding an admin user.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String addReviewer(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserMasterAdmin(request)) {
+            addErrorsToRequest(request, "You do not have access to perform this action");
+            return displayHomeView(request, response);
+        }
+
+        String onid = ParamUtil.getString(request, "onid");
+        String businessCenterName = ParamUtil.getString(request, "businessCenterName");
+
+        try {
+            reviewerMgr.add(onid, businessCenterName);
+            setPassReviewers();
+            SessionMessages.add(request, "reviewer-added");
+        } catch (Exception e) {
+            addErrorsToRequest(request, e.getMessage());
+        }
+
+        return listReviewer(request, response);
     }
 
     /**

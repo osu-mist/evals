@@ -47,6 +47,7 @@ name of the hibernate configuration file.
         <!-- Mappings -->
         <mapping resource="edu/osu/cws/pass/hbm/Admin.hbm.xml" />
         <mapping resource="edu/osu/cws/pass/hbm/AppointmentType.hbm.xml" />
+        <mapping resource="edu/osu/cws/pass/hbm/BusinessCenter.hbm.xml" />
         <mapping resource="edu/osu/cws/pass/hbm/CriterionArea.hbm.xml" />
         <mapping resource="edu/osu/cws/pass/hbm/CriterionDetail.hbm.xml" />
         <mapping resource="edu/osu/cws/pass/hbm/Employee.hbm.xml" />

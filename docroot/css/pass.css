@@ -89,6 +89,9 @@ width: 99%;
 #pass-user-add table {
     width: 100%;
 }
+#pass-user-add input, #pass-user-add select {
+    margin-bottom:1em;
+}
 #pass-user-add input[type="submit"] {
     margin-right:2em;
 }
