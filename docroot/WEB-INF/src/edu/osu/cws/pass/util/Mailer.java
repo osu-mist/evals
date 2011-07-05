@@ -1,33 +1,98 @@
 package edu.osu.cws.pass.util;
 
 /**
- * Created by IntelliJ IDEA.
- * User: luf
- * Date: 6/30/11
- * Time: 4:59 PM
- * To change this template use File | Settings | File Templates.
+ * @author Kenneth Lett <kenneth.lett@oregonstate.edu>
+ * @copyright Copyright 2011, Central Web Services, Oregon State University
+ * Date: 6/24/11
  */
+import java.util.*;
+import javax.activation.MimeType;
+import javax.mail.*;
+import edu.osu.cws.pass.models.*;
+import edu.osu.cws.util.*;
+import edu.osu.cws.pass.hibernate.AppraisalMgr;
+import sun.misc.Resource;
+import sun.net.www.protocol.mailto.MailToURLConnection;
 
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import edu.osu.cws.pass.models.Email;
-import edu.osu.cws.util.Mail;
-import edu.osu.cws.pass.models.Appraisal;
-import edu.osu.cws.pass.models.EmailType;
-
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.NewsAddress;
+import javax.portlet.*;
 
 public class Mailer {
 
-    public Mailer(ResourceBundle emailBundle, Mail mail, String mimeType)
-    {
+    /**
+     * Body and subject from resource Bundle
+	 * body a dynamic message
+     * Instantiate an Email object
+     * and call its send function
+     *
+     */
+    private ResourceBundle emailBundle;
+	private Mail email;
 
+ 	/** gets the text from the emailResources, format it, and call the send function of
+        * of the Email class.
+        */
+
+    public Mailer(ResourceBundle emailBundle, Mail email) {}
+
+    public void sendMail(Appraisal appraisal, EmailType emailType) throws MessagingException {
+
+        Message message = email.getMessage();
+
+        //get mailTo from emailType   //mail to is comma separated list of roles, like "employee, supervisor"
+
+        String mailTo = emailType.getMailTo();
+
+        if (mailTo != null) {
+            Address recipient = getRecipient(mailTo, appraisal);
+            message.setRecipient(Message.RecipientType.TO, recipient);
+		    //message.setRecipient(recipient);
+        }
+
+/*
+        String cc = emailType.getCc();
+
+	    if (cc != null) {
+		    getEmailAddress(appraisal, cc);
+		    set the cc in the message
+        }
+
+        get bcc from emailType
+	    if bcc is not null
+		    bcc = getEmailAddress(appraisal, bcc)
+		    set the bcc in the message
+	    get the subject from the resource bundle
+	    get the body from the get body method.  Maybe we should do it the way Jose in the delegate method in the portlet.
+
+	    Transport.send(message);
+	    */
+   }
+
+	//get the appropriate resourceBundle resource
+	//format and return it.
+    private String getGoalsDueBody(Appraisal appraisal) throws MessagingException {
+
+        String body = emailBundle.getString("goalsDue");
+
+        return body;
     }
 
-    public void sendMail(Appraisal appraisal, EmailType type) throws Exception
-
-    {
-
+    private String getGoalsPastDueBody(Appraisal appraisal) {
+       return "done";
     }
 
+    private String getGoalsRequireModificationBody(Appraisal appraisal) {
+       return "done";
+    }
 
+    private Address getRecipient(String mailTo, Appraisal appraisal) {
+
+        
+        Address recipient = new InternetAddress();
+        return recipient;
+    }
 }

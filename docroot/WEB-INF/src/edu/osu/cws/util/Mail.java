@@ -2,40 +2,43 @@ package edu.osu.cws.util;
 
 /**
  * Created by IntelliJ IDEA.
- * User: luf
- * Date: 6/30/11
- * Time: 4:59 PM
- * To change this template use File | Settings | File Templates.
+ * @author Kenneth Lett <kenneth.lett@oregonstate.edu>
+ * @copyright Copyright 2011, Central Web Services, Oregon State University
+ * Date: 6/23/11
  */
 
-import javax.mail.Address;
-import javax.mail.Message;
-import java.util.Properties;
+import org.hibernate.stat.SessionStatisticsImpl;
+import sun.applet.resources.MsgAppletViewer;
+import sun.nio.cs.ext.MacIceland;
 
+import javax.mail.*;
+import javax.mail.internet.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import java.util.Date;
+import java.util.Properties;
 
 public class Mail {
     Address from;
-	Properties prop;  //this is the properties that holds the mailHost and is used to create a session.
+	Properties props;  //this is the properties that holds the mailHost and is used to create a session.
 
-	public Mail(String hostname, String from)  throws Exception
-    {
 
-    }
-	/*
-    public Message getMessage() throws Exception
-    {
-      return new Message();
-    }
+	public Mail(String hostname, Address from) {}
 
-	private Address[] StringToAddress(String[] emailAddresses) throws Exception
-    {
-
+	public Message getMessage() throws MessagingException {
+        Session session = Session.getInstance(props, null);
+        Message message = new MimeMessage(session);
+        message.setFrom(from);
+        return message;
     }
 
-	private Address stringToAddress(String emailAddress) throws Exception
-    {
-
+	public Address[] StringToAddress(String[] emailAddresses) throws AddressException {
+        Address address = new InternetAddress();
+        Address[] addresses = InternetAddress.parse(java.util.Arrays.toString(emailAddresses));
+        return addresses;
     }
-    */
 
+	public Address stringToAddress(String emailAddress) throws AddressException {
+        Address address = new InternetAddress(emailAddress);
+        return address;
+    }
 }
