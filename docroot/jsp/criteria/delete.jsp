@@ -3,7 +3,7 @@
 
 <h2><liferay-ui:message key="criteria-delete" /></h2>
 
-<form action="<portlet:actionURL>
+<form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
     <portlet:param name="id" value="${criterion.id}"/>
     <portlet:param name="action" value="deleteCriteria"/>
     </portlet:actionURL>" method="post">

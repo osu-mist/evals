@@ -20,7 +20,7 @@
     <fieldset id="pass-user-add">
         <legend><liferay-ui:message key="admin-add"/></legend>
 
-        <form action="<portlet:actionURL>
+        <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
             <portlet:param name="action" value="${addAction}"/>
             </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
 
@@ -79,7 +79,8 @@
         </td>
         <c:if test="${isMaster == true}">
             <td>
-            <a class="<portlet:namespace/>user-delete" href="<portlet:renderURL>
+            <a class="<portlet:namespace/>user-delete" href="<portlet:renderURL
+                windowState="<%= WindowState.MAXIMIZED.toString() %>">
                 <portlet:param name="id" value="${user.id}"/>
                 <portlet:param name="action" value="${deleteAction}"/>
             </portlet:renderURL>"><liferay-ui:message key="delete"/></a></td>

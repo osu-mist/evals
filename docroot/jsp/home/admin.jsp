@@ -1,15 +1,15 @@
 <jsp:useBean id="admin" class="edu.osu.cws.pass.models.Admin" scope="request" />
 <%
 PortletURL criteriaListURL = renderResponse.createRenderURL();
-criteriaListURL.setWindowState(WindowState.NORMAL);
+criteriaListURL.setWindowState(WindowState.MAXIMIZED);
 criteriaListURL.setParameter("action", "listCriteria");
 
 PortletURL adminListURL = renderResponse.createRenderURL();
-adminListURL.setWindowState(WindowState.NORMAL);
+adminListURL.setWindowState(WindowState.MAXIMIZED);
 adminListURL.setParameter("action", "listAdmin");
 
 PortletURL reviewerListURL = renderResponse.createRenderURL();
-reviewerListURL.setWindowState(WindowState.NORMAL);
+reviewerListURL.setWindowState(WindowState.MAXIMIZED);
 reviewerListURL.setParameter("action", "listReviewer");
 
 PortletURL configurationListURL = renderResponse.createRenderURL();

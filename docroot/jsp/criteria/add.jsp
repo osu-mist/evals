@@ -16,7 +16,7 @@ List appointmentTypes = (List) renderRequest.getAttribute("appointmentTypes");
 <h2><liferay-ui:message key="${titleKey}"/></h2>
 
 <div id="pass-add-criteria">
-    <form action="<portlet:actionURL>
+    <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
         <portlet:param name="action" value="${action}"/>
         </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
 
@@ -67,7 +67,8 @@ List appointmentTypes = (List) renderRequest.getAttribute("appointmentTypes");
     <br />
     <input type="submit" value="<liferay-ui:message key="save" />" />
     <input type="button" value="<liferay-ui:message key="cancel" />"
-        onClick="location.href = '<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>" />';" />
+        onClick="location.href = '<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+        <portlet:param name="action" value="listCriteria"/></portlet:renderURL>';" />
 
     </form>
 </div>

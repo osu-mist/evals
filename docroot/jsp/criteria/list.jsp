@@ -4,7 +4,7 @@
 List criteria = (List) renderRequest.getAttribute("criteria");
 
 PortletURL addCriteriaURL = renderResponse.createRenderURL();
-addCriteriaURL.setWindowState(WindowState.NORMAL);
+addCriteriaURL.setWindowState(WindowState.MAXIMIZED);
 addCriteriaURL.setParameter("action", "addCriteria");
 %>
 
@@ -35,12 +35,14 @@ addCriteriaURL.setParameter("action", "addCriteria");
         <td>${criterion.currentDetail.description}</td>
         <td>
         <a class="<portlet:namespace/>criterion-edit"
-            onclick="return <portlet:namespace/>edit(${criterion.id});" href="<portlet:renderURL>
+            onclick="return <portlet:namespace/>edit(${criterion.id});" href="<portlet:renderURL
+            windowState="<%= WindowState.MAXIMIZED.toString() %>">
             <portlet:param name="criterionAreaId" value="${criterion.id}"/>
             <portlet:param name="action" value="editCriteria"/>
         </portlet:renderURL>"><liferay-ui:message key="edit"/></a>
         <a class="<portlet:namespace/>criterion-delete"
-            onclick="return <portlet:namespace/>delete(${criterion.id}, '${criterion.name}');" href="<portlet:renderURL>
+            onclick="return <portlet:namespace/>delete(${criterion.id}, '${criterion.name}');" href="<portlet:renderURL
+            windowState="<%= WindowState.MAXIMIZED.toString() %>">
             <portlet:param name="id" value="${criterion.id}"/>
             <portlet:param name="action" value="deleteCriteria"/>
         </portlet:renderURL>"><liferay-ui:message key="delete"/></a></td>
