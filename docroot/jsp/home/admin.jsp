@@ -11,6 +11,10 @@ adminListURL.setParameter("action", "listAdmin");
 PortletURL reviewerListURL = renderResponse.createRenderURL();
 reviewerListURL.setWindowState(WindowState.NORMAL);
 reviewerListURL.setParameter("action", "listReviewer");
+
+PortletURL configurationListURL = renderResponse.createRenderURL();
+configurationListURL.setWindowState(WindowState.MAXIMIZED);
+configurationListURL.setParameter("action", "listConfiguration");
 %>
 
 <c:if test="${admin.id ne 0}">
@@ -39,6 +43,9 @@ reviewerListURL.setParameter("action", "listReviewer");
                 </li>
                 <li>
                     <a href="<%= reviewerListURL.toString() %>"><liferay-ui:message key="reviewers-list-title"/></a>
+                </li>
+                <li>
+                    <a href="<%= configurationListURL.toString() %>"><liferay-ui:message key="configurations-list-title"/></a>
                 </li>
             </ul>
         </div>

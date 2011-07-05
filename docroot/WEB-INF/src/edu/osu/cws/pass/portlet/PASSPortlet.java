@@ -213,6 +213,7 @@ public class PASSPortlet extends GenericPortlet {
             actionClass.setPortletContext(getPortletContext());
             actionClass.setPassAdmins();
             actionClass.setPassReviewers();
+            actionClass.setPassConfiguration();
         }
     }
 

@@ -27,6 +27,8 @@ public class Actions {
 
     private ReviewerMgr reviewerMgr = new ReviewerMgr();
 
+    private ConfigurationMgr2 configurationMgr = new ConfigurationMgr2();
+
     private PortletContext portletContext;
 
     private AppraisalMgr appraisalMgr = new AppraisalMgr();
@@ -279,6 +281,17 @@ public class Actions {
     public void setPassReviewers() throws Exception {
         portletContext.setAttribute("reviewers", reviewerMgr.mapByEmployeeId());
         portletContext.setAttribute("reviewersList", reviewerMgr.list());
+    }
+
+    /**
+     * Updates the configuration List in the portletContext. This method is called by
+     * PassPortlet.portletSetup and by Actions.editConfiguration methods.
+     *
+     * @throws Exception
+     */
+    public void setPassConfiguration() throws Exception {
+        portletContext.setAttribute("configurations", configurationMgr.mapByName());
+        portletContext.setAttribute("configurationsList", configurationMgr.list());
     }
 
 
@@ -566,6 +579,56 @@ public class Actions {
         }
 
         return listReviewer(request, response);
+    }
+
+
+    /**
+     * Handles listing the configuration parameters.
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    public String listConfiguration(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, "You do not have access to perform this action");
+            return displayHomeView(request, response);
+        }
+
+        ArrayList<Configuration> configurations = (ArrayList<Configuration>)
+                portletContext.getAttribute("configurationsList");
+        request.setAttribute("configurations", configurations);
+        return "configuration-list-jsp";
+    }
+
+    /**
+     * Handles updating a configuration parameter. This method is only called using ajax.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String editConfiguration(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, "You do not have access to perform this action");
+            return displayHomeView(request, response);
+        }
+
+        int id = ParamUtil.getInteger(request, "id");
+        String value = ParamUtil.getString(request, "value");
+
+        if (id != 0) {
+            try {
+                configurationMgr.edit(id, value);
+            } catch (Exception e) {
+                return e.getMessage();
+            }
+        }
+
+        return "success";
     }
 
     /**
