@@ -95,3 +95,17 @@ width: 99%;
 #pass-user-add input[type="submit"] {
     margin-right:2em;
 }
+
+/** JQuery UI Sortable */
+tr.ui-sortable-helper {
+    display: table;
+    background-color: #fff;
+    border: 1px solid black;
+}
+tr.ui-state-highlight {
+    height: 2.25em;
+    line-height: 2.25em;
+}
+.pass-sortable-icon {
+    display: none;
+}

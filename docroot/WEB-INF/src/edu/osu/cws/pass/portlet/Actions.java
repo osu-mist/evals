@@ -217,15 +217,32 @@ public class Actions {
     }
 
     /**
-     * This method uses the request object to get a string with the new order. It then calls
-     * a method in the hibernate util class to update the sequence of criterion for the given
-     * employeeType.
+     * This method is called via AJAX when the sequence of an evaluation criteria is updated.
      *
-     * @param actionRequest
-     * @param actionResponse
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
      */
-    public void updateCriteriaSequence(ActionRequest actionRequest, ActionResponse actionResponse) {
+    public String updateCriteriaSequence(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, "You do not have access to perform this action");
+            return displayHomeView(request, response);
+        }
 
+        int id = ParamUtil.getInteger(request, "id");
+        int sequence = ParamUtil.getInteger(request, "sequence");
+        CriteriaMgr criteriaMgrArea = new CriteriaMgr();
+
+        try {
+            Employee loggedOnUser = getLoggedOnUser(request);
+            criteriaMgrArea.updateSequence(id, sequence);
+        } catch (ModelException e) {
+            return e.getMessage();
+        }
+
+        return "success";
     }
 
     /**
