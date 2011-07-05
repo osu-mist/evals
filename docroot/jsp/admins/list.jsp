@@ -2,10 +2,6 @@
 <c:set var="deleteAction" value="deleteAdmin"/>
 <c:set var="addAction" value="addAdmin"/>
 
-<%
-List criteria = (List) renderRequest.getAttribute("adminsList");
-%>
-
 <h2><liferay-ui:message key="admins-list-title"/></h2>
 <liferay-ui:success key="admin-saved" message="admin-saved" />
 <liferay-ui:success key="admin-deleted" message="admin-deleted" />
