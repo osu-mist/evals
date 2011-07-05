@@ -81,10 +81,7 @@ public class CriteriaMgr {
 
         String description = request.get("description")[0];
         String name = request.get("name")[0];
-        String propagateEdit = "";
-        if (request.get("propagateEdit") != null){
-            propagateEdit = "1";
-        }
+        boolean propagateEdit = request.get("propagateEdit") != null;
 
         try {
             Transaction tx = session.beginTransaction();
@@ -103,6 +100,9 @@ public class CriteriaMgr {
             }
             if (descHash != updatedDescHash) {
                 descriptionChanged = true;
+            }
+            if (!areaChanged && !descriptionChanged) {
+                return true;
             }
 
             if (areaChanged && !descriptionChanged) {
@@ -156,7 +156,7 @@ public class CriteriaMgr {
                 newCriterion.addDetails(newDetails);
                 session.save(newDetails);
             }
-            if (propagateEdit.equals("1") && (areaChanged || descriptionChanged)) {
+            if (propagateEdit) {
                 String sqlUpdate = "UPDATE assessments a SET a.CRITERION_DETAIL_ID = :newDetail " +
                         "WHERE a.CRITERION_DETAIL_ID = :oldDetail AND a.APPRAISAL_ID in ( " +
                             "SELECT ID FROM appraisals WHERE STATUS not in ('completed', 'closed')" +
