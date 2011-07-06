@@ -48,7 +48,7 @@ public class Mailer {
         String mailTo = emailType.getMailTo();
 
         if (mailTo != null) {
-            Address recipient = getRecipient(mailTo, appraisal);
+            Address recipient = getEvaluatorEmail(mailTo, appraisal);
             message.setRecipient(Message.RecipientType.TO, recipient);
 		    //message.setRecipient(recipient);
         }
@@ -77,22 +77,22 @@ public class Mailer {
     private String getGoalsDueBody(Appraisal appraisal) throws MessagingException {
 
         String body = emailBundle.getString("goalsDue");
-
+        // replace body
         return body;
     }
 
-    private String getGoalsPastDueBody(Appraisal appraisal) {
+    private String getGoalsPastDueBody(Appraisal appraisal) throws MessagingException {
        return "done";
     }
 
-    private String getGoalsRequireModificationBody(Appraisal appraisal) {
+    private String getGoalsRequireModificationBody(Appraisal appraisal) throws MessagingException {
        return "done";
     }
 
-    private Address getRecipient(String mailTo, Appraisal appraisal) {
-
-        
-        Address recipient = new InternetAddress();
+    private Address getEvaluatorEmail(String mailTo, Appraisal appraisal) throws MessagingException {
+        Employee contact = appraisal.getEvaluator();
+        String address = contact.getEmail();
+        Address recipient = email.stringToAddress(address);
         return recipient;
     }
 }
