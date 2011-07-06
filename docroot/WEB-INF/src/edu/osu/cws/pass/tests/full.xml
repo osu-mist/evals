@@ -2,6 +2,7 @@
 <dataset>
   <admins ID="1" EMPLOYEE_PIDM="12345" IS_MASTER="true" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0" SCOPE="hr"/>
   <admins ID="2" EMPLOYEE_PIDM="12467" IS_MASTER="false" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0" SCOPE="hr"/>
+  <admins ID="3" EMPLOYEE_PIDM="8712359" IS_MASTER="true" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0" SCOPE="hr"/>
   <appointment_types NAME="Classified"/>
   <appraisal_steps ID="1" ACTION="submit" APPOINTMENT_TYPE="Classified" NEW_STATUS="goals-submitted" EMAIL_TYPE="goals-submitted"/>
   <appraisal_steps ID="2" ACTION="require-modification" APPOINTMENT_TYPE="Classified" NEW_STATUS="goals-require-modification" EMAIL_TYPE="goals-require-modification"/>
@@ -45,17 +46,42 @@
               CREATE_DATE="2010-05-01"
               TYPE="annual"
   />
+  <appraisals ID="5"
+              START_DATE="2009-05-14"
+              END_DATE="2010-05-10"
+              STATUS="closed"
+              PYVPASJ_PIDM="12345"
+              PYVPASJ_POSN="4444"
+              PYVPASJ_SUFF="00"
+              CREATE_DATE="2010-05-01"
+              TYPE="annual"
+  />
+  <appraisals ID="6"
+              START_DATE="2009-05-14"
+              END_DATE="2010-05-10"
+              STATUS="completed"
+              PYVPASJ_PIDM="12345"
+              PYVPASJ_POSN="4444"
+              PYVPASJ_SUFF="00"
+              CREATE_DATE="2010-05-01"
+              TYPE="annual"
+  />
   <goals_logs/>
-  <assessments/>
+  <assessments ID="1" APPRAISAL_ID="1" CRITERION_DETAIL_ID="3" CREATE_DATE="2011-04-10 20:16:48.0" />
+  <assessments ID="2" APPRAISAL_ID="2" CRITERION_DETAIL_ID="3" CREATE_DATE="2011-04-10 20:16:48.0" />
+  <assessments ID="3" APPRAISAL_ID="5" CRITERION_DETAIL_ID="3" CREATE_DATE="2011-04-10 20:16:48.0" />
+  <assessments ID="4" APPRAISAL_ID="6" CRITERION_DETAIL_ID="3" CREATE_DATE="2011-04-10 20:16:48.0" />
+
   <business_centers NAME="UABC"/>
-  <criteria_areas ID="1" NAME="COMMUNICATION SKILLS" APPOINTMENT_TYPE="Classified" SEQUENCE="1" CREATE_DATE="2011-04-10 20:16:48.0" CREATOR_PIDM="12345" DELETE_DATE="2011-04-10 20:16:48.0"/>
-  <criteria_areas ID="2" NAME="TECHNICAL SKILLS" APPOINTMENT_TYPE="Classified" SEQUENCE="2" CREATE_DATE="2011-04-11 09:57:08.0" CREATOR_PIDM="12345" DELETE_DATE="2011-04-11 09:57:08.0"/>
+  <criteria_areas ID="1" NAME="COMMUNICATION SKILLS" APPOINTMENT_TYPE="Classified" SEQUENCE="1" CREATE_DATE="2011-04-10 20:16:48.0" CREATOR_PIDM="12345"/>
+  <criteria_areas ID="2" NAME="TECHNICAL SKILLS" APPOINTMENT_TYPE="Classified" SEQUENCE="2" CREATE_DATE="2011-04-11 09:57:08.0" CREATOR_PIDM="12345"/>
+  <criteria_areas ID="3" NAME="DELETETED CRITERIA AREA" APPOINTMENT_TYPE="Classified" SEQUENCE="3" CREATE_DATE="2011-04-11 09:57:08.0" CREATOR_PIDM="12345" DELETE_DATE="2011-04-11 09:57:08.0"/>
   <criteria_details ID="1" AREA_ID="1" DESCRIPTION="How will you improve your communication?" CREATE_DATE="2011-04-11 10:00:19.0" CREATOR_PIDM="12345"/>
   <criteria_details ID="2" AREA_ID="2" DESCRIPTION="What training will you obtain this year?" CREATE_DATE="2011-04-11 10:31:58.0" CREATOR_PIDM="12345"/>
   <criteria_details ID="3" AREA_ID="1" DESCRIPTION="How will you increase your communication skills?" CREATE_DATE="2011-04-12 14:30:23.0" CREATOR_PIDM="12345"/>
   <email_types TYPE="goals-submitted" MAILTO="employee"/>
   <email_types TYPE="goals-require-modification" MAILTO="employee"/>
-  <PYVPASE
+  <employees
       PYVPASE_PIDM="12345"
       PYVPASE_FIRST_NAME="Jose"
       PYVPASE_MI="Daniel"
@@ -64,7 +90,7 @@
       PYVPASE_ONID_LOGIN="cedenoj"
       PYVPASE_EMAIL="jose.cedeno@oregonstate.edu"
       PYVPASE_EMPL_STATUS="A"/>
-  <PYVPASE
+  <employees
       PYVPASE_PIDM="12467"
       PYVPASE_FIRST_NAME="Joan"
       PYVPASE_LAST_NAME="Lu"
@@ -72,7 +98,7 @@
       PYVPASE_ONID_LOGIN="luf"
       PYVPASE_EMAIL="joan.lu@oregonstate.edu"
       PYVPASE_EMPL_STATUS="A"/>
-  <PYVPASE
+  <employees
       PYVPASE_PIDM="787812"
       PYVPASE_FIRST_NAME="Clark"
       PYVPASE_LAST_NAME="Barlow"
@@ -80,23 +106,23 @@
       PYVPASE_ONID_LOGIN="barlowc"
       PYVPASE_EMAIL="test@orst.edu"
       PYVPASE_EMPL_STATUS="A"/>
-  <PYVPASE
+  <employees
       PYVPASE_PIDM="8712359" 
       PYVPASE_FIRST_NAME="Lois"
       PYVPASE_LAST_NAME="Barlow"
       PYVPASE_ID="12345678" 
-      PYVPASE_ONID_LOGIN="barlowc"
+      PYVPASE_ONID_LOGIN="barlowc2"
       PYVPASE_EMAIL="test@orst.edu"
       PYVPASE_EMPL_STATUS="A"/>
-  <PYVPASE
+  <employees
       PYVPASE_PIDM="990871" 
       PYVPASE_FIRST_NAME="Megan"
       PYVPASE_LAST_NAME="Barlow"
       PYVPASE_ID="12345678" 
-      PYVPASE_ONID_LOGIN="barlowc"
+      PYVPASE_ONID_LOGIN="barlowc3"
       PYVPASE_EMAIL="test@orst.edu"
       PYVPASE_EMPL_STATUS="A"/>
-  <PYVPASE
+  <employees
       PYVPASE_PIDM="56198" 
       PYVPASE_FIRST_NAME="Jess"
       PYVPASE_LAST_NAME="Smith"
@@ -106,8 +132,9 @@
       PYVPASE_EMPL_STATUS="T"/>
 
   <reviewers ID="1" EMPLOYEE_PIDM="787812" BUSINESS_CENTER_NAME="UABC"/>
-  <reviewers ID="2" EMPLOYEE_PIDM="8712359" BUSINESS_CENTER_NAME="UABC"/>
-  <PYVPASJ
+  <reviewers ID="2" EMPLOYEE_PIDM="8712359" BUSINESS_CENTER_NAME="AABC"/>
+  <reviewers ID="3" EMPLOYEE_PIDM="990871" BUSINESS_CENTER_NAME="AABC"/>
+  <jobs
         PYVPASJ_PIDM="12345"
         PYVPASJ_SUPERVISOR_PIDM="12467"
         PYVPASJ_SUPERVISOR_POSN="1234"
@@ -118,7 +145,6 @@
         PYVPASJ_ECLS_CODE="kjlkjlk"
         PYVPASJ_APPOINTMENT_TYPE="Classified"
         PYVPASJ_BEGIN_DATE="2011-05-14"
-        positionClass="foobar"
         PYVPASJ_BCTR_TITLE="UABC"
         PYVPASJ_ORGN_CODE_TS="test"
         PYVPASJ_STATUS="A"
@@ -129,10 +155,10 @@
         PYVPASJ_ANNUAL_IND="test"
         PYVPASJ_EVAL_DATE="test"
         PYVPASJ_ORGN_DESC="testing"/>
-  <PYVPASJ
+  <jobs
         PYVPASJ_PIDM="12345"
         PYVPASJ_SUPERVISOR_PIDM="12467"
-        PYVPASJ_SUPERVISOR_POSN="12345"
+        PYVPASJ_SUPERVISOR_POSN="1234"
         PYVPASJ_SUPERVISOR_SUFF="00"
         PYVPASJ_DESC="baggel maker"
         PYVPASJ_POSN="4444"
@@ -140,7 +166,6 @@
         PYVPASJ_ECLS_CODE="kjlkjlk"
         PYVPASJ_APPOINTMENT_TYPE="Classified"
         PYVPASJ_BEGIN_DATE="2011-05-14"
-        positionClass="foobar"
         PYVPASJ_BCTR_TITLE="UABC"
         PYVPASJ_ORGN_CODE_TS="test"
         PYVPASJ_STATUS="A"
@@ -151,7 +176,7 @@
         PYVPASJ_ANNUAL_IND="test"
         PYVPASJ_EVAL_DATE="test"
         PYVPASJ_ORGN_DESC="testing"/>
-  <PYVPASJ
+  <jobs
         PYVPASJ_PIDM="12467"
         PYVPASJ_DESC="MU Supervisor"
         PYVPASJ_POSN="1234"
@@ -159,7 +184,6 @@
         PYVPASJ_ECLS_CODE="kjlkjlk"
         PYVPASJ_APPOINTMENT_TYPE="Classified"
         PYVPASJ_BEGIN_DATE="2011-05-14"
-        positionClass="foobar"
         PYVPASJ_BCTR_TITLE="UABC"
         PYVPASJ_ORGN_CODE_TS="test"
         PYVPASJ_STATUS="A"
@@ -170,7 +194,7 @@
         PYVPASJ_ANNUAL_IND="test"
         PYVPASJ_EVAL_DATE="test"
         PYVPASJ_ORGN_DESC="testing"/>
-  <PYVPASJ
+  <jobs
         PYVPASJ_PIDM="12345"
         PYVPASJ_SUPERVISOR_PIDM="56198"
         PYVPASJ_SUPERVISOR_POSN="1234"
@@ -181,7 +205,6 @@
         PYVPASJ_ECLS_CODE="kjlkjlk"
         PYVPASJ_APPOINTMENT_TYPE="Classified"
         PYVPASJ_BEGIN_DATE="2011-05-14"
-        positionClass="foobar"
         PYVPASJ_BCTR_TITLE="UABC"
         PYVPASJ_ORGN_CODE_TS="test"
         PYVPASJ_STATUS="A"
@@ -192,7 +215,7 @@
         PYVPASJ_ANNUAL_IND="test"
         PYVPASJ_EVAL_DATE="test"
         PYVPASJ_ORGN_DESC="testing"/>
-  <PYVPASJ
+  <jobs
         PYVPASJ_PIDM="787812"
         PYVPASJ_SUPERVISOR_PIDM="8712359"
         PYVPASJ_SUPERVISOR_POSN="1234"
@@ -203,7 +226,6 @@
         PYVPASJ_ECLS_CODE="kjlkjlk"
         PYVPASJ_APPOINTMENT_TYPE="Classified"
         PYVPASJ_BEGIN_DATE="2011-05-14"
-        positionClass="foobar"
         PYVPASJ_BCTR_TITLE="UABC"
         PYVPASJ_ORGN_CODE_TS="test"
         PYVPASJ_STATUS="A"
@@ -214,7 +236,7 @@
         PYVPASJ_ANNUAL_IND="test"
         PYVPASJ_EVAL_DATE="test"
         PYVPASJ_ORGN_DESC="testing"/>
-  <PYVPASJ
+  <jobs
         PYVPASJ_PIDM="8712359"
         PYVPASJ_SUPERVISOR_PIDM="990871"
         PYVPASJ_SUPERVISOR_POSN="1234"
@@ -225,7 +247,6 @@
         PYVPASJ_ECLS_CODE="kjlkjlk"
         PYVPASJ_APPOINTMENT_TYPE="Classified"
         PYVPASJ_BEGIN_DATE="2011-05-14"
-        positionClass="foobar"
         PYVPASJ_BCTR_TITLE="UABC"
         PYVPASJ_ORGN_CODE_TS="test"
         PYVPASJ_STATUS="A"
@@ -236,7 +257,7 @@
         PYVPASJ_ANNUAL_IND="test"
         PYVPASJ_EVAL_DATE="test"
         PYVPASJ_ORGN_DESC="testing"/>
-  <PYVPASJ
+  <jobs
         PYVPASJ_PIDM="990871"
         PYVPASJ_DESC="Bar owner"
         PYVPASJ_POSN="1234"
@@ -244,7 +265,6 @@
         PYVPASJ_ECLS_CODE="kjlkjlk"
         PYVPASJ_APPOINTMENT_TYPE="Classified"
         PYVPASJ_BEGIN_DATE="2011-05-14"
-        positionClass="foobar"
         PYVPASJ_BCTR_TITLE="UABC"
         PYVPASJ_ORGN_CODE_TS="test"
         PYVPASJ_STATUS="A"
@@ -255,7 +275,7 @@
         PYVPASJ_ANNUAL_IND="test"
         PYVPASJ_EVAL_DATE="test"
         PYVPASJ_ORGN_DESC="testing"/>
-  <PYVPASJ
+  <jobs
         PYVPASJ_PIDM="56198"
         PYVPASJ_SUPERVISOR_PIDM="12345"
         PYVPASJ_SUPERVISOR_POSN="1234"
@@ -266,7 +286,6 @@
         PYVPASJ_ECLS_CODE="kjlkjlk"
         PYVPASJ_APPOINTMENT_TYPE="Classified"
         PYVPASJ_BEGIN_DATE="2011-05-14"
-        positionClass="foobar"
         PYVPASJ_BCTR_TITLE="UABC"
         PYVPASJ_ORGN_CODE_TS="test"
         PYVPASJ_STATUS="A"
