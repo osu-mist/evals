@@ -9,6 +9,8 @@ import sun.security.krb5.Config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ConfigurationMgr2 {
 
@@ -67,6 +69,16 @@ public class ConfigurationMgr2 {
         configuration.setValue(value);
         session.update(configuration);
         tx.commit();
+    }
+
+    /**
+     * returns a map of all the configurations using the name as the key.
+     * @return
+     */
+    public static Map<String, Configuration> getMap()
+    {
+        Map<String, Configuration> configMap = new HashMap();
+        return configMap;
     }
 
 }

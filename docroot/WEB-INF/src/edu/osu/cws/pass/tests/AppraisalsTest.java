@@ -38,7 +38,7 @@ public class AppraisalsTest {
      */
     @Test(groups = {"unittest"}, dataProvider = "job")
     public void shouldCreateAnAppraisal(Job job) throws Exception {
-        assert appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL) != 0 :
+        assert appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL).getId() != 0 :
                 "AppraisalMgr.createAppraisal should return id of appraisal";
     }
 
@@ -46,7 +46,7 @@ public class AppraisalsTest {
     public void appraisalShouldRequireValidJob() throws Exception {
         Job invalidJob = new Job();
 
-        assert appraisalMgr.createAppraisal(invalidJob, Appraisal.TYPE_ANNUAL) != 0 :
+        assert appraisalMgr.createAppraisal(invalidJob, Appraisal.TYPE_ANNUAL).getId() != 0 :
                 "AppraisalMgr.createAppraisal should require valid Job";
     }
 
@@ -77,7 +77,7 @@ public class AppraisalsTest {
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         tx.commit();
 
-        int appraisalID =  appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL);
+        int appraisalID =  appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL).getId();
         hsession = HibernateUtil.getCurrentSession();
         tx = hsession.beginTransaction();
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
@@ -128,7 +128,7 @@ public class AppraisalsTest {
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         tx.commit();
 
-        int appraisalID =  appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL);
+        int appraisalID =  appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL).getId();
         hsession = HibernateUtil.getCurrentSession();
         tx = hsession.beginTransaction();
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
@@ -158,7 +158,7 @@ public class AppraisalsTest {
         Transaction tx = hsession.beginTransaction();
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         tx.commit();
-        int appraisalID =  appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL);
+        int appraisalID =  appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL).getId();
 
         // Grab the freshly created appraisal from the db before we start
         // updating the properties.

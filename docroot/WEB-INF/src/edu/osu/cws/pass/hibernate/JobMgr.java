@@ -150,4 +150,21 @@ public class JobMgr {
         tx.commit();
         return result;
     }
+
+    /**
+     * This isn't quite there yet
+     * @param appointmentType: the type of appointment (classified, classifiedIT, ...)
+     * @return a list of jobs.
+     */
+    public static List<Job> list(String appointmentType)
+    {
+        Session session = HibernateUtil.getCurrentSession();
+        //@@@Not sure this is correct.  Need to think and talk to Jose
+        String sql = "select PYVPASJ_PIDM, PYVPASJ_POSN, PYVPASJ_SUFF, PYVPASJ_BEGIN_DATE "
+                + "PYVPASJ_BCTR_TITLE, PYVPASJ_TRIAL_IND, PYVPASJ_EVAL_DATE "
+                + "FROM edu.osu.cws.pass.models.Job"
+                + "WHERE PYVPASJ_APPOINTMENT_TYPE = :appointmentType";
+        List<Job> results =  session.createCriteria(sql).list();
+        return results;
+    }
 }

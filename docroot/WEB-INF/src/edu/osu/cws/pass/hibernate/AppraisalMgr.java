@@ -34,11 +34,10 @@ public class AppraisalMgr {
      * class. It returns the id of the created appraisal.
      *
      * @param job   Job for this appraisal
-     * @param type  Type of appraisal: trial, annual or special
      * @return appraisal.id
      * @throws Exception
      */
-    public int createAppraisal(Job job, String type) throws Exception {
+    public Appraisal createAppraisal(Job job, String type) throws Exception {
         CriterionDetail detail;
         Assessment assessment;
 
@@ -75,7 +74,52 @@ public class AppraisalMgr {
             }
         }
 
-        return appraisal.getId();
+        return appraisal;
+    }
+
+    /**
+     * creates an appraisal record and returns it
+     * @param job:  the job the appraisal record is created against
+     * @param Type:  possible values are trials, annual and initial.
+     * @             Initial is annual except the length of the period is defined by annual_eval_ind
+     * @return:  the appraisal record created
+     * @throws Exception
+     */
+   /* public static Appraisal createAppraisal(Job job, String Type) throws Exception
+    {
+        return new Appraisal();
+    }
+    */
+
+    /**
+     * This method is called upon completion or closure of an trial appraisal to create the
+     * initial appraisal record.
+     * It copies the jobpidm, position#, subfix, all the fields related to goals,
+     * the assessment records from the trial records.
+     * Depends on the times, it either sets the status to goals-approved, results-due
+     * or results over due.
+     * startDate of the appraisal record is the first day of the month on or after
+     * the eval_date or job_start_date.
+     * end_date of the appraisal record is the number of month indicated by
+     * PYVPASJ.annual_eval_ind.
+     * @param  trialAppraisal: this is the newly closed or completed trial appraisal
+     * @return the newly created appraisal
+     *
+     */
+    public static Appraisal createInitialAppraisalAfterTrial(Appraisal trialAppraisal)
+    {
+        return new Appraisal();
+    }
+
+    /**
+     *
+     * @param job
+     * @param startDate
+     * @return true is an appraisal with that startDate for the job exists
+     */
+    public static boolean AnnualAppraisalExists(Job job, Date startDate)
+    {
+        return true;
     }
 
     /**
@@ -620,6 +664,24 @@ public class AppraisalMgr {
         return count;
     }
 
+    /**
+     * @param bcName: name of the business center
+     * @return  the number of appraisals that are due for review for a business center.
+     */
+    public int getReviewDueCount(String bcName)
+    {
+      return 1;
+    }
+
+    /**
+     * @param bcName: name of the business center
+     * @return  the number of appraisals that are overdue for review for a business center.
+     */
+    public int getReviewpastDueCount(String bcName)
+    {
+        return 1;
+    }
+
     public void setLoggedInUser(Employee loggedInUser) {
         this.loggedInUser = loggedInUser;
     }
@@ -630,6 +692,33 @@ public class AppraisalMgr {
 
     public void setPermissionRules(HashMap permissionRules) {
         this.permissionRules = permissionRules;
+    }
+
+    /**
+     * select count(*) from appraisals where pidm, positionNum, subfix and type
+     * @param job
+     * @return: true if there is a trial record for the job, false otherwise
+     */
+    public static boolean trialAppraisalExists(Job job)
+    {
+        return true;
+    }
+
+    /**
+     * select id from appraisals where status is not completed or closed.
+     * @return a lis of all the active IDs
+     */
+    public static List activeIDs()
+    {
+       Session session = HibernateUtil.getCurrentSession();
+       Transaction tx = session.beginTransaction();
+        String query = "select id " +
+                "from edu.osu.cws.pass.models.Appraisal " +
+                "where status not in ('completed', 'closed')";
+
+        List result =  session.createQuery(query).list();
+        tx.commit();
+        return result;
     }
 }
 

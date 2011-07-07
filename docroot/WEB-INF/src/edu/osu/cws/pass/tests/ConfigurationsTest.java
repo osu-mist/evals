@@ -23,7 +23,7 @@ public class ConfigurationsTest {
     }
 
     @Test
-    public void shouldSortConfigurationsBySectionThenBySequence() throws Exception {
+    public void quitshouldSortConfigurationsBySectionThenBySequence() throws Exception {
         ConfigurationMgr2 configurationMgr = new ConfigurationMgr2();
         ArrayList<Configuration> configs = (ArrayList<Configuration>) configurationMgr.list();
 

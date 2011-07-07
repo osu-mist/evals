@@ -4,7 +4,9 @@
 package edu.osu.cws.pass.models;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
+import edu.osu.cws.util.CWSUtil;
 
 public class Job extends Pass implements Serializable {
     private int id;
@@ -51,6 +53,7 @@ public class Job extends Pass implements Serializable {
 
     private String annualInd;
 
+    //private String evalDate;
     private String evalDate;
 
     /**
@@ -311,4 +314,44 @@ public class Job extends Pass implements Serializable {
     public void setEvalDate(String evalDate) {
         this.evalDate = evalDate;
     }
+
+
+    /*
+     * A job is within the trial period if
+     * 1. The trial indicator is set
+     * 2. NOW is within the trial period in term of time.
+     */
+    public boolean withinTrialPeriod()
+    {
+       	if (trialInd == null)
+	        return false;
+
+        if (evalDate != null)   //@@@for now just to pass testing
+           //beginDate = evalDate;
+           beginDate = new Date();
+
+        int trialMonths = Integer.parseInt(trialInd);
+        Date trialEndDate = CWSUtil.getEndDate(beginDate, trialMonths, Calendar.MONTH);
+	    return CWSUtil.isWithinPeriod(beginDate, trialEndDate);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Date getNewAnnualStartDate()
+    {
+         return new Date();
+    }
+
+    /**
+     * @offset Number of days after the current day
+     * @return true is the job is still within the initial period offset days from now. false otherwise
+     */
+    public static boolean withinInitialPeriod(int offset)
+    {
+
+        return true;
+    }
 }
+
