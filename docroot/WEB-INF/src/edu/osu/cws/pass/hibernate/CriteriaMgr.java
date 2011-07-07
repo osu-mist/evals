@@ -81,7 +81,7 @@ public class CriteriaMgr {
 
         String description = request.get("description")[0];
         String name = request.get("name")[0];
-        boolean propagateEdit = (request.get("propagateEdit") != null);
+        boolean propagateEdit = request.get("propagateEdit") != null;
 
         try {
             Transaction tx = session.beginTransaction();
@@ -100,6 +100,9 @@ public class CriteriaMgr {
             }
             if (descHash != updatedDescHash) {
                 descriptionChanged = true;
+            }
+            if (!areaChanged && !descriptionChanged) {
+                return true;
             }
 
             if (!areaChanged && !descriptionChanged)
@@ -295,14 +298,86 @@ public class CriteriaMgr {
     }
 
     /**
-     * Takes a string specifying the new order the criterias. Fetches all the CriterionArea for the
-     * given employee type. Then it sets the new sequence in each one of them and saves the POJOs.
+     * Takes care of updating the sequence of the evaluation criteria.
      *
-     * @param order     The new order of criterias
-     * @return errors
+     * @param id
+     * @param newPosition
+     * @return
+     * @throws Exception
      */
-    public String[] updateSequence(String order, long employeeTypeID) {
-        return new String[2];
+    public boolean updateSequence(int id, int newPosition) throws Exception {
+        CriterionArea criterion = get(id);
+
+        if (criterion == null || criterion.getDeleteDate() != null) {
+            throw new ModelException("Can't update sequence. Invalid Evaluation Criteria");
+        }
+
+        int originalPosition = criterion.getSequence();
+        if (originalPosition == newPosition)  {
+            return true;
+        }
+
+        String appointmentType = criterion.getAppointmentType();
+        // whether or not we are moving the Criteria up visually
+        boolean moveCriteriaToSmallerSequence = true;
+
+        // Calculate the inclusive lower and upper bound of the objects whose sequence need to be updated
+        int lowerBound = newPosition;
+        int upperBound = originalPosition;
+        if (originalPosition < newPosition) {
+            lowerBound = originalPosition;
+            upperBound = newPosition;
+            moveCriteriaToSmallerSequence = false;
+        }
+
+        Session session = HibernateUtil.getCurrentSession();
+        try {
+            updateSequence(newPosition, originalPosition, appointmentType, lowerBound, upperBound,
+                    moveCriteriaToSmallerSequence, session);
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+        return true;
+    }
+
+    /**
+     * Takes care of updating the sequence of all the affected evaluation criteria.
+     *
+     * @param newPosition
+     * @param originalPosition
+     * @param appointmentType
+     * @param lowerBound
+     * @param upperBound
+     * @param moveCriteriaToSmallerSequence
+     * @param session
+     */
+    private void updateSequence(int newPosition, int originalPosition, String appointmentType,
+                                int lowerBound, int upperBound,
+                                boolean moveCriteriaToSmallerSequence, Session session) {
+        Transaction tx = session.beginTransaction();
+        String query = "from edu.osu.cws.pass.models.CriterionArea where deleteDate is null " +
+                "and appointmentType = :appointmentType and sequence >= :lowerBound and " +
+                "sequence <= :upperBound";
+
+        List<CriterionArea> results = (List<CriterionArea>) session.createQuery(query)
+                .setString("appointmentType", appointmentType)
+                .setInteger("lowerBound", lowerBound)
+                .setInteger("upperBound", upperBound)
+                .list();
+        for (CriterionArea criteria : results) {
+            if (criteria.getSequence() == originalPosition) {
+                criteria.setSequence(newPosition);
+            } else {
+                if (moveCriteriaToSmallerSequence) {
+                    criteria.setSequence(criteria.getSequence() + 1);
+                } else {
+                    criteria.setSequence(criteria.getSequence() - 1);
+                }
+            }
+            session.update(criteria);
+        }
+        tx.commit();
     }
 
     /**

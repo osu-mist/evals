@@ -30,6 +30,10 @@
             <value>/jsp/reviewers/delete.jsp</value>
         </init-param>
         <init-param>
+            <name>configuration-list-jsp</name>
+            <value>/jsp/configurations/list.jsp</value>
+        </init-param>
+        <init-param>
             <name>criteria-add-jsp</name>
             <value>/jsp/criteria/add.jsp</value>
         </init-param>

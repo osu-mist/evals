@@ -108,11 +108,10 @@ public class PASSPortlet extends GenericPortlet {
 
         try {
             portletSetup(actionRequest);
+            delegate(actionRequest, actionResponse);
         } catch (Exception e) {
             handlePASSException(e, true);
         }
-
-        delegate(actionRequest, actionResponse);
 	}
 
     public void serveResource(ResourceRequest request, ResourceResponse response)
@@ -213,6 +212,7 @@ public class PASSPortlet extends GenericPortlet {
             actionClass.setPortletContext(getPortletContext());
             actionClass.setPassAdmins();
             actionClass.setPassReviewers();
+            actionClass.setPassConfiguration();
         }
     }
 

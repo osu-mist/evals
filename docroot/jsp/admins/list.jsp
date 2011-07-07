@@ -2,10 +2,6 @@
 <c:set var="deleteAction" value="deleteAdmin"/>
 <c:set var="addAction" value="addAdmin"/>
 
-<%
-List criteria = (List) renderRequest.getAttribute("adminsList");
-%>
-
 <h2><liferay-ui:message key="admins-list-title"/></h2>
 <liferay-ui:success key="admin-saved" message="admin-saved" />
 <liferay-ui:success key="admin-deleted" message="admin-deleted" />
@@ -24,7 +20,7 @@ List criteria = (List) renderRequest.getAttribute("adminsList");
     <fieldset id="pass-user-add">
         <legend><liferay-ui:message key="admin-add"/></legend>
 
-        <form action="<portlet:actionURL>
+        <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
             <portlet:param name="action" value="${addAction}"/>
             </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
 
@@ -83,7 +79,8 @@ List criteria = (List) renderRequest.getAttribute("adminsList");
         </td>
         <c:if test="${isMaster == true}">
             <td>
-            <a class="<portlet:namespace/>user-delete" href="<portlet:renderURL>
+            <a class="<portlet:namespace/>user-delete" href="<portlet:renderURL
+                windowState="<%= WindowState.MAXIMIZED.toString() %>">
                 <portlet:param name="id" value="${user.id}"/>
                 <portlet:param name="action" value="${deleteAction}"/>
             </portlet:renderURL>"><liferay-ui:message key="delete"/></a></td>

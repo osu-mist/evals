@@ -3,7 +3,7 @@
 
 <h2><liferay-ui:message key="reviewer-delete" /></h2>
 
-<form action="<portlet:actionURL>
+<form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
     <portlet:param name="id" value="${reviewer.id}"/>
     <portlet:param name="action" value="deleteReviewer"/>
     </portlet:actionURL>" method="post">

@@ -545,4 +545,21 @@ public class CriteriaTests {
         assert criteriaMgrObject.getNextSequence(AppointmentType.CLASSIFIED) == 2 :
                 "Invalid criteria sequence";
     }
+
+    public void shouldUpdateSequenceWhenMovingDown() throws Exception {
+        criteriaMgrObject.updateSequence(1, 2);
+        assert criteriaMgrObject.get(1).getSequence() == 2;
+        assert criteriaMgrObject.get(2).getSequence() == 1;
+    }
+
+    public void shouldUpdateSequenceWhenMovingUp() throws Exception {
+        criteriaMgrObject.updateSequence(2, 1);
+        assert criteriaMgrObject.get(1).getSequence() == 2;
+        assert criteriaMgrObject.get(2).getSequence() == 1;
+    }
+
+    @Test(expectedExceptions = {ModelException.class})
+    public void shouldNotUpdateSequenceOfDeletedCriteria() throws Exception {
+        criteriaMgrObject.updateSequence(3, 1);
+    }
 }

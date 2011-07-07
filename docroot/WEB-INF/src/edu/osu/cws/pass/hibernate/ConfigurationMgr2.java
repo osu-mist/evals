@@ -8,11 +8,36 @@ import org.hibernate.Transaction;
 import sun.security.krb5.Config;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigurationMgr2 {
+
+    /**
+     * Returns a hashmap of Configurations using the configuration name as the map key.
+     *
+     * @return
+     * @throws Exception
+     */
+    public Map<String, Configuration> mapByName() throws Exception {
+        HashMap<String, Configuration> configs = new HashMap<String, Configuration>();
+        List<Configuration> configsList = new ArrayList<Configuration>();
+        Session session = HibernateUtil.getCurrentSession();
+
+        try {
+            configsList = list(session);
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+
+        for (Configuration configuration : configsList) {
+            configs.put(configuration.getName(), configuration);
+        }
+        return configs;
+    }
 
     /**
      * Uses list(session) method to grab a list of configurations.
