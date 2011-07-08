@@ -92,4 +92,10 @@ public class Configuration extends Pass {
     public void setAction(String action) {
         this.action = action;
     }
+
+    public int getIntValue() throws  NumberFormatException
+    {
+        return Integer.parseInt(value);
+    }
+
 }

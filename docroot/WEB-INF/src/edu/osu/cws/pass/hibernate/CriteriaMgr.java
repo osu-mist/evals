@@ -105,6 +105,9 @@ public class CriteriaMgr {
                 return true;
             }
 
+            if (!areaChanged && !descriptionChanged)
+                return false;
+
             if (areaChanged && !descriptionChanged) {
                 // copy all the values from the old CriterionArea
                 copyCriterion(loggedInUser, newCriterion, criterion);
