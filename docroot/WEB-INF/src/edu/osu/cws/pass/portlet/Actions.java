@@ -151,6 +151,7 @@ public class Actions {
             addErrorsToRequest(request, e.getMessage());
         }
 
+        request.setAttribute("menuMax", true);
         return "criteria-list-jsp";
     }
 
@@ -279,7 +280,7 @@ public class Actions {
         ArrayList<HashMap> allMyActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(employeeId);
         request.setAttribute("myActiveAppraisals", allMyActiveAppraisals);
         if (isLoggedInUserSupervisor(request)) {
-            List<HashMap> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsActiveAppraisals(employeeId);
+            List<HashMap> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true);
             request.setAttribute("myTeamsActiveAppraisals", myTeamsActiveAppraisals);
         }
     }
@@ -403,15 +404,19 @@ public class Actions {
             return displayHomeView(request, response);
         }
 
+        ArrayList<HashMap> reviews = getReviewsForLoggedInUser(request);
+        request.setAttribute("reviews", reviews);
+
+        return "review-list-jsp";
+    }
+
+    private ArrayList<HashMap> getReviewsForLoggedInUser(PortletRequest request) throws Exception {
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
         if (businessCenterName.equals("")) {
             int employeeID = getLoggedOnUser(request).getId();
             businessCenterName = getReviewer(employeeID).getBusinessCenterName();
         }
-        ArrayList<HashMap> reviews = appraisalMgr.getReviews(businessCenterName);
-        request.setAttribute("reviews", reviews);
-
-        return "review-list-jsp";
+        return appraisalMgr.getReviews(businessCenterName);
     }
 
     /**
@@ -446,9 +451,21 @@ public class Actions {
             showForm = true;
         }
 
+        if (isLoggedInUserSupervisor(request)) {
+            int userID = currentlyLoggedOnUser.getId();
+            List<HashMap> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(userID, true);
+            request.setAttribute("myTeamsAppraisals", myTeamsActiveAppraisals);
+        }
+
+        if (isLoggedInUserReviewer(request)) {
+            ArrayList<HashMap> reviews = getReviewsForLoggedInUser(request);
+            request.setAttribute("pendingReviews", reviews);
+        }
+
         request.setAttribute("appraisal", appraisal);
         request.setAttribute("permissionRule", permRule);
         request.setAttribute("showForm", showForm);
+        request.setAttribute("menuMax", true);
 
         return "appraisal-jsp";
     }

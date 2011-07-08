@@ -472,13 +472,14 @@ public class AppraisalMgr {
      * Returns a List of team's active appraisals for the given supervisor's pidm.
      *
      * @param pidm
+     * @param onlyActive    Whether or not to include only the active appraisals
      * @return
      */
-    public List<HashMap> getMyTeamsActiveAppraisals(Integer pidm) throws Exception {
+    public List<HashMap> getMyTeamsAppraisals(Integer pidm, boolean onlyActive) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         List<HashMap> teamActiveAppraisals;
         try {
-            teamActiveAppraisals = this.getMyTeamsActiveAppraisals(pidm, session);
+            teamActiveAppraisals = this.getMyTeamsAppraisals(pidm, onlyActive, session);
         } catch (Exception e){
             session.close();
             throw e;
@@ -491,17 +492,22 @@ public class AppraisalMgr {
      * start/end date and appointment type of the jobs' the employee supervises.
      *
      * @param pidm      Supervisor's pidm.
+     * @param onlyActive    Whether or not to include only the active appraisals
      * @param session
      * @return List of Hashmaps that contains the jobs this employee supervises.
      */
-    private List<HashMap> getMyTeamsActiveAppraisals(Integer pidm, Session session) {
+    private List<HashMap> getMyTeamsAppraisals(Integer pidm, boolean onlyActive, Session session) {
         Transaction tx = session.beginTransaction();
         String query = "select new map(id as id, job.jobTitle as jobTitle, " +
                 "concat(job.employee.lastName, ', ', job.employee.firstName) as employeeName, " +
                 "job.appointmentType as appointmentType, startDate as startDate, " +
                 "endDate as endDate, status as status) " +
-                "from edu.osu.cws.pass.models.Appraisal where job.supervisor.employee.id = :pidm " +
-                "and status not in ('completed', 'closed') ";
+                "from edu.osu.cws.pass.models.Appraisal where job.supervisor.employee.id = :pidm ";
+
+        if (onlyActive) {
+            query += "and status not in ('completed', 'closed') ";
+        }
+
         List result =  session.createQuery(query).setInteger("pidm", pidm).list();
 
         tx.commit();

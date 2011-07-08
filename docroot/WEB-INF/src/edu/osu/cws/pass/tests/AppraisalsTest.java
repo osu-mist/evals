@@ -250,7 +250,7 @@ public class AppraisalsTest {
     @Test(groups = "unittest")
     public void shouldFindAllTeamActiveAppraisals() throws Exception {
         int pidm = 12467;
-        List<HashMap> teamActiveAppraisals = appraisalMgr.getMyTeamsActiveAppraisals(pidm);
+        List<HashMap> teamActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(pidm, true);
         assert teamActiveAppraisals.size() == 4 : "Invalid size of team active appraisals";
         for (HashMap ap : teamActiveAppraisals) {
             assert ap.get("id") != new Integer(0) :
