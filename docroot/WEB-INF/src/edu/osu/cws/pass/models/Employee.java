@@ -3,6 +3,9 @@
  */
 package edu.osu.cws.pass.models;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Employee extends Pass {
     private int id;
 
@@ -25,6 +28,8 @@ public class Employee extends Pass {
      * T - terminated
      */
     private String status;
+
+    private Set jobs = new HashSet();
 
     public String getName() {
         return lastName + ", " + firstName;
@@ -98,5 +103,13 @@ public class Employee extends Pass {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Set getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(Set jobs) {
+        this.jobs = jobs;
     }
 }

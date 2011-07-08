@@ -291,14 +291,6 @@ public class Actions {
 
         return "admin-home-jsp";
     }
-//
-//    public String displayReviewerHomeView(PortletRequest request, PortletResponse response) throws Exception {
-//        Employee employee = getLoggedOnUser(request);
-//        setupActiveAppraisals(request, employee.getId());
-//        request.setAttribute("menuHome", true);
-//
-//        return "reviewer-home-jsp";
-//    }
 
     public String displaySupervisorHomeView(PortletRequest request, PortletResponse response) throws Exception {
         Employee employee = getLoggedOnUser(request);
@@ -310,6 +302,7 @@ public class Actions {
 
     public String displayMyInformation(PortletRequest request, PortletResponse response) throws Exception {
         request.setAttribute("menuHome", true);
+        request.setAttribute("employee", getLoggedOnUser(request));
 
         return "my-information-jsp";
     }

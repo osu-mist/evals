@@ -159,3 +159,15 @@ tr.ui-state-highlight {
 #pass-top-menu .portlet-action-menu li:hover {
     border-bottom: 2px solid #D85A1A;
 }
+
+/* My Information */
+#pass-my-info table {
+    width: 50%;
+    margin-top: 0.5em;
+}
+#pass-my-info td {
+    padding: 0.3em;
+}
+#pass-my-info h3 {
+    margin-top: 0.8em;
+}

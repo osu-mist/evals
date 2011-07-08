@@ -13,6 +13,12 @@
         <property name="onid" column="PYVPASE_ONID_LOGIN"/>
         <property name="email" column="PYVPASE_EMAIL"/>
         <property name="status" length="1" column="PYVPASE_EMPL_STATUS"/>
+
+        <set name="jobs" inverse="true">
+            <key column="PYVPASJ_PIDM"/>
+            <one-to-many class="edu.osu.cws.pass.models.Job"/>
+
+        </set>
     </class>
 
 </hibernate-mapping>
