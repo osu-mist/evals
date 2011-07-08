@@ -6,6 +6,8 @@
 
 <div id="pass-appraisal-form">
     <h2><liferay-ui:message key="appraisal-classified-title" /></h2>
+    <liferay-ui:success key="draft-saved" message="draft-saved" />
+
     <%@ include file="/jsp/appraisals/info.jsp"%>
 
     <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}">
