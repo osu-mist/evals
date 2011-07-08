@@ -159,6 +159,9 @@ tr.ui-state-highlight {
 #pass-top-menu .portlet-action-menu li:hover {
     border-bottom: 2px solid #D85A1A;
 }
+#pass-top-menu .portlet-action-menu li:hover ul, #pass-top-menu .portlet-action-menu li.sfHover ul {
+    right: auto;
+}
 
 /* My Information */
 #pass-my-info table {
