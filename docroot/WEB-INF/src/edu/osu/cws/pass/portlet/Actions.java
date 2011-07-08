@@ -282,6 +282,7 @@ public class Actions {
         setupActiveAppraisals(request, employeeId);
         helpLinks(request);
         request.setAttribute("isHome", true);
+        setupDemoSwitch(request, employee);
 
         setRequiredActions(request);
         useNormalMenu(request);
@@ -317,6 +318,20 @@ public class Actions {
         }
     }
 
+    /**
+     * Set up the attributes needed for the user switch used by the demo.
+     *
+     * @param request
+     * @param employee
+     */
+    private void setupDemoSwitch(PortletRequest request, Employee employee) {
+        // set Employee  and employees object(s) - used by demo
+        // @todo: remove after demo
+        request.setAttribute("employees", employeeMgr.list());
+        request.setAttribute("employee", employee);
+        // end of remove section for demo
+    }
+
     public String displayAdminHomeView(PortletRequest request, PortletResponse response) throws Exception {
         Employee employee = getLoggedOnUser(request);
         setupActiveAppraisals(request, employee.getId());
@@ -325,6 +340,7 @@ public class Actions {
         helpLinks(request);
         request.setAttribute("isAdminHome", true);
         request.setAttribute("alertMsg", "display yellow alert message");
+        setupDemoSwitch(request, employee);
 
         return "admin-home-jsp";
     }
@@ -338,6 +354,7 @@ public class Actions {
         helpLinks(request);
         request.setAttribute("isSupervisorHome", true);
         request.setAttribute("alertMsg", "display yellow alert message");
+        setupDemoSwitch(request, employee);
 
         return "supervisor-home-jsp";
     }
@@ -470,6 +487,7 @@ public class Actions {
             _log.error("unexpected exception - " + ExceptionHandler.stackTraceString(e));
         }
         session.setAttribute("loggedOnUser", employee);
+        setUpUserPermissionInSession(request, true);
 
         return displayHomeView(request, response);
     }
