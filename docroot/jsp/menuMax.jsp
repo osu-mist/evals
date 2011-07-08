@@ -4,7 +4,7 @@
                         <portlet:param name="action" value="displayHomeView"/>
                         </portlet:renderURL>"><liferay-ui:message key="home"/></a>
         </li>
-        <c:if test="${isReviewer == 'true'}">
+        <c:if test="${isReviewer == 'true' and !empty pendingReviews}">
         <li><a href="#"><liferay-ui:message key="reviews"/></a>
             <ul>
                 <c:forEach  var="appraisal" items="${pendingReviews}">
@@ -16,7 +16,7 @@
             </ul>
         </li>
         </c:if>
-        <c:if test="${isSupervisor == 'true'}">
+        <c:if test="${isSupervisor == 'true' and !empty myTeamsAppraisals}">
         <li><a href="#"><liferay-ui:message key="employees"/></a>
             <ul>
                 <c:forEach  var="appraisal" items="${myTeamsAppraisals}">

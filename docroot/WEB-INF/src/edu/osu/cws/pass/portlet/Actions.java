@@ -81,6 +81,7 @@ public class Actions {
 
         request.setAttribute("criterionArea", criterionArea);
         request.setAttribute("criterionDetail", criterionDetail);
+        request.setAttribute("menuMax", true);
 
         return "criteria-add-jsp";
     }
@@ -122,6 +123,8 @@ public class Actions {
 
         request.setAttribute("criterionArea", criterionArea);
         request.setAttribute("criterionDetail", criterionDetail);
+        request.setAttribute("menuMax", true);
+
         return "criteria-add-jsp";
     }
 
@@ -535,6 +538,8 @@ public class Actions {
         ArrayList<Admin> adminsList = (ArrayList<Admin>) portletContext.getAttribute("adminsList");
         request.setAttribute("isMaster", isLoggedInUserMasterAdmin(request));
         request.setAttribute("adminsList", adminsList);
+        request.setAttribute("menuMax", true);
+
         return "admin-list-jsp";
     }
 
@@ -631,6 +636,8 @@ public class Actions {
         request.setAttribute("isMaster", isLoggedInUserMasterAdmin(request));
         request.setAttribute("reviewersList", reviewersList);
         request.setAttribute("businessCenters", businessCenters);
+        request.setAttribute("menuMax", true);
+
         return "reviewer-list-jsp";
     }
 
@@ -729,6 +736,8 @@ public class Actions {
         ArrayList<Configuration> configurations = (ArrayList<Configuration>)
                 portletContext.getAttribute("configurationsList");
         request.setAttribute("configurations", configurations);
+        request.setAttribute("menuMax", true);
+
         return "configuration-list-jsp";
     }
 
