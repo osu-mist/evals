@@ -37,7 +37,9 @@ public class AppraisalMgr {
      * @return appraisal.id
      * @throws Exception
      */
-    public Appraisal createAppraisal(Job job, String type) throws Exception {
+    public static Appraisal createAppraisal(Job job, String type) throws Exception {
+        CriteriaMgr criteriaMgr = new CriteriaMgr();
+        Appraisal appraisal = new Appraisal();
         CriterionDetail detail;
         Assessment assessment;
 
