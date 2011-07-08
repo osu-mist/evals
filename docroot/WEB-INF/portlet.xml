@@ -10,6 +10,18 @@
             <value>/jsp/home/start.jsp</value>
         </init-param>
         <init-param>
+            <name>admin-home-jsp</name>
+            <value>/jsp/home/startAdmin.jsp</value>
+        </init-param>
+        <init-param>
+            <name>supervisor-home-jsp</name>
+            <value>/jsp/home/startSupervisor.jsp</value>
+        </init-param>
+        <init-param>
+            <name>my-information-jsp</name>
+            <value>/jsp/home/myInfo.jsp</value>
+        </init-param>
+        <init-param>
             <name>error-jsp</name>
             <value>/jsp/error.jsp</value>
         </init-param>

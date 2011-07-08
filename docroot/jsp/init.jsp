@@ -33,6 +33,13 @@ if (errorMsg != null && !errorMsg.equals("")) {
 }
 %>
 
+<c:if test="${not empty menuHome}">
+    <%@ include file="/jsp/menuHome.jsp"%>
+</c:if>
+<c:if test="${not empty menuMax}">
+    <%@ include file="/jsp/menuMax.jsp"%>
+</c:if>
+
 <div id="<portlet:namespace />flash">
     <c:if test="${!empty errorMsg}">
     <span class="portlet-msg-error">${errorMsg}</span>

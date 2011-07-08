@@ -99,7 +99,7 @@ width: 99%;
 /** JQuery UI Sortable */
 tr.ui-sortable-helper {
     display: table;
-    background-color: #fff;
+    background-color: #FFF;
     border: 1px solid black;
 }
 tr.ui-state-highlight {
@@ -108,4 +108,54 @@ tr.ui-state-highlight {
 }
 .pass-sortable-icon {
     display: none;
+}
+
+/* Top Menu */
+#pass-top-menu {
+    padding-bottom: 4em;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+}
+#pass-top-menu.action-menu-wrapper ul {
+    background: #FFF;
+    border: 2px solid #CCC;
+}
+#pass-top-menu .portlet-action-menu li {
+    background: #fff;
+    border-right: 2px solid #CCC;
+    float: left;
+    border-bottom: 2px solid #FFF;
+}
+#pass-top-menu .portlet-action-menu li.pass-roles {
+    border-left: 2px solid #CCC;
+    border-right: 0;
+    float: right;
+}
+#pass-top-menu  .portlet-action-menu a {
+    color: #686868;
+    padding: 0.5em 0.5em 0.25em 0.5em;
+    font-size: 1.37em;
+}
+#pass-top-menu  .portlet-action-menu ul {
+    width: auto;
+}
+#pass-top-menu .portlet-action-menu ul li {
+    width: 100%;
+    font-size: 0.9em;
+    border-bottom: 2px solid #ccc;
+}
+#pass-top-menu .portlet-action-menu ul li:last-child {
+    border-bottom: 0px;
+}
+#pass-top-menu .portlet-action-menu ul li:last-child:hover {
+    border-bottom: 2px solid #D85A1A;
+}
+#pass-top-menu .portlet-action-menu li:hover, #pass-top-menu .portlet-action-menu li.sfHover,
+#pass-top-menu .portlet-action-menu a:focus, #pass-top-menu .portlet-action-menu a:hover,
+#pass-top-menu .portlet-action-menu a:active {
+    background: none repeat scroll 0 0 #FFF;
+}
+#pass-top-menu .portlet-action-menu li:hover {
+    border-bottom: 2px solid #D85A1A;
 }

@@ -145,6 +145,45 @@ public class ReviewerMgr {
      * Retrieves a reviewer object from the db using the employee id
      *
      * @param onid
+     * @return
+     * @throws Exception
+     */
+    public List<Reviewer> findByOnid(String onid) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        ArrayList<Reviewer> reviewerList;
+        try {
+            Transaction tx = session.beginTransaction();
+            reviewerList = (ArrayList<Reviewer>) findByOnid(onid, session);
+            tx.commit();
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+
+        return reviewerList;
+    }
+
+    /**
+     * Retrieves a reviewer object from the db using the employee id
+     *
+     * @param onid
+     * @param session
+     * @return
+     */
+    private List<Reviewer> findByOnid(String onid, Session session) {
+        String query = "from edu.osu.cws.pass.models.Reviewer reviewer where reviewer.employee.onid = :onid " +
+                "and reviewer.businessCenterName = :businessCenterName";
+        List<Reviewer> results = (List<Reviewer>) session.createQuery(query)
+                .setString("onid", onid)
+                .list();
+
+        return results;
+    }
+
+    /**
+     * Retrieves a reviewer object from the db using the employee id and BC
+     *
+     * @param onid
      * @param businessCenterName
      * @return
      * @throws Exception
@@ -165,7 +204,7 @@ public class ReviewerMgr {
     }
 
     /**
-     * Retrieves a reviewer object from the db using the employee id
+     * Retrieves a reviewer object from the db using the employee id and BC
      *
      * @param onid
      * @param businessCenterName

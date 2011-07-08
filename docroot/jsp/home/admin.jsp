@@ -17,7 +17,7 @@ configurationListURL.setWindowState(WindowState.MAXIMIZED);
 configurationListURL.setParameter("action", "listConfiguration");
 %>
 
-<c:if test="${admin.id ne 0}">
+<c:if test="${isAdmin == 'true'}">
     <div id="<portlet:namespace/>accordionMenuPassAdmin" class="accordion-menu">
         <div class="accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>passAdmin');">
             <table>

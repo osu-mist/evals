@@ -259,23 +259,107 @@ public class Actions {
         Employee employee = getLoggedOnUser(request);
         int employeeId = employee.getId();
 
-        ArrayList<HashMap> allMyActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(employeeId);
-        request.setAttribute("myActiveAppraisals", allMyActiveAppraisals);
-        if (jobMgr.isSupervisor(employeeId)) {
-            List<HashMap> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsActiveAppraisals(employeeId);
-            request.setAttribute("myTeamsActiveAppraisals", myTeamsActiveAppraisals);
-            request.setAttribute("isSupervisor", true);
-        } else {
-            request.setAttribute("isSupervisor", false);
-        }
-
-        request.setAttribute("reviewer", getReviewer(employeeId));
-        request.setAttribute("admin", getAdmin(employeeId));
+        setupActiveAppraisals(request, employeeId);
 
         request.setAttribute("requiredActions", getRequiredActions(request));
-
+        request.setAttribute("menuHome", true);
 
         return "home-jsp";
+    }
+
+    /**
+     * Places in the request object the active appraisals of the user. This is used by the notification
+     * piece.
+     *
+     * @param request
+     * @param employeeId
+     * @throws Exception
+     */
+    private void setupActiveAppraisals(PortletRequest request, int employeeId) throws Exception {
+        ArrayList<HashMap> allMyActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(employeeId);
+        request.setAttribute("myActiveAppraisals", allMyActiveAppraisals);
+        if (isLoggedInUserSupervisor(request)) {
+            List<HashMap> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsActiveAppraisals(employeeId);
+            request.setAttribute("myTeamsActiveAppraisals", myTeamsActiveAppraisals);
+        }
+    }
+
+    public String displayAdminHomeView(PortletRequest request, PortletResponse response) throws Exception {
+        Employee employee = getLoggedOnUser(request);
+        setupActiveAppraisals(request, employee.getId());
+        request.setAttribute("menuHome", true);
+
+        return "admin-home-jsp";
+    }
+//
+//    public String displayReviewerHomeView(PortletRequest request, PortletResponse response) throws Exception {
+//        Employee employee = getLoggedOnUser(request);
+//        setupActiveAppraisals(request, employee.getId());
+//        request.setAttribute("menuHome", true);
+//
+//        return "reviewer-home-jsp";
+//    }
+
+    public String displaySupervisorHomeView(PortletRequest request, PortletResponse response) throws Exception {
+        Employee employee = getLoggedOnUser(request);
+        setupActiveAppraisals(request, employee.getId());
+        request.setAttribute("menuHome", true);
+
+        return "supervisor-home-jsp";
+    }
+
+    public String displayMyInformation(PortletRequest request, PortletResponse response) throws Exception {
+        request.setAttribute("menuHome", true);
+
+        return "my-information-jsp";
+    }
+
+    /**
+     * Checks the user permission level and sets up some flags in the session object to store those
+     * permissions.
+     *
+     * @param request
+     * @param refresh   Update the user permissions, even if they have already been set
+     * @throws Exception
+     */
+    public void setUpUserPermissionInSession(PortletRequest request, boolean refresh) throws Exception {
+        PortletSession session = request.getPortletSession(true);
+        Employee employee = getLoggedOnUser(request);
+        int employeeId = employee.getId();
+
+        Boolean isSupervisor = (Boolean) session.getAttribute("isSupervisor");
+        if (refresh || isSupervisor == null) {
+            isSupervisor = jobMgr.isSupervisor(employeeId);
+            session.setAttribute("isSupervisor", isSupervisor);
+        }
+        request.setAttribute("isSupervisor", isSupervisor);
+
+        Boolean isReviewer = (Boolean) session.getAttribute("isReviewer");
+        if (refresh || isReviewer == null) {
+            isReviewer = getReviewer(employeeId) != null;
+            session.setAttribute("isReviewer", isReviewer);
+        }
+        request.setAttribute("isReviewer", isReviewer);
+
+        Boolean isMasterAdmin = (Boolean) session.getAttribute("isSuperAdmin");
+        if (refresh || isMasterAdmin == null) {
+            if (getAdmin(employeeId) != null && getAdmin(employeeId).getIsMaster()) {
+                isMasterAdmin = true;
+            }
+            session.setAttribute("isMasterAdmin", isMasterAdmin);
+        }
+        request.setAttribute("isMasterAdmin", isMasterAdmin);
+
+        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
+        _log.error("isAdmin = "+isAdmin);
+        if (refresh || isAdmin == null) {
+            _log.error("setting isAdmin again");
+            isAdmin = getAdmin(employeeId) != null;
+            session.setAttribute("isAdmin", isAdmin);
+        }
+        request.setAttribute("isAdmin", isAdmin);
+        _log.error("isAdmin = "+isAdmin);
+
     }
 
     /**
@@ -311,7 +395,6 @@ public class Actions {
         portletContext.setAttribute("configurationsList", configurationMgr.list());
     }
 
-
     /**
      * Handles displaying a list of pending reviews for a given business center.
      *
@@ -328,6 +411,10 @@ public class Actions {
         }
 
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
+        if (businessCenterName.equals("")) {
+            int employeeID = getLoggedOnUser(request).getId();
+            businessCenterName = getReviewer(employeeID).getBusinessCenterName();
+        }
         ArrayList<HashMap> reviews = appraisalMgr.getReviews(businessCenterName);
         request.setAttribute("reviews", reviews);
 
@@ -587,6 +674,13 @@ public class Actions {
         String onid = ParamUtil.getString(request, "onid");
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
 
+        // Check whether or not the user is already an admin user
+        Employee onidUser = employeeMgr.findByOnid(onid);
+        if (getReviewer(onidUser.getId()) != null) {
+            addErrorsToRequest(request, "This user is already a reviewer.");
+            return listReviewer(request, response);
+        }
+
         try {
             reviewerMgr.add(onid, businessCenterName);
             setPassReviewers();
@@ -756,9 +850,8 @@ public class Actions {
      * @throws Exception
      */
     private boolean isLoggedInUserAdmin(PortletRequest request) throws Exception {
-        int pidm = getLoggedOnUser(request).getId();
-
-        return getAdmin(pidm) != null;
+        PortletSession session = request.getPortletSession(true);
+        return (Boolean) session.getAttribute("isAdmin");
     }
 
     /**
@@ -769,10 +862,8 @@ public class Actions {
      * @throws Exception
      */
     private boolean isLoggedInUserMasterAdmin(PortletRequest request) throws Exception {
-        int pidm = getLoggedOnUser(request).getId();
-        Admin admin = getAdmin(pidm);
-
-        return admin != null && admin.getIsMaster();
+        PortletSession session = request.getPortletSession(true);
+        return (Boolean) session.getAttribute("isMasterAdmin");
     }
 
     /**
@@ -783,9 +874,20 @@ public class Actions {
      * @throws Exception
      */
     private boolean isLoggedInUserReviewer(PortletRequest request) throws Exception {
-        int pidm = getLoggedOnUser(request).getId();
+        PortletSession session = request.getPortletSession(true);
+        return (Boolean) session.getAttribute("isReviewer");
+    }
 
-        return getReviewer(pidm) != null;
+    /**
+     * Returns true if the logged in user is a supervisor, false otherwise.
+     *
+     * @param request
+     * @return boolean
+     * @throws Exception
+     */
+    private boolean isLoggedInUserSupervisor(PortletRequest request) throws Exception {
+        PortletSession session = request.getPortletSession(true);
+        return (Boolean) session.getAttribute("isSupervisor");
     }
 
     /**
@@ -822,7 +924,7 @@ public class Actions {
         }
 
         reviewer = getReviewer(employeeID);
-        if (reviewer != null) {
+        if (isLoggedInUserReviewer(request)) {
             String businessCenterName = reviewer.getBusinessCenterName();
             reviewerAction = getReviewerAction(businessCenterName, resource);
             if (reviewerAction != null) {
@@ -893,7 +995,6 @@ public class Actions {
 
         HashMap<String, String> parameters = new HashMap<String, String>();
         parameters.put("action", "displayReviewList");
-        parameters.put("businessCenterName", businessCenterName);
         requiredAction.setAnchorText("action-required-review", reviewCount, resource);
         requiredAction.setParameters(parameters);
 

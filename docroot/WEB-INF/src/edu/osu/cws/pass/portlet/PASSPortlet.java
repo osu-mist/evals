@@ -87,6 +87,7 @@ public class PASSPortlet extends GenericPortlet {
 
         try {
             portletSetup(renderRequest);
+            actionClass.setUpUserPermissionInSession(renderRequest, false);
         } catch (Exception e) {
             handlePASSException(e, true);
         }
@@ -108,6 +109,7 @@ public class PASSPortlet extends GenericPortlet {
 
         try {
             portletSetup(actionRequest);
+            actionClass.setUpUserPermissionInSession(actionRequest, false);
             delegate(actionRequest, actionResponse);
         } catch (Exception e) {
             handlePASSException(e, true);
