@@ -22,12 +22,12 @@ public class AppraisalMgr {
     private ArrayList<String> statusHiddenFromEmployee = new ArrayList<String>();
 
     public AppraisalMgr() {
-        statusHiddenFromEmployee.add("appraisal-due");
-        statusHiddenFromEmployee.add("appraisal-past-due");
-        statusHiddenFromEmployee.add("review-due");
-        statusHiddenFromEmployee.add("review-past-due");
-        statusHiddenFromEmployee.add("release-due");
-        statusHiddenFromEmployee.add("release-past-due");
+        statusHiddenFromEmployee.add("appraisalDue");
+        statusHiddenFromEmployee.add("appraisalOverdue");
+        statusHiddenFromEmployee.add("reviewDue");
+        statusHiddenFromEmployee.add("reviewOverdue");
+        statusHiddenFromEmployee.add("releaseDue");
+        statusHiddenFromEmployee.add("releaseOverdue");
     }
 
     /**
@@ -336,7 +336,7 @@ public class AppraisalMgr {
             String employeeResponse = appraisal.getRebuttal();
             if (request.get("sign-appraisal") != null &&
                     employeeResponse != null && !employeeResponse.equals("")) {
-                appraisal.setStatus("rebuttal-submitted");
+                appraisal.setStatus("rebuttalReadDue");
             }
         }
     }
@@ -427,8 +427,8 @@ public class AppraisalMgr {
     /**
      * Returns a list of active appraisals for all the jobs that the current pidm holds.
      * The fields that are returned in the appraisal are:
-     *      appraisalID
-     *      jobTitle
+     *      id
+     *      Job.jobTitle
      *      startDate
      *      endDate
      *      status;
@@ -437,9 +437,9 @@ public class AppraisalMgr {
      * @return
      * @throws Exception
      */
-    public ArrayList<HashMap> getAllMyActiveAppraisals(int pidm) throws Exception {
+    public ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        ArrayList<HashMap> myActiveAppraisals;
+        ArrayList<Appraisal> myActiveAppraisals;
         try {
             myActiveAppraisals = this.getAllMyActiveAppraisals(pidm, session);
         } catch (Exception e){
@@ -455,17 +455,21 @@ public class AppraisalMgr {
      * @param session
      * @return
      */
-    private ArrayList<HashMap> getAllMyActiveAppraisals(int pidm, Session session) {
+    private ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm, Session session) {
         Transaction tx = session.beginTransaction();
         //@todo: the query below should have a where clause => job.employee.id = pidm
-        String query = "select new map( id as id, job.jobTitle as jobTitle, " +
-                "startDate as startDate, endDate as endDate, status as status)" +
+        String query = "select new edu.osu.cws.pass.models.Appraisal(id, job.jobTitle, startDate, endDate, status)" +
                 " from edu.osu.cws.pass.models.Appraisal where " +
                 " job.employee.id = :pidm and status not in ('completed', 'closed')";
-        ArrayList<HashMap> result = (ArrayList<HashMap>) session.createQuery(query)
+        ArrayList<Appraisal> result = (ArrayList<Appraisal>) session.createQuery(query)
                 .setInteger("pidm", pidm)
                 .list();
         tx.commit();
+
+        // Check the status of the appraisal and check to see if it needs to be replaced
+        for(Appraisal appraisal : result) {
+            setAppraisalStatus(appraisal, "employee");
+        }
         return result;
     }
 
@@ -476,9 +480,9 @@ public class AppraisalMgr {
      * @param onlyActive    Whether or not to include only the active appraisals
      * @return
      */
-    public List<HashMap> getMyTeamsAppraisals(Integer pidm, boolean onlyActive) throws Exception {
+    public List<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        List<HashMap> teamActiveAppraisals;
+        List<Appraisal> teamActiveAppraisals;
         try {
             teamActiveAppraisals = this.getMyTeamsAppraisals(pidm, onlyActive, session);
         } catch (Exception e){
@@ -497,12 +501,10 @@ public class AppraisalMgr {
      * @param session
      * @return List of Hashmaps that contains the jobs this employee supervises.
      */
-    private List<HashMap> getMyTeamsAppraisals(Integer pidm, boolean onlyActive, Session session) {
+    private List<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive, Session session) {
         Transaction tx = session.beginTransaction();
-        String query = "select new map(id as id, job.jobTitle as jobTitle, " +
-                "concat(job.employee.lastName, ', ', job.employee.firstName) as employeeName, " +
-                "job.appointmentType as appointmentType, startDate as startDate, " +
-                "endDate as endDate, status as status) " +
+        String query = "select new edu.osu.cws.pass.models.Appraisal(id, job.jobTitle, job.employee.lastName, job.employee.firstName, " +
+                "job.appointmentType, startDate, endDate, status) " +
                 "from edu.osu.cws.pass.models.Appraisal where job.supervisor.employee.id = :pidm ";
 
         if (onlyActive) {
@@ -575,17 +577,11 @@ public class AppraisalMgr {
             Transaction tx = session.beginTransaction();
             appraisal = getAppraisal(id, session);
             userRole = getRole(appraisal, userID);
-            appraisalStatus = appraisal.getStatus();
             tx.commit();
 
             Job supervisorJob = jobMgr.getSupervisor(appraisal.getJob());
             appraisal.getJob().setCurrentSupervisor(supervisorJob);
-
-            if (userRole.equals("employee") && statusHiddenFromEmployee.contains(appraisalStatus)) {
-                appraisal.setRoleBasedStatus("in-review");
-            } else {
-                appraisal.setRoleBasedStatus(appraisal.getStatus());
-            }
+            setAppraisalStatus(appraisal, userRole);
         } catch (Exception e) {
             session.close();
             throw e;
@@ -593,6 +589,20 @@ public class AppraisalMgr {
 
 
         return appraisal;
+    }
+
+    /**
+     * Checks the appraisal status and if we need to change the status based on the user role, the status
+     * is changed. Right now, if the supervisor submitted the appraisal or hr submitted comments, the status
+     * displayed to the user is in review.
+     *
+     * @param appraisal
+     * @param role
+     */
+    private void setAppraisalStatus(Appraisal appraisal, String role) {
+        if (role.equals("employee") && statusHiddenFromEmployee.contains(appraisal.getStatus())) {
+            appraisal.setStatus("inReview");
+        }
     }
 
     /**
@@ -666,7 +676,7 @@ public class AppraisalMgr {
     private int getReviewCount(String businessCenterName, Session session) {
         Transaction tx = session.beginTransaction();
         int count = session.createQuery("from edu.osu.cws.pass.models.Appraisal " +
-                "where status in ('review-due', 'review-past-due') " +
+                "where status in ('reviewDue', 'reviewOverdue') " +
                 "and job.businessCenterName = :bcName and job.endDate is NULL")
                 .setString("bcName", businessCenterName)
                 .list().size();

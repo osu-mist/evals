@@ -27,7 +27,7 @@ public class Actions {
 
     private ReviewerMgr reviewerMgr = new ReviewerMgr();
 
-    private ConfigurationMgr2 configurationMgr = new ConfigurationMgr2();
+    private ConfigurationMgr configurationMgr = new ConfigurationMgr();
 
     private PortletContext portletContext;
 
@@ -265,7 +265,7 @@ public class Actions {
 
         setupActiveAppraisals(request, employeeId);
 
-        request.setAttribute("requiredActions", getRequiredActions(request));
+        setRequiredActions(request);
         request.setAttribute("menuHome", true);
 
         return "home-jsp";
@@ -280,10 +280,10 @@ public class Actions {
      * @throws Exception
      */
     private void setupActiveAppraisals(PortletRequest request, int employeeId) throws Exception {
-        ArrayList<HashMap> allMyActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(employeeId);
+        ArrayList<Appraisal> allMyActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(employeeId);
         request.setAttribute("myActiveAppraisals", allMyActiveAppraisals);
         if (isLoggedInUserSupervisor(request)) {
-            List<HashMap> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true);
+            List<Appraisal> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true);
             request.setAttribute("myTeamsActiveAppraisals", myTeamsActiveAppraisals);
         }
     }
@@ -291,6 +291,7 @@ public class Actions {
     public String displayAdminHomeView(PortletRequest request, PortletResponse response) throws Exception {
         Employee employee = getLoggedOnUser(request);
         setupActiveAppraisals(request, employee.getId());
+        setRequiredActions(request);
         request.setAttribute("menuHome", true);
 
         return "admin-home-jsp";
@@ -299,6 +300,7 @@ public class Actions {
     public String displaySupervisorHomeView(PortletRequest request, PortletResponse response) throws Exception {
         Employee employee = getLoggedOnUser(request);
         setupActiveAppraisals(request, employee.getId());
+        setRequiredActions(request);
         request.setAttribute("menuHome", true);
 
         return "supervisor-home-jsp";
@@ -456,7 +458,7 @@ public class Actions {
 
         if (isLoggedInUserSupervisor(request)) {
             int userID = currentlyLoggedOnUser.getId();
-            List<HashMap> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(userID, true);
+            List<Appraisal> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(userID, true);
             request.setAttribute("myTeamsAppraisals", myTeamsActiveAppraisals);
         }
 
@@ -922,17 +924,17 @@ public class Actions {
      * Using the request object, it fetches the list of employee appraisals and supervisor
      * appraisals and finds out if there are any actions required for them. It also checks
      * to see if the user is a reviewer and it gets the action required for the reviewer.
+     * It sets two attributes in the request object: employeeActions and administrativeActions.
      *
      * @param request
      * @return ArrayList<RequiredAction>
      * @throws Exception
      */
-    public ArrayList<RequiredAction> getRequiredActions(PortletRequest request) throws Exception {
-        ArrayList<RequiredAction> requiredActions = new ArrayList<RequiredAction>();
+    private void setRequiredActions(PortletRequest request) throws Exception {
         ArrayList<RequiredAction> employeeRequiredActions;
-        ArrayList<RequiredAction> supervisorRequiredActions;
-        ArrayList<HashMap> myActiveAppraisals;
-        ArrayList<HashMap> supervisorActions;
+        ArrayList<RequiredAction> administrativeActions = new ArrayList<RequiredAction>();
+        ArrayList<Appraisal> myActiveAppraisals;
+        ArrayList<Appraisal> supervisorActions;
         RequiredAction reviewerAction;
         Reviewer reviewer;
         Employee loggedInEmployee = getLoggedOnUser(request);
@@ -940,15 +942,14 @@ public class Actions {
         ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
 
 
-        myActiveAppraisals = (ArrayList<HashMap>) request.getAttribute("myActiveAppraisals");
+        myActiveAppraisals = (ArrayList<Appraisal>) request.getAttribute("myActiveAppraisals");
         employeeRequiredActions = getAppraisalActions(myActiveAppraisals, "employee", resource);
-        requiredActions.addAll(employeeRequiredActions);
+        request.setAttribute("employeeActions", employeeRequiredActions);
 
         // add supervisor required actions, if user has team's active appraisals
         if (request.getAttribute("myTeamsActiveAppraisals") != null) {
-            supervisorActions = (ArrayList<HashMap>) request.getAttribute("myTeamsActiveAppraisals");
-            supervisorRequiredActions = getAppraisalActions(supervisorActions, "supervisor", resource);
-            requiredActions.addAll(supervisorRequiredActions);
+            supervisorActions = (ArrayList<Appraisal>) request.getAttribute("myTeamsActiveAppraisals");
+            administrativeActions = getAppraisalActions(supervisorActions, "supervisor", resource);
         }
 
         reviewer = getReviewer(employeeID);
@@ -956,10 +957,10 @@ public class Actions {
             String businessCenterName = reviewer.getBusinessCenterName();
             reviewerAction = getReviewerAction(businessCenterName, resource);
             if (reviewerAction != null) {
-                requiredActions.add(reviewerAction);
+                administrativeActions.add(reviewerAction);
             }
         }
-        return requiredActions;
+        request.setAttribute("administrativeActions", administrativeActions);
     }
 
 
@@ -973,17 +974,22 @@ public class Actions {
      * @param resource          Resource bundle to pass in to RequiredAction bean
      * @return  outList
      */
-    public ArrayList<RequiredAction> getAppraisalActions(List<HashMap> appraisalList,
-                                                         String role, ResourceBundle resource) {
+    public ArrayList<RequiredAction> getAppraisalActions(List<Appraisal> appraisalList,
+                                                         String role, ResourceBundle resource) throws ModelException {
+        Configuration configuration;
         HashMap permissionRuleMap = (HashMap) portletContext.getAttribute("permissionRules");
+        Map<String, Configuration> configurationMap =
+                (Map<String, Configuration>) portletContext.getAttribute("configurations");
+
         ArrayList<RequiredAction> outList = new ArrayList<RequiredAction>();
         String actionKey = "";
         RequiredAction actionReq;
         HashMap<String, String> anchorParams;
 
-        for (HashMap<String, String> appraisalMap : appraisalList) {
+        for (Appraisal appraisal : appraisalList) {
             //get the status, compose the key "status"-"role"
-            actionKey = appraisalMap.get("status")+"-"+role;
+            String appraisalStatus = appraisal.getStatus();
+            actionKey = appraisalStatus +"-"+role;
 
             // Get the appropriate permissionrule object from the permissionRuleMap
             PermissionRule rule = (PermissionRule) permissionRuleMap.get(actionKey);
@@ -993,11 +999,17 @@ public class Actions {
                 // compose a requiredAction object and add it to the outList.
                 anchorParams = new HashMap<String, String>();
                 anchorParams.put("action", "displayAppraisal");
-                anchorParams.put("id", appraisalMap.get("id"));
+                String appraisalID = Integer.toString(appraisal.getId());
+                anchorParams.put("id", appraisalID);
+                if (appraisalStatus.equals("goalsRequiredModification") || appraisalStatus.equals("goalsReactivated")) {
+                    configuration = configurationMap.get("goalsDue");
+                } else {
+                    configuration = configurationMap.get(appraisalStatus);
+                }
 
                 actionReq = new RequiredAction();
                 actionReq.setParameters(anchorParams);
-                actionReq.setAnchorText(actionRequired, appraisalMap, resource);
+                actionReq.setAnchorText(actionRequired, appraisal, resource, configuration);
                 outList.add(actionReq);
             }
         }

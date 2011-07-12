@@ -5,15 +5,13 @@ import edu.osu.cws.pass.models.ModelException;
 import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import sun.security.krb5.Config;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.HashMap;
 import java.util.Map;
 
-public class ConfigurationMgr2 {
+public class ConfigurationMgr {
 
     /**
      * Returns a hashmap of Configurations using the configuration name as the map key.

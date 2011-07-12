@@ -11,6 +11,7 @@ package edu.osu.cws.pass.util;
 import edu.osu.cws.pass.hibernate.EmailMgr;
 import edu.osu.cws.util.CWSUtil;
 
+import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
 import edu.osu.cws.pass.models.*;
@@ -93,6 +94,14 @@ public class PassUtil {
          return (daysPassed >= frequency);
      }
 
-
+    /**
+     * Formats date object with the standard dd/MM/yy used throughout the application.
+     *
+     * @param date
+     * @return
+     */
+    public static String formatDate(Date date) {
+        return MessageFormat.format("{0,date,dd/MM/yy}",new Object[]{date});
+    }
 
 }

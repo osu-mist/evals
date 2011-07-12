@@ -5,13 +5,10 @@
         <th><liferay-ui:message key="job-title" />:</th>
         <td><c:out value="${appraisal.job.jobTitle}" /></td>
         <th><liferay-ui:message key="reviewPeriod" />:</th>
-        <td>
-            <fmt:formatDate value="${appraisal.startDate}" pattern="MM/yyyy"/> -
-            <fmt:formatDate value="${appraisal.endDate}" pattern="MM/yyyy"/>
-        </td>
+        <td>${appraisal.reviewPeriod}</td>
         <th><liferay-ui:message key="status" />:</th>
         <td>
-            <liferay-ui:message key="${appraisal.roleBasedStatus}" />
+            <liferay-ui:message key="${appraisal.status}" />
         </td>
     </tr>
     <tr>

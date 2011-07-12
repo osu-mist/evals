@@ -28,27 +28,13 @@
                         onmouseover="this.className = 'portlet-section-body-hover results-row hover';"
                         onmouseout="this.className = '${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}';"
                     >
-                        <td>${shortAppraisal.jobTitle}</td>
-                        <td><fmt:formatDate value="${shortAppraisal.startDate}" pattern="MM/yyyy"/> -
-                            <fmt:formatDate value="${shortAppraisal.endDate}" pattern="MM/yyyy"/>
-                        </td>
+                        <td>${shortAppraisal.job.jobTitle}</td>
+                        <td>${shortAppraisal.reviewPeriod}</td>
                         <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
                             <portlet:param name="id" value="${shortAppraisal.id}"/>
                             <portlet:param  name="action" value="displayAppraisal"/>
                            </portlet:actionURL>">
-                           <c:choose>
-                                <c:when test="${shortAppraisal.status == 'appraisal-due'
-                                    || shortAppraisal.status == 'appraisal-past-due'
-                                    || shortAppraisal.status == 'review-due'
-                                    || shortAppraisal.status == 'review-past-due'
-                                    || shortAppraisal.status == 'release-due'
-                                    || shortAppraisal.status == 'release-past-due'}">
-                               <liferay-ui:message key="in-review"/>
-                                </c:when>
-                                <c:otherwise>
-                                    <liferay-ui:message key="${shortAppraisal.status}" />
-                                </c:otherwise>
-                            </c:choose>
+                                <liferay-ui:message key="${shortAppraisal.status}" />
                            </a>
                         </td>
                     </tr>
@@ -60,21 +46,3 @@
         </c:if>
     </div>
 </div>
-
-<script type="text/javascript">
-    function <portlet:namespace/>toggleContent(id){
-            var imgId=id+'ImageToggle';
-
-             if(document.getElementById(id).style.display=='block'){
-
-                var path1 = new String('/cps/images/accordion/accordion_arrow_up.png');
-                document.getElementById(imgId).src = path1;
-                jQuery('#' + id).hide('slow');
-            }else if(document.getElementById(id).style.display=='none'){
-                var path2 = new String('/cps/images/accordion/accordion_arrow_down.png');
-                document.getElementById(imgId).src = path2;
-                jQuery('#' + id).show('slow');
-            }
-        }
-
-</script>

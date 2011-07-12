@@ -1,5 +1,6 @@
 package edu.osu.cws.pass.models;
 
+import java.text.MessageFormat;
 import java.util.*;
 
 public class Appraisal extends Pass {
@@ -111,13 +112,6 @@ public class Appraisal extends Pass {
 
     private Set<Assessment> assessments = new HashSet<Assessment>();
 
-    /**
-     * Property that holds the appraisal status displayed based on the user status
-     * For example, an employee gets to see in-review vs supervisor sees appraisal
-     * submitted.
-     */
-    private String roleBasedStatus;
-
     private static final String jobRequired =
             "Please provide a valid job";
 
@@ -136,6 +130,51 @@ public class Appraisal extends Pass {
 
     public Appraisal() { }
 
+    /**
+     * Constructor used by AppraisalMgr to fetch only a limited set of attributes.
+     *
+     * @param id
+     * @param jobTitle
+     * @param startDate
+     * @param endDate
+     * @param status
+     */
+    public Appraisal(int id, String jobTitle, Date startDate, Date endDate, String status) {
+        this.id = id;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = status;
+        this.job = new Job();
+        this.job.setJobTitle(jobTitle);
+    }
+
+    /**
+     * Constructor used by AppraisalMgr to fetch only a limited set of attributes.
+     *
+     * @param id
+     * @param jobTitle
+     * @param lastName
+     * @param firstName
+     * @param appointmentType
+     * @param startDate
+     * @param endDate
+     * @param status
+     */
+    public Appraisal(int id, String jobTitle, String lastName, String firstName, String appointmentType,
+                     Date startDate, Date endDate, String status) {
+        Employee employee = new Employee();
+        employee.setLastName(lastName);
+        employee.setFirstName(firstName);
+        this.id = id;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = status;
+        this.job = new Job();
+        this.job.setJobTitle(jobTitle);
+        this.job.setAppointmentType(appointmentType);
+        this.job.setEmployee(employee);
+    }
+
     public boolean validateJob() {
         ArrayList<String> jobErrors = new ArrayList<String>();
 
@@ -151,6 +190,23 @@ public class Appraisal extends Pass {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Uses the start date and end date to generate the review period.
+     *
+     * @return
+     */
+    public String getReviewPeriod() {
+        if (startDate == null) {
+            startDate = new Date();
+        }
+        if (endDate == null) {
+            startDate = new Date();
+        }
+
+        return MessageFormat.format("{0,date,dd/MM/yy} - {1,date,dd/MM/yy}",
+                new Object[]{getStartDate(), getEndDate()});
     }
 
     /**
@@ -480,13 +536,5 @@ public class Appraisal extends Pass {
 
     public void setOriginalStatus(String originalStatus) {
         this.originalStatus = originalStatus;
-    }
-
-    public String getRoleBasedStatus() {
-        return roleBasedStatus;
-    }
-
-    public void setRoleBasedStatus(String roleBasedStatus) {
-        this.roleBasedStatus = roleBasedStatus;
     }
 }

@@ -1,6 +1,6 @@
 package edu.osu.cws.pass.tests;
 
-import edu.osu.cws.pass.hibernate.ConfigurationMgr2;
+import edu.osu.cws.pass.hibernate.ConfigurationMgr;
 import edu.osu.cws.pass.models.Configuration;
 import edu.osu.cws.pass.models.ModelException;
 import edu.osu.cws.pass.util.HibernateUtil;
@@ -29,7 +29,7 @@ public class ConfigurationsTest {
     }
 
     public void shouldSortConfigurationsBySectionThenBySequence() throws Exception {
-        ConfigurationMgr2 configurationMgr = new ConfigurationMgr2();
+        ConfigurationMgr configurationMgr = new ConfigurationMgr();
         ArrayList<Configuration> configs = (ArrayList<Configuration>) configurationMgr.list();
 
         assert configs.get(0).getId() == 1;
@@ -42,7 +42,7 @@ public class ConfigurationsTest {
     }
 
     public void shouldProvideMapUsingNameAsKey() throws Exception {
-        ConfigurationMgr2 configurationMgr = new ConfigurationMgr2();
+        ConfigurationMgr configurationMgr = new ConfigurationMgr();
         HashMap<String, Configuration> configs = (HashMap<String, Configuration>) configurationMgr.mapByName();
 
         assert configs.containsKey("configurations-goal-max-char");
@@ -56,12 +56,12 @@ public class ConfigurationsTest {
 
     @Test(expectedExceptions = {ModelException.class})
     public void shouldThrowErrorWhenConfigurationIsNotFound() throws Exception {
-        ConfigurationMgr2 configurationMgr = new ConfigurationMgr2();
+        ConfigurationMgr configurationMgr = new ConfigurationMgr();
         configurationMgr.edit(10, "should not save because 10 is not a valid id");
     }
 
     public void shouldSaveConfigurationOnEdit() throws Exception {
-        ConfigurationMgr2 configurationMgr = new ConfigurationMgr2();
+        ConfigurationMgr configurationMgr = new ConfigurationMgr();
         String newConfigValue = "should save value to db";
         assert configurationMgr.edit(1, newConfigValue);
 

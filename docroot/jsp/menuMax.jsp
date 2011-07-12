@@ -11,7 +11,7 @@
                 <li><a href="<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                         <portlet:param name="action" value="displayAppraisal"/>
                         <portlet:param name="id" value="${appraisal.id}"/>
-                        </portlet:renderURL>">${appraisal.employeeName}</a></li>
+                        </portlet:renderURL>">${appraisal.job.employee.name}</a></li>
                 </c:forEach>
             </ul>
         </li>
@@ -23,7 +23,7 @@
                 <li><a href="<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                         <portlet:param name="action" value="displayAppraisal"/>
                         <portlet:param name="id" value="${appraisal.id}"/>
-                        </portlet:renderURL>">${appraisal.employeeName}</a></li>
+                        </portlet:renderURL>">${appraisal.job.employee.name}</a></li>
                 </c:forEach>
             </ul>
         </li>

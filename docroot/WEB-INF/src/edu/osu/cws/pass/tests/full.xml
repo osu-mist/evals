@@ -9,7 +9,7 @@
   <appraisals ID="1"
               START_DATE="2011-05-14"
               END_DATE="2012-05-14"
-              STATUS="goals-due"
+              STATUS="goalsDue"
               PYVPASJ_PIDM="12345"
               PYVPASJ_POSN="1234"
               PYVPASJ_SUFF="00"
@@ -19,7 +19,7 @@
   <appraisals ID="2"
               START_DATE="2010-05-14"
               END_DATE="2011-05-10"
-              STATUS="results-due"
+              STATUS="resultsDue"
               PYVPASJ_PIDM="12345"
               PYVPASJ_POSN="1234"
               PYVPASJ_SUFF="00"
@@ -29,7 +29,7 @@
   <appraisals ID="3"
               START_DATE="2009-05-14"
               END_DATE="2010-05-10"
-              STATUS="review-due"
+              STATUS="reviewDue"
               PYVPASJ_PIDM="12345"
               PYVPASJ_POSN="1234"
               PYVPASJ_SUFF="00"
@@ -39,7 +39,7 @@
   <appraisals ID="4"
               START_DATE="2009-05-14"
               END_DATE="2010-05-10"
-              STATUS="review-past-due"
+              STATUS="reviewOverdue"
               PYVPASJ_PIDM="12345"
               PYVPASJ_POSN="4444"
               PYVPASJ_SUFF="00"
@@ -296,8 +296,8 @@
         PYVPASJ_ANNUAL_IND="test"
         PYVPASJ_EVAL_DATE="test"
         PYVPASJ_ORGN_DESC="testing"/>
-  <permission_rules ID="1" STATUS="goals-due" ROLE="employee" GOALS="e" ACTION_REQUIRED="goals-due"/>
-  <permission_rules ID="2" STATUS="goals-due" ROLE="immediate-supervisor" GOALS="e"/>
+  <permission_rules ID="1" STATUS="goalsDue" ROLE="employee" GOALS="e" ACTION_REQUIRED="goalsDue"/>
+  <permission_rules ID="2" STATUS="goalsDue" ROLE="immediate-supervisor" GOALS="e"/>
   <status/>
   <configurations
           ID="1"

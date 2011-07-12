@@ -236,37 +236,39 @@ public class AppraisalsTest {
     @Test(groups = "unittest")
     public void shouldFindAllEmployeeActiveAppraisals() throws Exception {
         int pidm = 12345;
-        ArrayList<HashMap> myActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(pidm);
+        ArrayList<Appraisal> myActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(pidm);
         assert myActiveAppraisals.size() == 4 : "Invalid size of active appraisals";
-        for (HashMap ap : myActiveAppraisals) {
-            assert ap.get("id") != new Integer(0) : "id should be present in list of appraisals";
-            assert ap.get("jobTitle") != null : "job title should be present in list of appraisals";
-            assert ap.get("startDate") != null : "start date should be present in list of appraisals";
-            assert ap.get("endDate") != null : "end date should be present in list of appraisals";
-            assert ap.get("status") != null : "status should be present in list of appraisals";
+        for (Appraisal ap : myActiveAppraisals) {
+            assert ap.getId() != new Integer(0) : "id should be present in list of appraisals";
+            assert ap.getJob().getJobTitle() != null : "job title should be present in list of appraisals";
+            assert ap.getStartDate() != null : "start date should be present in list of appraisals";
+            assert ap.getEndDate() != null : "end date should be present in list of appraisals";
+            assert ap.getStatus() != null : "status should be present in list of appraisals";
         }
     }
 
     @Test(groups = "unittest")
     public void shouldFindAllTeamActiveAppraisals() throws Exception {
         int pidm = 12467;
-        List<HashMap> teamActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(pidm, true);
+        List<Appraisal> teamActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(pidm, true);
         assert teamActiveAppraisals.size() == 4 : "Invalid size of team active appraisals";
-        for (HashMap ap : teamActiveAppraisals) {
-            assert ap.get("id") != new Integer(0) :
+        for (Appraisal ap : teamActiveAppraisals) {
+            assert ap.getId() != 0 :
                     "id should be present in list of team appraisals";
             //@todo: should this be use jobTitle instead? check my notes
-            assert ap.get("jobTitle") != null : "" +
+            assert ap.getJob().getJobTitle() != null : "" +
                     "job title should be present in list of team appraisals";
-            assert ap.get("startDate") != null :
+            assert ap.getStartDate() != null :
                     "start date should be present in list of team appraisals";
-            assert ap.get("endDate") != null :
+            assert ap.getEndDate() != null :
                     "end date should be present in list of team appraisals";
-            assert ap.get("status") != null :
+            assert ap.getStatus() != null :
                     "status should be present in list of team appraisals";
-            assert ap.get("employeeName") != null :
-                    "employee name should be present in list of team appraisals";
-            assert ap.get("appointmentType") != null :
+            assert ap.getJob().getEmployee().getFirstName() != null :
+                    "employee first name should be present in list of team appraisals";
+            assert ap.getJob().getEmployee().getLastName() != null :
+                    "employee last name should be present in list of team appraisals";
+            assert ap.getJob().getAppointmentType() != null :
                     "appointment type name should be present in list of team appraisals";
         }
     }
@@ -301,8 +303,8 @@ public class AppraisalsTest {
 
     public void shouldOnlyIncludeReviewDueOrReviewPastDueInAppraisalReviewList() throws Exception {
         for (HashMap appraisal : appraisalMgr.getReviews("UABC")) {
-            assert appraisal.get("status").equals("review-due")
-                    || appraisal.get("status").equals("review-past-due");
+            assert appraisal.get("status").equals("reviewDue")
+                    || appraisal.get("status").equals("reviewOverdue");
         }
     }
 

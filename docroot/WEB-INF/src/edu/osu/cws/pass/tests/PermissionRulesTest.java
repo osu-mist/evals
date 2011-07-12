@@ -25,8 +25,8 @@ public class PermissionRulesTest {
     @Test(groups = {"unittest"})
     public void shouldListAllPermissionRules() throws Exception {
         HashMap rules = permissionRuleMgr.list();
-        assert rules.containsKey("goals-due-employee") : "Invalid key in permissions rules";
-        assert rules.containsKey("goals-due-immediate-supervisor") : "Invalid key in permissions rules";
+        assert rules.containsKey("goalsDue-employee") : "Invalid key in permissions rules";
+        assert rules.containsKey("goalsDue-immediate-supervisor") : "Invalid key in permissions rules";
         assert rules.size() == 2 :
         "PermissionRuleMgr.list() should find all permission rules";
 

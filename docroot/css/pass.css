@@ -5,6 +5,13 @@
 .accordion-content .pass-menu-list {
     margin-top:0em;
 }
+.pass-notification h3 {
+    color:#3B3737;
+    font-size:12px;
+    border-bottom:2px solid;
+    margin:0 1em 0 0.5em;
+    padding:0.3em 0 0 0.5em;
+}
 
 /* Add/Edit Criteria */
 #pass-add-criteria {
