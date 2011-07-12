@@ -5,6 +5,7 @@ import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.io.PrintStream;
 import java.util.*;
 
 public class AppraisalMgr {
@@ -565,6 +566,7 @@ public class AppraisalMgr {
      */
     public Appraisal getAppraisal(int id) throws Exception {
         int userID = loggedInUser.getId();
+
         String userRole;
         String appraisalStatus;
 

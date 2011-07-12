@@ -3,6 +3,7 @@ package edu.osu.cws.pass.util;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import javax.portlet.*;
 
 public class HibernateUtil {
 
@@ -11,7 +12,9 @@ public class HibernateUtil {
     /**
      * Config value - name of hibernate test xml config file.
      */
+
     public static final String TEST_CONFIG = "hibernate-test.cfg.xml";
+    public static final String DEV_CONFIG = "hibernate-dev.cfg.xml";
 
     /**
      * Config value - path to hibernate xml config files from the root of the
@@ -24,7 +27,7 @@ public class HibernateUtil {
      * Static variable used to keep track of what hibernate config file the java
      * class should be using. By default it uses the test configuration db.
      */
-    private static String config = TEST_CONFIG;
+    private static String config = DEV_CONFIG;
 
     /**
      * Method used to create the Hibernate session. This method is private to ensure

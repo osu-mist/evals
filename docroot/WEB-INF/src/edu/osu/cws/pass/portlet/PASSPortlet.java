@@ -1,7 +1,7 @@
 /**
  * Portlet class for PASS project, used to handle the processAction and doView
  * requests. It relies heavily on the Actions class to figure out which classes
- * to deleage the work to.
+ * to delegate the work to.
  */
 
 package edu.osu.cws.pass.portlet;
