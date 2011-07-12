@@ -7,15 +7,14 @@ package edu.osu.cws.pass.util;
  */
 import java.lang.reflect.Method;
 import javax.mail.*;
+import javax.mail.internet.NewsAddress;
+
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.util.*;
-import org.testng.remote.strprotocol.IStringMessage;
-
+import edu.osu.cws.pass.util.PassUtil;
+import java.util.Date;
+import java.util.Map;
 import java.util.ResourceBundle;
-
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.NewsAddress;
-import javax.portlet.*;
 import java.text.MessageFormat;
 
 public class Mailer {
@@ -31,15 +30,19 @@ public class Mailer {
 	private Mail email;
     private String linkURL;
     private String mimeType;
+    private Map<String, Configuration> configMap;
+    
  	/** gets the text from the emailResources, format it, and call the send function of
         * of the Email class.
         */
 
-    public Mailer(ResourceBundle resources, Mail mail, String linkURL, String mimeType) {
+    public Mailer(ResourceBundle resources, Mail mail,
+                  String linkURL, String mimeType, Map<String, Configuration> map) {
         this.email = mail;
         this.emailBundle = resources;
         this.linkURL = linkURL;
         this.mimeType = mimeType;
+        configMap = map;
 
     }
 
@@ -124,8 +127,15 @@ public class Mailer {
         return body;
     }
 
-    private String goalsDueBody(String bodyString, String jobTitle, String evaluationPeriod, Integer days) throws Exception {
-        String body = MessageFormat.format(bodyString, jobTitle, evaluationPeriod, days);
+    private String goalsDueBody(Appraisal appraisal, String resourceKey) throws Exception {
+        Configuration config = configMap.get(appraisal.getStatus());
+        Date dueDay = PassUtil.getDueDate(appraisal, config);
+        int days = CWSUtil.daysBetween(new Date(), dueDay);
+        String jobTitle = getJobTitle(appraisal);
+        
+        String bodyString = emailBundle.getString(resourceKey);
+
+        String body = MessageFormat.format(bodyString, jobTitle, "evaluationPeriod", days);
         return body;
     }
     
@@ -137,4 +147,10 @@ public class Mailer {
     }
 
 
+    private String getJobTitle(Appraisal appraisal) {
+        return appraisal.getJob().getJobTitle();
+    }
+    private String getJob(Appraisal appraisal) {
+        return appraisal.getJob().getJobTitle();
+    }
 }

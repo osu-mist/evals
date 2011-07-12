@@ -26,11 +26,11 @@ public class PassUtil {
     /**
      *
      * @param appraisal
-     * @param configMap
+     * @param config
      * @return
      * @throws ModelException
      */
-    public Date getDueDate(Appraisal appraisal, Configuration config) throws ModelException
+    public static Date getDueDate(Appraisal appraisal, Configuration config) throws ModelException
     {
 
         Date refDate= appraisal.getEndDate();
