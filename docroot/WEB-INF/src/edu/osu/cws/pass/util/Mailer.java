@@ -8,10 +8,13 @@ package edu.osu.cws.pass.util;
 import java.lang.reflect.Method;
 import javax.mail.*;
 import javax.mail.internet.NewsAddress;
+import javax.xml.stream.events.StartDocument;
 
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.util.*;
 import edu.osu.cws.pass.util.PassUtil;
+import org.hibernate.loader.custom.Return;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -51,7 +54,7 @@ public class Mailer {
         Message msg = email.getMessage();
         String mailTo = emailType.getMailTo();
 
-        if (mailTo != null) {
+        if (mailTo != null && !mailTo.equals("")) {
             Address[] to = getRecipients(mailTo, appraisal);
             msg.addRecipients(Message.RecipientType.TO, to);
         }
@@ -99,58 +102,148 @@ public class Mailer {
     }
 
     private String getBody(Appraisal appraisal, EmailType emailType) throws Exception {
-
-        String body = emailBundle.getString("email_body");
-        Job job = appraisal.getJob();
-        Employee employee = job.getEmployee();
-        String bcDescriptor = getBusinessCenterDescriptor(job);
-        String jobTitle = job.getJobTitle();
-        String firstName =  employee.getFirstName();
-        String lastName = employee.getLastName();
-        String name = firstName + " " + lastName;
+        String bodyWrapper = emailBundle.getString("email_body");
         Method bodyMethod;
-
-        // evaluation period
-        // Integer days = job.
-        // evaluation time
-
-        String bodyResourceKey = "email_" + emailType.getType() + "_body";
-        String bodyString = emailBundle.getString(bodyResourceKey);
+        String bodyContent = "";
         String bodyMethodId = emailType.getType() + "Body";
 
         if (!bodyMethodId.equals("")) {
             bodyMethod = Mailer.class.getDeclaredMethod(bodyMethodId, String.class, String.class, String.class, Integer.class);
-            bodyString = (String) bodyMethod.invoke(this, bodyString, jobTitle, "now til then", 30);
+            bodyContent = (String) bodyMethod.invoke(this, appraisal);
         }
 
-        body = MessageFormat.format(body, name, bodyString, bcDescriptor, linkURL);
-        return body;
+        return MessageFormat.format(bodyWrapper, getEmployeeName(appraisal), bodyContent, getBusinessCenterDescriptor(appraisal), linkURL);
+
     }
 
-    private String goalsDueBody(Appraisal appraisal, String resourceKey) throws Exception {
-        Configuration config = configMap.get(appraisal.getStatus());
-        Date dueDay = PassUtil.getDueDate(appraisal, config);
-        int days = CWSUtil.daysBetween(new Date(), dueDay);
-        String jobTitle = getJobTitle(appraisal);
-        
-        String bodyString = emailBundle.getString(resourceKey);
+    private String goalsDueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_goalsDue_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal),
+                getEvaluationPeriod(appraisal), getDaysRemaining(appraisal));
+    }
 
-        String body = MessageFormat.format(bodyString, jobTitle, "evaluationPeriod", days);
-        return body;
+    private String goalsOverdueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_goalsOverdue_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), getEvaluationPeriod(appraisal));
+    }
+
+    private String goalsApprovedBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_goalsApproved_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), getEvaluationPeriod(appraisal));
+    }
+
+    private String goalsRequiredModificationBody(Appraisal appraisal) throws Exception {
+        return emailBundle.getString("email_RequiredModification_body");
+    }
+
+    private String goalsReactivatedBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_goalsReactivated_body");
+        return MessageFormat.format(bodyString, getEvaluationPeriod(appraisal));
+    }
+
+    private String resultsDueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_resultsDue_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal),
+                getEvaluationPeriod(appraisal), getDaysRemaining(appraisal));
+    }
+
+    private String resultsOverdueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_resultsOverdue_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), getEvaluationPeriod(appraisal));
+    }
+
+    private String goalsApprovalDueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_goalsApprovalDue_body");
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
+                getEvaluationPeriod(appraisal));
+    }
+
+    private String goalsApprovalOverdueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_goalsApprovalOverdue_body");
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
+                getEvaluationPeriod(appraisal));
+    }
+
+    private String appraisalDueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_appraisalDue_body");
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal),
+                getEvaluationPeriod(appraisal), getDaysRemaining(appraisal));
+    }
+
+    private String appraisalOverdueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_appraisalOverdue_body");
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getEvaluationPeriod(appraisal));
+    }
+
+    private String releaseDueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_releaseDue_body");
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
+                getEvaluationPeriod(appraisal));
+    }
+
+    private String releaseOverdueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_releaseOverdue_body");
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
+                getEvaluationPeriod(appraisal));
+    }
+
+    private String signatureDueBody(Appraisal appraisal) throws Exception {
+         return emailBundle.getString("email_signatureDue_body");
+    }
+
+    private String signatureOverdueBody(Appraisal appraisal) throws Exception {
+        return emailBundle.getString("email_signatureOverdue_body");
+    }
+
+    private String rebuttalReadDueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_rebuttalReadDue_body");
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
+                getEvaluationPeriod(appraisal));
+    }
+
+    private String rebuttalReadOverdueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_rebuttalReadOverdue_body");
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
+                getEvaluationPeriod(appraisal));
+    }
+
+    private String completedBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_completed_body");
+        return MessageFormat.format(bodyString, getEvaluationPeriod(appraisal));
+    }
+
+    private String closedBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_closed_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), getEvaluationPeriod(appraisal));
     }
     
-    private String getBusinessCenterDescriptor(Job job) {
+    private String getBusinessCenterDescriptor(Appraisal appraisal) {
+        Job job = appraisal.getJob();
         String bcName = job.getBusinessCenterName();
         String bcKey = "businesscenter_" + bcName + "_descriptor";
-        String bcDescriptor = emailBundle.getString(bcKey);
-        return bcDescriptor;
+        return emailBundle.getString(bcKey);
     }
-
 
     private String getJobTitle(Appraisal appraisal) {
         return appraisal.getJob().getJobTitle();
     }
-    private String getJob(Appraisal appraisal) {
-        return appraisal.getJob().getJobTitle();
+
+    private String getEmployeeName(Appraisal appraisal) {
+        Job job = appraisal.getJob();
+        Employee employee = job.getEmployee();
+        return employee.getConventionName();
     }
+    
+    private Integer getDaysRemaining(Appraisal appraisal) throws Exception {
+        Configuration config = configMap.get(appraisal.getStatus());
+        Date dueDay = PassUtil.getDueDate(appraisal, config);
+        return CWSUtil.daysBetween(new Date(), dueDay);
+    }
+
+    private String getEvaluationPeriod(Appraisal appraisal) {
+        Date start = appraisal.getStartDate();
+        Date end = appraisal.getEndDate();
+        return start.toString() + " to " + end.toString();
+    }
+
 }

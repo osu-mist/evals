@@ -27,7 +27,7 @@ public class HibernateUtil {
      * Static variable used to keep track of what hibernate config file the java
      * class should be using. By default it uses the test configuration db.
      */
-    private static String config = TEST_CONFIG;
+    private static String config = DEV_CONFIG;
 
     /**
      * Method used to create the Hibernate session. This method is private to ensure
