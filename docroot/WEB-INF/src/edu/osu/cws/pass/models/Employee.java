@@ -112,4 +112,9 @@ public class Employee extends Pass {
     public void setJobs(Set jobs) {
         this.jobs = jobs;
     }
+
+    public String getConventionName()
+    {
+        return (firstName + " " + lastName);
+    }
 }
