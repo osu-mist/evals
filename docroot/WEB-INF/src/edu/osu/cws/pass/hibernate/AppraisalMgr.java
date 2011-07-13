@@ -45,7 +45,7 @@ public class AppraisalMgr {
         Assessment assessment;
 
         appraisal.setJob(job);
-        appraisal.setStatus("goals-due");
+        appraisal.setStatus("goalsDue");
         //@todo: how do we define the start and end date ?
         appraisal.setStartDate(new Date());
         appraisal.setEndDate(new Date());
@@ -99,7 +99,7 @@ public class AppraisalMgr {
      * initial appraisal record.
      * It copies the jobpidm, position#, subfix, all the fields related to goals,
      * the assessment records from the trial records.
-     * Depends on the times, it either sets the status to goals-approved, results-due
+     * Depends on the times, it either sets the status to goalsApproved, resultsDue
      * or results over due.
      * startDate of the appraisal record is the first day of the month on or after
      * the eval_date or job_start_date.
@@ -646,7 +646,7 @@ public class AppraisalMgr {
                 "concat(job.employee.lastName, ', ', job.employee.firstName) as employeeName, " +
                 "evaluationSubmitDate as evaluationSubmitDate, status as status) " +
                 "from edu.osu.cws.pass.models.Appraisal where job.businessCenterName = :bc " +
-                "and status in ('review-due', 'review-past-due') and job.endDate is NULL";
+                "and status in ('reviewDue', 'reviewOverdue') and job.endDate is NULL";
 
         ArrayList<HashMap> result =  (ArrayList<HashMap>) session.createQuery(query)
                 .setString("bc", businessCenterName).list();
