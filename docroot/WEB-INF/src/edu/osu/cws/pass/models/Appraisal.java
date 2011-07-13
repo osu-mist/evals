@@ -131,7 +131,8 @@ public class Appraisal extends Pass {
     public Appraisal() { }
 
     /**
-     * Constructor used by AppraisalMgr to fetch only a limited set of attributes.
+     * Constructor used by AppraisalMgr to fetch only a limited set of attributes. Used to
+     * display information in my status section.
      *
      * @param id
      * @param jobTitle
@@ -149,7 +150,8 @@ public class Appraisal extends Pass {
     }
 
     /**
-     * Constructor used by AppraisalMgr to fetch only a limited set of attributes.
+     * Constructor used by AppraisalMgr to fetch only a limited set of attributes. Used to display
+     * information in my team section.
      *
      * @param id
      * @param jobTitle
@@ -173,6 +175,45 @@ public class Appraisal extends Pass {
         this.job.setJobTitle(jobTitle);
         this.job.setAppointmentType(appointmentType);
         this.job.setEmployee(employee);
+    }
+
+    /**
+     * Constructor used by the getReviews method in appraisal mgr to fetch a list
+     * of appraisal objects.
+     *
+     * @param id
+     * @param jobTitle
+     * @param lastName
+     * @param firstName
+     * @param evaluationSubmitDate
+     * @param status
+     * @param supervisorLastName
+     * @param supervisorFirstName
+     * @param tsOrgCode
+     */
+    public Appraisal(int id, String jobTitle, String lastName, String firstName,
+                     Date evaluationSubmitDate, String status, String supervisorLastName,
+                     String supervisorFirstName, String tsOrgCode) {
+        Employee employee = new Employee();
+        employee.setLastName(lastName);
+        employee.setFirstName(firstName);
+
+        Employee supervisor = new Employee();
+        supervisor.setLastName(supervisorLastName);
+        supervisor.setFirstName(supervisorFirstName);
+        Job supervisorJob = new Job();
+        supervisorJob.setEmployee(supervisor);
+
+        Job tempJob = new Job();
+        tempJob.setJobTitle(jobTitle);
+        tempJob.setTsOrgCode(tsOrgCode);
+        tempJob.setEmployee(employee);
+        tempJob.setSupervisor(supervisorJob);
+
+        this.id = id;
+        this.evaluationSubmitDate = evaluationSubmitDate;
+        this.status = status;
+        this.job = tempJob;
     }
 
     public boolean validateJob() {

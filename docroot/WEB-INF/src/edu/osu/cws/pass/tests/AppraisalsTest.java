@@ -302,21 +302,20 @@ public class AppraisalsTest {
     }
 
     public void shouldOnlyIncludeReviewDueOrReviewPastDueInAppraisalReviewList() throws Exception {
-        for (HashMap appraisal : appraisalMgr.getReviews("UABC")) {
-            assert appraisal.get("status").equals("reviewDue")
-                    || appraisal.get("status").equals("reviewOverdue");
+        for (Appraisal appraisal : appraisalMgr.getReviews("UABC")) {
+            assert appraisal.getStatus().equals("reviewDue")
+                    || appraisal.getStatus().equals("reviewOverdue");
         }
     }
 
     public void getReviewsShouldIncludeOnlyNeededFields() throws Exception {
-        for (HashMap appraisal : appraisalMgr.getReviews("UABC")) {
-            assert appraisal.containsKey("id") : "Missing appraisalID";
-            assert appraisal.containsKey("employeeName") : "Missing employeeName";
-            assert appraisal.containsKey("jobTitle") : "Missing jobTitle";
-            assert appraisal.containsKey("status") : "Missing status";
-            assert appraisal.containsKey("evaluationSubmitDate") : "Missing evaluationSubmitDate";
-            assert appraisal.keySet().size() == 5 :
-                    "Incorrect amount of values returned by getReviews";
+        //@todo: a couple of extra fields were added to the reviews: supervisor first/last name and tsOrgCode
+        for (Appraisal appraisal : appraisalMgr.getReviews("UABC")) {
+            assert appraisal.getId() != 0 : "Missing appraisalID";
+            assert !appraisal.getJob().getEmployee().getName().equals("") : "Missing employeeName";
+            assert !appraisal.getJob().getJobTitle().equals("") : "Missing jobTitle";
+            assert !appraisal.getStatus().equals("") : "Missing status";
+            assert appraisal.getEvaluationSubmitDate() != null : "Missing evaluationSubmitDate";
         }
     }
 

@@ -34,6 +34,7 @@
               PYVPASJ_POSN="1234"
               PYVPASJ_SUFF="00"
               CREATE_DATE="2010-05-01"
+              EVALUATION_SUBMIT_DATE="2011-03-01"
               TYPE="annual"
   />
   <appraisals ID="4"
@@ -44,6 +45,7 @@
               PYVPASJ_POSN="4444"
               PYVPASJ_SUFF="00"
               CREATE_DATE="2010-05-01"
+              EVALUATION_SUBMIT_DATE="2011-03-01"
               TYPE="annual"
   />
   <appraisals ID="5"

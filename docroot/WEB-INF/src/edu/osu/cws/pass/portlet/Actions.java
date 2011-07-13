@@ -409,13 +409,13 @@ public class Actions {
             return displayHomeView(request, response);
         }
 
-        ArrayList<HashMap> reviews = getReviewsForLoggedInUser(request);
+        ArrayList<Appraisal> reviews = getReviewsForLoggedInUser(request);
         request.setAttribute("reviews", reviews);
 
         return "review-list-jsp";
     }
 
-    private ArrayList<HashMap> getReviewsForLoggedInUser(PortletRequest request) throws Exception {
+    private ArrayList<Appraisal> getReviewsForLoggedInUser(PortletRequest request) throws Exception {
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
         if (businessCenterName.equals("")) {
             int employeeID = getLoggedOnUser(request).getId();
@@ -463,7 +463,7 @@ public class Actions {
         }
 
         if (isLoggedInUserReviewer(request)) {
-            ArrayList<HashMap> reviews = getReviewsForLoggedInUser(request);
+            ArrayList<Appraisal> reviews = getReviewsForLoggedInUser(request);
             request.setAttribute("pendingReviews", reviews);
         }
 

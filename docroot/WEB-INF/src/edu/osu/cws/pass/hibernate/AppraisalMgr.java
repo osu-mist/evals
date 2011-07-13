@@ -618,8 +618,8 @@ public class AppraisalMgr {
         return appraisal;
     }
 
-    public ArrayList<HashMap> getReviews(String businessCenterName) throws Exception {
-        ArrayList<HashMap> reviewList;
+    public ArrayList<Appraisal> getReviews(String businessCenterName) throws Exception {
+        ArrayList<Appraisal> reviewList;
         Session session = HibernateUtil.getCurrentSession();
         try {
             reviewList = getReviews(businessCenterName, session);
@@ -632,7 +632,7 @@ public class AppraisalMgr {
 
 
     /**
-     * Returns an ArrayList of HashMaps which contain data about appraisals pending
+     * Returns an ArrayList of Appraisal which contain data about appraisals pending
      * review. This method is used to display a list of pending reviews in the displayReview
      * actions method.
      *
@@ -640,15 +640,15 @@ public class AppraisalMgr {
      * @param session
      * @return
      */
-    private ArrayList<HashMap> getReviews(String businessCenterName, Session session) {
+    private ArrayList<Appraisal> getReviews(String businessCenterName, Session session) {
         Transaction tx = session.beginTransaction();
-        String query = "select new map(id as id, job.jobTitle as jobTitle, " +
-                "concat(job.employee.lastName, ', ', job.employee.firstName) as employeeName, " +
-                "evaluationSubmitDate as evaluationSubmitDate, status as status) " +
+        String query = "select new edu.osu.cws.pass.models.Appraisal(id, job.jobTitle, " +
+                "job.employee.lastName, job.employee.firstName, evaluationSubmitDate, status, " +
+                "job.supervisor.employee.lastName, job.supervisor.employee.firstName, job.tsOrgCode) " +
                 "from edu.osu.cws.pass.models.Appraisal where job.businessCenterName = :bc " +
                 "and status in ('reviewDue', 'reviewOverdue') and job.endDate is NULL";
 
-        ArrayList<HashMap> result =  (ArrayList<HashMap>) session.createQuery(query)
+        ArrayList<Appraisal> result =  (ArrayList<Appraisal>) session.createQuery(query)
                 .setString("bc", businessCenterName).list();
         tx.commit();
         return result;

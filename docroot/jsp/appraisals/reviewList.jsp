@@ -7,7 +7,9 @@
     <table class="taglib-search-iterator">
         <tr class="portlet-section-header results-header">
             <th><liferay-ui:message key="employee"/></th>
+            <th><liferay-ui:message key="supervisor"/></th>
             <th><liferay-ui:message key="job-title"/></th>
+            <th><liferay-ui:message key="orgn-code-ts"/></th>
             <th><liferay-ui:message key="submit-date"/></th>
             <th><liferay-ui:message key="status"/></th>
         </tr>
@@ -17,9 +19,11 @@
             onmouseover="this.className = 'portlet-section-body-hover results-row hover';"
             onmouseout="this.className = '${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}';"
         >
-            <td>${review.employeeName}</td>
-            <td>${review.jobTitle}</td>
-            <td>${review.evaluationSubmitDate}</td>
+            <td>${review.job.employee.name}</td>
+            <td>${review.job.supervisor.employee.name}</td>
+            <td>${review.job.jobTitle}</td>
+            <td>${review.job.tsOrgCode}</td>
+            <td><fmt:formatDate value="${review.evaluationSubmitDate}" pattern="dd/MM/yy"/></td>
             <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
                                 <portlet:param name="id" value="${review.id}"/>
                                 <portlet:param  name="action" value="displayAppraisal"/>
