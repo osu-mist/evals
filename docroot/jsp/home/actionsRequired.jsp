@@ -30,20 +30,22 @@
             <liferay-ui:message key="no-employee-actions"/>
         </c:if>
 
-        <h3><liferay-ui:message key="my-admin-actions" /></h3>
-        <c:if test="${!empty administrativeActions}">
-            <ul>
-                <c:forEach var="reqAction" items="${administrativeActions}">
-                    <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
-                    <c:forEach var="params" items="${reqAction.parameters}">
-                        <portlet:param name="${params.key}" value="${params.value}"/>
+        <c:if test="${isSupervisor == 'true' || isReviewer == 'true'}">
+            <h3><liferay-ui:message key="my-admin-actions" /></h3>
+            <c:if test="${!empty administrativeActions}">
+                <ul>
+                    <c:forEach var="reqAction" items="${administrativeActions}">
+                        <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
+                        <c:forEach var="params" items="${reqAction.parameters}">
+                            <portlet:param name="${params.key}" value="${params.value}"/>
+                        </c:forEach>
+                       </portlet:actionURL>">${reqAction.anchorText}</a></li>
                     </c:forEach>
-                   </portlet:actionURL>">${reqAction.anchorText}</a></li>
-                </c:forEach>
-            </ul>
-        </c:if>
-        <c:if test="${empty administrativeActions}">
-            <liferay-ui:message key="no-admin-actions"/>
+                </ul>
+            </c:if>
+            <c:if test="${empty administrativeActions}">
+                <liferay-ui:message key="no-admin-actions"/>
+            </c:if>
         </c:if>
     </div>
 </div>

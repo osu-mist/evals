@@ -27,8 +27,8 @@
         onmouseout="this.className = '${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}';"
         id="<portlet:namespace/>users-${configuration.id}"
     >
-        <td><strong><liferay-ui:message key="${configuration.name}"/></strong><br />
-            <liferay-ui:message key="${configuration.name}-description"/>
+        <td><strong><liferay-ui:message key="parameters-${configuration.name}"/></strong><br />
+            <liferay-ui:message key="parameters-${configuration.name}-description"/>
         </td>
         <td>
             <div id="<portlet:namespace/>displayValue${configuration.id}">${configuration.value}</div>

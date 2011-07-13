@@ -21,6 +21,7 @@
             <td><c:out value="${employee.email}"/></td>
         </tr>
     </table>
+    <hr />
 
     <h3><liferay-ui:message key="jobs"/></h3>
     <c:forEach var="job" items="${employee.jobs}" varStatus="loopStatus">
@@ -48,4 +49,6 @@
         </table>
         <hr />
     </c:forEach>
+
+    <p><em><liferay-ui:message key="how-to-correct-job-info"/></em></p>
 </div>
