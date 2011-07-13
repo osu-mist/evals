@@ -993,9 +993,11 @@ public class Actions {
 
             // Get the appropriate permissionrule object from the permissionRuleMap
             PermissionRule rule = (PermissionRule) permissionRuleMap.get(actionKey);
-            String actionRequired = rule.getActionRequired();
-            if (rule != null && actionRequired != null
-                    && !actionRequired.equals("")) {
+            String actionRequired = "";
+            if (rule != null) {
+                actionRequired = rule.getActionRequired();
+            }
+            if (!actionRequired.equals("")) {
                 // compose a requiredAction object and add it to the outList.
                 anchorParams = new HashMap<String, String>();
                 anchorParams.put("action", "displayAppraisal");
