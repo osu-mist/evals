@@ -23,7 +23,7 @@
     </table>
     <hr />
 
-    <h3><liferay-ui:message key="jobs"/></h3>
+    <h3><liferay-ui:message key="job-information"/></h3>
     <c:forEach var="job" items="${employee.jobs}" varStatus="loopStatus">
         <table>
             <tr>
@@ -35,8 +35,12 @@
             <td><c:out value="${job.jobTitle}"/></td>
             </tr>
             <tr>
+                <td><strong><liferay-ui:message key="supervisor"/></strong></td>
+            <td><c:out value="${job.supervisor.name}"/></td>
+            </tr>
+            <tr>
                 <td><strong><liferay-ui:message key="job-start-date"/></strong></td>
-                <td><fmt:formatDate value="${job.beginDate}" pattern="MM/yyyy"/></td>
+                <td><fmt:formatDate value="${job.beginDate}" pattern="dd/MM/yy"/></td>
             </tr>
             <tr>
                 <td><strong><liferay-ui:message key="appointment-type"/></strong></td>

@@ -14,7 +14,7 @@
         <c:set var="sectionName" value="${configuration.section}"/>
         <h3><liferay-ui:message key="${configuration.section}"/></h3>
 
-        <table class="taglib-search-iterator">
+        <table class="taglib-search-iterator configuration-list">
             <tr class="portlet-section-header results-header">
                 <th width="75%"><liferay-ui:message key="configurations-setting"/></th>
                 <th><liferay-ui:message key="value"/></th>

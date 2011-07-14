@@ -181,3 +181,8 @@ tr.ui-state-highlight {
 #pass-my-info h3 {
     margin-top: 0.8em;
 }
+
+/* Configuration List */
+table.configuration-list {
+    width: 50%;
+}
