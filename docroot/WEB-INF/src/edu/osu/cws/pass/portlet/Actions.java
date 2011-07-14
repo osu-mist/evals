@@ -992,6 +992,7 @@ public class Actions {
      * @param role              Role of the currently logged in user
      * @param resource          Resource bundle to pass in to RequiredAction bean
      * @return  outList
+     * @throws edu.osu.cws.pass.models.ModelException
      */
     public ArrayList<RequiredAction> getAppraisalActions(List<Appraisal> appraisalList,
                                                          String role, ResourceBundle resource) throws ModelException {
@@ -1025,7 +1026,13 @@ public class Actions {
                 if (appraisalStatus.equals("goalsRequiredModification") || appraisalStatus.equals("goalsReactivated")) {
                     configuration = configurationMap.get("goalsDue");
                 } else {
+                    if (appraisalStatus.contains("Overdue")) {
+                        appraisalStatus = appraisalStatus.replace("Overdue", "Due");
+                    }
                     configuration = configurationMap.get(appraisalStatus);
+                }
+                if (configuration == null) {
+                    throw new ModelException("Could not find configuration object for status - " + appraisalStatus);
                 }
 
                 actionReq = new RequiredAction();
