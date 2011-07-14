@@ -81,7 +81,7 @@ public class Actions {
 
         request.setAttribute("criterionArea", criterionArea);
         request.setAttribute("criterionDetail", criterionDetail);
-        request.setAttribute("menuMax", true);
+        useMaximizedMenu(request);
 
         return "criteria-add-jsp";
     }
@@ -123,7 +123,7 @@ public class Actions {
 
         request.setAttribute("criterionArea", criterionArea);
         request.setAttribute("criterionDetail", criterionDetail);
-        request.setAttribute("menuMax", true);
+        useMaximizedMenu(request);
 
         return "criteria-add-jsp";
     }
@@ -154,7 +154,7 @@ public class Actions {
             addErrorsToRequest(request, e.getMessage());
         }
 
-        request.setAttribute("menuMax", true);
+        useMaximizedMenu(request);
         return "criteria-list-jsp";
     }
 
@@ -266,7 +266,7 @@ public class Actions {
         setupActiveAppraisals(request, employeeId);
 
         setRequiredActions(request);
-        request.setAttribute("menuHome", true);
+        useNormalMenu(request);
 
         return "home-jsp";
     }
@@ -292,7 +292,7 @@ public class Actions {
         Employee employee = getLoggedOnUser(request);
         setupActiveAppraisals(request, employee.getId());
         setRequiredActions(request);
-        request.setAttribute("menuHome", true);
+        useNormalMenu(request);
 
         return "admin-home-jsp";
     }
@@ -301,13 +301,13 @@ public class Actions {
         Employee employee = getLoggedOnUser(request);
         setupActiveAppraisals(request, employee.getId());
         setRequiredActions(request);
-        request.setAttribute("menuHome", true);
+        useNormalMenu(request);
 
         return "supervisor-home-jsp";
     }
 
     public String displayMyInformation(PortletRequest request, PortletResponse response) throws Exception {
-        request.setAttribute("menuHome", true);
+        useNormalMenu(request);
         request.setAttribute("employee", getLoggedOnUser(request));
 
         return "my-information-jsp";
@@ -411,8 +411,27 @@ public class Actions {
 
         ArrayList<Appraisal> reviews = getReviewsForLoggedInUser(request);
         request.setAttribute("reviews", reviews);
+        useMaximizedMenu(request);
 
         return "review-list-jsp";
+    }
+
+    /**
+     * Sets a request parameter to tell the jsp to use the normal top menu.
+     *
+     * @param request
+     */
+    private void useNormalMenu(PortletRequest request) {
+        request.setAttribute("menuHome", true);
+    }
+
+    /**
+     * Sets a request parameter to tell the jsp to use the maximized top menu.
+     *
+     * @param request
+     */
+    private void useMaximizedMenu(PortletRequest request) {
+        request.setAttribute("menuMax", true);
     }
 
     private ArrayList<Appraisal> getReviewsForLoggedInUser(PortletRequest request) throws Exception {
@@ -470,7 +489,7 @@ public class Actions {
         request.setAttribute("appraisal", appraisal);
         request.setAttribute("permissionRule", permRule);
         request.setAttribute("showForm", showForm);
-        request.setAttribute("menuMax", true);
+        useMaximizedMenu(request);
 
         return "appraisal-jsp";
     }
@@ -540,7 +559,7 @@ public class Actions {
         ArrayList<Admin> adminsList = (ArrayList<Admin>) portletContext.getAttribute("adminsList");
         request.setAttribute("isMaster", isLoggedInUserMasterAdmin(request));
         request.setAttribute("adminsList", adminsList);
-        request.setAttribute("menuMax", true);
+        useMaximizedMenu(request);
 
         return "admin-list-jsp";
     }
@@ -638,7 +657,7 @@ public class Actions {
         request.setAttribute("isMaster", isLoggedInUserMasterAdmin(request));
         request.setAttribute("reviewersList", reviewersList);
         request.setAttribute("businessCenters", businessCenters);
-        request.setAttribute("menuMax", true);
+        useMaximizedMenu(request);
 
         return "reviewer-list-jsp";
     }
@@ -738,7 +757,7 @@ public class Actions {
         ArrayList<Configuration> configurations = (ArrayList<Configuration>)
                 portletContext.getAttribute("configurationsList");
         request.setAttribute("configurations", configurations);
-        request.setAttribute("menuMax", true);
+        useMaximizedMenu(request);
 
         return "configuration-list-jsp";
     }
