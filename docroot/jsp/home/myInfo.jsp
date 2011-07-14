@@ -36,7 +36,7 @@
             </tr>
             <tr>
                 <td><strong><liferay-ui:message key="supervisor"/></strong></td>
-            <td><c:out value="${job.supervisor.name}"/></td>
+            <td><c:out value="${job.supervisor.employee.name}"/></td>
             </tr>
             <tr>
                 <td><strong><liferay-ui:message key="job-start-date"/></strong></td>
