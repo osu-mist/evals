@@ -189,11 +189,11 @@ public class Appraisal extends Pass {
      * @param status
      * @param supervisorLastName
      * @param supervisorFirstName
-     * @param tsOrgCode
+     * @param orgCodeDescription
      */
     public Appraisal(int id, String jobTitle, String lastName, String firstName,
                      Date evaluationSubmitDate, String status, String supervisorLastName,
-                     String supervisorFirstName, String tsOrgCode) {
+                     String supervisorFirstName, String orgCodeDescription) {
         Employee employee = new Employee();
         employee.setLastName(lastName);
         employee.setFirstName(firstName);
@@ -206,7 +206,7 @@ public class Appraisal extends Pass {
 
         Job tempJob = new Job();
         tempJob.setJobTitle(jobTitle);
-        tempJob.setTsOrgCode(tsOrgCode);
+        tempJob.setOrgCodeDescription(orgCodeDescription);
         tempJob.setEmployee(employee);
         tempJob.setSupervisor(supervisorJob);
 

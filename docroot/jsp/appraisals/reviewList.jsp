@@ -9,7 +9,7 @@
             <th><liferay-ui:message key="employee"/></th>
             <th><liferay-ui:message key="supervisor"/></th>
             <th><liferay-ui:message key="job-title"/></th>
-            <th><liferay-ui:message key="orgn-code-ts"/></th>
+            <th><liferay-ui:message key="orgn-code-desc"/></th>
             <th><liferay-ui:message key="submit-date"/></th>
             <th><liferay-ui:message key="status"/></th>
         </tr>
@@ -22,7 +22,7 @@
             <td>${review.job.employee.name}</td>
             <td>${review.job.supervisor.employee.name}</td>
             <td>${review.job.jobTitle}</td>
-            <td>${review.job.tsOrgCode}</td>
+            <td>${review.job.orgCodeDescription}</td>
             <td><fmt:formatDate value="${review.evaluationSubmitDate}" pattern="dd/MM/yy"/></td>
             <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
                                 <portlet:param name="id" value="${review.id}"/>

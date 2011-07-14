@@ -644,9 +644,10 @@ public class AppraisalMgr {
         Transaction tx = session.beginTransaction();
         String query = "select new edu.osu.cws.pass.models.Appraisal(id, job.jobTitle, " +
                 "job.employee.lastName, job.employee.firstName, evaluationSubmitDate, status, " +
-                "job.supervisor.employee.lastName, job.supervisor.employee.firstName, job.tsOrgCode) " +
-                "from edu.osu.cws.pass.models.Appraisal where job.businessCenterName = :bc " +
-                "and status in ('reviewDue', 'reviewOverdue') and job.endDate is NULL";
+                "job.supervisor.employee.lastName, job.supervisor.employee.firstName, " +
+                "job.orgCodeDescription) from edu.osu.cws.pass.models.Appraisal " +
+                "where job.businessCenterName = :bc and status in ('reviewDue', 'reviewOverdue') " +
+                "and job.endDate is NULL";
 
         ArrayList<Appraisal> result =  (ArrayList<Appraisal>) session.createQuery(query)
                 .setString("bc", businessCenterName).list();
