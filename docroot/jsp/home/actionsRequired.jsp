@@ -27,7 +27,7 @@
             </ul>
         </c:if>
         <c:if test="${empty employeeActions}">
-            <liferay-ui:message key="no-employee-actions"/>
+            <p><liferay-ui:message key="no-employee-actions"/></p>
         </c:if>
 
         <c:if test="${isSupervisor == 'true' || isReviewer == 'true'}">
@@ -44,7 +44,7 @@
                 </ul>
             </c:if>
             <c:if test="${empty administrativeActions}">
-                <liferay-ui:message key="no-admin-actions"/>
+                <p><liferay-ui:message key="no-admin-actions"/></p>
             </c:if>
         </c:if>
     </div>
