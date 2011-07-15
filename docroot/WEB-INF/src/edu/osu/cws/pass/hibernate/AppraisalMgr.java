@@ -5,7 +5,6 @@ import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.io.PrintStream;
 import java.util.*;
 
 public class AppraisalMgr {
@@ -576,12 +575,10 @@ public class AppraisalMgr {
         try {
             Transaction tx = session.beginTransaction();
             appraisal = getAppraisal(id, session);
-            userRole = getRole(appraisal, userID);
             tx.commit();
 
             Job supervisorJob = jobMgr.getSupervisor(appraisal.getJob());
             appraisal.getJob().setCurrentSupervisor(supervisorJob);
-            setAppraisalStatus(appraisal, userRole);
         } catch (Exception e) {
             session.close();
             throw e;
@@ -599,7 +596,7 @@ public class AppraisalMgr {
      * @param appraisal
      * @param role
      */
-    private void setAppraisalStatus(Appraisal appraisal, String role) {
+    public void setAppraisalStatus(Appraisal appraisal, String role) {
         if (role.equals("employee") && statusHiddenFromEmployee.contains(appraisal.getStatus())) {
             appraisal.setStatus("inReview");
         }

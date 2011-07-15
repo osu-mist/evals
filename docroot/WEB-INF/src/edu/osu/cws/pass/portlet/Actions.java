@@ -465,9 +465,11 @@ public class Actions {
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
-            SessionErrors.add(request, "appraisal-permission-denied");
-            return "home-jsp";
+            addErrorsToRequest(request, "You do not have permission to view the appraisal");
+            return displayHomeView(request, response);
         }
+        String userRole = appraisalMgr.getRole(appraisal, currentlyLoggedOnUser.getId());
+        appraisalMgr.setAppraisalStatus(appraisal, userRole);
 
         // Set flag whether or not the html form to update the appraisal needs to be displayed
         if (permRule.getSaveDraft() != null && permRule.getSubmit() != null
@@ -510,8 +512,9 @@ public class Actions {
 
         int id = ParamUtil.getInteger(request, "id", 0);
         if (id == 0) {
-            SessionErrors.add(request, "appraisal-does-not-exist");
-            return "home-jsp";
+            addErrorsToRequest(request, "We couldn't find your appraisal. If you believe this is an " +
+                    "error, please contact your supervisor.");
+            return displayHomeView(request, response);
         }
 
         HashMap permissionRules = (HashMap) portletContext.getAttribute("permissionRules");
