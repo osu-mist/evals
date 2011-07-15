@@ -43,7 +43,7 @@ public class PassUtil {
         cal.setTime(refDate);
 
         int offset = config.getIntValue();
-        if (config.getAction().equals("substract"))
+        if (config.getAction().equals("subtract"))
             offset = offset * (-1);
 
         cal.add(Calendar.DAY_OF_MONTH, offset); //This assumes all the days are based days, not months.
