@@ -468,7 +468,7 @@ public class Actions {
             addErrorsToRequest(request, "You do not have permission to view the appraisal");
             return displayHomeView(request, response);
         }
-        String userRole = appraisalMgr.getRole(appraisal, currentlyLoggedOnUser.getId());
+        String userRole = appraisalMgr.getRoleAndSession(appraisal, currentlyLoggedOnUser.getId());
         appraisalMgr.setAppraisalStatus(appraisal, userRole);
 
         // Set flag whether or not the html form to update the appraisal needs to be displayed

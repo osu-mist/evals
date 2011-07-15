@@ -558,6 +558,31 @@ public class AppraisalMgr {
     }
 
     /**
+     * Returns the role (employee, supervisor, immediate supervisor or reviewer) of the pidm
+     * in the given appraisal. Return empty string if the pidm does not have any role on the
+     * appraisal. This method creates a new session and calls the getRole method.
+     *
+     * @param appraisal     appraisal to check role in
+     * @param pidm          pidm of the user to check
+     * @return role
+     * @throws Exception
+     */
+    public String getRoleAndSession(Appraisal appraisal, int pidm) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        String role;
+
+        try {
+            Transaction tx = session.beginTransaction();
+            role = getRole(appraisal, pidm);
+            tx.commit();
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+
+        return role;
+    }
+    /**
      * This method is just a wrapper for session.get. It returns the appraisal that
      * matches the id. It also adds the currentSupervisor to the appraisal object.
      *
