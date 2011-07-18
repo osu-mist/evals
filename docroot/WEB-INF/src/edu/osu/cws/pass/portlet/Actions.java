@@ -301,9 +301,30 @@ public class Actions {
         Employee employee = getLoggedOnUser(request);
         setupActiveAppraisals(request, employee.getId());
         setRequiredActions(request);
+        setTeamAppraisalStatus(request);
         useNormalMenu(request);
 
         return "supervisor-home-jsp";
+    }
+
+    /**
+     * Goes through the team appraisals in the request object, and sets their status accordingly by calling
+     * AppraisalMgr.setAppraisalStatus.
+     *
+     * @param request
+     */
+    private void setTeamAppraisalStatus(PortletRequest request) {
+        if (request.getAttribute("myTeamsActiveAppraisals") != null) {
+            ArrayList<Appraisal> newTeamAppraisals = new ArrayList<Appraisal>();
+            ArrayList<Appraisal> teamAppraisals = (ArrayList<Appraisal>)
+                    request.getAttribute("myTeamsActiveAppraisals");
+            for (Appraisal appraisal : teamAppraisals) {
+                appraisalMgr.setAppraisalStatus(appraisal, "supervisor");
+                newTeamAppraisals.add(appraisal);
+            }
+
+            request.setAttribute("myTeamsActiveAppraisals", newTeamAppraisals);
+        }
     }
 
     public String displayMyInformation(PortletRequest request, PortletResponse response) throws Exception {

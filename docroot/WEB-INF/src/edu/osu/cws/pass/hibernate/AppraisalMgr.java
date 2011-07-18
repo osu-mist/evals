@@ -616,7 +616,8 @@ public class AppraisalMgr {
     /**
      * Checks the appraisal status and if we need to change the status based on the user role, the status
      * is changed. Right now, if the supervisor submitted the appraisal or hr submitted comments, the status
-     * displayed to the user is in review.
+     * displayed to the user is in review. If the status contains rebuttalRead, we set the status to
+     * completed.
      *
      * @param appraisal
      * @param role
@@ -624,6 +625,11 @@ public class AppraisalMgr {
     public void setAppraisalStatus(Appraisal appraisal, String role) {
         if (role.equals("employee") && statusHiddenFromEmployee.contains(appraisal.getStatus())) {
             appraisal.setStatus("inReview");
+        }
+
+        // Whenever the status is rebuttalReadDue or rebuttalReadOverDue, we set it as completed.
+        if (appraisal.getStatus().contains("rebuttalRead")) {
+            appraisal.setStatus("completed");
         }
     }
 
