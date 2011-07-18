@@ -3,7 +3,6 @@
         <li><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
                         <portlet:param name="action" value="displayHomeView"/>
                         </portlet:renderURL>"><liferay-ui:message key="home"/></a></li>
-        <li><a href="#"><liferay-ui:message key="reports"/></a></li>
         <li><a href="#"><liferay-ui:message key="settings"/></a>
             <ul>
                 <li><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
