@@ -2,7 +2,7 @@
 <!DOCTYPE plugin-package PUBLIC "-//Liferay//DTD Plugin Package 5.2.0//EN" "http://www.liferay.com/dtd/liferay-plugin-package_5_2_0.dtd">
 
 <plugin-package>
-    <name>Performance Appraisal Software System</name>
+    <name>PASS</name>
     <module-id>osu/pass/5.2.3.1/war</module-id>
     <types>
         <type>portlet</type>
