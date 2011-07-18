@@ -34,6 +34,7 @@ if (errorMsg != null && !errorMsg.equals("")) {
 %>
 
 <c:if test="${not empty menuHome}">
+    <liferay-ui:message key="performance-appraisal-software-system"/>
     <%@ include file="/jsp/menuHome.jsp"%>
 </c:if>
 <c:if test="${not empty menuMax}">
