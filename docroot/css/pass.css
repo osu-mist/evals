@@ -122,7 +122,6 @@ tr.ui-state-highlight {
 
 /* Top Menu */
 #pass-top-menu {
-    padding-bottom: 4em;
     position: relative;
     z-index: 1;
     width: 100%;
@@ -145,7 +144,7 @@ tr.ui-state-highlight {
 #pass-top-menu  .portlet-action-menu a {
     color: #686868;
     padding: 0.5em 0.5em 0.25em 0.5em;
-    font-size: 1.37em;
+    font-size: 1em;
 }
 #pass-top-menu  .portlet-action-menu ul {
     width: auto;
@@ -171,6 +170,7 @@ tr.ui-state-highlight {
 }
 #pass-top-menu .portlet-action-menu li:hover ul, #pass-top-menu .portlet-action-menu li.sfHover ul {
     right: auto;
+    top:1.9em;
 }
 
 /* My Information */
