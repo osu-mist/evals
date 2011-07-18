@@ -8,6 +8,8 @@ package edu.osu.cws.pass.util;
  */
 import java.lang.reflect.Method;
 import javax.mail.*;
+
+import com.sun.xml.internal.ws.wsdl.writer.document.soap.Body;
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.util.*;
 import java.util.Date;
@@ -33,7 +35,7 @@ public class Mailer {
     }
 
 /* send an email
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @param emailType - an EmailType
  *
  */
@@ -62,7 +64,7 @@ public class Mailer {
 
         String body = getBody(appraisal, bodyMethodId);
 
-        msg. setContent(body, "text/html");
+        msg.setContent(body, "text/html");
 
         String subject = emailBundle.getString( "email_" + emailType.getType() + "_subject");
 
@@ -71,7 +73,7 @@ public class Mailer {
    }
 
 /* get the recipients of a particular email
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @param emailType - an EmailType
  * @return array of recipient addresses
  */
@@ -95,28 +97,26 @@ public class Mailer {
 
 /* fetch the standard parts of the email body, and then delegate a specific method
  * to retrieve the body for that specific emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @param bodyMethodId - the name of the method to call
- * @return compelete email body
+ * @return complete email body
  */
     private String getBody(Appraisal appraisal, String bodyMethodId) throws Exception {
         String bodyWrapper = emailBundle.getString("email_body");
         Method bodyMethod;
         String bodyContent = "";
 
-        if (!bodyMethodId.equals("")) {
-            bodyMethod = Mailer.class.getDeclaredMethod(bodyMethodId, String.class,
-                    String.class, String.class, Integer.class);
-
+        if (!bodyMethodId.equals("Body")) {
+            bodyMethod = Mailer.class.getDeclaredMethod(bodyMethodId, Appraisal.class);
             bodyContent = (String) bodyMethod.invoke(this, appraisal);
-        }
 
+        }
         return MessageFormat.format(bodyWrapper, getEmployeeName(appraisal),
                 bodyContent, getBusinessCenterDescriptor(appraisal), linkURL);
     }
 
 /* Fetch the body for a particular emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String goalsDueBody(Appraisal appraisal) throws Exception {
@@ -126,7 +126,7 @@ public class Mailer {
     }
 
 /* Fetch the body for a particular emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String goalsOverdueBody(Appraisal appraisal) throws Exception {
@@ -135,7 +135,7 @@ public class Mailer {
     }
 
 /* Fetch the body for goalsApproved emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String goalsApprovedBody(Appraisal appraisal) throws Exception {
@@ -144,15 +144,15 @@ public class Mailer {
     }
 
 /* Fetch the body for goalsRequiredModification emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String goalsRequiredModificationBody(Appraisal appraisal) throws Exception {
-        return emailBundle.getString("email_RequiredModification_body");
+        return emailBundle.getString("email_goalsRequiredModification_body");
     }
 
 /* Fetch the body for a goalsReactivated emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String goalsReactivatedBody(Appraisal appraisal) throws Exception {
@@ -161,7 +161,7 @@ public class Mailer {
     }
 
 /* Fetch the body for a resultsDue emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String resultsDueBody(Appraisal appraisal) throws Exception {
@@ -171,7 +171,7 @@ public class Mailer {
     }
 
 /* Fetch the body for a resultsOverdue emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String resultsOverdueBody(Appraisal appraisal) throws Exception {
@@ -180,7 +180,7 @@ public class Mailer {
     }
 
 /* Fetch the body for goalsApprovalDue emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String goalsApprovalDueBody(Appraisal appraisal) throws Exception {
@@ -190,7 +190,7 @@ public class Mailer {
     }
 
 /* Fetch the body for goalsApprovalOverdue emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String goalsApprovalOverdueBody(Appraisal appraisal) throws Exception {
@@ -200,7 +200,7 @@ public class Mailer {
     }
 
 /* Fetch the body for appraisalDue emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String appraisalDueBody(Appraisal appraisal) throws Exception {
@@ -210,7 +210,7 @@ public class Mailer {
     }
 
 /* Fetch the body for appraisalOverdue emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String appraisalOverdueBody(Appraisal appraisal) throws Exception {
@@ -219,7 +219,7 @@ public class Mailer {
     }
 
 /* Fetch the body for releaseDue emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String releaseDueBody(Appraisal appraisal) throws Exception {
@@ -229,7 +229,7 @@ public class Mailer {
     }
 
 /* Fetch the body for releaseOverdue emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String releaseOverdueBody(Appraisal appraisal) throws Exception {
@@ -239,7 +239,7 @@ public class Mailer {
     }
 
 /* Fetch the body for signatureDue emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String signatureDueBody(Appraisal appraisal) throws Exception {
@@ -247,7 +247,7 @@ public class Mailer {
     }
 
 /* Fetch the body for signatureOverdue emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String signatureOverdueBody(Appraisal appraisal) throws Exception {
@@ -255,7 +255,7 @@ public class Mailer {
     }
 
 /* Fetch the body for rebuttalReadDue emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String rebuttalReadDueBody(Appraisal appraisal) throws Exception {
@@ -265,7 +265,7 @@ public class Mailer {
     }
 
 /* Fetch the body for rebuttalReadOverdue emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String rebuttalReadOverdueBody(Appraisal appraisal) throws Exception {
@@ -275,7 +275,7 @@ public class Mailer {
     }
 
 /* Fetch the body for completed emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String completedBody(Appraisal appraisal) throws Exception {
@@ -284,7 +284,7 @@ public class Mailer {
     }
 
 /* Fetch the body for closed emailType
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
     private String closedBody(Appraisal appraisal) throws Exception {
@@ -293,7 +293,7 @@ public class Mailer {
     }
 
 /* Fetch the business center descriptor
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return full name of business center
  */
     private String getBusinessCenterDescriptor(Appraisal appraisal) {
@@ -304,15 +304,16 @@ public class Mailer {
     }
 
 /* Fetch the title of the job for a specific appraisal
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return job title
  */
     private String getJobTitle(Appraisal appraisal) {
-        return appraisal.getJob().getJobTitle();
+        String jobTitle = appraisal.getJob().getJobTitle();
+        return jobTitle;
     }
 
 /* Fetch the full name of the employee for a particular appraisal
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return name
  */
     private String getEmployeeName(Appraisal appraisal) {
@@ -322,11 +323,12 @@ public class Mailer {
     }
 
 /* Fetch the days remaining to respond to a particular action
- * @param appraisal - an Appriasal object
+ * @param appraisal - an Appraisal object
  * @return number of days
  */
     private Integer getDaysRemaining(Appraisal appraisal) throws Exception {
-        Configuration config = configMap.get(appraisal.getStatus());
+        String status = appraisal.getStatus();
+        Configuration config = configMap.get(status);
         Date dueDay = PassUtil.getDueDate(appraisal, config);
         return CWSUtil.daysBetween(new Date(), dueDay);
     }
