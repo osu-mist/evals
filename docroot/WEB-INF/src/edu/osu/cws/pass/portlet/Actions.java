@@ -33,6 +33,8 @@ public class Actions {
 
     private AppraisalMgr appraisalMgr = new AppraisalMgr();
 
+    private static final String ACCESS_DENIED = "You do not have access to perform this action";
+
     /**
      * Takes the request object and creates POJO objects. Then it calls the respective
      * Hibernate util classes passing the POJOs to handle the saving of data and
@@ -45,7 +47,7 @@ public class Actions {
     public String addCriteria(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserAdmin(request)) {
-            addErrorsToRequest(request, "You do not have access to add criteria");
+            addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
 
@@ -98,7 +100,7 @@ public class Actions {
     public String editCriteria(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserAdmin(request)) {
-            addErrorsToRequest(request, "You do not have access to edit criteria");
+            addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
 
@@ -140,7 +142,7 @@ public class Actions {
     public String listCriteria(PortletRequest request, PortletResponse response) throws  Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserAdmin(request)) {
-            addErrorsToRequest(request, "You do not have access to list criteria");
+            addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
 
@@ -172,7 +174,7 @@ public class Actions {
     public String deleteCriteria(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserAdmin(request)) {
-            addErrorsToRequest(request, "You do not have access to list criteria");
+            addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
 
@@ -231,7 +233,7 @@ public class Actions {
     public String updateCriteriaSequence(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserAdmin(request)) {
-            addErrorsToRequest(request, "You do not have access to perform this action");
+            addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
 
@@ -426,7 +428,7 @@ public class Actions {
     public String displayReviewList(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserReviewer(request)) {
-            addErrorsToRequest(request, "You do not have access to review performance evaluation");
+            addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
 
@@ -486,7 +488,7 @@ public class Actions {
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
-            addErrorsToRequest(request, "You do not have permission to view the appraisal");
+            addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
         String userRole = appraisalMgr.getRoleAndSession(appraisal, currentlyLoggedOnUser.getId());
@@ -576,7 +578,7 @@ public class Actions {
     public String listAdmin(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserAdmin(request)) {
-            addErrorsToRequest(request, "You do not have access to list admin users");
+            addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
 
@@ -599,7 +601,7 @@ public class Actions {
     public String deleteAdmin(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserMasterAdmin(request)) {
-            addErrorsToRequest(request, "You do not have access to perform this action");
+            addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
 
@@ -640,7 +642,7 @@ public class Actions {
     public String addAdmin(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserMasterAdmin(request)) {
-            addErrorsToRequest(request, "You do not have access to perform this action");
+            addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
 
@@ -670,7 +672,7 @@ public class Actions {
     public String listReviewer(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserAdmin(request)) {
-            addErrorsToRequest(request, "You do not have access to perform this action");
+            addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
 
@@ -697,7 +699,7 @@ public class Actions {
     public String deleteReviewer(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserMasterAdmin(request)) {
-            addErrorsToRequest(request, "You do not have access to perform this action");
+            addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
 
@@ -738,7 +740,7 @@ public class Actions {
     public String addReviewer(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserMasterAdmin(request)) {
-            addErrorsToRequest(request, "You do not have access to perform this action");
+            addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
 
@@ -774,7 +776,7 @@ public class Actions {
     public String listConfiguration(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserAdmin(request)) {
-            addErrorsToRequest(request, "You do not have access to perform this action");
+            addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
 
@@ -797,7 +799,7 @@ public class Actions {
     public String editConfiguration(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserAdmin(request)) {
-            addErrorsToRequest(request, "You do not have access to perform this action");
+            addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
 
