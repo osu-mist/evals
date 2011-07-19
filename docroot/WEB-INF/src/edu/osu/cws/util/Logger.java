@@ -2,8 +2,6 @@ package edu.osu.cws.util;
 
 import org.graylog2.GelfMessage;
 import org.graylog2.GelfSender;
-
-import javax.net.ssl.HostnameVerifier;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -11,7 +9,7 @@ import java.util.Set;
 /**
  * Logger
  * @author Kenneth Lett <kenneth.lett@oregonstate.edu>
- * Date: 7/14/11
+ * @date: 7/14/11
  * @copyright Copyright 2011, Central Web Services, Oregon State University
  */
 public class Logger {
