@@ -34,6 +34,7 @@ public class Mailer {
         configMap = map;
     }
 
+
 /* send an email
  * @param appraisal - an Appraisal object
  * @param emailType - an EmailType
@@ -62,9 +63,9 @@ public class Mailer {
             msg.addRecipients(Message.RecipientType.BCC, bcc);
         }
 
-        String body = getBody(appraisal, bodyMethodId);
+        String body = getBody(appraisal, emailType);
 
-        msg.setContent(body, "text/html");
+        msg.setContent(body, mimeType);
 
         String subject = emailBundle.getString( "email_" + emailType.getType() + "_subject");
 
@@ -101,18 +102,72 @@ public class Mailer {
  * @param bodyMethodId - the name of the method to call
  * @return complete email body
  */
-    private String getBody(Appraisal appraisal, String bodyMethodId) throws Exception {
+    private String getBody(Appraisal appraisal, EmailType emailType) throws Exception {
         String bodyWrapper = emailBundle.getString("email_body");
-        Method bodyMethod;
         String bodyContent = "";
+
+        bodyContent = getStatusMsg(appraisal, emailType);
+        return MessageFormat.format(bodyWrapper, getEmployeeName(appraisal),
+                bodyContent, getBusinessCenterDescriptor(appraisal), linkURL);
+    }
+
+    /*
+     @todo: delegation method to return body without wrapper
+    public string method take appraisal and emailtype
+    public string getStatusMsg
+     */
+    public String getStatusMsg(Appraisal appraisal, EmailType emailType) throws Exception {
+        String statusMsg = "";
+        String bodyMethodId = emailType.getType() + "Body";
+        Method bodyMethod;
 
         if (!bodyMethodId.equals("Body")) {
             bodyMethod = Mailer.class.getDeclaredMethod(bodyMethodId, Appraisal.class);
-            bodyContent = (String) bodyMethod.invoke(this, appraisal);
-
+            statusMsg = (String) bodyMethod.invoke(this, appraisal);
         }
-        return MessageFormat.format(bodyWrapper, getEmployeeName(appraisal),
-                bodyContent, getBusinessCenterDescriptor(appraisal), linkURL);
+
+        return statusMsg;
+    }
+
+    /* Send batched email to a supervisor
+     * @param String subject - the subject line
+     * @param String emailAddress - addresses of supervisor to send to
+     * @param String middleContent - the status - specific content of the message to send
+     */
+    public void sendSupervisorMail(String subject, String emailAddress, String middleBody) throws Exception {
+        String bodyString = emailBundle.getString("email_supervisor");
+        String body = MessageFormat.format(bodyString, middleBody);
+        Message msg = email.getMessage();
+        Address to = email.stringToAddress(emailAddress);
+
+        msg.addRecipient(Message.RecipientType.TO, to);
+        msg.setContent(body, mimeType);
+        msg.setSubject(subject);
+
+        Transport.send(msg);
+    }
+    
+    /* Send mail to all the reviewers
+     * @param String subject - the subject line
+     * @param String[] emailAddresses - string array of addresses to send to
+     * @param String middleContent - the status - specific content of the message to send
+     */
+    public void sendSupervisorMail(String subject, String[] emailAddresses, String middleBody) throws Exception {
+        String bodyString = emailBundle.getString("email_reviewers");
+        String body = MessageFormat.format(bodyString, middleBody);
+        Message msg = email.getMessage();
+
+        Address[] recipients = new Address[emailAddresses.length];
+        String contact = "";
+        int i = 0;
+        for (String recipient : emailAddresses) {
+            recipients[i++] = email.stringToAddress(contact);
+        }
+
+        msg.addRecipients(Message.RecipientType.TO, recipients);
+        msg.setContent(body, mimeType);
+        msg.setSubject(subject);
+        Transport.send(msg);
     }
 
 /* Fetch the body for a particular emailType
