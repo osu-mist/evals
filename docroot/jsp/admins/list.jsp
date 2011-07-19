@@ -40,7 +40,8 @@
                      </td>
                 </tr>
                 <tr>
-                    <td><a href="http://oregonstate.edu/main/campus-online-directory">Online Directory</a></td>
+                    <td><a target="_new" href="http://oregonstate.edu/main/campus-online-directory">
+                    Online Directory</a></td>
                     <td>
                         <input type="submit" value="<liferay-ui:message key="save" />" />
                         <input type="submit" value="<liferay-ui:message key="cancel" />"
