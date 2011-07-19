@@ -2,6 +2,8 @@ package edu.osu.cws.util;
 
 import org.graylog2.GelfMessage;
 import org.graylog2.GelfSender;
+
+import javax.net.ssl.HostnameVerifier;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -23,14 +25,16 @@ public class Logger {
     public static final String DEBUG = "7";
 
     private String logHost;
+    private String host;
 
-    public Logger(String logHost) {
+    public Logger(String logHost, String host) {
         this.logHost = logHost;
+        this.host = host;
     }
 
-    public void log(GelfMe`ssage message) throws Exception {
+    public void log(GelfMessage message) throws Exception {
         GelfSender gelfSender = new GelfSender(logHost);
-        message.setHost("Portal");
+        message.setHost(host);
         if (message.isValid()) {
             gelfSender.sendMessage(message);
         }
