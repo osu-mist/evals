@@ -162,7 +162,7 @@ public class CriteriaMgr {
             if (propagateEdit) {
                 String sqlUpdate = "UPDATE assessments a SET a.CRITERION_DETAIL_ID = :newDetail " +
                         "WHERE a.CRITERION_DETAIL_ID = :oldDetail AND a.APPRAISAL_ID in ( " +
-                            "SELECT ID FROM appraisals WHERE STATUS not in ('completed', 'closed')" +
+                            "SELECT ID FROM appraisals WHERE STATUS not in ('completed', 'closed', 'archived')" +
                         ")";
                 session.createSQLQuery(sqlUpdate)
                         .setInteger("newDetail", newDetails.getId())

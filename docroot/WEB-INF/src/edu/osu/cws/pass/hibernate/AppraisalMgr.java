@@ -471,7 +471,7 @@ public class AppraisalMgr {
         //@todo: the query below should have a where clause => job.employee.id = pidm
         String query = "select new edu.osu.cws.pass.models.Appraisal(id, job.jobTitle, startDate, endDate, status)" +
                 " from edu.osu.cws.pass.models.Appraisal where " +
-                " job.employee.id = :pidm and status not in ('completed', 'closed')";
+                " job.employee.id = :pidm and status not in ('archived')";
         ArrayList<Appraisal> result = (ArrayList<Appraisal>) session.createQuery(query)
                 .setInteger("pidm", pidm)
                 .list();
@@ -520,7 +520,7 @@ public class AppraisalMgr {
                 "from edu.osu.cws.pass.models.Appraisal where job.supervisor.employee.id = :pidm ";
 
         if (onlyActive) {
-            query += "and status not in ('completed', 'closed') ";
+            query += "and status not in ('archived') ";
         }
 
         List result =  session.createQuery(query).setInteger("pidm", pidm).list();

@@ -237,7 +237,7 @@ public class AppraisalsTest {
     public void shouldFindAllEmployeeActiveAppraisals() throws Exception {
         int pidm = 12345;
         ArrayList<Appraisal> myActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(pidm);
-        assert myActiveAppraisals.size() == 4 : "Invalid size of active appraisals";
+        assert myActiveAppraisals.size() == 6 : "Invalid size of active appraisals";
         for (Appraisal ap : myActiveAppraisals) {
             assert ap.getId() != new Integer(0) : "id should be present in list of appraisals";
             assert ap.getJob().getJobTitle() != null : "job title should be present in list of appraisals";
@@ -251,7 +251,7 @@ public class AppraisalsTest {
     public void shouldFindAllTeamActiveAppraisals() throws Exception {
         int pidm = 12467;
         List<Appraisal> teamActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(pidm, true);
-        assert teamActiveAppraisals.size() == 4 : "Invalid size of team active appraisals";
+        assert teamActiveAppraisals.size() == 6 : "Invalid size of team active appraisals";
         for (Appraisal ap : teamActiveAppraisals) {
             assert ap.getId() != 0 :
                     "id should be present in list of team appraisals";
