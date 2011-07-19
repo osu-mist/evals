@@ -367,6 +367,8 @@ public class Actions {
         if (refresh || isMasterAdmin == null) {
             if (getAdmin(employeeId) != null && getAdmin(employeeId).getIsMaster()) {
                 isMasterAdmin = true;
+            } else {
+                isMasterAdmin = false;
             }
             session.setAttribute("isMasterAdmin", isMasterAdmin);
         }
