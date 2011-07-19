@@ -32,7 +32,7 @@ public class Logger {
         this.host = host;
     }
 
-    public void log(GelfMessage message) throws Exception {
+    private void log(GelfMessage message) throws Exception {
         GelfSender gelfSender = new GelfSender(logHost);
         message.setHost(host);
         if (message.isValid()) {
