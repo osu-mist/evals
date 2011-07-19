@@ -2,3 +2,4 @@
 
 <%@ include file="/jsp/home/actionsRequired.jsp" %>
 <%@ include file="/jsp/home/myTeam.jsp" %>
+<%@ include file="/jsp/home/search.jsp" %>

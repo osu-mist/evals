@@ -70,8 +70,6 @@ public class Appraisal extends Pass {
      */
     private String review;
 
-    private Date respondedDate;
-
     private Date createDate;
 
     private String rebuttal;
@@ -178,11 +176,15 @@ public class Appraisal extends Pass {
     }
 
     /**
-     * Constructor used by the getReviews method in appraisal mgr to fetch a list
-     * of appraisal objects.
+     * Constructor used by the getReviews and search method in appraisal mgr to fetch a list
+     * of appraisal objects
      *
      * @param id
      * @param jobTitle
+     * @param positionNumber
+     * @param startDate
+     * @param endDate
+     * @param type
      * @param lastName
      * @param firstName
      * @param evaluationSubmitDate
@@ -191,9 +193,10 @@ public class Appraisal extends Pass {
      * @param supervisorFirstName
      * @param orgCodeDescription
      */
-    public Appraisal(int id, String jobTitle, String lastName, String firstName,
-                     Date evaluationSubmitDate, String status, String supervisorLastName,
-                     String supervisorFirstName, String orgCodeDescription) {
+    public Appraisal(int id, String jobTitle, String positionNumber, Date startDate, Date endDate,
+                     String type, String lastName, String firstName, Date evaluationSubmitDate,
+                     String status, String supervisorLastName, String supervisorFirstName,
+                     String orgCodeDescription) {
         Employee employee = new Employee();
         employee.setLastName(lastName);
         employee.setFirstName(firstName);
@@ -209,8 +212,12 @@ public class Appraisal extends Pass {
         tempJob.setOrgCodeDescription(orgCodeDescription);
         tempJob.setEmployee(employee);
         tempJob.setSupervisor(supervisorJob);
+        tempJob.setPositionNumber(positionNumber);
 
         this.id = id;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.type = type;
         this.evaluationSubmitDate = evaluationSubmitDate;
         this.status = status;
         this.job = tempJob;
@@ -260,6 +267,29 @@ public class Appraisal extends Pass {
         List sortedAssessments = new ArrayList(assessments);
         Collections.sort(sortedAssessments);
         return sortedAssessments;
+    }
+
+    /**
+     * Compares various date fields of the appraisal object to figure out when was the last modified
+     * date of the appraisal. The fields that are compared are: evaluationSubmitDate, goalsSubmitDate,
+     * goalApprovedDate, resultSubmitDate, reviewSubmitDate, rebuttalDate, employeeSignedDate,
+     * releaseDate, supervisorRebuttalRead, closeOutDate, reopenedDate
+     *
+     * @return lastModified
+     */
+    public Date getLastModified() {
+        Date lastModified = createDate;
+        Date fieldsToCompare[] = {evaluationSubmitDate, goalsSubmitDate, goalApprovedDate,
+                resultSubmitDate, reviewSubmitDate, rebuttalDate, employeeSignedDate,
+                releaseDate, supervisorRebuttalRead, closeOutDate, reopenedDate};
+
+        for (Date appraisalDate : fieldsToCompare) {
+            if (appraisalDate != null && appraisalDate.after(lastModified)) {
+                lastModified = appraisalDate;
+            }
+        }
+
+        return lastModified;
     }
 
     public int getId() {
@@ -404,14 +434,6 @@ public class Appraisal extends Pass {
 
     public void setReview(String review) {
         this.review = review;
-    }
-
-    public Date getRespondedDate() {
-        return respondedDate;
-    }
-
-    public void setRespondedDate(Date respondedDate) {
-        this.respondedDate = respondedDate;
     }
 
     public Date getCreateDate() {

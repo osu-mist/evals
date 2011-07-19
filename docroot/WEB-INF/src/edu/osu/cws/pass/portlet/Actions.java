@@ -432,8 +432,9 @@ public class Actions {
             return displayHomeView(request, response);
         }
 
-        ArrayList<Appraisal> reviews = getReviewsForLoggedInUser(request);
-        request.setAttribute("reviews", reviews);
+        ArrayList<Appraisal> appraisals = getReviewsForLoggedInUser(request);
+        request.setAttribute("appraisals", appraisals);
+        request.setAttribute("pageTitle", "pending-reviews");
         useMaximizedMenu(request);
 
         return "review-list-jsp";
@@ -467,6 +468,59 @@ public class Actions {
     }
 
     /**
+     * Renders a list of appraisals based on the search criteria.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String searchAppraisals(PortletRequest request, PortletResponse response) throws Exception {
+        boolean isAdmin = isLoggedInUserAdmin(request);
+        boolean isReviewer = isLoggedInUserReviewer(request);
+        boolean isSupervisor = isLoggedInUserSupervisor(request);
+
+        if (!isAdmin && !isReviewer && !isSupervisor)  {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            ((ActionResponse) response).setWindowState(WindowState.NORMAL);
+            return displayHomeView(request, response);
+        }
+
+        int pidm = getLoggedOnUser(request).getId();
+        int osuid = ParamUtil.getInteger(request, "osuid");
+        if (osuid == 0) {
+            addErrorsToRequest(request, "Please enter an employee's OSU ID");
+            ((ActionResponse) response).setWindowState(WindowState.NORMAL);
+            return displayHomeView(request, response);
+        }
+
+        String bcName = "";
+        if (isReviewer) {
+            bcName = getReviewer(pidm).getBusinessCenterName();
+        }
+        List<Appraisal> appraisals = appraisalMgr.search(osuid, pidm, isAdmin, isSupervisor, bcName);
+
+        if (appraisals.isEmpty()) {
+            if (isAdmin) {
+                addErrorsToRequest(request, "No employee found.");
+            } else if (isReviewer) {
+                addErrorsToRequest(request, "No employee found in your business center.");
+            } else {
+                addErrorsToRequest(request, "No employee found under your supervising chain.");
+            }
+
+            ((ActionResponse) response).setWindowState(WindowState.NORMAL);
+            return displayHomeView(request, response);
+        }
+
+        request.setAttribute("appraisals", appraisals);
+        request.setAttribute("pageTitle", "search-results");
+        useMaximizedMenu(request);
+
+        return "review-list-jsp";
+    }
+
+    /**
      * Handles displaying the appraisal when a user clicks on it. It loads the appraisal
      * object along with the respective permissionRule.
      *
@@ -478,9 +532,8 @@ public class Actions {
     public String displayAppraisal(PortletRequest request, PortletResponse response) throws Exception {
         int appraisalID = ParamUtil.getInteger(request, "id");
         Employee currentlyLoggedOnUser = getLoggedOnUser(request);
-        appraisalMgr.setLoggedInUser(currentlyLoggedOnUser);
-        HashMap permissionRules = (HashMap) portletContext.getAttribute("permissionRules");
-        appraisalMgr.setPermissionRules(permissionRules);
+        setAppraisalMgrParameters(currentlyLoggedOnUser);
+
         Boolean showForm = false;
 
         Appraisal appraisal = appraisalMgr.getAppraisal(appraisalID);
@@ -520,6 +573,22 @@ public class Actions {
     }
 
     /**
+     * Setups up parameters from portletContext needed by AppraisalMgr class.
+     *
+     * @param currentlyLoggedOnUser
+     */
+    private void setAppraisalMgrParameters(Employee currentlyLoggedOnUser) {
+        HashMap permissionRules = (HashMap) portletContext.getAttribute("permissionRules");
+        HashMap<Integer, Admin> admins = (HashMap<Integer, Admin>) portletContext.getAttribute("admins");
+        HashMap appraisalSteps = (HashMap) portletContext.getAttribute("appraisalSteps");
+
+        appraisalMgr.setPermissionRules(permissionRules);
+        appraisalMgr.setLoggedInUser(currentlyLoggedOnUser);
+        appraisalMgr.setAdmins(admins);
+        appraisalMgr.setAppraisalSteps(appraisalSteps);
+    }
+
+    /**
      * Handles updating the appraisal form.
      *
      * @param request   PortletRequest
@@ -540,13 +609,9 @@ public class Actions {
             return displayHomeView(request, response);
         }
 
-        HashMap permissionRules = (HashMap) portletContext.getAttribute("permissionRules");
-        HashMap appraisalSteps = (HashMap) portletContext.getAttribute("appraisalSteps");
         Employee currentlyLoggedOnUser = getLoggedOnUser(request);
+        setAppraisalMgrParameters(currentlyLoggedOnUser);
 
-        appraisalMgr.setLoggedInUser(currentlyLoggedOnUser);
-        appraisalMgr.setPermissionRules(permissionRules);
-        appraisalMgr.setAppraisalSteps(appraisalSteps);
 
         try {
             appraisalMgr.processUpdateRequest(request.getParameterMap(), id);

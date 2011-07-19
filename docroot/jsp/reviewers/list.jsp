@@ -31,7 +31,7 @@ List criteria = (List) renderRequest.getAttribute("reviewersList");
             <table>
                 <tr>
                     <th><liferay-ui:message key="employee-onid" /></th>
-                    <td><input type="text" name="<portlet:namespace/>onid" id="<portlet:namespace/>onid"/>
+                    <td><input type="text" name="<portlet:namespace/>onid" id="<portlet:namespace/>onid"/></td>
                 </tr>
                 <tr>
                     <th><liferay-ui:message key="business-center"/></th>

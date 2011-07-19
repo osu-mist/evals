@@ -2,6 +2,8 @@ package edu.osu.cws.pass.hibernate;
 
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.pass.util.HibernateUtil;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -13,8 +15,10 @@ public class AppraisalMgr {
     private Appraisal appraisal = new Appraisal();
     private CriteriaMgr criteriaMgr = new CriteriaMgr();
     private JobMgr jobMgr = new JobMgr();
+    private EmployeeMgr employeeMgr = new EmployeeMgr();
     private HashMap appraisalSteps;
     private HashMap permissionRules;
+    private HashMap<Integer, Admin> admins = new HashMap<Integer, Admin>();
 
     // Holds a list of appraisal status that are hidden from the employee and
     // instead we display in-review
@@ -321,7 +325,7 @@ public class AppraisalMgr {
         if (permRule.getEmployeeResponse() != null && permRule.getEmployeeResponse().equals("e")) {
             appraisal.setRebuttal(request.get("appraisal.rebuttal")[0]);
             if (request.get("submit-response") != null) {
-                appraisal.setRespondedDate(new Date());
+                appraisal.setRebuttalDate(new Date());
             }
         }
 
@@ -554,6 +558,11 @@ public class AppraisalMgr {
             return "upper-supervisor";
         }
 
+        //@todo: the admin role below needs tests
+        if (admins.containsKey(pidm)) {
+            return "admin";
+        }
+
         return "";
     }
 
@@ -670,12 +679,12 @@ public class AppraisalMgr {
      */
     private ArrayList<Appraisal> getReviews(String businessCenterName, Session session) {
         Transaction tx = session.beginTransaction();
-        String query = "select new edu.osu.cws.pass.models.Appraisal(id, job.jobTitle, " +
-                "job.employee.lastName, job.employee.firstName, evaluationSubmitDate, status, " +
-                "job.supervisor.employee.lastName, job.supervisor.employee.firstName, " +
-                "job.orgCodeDescription) from edu.osu.cws.pass.models.Appraisal " +
-                "where job.businessCenterName = :bc and status in ('reviewDue', 'reviewOverdue') " +
-                "and job.endDate is NULL";
+        String query = "select new edu.osu.cws.pass.models.Appraisal(id, job.jobTitle, job.positionNumber, " +
+                "startDate, endDate, type, job.employee.lastName, job.employee.firstName, " +
+                "evaluationSubmitDate, status, job.supervisor.employee.lastName, " +
+                "job.supervisor.employee.firstName, job.orgCodeDescription) " +
+                "from edu.osu.cws.pass.models.Appraisal where job.businessCenterName = :bc " +
+                "and status in ('reviewDue', 'reviewOverdue') and job.endDate is NULL";
 
         ArrayList<Appraisal> result =  (ArrayList<Appraisal>) session.createQuery(query)
                 .setString("bc", businessCenterName).list();
@@ -714,6 +723,87 @@ public class AppraisalMgr {
     }
 
     /**
+     * Returns a list of appraisals. It searches for all the appraisals of the employee using the
+     * osuid. The parameters specify if the logged in user is: admin, supervisor of the business
+     * center the logged in user belongs to.
+     * @param osuid
+     * @param pidm
+     * @param isAdmin
+     * @param isSupervisor
+     * @param bcName
+     * @return
+     * @throws Exception
+     */
+    public List<Appraisal> search(int osuid, int pidm, boolean isAdmin, boolean isSupervisor, String bcName)
+            throws Exception {
+        List<Appraisal> appraisals;
+        Employee employee = employeeMgr.findById(pidm);
+        boolean isUpperSupervisorOfAJob = false;
+        for (Job job : (Set<Job>) employee.getJobs()) {
+            isUpperSupervisorOfAJob = isUpperSupervisorOfAJob || jobMgr.isUpperSupervisor(job,  pidm);
+        }
+
+        Session session = HibernateUtil.getCurrentSession();
+        try {
+            appraisals = search(osuid, pidm, isAdmin, isUpperSupervisorOfAJob, bcName, session);
+        } catch (Exception e){
+            session.close();
+            throw e;
+        }
+
+        return appraisals;
+    }
+
+    /**
+     * Returns a list of appraisals. It searches for all the appraisals of the employee using the
+     * osuid. The parameters specify if the logged in user is: admin, supervisor of the business
+     * center the logged in user belongs to.
+     *
+     * @param osuid
+     * @param pidm
+     * @param isAdmin
+     * @param isUpperSupervisor
+     * @param bcName
+     * @param session
+     * @return
+     */
+    public List<Appraisal> search(int osuid, int pidm, boolean isAdmin, boolean isUpperSupervisor, String bcName,
+                                  Session session) throws Exception {
+        List<Appraisal> result = new ArrayList<Appraisal>();
+        String query = "select new edu.osu.cws.pass.models.Appraisal(id, job.jobTitle, job.positionNumber, " +
+                "startDate, endDate, type, job.employee.lastName, job.employee.firstName, " +
+                "evaluationSubmitDate, status, job.supervisor.employee.lastName, " +
+                "job.supervisor.employee.firstName, job.orgCodeDescription) " +
+                "from edu.osu.cws.pass.models.Appraisal where job.employee.osuid = :osuid";
+
+        if (!isAdmin) {
+            ArrayList<String> conditions = new ArrayList<String>();
+            if (bcName != null && !bcName.equals("")) {
+                conditions.add("job.businessCenterName = :bcName");
+            }
+            if (!conditions.isEmpty()) {
+                query += "AND (" + StringUtils.join(conditions, " OR ") + " )";
+            } else if (!isUpperSupervisor) {
+                // If the user is not an admin, reviewer or supervisor, we return empty list
+                return result;
+            }
+        }
+
+        Transaction tx = session.beginTransaction();
+        Query hibernateQuery = session.createQuery(query).setInteger("osuid", osuid);
+        if (!isAdmin) {
+            if (bcName != null && !bcName.equals("")) {
+                hibernateQuery.setString(":bcName", bcName);
+            }
+        }
+
+        result =  (ArrayList<Appraisal>) hibernateQuery.list();
+        tx.commit();
+
+        return result;
+    }
+
+    /**
      * @param bcName: name of the business center
      * @return  the number of appraisals that are due for review for a business center.
      */
@@ -741,6 +831,10 @@ public class AppraisalMgr {
 
     public void setPermissionRules(HashMap permissionRules) {
         this.permissionRules = permissionRules;
+    }
+
+    public void setAdmins(HashMap<Integer, Admin> admins) {
+        this.admins = admins;
     }
 
     /**
