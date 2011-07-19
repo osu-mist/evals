@@ -4,12 +4,10 @@ package edu.osu.cws.pass.util;
  * Mailer: send email to the appropriate user/users give an appraisal and emailType
  * @author Kenneth Lett <kenneth.lett@oregonstate.edu>
  * @copyright Copyright 2011, Central Web Services, Oregon State University
- * Date: 6/24/11
+ * @date: 6/24/11
  */
 import java.lang.reflect.Method;
 import javax.mail.*;
-
-import com.sun.xml.internal.ws.wsdl.writer.document.soap.Body;
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.util.*;
 import java.util.Date;
