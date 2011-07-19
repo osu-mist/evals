@@ -112,9 +112,9 @@ public class Mailer {
     }
 
     /*
-     @todo: delegation method to return body without wrapper
-    public string method take appraisal and emailtype
-    public string getStatusMsg
+     * take an appraisal and emailType and return the status-specific message body
+     * @param Appraisal appraisal - the appraisal in question
+     * @param EmailType emailType - the status we are sending email for
      */
     public String getStatusMsg(Appraisal appraisal, EmailType emailType) throws Exception {
         String statusMsg = "";
@@ -152,7 +152,7 @@ public class Mailer {
      * @param String[] emailAddresses - string array of addresses to send to
      * @param String middleContent - the status - specific content of the message to send
      */
-    public void sendSupervisorMail(String subject, String[] emailAddresses, String middleBody) throws Exception {
+    public void sendReviewerMail(String subject, String[] emailAddresses, String middleBody) throws Exception {
         String bodyString = emailBundle.getString("email_reviewers");
         String body = MessageFormat.format(bodyString, middleBody);
         Message msg = email.getMessage();
