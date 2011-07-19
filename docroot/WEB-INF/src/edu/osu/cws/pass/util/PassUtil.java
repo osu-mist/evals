@@ -95,13 +95,13 @@ public class PassUtil {
      }
 
     /**
-     * Formats date object with the standard dd/MM/yy used throughout the application.
+     * Formats date object with the standard MM/dd/yy used throughout the application.
      *
      * @param date
      * @return
      */
     public static String formatDate(Date date) {
-        return MessageFormat.format("{0,date,dd/MM/yy}",new Object[]{date});
+        return MessageFormat.format("{0,date,MM/dd/yy}",new Object[]{date});
     }
 
 }

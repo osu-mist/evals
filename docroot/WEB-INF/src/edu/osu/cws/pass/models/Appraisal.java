@@ -253,7 +253,7 @@ public class Appraisal extends Pass {
             startDate = new Date();
         }
 
-        return MessageFormat.format("{0,date,dd/MM/yy} - {1,date,dd/MM/yy}",
+        return MessageFormat.format("{0,date,MM/dd/yy} - {1,date,MM/dd/yy}",
                 new Object[]{getStartDate(), getEndDate()});
     }
 

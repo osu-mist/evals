@@ -40,7 +40,7 @@
             </tr>
             <tr>
                 <td><strong><liferay-ui:message key="job-start-date"/></strong></td>
-                <td><fmt:formatDate value="${job.beginDate}" pattern="dd/MM/yy"/></td>
+                <td><fmt:formatDate value="${job.beginDate}" pattern="MM/dd/yy"/></td>
             </tr>
             <tr>
                 <td><strong><liferay-ui:message key="appointment-type"/></strong></td>
