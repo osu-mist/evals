@@ -1,42 +1,40 @@
 <%@ include file="/jsp/init.jsp" %>
 
 <h2><liferay-ui:message key="${pageTitle}" /></h2>
-<c:if test="${pageTitle == 'search-results'}">
-    <div id="<portlet:namespace/>appraisal-search-link">
-        <p><liferay-ui:icon
-            image="search"
-            url="#"
-            label="true"
-            message="Search"
-        />
-        </p>
-    </div>
-    
-    <fieldset id="pass-user-add">
-        <legend><liferay-ui:message key="search"/></legend>
+<div id="<portlet:namespace/>appraisal-search-link">
+    <p><liferay-ui:icon
+        image="search"
+        url="#"
+        label="true"
+        message="Search"
+    />
+    </p>
+</div>
 
-        <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-            <portlet:param name="action" value="searchAppraisals"/>
-            </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
+<fieldset id="pass-user-add">
+    <legend><liferay-ui:message key="search"/></legend>
 
-            <table>
-                <tr>
-                    <th><label for="<portlet:namespace/>osuid"><liferay-ui:message key="osuid"/>
-                    </label></th>
-                    <td><input type="text" id="<portlet:namespace/>osuid" name="<portlet:namespace/>osuid" /></td>
-                </tr>
-                <tr>
-                    <td>&nbsp;</td>
-                    <td>
-                        <input type="submit" value="<liferay-ui:message key="search" />" />
-                        <input type="submit" value="<liferay-ui:message key="cancel" />"
-                            id="<portlet:namespace/>cancel"/>
-                    </td>
-                </tr>
-            </table>
-            </form>
-    </fieldset>
-</c:if>
+    <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+        <portlet:param name="action" value="searchAppraisals"/>
+        </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
+
+        <table>
+            <tr>
+                <th><label for="<portlet:namespace/>osuid"><liferay-ui:message key="osuid"/>
+                </label></th>
+                <td><input type="text" id="<portlet:namespace/>osuid" name="<portlet:namespace/>osuid" /></td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>
+                    <input type="submit" value="<liferay-ui:message key="search" />" />
+                    <input type="submit" value="<liferay-ui:message key="cancel" />"
+                        id="<portlet:namespace/>cancel"/>
+                </td>
+            </tr>
+        </table>
+        </form>
+</fieldset>
 
 <c:if test="${!empty appraisals}">
     <div class="separator"></div>

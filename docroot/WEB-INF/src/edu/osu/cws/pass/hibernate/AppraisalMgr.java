@@ -609,11 +609,6 @@ public class AppraisalMgr {
      * @throws Exception
      */
     public Appraisal getAppraisal(int id) throws Exception {
-        int userID = loggedInUser.getId();
-
-        String userRole;
-        String appraisalStatus;
-
         Session session = HibernateUtil.getCurrentSession();
         try {
             Transaction tx = session.beginTransaction();
@@ -734,19 +729,21 @@ public class AppraisalMgr {
     /**
      * Returns a list of appraisals. It searches for all the appraisals of the employee using the
      * osuid. The parameters specify if the logged in user is: admin, supervisor of the business
-     * center the logged in user belongs to.
-     * @param osuid
-     * @param pidm
-     * @param isAdmin
-     * @param isSupervisor
-     * @param bcName
+     * center the logged in user belongs to. It also sets the status of the each appraisal based
+     * on the user role.
+     *
+     * @param osuid OSU ID to use when searching appraisals
+     * @param pidm  Pidm of currently logged in user
+     * @param isAdmin   Whether or not the logged in user is admin
+     * @param isSupervisor Whether or not the logged in user is a supervisor
+     * @param bcName Business Center Name
      * @return
      * @throws Exception
      */
     public List<Appraisal> search(int osuid, int pidm, boolean isAdmin, boolean isSupervisor, String bcName)
             throws Exception {
         List<Appraisal> appraisals;
-        Employee employee = employeeMgr.findById(pidm);
+        Employee employee = employeeMgr.findByOsuid(osuid);
         boolean isUpperSupervisorOfAJob = false;
         for (Job job : (Set<Job>) employee.getJobs()) {
             isUpperSupervisorOfAJob = isUpperSupervisorOfAJob || jobMgr.isUpperSupervisor(job,  pidm);
@@ -759,8 +756,33 @@ public class AppraisalMgr {
             session.close();
             throw e;
         }
+        setAppraisalsStatusByRole(pidm, appraisals);
 
         return appraisals;
+    }
+
+    /**
+     * Iterates over list of appraisal and sets the status based on the role of the user (pidm).
+     *
+     * @param pidm
+     * @param appraisals
+     * @throws Exception
+     */
+    private void setAppraisalsStatusByRole(int pidm, List<Appraisal> appraisals) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        Appraisal tempAppraisal;
+        try {
+            Transaction tx = session.beginTransaction();
+            for (Appraisal appraisal : appraisals) {
+                tempAppraisal = (Appraisal) session.load(Appraisal.class, appraisal.getId());
+                String userRole = getRole(tempAppraisal, pidm);
+                setAppraisalStatus(appraisal, userRole);
+            }
+            tx.commit();
+        } catch (Exception e){
+            session.close();
+            throw e;
+        }
     }
 
     /**
@@ -775,6 +797,7 @@ public class AppraisalMgr {
      * @param bcName
      * @param session
      * @return
+     * @throws Exception
      */
     public List<Appraisal> search(int osuid, int pidm, boolean isAdmin, boolean isUpperSupervisor, String bcName,
                                   Session session) throws Exception {
