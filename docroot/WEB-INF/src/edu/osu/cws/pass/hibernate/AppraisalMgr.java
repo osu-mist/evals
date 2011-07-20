@@ -684,9 +684,9 @@ public class AppraisalMgr {
     private ArrayList<Appraisal> getReviews(String businessCenterName, Session session) {
         Transaction tx = session.beginTransaction();
         String query = "select new edu.osu.cws.pass.models.Appraisal(id, job.jobTitle, job.positionNumber, " +
-                "startDate, endDate, type, job.employee.lastName, job.employee.firstName, " +
-                "evaluationSubmitDate, status, job.supervisor.employee.lastName, " +
-                "job.supervisor.employee.firstName, job.orgCodeDescription) " +
+                "startDate, endDate, type, job.employee.id, job.employee.lastName, job.employee.firstName, " +
+                "evaluationSubmitDate, status, job.supervisor.employee.lastName, job.businessCenterName, " +
+                "job.supervisor.employee.firstName, job.orgCodeDescription, job.suffix) " +
                 "from edu.osu.cws.pass.models.Appraisal where job.businessCenterName = :bc " +
                 "and status in ('reviewDue', 'reviewOverdue') and job.endDate is NULL";
 
@@ -736,7 +736,7 @@ public class AppraisalMgr {
      * @param pidm  Pidm of currently logged in user
      * @param isAdmin   Whether or not the logged in user is admin
      * @param isSupervisor Whether or not the logged in user is a supervisor
-     * @param bcName Business Center Name
+     * @param bcName Business Center Name of logged in user reviewer
      * @return
      * @throws Exception
      */
@@ -744,21 +744,52 @@ public class AppraisalMgr {
             throws Exception {
         List<Appraisal> appraisals;
         Employee employee = employeeMgr.findByOsuid(osuid);
+        Job appraisalJob;
         boolean isUpperSupervisorOfAJob = false;
-        for (Job job : (Set<Job>) employee.getJobs()) {
-            isUpperSupervisorOfAJob = isUpperSupervisorOfAJob || jobMgr.isUpperSupervisor(job,  pidm);
+        boolean isUpperSupervisor;
+        ArrayList<Job> jobsWhiteList = new ArrayList<Job>();
+        List<Appraisal> appraisalsCopy = new ArrayList<Appraisal>();
+
+        if (!isAdmin && isSupervisor) {
+            for (Job job : (Set<Job>) employee.getJobs()) {
+                isUpperSupervisor = jobMgr.isUpperSupervisor(job, pidm);
+                isUpperSupervisorOfAJob = isUpperSupervisorOfAJob || isUpperSupervisor;
+
+                // Keep track of the jobs the pidm user is upper supervisor, so that we can use them to filter out
+                // appraisals
+                if (isUpperSupervisor || job.getBusinessCenterName().equals(bcName)) {
+                    jobsWhiteList.add(job);
+                }
+            }
         }
 
         Session session = HibernateUtil.getCurrentSession();
         try {
             appraisals = search(osuid, pidm, isAdmin, isUpperSupervisorOfAJob, bcName, session);
+            if (!isAdmin && isSupervisor) {
+                // Iterate over the appraisals and add only the ones with jobs in the jobsWhiteList
+                for (Appraisal appraisal : appraisals) {
+                    for (Job accessibleJobs : jobsWhiteList) {
+                        appraisalJob = appraisal.getJob();
+                        if (accessibleJobs.getPositionNumber().equals(appraisalJob.getPositionNumber()) &&
+                                accessibleJobs.getSuffix().equals(appraisalJob.getSuffix()) &&
+                                accessibleJobs.getEmployee().getId() == appraisalJob.getEmployee().getId()
+                                ) {
+                            appraisalsCopy.add(appraisal);
+                        }
+                    }
+                }
+            } else {
+                appraisalsCopy = appraisals;
+            }
+
         } catch (Exception e){
             session.close();
             throw e;
         }
-        setAppraisalsStatusByRole(pidm, appraisals);
+        setAppraisalsStatusByRole(pidm, appraisalsCopy);
 
-        return appraisals;
+        return appraisalsCopy;
     }
 
     /**
@@ -802,31 +833,27 @@ public class AppraisalMgr {
     public List<Appraisal> search(int osuid, int pidm, boolean isAdmin, boolean isUpperSupervisor, String bcName,
                                   Session session) throws Exception {
         List<Appraisal> result = new ArrayList<Appraisal>();
-        String query = "select new edu.osu.cws.pass.models.Appraisal(id, job.jobTitle, job.positionNumber, " +
-                "startDate, endDate, type, job.employee.lastName, job.employee.firstName, " +
-                "evaluationSubmitDate, status, job.supervisor.employee.lastName, " +
-                "job.supervisor.employee.firstName, job.orgCodeDescription) " +
+        ArrayList<String> conditions = new ArrayList<String>();
+
+        String query = "select new edu.osu.cws.pass.models.Appraisal (id, job.jobTitle, job.positionNumber, " +
+                "startDate, endDate, type, job.employee.id, job.employee.lastName, job.employee.firstName, " +
+                "evaluationSubmitDate, status, job.supervisor.employee.lastName, job.businessCenterName, " +
+                "job.supervisor.employee.firstName, job.orgCodeDescription, job.suffix) " +
                 "from edu.osu.cws.pass.models.Appraisal where job.employee.osuid = :osuid";
 
         if (!isAdmin) {
-            ArrayList<String> conditions = new ArrayList<String>();
             if (bcName != null && !bcName.equals("")) {
                 conditions.add("job.businessCenterName = :bcName");
             }
             if (!conditions.isEmpty()) {
-                query += "AND (" + StringUtils.join(conditions, " OR ") + " )";
-            } else if (!isUpperSupervisor) {
-                // If the user is not an admin, reviewer or supervisor, we return empty list
-                return result;
+                query += " AND ( " + StringUtils.join(conditions, " OR ") + " )";
             }
         }
 
         Transaction tx = session.beginTransaction();
         Query hibernateQuery = session.createQuery(query).setInteger("osuid", osuid);
-        if (!isAdmin) {
-            if (bcName != null && !bcName.equals("")) {
-                hibernateQuery.setString(":bcName", bcName);
-            }
+        if (!conditions.isEmpty()) {
+            hibernateQuery.setString("bcName", bcName);
         }
 
         result =  (ArrayList<Appraisal>) hibernateQuery.list();

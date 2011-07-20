@@ -45,7 +45,7 @@ public class Employee extends Pass {
         return id;
     }
 
-    private void setId(int pidm) {
+    public void setId(int pidm) {
         this.id = pidm;
     }
 
