@@ -640,7 +640,7 @@ public class AppraisalMgr {
             appraisal.setStatus("inReview");
         }
 
-        // Whenever the status is rebuttalReadDue or rebuttalReadOverDue, we set it as completed.
+        // Whenever the status is rebuttalReadDue or rebuttalReadOverdue, we set it as completed.
         if (appraisal.getStatus().contains("rebuttalRead")) {
             appraisal.setStatus("completed");
         }
