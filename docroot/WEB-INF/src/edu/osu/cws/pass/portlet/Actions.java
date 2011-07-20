@@ -765,7 +765,7 @@ public class Actions {
      */
     public String deleteReviewer(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!isLoggedInUserMasterAdmin(request)) {
+        if (!isLoggedInUserAdmin(request)) {
             addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
@@ -806,7 +806,7 @@ public class Actions {
      */
     public String addReviewer(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!isLoggedInUserMasterAdmin(request)) {
+        if (!isLoggedInUserAdmin(request)) {
             addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
