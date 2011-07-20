@@ -72,38 +72,36 @@
     </table>
 </c:if>
 
-<c:if test="${pageTitle == 'search-results'}">
-  <script type="text/javascript">
-    jQuery(document).ready(function() {
-      jQuery("#pass-user-add").hide();
+<script type="text/javascript">
+jQuery(document).ready(function() {
+  jQuery("#pass-user-add").hide();
 
-      // When user clicks cancel in add form, hide the form.
-      jQuery("#<portlet:namespace/>cancel").click(function() {
-        jQuery("#pass-user-add").hide();
-        jQuery("#<portlet:namespace/>appraisal-search-link").show();
-        return false;
-      });
-      // When user clicks cancel in add form, hide the form.
-      jQuery("#<portlet:namespace/>appraisal-search-link").click(function() {
-        jQuery("#pass-user-add").show();
-        jQuery("#<portlet:namespace/>appraisal-search-link").hide();
-      });
+  // When user clicks cancel in add form, hide the form.
+  jQuery("#<portlet:namespace/>cancel").click(function() {
+    jQuery("#pass-user-add").hide();
+    jQuery("#<portlet:namespace/>appraisal-search-link").show();
+    return false;
+  });
+  // When user clicks cancel in add form, hide the form.
+  jQuery("#<portlet:namespace/>appraisal-search-link").click(function() {
+    jQuery("#pass-user-add").show();
+    jQuery("#<portlet:namespace/>appraisal-search-link").hide();
+  });
 
-      // Validate form submission
-      jQuery("#<portlet:namespace />fm").submit(function() {
-        var errors = "";
-        if (jQuery("#<portlet:namespace />osuid").val() == "") {
-          errors = "<li>Please enter the employee's OSU ID</li>";
-        }
-        if (errors != "") {
-          jQuery("#<portlet:namespace />flash").html(
-            '<span class="portlet-msg-error"><ul>'+errors+'</ul></span>'
-          );
-          return false;
-        }
+  // Validate form submission
+  jQuery("#<portlet:namespace />fm").submit(function() {
+    var errors = "";
+    if (jQuery("#<portlet:namespace />osuid").val() == "") {
+      errors = "<li>Please enter the employee's OSU ID</li>";
+    }
+    if (errors != "") {
+      jQuery("#<portlet:namespace />flash").html(
+        '<span class="portlet-msg-error"><ul>'+errors+'</ul></span>'
+      );
+      return false;
+    }
 
-        return true;
-      });
-    });
-  </script>
-</c:if>
+    return true;
+  });
+});
+</script>
