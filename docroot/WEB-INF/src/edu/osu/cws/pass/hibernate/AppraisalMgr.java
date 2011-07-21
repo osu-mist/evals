@@ -38,10 +38,12 @@ public class AppraisalMgr {
      * class. It returns the id of the created appraisal.
      *
      * @param job   Job for this appraisal
+     * @param type: trial, annual, initial
+     * @param startDate: starting date of appraisal period.
      * @return appraisal.id
      * @throws Exception
      */
-    public static Appraisal createAppraisal(Job job, String type) throws Exception {
+    public static Appraisal createAppraisal(Job job, Date startDate, String type) throws Exception {
         CriteriaMgr criteriaMgr = new CriteriaMgr();
         Appraisal appraisal = new Appraisal();
         CriterionDetail detail;
@@ -81,6 +83,12 @@ public class AppraisalMgr {
         }
 
         return appraisal;
+    }
+
+
+    public static List<Appraisal>  getActiveAppraisals(Job job)
+    {
+        return new ArrayList();
     }
 
     /**
@@ -476,6 +484,7 @@ public class AppraisalMgr {
         return result;
     }
 
+
     /**
      * Returns a List of team's active appraisals for the given supervisor's pidm.
      *
@@ -807,7 +816,7 @@ public class AppraisalMgr {
      * @param bcName: name of the business center
      * @return  the number of appraisals that are due for review for a business center.
      */
-    public int getReviewDueCount(String bcName)
+    public static int getReviewDueCount(String bcName)
     {
       return 1;
     }
@@ -816,7 +825,7 @@ public class AppraisalMgr {
      * @param bcName: name of the business center
      * @return  the number of appraisals that are overdue for review for a business center.
      */
-    public int getReviewpastDueCount(String bcName)
+    public static int getReviewOvedDueCount(String bcName)
     {
         return 1;
     }
@@ -851,7 +860,7 @@ public class AppraisalMgr {
      * select id from appraisals where status is not completed or closed.
      * @return a lis of all the active IDs
      */
-    public static List activeIDs()
+    public static List getActiveIDs()
     {
        Session session = HibernateUtil.getCurrentSession();
        Transaction tx = session.beginTransaction();
@@ -863,5 +872,16 @@ public class AppraisalMgr {
         tx.commit();
         return result;
     }
+
+    /**
+     * todo
+     * @param job
+     * @return: true is there is an trial appraisal not in the status of "closed", "completed" or closed. false otherwise.
+     */
+    public static boolean OpenTrialAppraisalExists(Job job)
+    {
+        return true;
+    }
+
 }
 

@@ -21,11 +21,16 @@ public class EmailMgr {
      * @param emailType
      * @return
      */
-    public static Email lastEmail(int appraisalID, String emailType)
+    public static Email getLastEmail(int appraisalID, String emailType)
     {
         return new Email();
     }
 
+
+    public static Email getFirstEmail(int appraisalID, String emailType)
+    {
+        return new Email();
+    }
 
     /**
      * select count(*) from emails where apparaisalID, emailType

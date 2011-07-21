@@ -67,24 +67,30 @@ public class CWSUtil
 
     /**
      *
-     * @param d1
-     * @param d2
-     * @return: true if the current time is in between d1 and d2, including d1 and d2.
+     * @param start: start of the period
+     * @param end: end of the period
+     * @param target: The date in question
+     * @return true is target is the same as start or end, or target is between start and end.  False otherwise.
      */
-    public static boolean isWithinPeriod(Date d1, Date d2)
+    public static boolean isWithinPeriod(Date start, Date end, Date target)
     {
-        Date now = new Date();
-        if (now.equals(d1) || now.equals(d2))   //on the boundary
+
+        if (target.equals(start) || target.equals(end))   //on the boundary
             return true;
 
-        Date begin = d1;
-        Date end = d2;
-        if (d1.after(d2))
-        {
-            begin = d2;
-            end = d1;
-        }
-        return (now.after(begin) && now.before(end));
+        return (target.after(start) && target.before(end));
+    }
+
+    /**
+     *
+     * @param start
+     * @param end
+     * @return true is the current time is between start and end, false otherwise.
+     */
+    public static boolean isWithinPeriod(Date start, Date end)
+    {
+        Date now = new Date();
+        return isWithinPeriod(start, end, now);
     }
 
     /**
@@ -108,15 +114,18 @@ public class CWSUtil
 
     /**
      *
-     * @param d
-     * @return a date representing 1st day of the month after the month of the input date
+     * @param date
+     * @return if date is the first date of the month, return date, else return the first day of next month
      */
-   public static Date firstDateNextMonth(Date d)
+   public static Date firstDayOfMonth(Date date)
    {
        Calendar cal = Calendar.getInstance();
-       cal.setTime(d);
-       cal.add(Calendar.MONTH, 1);
-       cal.set(Calendar.DAY_OF_MONTH, 1);
+       cal.setTime(date);
+       if (cal.get(Calendar.DAY_OF_MONTH) > 1)
+       {
+            cal.add(Calendar.MONTH, 1);
+            cal.set(Calendar.DAY_OF_MONTH, 1);
+       }
        return cal.getTime();
    }
 

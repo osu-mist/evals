@@ -21,7 +21,10 @@ public class Mail {
     Address from;
 	Properties props = new Properties();  //this is the properties that holds the mailHost and is used to create a session.
 
-	public Mail(String hostname, Address from) {}
+	public Mail(String hostname, Address from)
+    {
+       //@todo
+    }
 
 	public Message getMessage() throws MessagingException {
 

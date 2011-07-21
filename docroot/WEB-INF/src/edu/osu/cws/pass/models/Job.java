@@ -49,12 +49,12 @@ public class Job extends Pass implements Serializable {
 
     private String salaryStep;
 
-    private String trialInd;
+    private int trialInd;
 
-    private String annualInd;
+    private int annualInd;
 
     //private String evalDate;
-    private String evalDate;
+    private Date evalDate;
 
     /**
      * This property holds the job of the current supervisor. If
@@ -87,7 +87,7 @@ public class Job extends Pass implements Serializable {
         Job job = (Job) o;
 
         if (id != job.id) return false;
-        if (annualInd != null ? !annualInd.equals(job.annualInd) : job.annualInd != null) return false;
+        //if (annualInd != null ? !annualInd.equals(job.annualInd) : job.annualInd != null) return false;
         if (appointmentType != null ? !appointmentType.equals(job.appointmentType) : job.appointmentType != null)
             return false;
         if (beginDate != null ? !beginDate.equals(job.beginDate) : job.beginDate != null) return false;
@@ -110,7 +110,7 @@ public class Job extends Pass implements Serializable {
         if (status != null ? !status.equals(job.status) : job.status != null) return false;
         if (suffix != null ? !suffix.equals(job.suffix) : job.suffix != null) return false;
         if (supervisor != null ? !supervisor.equals(job.supervisor) : job.supervisor != null) return false;
-        if (trialInd != null ? !trialInd.equals(job.trialInd) : job.trialInd != null) return false;
+        //if (trialInd != null ? !trialInd.equals(job.trialInd) : job.trialInd != null) return false;
         if (tsOrgCode != null ? !tsOrgCode.equals(job.tsOrgCode) : job.tsOrgCode != null) return false;
 
         return true;
@@ -140,8 +140,8 @@ public class Job extends Pass implements Serializable {
         result = 31 * result + (businessCenterName != null ? businessCenterName.hashCode() : 0);
         result = 31 * result + (salaryGrade != null ? salaryGrade.hashCode() : 0);
         result = 31 * result + (salaryStep != null ? salaryStep.hashCode() : 0);
-        result = 31 * result + (trialInd != null ? trialInd.hashCode() : 0);
-        result = 31 * result + (annualInd != null ? annualInd.hashCode() : 0);
+       // result = 31 * result + (trialInd != null ? trialInd.hashCode() : 0);
+       // result = 31 * result + (annualInd != null ? annualInd.hashCode() : 0);
         result = 31 * result + (evalDate != null ? evalDate.hashCode() : 0);
         result = 31 * result + (currentSupervisor != null ? currentSupervisor.hashCode() : 0);
         return result;
@@ -291,28 +291,36 @@ public class Job extends Pass implements Serializable {
         this.salaryStep = salaryStep;
     }
 
-    public String getTrialInd() {
+    public int getTrialInd() {
         return trialInd;
     }
 
-    public void setTrialInd(String trialInd) {
+    public void setTrialInd(int trialInd) {
         this.trialInd = trialInd;
     }
 
-    public String getAnnualInd() {
+    public int getAnnualInd() {
         return annualInd;
     }
 
-    public void setAnnualInd(String annualInd) {
+    public void setAnnualInd(int annualInd) {
         this.annualInd = annualInd;
     }
 
-    public String getEvalDate() {
+    public Date getEvalDate() {
         return evalDate;
     }
 
-    public void setEvalDate(String evalDate) {
+    public void setEvalDate(Date evalDate) {
         this.evalDate = evalDate;
+    }
+
+
+    public Date getTrialStartDate()
+    {
+       if (evalDate != null)
+           return evalDate;
+        return beginDate;
     }
 
 
@@ -323,35 +331,88 @@ public class Job extends Pass implements Serializable {
      */
     public boolean withinTrialPeriod()
     {
-       	if (trialInd == null)
+       	if (trialInd == 0)
 	        return false;
 
-        if (evalDate != null)   //@@@for now just to pass testing
-           //beginDate = evalDate;
-           beginDate = new Date();
+        Date trialBeginDate = getTrialStartDate();
 
-        int trialMonths = Integer.parseInt(trialInd);
+        int trialMonths = trialInd;
         Date trialEndDate = CWSUtil.getEndDate(beginDate, trialMonths, Calendar.MONTH);
 	    return CWSUtil.isWithinPeriod(beginDate, trialEndDate);
     }
 
     /**
      *
-     * @return
+     * @return a Date object representing the start date of appraisal period of the current year.
+     * This day may be in the past of the future.
+     * It's just the eval_date with the year replaced by the current year.
      */
-    public Date getNewAnnualStartDate()
+    public Calendar getNewAnnualStartDate()
     {
-         return new Date();
+        Date myDate = getInitialEvalStartDate(); //starting point
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(myDate);
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        cal.set(Calendar.YEAR, year);
+        return cal;
     }
 
     /**
-     * @offset Number of days after the current day
-     * @return true is the job is still within the initial period offset days from now. false otherwise
+     *
+     * @return a Date object representing the start date of the initial annual appraisal period
      */
-    public static boolean withinInitialPeriod(int offset)
+    public Date getInitialEvalStartDate()
     {
+        Date myDate;
+        if (evalDate != null)
+            myDate = evalDate;
+        else
+            myDate = beginDate;
+        return(CWSUtil.firstDayOfMonth(myDate));
+    }
 
-        return true;
+    /**
+     *
+     * @param startDate
+     * @param type: trial, intial, annual
+     * @return
+     */
+    public Date getEndEvalDate(Date startDate, String type)
+    {
+      Calendar endCal = Calendar.getInstance();
+        endCal.setTime(startDate);
+      int interval;
+      if (type.equalsIgnoreCase("trial"))
+        interval = trialInd;
+      else if (type.equalsIgnoreCase("initial"))
+        interval = annualInd;
+      else if (type.equalsIgnoreCase("annual"))
+        interval = 12;
+      else
+        interval = 0;
+      if (interval == 0) //No evaluation needed
+        return null;
+
+      endCal.add(Calendar.MONTH, interval);
+      return endCal.getTime();
+
+    }
+
+
+    /**
+     * @date
+     * @return true if the date parameter is withing the intial appraisal period
+     */
+    public boolean withinInitialPeriod(Date target)
+    {
+        if (annualInd == 0)  //Not doing annual evaluation
+            return false;
+
+        Calendar cal = Calendar.getInstance();
+        Date startDate = getInitialEvalStartDate();
+        cal.setTime(startDate);
+        cal.add(Calendar.MONTH, annualInd);
+        return CWSUtil.isWithinPeriod(startDate, cal.getTime(), target);
     }
 }
 

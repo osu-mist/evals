@@ -275,4 +275,9 @@ public class ReviewerMgr {
         session.save(reviewer);
         tx.commit();
     }
+
+    public static List<Reviewer> getReviewers(String bcName)
+    {
+        return new ArrayList<Reviewer>();
+    }
 }

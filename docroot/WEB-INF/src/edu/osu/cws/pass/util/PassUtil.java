@@ -34,10 +34,17 @@ public class PassUtil {
     public static Date getDueDate(Appraisal appraisal, Configuration config) throws ModelException
     {
 
-        Date refDate= appraisal.getEndDate();
+        Date refDate;
+        String refPoint = config.getReferencePoint();
 
-        if (config.getReferencePoint().equals("start"))
+        if (refPoint == null || refPoint.equals("start"))
             refDate = appraisal.getStartDate();
+        else if (refPoint.equals("end"))
+            refDate = appraisal.getEndDate();
+        else if (refPoint.equals("employee_signed_date"))
+            refDate = appraisal.getEmployeeSignedDate();
+        else //should not happen
+            refDate =  appraisal.getStartDate();
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(refDate);
