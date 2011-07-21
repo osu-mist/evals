@@ -7,14 +7,16 @@
 <liferay-ui:success key="admin-deleted" message="admin-deleted" />
 
 <c:if test="${isMaster == true}">
-    <div id="<portlet:namespace/>admin-add-link">
-        <p><liferay-ui:icon
-            image="add_user"
-            url="#"
-            label="true"
-            message="Add Admin User"
-        />
-        </p>
+    <div class="actions">
+        <div id="<portlet:namespace/>admin-add-link">
+            <p><liferay-ui:icon
+                image="add_user"
+                url="#"
+                label="true"
+                message="Add Admin User"
+            />
+            </p>
+        </div>
     </div>
 
     <fieldset id="pass-user-add">
@@ -27,7 +29,7 @@
             <table>
                 <tr>
                     <th><liferay-ui:message key="employee-onid" /></th>
-                    <td><input type="text" name="<portlet:namespace/>onid" id="<portlet:namespace/>onid"/></td>
+                    <td><input type="text" name="<portlet:namespace/>onid" id="<portlet:namespace/>onid"/>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
@@ -40,8 +42,7 @@
                      </td>
                 </tr>
                 <tr>
-                    <td><a target="_new" href="http://oregonstate.edu/main/campus-online-directory">
-                    Online Directory</a></td>
+                    <td><a href="http://oregonstate.edu/main/campus-online-directory">Online Directory</a></td>
                     <td>
                         <input type="submit" value="<liferay-ui:message key="save" />" />
                         <input type="submit" value="<liferay-ui:message key="cancel" />"
@@ -133,3 +134,4 @@
     });
   </script>
 </c:if>
+<%@ include file="/jsp/footer.jsp" %>

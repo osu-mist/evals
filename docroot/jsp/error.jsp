@@ -5,3 +5,4 @@
 <div id="<portlet:namespace />flash">
     <span class="portlet-msg-error"><liferay-ui:message key="system-error-message"/></span>
 </div>
+<%@ include file="/jsp/footer.jsp" %>

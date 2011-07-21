@@ -4,7 +4,7 @@
 <jsp:useBean id="appraisal" class="edu.osu.cws.pass.models.Appraisal" scope="request" />
 <jsp:useBean id="permissionRule" class="edu.osu.cws.pass.models.PermissionRule" scope="request" />
 
-<div id="pass-appraisal-form">
+<div id="pass-appraisal-form" class="osu-cws">
     <h2><liferay-ui:message key="appraisal-classified-title" /></h2>
     <liferay-ui:success key="draft-saved" message="draft-saved" />
 
@@ -27,7 +27,7 @@
 
     <c:choose>
         <c:when test="${permissionRule.goalComments == 'e'}">
-            <p><strong><liferay-ui:message key="appraisal-goals-comments" /></strong></p>
+            <label for="<portlet:namespace />.appraisal.goalsComments"><liferay-ui:message key="appraisal-goals-comments" /> </label>
             <liferay-ui:input-textarea param="appraisal.goalsComments"
                 defaultValue="${appraisal.goalsComments}" /><br />
         </c:when>
@@ -63,7 +63,7 @@
                         value="<liferay-ui:message key="appraisal-want-rebuttal" />" />
                     <div class="pass-hide pass-appraisal-rebuttal">
                 </c:if>
-                <p><strong><liferay-ui:message key="appraisal-employee-response" /></strong></p>
+                <label for="<portlet:namespace />appraisal.rebuttal"><liferay-ui:message key="appraisal-employee-response" /></label>
                 <liferay-ui:input-textarea param="appraisal.rebuttal"
                     defaultValue="${appraisal.rebuttal}" /><br />
                 <c:if test="${empty appraisal.rebuttal}">
@@ -135,4 +135,27 @@
     });
     </script>
     </c:if>
+
+
+    <hr />
+    <h3><liferay-ui:message key="demo-settings"/></h3>
+    <p><liferay-ui:message key="demo-settings-description"/></p>
+
+    <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+        <portlet:param name="id" value="${appraisal.id}" />
+        <portlet:param name="action" value="demoResetAppraisal" />
+        <portlet:param name="status" value="goalsDue" />
+        </portlet:actionURL>">
+    <liferay-ui:message key="demo-settings-appraisal-reset-goals-due"/>
+    </a><br />
+
+    <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+        <portlet:param name="id" value="${appraisal.id}" />
+        <portlet:param name="action" value="demoResetAppraisal" />
+        <portlet:param name="status" value="resultsDue" />
+        </portlet:actionURL>">
+    <liferay-ui:message key="demo-settings-appraisal-reset-results-due"/>
+    </a><br />
+
 </div><!-- end appraisal -->
+<%@ include file="/jsp/footer.jsp" %>

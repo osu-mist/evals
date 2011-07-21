@@ -21,9 +21,7 @@
     width:100%;
     margin:0 1em 1em 0;
 }
-#pass-add-criteria input[type="text"], #pass-add-criteria textarea {
-    width:95%;
-}
+
 #pass-add-criteria input[type="submit"] {
     margin-right:1.5em;
 }
@@ -34,15 +32,13 @@
 #pass-add-criteria td {
     padding-top:0.5em;
 }
-
+ 
 /* Appraisal Form */
 #pass-appraisal-form {
     width:100%;
     margin-right:1.5em;
 }
-#pass-appraisal-form textarea {
-width: 99%;
-}
+
 #pass-appraisal-form table.appraisal-info {
     width:100%;
     margin:1em 0em;
@@ -120,8 +116,9 @@ tr.ui-state-highlight {
     display: none;
 }
 
-/* Top Menu */
+/* Top Menu 
 #pass-top-menu {
+    padding-bottom: 4em;
     position: relative;
     z-index: 1;
     width: 100%;
@@ -144,7 +141,7 @@ tr.ui-state-highlight {
 #pass-top-menu  .portlet-action-menu a {
     color: #686868;
     padding: 0.5em 0.5em 0.25em 0.5em;
-    font-size: 1em;
+    font-size: 1.37em;
 }
 #pass-top-menu  .portlet-action-menu ul {
     width: auto;
@@ -170,32 +167,31 @@ tr.ui-state-highlight {
 }
 #pass-top-menu .portlet-action-menu li:hover ul, #pass-top-menu .portlet-action-menu li.sfHover ul {
     right: auto;
-    top:1.9em;
+} */
+
+/* My Information 
+#pass-my-info {
+    background: #f2f2f2;
 }
 
-/* My Information */
-#pass-my-info table {
-    width: 50%;
-    margin-top: 0.5em;
+#pass-my-info .section {
+    padding: 0.5em;
+    background: #fff;
+    border-radius: 8px;
 }
-#pass-my-info td {
-    padding: 0.3em;
+
+#pass-my-info .col1 {
+    float: left;
+    vertical-align: middle;
+    color: #c34500;
+    width: 22%;
 }
+
 #pass-my-info h3 {
     margin-top: 0.8em;
-}
+} */
 
 /* Configuration List */
 table.configuration-list {
     width: 50%;
-}
-
-/* Appraisal Search */
-.accordion-content.pass-search form {
-    padding: 0.5em 0 0.5em 1em;
-    color: #000;
-}
-.accordion-content.pass-search label,
-.accordion-content.pass-search input {
-    margin-right: 1em;
 }

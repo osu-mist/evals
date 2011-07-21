@@ -19,6 +19,9 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.HashMap" %>
 
+<style>
+<%@ include file="/css/pass.css"%>
+</style>
 
 <%@ page isELIgnored ="false" %>
 
@@ -33,8 +36,9 @@ if (errorMsg != null && !errorMsg.equals("")) {
 }
 %>
 
+<div id="osu-cws"> <!-- Full wrapper for portlet (closed in footer.jsp) -->
+  
 <c:if test="${not empty menuHome}">
-    <liferay-ui:message key="performance-appraisal-software-system"/>
     <%@ include file="/jsp/menuHome.jsp"%>
 </c:if>
 <c:if test="${not empty menuMax}">
@@ -46,21 +50,3 @@ if (errorMsg != null && !errorMsg.equals("")) {
     <span class="portlet-msg-error">${errorMsg}</span>
     </c:if>
 </div>
-
-<script type="text/javascript">
-    function <portlet:namespace/>toggleContent(id){
-            var imgId=id+'ImageToggle';
-
-             if(document.getElementById(id).style.display=='block'){
-
-                var path1 = new String('/cps/images/accordion/accordion_arrow_up.png');
-                document.getElementById(imgId).src = path1;
-                jQuery('#' + id).hide('slow');
-            }else if(document.getElementById(id).style.display=='none'){
-                var path2 = new String('/cps/images/accordion/accordion_arrow_down.png');
-                document.getElementById(imgId).src = path2;
-                jQuery('#' + id).show('slow');
-            }
-        }
-
-</script>

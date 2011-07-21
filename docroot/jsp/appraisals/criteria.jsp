@@ -1,13 +1,13 @@
 <%
 Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 %>
-
-<h3><c:out value="${assessment.criterionDetail.areaID.name}"/></h3>
+<fieldset>
+<legend><c:out value="${assessment.criterionDetail.areaID.name}"/></legend>
 <p class="instructions"><c:out value="${assessment.criterionDetail.description}" /></p>
 
 <c:choose>
     <c:when test="${permissionRule.goals == 'e'}">
-        <p class="instructions"><liferay-ui:message key="appraisal-goals" /></p>
+        <label for="<portlet:namespace />appraisal.goal.${assessment.id}"><liferay-ui:message key="appraisal-goals" /></label>
         <liferay-ui:input-textarea param="appraisal.goal.${assessment.id}"
             defaultValue="${assessment.goal}" />
     </c:when>
@@ -19,7 +19,7 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 
 <c:choose>
     <c:when test="${permissionRule.newGoals == 'e'}">
-        <p class="instructions"><liferay-ui:message key="appraisal-newGoals" /></p>
+        <label for="<portlet:namespace />appraisal.newGoals.${assessment.id}"><liferay-ui:message key="appraisal-newGoals" /></label>
         <liferay-ui:input-textarea param="appraisal.newGoals.${assessment.id}"
             defaultValue="${assessment.newGoals}" />
     </c:when>
@@ -31,7 +31,7 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 
 <c:choose>
     <c:when test="${permissionRule.results == 'e'}">
-        <p class="instructions"><liferay-ui:message key="appraisal-employee-results" /></p>
+        <label for="<portlet:namespace />assessment.employeeResult.${assessment.id}"><liferay-ui:message key="appraisal-employee-results" /></label>
         <liferay-ui:input-textarea param="assessment.employeeResult.${assessment.id}"
             defaultValue="${assessment.employeeResult}" />
     </c:when>
@@ -43,7 +43,7 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 
 <c:choose>
     <c:when test="${permissionRule.supervisorResults == 'e'}">
-        <p class="instructions"><liferay-ui:message key="appraisal-result-comments" /></p>
+        <label for="<portlet:namespace />assessment.supervisorResult.${assessment.id}"><liferay-ui:message key="appraisal-result-comments" /></label>
         <liferay-ui:input-textarea param="assessment.supervisorResult.${assessment.id}"
             defaultValue="${assessment.supervisorResult}" />
     </c:when>
@@ -52,3 +52,4 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 <p class="pass-form-text"><%= formAssessment.getSupervisorResult().replaceAll("\n", "<br />") %></p>
     </c:when>
 </c:choose>
+</fieldset>

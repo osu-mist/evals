@@ -1,5 +1,5 @@
-<div class="pass-review">
-    <h4><liferay-ui:message key="appraisal-review"/></h4>
+<fieldset class="pass-review">
+    <legend><liferay-ui:message key="appraisal-review"/></legend>
     <c:choose>
         <c:when test="${permissionRule.review == 'e'}">
             <liferay-ui:input-textarea param="appraisal.review"
@@ -9,4 +9,4 @@
 <p class="pass-form-text"><%= formAppraisal.getReview().replaceAll("\n", "<br />") %></p>
         </c:when>
     </c:choose>
-</div><!-- end review -->
+</fieldset><!-- end review -->

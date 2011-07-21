@@ -13,6 +13,14 @@ addCriteriaURL.setParameter("action", "addCriteria");
 <liferay-ui:success key="criteria-deleted" message="criteria-deleted" />
 
 <div class="separator"></div>
+<div class="actions">
+<liferay-ui:icon
+    image="add_article"
+    url="<%= addCriteriaURL.toString() %>"
+    label="true"
+    message="Add Evaluation Criteria"
+/>
+</div>
 <table class="taglib-search-iterator" id="<portlet:namespace/>criteria-list">
     <thead>
         <tr class="portlet-section-header results-header">
@@ -49,13 +57,6 @@ addCriteriaURL.setParameter("action", "addCriteria");
     </tr>
 </c:forEach>
     </tbody>
-
-<liferay-ui:icon
-    image="add_article"
-    url="<%= addCriteriaURL.toString() %>"
-    label="true"
-    message="Add Evaluation Criteria"
-/>
 
 </table>
 
@@ -159,3 +160,4 @@ addCriteriaURL.setParameter("action", "addCriteria");
       "results-row portlet-section-alternate alt");
   }
 </script>
+<%@ include file="/jsp/footer.jsp" %>
