@@ -2,11 +2,14 @@ package edu.osu.cws.pass.hibernate;
 
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.pass.util.HibernateUtil;
+import edu.osu.cws.pass.util.PassUtil;
+import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class AppraisalMgr {
@@ -39,23 +42,31 @@ public class AppraisalMgr {
      *
      * @param job   Job for this appraisal
      * @param type: trial, annual, initial
+     * @param configuration: configuration object of goalsDue or resultsDue
      * @param startDate: starting date of appraisal period.
      * @return appraisal.id
      * @throws Exception
      */
-    public static Appraisal createAppraisal(Job job, Date startDate, String type) throws Exception {
+    public static Appraisal createAppraisal(Job job, Date startDate, String type,
+                                            Configuration configuration) throws Exception {
         CriteriaMgr criteriaMgr = new CriteriaMgr();
         Appraisal appraisal = new Appraisal();
         CriterionDetail detail;
         Assessment assessment;
 
+        if (!type.equals(Appraisal.TYPE_TRIAL) && !type.equals(Appraisal.TYPE_ANNUAL)) {
+            throw new ModelException("Invalid appraisal type : " + type);
+        }
+
         appraisal.setJob(job);
-        appraisal.setStatus("goalsDue");
-        //@todo: how do we define the start and end date ?
-        appraisal.setStartDate(new Date());
-        appraisal.setEndDate(new Date());
+        appraisal.setStartDate(startDate);
         appraisal.setCreateDate(new Date());
         appraisal.setType(type);
+
+        createAppraisalStatus(startDate, configuration, appraisal);
+
+        Date endDate = job.getEndEvalDate(startDate, type);
+        appraisal.setEndDate(endDate);
 
         if (appraisal.validate()) {
             String appointmentType = job.getAppointmentType();
@@ -83,6 +94,29 @@ public class AppraisalMgr {
         }
 
         return appraisal;
+    }
+
+    /**
+     * Sets the status of the appraisal. If the startDate of the appraisal is before Nov 1st, 2011, we set the
+     * status to appraisalDue, else if
+     *
+     * @param startDate
+     * @param configuration
+     * @param appraisal
+     * @throws Exception
+     */
+    private static void createAppraisalStatus(Date startDate, Configuration configuration,
+                                              Appraisal appraisal) throws Exception {
+        String Nov1st2011 = "11/01/2011";
+        SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
+        Date startPointDate = fmt.parse(Nov1st2011);
+        if (startDate.before(startPointDate)) {
+            appraisal.setStatus("appraisalDue");
+        } else if (PassUtil.isDue(appraisal, "goalsDue", configuration) < 0) {
+            appraisal.setStatus("goalsOverdue");
+        } else {
+            appraisal.setStatus("goalsDue");
+        }
     }
 
 
@@ -116,13 +150,61 @@ public class AppraisalMgr {
      * the eval_date or job_start_date.
      * end_date of the appraisal record is the number of month indicated by
      * PYVPASJ.annual_eval_ind.
+     *
      * @param  trialAppraisal: this is the newly closed or completed trial appraisal
      * @return the newly created appraisal
      *
      */
-    public static Appraisal createInitialAppraisalAfterTrial(Appraisal trialAppraisal)
-    {
-        return new Appraisal();
+    public static Appraisal createInitialAppraisalAfterTrial(Appraisal trialAppraisal,
+                                                             Configuration resultsDueConfig) throws Exception {
+        Appraisal appraisal = new Appraisal();
+        appraisal.setJob(trialAppraisal.getJob());
+        appraisal.setStartDate(trialAppraisal.getStartDate());
+        Date initialEvalStartDate = appraisal.getJob().getInitialEvalStartDate();
+        appraisal.setCreateDate(initialEvalStartDate);
+        appraisal.setGoalsSubmitDate(trialAppraisal.getGoalsSubmitDate());
+        appraisal.setGoalsApprover(trialAppraisal.getGoalsApprover());
+        appraisal.setGoalApprovedDate(trialAppraisal.getGoalApprovedDate());
+
+        Date endDate = appraisal.getJob().getEndEvalDate(trialAppraisal.getStartDate(), Appraisal.TYPE_INITIAL);
+        appraisal.setEndDate(endDate);
+
+        int resultsDue = PassUtil.isDue(appraisal, "resultsDue", resultsDueConfig);
+        if (resultsDue == 0) {
+            appraisal.setStatus("resultsDue");
+        } else if (resultsDue < 0) {
+            appraisal.setStatus("resultsOverdue");
+        } else {
+            appraisal.setStatus("goalsApproved");
+        }
+
+        if (appraisal.validate()) {
+            Session session = HibernateUtil.getCurrentSession();
+            try {
+                Transaction tx = session.beginTransaction();
+                session.save(appraisal);
+
+                Assessment newAssessment;
+                for (Assessment origAssesment: appraisal.getAssessments()) {
+                    newAssessment = new Assessment();
+                    newAssessment.setCriterionDetail(origAssesment.getCriterionDetail());
+                    newAssessment.setNewGoals(origAssesment.getNewGoals());
+                    newAssessment.setGoal(origAssesment.getGoal());
+                    newAssessment.setAppraisal(appraisal);
+                    newAssessment.setCreateDate(new Date());
+                    newAssessment.setEmployeeResult(origAssesment.getEmployeeResult());
+                    newAssessment.setSupervisorResult(origAssesment.getSupervisorResult());
+                    session.save(newAssessment);
+                }
+
+                tx.commit();
+            } catch (Exception e){
+                session.close();
+                throw e;
+            }
+        }
+
+        return appraisal;
     }
 
     /**
@@ -191,10 +273,12 @@ public class AppraisalMgr {
      *
      * @param request
      * @param id
+     * @param resultsDueConfig
      * @return
      * @throws Exception
      */
-    public boolean processUpdateRequest(Map request, int id) throws Exception {
+    public boolean processUpdateRequest(Map request, int id, Configuration resultsDueConfig)
+            throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         try {
             Transaction tx = session.beginTransaction();
@@ -215,6 +299,9 @@ public class AppraisalMgr {
             updateAppraisal(appraisal);
             tx.commit();
 
+            // Creates the first annual appraisal if needed
+            createFirstAnnualAppraisal(appraisal, resultsDueConfig);
+
             // If appraisalStep.getEmailType() is not null
                 // Send the email  //design in another module, not for the June demo.
         } catch (Exception e) {
@@ -224,7 +311,35 @@ public class AppraisalMgr {
         return false;
     }
 
-        /**
+    /**
+     * Creates the first annual appraisal if needed. The first annual appraisal is created if:
+     *  1) the appraisal status is closed, completed or rebuttalReaddue
+     *  2) the job status is not T
+     *  3) the job does not already have an initial annual appraisal
+     *  4) The current appraisal is of type: trial
+     *  5) The job annual_indicator != 0
+     *
+     * @param appraisal
+     * @throws Exception
+     */
+    private void createFirstAnnualAppraisal(Appraisal appraisal, Configuration resultsDueConfig)
+            throws Exception {
+        String appraisalStatus = appraisal.getStatus();
+        boolean allowedStatus = appraisalStatus.equals("closed") || appraisalStatus.equals("completed") ||
+                appraisalStatus.equals("rebuttalReadDue");
+        Job job = appraisal.getJob();
+        String jobStatus = job.getStatus();
+
+        //@todo: instead use trialAppraisalExsits(Job)
+        boolean hasFirstAnnualAppraisal = AppraisalMgr.AnnualAppraisalExists(job, job.getInitialEvalStartDate());
+
+        if (appraisal.getType().equals(Appraisal.TYPE_TRIAL) && allowedStatus && !jobStatus.equals("T")
+                && job.getAnnualInd() != 0 && hasFirstAnnualAppraisal) {
+            AppraisalMgr.createInitialAppraisalAfterTrial(appraisal, resultsDueConfig);
+        }
+    }
+
+    /**
      * Handles updating the appraisal fields in the appraisal and assessment objects.
      *
      * @param request

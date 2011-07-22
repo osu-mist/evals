@@ -54,7 +54,6 @@ public class Job extends Pass implements Serializable {
 
     private int annualInd;
 
-    //private String evalDate;
     private Date evalDate;
 
     /**

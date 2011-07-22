@@ -14,13 +14,13 @@ public class Appraisal extends Pass {
     public static final String signatureRequired =
             "Please click the box to acknowledge that you have read the appraisal";
 
+    public static final String invalidType =
+            "Appraisal type can only be: annual or trial. Please provide a valid type.";
+
     public static final String TYPE_ANNUAL = "annual";
     public static final String TYPE_INITIAL = "initial";
 
     public static final String TYPE_TRIAL = "trial";
-
-    public static final String TYPE_SPECIAL = "special";
-
 
     private int id;
 
@@ -139,7 +139,6 @@ public class Appraisal extends Pass {
 
     private Set<Assessment> assessments = new HashSet<Assessment>();
 
-
     public Appraisal() { }
 
     /**
@@ -253,6 +252,23 @@ public class Appraisal extends Pass {
 
         if (jobErrors.size() > 0) {
             this.errors.put("job", jobErrors);
+            return false;
+        }
+        return true;
+    }
+
+    public boolean validateType() {
+        ArrayList<String> typeErrors = new ArrayList<String>();
+
+        // If there were any previous validation errors remove them
+        this.errors.remove("type");
+
+        if (this.type == null || (!this.type.equals(TYPE_ANNUAL) && !this.type.equals(TYPE_TRIAL))) {
+            typeErrors.add(invalidType);
+        }
+
+        if (typeErrors.size() > 0) {
+            this.errors.put("type", typeErrors);
             return false;
         }
         return true;

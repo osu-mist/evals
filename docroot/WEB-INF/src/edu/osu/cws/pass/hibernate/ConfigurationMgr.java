@@ -103,5 +103,4 @@ public class ConfigurationMgr {
         Map<String, Configuration> configMap = new HashMap();
         return configMap;
     }
-
 }

@@ -10,6 +10,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Test
@@ -36,9 +37,9 @@ public class AppraisalsTest {
      *
      * @throws Exception
      */
-    @Test(groups = {"unittest"}, dataProvider = "job")
-    public void shouldCreateAnAppraisal(Job job) throws Exception {
-        assert appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL).getId() != 0 :
+    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
+    public void shouldCreateAnAppraisal(Job job, Configuration configuration) throws Exception {
+        assert AppraisalMgr.createAppraisal(job, new Date(),  Appraisal.TYPE_ANNUAL, configuration).getId() != 0 :
                 "AppraisalMgr.createAppraisal should return id of appraisal";
     }
 
@@ -46,7 +47,7 @@ public class AppraisalsTest {
     public void appraisalShouldRequireValidJob() throws Exception {
         Job invalidJob = new Job();
 
-        assert appraisalMgr.createAppraisal(invalidJob, Appraisal.TYPE_ANNUAL).getId() != 0 :
+        assert AppraisalMgr.createAppraisal(invalidJob, new Date(),  Appraisal.TYPE_ANNUAL, new Configuration()).getId() != 0 :
                 "AppraisalMgr.createAppraisal should require valid Job";
     }
 
@@ -67,6 +68,57 @@ public class AppraisalsTest {
     }
 
     /**
+     * TestNG Dataprovider, returns an array of Configurations to be used in this test class.
+     * @return
+     */
+    @DataProvider(name = "jobAndGoalsDueConfiguration")
+    public Object[][] loadJobAndGoalsDueConfiguration() {
+        Configuration configuration = new Configuration();
+        configuration.setName("goalsDue");
+        configuration.setValue("30");
+        configuration.setReferencePoint("start");
+        configuration.setAction("substract");
+
+        Session hsession = HibernateUtil.getCurrentSession();
+        Transaction tx = hsession.beginTransaction();
+        Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
+        tx.commit();
+
+        return new Object[][] {
+                {job, configuration}
+        };
+    }
+
+    /**
+     * TestNG Dataprovider, returns an array of Configurations to be used in this test class.
+     *
+     * @return
+     */
+    @DataProvider(name = "jobAndGoalsDueAndResultsDueConfiguration")
+    public Object[][] loadJobAndGoalsDueAndResultsDueConfiguration() {
+        Configuration configuration = new Configuration();
+        configuration.setName("goalsDue");
+        configuration.setValue("30");
+        configuration.setReferencePoint("start");
+        configuration.setAction("substract");
+
+        Configuration configuration2 = new Configuration();
+        configuration2.setName("goalsDue");
+        configuration2.setValue("30");
+        configuration2.setReferencePoint("start");
+        configuration2.setAction("substract");
+
+        Session hsession = HibernateUtil.getCurrentSession();
+        Transaction tx = hsession.beginTransaction();
+        Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
+        tx.commit();
+
+        return new Object[][] {
+                {job, configuration, configuration2}
+        };
+    }
+
+    /**
      * Method that builds an Appraisal with a bunch of data to save
      *
      * @return
@@ -77,7 +129,8 @@ public class AppraisalsTest {
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         tx.commit();
 
-        int appraisalID =  appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL).getId();
+        int appraisalID =  AppraisalMgr.createAppraisal(job, new Date(), Appraisal.TYPE_ANNUAL,
+                new Configuration()).getId();
         hsession = HibernateUtil.getCurrentSession();
         tx = hsession.beginTransaction();
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
@@ -128,7 +181,8 @@ public class AppraisalsTest {
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         tx.commit();
 
-        int appraisalID =  appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL).getId();
+        int appraisalID =  AppraisalMgr.createAppraisal(job, new Date(), Appraisal.TYPE_ANNUAL,
+                new Configuration()).getId();
         hsession = HibernateUtil.getCurrentSession();
         tx = hsession.beginTransaction();
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
@@ -158,7 +212,8 @@ public class AppraisalsTest {
         Transaction tx = hsession.beginTransaction();
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         tx.commit();
-        int appraisalID =  appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL).getId();
+        int appraisalID =  AppraisalMgr.createAppraisal(job, new Date(), Appraisal.TYPE_ANNUAL,
+                new Configuration()).getId();
 
         // Grab the freshly created appraisal from the db before we start
         // updating the properties.
@@ -337,4 +392,138 @@ public class AppraisalsTest {
             appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL);
         }
     }*/
+
+    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
+    public void shouldSetTheStartDateWhenCreatingAppraisal(Job job, Configuration configuration) throws Exception {
+        Date today = new Date();
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_ANNUAL, configuration);
+        assert appraisal.getStartDate().equals(today);
+    }
+
+    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration",
+            expectedExceptions = {ModelException.class})
+    public void shouldOnlyCreateTwoTypesOfAppraisals(Job job, Configuration configuration) throws Exception {
+        Date today = new Date();
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_ANNUAL, configuration);
+        assert appraisal != null;
+
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL, configuration);
+        assert appraisal != null;
+
+        appraisal = AppraisalMgr.createAppraisal(job, today, "invalid type", configuration);
+        assert appraisal == null;
+
+    }
+
+    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
+    public void shouldUseStartDatePlusNumberOfMonthsInTrialIndToSetTheEndDateForTrialAppraisal(Job job,
+            Configuration configuration) throws Exception {
+        Date today = new Date();
+        Date endDate = job.getEndEvalDate(today, Appraisal.TYPE_TRIAL);
+
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL, configuration);
+        assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
+        assert appraisal.getEndDate().equals(endDate) : "End date should have been today + 6 months.";
+
+        job.setTrialInd(9);
+        endDate = job.getEndEvalDate(today, Appraisal.TYPE_TRIAL);
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL, configuration);
+        assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
+        assert appraisal.getEndDate().equals(endDate) : "End date should have been today + 9 months.";
+    }
+
+    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueAndResultsDueConfiguration")
+    public void shouldUseStartDatePlusNumberOfMonthsInAnnualIndToSetTheEndDateForFirstAnnualAppraisal(Job job,
+            Configuration goalsDueConfig, Configuration resultsDueConfig) throws Exception {
+        Date today = new Date();
+        job.setAnnualInd(12);
+        Date endDate = job.getEndEvalDate(today, Appraisal.TYPE_INITIAL);
+
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL, goalsDueConfig);
+        appraisal = AppraisalMgr.createInitialAppraisalAfterTrial(appraisal, resultsDueConfig);
+        assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
+        assert appraisal.getEndDate().equals(endDate) : "End date should have been today + 12 months.";
+
+        job.setAnnualInd(18);
+        endDate = job.getEndEvalDate(today, Appraisal.TYPE_INITIAL);
+
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL, goalsDueConfig);
+        appraisal = AppraisalMgr.createInitialAppraisalAfterTrial(appraisal, resultsDueConfig);
+        assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
+        assert appraisal.getEndDate().equals(endDate) : "End date should have been today + 18 months.";
+    }
+
+    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
+    public void shouldUseTwelveMonthsForAllAnnualAppraisalsAfterTheFirstOne(Job job, Configuration configuration)
+            throws Exception {
+        Date today = new Date();
+        job.setAnnualInd(100);
+        Date endDate = job.getEndEvalDate(today, Appraisal.TYPE_ANNUAL);
+
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_ANNUAL, configuration);
+        assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
+        assert appraisal.getEndDate().equals(endDate) :
+                "End date should have been today + 12 months for annual appraisals.";
+    }
+
+    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
+    public void shouldSetStatusToAppraisalDueIfStartDateIsBeforeNov1st2011(Job job, Configuration configuration)
+            throws Exception{
+        String startPointString = "10/29/2011";
+        SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
+        Date startPointDate = fmt.parse(startPointString);
+
+        appraisal = AppraisalMgr.createAppraisal(job, startPointDate, Appraisal.TYPE_ANNUAL, configuration);
+        assert appraisal.getStartDate().equals(startPointDate) : "Start date should be set correctly.";
+        assert appraisal.getStatus().equals("appraisalDue") :
+                "appraisal status should have been appraisalDue, instead got - " + appraisal.getStatus();
+    }
+
+/*    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
+    public void shouldSetStatusToGoalsOverdueIfGoalsAreDueInPast(Job job, Configuration configuration)
+            throws Exception {
+        //@todo: not sure how to test this
+        String startPointString = "11/01/2011";
+        SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
+        Date startPointDate = fmt.parse(startPointString);
+
+        appraisal = AppraisalMgr.createAppraisal(job, startPointDate, Appraisal.TYPE_ANNUAL, configuration);
+        assert appraisal.getStartDate().equals(startPointDate) : "Start date should be set correctly.";
+        assert appraisal.getStatus().equals("appraisalDue") :
+                "appraisal status should have been appraisalDue, instead got - " + appraisal.getStatus();
+    }*/
+
+    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
+    public void shouldSetStatusToGoalsDueIfAppraisalIsAfterNov1st2011AndGoalsAreNotDueInPast(Job job,
+            Configuration configuration) throws Exception {
+        String startPointString = "11/01/2012";
+        SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
+        Date startPointDate = fmt.parse(startPointString);
+
+        appraisal = AppraisalMgr.createAppraisal(job, startPointDate, Appraisal.TYPE_ANNUAL, configuration);
+        assert appraisal.getStartDate().equals(startPointDate) : "Start date should be set correctly.";
+        assert appraisal.getStatus().equals("goalsDue") :
+                "appraisal status should have been goalsDue, instead got - " + appraisal.getStatus();
+    }
+
+    public void shouldCreateFirstAnnualAppraisalIfTrialAppraisalIsClosedOrCompletedOrRebuttalDue() {
+        //@todo: code is written, I just have to test it out
+    }
+
+    public void shouldSetStatusOfFirstAnnualAppraisalToGoalsApprovedOrResultsDueOrResultsOverDue() {
+        //@todo: code is written, I just have to test it out
+    }
+
+    public void shouldCopyAllTheFieldsFromTrialAppraisalWhenCreatingFirstAnnualAppraisal() {
+        //@todo: code is written, I just have to test it out
+    }
+
+    @Test(groups={"pending"})
+    public void shouldOnlyCreateTrialAppraisalIfAndOnlyIfTrialIndIsSet() {}
+
+    @Test(groups={"pending"})
+    public void shouldOnlyCreateAnnualAppraisalIfAndOnlyIfAnnualIndIsSet() {}
+
+
+    //@todo: does the start dat
 }

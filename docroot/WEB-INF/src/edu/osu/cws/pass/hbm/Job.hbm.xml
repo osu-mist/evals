@@ -25,9 +25,9 @@
         <property name="appointmentType" length="45" column="PYVPASJ_APPOINTMENT_TYPE"/>
         <property name="salaryGrade" length="45" column="PYVPASJ_SAL_GRADE"/>
         <property name="salaryStep" length="3" column="PYVPASJ_SAL_STEP"/>
-        <property name="trialInd" length="45" column="PYVPASJ_TRIAL_IND"/>
-        <property name="annualInd" length="45" column="PYVPASJ_ANNUAL_IND"/>
-        <property name="evalDate" length="45" column="PYVPASJ_EVAL_DATE"/>
+        <property name="trialInd" length="45" type="int" column="PYVPASJ_TRIAL_IND"/>
+        <property name="annualInd" length="45" type="int" column="PYVPASJ_ANNUAL_IND"/>
+        <property name="evalDate" length="45" type="timestamp" column="PYVPASJ_EVAL_DATE"/>
 
         <!--<many-to-one name="employee" class="edu.osu.cws.pass.models.Employee"-->
                      <!--column="PYVPASJ_PIDM"-->

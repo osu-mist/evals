@@ -153,9 +153,9 @@
         PYVPASJ_PCLS_CODE="test"
         PYVPASJ_SAL_GRADE="0"
         PYVPASJ_SAL_STEP="0"
-        PYVPASJ_TRIAL_IND="test"
-        PYVPASJ_ANNUAL_IND="test"
-        PYVPASJ_EVAL_DATE="test"
+        PYVPASJ_TRIAL_IND="6"
+        PYVPASJ_ANNUAL_IND="0"
+        PYVPASJ_EVAL_DATE="2010-01-30"
         PYVPASJ_ORGN_DESC="testing"/>
   <jobs
         PYVPASJ_PIDM="12345"
@@ -174,9 +174,9 @@
         PYVPASJ_PCLS_CODE="test"
         PYVPASJ_SAL_GRADE="0"
         PYVPASJ_SAL_STEP="0"
-        PYVPASJ_TRIAL_IND="test"
-        PYVPASJ_ANNUAL_IND="test"
-        PYVPASJ_EVAL_DATE="test"
+        PYVPASJ_TRIAL_IND="9"
+        PYVPASJ_ANNUAL_IND="18"
+        PYVPASJ_EVAL_DATE="2010-01-30"
         PYVPASJ_ORGN_DESC="testing"/>
   <jobs
         PYVPASJ_PIDM="12467"
@@ -192,9 +192,9 @@
         PYVPASJ_PCLS_CODE="test"
         PYVPASJ_SAL_GRADE="0"
         PYVPASJ_SAL_STEP="0"
-        PYVPASJ_TRIAL_IND="test"
-        PYVPASJ_ANNUAL_IND="test"
-        PYVPASJ_EVAL_DATE="test"
+        PYVPASJ_TRIAL_IND="18"
+        PYVPASJ_ANNUAL_IND="12"
+        PYVPASJ_EVAL_DATE="2010-01-30"
         PYVPASJ_ORGN_DESC="testing"/>
   <jobs
         PYVPASJ_PIDM="12345"
@@ -213,9 +213,9 @@
         PYVPASJ_PCLS_CODE="test"
         PYVPASJ_SAL_GRADE="0"
         PYVPASJ_SAL_STEP="0"
-        PYVPASJ_TRIAL_IND="test"
-        PYVPASJ_ANNUAL_IND="test"
-        PYVPASJ_EVAL_DATE="test"
+        PYVPASJ_TRIAL_IND="6"
+        PYVPASJ_ANNUAL_IND="0"
+        PYVPASJ_EVAL_DATE="2010-01-30"
         PYVPASJ_ORGN_DESC="testing"/>
   <jobs
         PYVPASJ_PIDM="787812"
@@ -234,9 +234,9 @@
         PYVPASJ_PCLS_CODE="test"
         PYVPASJ_SAL_GRADE="0"
         PYVPASJ_SAL_STEP="0"
-        PYVPASJ_TRIAL_IND="test"
-        PYVPASJ_ANNUAL_IND="test"
-        PYVPASJ_EVAL_DATE="test"
+        PYVPASJ_TRIAL_IND="6"
+        PYVPASJ_ANNUAL_IND="0"
+        PYVPASJ_EVAL_DATE="2010-01-30"
         PYVPASJ_ORGN_DESC="testing"/>
   <jobs
         PYVPASJ_PIDM="8712359"
@@ -255,9 +255,9 @@
         PYVPASJ_PCLS_CODE="test"
         PYVPASJ_SAL_GRADE="0"
         PYVPASJ_SAL_STEP="0"
-        PYVPASJ_TRIAL_IND="test"
-        PYVPASJ_ANNUAL_IND="test"
-        PYVPASJ_EVAL_DATE="test"
+        PYVPASJ_TRIAL_IND="0"
+        PYVPASJ_ANNUAL_IND="12"
+        PYVPASJ_EVAL_DATE="2010-01-30"
         PYVPASJ_ORGN_DESC="testing"/>
   <jobs
         PYVPASJ_PIDM="990871"
@@ -273,9 +273,9 @@
         PYVPASJ_PCLS_CODE="test"
         PYVPASJ_SAL_GRADE="0"
         PYVPASJ_SAL_STEP="0"
-        PYVPASJ_TRIAL_IND="test"
-        PYVPASJ_ANNUAL_IND="test"
-        PYVPASJ_EVAL_DATE="test"
+        PYVPASJ_TRIAL_IND="12"
+        PYVPASJ_ANNUAL_IND="18"
+        PYVPASJ_EVAL_DATE="2010-01-30"
         PYVPASJ_ORGN_DESC="testing"/>
   <jobs
         PYVPASJ_PIDM="56198"
@@ -294,9 +294,9 @@
         PYVPASJ_PCLS_CODE="test"
         PYVPASJ_SAL_GRADE="0"
         PYVPASJ_SAL_STEP="0"
-        PYVPASJ_TRIAL_IND="test"
-        PYVPASJ_ANNUAL_IND="test"
-        PYVPASJ_EVAL_DATE="test"
+        PYVPASJ_TRIAL_IND="6"
+        PYVPASJ_ANNUAL_IND="12"
+        PYVPASJ_EVAL_DATE="2010-01-30"
         PYVPASJ_ORGN_DESC="testing"/>
   <permission_rules ID="1" STATUS="goalsDue" ROLE="employee" GOALS="e" ACTION_REQUIRED="goalsDue"/>
   <permission_rules ID="2" STATUS="goalsDue" ROLE="immediate-supervisor" GOALS="e"/>

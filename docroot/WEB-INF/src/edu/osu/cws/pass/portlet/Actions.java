@@ -616,7 +616,11 @@ public class Actions {
 
 
         try {
-            appraisalMgr.processUpdateRequest(request.getParameterMap(), id);
+            Map<String, Configuration> configurationMap =
+                    (Map<String, Configuration>) portletContext.getAttribute("configurations");
+            Configuration resultsDueConfig = configurationMap.get("resultsDue");
+
+            appraisalMgr.processUpdateRequest(request.getParameterMap(), id, resultsDueConfig);
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
         }
