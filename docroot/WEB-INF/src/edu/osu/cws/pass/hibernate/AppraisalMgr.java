@@ -69,15 +69,10 @@ public class AppraisalMgr {
         }
         appraisal.setType(dbType);
 
+        Date endDate = job.getEndEvalDate(startDate, type);
+        appraisal.setEndDate(endDate);
+
         createAppraisalStatus(startDate, goalsDueConfig, appraisal);
-
-        Date endDate = job.getEndEvalDate(startDate, type);
-        appraisal.setEndDate(endDate);
-
-        createAppraisalStatus(startDate, configuration, appraisal);
-
-        Date endDate = job.getEndEvalDate(startDate, type);
-        appraisal.setEndDate(endDate);
 
         if (appraisal.validate()) {
             String appointmentType = job.getAppointmentType();
