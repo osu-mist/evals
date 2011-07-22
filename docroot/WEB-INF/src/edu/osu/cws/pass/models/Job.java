@@ -316,6 +316,10 @@ public class Job extends Pass implements Serializable {
     }
 
 
+    /**
+     * Trial start date doed not need to be the first date of the month.
+     * @return  start date of the trial appraisal period.
+     */
     public Date getTrialStartDate()
     {
        if (evalDate != null)
@@ -334,18 +338,15 @@ public class Job extends Pass implements Serializable {
        	if (trialInd == 0)
 	        return false;
 
-        Date trialBeginDate = getTrialStartDate();
-
-        int trialMonths = trialInd;
-        Date trialEndDate = CWSUtil.getEndDate(beginDate, trialMonths, Calendar.MONTH);
+        Date startDate = getTrialStartDate();
+        Date trialEndDate = getEndEvalDate(startDate, "trial");
 	    return CWSUtil.isWithinPeriod(beginDate, trialEndDate);
     }
 
     /**
      *
-     * @return a Date object representing the start date of appraisal period of the current year.
+     * @return start date of appraisal period of the current year.
      * This day may be in the past of the future.
-     * It's just the eval_date with the year replaced by the current year.
      */
     public Calendar getNewAnnualStartDate()
     {
@@ -368,28 +369,27 @@ public class Job extends Pass implements Serializable {
             myDate = evalDate;
         else
             myDate = beginDate;
-        return(CWSUtil.firstDayOfMonth(myDate));
+        return(CWSUtil.getFirstDayOfMonth(myDate));
     }
 
     /**
      *
      * @param startDate
-     * @param type: trial, intial, annual
+     * @param type: trial, initial, annual
      * @return
      */
     public Date getEndEvalDate(Date startDate, String type)
     {
       Calendar endCal = Calendar.getInstance();
         endCal.setTime(startDate);
-      int interval;
+      int interval = 0;
       if (type.equalsIgnoreCase("trial"))
         interval = trialInd;
       else if (type.equalsIgnoreCase("initial"))
         interval = annualInd;
       else if (type.equalsIgnoreCase("annual"))
         interval = 12;
-      else
-        interval = 0;
+
       if (interval == 0) //No evaluation needed
         return null;
 
@@ -401,7 +401,7 @@ public class Job extends Pass implements Serializable {
 
     /**
      * @date
-     * @return true if the date parameter is withing the intial appraisal period
+     * @return true if target is withing the initial appraisal period
      */
     public boolean withinInitialPeriod(Date target)
     {
@@ -410,8 +410,7 @@ public class Job extends Pass implements Serializable {
 
         Calendar cal = Calendar.getInstance();
         Date startDate = getInitialEvalStartDate();
-        cal.setTime(startDate);
-        cal.add(Calendar.MONTH, annualInd);
+        Date endDate = getEndEvalDate(startDate, "initial");
         return CWSUtil.isWithinPeriod(startDate, cal.getTime(), target);
     }
 }

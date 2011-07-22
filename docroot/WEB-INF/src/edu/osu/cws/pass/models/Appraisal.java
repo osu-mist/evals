@@ -42,6 +42,17 @@ public class Appraisal extends Pass {
      */
     private String goalsComments;
 
+    private Date goalsRequiredModificationDate;
+
+    public void setGoalsRequiredModificationDate(Date goalsRequiredModificationDate) {
+        this.goalsRequiredModificationDate = goalsRequiredModificationDate;
+    }
+
+    public Date getGoalsRequiredModificationDate() {
+
+        return goalsRequiredModificationDate;
+    }
+
     private Date resultSubmitDate;
 
     /**

@@ -126,17 +126,6 @@ public class AppraisalMgr {
     }
 
     /**
-     *
-     * @param job
-     * @param startDate
-     * @return true is an appraisal with that startDate for the job exists
-     */
-    public static boolean AnnualAppraisalExists(Job job, Date startDate)
-    {
-        return true;
-    }
-
-    /**
      * Updates the appraisal object along with the assessment object. If the goals have been
      * modified, a new record is inserted in the assessments_logs table.
      *
@@ -897,30 +886,46 @@ public class AppraisalMgr {
     }
 
     /**
-     * select count(*) from appraisals where pidm, positionNum, subfix and type
-     * @param job
-     * @return: true if there is a trial record for the job, false otherwise
-     */
-    public static boolean trialAppraisalExists(Job job)
-    {
-        return true;
-    }
-
-    /**
      * select id from appraisals where status is not completed or closed.
-     * @return a lis of all the active IDs
+     * @return an array of int containing the open appraisalID's.
      */
-    public static List getActiveIDs()
+    public static int[] getActiveIDs()
     {
+       int[] ids = new int[10];
        Session session = HibernateUtil.getCurrentSession();
        Transaction tx = session.beginTransaction();
         String query = "select id " +
                 "from edu.osu.cws.pass.models.Appraisal " +
-                "where status not in ('completed', 'closed')";
+                "where status not in ('completed', 'closed', 'archive'')";
 
         List result =  session.createQuery(query).list();
         tx.commit();
-        return result;
+
+        return ids;
+    }
+
+    /**
+     *
+     * @param job
+     * @return
+     */
+    public static boolean trialAppraisalExist(Job job)
+    {
+        Date startDate = job.getTrialStartDate();
+        return appraisalExists(job, startDate,  Appraisal.TYPE_TRIAL);
+    }
+
+    /**
+     *
+     *
+     * @param job: job against which the appraisal was create
+     * @param startDate: start date of appraisal period
+     * @param type: "trial" or "annual".
+     * @return true if an appraisal exist for job and startDate and type, false otherwise
+     */
+    public static boolean appraisalExists(Job job, Date startDate, String type)
+    {
+        return true;
     }
 
     /**

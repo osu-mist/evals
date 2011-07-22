@@ -28,33 +28,29 @@ public class PassUtil {
      *
      * @param appraisal
      * @param config
-     * @return
+     * @return a Date object presenting the date a certain status is due.
      * @throws ModelException
      */
     public static Date getDueDate(Appraisal appraisal, Configuration config) throws ModelException
     {
-
-        Date refDate;
-        String refPoint = config.getReferencePoint();
-
-        if (refPoint == null || refPoint.equals("start"))
-            refDate = appraisal.getStartDate();
-        else if (refPoint.equals("end"))
-            refDate = appraisal.getEndDate();
-        else if (refPoint.equals("employee_signed_date"))
-            refDate = appraisal.getEmployeeSignedDate();
-        else //should not happen
-            refDate =  appraisal.getStartDate();
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(refDate);
-
         int offset = config.getIntValue();
         if (config.getAction().equals("subtract"))
             offset = offset * (-1);
 
-        cal.add(Calendar.DAY_OF_MONTH, offset); //This assumes all the days are based days, not months.
-        return cal.getTime();
+        Date refDate = appraisal.getStartDate();
+        Calendar dueDay = Calendar.getInstance();
+        String ref = config.getReferencePoint();
+
+        if (ref.equals("end"))
+            refDate = appraisal.getEndDate();
+        else if (ref.equals("requiredModificationDate"))
+            refDate = appraisal.getGoalsRequiredModificationDate();
+        else if (ref.equals("employee_signed_date"))
+            refDate = appraisal.getEmployeeSignedDate();
+
+        dueDay.setTime(refDate);
+        dueDay.add(Calendar.DAY_OF_MONTH, offset);
+        return dueDay.getTime();
     }
 
 
@@ -64,41 +60,26 @@ public class PassUtil {
      * compare to the current day to see if it's due or pass due.
      * @@@Need to rethink this.  Maybe move to the PASSUtil class
      * @param appraisal
-     * @param status
      * @return <0 < overdue, 0 due, >0 not due
      * @throws Exception
      */
-    public static int isDue(Appraisal appraisal, String status, Configuration config) throws Exception
+    public static int isDue(Appraisal appraisal, Configuration config) throws Exception
     {
-        int offset = config.getIntValue();
-        if (config.getAction().equals("subtract"))
-            offset = offset * (-1);
-
-        Calendar dueDay = Calendar.getInstance();
-
-        if (config.getReferencePoint().equals("start"))
-            dueDay.setTime(appraisal.getStartDate());
-        else
-            dueDay.setTime(appraisal.getEndDate());
-
-        dueDay.add(Calendar.DAY_OF_MONTH, offset);
-
-        return (CWSUtil.daysBetween(dueDay.getTime(), new Date()));  //@@@Need to check direction
+        Date dueDate = getDueDate(appraisal, config);
+        return (CWSUtil.daysBetween(dueDate, new Date()));  //@@@Need to check direction
     }
 
     /**
       * Figures out if additional reminder email needs to be sent.
       * @param lastEmail
       * @param conf
-      * @return
+      * @return  true if need to send another email, false otherwise.
       */
-
-
      public static boolean anotherEmail(Email lastEmail, Configuration conf)
      {
          int frequency = conf.getIntValue();
          int daysPassed = CWSUtil.daysBetween(new Date(), lastEmail.getSentDate());
-         return (daysPassed >= frequency);
+         return (daysPassed > frequency);
      }
 
     /**

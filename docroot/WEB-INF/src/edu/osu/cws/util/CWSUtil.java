@@ -18,24 +18,25 @@ import java.util.StringTokenizer;
 public class CWSUtil
 {
     /**
-     * Adds or subtracts the offset amount of time to the given calendar field
+     * Adds to or subtracts from date the offset amount of time, and see if the
+     * resulting time is in the past or the future.
      * @param date: reference point
      * @param offset: offset from reference point
      *                positive Number means addition, negative means subtraction.
      * @param offsetType:  Calendar.MONTH or Calendar.DAY_OF_MONTH
      * @return true if the resulting date is on or after the current time.
      */
-   public static boolean onOrAfterNow(Date date, int offset, int offsetType)
+   public static boolean isOnOrAfterNow(Date date, int offset, int offsetType)
     {
 	    Calendar cal = Calendar.getInstance();
 	    cal.setTime(date);
 
 	    if ((offsetType != Calendar.MONTH) && (offsetType != Calendar.DAY_OF_MONTH))
-            //@@@invalid offsetType, not sure this is the right way to handle it.
+            //invalid offsetType
 		    return false;
 
 		cal.add(offsetType, offset);
-	    return onOrAfterNow(cal);
+	    return isOnOrAfterNow(cal);
     }
 
     /**
@@ -43,7 +44,7 @@ public class CWSUtil
      * @param cal
      * @return true is the time represented by cal is on or after the current time.
      */
-    public static boolean onOrAfterNow(Calendar cal)
+    public static boolean isOnOrAfterNow(Calendar cal)
     {
   	    Calendar today = Calendar.getInstance();
         if (cal.equals(today))
@@ -56,12 +57,10 @@ public class CWSUtil
      * @param d1
      * @param d2
      * @return the number of days between the 2 date object.
-     *          positive number is d1 is later than d2, negative number otherwise.
+     *          positive if d1 is after d2, negative number otherwise.
      */
     public static int daysBetween(Date d1, Date d2)
     {
-	    //returns positive number if dueDate is in the future
-	    //returns negative number if dueDate is in the past.
 	    return (int)( (d1.getTime() - d2.getTime()) / (1000 * 60 * 60 * 24));
     }
 
@@ -93,14 +92,14 @@ public class CWSUtil
         return isWithinPeriod(start, end, now);
     }
 
+
     /**
-     * @@@This seems to be a duplicate of getDueDate.  Need to think!
      * @param startDate: reference point
      * @param offset: amount of time from reference point, positive or negative
      * @param offsetType, either Calendar.MONTH or Calendar.DAY_OF_MONTH
      * @return a new date by adding offset to startDate
      */
-   public static Date getEndDate(Date startDate, int offset, int offsetType)
+   public static Date getNewDate(Date startDate, int offset, int offsetType)
    {
       if ((offsetType != Calendar.MONTH) && (offsetType != Calendar.DAY_OF_MONTH))
           //invalid input
@@ -114,14 +113,15 @@ public class CWSUtil
 
     /**
      *
-     * @param date
-     * @return if date is the first date of the month, return date, else return the first day of next month
+     * @param date: reference point
+     * @return if date is the first date of the month, return date
+     * else return the first day of next month
      */
-   public static Date firstDayOfMonth(Date date)
+   public static Date getFirstDayOfMonth(Date date)
    {
        Calendar cal = Calendar.getInstance();
        cal.setTime(date);
-       if (cal.get(Calendar.DAY_OF_MONTH) > 1)
+       if (cal.get(Calendar.DAY_OF_MONTH) != 1)
        {
             cal.add(Calendar.MONTH, 1);
             cal.set(Calendar.DAY_OF_MONTH, 1);
@@ -134,8 +134,8 @@ public class CWSUtil
      *
      * @param dueDate
      * @return Number of day between today and dueDate.
-     * Positive # indicates dueDate is in the future
-     * Negative number indicate dueDate is in the past (overdue)
+     * Positive indicates dueDate is in the future
+     * Negative indicates dueDate is in the past (overdue)
      */
    public static int getRemainDays(Date dueDate)
    {
