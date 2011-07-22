@@ -9,6 +9,7 @@ import java.util.Date;
 import edu.osu.cws.util.CWSUtil;
 
 public class Job extends Pass implements Serializable {
+    public static final String TYPE_CLASSIFIED = "classified";
     private int id;
 
     private Employee employee;

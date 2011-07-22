@@ -4,6 +4,24 @@ import java.text.MessageFormat;
 import java.util.*;
 
 public class Appraisal extends Pass {
+    private static final String jobRequired =
+            "Please provide a valid job";
+
+    /**
+     * Validation error message for signature is public because the appraisal.jsp
+     * needs to access this static variable in order to do js validation
+     */
+    public static final String signatureRequired =
+            "Please click the box to acknowledge that you have read the appraisal";
+
+    public static final String TYPE_ANNUAL = "annual";
+    public static final String TYPE_INITIAL = "initial";
+
+    public static final String TYPE_TRIAL = "trial";
+
+    public static final String TYPE_SPECIAL = "special";
+
+
     private int id;
 
     /**
@@ -121,21 +139,6 @@ public class Appraisal extends Pass {
 
     private Set<Assessment> assessments = new HashSet<Assessment>();
 
-    private static final String jobRequired =
-            "Please provide a valid job";
-
-    /**
-     * Validation error message for signature is public because the appraisal.jsp
-     * needs to access this static variable in order to do js validation
-     */
-    public static final String signatureRequired =
-            "Please click the box to acknowledge that you have read the appraisal";
-
-    public static final String TYPE_ANNUAL = "annual";
-
-    public static final String TYPE_TRIAL = "trial";
-
-    public static final String TYPE_SPECIAL = "special";
 
     public Appraisal() { }
 

@@ -885,18 +885,21 @@ public class AppraisalMgr {
         this.admins = admins;
     }
 
-    /**
+    /** @todo: Not quite there yet
      * select id from appraisals where status is not completed or closed.
-     * @return an array of int containing the open appraisalID's.
+     * @return an array of int containing the appraisalID's of
+     * all the appraisal records whose status are not "completed", "closed"
+     * or "archived".
+     * It now assumes all appraisal records are classified appraisal records.
      */
-    public static int[] getActiveIDs()
+    public static int[] getOpenIDs()
     {
        int[] ids = new int[10];
        Session session = HibernateUtil.getCurrentSession();
        Transaction tx = session.beginTransaction();
         String query = "select id " +
                 "from edu.osu.cws.pass.models.Appraisal " +
-                "where status not in ('completed', 'closed', 'archive'')";
+                "where status not in ('completed', 'closed', 'archived')";
 
         List result =  session.createQuery(query).list();
         tx.commit();
@@ -907,7 +910,7 @@ public class AppraisalMgr {
     /**
      *
      * @param job
-     * @return
+     * @return  true is a trial appraisal exist for the job, false otherwise
      */
     public static boolean trialAppraisalExist(Job job)
     {
@@ -916,8 +919,7 @@ public class AppraisalMgr {
     }
 
     /**
-     *
-     *
+     * @todo:
      * @param job: job against which the appraisal was create
      * @param startDate: start date of appraisal period
      * @param type: "trial" or "annual".
@@ -933,10 +935,21 @@ public class AppraisalMgr {
      * @param job
      * @return: true is there is an trial appraisal not in the status of "closed", "completed" or closed. false otherwise.
      */
-    public static boolean OpenTrialAppraisalExists(Job job)
+    public static boolean openTrialAppraisalExists(Job job)
     {
         return true;
     }
 
+
+    /**
+     * @todo: update just the status of an appraisal
+     * Just update status and original status
+     *
+     * @param appraisal
+     */
+    public static void updateAppraisalStatus(Appraisal appraisal)
+    {
+
+    }
 }
 

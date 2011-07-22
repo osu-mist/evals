@@ -152,19 +152,16 @@ public class JobMgr {
     }
 
     /**
-     * This isn't quite there yet
+     * @todo: queries for all the not terminated jobs of a certain appointment type and returns them.
+     *
      * @param appointmentType: the type of appointment (classified, classifiedIT, ...)
-     * @return a list of jobs.
+     * @return a list of not terminated jobs of businessType.
      */
-    public static List<Job> list(String appointmentType)
+    public static List<Job> listNotTerminatedJobs(String appointmentType)
     {
         Session session = HibernateUtil.getCurrentSession();
-        //@@@Not sure this is correct.  Need to think and talk to Jose
-        String sql = "select PYVPASJ_PIDM, PYVPASJ_POSN, PYVPASJ_SUFF, PYVPASJ_BEGIN_DATE "
-                + "PYVPASJ_BCTR_TITLE, PYVPASJ_TRIAL_IND, PYVPASJ_EVAL_DATE "
-                + "FROM edu.osu.cws.pass.models.Job"
-                + "WHERE PYVPASJ_APPOINTMENT_TYPE = :appointmentType";
-        List<Job> results =  session.createCriteria(sql).list();
+
+        List<Job> results = new ArrayList();
         return results;
     }
 }
