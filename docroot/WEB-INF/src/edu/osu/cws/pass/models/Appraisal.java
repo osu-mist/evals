@@ -68,7 +68,6 @@ public class Appraisal extends Pass {
     }
 
     public Date getGoalsRequiredModificationDate() {
-
         return goalsRequiredModificationDate;
     }
 
@@ -175,7 +174,8 @@ public class Appraisal extends Pass {
      * @param status
      */
     public Appraisal(int id, String jobTitle, String lastName, String firstName, String appointmentType,
-                     Date startDate, Date endDate, String status) {
+                     Date startDate, Date endDate, String status, Date goalsRequiredModificationDate,
+                     Date employeeSignedDate) {
         Employee employee = new Employee();
         employee.setLastName(lastName);
         employee.setFirstName(firstName);
@@ -187,6 +187,8 @@ public class Appraisal extends Pass {
         this.job.setJobTitle(jobTitle);
         this.job.setAppointmentType(appointmentType);
         this.job.setEmployee(employee);
+        this.employeeSignedDate = employeeSignedDate;
+        this.goalsRequiredModificationDate = goalsRequiredModificationDate;
     }
 
     /**
@@ -635,4 +637,4 @@ public class Appraisal extends Pass {
     public void setOriginalStatus(String originalStatus) {
         this.originalStatus = originalStatus;
     }
-}
+    }

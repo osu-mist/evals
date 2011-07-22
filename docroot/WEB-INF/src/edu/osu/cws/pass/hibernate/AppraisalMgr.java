@@ -172,14 +172,14 @@ public class AppraisalMgr {
         Appraisal appraisal = new Appraisal();
         appraisal.setType(Appraisal.TYPE_ANNUAL);
         appraisal.setJob(trialAppraisal.getJob());
-        appraisal.setStartDate(trialAppraisal.getStartDate());
+        appraisal.setCreateDate(new Date());
         Date initialEvalStartDate = appraisal.getJob().getInitialEvalStartDate();
-        appraisal.setCreateDate(initialEvalStartDate);
+        appraisal.setStartDate(initialEvalStartDate);
         appraisal.setGoalsSubmitDate(trialAppraisal.getGoalsSubmitDate());
         appraisal.setGoalsApprover(trialAppraisal.getGoalsApprover());
         appraisal.setGoalApprovedDate(trialAppraisal.getGoalApprovedDate());
 
-        Date endDate = appraisal.getJob().getEndEvalDate(trialAppraisal.getStartDate(), Appraisal.TYPE_INITIAL);
+        Date endDate = appraisal.getJob().getEndEvalDate(appraisal.getStartDate(), Appraisal.TYPE_INITIAL);
         appraisal.setEndDate(endDate);
 
         int resultsDue = PassUtil.isDue(appraisal, resultsDueConfig);
@@ -194,11 +194,10 @@ public class AppraisalMgr {
         if (appraisal.validate()) {
             Session session = HibernateUtil.getCurrentSession();
             try {
-                Transaction tx = session.beginTransaction();
                 session.save(appraisal);
 
                 Assessment newAssessment;
-                for (Assessment origAssesment: appraisal.getAssessments()) {
+                for (Assessment origAssesment: trialAppraisal.getAssessments()) {
                     newAssessment = new Assessment();
                     newAssessment.setCriterionDetail(origAssesment.getCriterionDetail());
                     newAssessment.setNewGoals(origAssesment.getNewGoals());
@@ -209,8 +208,6 @@ public class AppraisalMgr {
                     newAssessment.setSupervisorResult(origAssesment.getSupervisorResult());
                     session.save(newAssessment);
                 }
-
-                tx.commit();
             } catch (Exception e){
                 session.close();
                 throw e;
@@ -310,10 +307,10 @@ public class AppraisalMgr {
 
             // save changes to db
             updateAppraisal(appraisal);
-            tx.commit();
 
             // Creates the first annual appraisal if needed
             createFirstAnnualAppraisal(appraisal, resultsDueConfig);
+            tx.commit();
 
             // If appraisalStep.getEmailType() is not null
                 // Send the email  //design in another module, not for the June demo.
@@ -465,6 +462,9 @@ public class AppraisalMgr {
                     employeeResponse != null && !employeeResponse.equals("")) {
                 appraisal.setStatus("rebuttalReadDue");
             }
+        }
+        if (appraisal.getStatus().equals("goalsRequiredModification")) {
+            appraisal.setGoalsRequiredModificationDate(new Date());
         }
     }
 
@@ -621,8 +621,9 @@ public class AppraisalMgr {
     }
 
     /**
-     * Returns a list of hashmap that includes the job title, employee name, status,
-     * start/end date and appointment type of the jobs' the employee supervises.
+     * Returns a list of appraisals with limited attributes set: id, job title, employee name,
+     * job appointment type, start date, end date, status, goalsRequiredModification and
+     * employeSignedDate.
      *
      * @param pidm      Supervisor's pidm.
      * @param onlyActive    Whether or not to include only the active appraisals
@@ -631,8 +632,9 @@ public class AppraisalMgr {
      */
     private List<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive, Session session) {
         Transaction tx = session.beginTransaction();
-        String query = "select new edu.osu.cws.pass.models.Appraisal(id, job.jobTitle, job.employee.lastName, job.employee.firstName, " +
-                "job.appointmentType, startDate, endDate, status) " +
+        String query = "select new edu.osu.cws.pass.models.Appraisal(id, job.jobTitle, job.employee.lastName, " +
+                "job.employee.firstName, job.appointmentType, startDate, endDate, status, " +
+                "goalsRequiredModificationDate, employeeSignedDate) " +
                 "from edu.osu.cws.pass.models.Appraisal where job.supervisor.employee.id = :pidm ";
 
         if (onlyActive) {
