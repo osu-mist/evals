@@ -42,28 +42,35 @@ public class AppraisalMgr {
      *
      * @param job   Job for this appraisal
      * @param type: trial, annual, initial
-     * @param configuration: configuration object of goalsDue or resultsDue
+     * @param goalsDueConfig: Configuration object of goalsDue or resultsDue
      * @param startDate: starting date of appraisal period.
      * @return appraisal.id
      * @throws Exception
      */
     public static Appraisal createAppraisal(Job job, Date startDate, String type,
-                                            Configuration configuration) throws Exception {
+                                            Configuration goalsDueConfig) throws Exception {
         CriteriaMgr criteriaMgr = new CriteriaMgr();
         Appraisal appraisal = new Appraisal();
         CriterionDetail detail;
         Assessment assessment;
 
-        if (!type.equals(Appraisal.TYPE_TRIAL) && !type.equals(Appraisal.TYPE_ANNUAL)) {
+        if (!type.equals(Appraisal.TYPE_TRIAL) && !type.equals(Appraisal.TYPE_ANNUAL) &&
+                !type.equals(Appraisal.TYPE_INITIAL)) {
             throw new ModelException("Invalid appraisal type : " + type);
         }
 
         appraisal.setJob(job);
         appraisal.setStartDate(startDate);
         appraisal.setCreateDate(new Date());
-        appraisal.setType(type);
 
-        createAppraisalStatus(startDate, configuration, appraisal);
+        // In the db, we only store: annual or trial.
+        String dbType = type;
+        if (type.equals(Appraisal.TYPE_INITIAL)) {
+            dbType = Appraisal.TYPE_ANNUAL;
+        }
+        appraisal.setType(dbType);
+
+        createAppraisalStatus(startDate, goalsDueConfig, appraisal);
 
         Date endDate = job.getEndEvalDate(startDate, type);
         appraisal.setEndDate(endDate);
@@ -101,18 +108,18 @@ public class AppraisalMgr {
      * status to appraisalDue, else if
      *
      * @param startDate
-     * @param configuration
+     * @param goalsDueConfig
      * @param appraisal
      * @throws Exception
      */
-    private static void createAppraisalStatus(Date startDate, Configuration configuration,
+    private static void createAppraisalStatus(Date startDate, Configuration goalsDueConfig,
                                               Appraisal appraisal) throws Exception {
         String Nov1st2011 = "11/01/2011";
         SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
         Date startPointDate = fmt.parse(Nov1st2011);
         if (startDate.before(startPointDate)) {
             appraisal.setStatus("appraisalDue");
-        } else if (PassUtil.isDue(appraisal, "goalsDue", configuration) < 0) {
+        } else if (PassUtil.isDue(appraisal, goalsDueConfig) < 0) {
             appraisal.setStatus("goalsOverdue");
         } else {
             appraisal.setStatus("goalsDue");
@@ -158,6 +165,7 @@ public class AppraisalMgr {
     public static Appraisal createInitialAppraisalAfterTrial(Appraisal trialAppraisal,
                                                              Configuration resultsDueConfig) throws Exception {
         Appraisal appraisal = new Appraisal();
+        appraisal.setType(Appraisal.TYPE_ANNUAL);
         appraisal.setJob(trialAppraisal.getJob());
         appraisal.setStartDate(trialAppraisal.getStartDate());
         Date initialEvalStartDate = appraisal.getJob().getInitialEvalStartDate();
@@ -169,7 +177,7 @@ public class AppraisalMgr {
         Date endDate = appraisal.getJob().getEndEvalDate(trialAppraisal.getStartDate(), Appraisal.TYPE_INITIAL);
         appraisal.setEndDate(endDate);
 
-        int resultsDue = PassUtil.isDue(appraisal, "resultsDue", resultsDueConfig);
+        int resultsDue = PassUtil.isDue(appraisal, resultsDueConfig);
         if (resultsDue == 0) {
             appraisal.setStatus("resultsDue");
         } else if (resultsDue < 0) {
@@ -330,8 +338,7 @@ public class AppraisalMgr {
         Job job = appraisal.getJob();
         String jobStatus = job.getStatus();
 
-        //@todo: instead use trialAppraisalExsits(Job)
-        boolean hasFirstAnnualAppraisal = AppraisalMgr.AnnualAppraisalExists(job, job.getInitialEvalStartDate());
+        boolean hasFirstAnnualAppraisal = AppraisalMgr.trialAppraisalExist(job);
 
         if (appraisal.getType().equals(Appraisal.TYPE_TRIAL) && allowedStatus && !jobStatus.equals("T")
                 && job.getAnnualInd() != 0 && hasFirstAnnualAppraisal) {
