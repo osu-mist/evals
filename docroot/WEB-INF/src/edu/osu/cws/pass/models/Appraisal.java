@@ -18,6 +18,7 @@ public class Appraisal extends Pass {
             "Appraisal type can only be: annual or trial. Please provide a valid type.";
 
     public static final String TYPE_ANNUAL = "annual";
+
     public static final String TYPE_INITIAL = "initial";
 
     public static final String TYPE_TRIAL = "trial";
