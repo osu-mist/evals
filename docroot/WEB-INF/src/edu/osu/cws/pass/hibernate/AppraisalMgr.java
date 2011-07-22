@@ -3,7 +3,6 @@ package edu.osu.cws.pass.hibernate;
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.pass.util.HibernateUtil;
 import edu.osu.cws.pass.util.PassUtil;
-import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -340,7 +339,7 @@ public class AppraisalMgr {
         Job job = appraisal.getJob();
         String jobStatus = job.getStatus();
 
-        boolean hasFirstAnnualAppraisal = AppraisalMgr.trialAppraisalExist(job);
+        boolean hasFirstAnnualAppraisal = AppraisalMgr.trialAppraisalExists(job);
 
         if (appraisal.getType().equals(Appraisal.TYPE_TRIAL) && allowedStatus && !jobStatus.equals("T")
                 && job.getAnnualInd() != 0 && hasFirstAnnualAppraisal) {
@@ -1041,7 +1040,7 @@ public class AppraisalMgr {
      * @param job
      * @return  true is a trial appraisal exist for the job, false otherwise
      */
-    public static boolean trialAppraisalExist(Job job)
+    public static boolean trialAppraisalExists(Job job)
     {
         Date startDate = job.getTrialStartDate();
         return appraisalExists(job, startDate,  Appraisal.TYPE_TRIAL);
