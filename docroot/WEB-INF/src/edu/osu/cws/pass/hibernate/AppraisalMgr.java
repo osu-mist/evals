@@ -342,7 +342,7 @@ public class AppraisalMgr {
         boolean hasFirstAnnualAppraisal = AppraisalMgr.trialAppraisalExists(job);
 
         if (appraisal.getType().equals(Appraisal.TYPE_TRIAL) && allowedStatus && !jobStatus.equals("T")
-                && job.getAnnualInd() != 0 && hasFirstAnnualAppraisal) {
+                && job.getAnnualInd() != 0 && !hasFirstAnnualAppraisal) {
             AppraisalMgr.createInitialAppraisalAfterTrial(appraisal, resultsDueConfig);
         }
     }
