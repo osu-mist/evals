@@ -195,3 +195,16 @@ tr.ui-state-highlight {
 table.configuration-list {
     width: 50%;
 }
+
+/* Appraisal Search */
+.accordion-content.pass-search form {
+    padding: 0.5em 0 0.5em 1em;
+    color: #000;
+}
+.accordion-content.pass-search label,
+.accordion-content.pass-search input {
+    margin-right: 1em;
+}
+#osu-cws .accordion-content.pass-search input[type="text"] {
+    min-width: 0;
+}
