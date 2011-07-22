@@ -75,11 +75,6 @@ public class AppraisalMgr {
 
         createAppraisalStatus(startDate, goalsDueConfig, appraisal);
 
-        createAppraisalStatus(startDate, configuration, appraisal);
-
-        Date endDate = job.getEndEvalDate(startDate, type);
-        appraisal.setEndDate(endDate);
-
         if (appraisal.validate()) {
             String appointmentType = job.getAppointmentType();
             List<CriterionArea> criteriaList = criteriaMgr.list(appointmentType);
