@@ -8,6 +8,9 @@ package edu.osu.cws.pass.util;
  */
 import java.lang.reflect.Method;
 import javax.mail.*;
+import java.util.List;
+
+import edu.osu.cws.pass.hibernate.EmailMgr;
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.util.*;
 import java.util.Date;
@@ -33,12 +36,27 @@ public class Mailer {
     }
 
 
-/* send an email
+/* @todo: method documentation
+ * @todo: if job is on leave (L), or terminated (T), don't send email. Have put in the code, but need to talk to Ken
+ * @todo: logging activities.
+ * @todo: insert email records into database table emails.
+ * send an email
  * @param appraisal - an Appraisal object
  * @param emailType - an EmailType
  *
  */
+
+    /**
+     *
+     * @param appraisal
+     * @param emailType
+     * @throws Exception
+     */
     public void sendMail(Appraisal appraisal, EmailType emailType) throws Exception {
+        //Don't send email if job is not active.
+        if (!(appraisal.getJob().getStatus().equals("A")))
+            //The job is currently not active, don't send email
+            return;
 
         Message msg = email.getMessage();
         String mailTo = emailType.getMailTo();
@@ -69,9 +87,14 @@ public class Mailer {
 
         msg.setSubject(subject);
         Transport.send(msg);
+
+        //@todo: update emails table, logging. Will talk with Ken on this Monday.
+        Email email = new Email(appraisal.getId(), emailType.getType());
+        EmailMgr.add(email);
    }
 
-/* get the recipients of a particular email
+/* @todo: It makes better sense to move the conversion to the mail class.
+ *get the recipients of a particular email
  * @param appraisal - an Appraisal object
  * @param emailType - an EmailType
  * @return array of recipient addresses
@@ -127,12 +150,15 @@ public class Mailer {
         return statusMsg;
     }
 
-    /* Send batched email to a supervisor
+    /* @todo: Some changes in the design... Talk to Ken about it Monday
+     * @todo: take subject out of signature and put into resource bundle.
+     * Send batched email to a supervisor
      * @param String subject - the subject line
      * @param String emailAddress - addresses of supervisor to send to
      * @param String middleContent - the status - specific content of the message to send
      */
-    public void sendSupervisorMail(String subject, String emailAddress, String middleBody) throws Exception {
+    public void sendSupervisorMail(String subject, String emailAddress,
+                                   String middleBody, List<Email> emailList) throws Exception {
         String bodyString = emailBundle.getString("email_supervisor");
         String body = MessageFormat.format(bodyString, middleBody);
         Message msg = email.getMessage();
@@ -143,12 +169,15 @@ public class Mailer {
         msg.setSubject(subject);
 
         Transport.send(msg);
+        EmailMgr.add(emailList);
+        //@todo: Log every all the emails in the emails list.
     }
     
     /* Send mail to all the reviewers
      * @param String subject - the subject line
      * @param String[] emailAddresses - string array of addresses to send to
      * @param String middleContent - the status - specific content of the message to send
+     * @todo: take subject out of signature and put into resource bundle.
      */
     public void sendReviewerMail(String subject, String[] emailAddresses, String middleBody) throws Exception {
         String bodyString = emailBundle.getString("email_reviewers");
@@ -336,7 +365,8 @@ public class Mailer {
         return MessageFormat.format(bodyString, appraisal.getReviewPeriod());
     }
 
-/* Fetch the body for closed emailType
+/*
+ * Fetch the body for closed emailType
  * @param appraisal - an Appraisal object
  * @return emailType specific email content
  */
@@ -361,8 +391,7 @@ public class Mailer {
  * @return job title
  */
     private String getJobTitle(Appraisal appraisal) {
-        String jobTitle = appraisal.getJob().getJobTitle();
-        return jobTitle;
+        return (appraisal.getJob().getJobTitle());
     }
 
 /* Fetch the full name of the employee for a particular appraisal
@@ -375,7 +404,8 @@ public class Mailer {
         return employee.getConventionName();
     }
 
-/* Fetch the days remaining to respond to a particular action
+/* @todo: This method is in CWSUtil class.  Also, the return type should not be Integer.
+ * Fetch the days remaining to respond to a particular action
  * @param appraisal - an Appraisal object
  * @return number of days
  */

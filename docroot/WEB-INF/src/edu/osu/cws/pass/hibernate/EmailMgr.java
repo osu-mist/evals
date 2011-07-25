@@ -12,6 +12,8 @@ import edu.osu.cws.pass.models.Email;
 import org.hibernate.Transaction;
 import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
+import java.util.List;
+
 
 public class EmailMgr {
 
@@ -76,7 +78,7 @@ public class EmailMgr {
      * @param emails
      * @return: Number of records inserted.
      */
-    public static int add(Email[] emails)
+    public static int add(List<Email> emails)
     {
         return 1;
     }
