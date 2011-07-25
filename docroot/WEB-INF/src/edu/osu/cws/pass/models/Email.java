@@ -19,7 +19,7 @@ public class Email extends Pass
 
     public Email(int appraisalID, String emailType) {
         this.emailType = emailType;
-        this.appraisalId = appraisalId;
+        this.appraisalId = appraisalID;
         sentDate = new Date();
     }
 

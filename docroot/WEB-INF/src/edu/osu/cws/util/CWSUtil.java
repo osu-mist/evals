@@ -8,9 +8,11 @@ package edu.osu.cws.util;
  * To change this template use File | Settings | File Templates.
  */
 
+import java.net.InetAddress;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.StringTokenizer;
+import java.net.*;
 
 /**
  *
@@ -18,13 +20,13 @@ import java.util.StringTokenizer;
 public class CWSUtil
 {
     /**
-     * Adds to or subtracts from date the offset amount of time, and see if the
+     * Adds to or subtracts from date the offset amount of time, and return if the
      * resulting time is in the past or the future.
      * @param date: reference point
      * @param offset: offset from reference point
      *                positive Number means addition, negative means subtraction.
      * @param offsetType:  Calendar.MONTH or Calendar.DAY_OF_MONTH
-     * @return true if the resulting date is on or after the current time.
+     * @return true if the resulting date is on or after the current time, false otherwise.
      */
    public static boolean isOnOrAfterNow(Date date, int offset, int offsetType)
     {
@@ -36,7 +38,10 @@ public class CWSUtil
 		    return false;
 
 		cal.add(offsetType, offset);
-	    return isOnOrAfterNow(cal);
+        Calendar today = Calendar.getInstance();
+        if (cal.equals(today))
+            return true;
+        return (cal.after(today));
     }
 
     /**
@@ -61,7 +66,7 @@ public class CWSUtil
      */
     public static int daysBetween(Date d1, Date d2)
     {
-	    return (int)( (d1.getTime() - d2.getTime()) / (1000 * 60 * 60 * 24));
+	    return (int) ((d1.getTime() - d2.getTime()) / (1000 * 60 * 60 * 24));
     }
 
     /**
@@ -114,7 +119,7 @@ public class CWSUtil
     /**
      *
      * @param date: reference point
-     * @return if date is the first date of the month, return date
+     * @return if date is the first date of the month, return the input date
      * else return the first day of next month
      */
    public static Date getFirstDayOfMonth(Date date)
@@ -139,8 +144,7 @@ public class CWSUtil
      */
    public static int getRemainDays(Date dueDate)
    {
-	    Date now = new Date();
-	    return CWSUtil.daysBetween(now, dueDate);
+	    return CWSUtil.daysBetween(dueDate, new Date());
    }
 
 
@@ -174,4 +178,22 @@ public class CWSUtil
     {
         return  stringToArray(str, " ");
     }
+
+    /**
+     *
+     * @return the name of the local host.
+     */
+    public static String getLocalHostname()
+    {
+      try
+      {
+        InetAddress address = InetAddress.getLocalHost();
+        return address.getHostName();
+      } catch(UnknownHostException e)
+      {
+        return null;
+      }
+    }
+
+
 }

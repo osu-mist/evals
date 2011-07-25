@@ -912,7 +912,7 @@ public class AppraisalMgr {
      * @param job
      * @return  true is a trial appraisal exist for the job, false otherwise
      */
-    public static boolean trialAppraisalExist(Job job)
+    public static boolean trialAppraisalExists(Job job)
     {
         Date startDate = job.getTrialStartDate();
         return appraisalExists(job, startDate,  Appraisal.TYPE_TRIAL);

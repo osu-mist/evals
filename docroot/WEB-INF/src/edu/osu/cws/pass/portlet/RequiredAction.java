@@ -49,10 +49,10 @@ public class RequiredAction {
                               Configuration configuration) throws ModelException {
 
         String pattern = resource.getString(key);
-        PassUtil passUtil = new PassUtil();
+        //PassUtil passUtil = new PassUtil();
 
-        Date dueDate = passUtil.getDueDate(appraisal, configuration);
-        Date goalsDueOnDate = passUtil.getDueDate(appraisal, configuration);
+        Date dueDate = PassUtil.getDueDate(appraisal, configuration);
+        Date goalsDueOnDate = PassUtil.getDueDate(appraisal, configuration);   //@todo?
         String goalsDueOn = PassUtil.formatDate(goalsDueOnDate);
 
         String name = "";

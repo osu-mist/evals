@@ -22,8 +22,8 @@ public class Logger {
     public static final String INFORMATIONAL = "6";
     public static final String DEBUG = "7";
 
-    private String logHost;
-    private String host;
+    private String logHost;  //the logging server
+    private String host;     //client requestin logging. @todo: change to clientHost
 
     public Logger(String logHost, String host) {
         this.logHost = logHost;
@@ -50,5 +50,31 @@ public class Logger {
             message.addField(key, fields.get(key));
         }
         log(message);
+    }
+
+    /**
+     * @todo: Stub
+     * @param level
+     * @param shortMessage
+     * @param exception
+     * @param fields
+     * @throws Exception
+     */
+    public void log(String level, String shortMessage, Exception exception,
+                    Map<String,String> fields)  throws Exception
+    {
+
+    }
+
+    /**
+     * * @todo: Stub
+     * @param level
+     * @param shortMessage
+     * @param exception
+     * @throws Exception
+     */
+    public void log(String level, String shortMessage, Exception exception)  throws Exception
+    {
+
     }
 }

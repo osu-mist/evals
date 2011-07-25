@@ -27,12 +27,16 @@ public class PassUtil {
     /**
      *
      * @param appraisal
-     * @param config
+     * @param config: a appropriate configuration object. It's the caller's responsibility to pass in
+     * the correct configuration.  For example, if you want to figure out if goals are due, the
+     * name of the config should be "goalsDue".
      * @return a Date object presenting the date a certain status is due.
-     * @throws ModelException
      */
-    public static Date getDueDate(Appraisal appraisal, Configuration config) throws ModelException
+    public static Date getDueDate(Appraisal appraisal, Configuration config)
     {
+        if (config == null)  //Should not need to do this.
+            return null;
+
         int offset = config.getIntValue();
         if (config.getAction().equals("subtract"))
             offset = offset * (-1);
@@ -47,9 +51,14 @@ public class PassUtil {
             refDate = appraisal.getGoalsRequiredModificationDate();
         else if (ref.equals("employee_signed_date"))
             refDate = appraisal.getEmployeeSignedDate();
+        else if (ref.equals("firstEmailSentDate"))
+            refDate = EmailMgr.getFirstEmail(appraisal.getId(), "jobTerminated").getSentDate();
+
+        if (refDate == null) //error
+            return null;
 
         dueDay.setTime(refDate);
-        dueDay.add(Calendar.DAY_OF_MONTH, offset);
+        dueDay.add(Calendar.DAY_OF_MONTH, offset);  //Assumes the offset type is Calendar.DAY_OF_MONTH
         return dueDay.getTime();
     }
 
@@ -59,11 +68,13 @@ public class PassUtil {
      * For example, if status is "goals-due", then calculate the due day for goals,
      * compare to the current day to see if it's due or pass due.
      * @@@Need to rethink this.  Maybe move to the PASSUtil class
-     * @param appraisal
-     * @return <0 < overdue, 0 due, >0 not due
-     * @throws Exception
+     * @param appraisal: the appraisal record of interest
+     * @param config a appropriate configuration object. It's the caller's responsibility to pass in
+     * the correct configuration.  For example, if you want to figure out if goals are due, the
+     * name of the config should be "goalsDue".
+     * @return <0 < overdue, 0 due, >0 due day in the future, or not due yet.
      */
-    public static int isDue(Appraisal appraisal, Configuration config) throws Exception
+    public static int isDue(Appraisal appraisal, Configuration config)
     {
         Date dueDate = getDueDate(appraisal, config);
         return (CWSUtil.daysBetween(dueDate, new Date()));  //@@@Need to check direction
@@ -72,12 +83,14 @@ public class PassUtil {
     /**
       * Figures out if additional reminder email needs to be sent.
       * @param lastEmail
-      * @param conf
+      * @param config a appropriate configuration object. It's the caller's responsibility to pass in
+      * the correct configuration.  For example, if you want to figure out if goals are due, the
+      * name of the config should be "goalsDue".
       * @return  true if need to send another email, false otherwise.
       */
-     public static boolean anotherEmail(Email lastEmail, Configuration conf)
+     public static boolean anotherEmail(Email lastEmail, Configuration config)
      {
-         int frequency = conf.getIntValue();
+         int frequency = config.getIntValue();
          int daysPassed = CWSUtil.daysBetween(new Date(), lastEmail.getSentDate());
          return (daysPassed > frequency);
      }
