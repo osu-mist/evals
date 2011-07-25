@@ -276,8 +276,27 @@ public class ReviewerMgr {
         tx.commit();
     }
 
-    public static List<Reviewer> getReviewers(String bcName)
-    {
-        return new ArrayList<Reviewer>();
+    /**
+     * Returns a list of Reviewer objects associated to the given business center
+     *
+     * @param bcName
+     * @return
+     * @throws Exception
+     */
+    public static List<Reviewer> getReviewers(String bcName) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        List<Reviewer> results = new ArrayList<Reviewer>();
+        try {
+            Transaction tx = session.beginTransaction();
+            String query = "from edu.osu.cws.pass.models.Reviewer where businessCenterName = :bcName";
+            results = (List<Reviewer>) session.createQuery(query)
+                    .setString("bcName", bcName)
+                    .list();
+            tx.commit();
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+        return results;
     }
 }

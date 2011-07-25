@@ -524,6 +524,52 @@ public class AppraisalsTest {
     @Test(groups={"pending"})
     public void shouldOnlyCreateAnnualAppraisalIfAndOnlyIfAnnualIndIsSet() {}
 
+    @Test(groups={"pending"})
+    public void shouldCorrectlyCountReviewsDueBydBC() throws Exception {
+        assert AppraisalMgr.getReviewDueCount("AABC") == 0;
+        assert AppraisalMgr.getReviewDueCount("UABC") != 0;    }
 
-    //@todo: does the start dat
+    @Test(groups={"pending"})
+    public void shouldCorrectlyCountReviewsOverueBydBC() throws Exception {
+        assert AppraisalMgr.getReviewOvedDueCount("AABC") == 0;
+        assert AppraisalMgr.getReviewOvedDueCount("UABC") != 0;
+    }
+
+    @Test(groups={"pending"})
+    public void shouldDetectIfAJobHasTrialAppraisal() throws Exception {
+        //@todo: test trialAppraisalExists
+    }
+
+    @Test(groups={"pending"})
+    public void shouldDetectIfAJobHasAppraisalWithMatchingStartDateAndType() throws Exception {
+        //@todo: test appraisalExists
+    }
+
+    @Test(groups={"pending"})
+    public void shouldDetectIfAJobHasAnOpenTrialAppraisal() throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+        Employee employee = (Employee) session.load(Employee.class, "12345");
+        Job job = (Job) employee.getJobs().toArray()[0];
+        tx.commit();
+        assert AppraisalMgr.appraisalExists(job, new Date(), "annual");
+        //@todo: test openTrialAppraisalExists
+    }
+
+    @Test(groups={"pending"})
+    public void shouldReturnArrayOfOpenIDs() throws Exception {
+        assert AppraisalMgr.getOpenIDs().length != 0;
+        //@todo: test openIDs
+    }
+
+    @Test(groups={"pending"})
+    public void shouldUpdateAppraisalStatusAndOriginalStatus() throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+        Appraisal appraisal = (Appraisal) session.load(Appraisal.class, 1);
+        tx.commit();
+        appraisal.setStatus("closed");
+        appraisal.setOriginalStatus("goalsDue");
+        AppraisalMgr.updateAppraisalStatus(appraisal);
+    }
 }

@@ -56,31 +56,45 @@ public class EmailMgr {
 
 
     /**
-     * todo: Insert the email object into the emails table
+     * Saves the email pojo to the db.
+     *
      * @param email
      * @return
      * @throws Exception
      */
-    public static int add(Email email)  throws Exception
-    {
+    public static void add(Email email)  throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        //@@@Do I really need a transaction?
-        email.validate();
-        session.save(email);
-        tx.commit();
-        return 1; //@@@ Need to look at this
+        try {
+            Transaction tx = session.beginTransaction();
+            email.validate();
+            session.save(email);
+            tx.commit();
+        } catch (Exception e){
+            session.close();
+            throw e;
+        }
     }
 
     /**
-     * @todo: Inserts all the email objects passed in to the emails table.
-     * All in one transaction
+     * Iterates over the emails in the array and saves them to the db all
+     * in one transaction.
+     *
      * @param emails
-     * @return: Number of records inserted.
+     * @throws Exception
      */
-    public static int add(List<Email> emails)
-    {
-        return 1;
+    public static void add(Email[] emails) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        try {
+            Transaction tx = session.beginTransaction();
+            for (Email email : emails) {
+                email.validate();
+                session.save(email);
+            }
+            tx.commit();
+        } catch (Exception e){
+            session.close();
+            throw e;
+        }
     }
 
 }

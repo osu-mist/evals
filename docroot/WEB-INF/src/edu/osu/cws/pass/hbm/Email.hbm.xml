@@ -3,24 +3,17 @@
 
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
-    <class name="edu.osu.cws.pass.models.Email" table="Email"
+    <class name="edu.osu.cws.pass.models.Email" table="emails"
            dynamic-insert="true"
            dynamic-update="true">
         <id name="id" type="int" column="ID">
             <generator class="native" />
         </id>
 
-        <property name="appaisalId" type="text" column="APPRAISAL_ID"/>
-        <property name="emailType" type="text" column="EMAIL_TYPE"/>
-        <property name="" type="text" column="EMPLOYEE_RESULT"/>
-        <property name="sentDate" type="timestamp" column="SENT_DATE"/>
+        <property name="appraisalId" type="int" column="APPRAISAL_ID"/>
+        <property name="emailType" column="EMAIL_TYPE"/>
+        <property name="sentDate" type="timestamp" column="SENT_TImE"/>
 
-        <many-to-one name="appraisal" class="edu.osu.cws.pass.models.Appraisal"
-                     column="APPRAISAL_ID"
-                     not-null="true"/>
-        <many-to-one name="emailType" class="edu.osu.cws.pass.models.EmailType"
-                     column="CRITERION_DETAIL_ID"
-                     not-null="true"/>
     </class>
 
 </hibernate-mapping>

@@ -157,11 +157,22 @@ public class JobMgr {
      * @param appointmentType: the type of appointment (classified, classifiedIT, ...)
      * @return a list of not terminated jobs of businessType.
      */
-    public static List<Job> listNotTerminatedJobs(String appointmentType)
-    {
+    public static List<Job> listNotTerminatedJobs(String appointmentType) throws Exception {
+        List<Job> jobs = new ArrayList<Job>();
         Session session = HibernateUtil.getCurrentSession();
 
-        List<Job> results = new ArrayList();
-        return results;
+        try {
+            Transaction tx = session.beginTransaction();
+            List<Job> result = session.createQuery("from edu.osu.cws.pass.models.Job job " +
+                "where job.status != 'T' and job.appointmentType = :appointmentType")
+            .setString("appointmentType", appointmentType)
+            .list();
+            tx.commit();
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+        return jobs;
+
     }
 }

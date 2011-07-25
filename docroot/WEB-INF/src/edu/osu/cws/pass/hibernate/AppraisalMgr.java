@@ -978,18 +978,46 @@ public class AppraisalMgr {
      * @param bcName: name of the business center
      * @return  the number of appraisals that are due for review for a business center.
      */
-    public static int getReviewDueCount(String bcName)
-    {
-      return 1;
+    public static int getReviewDueCount(String bcName) throws Exception {
+        return getReviewCountByStatus(bcName, "reviewDue");
+    }
+
+    /**
+     * Returns the count of reviews due for a specific business center based on the status.
+     *
+     * @param bcName
+     * @param status
+     * @return
+     * @throws Exception
+     */
+    private static int getReviewCountByStatus(String bcName, String status) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        int count = 0;
+        try {
+            Transaction tx = session.beginTransaction();
+            String query = "select count(*) "+
+                    "from edu.osu.cws.pass.models.Appraisal where job.businessCenterName = :bc " +
+                    "and status in (:status) and job.endDate is NULL";
+
+            Object countObj = session.createQuery(query)
+                    .setString("bc", bcName)
+                    .setString("status", status)
+                    .list().get(0);
+            count =   Integer.parseInt(countObj.toString());
+            tx.commit();
+        } catch (Exception e){
+            session.close();
+            throw e;
+        }
+        return count;
     }
 
     /**
      * @param bcName: name of the business center
      * @return  the number of appraisals that are overdue for review for a business center.
      */
-    public static int getReviewOvedDueCount(String bcName)
-    {
-        return 1;
+    public static int getReviewOvedDueCount(String bcName) throws Exception {
+        return getReviewCountByStatus(bcName, "reviewOverdue");
     }
 
     public void setLoggedInUser(Employee loggedInUser) {
@@ -1008,24 +1036,33 @@ public class AppraisalMgr {
         this.admins = admins;
     }
 
-    /** @todo: Not quite there yet
+    /**
      * select id from appraisals where status is not completed or closed.
      * @return an array of int containing the appraisalID's of
      * all the appraisal records whose status are not "completed", "closed"
      * or "archived".
      * It now assumes all appraisal records are classified appraisal records.
+     * @throws Exception
      */
-    public static int[] getOpenIDs()
-    {
-       int[] ids = new int[10];
-       Session session = HibernateUtil.getCurrentSession();
-       Transaction tx = session.beginTransaction();
-        String query = "select id " +
-                "from edu.osu.cws.pass.models.Appraisal " +
-                "where status not in ('completed', 'closed', 'archived')";
+    public static int[] getOpenIDs() throws Exception {
+        int[] ids;
+        List result;
+        Session session = HibernateUtil.getCurrentSession();
+        try {
+            Transaction tx = session.beginTransaction();
+            String query = "select appraisal.id from edu.osu.cws.pass.models.Appraisal appraisal " +
+                    "where status not in ('completed', 'closed', 'archived')";
 
-        List result =  session.createQuery(query).list();
-        tx.commit();
+            result =  session.createQuery(query).list();
+            ids = new int[result.size()];
+            for (int i = 0; i < result.size(); i++) {
+                ids[i] = (Integer) result.get(i);
+            }
+            tx.commit();
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
 
         return ids;
     }
@@ -1042,7 +1079,6 @@ public class AppraisalMgr {
     }
 
     /**
-     * @todo:
      * @param job: job against which the appraisal was create
      * @param startDate: start date of appraisal period
      * @param type: "trial" or "annual".
@@ -1050,29 +1086,52 @@ public class AppraisalMgr {
      */
     public static boolean appraisalExists(Job job, Date startDate, String type)
     {
-        return true;
+        for (Appraisal appraisal : (Set<Appraisal>) job.getAppraisals()) {
+            if (appraisal.getType().equals(type) &&
+                    appraisal.getStartDate().equals(startDate)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
-     * todo
      * @param job
-     * @return: true is there is an trial appraisal not in the status of "closed", "completed" or closed. false otherwise.
+     * @return true if there is a trial appraisal not in the status of "closed", "completed"
+     *          or "archived". false otherwise.
      */
     public static boolean openTrialAppraisalExists(Job job)
     {
-        return true;
+        for (Appraisal appraisal : (Set<Appraisal>) job.getAppraisals()) {
+            if (appraisal.getType().equals(Appraisal.TYPE_TRIAL) &&
+                    (!appraisal.getStatus().equals("closed") || !appraisal.getStatus().equals("completed")
+                            || !appraisal.getStatus().equals("completed"))) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
     /**
-     * @todo: update just the status of an appraisal
-     * Just update status and original status
+     * Updates the appraisal status and originalStatus using the id of the appraisal and hsql query.
      *
      * @param appraisal
      */
-    public static void updateAppraisalStatus(Appraisal appraisal)
-    {
-
+    public static void updateAppraisalStatus(Appraisal appraisal) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        try {
+            Transaction tx = session.beginTransaction();
+            String query = "update edu.osu.cws.pass.models.Appraisal appraisal set status = :status, " +
+                    "originalStatus = :origStatus where id = :id";
+            session.createQuery(query).setString("status", appraisal.getStatus())
+                    .setString("origStatus", appraisal.getOriginalStatus())
+                    .setInteger("id", appraisal.getId())
+                    .executeUpdate();
+            tx.commit();
+        } catch (Exception e){
+            session.close();
+            throw e;
+        }
     }
 }
-

@@ -79,4 +79,10 @@ public class JobsTest {
         }
         assert results.size() > 0 : "The list of employees should not be empty";
     }
+
+
+    @Test(groups={"pending"})
+    public void shouldOnlyListJobsNotTerminatedByAppointmentType() throws Exception {
+
+    }
 }

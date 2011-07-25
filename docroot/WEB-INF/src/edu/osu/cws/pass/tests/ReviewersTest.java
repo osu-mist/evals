@@ -10,6 +10,7 @@ import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @Test
 public class ReviewersTest {
@@ -78,6 +79,20 @@ public class ReviewersTest {
         reviewerMgr.add("cedenoj", "UABC");
         ArrayList<Reviewer> newReviewerList = (ArrayList<Reviewer>) reviewerMgr.list();
         assert oldReviewersList.size() == newReviewerList.size() - 1;
+    }
+
+    public void shouldListReviewersByBC() throws Exception {
+        List<Reviewer> results = ReviewerMgr.getReviewers("UABC");
+
+        assert results.size() == 1 : "Invalid count of reviewers in UABC";
+        assert results.get(0).getEmployee().getId() == 787812 : "Invalid employee in reviewers list";
+
+        results = ReviewerMgr.getReviewers("AABC");
+
+        assert results.size() == 2 : "Invalid count of reviewers in AABC";
+        assert results.get(0).getEmployee().getId() == 8712359 : "Invalid employee in reviewers list";
+        assert results.get(1).getEmployee().getId() == 990871 : "Invalid employee in reviewers list";
+
     }
 
 }

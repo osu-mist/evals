@@ -37,6 +37,15 @@
             <column name="PYVPASJ_SUPERVISOR_POSN"/>
             <column name="PYVPASJ_SUPERVISOR_SUFF"/>
         </many-to-one>
+
+        <set name="appraisals" inverse="true">
+            <key>
+                <column name="PYVPASJ_PIDM"/>
+                <column name="PYVPASJ_POSN"/>
+                <column name="PYVPASJ_SUFF"/>
+            </key>
+            <one-to-many class="edu.osu.cws.pass.models.Appraisal"/>
+        </set>
     </class>
 
 </hibernate-mapping>

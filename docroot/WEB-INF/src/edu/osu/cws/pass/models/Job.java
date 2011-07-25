@@ -6,6 +6,9 @@ package edu.osu.cws.pass.models;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
 import edu.osu.cws.util.CWSUtil;
 
 public class Job extends Pass implements Serializable {
@@ -55,6 +58,8 @@ public class Job extends Pass implements Serializable {
     private int annualInd;
 
     private Date evalDate;
+
+    private Set appraisals = new HashSet();
 
     /**
      * This property holds the job of the current supervisor. If
@@ -315,6 +320,13 @@ public class Job extends Pass implements Serializable {
         this.evalDate = evalDate;
     }
 
+    public Set getAppraisals() {
+        return appraisals;
+    }
+
+    public void setAppraisals(Set appraisals) {
+        this.appraisals = appraisals;
+    }
 
     /**
      * Trial start date doed not need to be the first date of the month.
