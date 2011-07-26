@@ -10,7 +10,9 @@ import org.hibernate.Transaction;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Test
 public class EmailsTest {
@@ -40,16 +42,16 @@ public class EmailsTest {
 
     public void shouldAddAnArrayOfEmails()  throws Exception{
         //@todo: test add;
-        Email[] emails = new Email[2];
+        List<Email> emails = new ArrayList<Email>();
         Email email = new Email();
         email.setAppraisalId(1);
         email.setEmailType("goals-submitted");
         email.setSentDate(new Date());
-        emails[0] = email;
+        emails.add(email);
 
         email.setAppraisalId(2);
         email.setEmailType("goals-required-modification");
-        emails[1] = email;
+        emails.add(email);
 
         EmailMgr.add(emails);
     }

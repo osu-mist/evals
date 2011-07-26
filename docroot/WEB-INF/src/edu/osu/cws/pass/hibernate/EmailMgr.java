@@ -76,13 +76,13 @@ public class EmailMgr {
     }
 
     /**
-     * Iterates over the emails in the array and saves them to the db all
+     * Iterates over the emails in the list and saves them to the db all
      * in one transaction.
      *
      * @param emails
      * @throws Exception
      */
-    public static void add(Email[] emails) throws Exception {
+    public static void add(List<Email> emails) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         try {
             Transaction tx = session.beginTransaction();
