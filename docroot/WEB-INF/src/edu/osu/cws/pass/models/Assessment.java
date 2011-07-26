@@ -29,7 +29,7 @@ public class Assessment extends Pass implements Comparable<Assessment> {
 
     /**
      * This method returns the last GoalLog for either a regular
-     * goal entered during the goals due/past due period or the goals
+     * goal entered during the goals due/overdue period or the goals
      * that are appended afterwards: "new".
      *
      * @param type Either GoalLog.DEFAULT_GOAL_TYPE or GoalLog.NEW_GOAL_TYPE

@@ -52,7 +52,9 @@ public class RequiredAction {
         //PassUtil passUtil = new PassUtil();
 
         Date dueDate = PassUtil.getDueDate(appraisal, configuration);
+        //@todo: the goalsDueOnDate can be removed
         Date goalsDueOnDate = PassUtil.getDueDate(appraisal, configuration);   //@todo?
+        //@todo: goalsDueOn needs to be renamed to dueDate
         String goalsDueOn = PassUtil.formatDate(goalsDueOnDate);
 
         String name = "";
