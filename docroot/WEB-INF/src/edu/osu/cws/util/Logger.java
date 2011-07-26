@@ -23,16 +23,16 @@ public class Logger {
     public static final String DEBUG = "7";
 
     private String logHost;  //the logging server
-    private String host;     //client requestin logging. @todo: change to clientHost
+    private String clientHost;     //client requesting logging.
 
-    public Logger(String logHost, String host) {
+    public Logger(String logHost, String clientHost) {
         this.logHost = logHost;
-        this.host = host;
+        this.clientHost = clientHost;
     }
 
     public void log(GelfMessage message) throws Exception {
         GelfSender gelfSender = new GelfSender(logHost);
-        message.setHost(host);
+        message.setHost(clientHost);
         if (message.isValid()) {
             gelfSender.sendMessage(message);
         }
@@ -53,7 +53,7 @@ public class Logger {
     }
 
     /**
-     * @todo: Stub
+     * create a log message for an exception with custom fields
      * @param level
      * @param shortMessage
      * @param exception
@@ -61,20 +61,28 @@ public class Logger {
      * @throws Exception
      */
     public void log(String level, String shortMessage, Exception exception,
-                    Map<String,String> fields)  throws Exception
-    {
+                    Map<String,String> fields)  throws Exception {
+        String longMessage = exception.getMessage();
+        GelfMessage message = new GelfMessage(shortMessage, longMessage, new Date(), level);
+
+        Set<String> keys = fields.keySet();
+        for (String key : keys) {
+            message.addField(key, fields.get(key));
+        }
+        log(message);
 
     }
 
     /**
-     * * @todo: Stub
+     * create a log message for an exception with no additional fields
      * @param level
      * @param shortMessage
      * @param exception
      * @throws Exception
      */
-    public void log(String level, String shortMessage, Exception exception)  throws Exception
-    {
-
+    public void log(String level, String shortMessage, Exception exception)  throws Exception {
+        String longMessage = exception.getMessage();
+        GelfMessage message = new GelfMessage(shortMessage, longMessage, new Date(), level);
+        log(message);
     }
 }
