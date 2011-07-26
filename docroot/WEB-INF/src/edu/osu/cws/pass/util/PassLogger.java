@@ -42,12 +42,11 @@ public class PassLogger {
         logger.log(level, shortMessage, longMessage, fields);
     }
 
-    //@todo: infinite recursive calling.
     public void log(String level, String shortMessage, Exception exception,
                     Map<String,String> myFields)  throws Exception
     {
         fields.putAll(myFields);
-        log(level, shortMessage, exception, fields);
+        logger.log(level, shortMessage, exception, fields);
     }
 
     public void log(String level, String shortMessage, Exception exception)  throws Exception
