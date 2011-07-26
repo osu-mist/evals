@@ -347,7 +347,7 @@ public class Mailer {
      * @return
      * @throws Exception
      */
-    //@todo: get correct body
+    //@todo: get final body
     private String reviewDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_reviewDue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
@@ -360,7 +360,7 @@ public class Mailer {
      * @return
      * @throws Exception
      */
-    //@todo: get correct body
+    //@todo: get final body
     private String reviewOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_reviewOverdue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
@@ -417,11 +417,10 @@ public class Mailer {
      * @return
      * @throws Exception
      */
-    //@todo: get correct body
+    //@todo: get final body
     private String rebuttalReadBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_rebuttalRead_body");
-        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod());
+        return MessageFormat.format(bodyString, appraisal.getReviewPeriod());
     }
 
     /**
@@ -476,10 +475,10 @@ public class Mailer {
      * @return
      * @throws Exception
      */
-    //@todo: get correct body
+    //@todo: create final body
     private String jobTerminatedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_jobTerminated_body");
-        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
+        return MessageFormat.format(bodyString, getJobTitle(appraisal));
     }
 
     /**
