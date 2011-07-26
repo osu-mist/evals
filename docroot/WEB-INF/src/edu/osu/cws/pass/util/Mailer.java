@@ -25,44 +25,39 @@ public class Mailer {
     private String linkURL;
     private String mimeType;
     private Map<String, Configuration> configMap;
+    private String logHost;
+    private PassLogger logger;
 
     public Mailer(ResourceBundle resources, Mail mail,
-                  String linkURL, String mimeType, Map<String, Configuration> map) {
+                  String linkURL, String mimeType, Map<String, Configuration> map, PassLogger logger) {
         this.email = mail;
         this.emailBundle = resources;
         this.linkURL = linkURL;
         this.mimeType = mimeType;
         configMap = map;
+        this.logger = logger;
     }
 
-
-/* @todo: method documentation
- * @todo: if job is on leave (L), or terminated (T), don't send email. Have put in the code, but need to talk to Ken
- * @todo: logging activities.
- * @todo: insert email records into database table emails.
- * send an email
- * @param appraisal - an Appraisal object
- * @param emailType - an EmailType
- *
- */
-
     /**
-     *
-     * @param appraisal
-     * @param emailType
+     * Sends an email
+     * @param appraisal - an Appraisal object
+     * @param emailType - an EmailType
      * @throws Exception
      */
     public void sendMail(Appraisal appraisal, EmailType emailType) throws Exception {
-        //Don't send email if job is not active.
-        if (!(appraisal.getJob().getStatus().equals("A")))
-            //The job is currently not active, don't send email
-            return;
 
+        if (!(appraisal.getJob().getStatus().equals("A"))) {
+            //The job is currently not active, don't send email, but log the attempt
+            logger.log("NOTICE","Email not sent",
+                    "Appraisal " + appraisal.getId() +
+                    " not available, job " + appraisal.getJob().getId() +
+                    " is no longer active.");
+            return;
+        }
         Message msg = email.getMessage();
         String mailTo = emailType.getMailTo();
         String mailCC = emailType.getCc();
         String mailBCC = emailType.getBcc();
-        String bodyMethodId = emailType.getType() + "Body";
 
         if (mailTo != null && !mailTo.equals("")) {
             Address[] to = getRecipients(mailTo, appraisal);
@@ -88,17 +83,22 @@ public class Mailer {
         msg.setSubject(subject);
         Transport.send(msg);
 
-        //@todo: update emails table, logging. Will talk with Ken on this Monday.
         Email email = new Email(appraisal.getId(), emailType.getType());
         EmailMgr.add(email);
+
+        logger.log("INFORMATION", emailType + " email sent for appraisal " + appraisal.getId(),
+            emailType + " mail sent to " + msg.getAllRecipients().toString() + " for appraisal " + appraisal.getId());
    }
 
-/* @todo: It makes better sense to move the conversion to the mail class.
- *get the recipients of a particular email
- * @param appraisal - an Appraisal object
- * @param emailType - an EmailType
- * @return array of recipient addresses
- */
+    /**
+     * get the recipients of a particular email
+     * @param mailTo
+     * @param appraisal
+     * @return
+     * @throws MessagingException
+     *
+     */
+    // @todo: It makes better sense to move the conversion to the mail class.
     private Address[] getRecipients(String mailTo, Appraisal appraisal) throws MessagingException {
         String[] mailToArray = mailTo.split(",");
         Address[] recipients = new Address[mailToArray.length];
@@ -117,12 +117,14 @@ public class Mailer {
         return recipients;
     }
 
-/* fetch the standard parts of the email body, and then delegate a specific method
- * to retrieve the body for that specific emailType
- * @param appraisal - an Appraisal object
- * @param bodyMethodId - the name of the method to call
- * @return complete email body
- */
+    /**
+     * fetch the standard parts of the email body, and then delegate a specific method
+     * to retrieve the body for that specific emailType
+     * @param appraisal
+     * @param emailType
+     * @return
+     * @throws Exception
+     */
     private String getBody(Appraisal appraisal, EmailType emailType) throws Exception {
         String bodyWrapper = emailBundle.getString("email_body");
         String bodyContent = "";
@@ -132,10 +134,12 @@ public class Mailer {
                 bodyContent, getBusinessCenterDescriptor(appraisal), linkURL);
     }
 
-    /*
-     * take an appraisal and emailType and return the status-specific message body
-     * @param Appraisal appraisal - the appraisal in question
-     * @param EmailType emailType - the status we are sending email for
+    /**
+     * gets the status message
+     * @param appraisal
+     * @param emailType
+     * @return
+     * @throws Exception
      */
     public String getStatusMsg(Appraisal appraisal, EmailType emailType) throws Exception {
         String statusMsg = "";
@@ -146,43 +150,53 @@ public class Mailer {
             bodyMethod = Mailer.class.getDeclaredMethod(bodyMethodId, Appraisal.class);
             statusMsg = (String) bodyMethod.invoke(this, appraisal);
         }
-
         return statusMsg;
     }
 
-    /* @todo: Some changes in the design... Talk to Ken about it Monday
-     * @todo: take subject out of signature and put into resource bundle.
+    /**
      * Send batched email to a supervisor
-     * @param String subject - the subject line
-     * @param String emailAddress - addresses of supervisor to send to
-     * @param String middleContent - the status - specific content of the message to send
+     * @param emailAddress
+     * @param middleBody
+     * @param emailList
+     * @throws Exception
      */
-    public void sendSupervisorMail(String subject, String emailAddress,
+    public void sendSupervisorMail(String emailAddress,
                                    String middleBody, List<Email> emailList) throws Exception {
         String bodyString = emailBundle.getString("email_supervisor");
         String body = MessageFormat.format(bodyString, middleBody);
         Message msg = email.getMessage();
         Address to = email.stringToAddress(emailAddress);
+        String supervisorSubject = emailBundle.getString("email_supervisor_subject");
 
         msg.addRecipient(Message.RecipientType.TO, to);
         msg.setContent(body, mimeType);
-        msg.setSubject(subject);
+        msg.setSubject(supervisorSubject);
 
         Transport.send(msg);
         EmailMgr.add(emailList);
-        //@todo: Log every all the emails in the emails list.
+
+        for (Email email : emailList) {
+            Integer appraisalId = email.getAppraisalId();
+            String emailType = email.getEmailType();
+            email.getEmailType();
+
+            logger.log("INFORMATION", emailType + " email sent for appraisal " + appraisalId,
+                    emailType + " mail sent to " + emailAddress + " for appraisal " + appraisalId);
+        }
     }
-    
-    /* Send mail to all the reviewers
-     * @param String subject - the subject line
-     * @param String[] emailAddresses - string array of addresses to send to
-     * @param String middleContent - the status - specific content of the message to send
-     * @todo: take subject out of signature and put into resource bundle.
+
+    /**
+     * Send mail to all the reviewers
+     * @param subject
+     * @param emailAddresses
+     * @param middleBody
+     * @throws Exception
      */
     public void sendReviewerMail(String subject, String[] emailAddresses, String middleBody) throws Exception {
         String bodyString = emailBundle.getString("email_reviewers");
         String body = MessageFormat.format(bodyString, middleBody);
         Message msg = email.getMessage();
+        String reviewerSubject = emailBundle.getString("email_reviewer_subject");
 
         Address[] recipients = new Address[emailAddresses.length];
         String contact = "";
@@ -193,192 +207,286 @@ public class Mailer {
 
         msg.addRecipients(Message.RecipientType.TO, recipients);
         msg.setContent(body, mimeType);
-        msg.setSubject(subject);
+        msg.setSubject(reviewerSubject);
         Transport.send(msg);
+
+        for (String address : emailAddresses) {
+            logger.log("INFORMATION", "Email sent to reviewers",
+                    "Reviewer mail sent to " + address + ".");
+        }
     }
 
-/* Fetch the body for a particular emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
+    /**
+     * Fetch the body for a particular emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
     private String goalsDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsDue_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal),
                 appraisal.getReviewPeriod(), getDaysRemaining(appraisal));
     }
 
-/* Fetch the body for a particular emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
+    /**
+     * Fetch the body for a particular emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
     private String goalsOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsOverdue_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
     }
 
-/* Fetch the body for goalsApproved emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
-    private String goalsApprovedBody(Appraisal appraisal) throws Exception {
-        String bodyString = emailBundle.getString("email_goalsApproved_body");
-        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
-    }
-
-/* Fetch the body for goalsRequiredModification emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
+    /**
+     * Fetch the body for goalsRequiredModification emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
     private String goalsRequiredModificationBody(Appraisal appraisal) throws Exception {
         return emailBundle.getString("email_goalsRequiredModification_body");
     }
 
-/* Fetch the body for a goalsReactivated emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
-    private String goalsReactivatedBody(Appraisal appraisal) throws Exception {
-        String bodyString = emailBundle.getString("email_goalsReactivated_body");
-        return MessageFormat.format(bodyString, appraisal.getReviewPeriod());
-    }
-
-/* Fetch the body for a resultsDue emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
-    private String resultsDueBody(Appraisal appraisal) throws Exception {
-        String bodyString = emailBundle.getString("email_resultsDue_body");
-        return MessageFormat.format(bodyString, getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDaysRemaining(appraisal));
-    }
-
-/* Fetch the body for a resultsOverdue emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
-    private String resultsOverdueBody(Appraisal appraisal) throws Exception {
-        String bodyString = emailBundle.getString("email_resultsOverdue_body");
-        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
-    }
-
-/* Fetch the body for goalsApprovalDue emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
+    /**
+     * Fetch the body for goalsApprovalDue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
     private String goalsApprovalDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsApprovalDue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
                 appraisal.getReviewPeriod());
     }
 
-/* Fetch the body for goalsApprovalOverdue emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
+    /**
+     * Fetch the body for goalsApprovalOverdue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
     private String goalsApprovalOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsApprovalOverdue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
                 appraisal.getReviewPeriod());
     }
 
-/* Fetch the body for appraisalDue emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
+    /**
+     * Fetch the body for goalsApproved emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String goalsApprovedBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_goalsApproved_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
+    }
+
+    /**
+     * Fetch the body for a goalsReactivated emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String goalsReactivatedBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_goalsReactivated_body");
+        return MessageFormat.format(bodyString, appraisal.getReviewPeriod());
+    }
+
+    /**
+     * Fetch the body for a resultsDue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String resultsDueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_resultsDue_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal),
+                appraisal.getReviewPeriod(), getDaysRemaining(appraisal));
+    }
+
+    /**
+     * Fetch the body for a resultsOverdue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String resultsOverdueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_resultsOverdue_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
+    }
+
+    /**
+     * Fetch the body for appraisalDue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
     private String appraisalDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_appraisalDue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal),
                 appraisal.getReviewPeriod(), getDaysRemaining(appraisal));
     }
 
-/* Fetch the body for appraisalOverdue emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
+    /**
+     * Fetch the body for appraisalOverdue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
     private String appraisalOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_appraisalOverdue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), appraisal.getReviewPeriod());
     }
 
-/* Fetch the body for releaseDue emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
+    /**
+     * Fetch the body for releaseDue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    //@todo: get correct body
+    private String reviewDueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_reviewDue_body");
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
+                appraisal.getReviewPeriod());
+    }
+
+    /**
+     * Fetch the body for releaseOverdue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    //@todo: get correct body
+    private String reviewOverdueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_reviewOverdue_body");
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
+                appraisal.getReviewPeriod());
+    }
+
+    /**
+     * Fetch the body for releaseDue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
     private String releaseDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_releaseDue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
                 appraisal.getReviewPeriod());
     }
 
-/* Fetch the body for releaseOverdue emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
+    /**
+     * Fetch the body for releaseOverdue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
     private String releaseOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_releaseOverdue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
                 appraisal.getReviewPeriod());
     }
 
-/* Fetch the body for signatureDue emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
+    /**
+     * Fetch the body for signatureDue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
     private String signatureDueBody(Appraisal appraisal) throws Exception {
          return emailBundle.getString("email_signatureDue_body");
     }
 
-/* Fetch the body for signatureOverdue emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
+    /**
+     * Fetch the body for signatureOverdue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
     private String signatureOverdueBody(Appraisal appraisal) throws Exception {
         return emailBundle.getString("email_signatureOverdue_body");
     }
 
-/* Fetch the body for rebuttalReadDue emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
+    /**
+     * Fetch the body for rebuttalReadDue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    //@todo: get correct body
+    private String rebuttalReadBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_rebuttalRead_body");
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
+                appraisal.getReviewPeriod());
+    }
+
+    /**
+     * Fetch the body for rebuttalReadDue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
     private String rebuttalReadDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_rebuttalReadDue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
                 appraisal.getReviewPeriod());
     }
 
-/* Fetch the body for rebuttalReadOverdue emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
+    /**
+     * Fetch the body for rebuttalReadOverdue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
     private String rebuttalReadOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_rebuttalReadOverdue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
                 appraisal.getReviewPeriod());
     }
 
-/* Fetch the body for completed emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
+    /**
+     * Fetch the body for completed emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
     private String completedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_completed_body");
         return MessageFormat.format(bodyString, appraisal.getReviewPeriod());
     }
 
-/*
- * Fetch the body for closed emailType
- * @param appraisal - an Appraisal object
- * @return emailType specific email content
- */
+    /**
+     * Fetch the body for closed emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
     private String closedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_closed_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
     }
 
-/* Fetch the business center descriptor
- * @param appraisal - an Appraisal object
- * @return full name of business center
- */
+    /**
+     * Fetch the body for closed emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    //@todo: get correct body
+    private String jobTerminatedBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_jobTerminated_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
+    }
+
+    /**
+     * Fetch the business center descriptor
+     * @param appraisal
+     * @return
+     */
     private String getBusinessCenterDescriptor(Appraisal appraisal) {
         Job job = appraisal.getJob();
         String bcName = job.getBusinessCenterName();
@@ -386,34 +494,37 @@ public class Mailer {
         return emailBundle.getString(bcKey);
     }
 
-/* Fetch the title of the job for a specific appraisal
- * @param appraisal - an Appraisal object
- * @return job title
- */
+    /**
+     * Fetch the title of the job for a specific appraisal
+     * @param appraisal
+     * @return
+     */
     private String getJobTitle(Appraisal appraisal) {
         return (appraisal.getJob().getJobTitle());
     }
 
-/* Fetch the full name of the employee for a particular appraisal
- * @param appraisal - an Appraisal object
- * @return name
- */
+    /**
+     * Fetch the full name of the employee for a particular appraisal
+     * @param appraisal
+     * @return
+     */
     private String getEmployeeName(Appraisal appraisal) {
         Job job = appraisal.getJob();
         Employee employee = job.getEmployee();
         return employee.getConventionName();
     }
 
-/* @todo: This method is in CWSUtil class.  Also, the return type should not be Integer.
- * Fetch the days remaining to respond to a particular action
- * @param appraisal - an Appraisal object
- * @return number of days
- */
-    private Integer getDaysRemaining(Appraisal appraisal) throws Exception {
+    /**
+     * Fetch the days remaining to respond to a particular action
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private int getDaysRemaining(Appraisal appraisal) throws Exception {
         String status = appraisal.getStatus();
         Configuration config = configMap.get(status);
         Date dueDay = PassUtil.getDueDate(appraisal, config);
-        return CWSUtil.daysBetween(new Date(), dueDay);
+        return CWSUtil.getRemainDays(dueDay);
     }
 
 }
