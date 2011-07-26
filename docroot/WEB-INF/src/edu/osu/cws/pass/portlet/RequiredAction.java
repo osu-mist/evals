@@ -49,15 +49,14 @@ public class RequiredAction {
                               Configuration configuration) throws ModelException {
 
         String pattern = resource.getString(key);
-        //PassUtil passUtil = new PassUtil();
 
         Date dueDate = PassUtil.getDueDate(appraisal, configuration);
-        //@todo: the goalsDueOnDate can be removed
-        Date goalsDueOnDate = PassUtil.getDueDate(appraisal, configuration);   //@todo?
-        //@todo: goalsDueOn needs to be renamed to dueDate
-        String goalsDueOn = PassUtil.formatDate(goalsDueOnDate);
+        String dueOn = PassUtil.formatDate(dueDate);
 
         String name = "";
+        if (appraisal.getJob() != null && appraisal.getJob().getEmployee() != null) {
+            name = appraisal.getJob().getEmployee().getName();
+        }
         int numDays = Math.abs(CWSUtil.getRemainDays(dueDate));
         String jobTitle = appraisal.getJob().getJobTitle();
         String reviewPeriod = appraisal.getReviewPeriod();
@@ -68,22 +67,17 @@ public class RequiredAction {
                 key.contains("signature-due") || key.contains("signature-overdue")
                 ) {
             if (isTeamAction) {
-                name = appraisal.getJob().getEmployee().getName();
                 anchorText = MessageFormat.format(pattern, name, reviewPeriod, numDays);
             } else {
                 anchorText = MessageFormat.format(pattern, jobTitle, reviewPeriod, numDays);
             }
         }
 
-        if (key.equals("action-required-supervisor-rebuttal-read")) {
-            anchorText = MessageFormat.format(pattern, name, reviewPeriod);
-        }
-
         if (key.contains("goals-required-modification") || key.contains("goals-reactivated")) {
             if (isTeamAction) {
-                anchorText = MessageFormat.format(pattern, name, reviewPeriod, goalsDueOn);
+                anchorText = MessageFormat.format(pattern, name, reviewPeriod, dueOn);
             } else {
-                anchorText = MessageFormat.format(pattern, jobTitle, reviewPeriod, goalsDueOn);
+                anchorText = MessageFormat.format(pattern, jobTitle, reviewPeriod, dueOn);
             }
         }
 
@@ -94,10 +88,10 @@ public class RequiredAction {
                 key.equals("action-required-release-due") ||
                 key.equals("action-required-release-overdue") ||
                 key.equals("action-required-2nd-release-due") ||
-                key.equals("action-required-2nd-release-overdue")
+                key.equals("action-required-2nd-release-overdue") ||
+                key.contains("action-required-rebuttal-read")
             ) {
             pattern = resource.getString(key);
-            name = appraisal.getJob().getEmployee().getName();
             anchorText = MessageFormat.format(pattern, name, numDays);
         }
 
