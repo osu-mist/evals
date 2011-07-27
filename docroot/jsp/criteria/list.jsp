@@ -12,15 +12,14 @@ addCriteriaURL.setParameter("action", "addCriteria");
 <liferay-ui:success key="criteria-saved" message="criteria-saved" />
 <liferay-ui:success key="criteria-deleted" message="criteria-deleted" />
 
-<div class="separator"></div>
-<div class="actions">
-<liferay-ui:icon
-    image="add_article"
-    url="<%= addCriteriaURL.toString() %>"
-    label="true"
-    message="Add Evaluation Criteria"
-/>
-</div>
+<ul class="actions">
+    <li><liferay-ui:icon
+        image="add_article"
+        url="<%= addCriteriaURL.toString() %>"
+        label="true"
+        message="Add Evaluation Criteria"
+    /></li>
+</ul>
 <table class="taglib-search-iterator" id="<portlet:namespace/>criteria-list">
     <thead>
         <tr class="portlet-section-header results-header">

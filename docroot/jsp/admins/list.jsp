@@ -7,89 +7,81 @@
 <liferay-ui:success key="admin-deleted" message="admin-deleted" />
 
 <c:if test="${isMaster == true}">
-    <div class="actions">
-        <div id="<portlet:namespace/>admin-add-link">
-            <p><liferay-ui:icon
+    <ul class="actions">
+        <li id="<portlet:namespace/>admin-add-link">
+            <liferay-ui:icon
                 image="add_user"
                 url="#"
                 label="true"
                 message="Add Admin User"
             />
-            </p>
-        </div>
-    </div>
+        </li>
+    </ul>
 
-    <fieldset id="pass-user-add">
-        <legend><liferay-ui:message key="admin-add"/></legend>
+    
 
-        <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-            <portlet:param name="action" value="${addAction}"/>
-            </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
-
-            <table>
-                <tr>
-                    <th><liferay-ui:message key="employee-onid" /></th>
-                    <td><input type="text" name="<portlet:namespace/>onid" id="<portlet:namespace/>onid"/>
-                </tr>
-                <tr>
-                    <td>&nbsp;</td>
-                    <td><fieldset>
-                        <input type="radio" name="<portlet:namespace/>isAdmin" value="1" />
-                        <label for="<portlet:namespace/>isAdmin"><liferay-ui:message key="admins-master"/></label>
-                        <input type="radio" name="<portlet:namespace/>isAdmin" value="0" />
-                        <label for="<portlet:namespace/>isAdmin"><liferay-ui:message key="admins-non-master"/></label>
-                        </fieldset>
-                     </td>
-                </tr>
-                <tr>
-                    <td><a href="http://oregonstate.edu/main/campus-online-directory">Online Directory</a></td>
-                    <td>
-                        <input type="submit" value="<liferay-ui:message key="save" />" />
-                        <input type="submit" value="<liferay-ui:message key="cancel" />"
-                            id="<portlet:namespace/>cancel"/>
-                    </td>
-                </tr>
-            </table>
-            </form>
-    </fieldset>
+    <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+        <portlet:param name="action" value="${addAction}"/>
+        </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
+        <fieldset id="pass-user-add">
+            <legend><liferay-ui:message key="admin-add"/></legend>
+            <label><liferay-ui:message key="employee-onid" /></label>
+            <input type="text" name="<portlet:namespace/>onid" class="inline narrow" id="<portlet:namespace/>onid"/>
+            <a href="http://oregonstate.edu/main/campus-online-directory">Online Directory</a>
+            <fieldset>
+                <legend>Admin type</legend>
+                <input type="radio" name="<portlet:namespace/>isAdmin" value="1" />
+                <label for="<portlet:namespace/>isAdmin"><liferay-ui:message key="admins-master"/></label>
+                <input type="radio" name="<portlet:namespace/>isAdmin" value="0" />
+                <label for="<portlet:namespace/>isAdmin"><liferay-ui:message key="admins-non-master"/></label>
+            </fieldset>
+          
+            
+            <input type="submit" value="<liferay-ui:message key="save" />" />
+            <input type="submit" value="<liferay-ui:message key="cancel" />" id="<portlet:namespace/>cancel"/>
+             
+      </fieldset>
+  </form>
+    
 </c:if>
 
 <div class="separator"></div>
 <table class="taglib-search-iterator">
-    <tr class="portlet-section-header results-header">
-        <th><liferay-ui:message key="name"/></th>
-        <th>&nbsp;</th>
-        <c:if test="${isMaster == true}">
-            <th><liferay-ui:message key="actions"/></th>
-        </c:if>
-    </tr>
-
-    <c:forEach var="user" items="${adminsList}" varStatus="loopStatus">
-    <tr class="${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}"
-        onmouseover="this.className = 'portlet-section-body-hover results-row hover';"
-        onmouseout="this.className = '${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}';"
-        id="<portlet:namespace/>users-${user.id}"
-    >
-        <td>${user.employee.name}</td>
-        <td>
-            <c:if test="${user.isMaster}">
-                <liferay-ui:message key="admins-master"/>
+    <thead>
+        <tr class="portlet-section-header results-header">
+            <th><liferay-ui:message key="name"/></th>
+            <th>&nbsp;</th>
+            <c:if test="${isMaster == true}">
+                <th><liferay-ui:message key="actions"/></th>
             </c:if>
-            <c:if test="${not user.isMaster}">
-                <liferay-ui:message key="admins-non-master"/>
-            </c:if>
-        </td>
-        <c:if test="${isMaster == true}">
+        </tr>
+    </thead>
+    <tbody>
+        <c:forEach var="user" items="${adminsList}" varStatus="loopStatus">
+        <tr class="${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}"
+            id="<portlet:namespace/>users-${user.id}"
+        >
+            <td>${user.employee.name}</td>
             <td>
-            <a class="<portlet:namespace/>user-delete" href="<portlet:renderURL
-                windowState="<%= WindowState.MAXIMIZED.toString() %>">
-                <portlet:param name="id" value="${user.id}"/>
-                <portlet:param name="action" value="${deleteAction}"/>
-            </portlet:renderURL>"><liferay-ui:message key="delete"/></a></td>
-        </c:if>
-    </tr>
-    </c:forEach>
-    </table>
+                <c:if test="${user.isMaster}">
+                    <liferay-ui:message key="admins-master"/>
+                </c:if>
+                <c:if test="${not user.isMaster}">
+                    <liferay-ui:message key="admins-non-master"/>
+                </c:if>
+            </td>
+            <c:if test="${isMaster == true}">
+                <td>
+                <a class="<portlet:namespace/>user-delete" href="<portlet:renderURL
+                    windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                    <portlet:param name="id" value="${user.id}"/>
+                    <portlet:param name="action" value="${deleteAction}"/>
+                </portlet:renderURL>"><liferay-ui:message key="delete"/></a></td>
+            </c:if>
+        </tr>
+        </c:forEach>
+    </tbody>
+</table>
 
 <c:if test="${isMaster == true}">
   <script type="text/javascript">

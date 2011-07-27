@@ -11,6 +11,6 @@
     <p><liferay-ui:message key="reviewer-delete-confirm"/>: ${reviewer.employee.name} ?</p>
 
     <input type="submit" name="delete" value="<liferay-ui:message key="delete" />" />
-    <input type="submit" name="cancel" value="<liferay-ui:message key="cancel" />" />
+    <input type="submit"class="cancel" name="cancel" value="<liferay-ui:message key="cancel" />" />
 </form>
 <%@ include file="/jsp/footer.jsp" %>

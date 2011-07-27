@@ -12,24 +12,25 @@
         </c:if>
 
         <c:set var="sectionName" value="${configuration.section}"/>
-        <h3><liferay-ui:message key="${configuration.section}"/></h3>
+        
 
         <table class="taglib-search-iterator configuration-list">
-            <tr class="portlet-section-header results-header">
-                <th width="75%"><liferay-ui:message key="configurations-setting"/></th>
-                <th><liferay-ui:message key="value"/></th>
-                <th><liferay-ui:message key="actions"/></th>
-            </tr>
+            <caption><liferay-ui:message key="${configuration.section}"/></caption>
+            <thead>
+                <tr class="portlet-section-header results-header">
+                    <th><liferay-ui:message key="configurations-setting"/></th>
+                    <th><liferay-ui:message key="description"/></th>
+                    <th><liferay-ui:message key="value"/></th>
+                    <th><liferay-ui:message key="actions"/></th>
+                </tr>
+            </thead>
     </c:if>
-
+    
     <tr class="${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}"
-        onmouseover="this.className = 'portlet-section-body-hover results-row hover';"
-        onmouseout="this.className = '${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}';"
         id="<portlet:namespace/>users-${configuration.id}"
     >
-        <td><strong><liferay-ui:message key="parameters-${configuration.name}"/></strong><br />
-            <liferay-ui:message key="parameters-${configuration.name}-description"/>
-        </td>
+        <td><strong><liferay-ui:message key="parameters-${configuration.name}"/></strong></td>
+        <td><liferay-ui:message key="parameters-${configuration.name}-description"/></td>
         <td>
             <div id="<portlet:namespace/>displayValue${configuration.id}">${configuration.value}</div>
             <div id="<portlet:namespace/>form${configuration.id}" style="display:none;">

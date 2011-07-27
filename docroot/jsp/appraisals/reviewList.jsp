@@ -1,62 +1,49 @@
 <%@ include file="/jsp/init.jsp" %>
 
 <h2><liferay-ui:message key="${pageTitle}" /></h2>
-<div class="actions">
-    <div id="<portlet:namespace/>appraisal-search-link">
-        <p><liferay-ui:icon
+<ul class="actions">
+    <li id="<portlet:namespace/>appraisal-search-link">
+        <liferay-ui:icon
             image="search"
             url="#"
             label="true"
             message="Search"
         />
-        </p>
-    </div>
-</div>
+    </li>
+</ul>
 
-<fieldset id="pass-user-add">
-    <legend><liferay-ui:message key="search"/></legend>
+
 
     <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
         <portlet:param name="action" value="searchAppraisals"/>
-        </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
+        </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" class="search" method="post">
+        <fieldset id="pass-user-add">
+            <legend><liferay-ui:message key="search"/></legend>
+            <label for="<portlet:namespace/>osuid"><liferay-ui:message key="osuid"/></label>
+            <input type="text" id="<portlet:namespace/>osuid" name="<portlet:namespace/>osuid" />
+            <input type="submit" value="<liferay-ui:message key="search" />" />
+            <input type="submit" class="cancel" value="<liferay-ui:message key="cancel" />" id="<portlet:namespace/>cancel" />
+        </fieldset>    
+    </form>
 
-        <table>
-            <tr>
-                <th><label for="<portlet:namespace/>osuid"><liferay-ui:message key="osuid"/>
-                </label></th>
-                <td><input type="text" id="<portlet:namespace/>osuid" name="<portlet:namespace/>osuid" /></td>
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-                <td>
-                    <input type="submit" value="<liferay-ui:message key="search" />" />
-                    <input type="submit" value="<liferay-ui:message key="cancel" />"
-                        id="<portlet:namespace/>cancel"/>
-                </td>
-            </tr>
-        </table>
-        </form>
-</fieldset>
 
 <c:if test="${!empty appraisals}">
-    <div class="separator"></div>
     <table class="taglib-search-iterator">
-        <tr class="portlet-section-header results-header">
-            <th><liferay-ui:message key="reviewPeriod"/></th>
-            <th><liferay-ui:message key="type"/></th>
-            <th><liferay-ui:message key="employee"/></th>
-            <th><liferay-ui:message key="supervisor"/></th>
-            <th><liferay-ui:message key="job-title"/></th>
-            <th><liferay-ui:message key="position-no"/></th>
-            <th><liferay-ui:message key="orgn-code-desc"/></th>
-            <th><liferay-ui:message key="status"/></th>
-        </tr>
-
+        <thead>
+            <tr class="portlet-section-header results-header">
+                <th><liferay-ui:message key="reviewPeriod"/></th>
+                <th><liferay-ui:message key="type"/></th>
+                <th><liferay-ui:message key="employee"/></th>
+                <th><liferay-ui:message key="supervisor"/></th>
+                <th><liferay-ui:message key="job-title"/></th>
+                <th><liferay-ui:message key="position-no"/></th>
+                <th><liferay-ui:message key="orgn-code-desc"/></th>
+                <th><liferay-ui:message key="status"/></th>
+            </tr>
+        </thead>
+        <tbody>
     <c:forEach var="appraisal" items="${appraisals}" varStatus="loopStatus">
-        <tr class="${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}"
-            onmouseover="this.className = 'portlet-section-body-hover results-row hover';"
-            onmouseout="this.className = '${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}';"
-        >
+        <tr class="${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}">
             <td>${appraisal.reviewPeriod}</td>
             <td><liferay-ui:message key="appraisal-type-${appraisal.type}"/></td>
             <td>${appraisal.job.employee.name}</td>
@@ -71,6 +58,7 @@
                <liferay-ui:message key="${appraisal.status}"/></a></td>
         </tr>
     </c:forEach>
+        </tbody>
     </table>
 </c:if>
 <c:if test="${empty appraisals}">

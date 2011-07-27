@@ -16,7 +16,7 @@
     margin:0.5em 1em;
 }
 
-/* Add/Edit Criteria */
+/* Add/Edit Criteria 
 #pass-add-criteria {
     width:100%;
     margin:0 1em 1em 0;
@@ -33,7 +33,7 @@
     padding-top:0.5em;
 }
  
-/* Appraisal Form */
+/* Appraisal Form 
 #pass-appraisal-form {
     width:100%;
     margin-right:1.5em;
@@ -84,23 +84,7 @@
 }
 #pass-appraisal-form div.pass-actions input {
     margin-right:1.5em;
-}
-
-/* Admin/Reviewer add */
-#pass-user-add {
-    margin-top: 1em 0;
-    width: 25em;
-    border: 1px solid #ccc;
-}
-#pass-user-add table {
-    width: 100%;
-}
-#pass-user-add input, #pass-user-add select {
-    margin-bottom:1em;
-}
-#pass-user-add input[type="submit"] {
-    margin-right:2em;
-}
+} */
 
 /** JQuery UI Sortable */
 tr.ui-sortable-helper {
@@ -116,85 +100,10 @@ tr.ui-state-highlight {
     display: none;
 }
 
-/* Top Menu 
-#pass-top-menu {
-    padding-bottom: 4em;
-    position: relative;
-    z-index: 1;
-    width: 100%;
-}
-#pass-top-menu.action-menu-wrapper ul {
-    background: #FFF;
-    border: 2px solid #CCC;
-}
-#pass-top-menu .portlet-action-menu li {
-    background: #fff;
-    border-right: 2px solid #CCC;
-    float: left;
-    border-bottom: 2px solid #FFF;
-}
-#pass-top-menu .portlet-action-menu li.pass-roles {
-    border-left: 2px solid #CCC;
-    border-right: 0;
-    float: right;
-}
-#pass-top-menu  .portlet-action-menu a {
-    color: #686868;
-    padding: 0.5em 0.5em 0.25em 0.5em;
-    font-size: 1.37em;
-}
-#pass-top-menu  .portlet-action-menu ul {
-    width: auto;
-}
-#pass-top-menu .portlet-action-menu ul li {
-    width: 100%;
-    font-size: 0.9em;
-    border-bottom: 2px solid #ccc;
-}
-#pass-top-menu .portlet-action-menu ul li:last-child {
-    border-bottom: 0px;
-}
-#pass-top-menu .portlet-action-menu ul li:last-child:hover {
-    border-bottom: 2px solid #D85A1A;
-}
-#pass-top-menu .portlet-action-menu li:hover, #pass-top-menu .portlet-action-menu li.sfHover,
-#pass-top-menu .portlet-action-menu a:focus, #pass-top-menu .portlet-action-menu a:hover,
-#pass-top-menu .portlet-action-menu a:active {
-    background: none repeat scroll 0 0 #FFF;
-}
-#pass-top-menu .portlet-action-menu li:hover {
-    border-bottom: 2px solid #D85A1A;
-}
-#pass-top-menu .portlet-action-menu li:hover ul, #pass-top-menu .portlet-action-menu li.sfHover ul {
-    right: auto;
-} */
-
-/* My Information 
-#pass-my-info {
-    background: #f2f2f2;
-}
-
-#pass-my-info .section {
-    padding: 0.5em;
-    background: #fff;
-    border-radius: 8px;
-}
-
-#pass-my-info .col1 {
-    float: left;
-    vertical-align: middle;
-    color: #c34500;
-    width: 22%;
-}
-
-#pass-my-info h3 {
-    margin-top: 0.8em;
-} */
-
-/* Configuration List */
+/* Configuration List
 table.configuration-list {
     width: 50%;
-}
+} */
 
 /* Appraisal Search */
 .accordion-content.pass-search form {

@@ -11,7 +11,7 @@
             <liferay-ui:message key="${appraisal.status}" />
         </td>
     </tr>
-    <tr class="alt">
+    <tr>
         <th><liferay-ui:message key="appointment-type" />:</th>
         <td><liferay-ui:message key="${appraisal.job.appointmentType}"  /></td>
         <th><liferay-ui:message key="position-no" />:</th>
