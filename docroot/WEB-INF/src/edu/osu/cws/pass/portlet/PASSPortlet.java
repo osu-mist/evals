@@ -12,7 +12,8 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.pass.hibernate.AppraisalStepMgr;
 import edu.osu.cws.pass.hibernate.PermissionRuleMgr;
 import edu.osu.cws.pass.util.*;
-import edu.osu.cws.util.ExceptionHandler;
+import edu.osu.cws.util.CWSUtil;
+import edu.osu.cws.util.Logger;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
@@ -89,7 +90,7 @@ public class PASSPortlet extends GenericPortlet {
             portletSetup(renderRequest);
             actionClass.setUpUserPermissionInSession(renderRequest, false);
         } catch (Exception e) {
-            handlePASSException(e, true);
+            handlePASSException(e, "Error in doView", Logger.CRITICAL, true);
         }
 
         // If processAction's delegate method was called, it set the viewJSP property to some
@@ -112,7 +113,7 @@ public class PASSPortlet extends GenericPortlet {
             actionClass.setUpUserPermissionInSession(actionRequest, false);
             delegate(actionRequest, actionResponse);
         } catch (Exception e) {
-            handlePASSException(e, true);
+            handlePASSException(e, "Error in processAction", Logger.CRITICAL, true);
         }
 	}
 
@@ -138,7 +139,7 @@ public class PASSPortlet extends GenericPortlet {
                 // The resourceID methods return the init-param of the path
                 result = (String) actionMethod.invoke(actionClass, request, response);
             } catch (Exception e) {
-                handlePASSException(e, false);
+                handlePASSException(e, "Error in serveResource", Logger.ERROR, false);
                 result="There was an error performing your request";
             }
         } else {
@@ -174,15 +175,12 @@ public class PASSPortlet extends GenericPortlet {
                 // The action methods return the init-param of the path
                 viewJSP = (String) actionMethod.invoke(actionClass, request, response);
             } catch (Exception e) {
-                handlePASSException(e, false);
+                handlePASSException(e, action, Logger.ERROR, false);
             }
         }
 
         // viewJSP holds an init parameter that maps to a jsp file
         viewJSP = getInitParameter(viewJSP);
-
-
-        _log.debug("viewJSP in delegate: "+viewJSP);
     }
 
     /**
@@ -207,6 +205,7 @@ public class PASSPortlet extends GenericPortlet {
     private void portletSetup(PortletRequest request) throws Exception {
         if (getPortletContext().getAttribute("environmentProp") == null) {
             loadEnvironmentProperties(request);
+            createLogger();
             getPortletContext().setAttribute("permissionRules", permissionRuleMgr.list());
             getPortletContext().setAttribute("appraisalSteps", appraisalStepMgr.list());
             loadResourceBundle();
@@ -216,6 +215,32 @@ public class PASSPortlet extends GenericPortlet {
             actionClass.setPassReviewers();
             actionClass.setPassConfiguration();
         }
+    }
+
+    /**
+     * Creates an instance of PassLogger, grabs the properties from the properties file and stores the
+     * log instance in the portletContext.
+     */
+    private void createLogger() {
+        CompositeConfiguration config = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
+        String serverName = config.getString("log.serverName");
+        String clientHost = config.getString("log.clientHost");
+        PassLogger passLogger = new PassLogger(serverName, clientHost);
+        getPortletContext().setAttribute("log", passLogger);
+    }
+
+    /**
+     * Returns a PassLogger instance stored in the portletContext.
+     *
+     * @return PassLogger
+     * @throws Exception
+     */
+    private PassLogger getLog() throws Exception {
+        PassLogger log = (PassLogger) getPortletContext().getAttribute("log");
+        if (log == null) {
+            throw new Exception("Could not get instance of PassLogger from portletContext");
+        }
+        return log;
     }
 
     /**
@@ -255,10 +280,12 @@ public class PASSPortlet extends GenericPortlet {
      * @param e Exception
      * @param getInitParam  Whether or not to use getInitParameter when setting viewJSP
      */
-    private void handlePASSException(Exception e, boolean getInitParam) {
-        CompositeConfiguration props = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
-        ExceptionHandler eh = new ExceptionHandler(e, _log, props, "PASS");
-        eh.handleException();
+    private void handlePASSException(Exception e, String shortMessage, String level, boolean getInitParam) {
+        try {
+            getLog().log(level, shortMessage, e);
+        } catch (Exception exception) {
+            _log.error(CWSUtil.stackTraceString(exception));
+        }
         if (getInitParam) {
             viewJSP = getInitParameter("error-jsp");
         } else {
@@ -275,7 +302,12 @@ public class PASSPortlet extends GenericPortlet {
 			getPortletContext().getRequestDispatcher(path);
 
 		if (portletRequestDispatcher == null) {
-			_log.error(path + " is not a valid include");
+            try {
+                getLog().log(Logger.ERROR, path + " is not a valid include", "");
+            } catch (Exception e) {
+                _log.error(path + " is not a valid include");
+                _log.error(CWSUtil.stackTraceString(e));
+            }
 		}
 		else {
 			portletRequestDispatcher.include(renderRequest, renderResponse);
