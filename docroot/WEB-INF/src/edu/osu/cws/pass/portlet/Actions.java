@@ -7,6 +7,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.pass.hibernate.*;
 import edu.osu.cws.pass.models.*;
+import org.apache.commons.configuration.CompositeConfiguration;
 
 import javax.portlet.*;
 import java.util.*;
@@ -266,11 +267,22 @@ public class Actions {
         int employeeId = employee.getId();
 
         setupActiveAppraisals(request, employeeId);
+        helpLinks(request);
 
         setRequiredActions(request);
         useNormalMenu(request);
 
         return "home-jsp";
+    }
+
+    /**
+     * Set up the attribute in the request object that contains an array of helpful links
+     *
+     * @param request
+     */
+    private void helpLinks(PortletRequest request) {
+        CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
+        request.setAttribute("helpLinks", config.getStringArray("helpful-links"));
     }
 
     /**
@@ -295,6 +307,7 @@ public class Actions {
         setupActiveAppraisals(request, employee.getId());
         setRequiredActions(request);
         useNormalMenu(request);
+        helpLinks(request);
 
         return "admin-home-jsp";
     }
@@ -305,6 +318,7 @@ public class Actions {
         setRequiredActions(request);
         setTeamAppraisalStatus(request);
         useNormalMenu(request);
+        helpLinks(request);
 
         return "supervisor-home-jsp";
     }
