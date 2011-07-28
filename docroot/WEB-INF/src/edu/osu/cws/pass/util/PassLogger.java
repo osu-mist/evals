@@ -25,7 +25,7 @@ public class PassLogger {
 
     public PassLogger(String serverName, String logName)
     {
-        logger = new Logger(serverName, logName);
+        logger = new Logger(serverName);
         fields.put("Facility", appName);
     }
 
