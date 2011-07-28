@@ -25,9 +25,9 @@ public class Logger {
     private String logHost;  //the logging server
     private String clientHost;     //client requesting logging.
 
-    public Logger(String logHost, String clientHost) {
+    public Logger(String logHost) {
         this.logHost = logHost;
-        this.clientHost = clientHost;
+        this.clientHost = CWSUtil.getLocalHostname();
     }
 
     public void log(GelfMessage message) throws Exception {
