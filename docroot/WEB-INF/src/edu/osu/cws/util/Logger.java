@@ -62,7 +62,7 @@ public class Logger {
      */
     public void log(String level, String shortMessage, Exception exception,
                     Map<String,String> fields)  throws Exception {
-        String longMessage = exception.getMessage();
+        String longMessage = CWSUtil.stackTraceString(exception);
         GelfMessage message = new GelfMessage(shortMessage, longMessage, new Date(), level);
 
         Set<String> keys = fields.keySet();
@@ -81,7 +81,7 @@ public class Logger {
      * @throws Exception
      */
     public void log(String level, String shortMessage, Exception exception)  throws Exception {
-        String longMessage = exception.getMessage();
+        String longMessage = CWSUtil.stackTraceString(exception);
         GelfMessage message = new GelfMessage(shortMessage, longMessage, new Date(), level);
         log(message);
     }
