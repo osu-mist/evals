@@ -26,7 +26,7 @@ public class PassLogger {
     public PassLogger(String serverName, String logName)
     {
         logger = new Logger(serverName, logName);
-        fields.put("appName", "appName");
+        fields.put("Facility", appName);
     }
 
     public void log(String level, String shortMessage, String longMessage,
