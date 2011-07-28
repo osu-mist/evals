@@ -282,7 +282,7 @@ public class Actions {
      */
     private void helpLinks(PortletRequest request) {
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
-        request.setAttribute("helpLinks", config.getStringArray("helpful-links"));
+        request.setAttribute("helpLinks", config.getStringArray("helpfulLinks"));
     }
 
     /**
