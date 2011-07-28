@@ -10,7 +10,6 @@ import edu.osu.cws.pass.models.*;
 import edu.osu.cws.pass.util.Mailer;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
-import edu.osu.cws.util.ExceptionHandler;
 import org.apache.commons.configuration.CompositeConfiguration;
 
 import javax.portlet.*;
@@ -484,7 +483,7 @@ public class Actions {
         try {
             employee = employeeMgr.findById(employeeID);
         } catch (Exception e) {
-            _log.error("unexpected exception - " + ExceptionHandler.stackTraceString(e));
+            _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
         }
         session.setAttribute("loggedOnUser", employee);
         setUpUserPermissionInSession(request, true);
@@ -512,7 +511,7 @@ public class Actions {
         try {
             appraisalMgr.updateAppraisalStatus(id, status);
         } catch (Exception e) {
-            _log.error("unexpected exception - " + ExceptionHandler.stackTraceString(e));
+            _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
         }
 
         return displayAppraisal(request, response);
