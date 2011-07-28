@@ -15,6 +15,7 @@ import edu.osu.cws.pass.hibernate.AppraisalMgr;
 import edu.osu.cws.pass.hibernate.EmailMgr;
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.util.*;
+import oracle.net.ano.SupervisorService;
 import sun.awt.image.OffScreenImage;
 
 import java.util.Date;
@@ -110,24 +111,44 @@ public class Mailer {
      * @throws MessagingException
      *
      */
-    // @todo: It makes better sense to move the conversion to the mail class.
-    private Address[] getRecipients(String mailTo, Appraisal appraisal) throws MessagingException {
+    private Address[] getRecipients(String mailTo, Appraisal appraisal) throws Exception {
         String[] mailToArray = mailTo.split(",");
         Address[] recipients = new Address[mailToArray.length];
         String contact = "";
         int i = 0;
         for (String recipient : mailToArray) {
+            Job job = appraisal.getJob();
             if (recipient.equals("employee")) {
-                // test for null email
-                contact = appraisal.getJob().getEmployee().getEmail();
+                if (job == null) {
+                    String logShortMessage = "Employee email not sent";
+                    String logLongMessage = "Job for appraisal" + appraisal.getId() + "is null";
+                    logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
+                    contact = "nobody@oregonstate.edu";
+                } else {
+                    contact = job.getEmployee().getEmail();
+                }
             }
             if (recipient.equals("supervisor")) {
-                // sometimes job has no supervisor - check for null, and null email
-                // log and don't send mail
-                contact = appraisal.getJob().getSupervisor().getEmployee().getEmail();
+                if (job == null) {
+                    String logShortMessage = "Supervisor email not sent";
+                    String logLongMessage = "Job for appraisal" + appraisal.getId() + "is null";
+                    logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
+                    contact = null;
+                } else {
+                    Job supervisorJob = job.getSupervisor();
+                    if (supervisorJob == null) {
+                        String logShortMessage = "Supervisor email not sent";
+                        String logLongMessage = "Suppervisor for appraisal" + appraisal.getId() + "is null";
+                        logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
+                        contact = null;
+                    } else {
+                        contact = supervisorJob.getEmployee().getEmail();
+                    }
+                }
             }
-
-            recipients[i++] = email.stringToAddress(contact);
+            if (contact != null) {
+                recipients[i++] = email.stringToAddress(contact);
+            }
         }
         return recipients;
     }
