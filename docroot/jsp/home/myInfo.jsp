@@ -7,9 +7,7 @@
     <div class="section">
         <div class="col1">Name</div>
         <div class="col2">
-            <c:out value="${employee.firstName}"/>
-            <c:out value="${employee.middleName}"/>
-            <c:out value="${employee.lastName}"/>
+            <c:out value="${employee.name}"/>
         </div>
     </div>
     <div class="section">
@@ -37,7 +35,7 @@
             
         <div class="section">    
             <div class="col1"><liferay-ui:message key="job-start-date"/></div>
-            <div class="col2"><fmt:formatDate value="${job.beginDate}" pattern="dd/MM/yy"/></div>
+            <div class="col2"><fmt:formatDate value="${job.beginDate}" pattern="MM/dd/yy"/></div>
         </div>
         
         <div class="section">
