@@ -2,6 +2,7 @@ package edu.osu.cws.pass.hibernate;
 
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.pass.util.HibernateUtil;
+import edu.osu.cws.pass.util.Mailer;
 import edu.osu.cws.pass.util.PassUtil;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
@@ -273,15 +274,16 @@ public class AppraisalMgr {
 
     /**
      * Processes the processAction request (Map) and tries to save the appraisal. This method
-     * moves the appraisal to the next appraisal step.
+     * moves the appraisal to the next appraisal step and sends any emails if necessary.
      *
      * @param request
      * @param id
      * @param resultsDueConfig
+     * @param mailer
      * @return
      * @throws Exception
      */
-    public boolean processUpdateRequest(Map request, int id, Configuration resultsDueConfig)
+    public boolean processUpdateRequest(Map request, int id, Configuration resultsDueConfig, Mailer mailer)
             throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         try {
@@ -306,8 +308,13 @@ public class AppraisalMgr {
             createFirstAnnualAppraisal(appraisal, resultsDueConfig);
             tx.commit();
 
-            // If appraisalStep.getEmailType() is not null
-                // Send the email  //design in another module, not for the June demo.
+            // Send email if needed
+            String appointmentType = appraisal.getJob().getAppointmentType();
+            AppraisalStep appraisalStep = getAppraisalStepKey(request, appointmentType, permRule);
+            EmailType emailType = appraisalStep.getEmailType();
+            if (emailType != null) {
+                mailer.sendMail(appraisal, emailType);
+            }
         } catch (Exception e) {
             session.close();
             throw e;

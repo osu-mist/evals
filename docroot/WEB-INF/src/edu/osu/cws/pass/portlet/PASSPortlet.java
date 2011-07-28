@@ -11,18 +11,23 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.pass.hibernate.AppraisalStepMgr;
 import edu.osu.cws.pass.hibernate.PermissionRuleMgr;
+import edu.osu.cws.pass.models.Configuration;
 import edu.osu.cws.pass.util.*;
 import edu.osu.cws.util.CWSUtil;
 import edu.osu.cws.util.Logger;
+import edu.osu.cws.util.Mail;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import javax.mail.Address;
+import javax.mail.internet.InternetAddress;
 import javax.portlet.*;
 
 /**
@@ -196,7 +201,8 @@ public class PASSPortlet extends GenericPortlet {
     /**
      * Takes care of initializing portlet variables and storing them in the portletContext.
      * Some of these variables are: permissionRuleMgr, appraisalStepMgr, reviewers, admins and
-     * environment properties. This method is called everytime a doView, processAction or
+     * environment properties. It also creates a PassLogger and Mailer instances and stores them
+     * in portletContext. This method is called everytime a doView, processAction or
      * serveResource are called, but the code inside only executes the first time.
      *
      * @param request
@@ -204,17 +210,38 @@ public class PASSPortlet extends GenericPortlet {
      */
     private void portletSetup(PortletRequest request) throws Exception {
         if (getPortletContext().getAttribute("environmentProp") == null) {
+            actionClass.setPortletContext(getPortletContext());
             loadEnvironmentProperties(request);
             createLogger();
+            actionClass.setPassConfiguration();
+            createMailer();
             getPortletContext().setAttribute("permissionRules", permissionRuleMgr.list());
             getPortletContext().setAttribute("appraisalSteps", appraisalStepMgr.list());
             loadResourceBundle();
 
-            actionClass.setPortletContext(getPortletContext());
             actionClass.setPassAdmins();
             actionClass.setPassReviewers();
-            actionClass.setPassConfiguration();
         }
+    }
+
+    /**
+     * Creates a Mailer instance and stores it in the portlet context. It fetches the mail properties from
+     * the environmentProp attribute in portlet context that comes from the properties files.
+     *
+     * @throws Exception
+     */
+    private void createMailer() throws Exception {
+        ResourceBundle resources = ResourceBundle.getBundle("edu.osu.cws.pass.portlet.Email");
+        CompositeConfiguration config = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
+        String hostname = config.getString("mail.hostname");
+        Address from = new InternetAddress(config.getString("mail.fromAddress"));
+        String linkUrl = config.getString("mail.linkUrl");
+        String mimeType = config.getString("mail.mimeType");
+        Map<String, Configuration> configurationMap = (Map<String, Configuration>)
+                getPortletContext().getAttribute("configurations");
+        Mail mail = new Mail(hostname, from);
+        Mailer mailer = new Mailer(resources, mail, linkUrl, mimeType, configurationMap, getLog());
+        getPortletContext().setAttribute("mailer", mailer);
     }
 
     /**

@@ -7,6 +7,8 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.pass.hibernate.*;
 import edu.osu.cws.pass.models.*;
+import edu.osu.cws.pass.util.Mailer;
+import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
 
 import javax.portlet.*;
@@ -634,7 +636,8 @@ public class Actions {
                     (Map<String, Configuration>) portletContext.getAttribute("configurations");
             Configuration resultsDueConfig = configurationMap.get("resultsDue");
 
-            appraisalMgr.processUpdateRequest(request.getParameterMap(), id, resultsDueConfig);
+            Mailer mailer = (Mailer) portletContext.getAttribute("mailer");
+            appraisalMgr.processUpdateRequest(request.getParameterMap(), id, resultsDueConfig, mailer);
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
         }
