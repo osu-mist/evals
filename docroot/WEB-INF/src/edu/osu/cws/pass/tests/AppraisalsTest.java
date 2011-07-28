@@ -387,9 +387,11 @@ public class AppraisalsTest {
 /*    public void createAppraisals() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
+        Configuration goalsDueConfig = (Configuration) session.load(Configuration.class, 1);
         List<Job> results = (List<Job>) session.createQuery("from edu.osu.cws.pass.models.Job where status = 'A'").list();
+        tx.commit();
         for (Job job : results) {
-            appraisalMgr.createAppraisal(job, Appraisal.TYPE_ANNUAL);
+            AppraisalMgr.createAppraisal(job, new Date(), Appraisal.TYPE_ANNUAL, goalsDueConfig);
         }
     }*/
 
