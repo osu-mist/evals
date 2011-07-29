@@ -406,6 +406,7 @@ public class Job extends Pass implements Serializable {
         return null;
 
       endCal.add(Calendar.MONTH, interval);
+      endCal.add(Calendar.DAY_OF_MONTH, -1);
       return endCal.getTime();
 
     }
