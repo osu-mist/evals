@@ -11,17 +11,23 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.pass.hibernate.AppraisalStepMgr;
 import edu.osu.cws.pass.hibernate.PermissionRuleMgr;
+import edu.osu.cws.pass.models.Configuration;
 import edu.osu.cws.pass.util.*;
-import edu.osu.cws.util.ExceptionHandler;
+import edu.osu.cws.util.CWSUtil;
+import edu.osu.cws.util.Logger;
+import edu.osu.cws.util.Mail;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import javax.mail.Address;
+import javax.mail.internet.InternetAddress;
 import javax.portlet.*;
 
 /**
@@ -89,7 +95,7 @@ public class PASSPortlet extends GenericPortlet {
             portletSetup(renderRequest);
             actionClass.setUpUserPermissionInSession(renderRequest, false);
         } catch (Exception e) {
-            handlePASSException(e, true);
+            handlePASSException(e, "Error in doView", Logger.CRITICAL, true);
         }
 
         // If processAction's delegate method was called, it set the viewJSP property to some
@@ -112,7 +118,7 @@ public class PASSPortlet extends GenericPortlet {
             actionClass.setUpUserPermissionInSession(actionRequest, false);
             delegate(actionRequest, actionResponse);
         } catch (Exception e) {
-            handlePASSException(e, true);
+            handlePASSException(e, "Error in processAction", Logger.CRITICAL, true);
         }
 	}
 
@@ -138,7 +144,7 @@ public class PASSPortlet extends GenericPortlet {
                 // The resourceID methods return the init-param of the path
                 result = (String) actionMethod.invoke(actionClass, request, response);
             } catch (Exception e) {
-                handlePASSException(e, false);
+                handlePASSException(e, "Error in serveResource", Logger.ERROR, false);
                 result="There was an error performing your request";
             }
         } else {
@@ -174,15 +180,12 @@ public class PASSPortlet extends GenericPortlet {
                 // The action methods return the init-param of the path
                 viewJSP = (String) actionMethod.invoke(actionClass, request, response);
             } catch (Exception e) {
-                handlePASSException(e, false);
+                handlePASSException(e, action, Logger.ERROR, false);
             }
         }
 
         // viewJSP holds an init parameter that maps to a jsp file
         viewJSP = getInitParameter(viewJSP);
-
-
-        _log.debug("viewJSP in delegate: "+viewJSP);
     }
 
     /**
@@ -198,7 +201,8 @@ public class PASSPortlet extends GenericPortlet {
     /**
      * Takes care of initializing portlet variables and storing them in the portletContext.
      * Some of these variables are: permissionRuleMgr, appraisalStepMgr, reviewers, admins and
-     * environment properties. This method is called everytime a doView, processAction or
+     * environment properties. It also creates a PassLogger and Mailer instances and stores them
+     * in portletContext. This method is called everytime a doView, processAction or
      * serveResource are called, but the code inside only executes the first time.
      *
      * @param request
@@ -206,16 +210,65 @@ public class PASSPortlet extends GenericPortlet {
      */
     private void portletSetup(PortletRequest request) throws Exception {
         if (getPortletContext().getAttribute("environmentProp") == null) {
+            actionClass.setPortletContext(getPortletContext());
             loadEnvironmentProperties(request);
+            createLogger();
+            actionClass.setPassConfiguration();
+            createMailer();
             getPortletContext().setAttribute("permissionRules", permissionRuleMgr.list());
             getPortletContext().setAttribute("appraisalSteps", appraisalStepMgr.list());
             loadResourceBundle();
 
-            actionClass.setPortletContext(getPortletContext());
             actionClass.setPassAdmins();
             actionClass.setPassReviewers();
-            actionClass.setPassConfiguration();
         }
+    }
+
+    /**
+     * Creates a Mailer instance and stores it in the portlet context. It fetches the mail properties from
+     * the environmentProp attribute in portlet context that comes from the properties files.
+     *
+     * @throws Exception
+     */
+    private void createMailer() throws Exception {
+        ResourceBundle resources = ResourceBundle.getBundle("edu.osu.cws.pass.portlet.Email");
+        CompositeConfiguration config = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
+        String hostname = config.getString("mail.hostname");
+        Address from = new InternetAddress(config.getString("mail.fromAddress"));
+        Address replyTo = new InternetAddress(config.getString("mail.replyToAddress"));
+        String linkUrl = config.getString("mail.linkUrl");
+        String mimeType = config.getString("mail.mimeType");
+        Map<String, Configuration> configurationMap = (Map<String, Configuration>)
+                getPortletContext().getAttribute("configurations");
+        Mail mail = new Mail(hostname, from);
+        Mailer mailer = new Mailer(resources, mail, linkUrl, mimeType, configurationMap, getLog(),replyTo);
+        getPortletContext().setAttribute("mailer", mailer);
+    }
+
+    /**
+     * Creates an instance of PassLogger, grabs the properties from the properties file and stores the
+     * log instance in the portletContext.
+     */
+    private void createLogger() {
+        CompositeConfiguration config = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
+        String serverName = config.getString("log.serverName");
+        String clientHost = config.getString("log.clientHost");
+        PassLogger passLogger = new PassLogger(serverName, clientHost);
+        getPortletContext().setAttribute("log", passLogger);
+    }
+
+    /**
+     * Returns a PassLogger instance stored in the portletContext.
+     *
+     * @return PassLogger
+     * @throws Exception
+     */
+    private PassLogger getLog() throws Exception {
+        PassLogger log = (PassLogger) getPortletContext().getAttribute("log");
+        if (log == null) {
+            throw new Exception("Could not get instance of PassLogger from portletContext");
+        }
+        return log;
     }
 
     /**
@@ -255,10 +308,12 @@ public class PASSPortlet extends GenericPortlet {
      * @param e Exception
      * @param getInitParam  Whether or not to use getInitParameter when setting viewJSP
      */
-    private void handlePASSException(Exception e, boolean getInitParam) {
-        CompositeConfiguration props = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
-        ExceptionHandler eh = new ExceptionHandler(e, _log, props, "PASS");
-        eh.handleException();
+    private void handlePASSException(Exception e, String shortMessage, String level, boolean getInitParam) {
+        try {
+            getLog().log(level, shortMessage, e);
+        } catch (Exception exception) {
+            _log.error(CWSUtil.stackTraceString(exception));
+        }
         if (getInitParam) {
             viewJSP = getInitParameter("error-jsp");
         } else {
@@ -275,7 +330,12 @@ public class PASSPortlet extends GenericPortlet {
 			getPortletContext().getRequestDispatcher(path);
 
 		if (portletRequestDispatcher == null) {
-			_log.error(path + " is not a valid include");
+            try {
+                getLog().log(Logger.ERROR, path + " is not a valid include", "");
+            } catch (Exception e) {
+                _log.error(path + " is not a valid include");
+                _log.error(CWSUtil.stackTraceString(e));
+            }
 		}
 		else {
 			portletRequestDispatcher.include(renderRequest, renderResponse);

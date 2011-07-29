@@ -8,11 +8,16 @@ package edu.osu.cws.pass.util;
  */
 import java.lang.reflect.Method;
 import javax.mail.*;
+import javax.swing.border.TitledBorder;
 import java.util.List;
 
+import edu.osu.cws.pass.hibernate.AppraisalMgr;
 import edu.osu.cws.pass.hibernate.EmailMgr;
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.util.*;
+import oracle.net.ano.SupervisorService;
+import sun.awt.image.OffScreenImage;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -26,16 +31,18 @@ public class Mailer {
     private String mimeType;
     private Map<String, Configuration> configMap;
     private String logHost;
+    private Address[] replyTo;
     private PassLogger logger;
 
     public Mailer(ResourceBundle resources, Mail mail,
-                  String linkURL, String mimeType, Map<String, Configuration> map, PassLogger logger) {
+                  String linkURL, String mimeType, Map<String, Configuration> map, PassLogger logger, Address replyTo) {
         this.email = mail;
         this.emailBundle = resources;
         this.linkURL = linkURL;
         this.mimeType = mimeType;
         configMap = map;
         this.logger = logger;
+        this.replyTo[0] = replyTo;
     }
 
     /**
@@ -45,13 +52,14 @@ public class Mailer {
      * @throws Exception
      */
     public void sendMail(Appraisal appraisal, EmailType emailType) throws Exception {
-
+        String logShortMessage = "";
+        String logLongMessage = "";
         if (!(appraisal.getJob().getStatus().equals("A"))) {
-            //The job is currently not active, don't send email, but log the attempt
-            logger.log("NOTICE","Email not sent",
-                    "Appraisal " + appraisal.getId() +
+            logShortMessage = "Email not sent";
+            logLongMessage = "Appraisal " + appraisal.getId() +
                     " not available, job " + appraisal.getJob().getId() +
-                    " is no longer active.");
+                    " is not active.";
+            logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
             return;
         }
         Message msg = email.getMessage();
@@ -77,6 +85,8 @@ public class Mailer {
         String body = getBody(appraisal, emailType);
 
         msg.setContent(body, mimeType);
+   
+        msg.setReplyTo(replyTo);
 
         String subject = emailBundle.getString( "email_" + emailType.getType() + "_subject");
 
@@ -85,9 +95,12 @@ public class Mailer {
 
         Email email = new Email(appraisal.getId(), emailType.getType());
         EmailMgr.add(email);
-
-        logger.log("INFORMATION", emailType + " email sent for appraisal " + appraisal.getId(),
-            emailType + " mail sent to " + msg.getAllRecipients().toString() + " for appraisal " + appraisal.getId());
+        logShortMessage = emailType + " email sent for appraisal " + appraisal.getId();
+        logLongMessage = "email of type " + emailType
+                            + " mail sent to " + msg.getAllRecipients().toString()
+                            + " for appraisal " + appraisal.getId()
+                            + "for <job title> of <employee name> ";
+        logger.log(Logger.INFORMATIONAL, logShortMessage, logLongMessage);
    }
 
     /**
@@ -98,21 +111,44 @@ public class Mailer {
      * @throws MessagingException
      *
      */
-    // @todo: It makes better sense to move the conversion to the mail class.
-    private Address[] getRecipients(String mailTo, Appraisal appraisal) throws MessagingException {
+    private Address[] getRecipients(String mailTo, Appraisal appraisal) throws Exception {
         String[] mailToArray = mailTo.split(",");
         Address[] recipients = new Address[mailToArray.length];
         String contact = "";
         int i = 0;
         for (String recipient : mailToArray) {
+            Job job = appraisal.getJob();
             if (recipient.equals("employee")) {
-                contact = appraisal.getJob().getEmployee().getEmail();
+                if (job == null) {
+                    String logShortMessage = "Employee email not sent";
+                    String logLongMessage = "Job for appraisal" + appraisal.getId() + "is null";
+                    logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
+                    contact = "nobody@oregonstate.edu";
+                } else {
+                    contact = job.getEmployee().getEmail();
+                }
             }
             if (recipient.equals("supervisor")) {
-                contact = appraisal.getJob().getSupervisor().getEmployee().getEmail();
+                if (job == null) {
+                    String logShortMessage = "Supervisor email not sent";
+                    String logLongMessage = "Job for appraisal" + appraisal.getId() + "is null";
+                    logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
+                    contact = null;
+                } else {
+                    Job supervisorJob = job.getSupervisor();
+                    if (supervisorJob == null) {
+                        String logShortMessage = "Supervisor email not sent";
+                        String logLongMessage = "Suppervisor for appraisal" + appraisal.getId() + "is null";
+                        logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
+                        contact = null;
+                    } else {
+                        contact = supervisorJob.getEmployee().getEmail();
+                    }
+                }
             }
-
-            recipients[i++] = email.stringToAddress(contact);
+            if (contact != null) {
+                recipients[i++] = email.stringToAddress(contact);
+            }
         }
         return recipients;
     }
@@ -179,9 +215,11 @@ public class Mailer {
             Integer appraisalId = email.getAppraisalId();
             String emailType = email.getEmailType();
             email.getEmailType();
+            String logStatus = Logger.INFORMATIONAL;
+            String logShortMessage = emailType + " email sent for appraisal " + appraisalId;
+            String logLongMessage = emailType + " mail sent to " + emailAddress + " for appraisal " + appraisalId; 
 
-            logger.log("INFORMATION", emailType + " email sent for appraisal " + appraisalId,
-                    emailType + " mail sent to " + emailAddress + " for appraisal " + appraisalId);
+            logger.log(logStatus, logShortMessage, logLongMessage);
         }
     }
 
@@ -347,11 +385,11 @@ public class Mailer {
      * @return
      * @throws Exception
      */
-    //@todo: get final body
     private String reviewDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_reviewDue_body");
-        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod());
+                String businessCenterName = appraisal.getJob().getBusinessCenterName();
+        int dueCount = AppraisalMgr.getReviewDueCount(businessCenterName);
+        return MessageFormat.format(bodyString, dueCount);
     }
 
     /**
@@ -360,11 +398,12 @@ public class Mailer {
      * @return
      * @throws Exception
      */
-    //@todo: get final body
     private String reviewOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_reviewOverdue_body");
-        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod());
+        String businessCenterName = appraisal.getJob().getBusinessCenterName();
+        //AppraisalMgr.getReviewDueCount(businessCenterName);
+        int dueCount = AppraisalMgr.getReviewOvedDueCount(businessCenterName);
+        return MessageFormat.format(bodyString, dueCount);
     }
 
     /**
@@ -417,7 +456,6 @@ public class Mailer {
      * @return
      * @throws Exception
      */
-    //@todo: get final body
     private String rebuttalReadBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_rebuttalRead_body");
         return MessageFormat.format(bodyString, appraisal.getReviewPeriod());

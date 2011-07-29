@@ -8,6 +8,8 @@ package edu.osu.cws.util;
  * To change this template use File | Settings | File Templates.
  */
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.InetAddress;
 import java.util.Calendar;
 import java.util.Date;
@@ -195,5 +197,17 @@ public class CWSUtil
       }
     }
 
-
+    /**
+     * Simple method that takes in an exception and returns the stacktrace as a string. We
+     * need this so that if we get an exception, we can send it to the luminis log.
+     *
+     * @param e     Exception
+     * @return  String stack trace
+     */
+    public static String stackTraceString(Exception e) {
+        StringWriter writerStr = new StringWriter();
+        PrintWriter myPrinter = new PrintWriter(writerStr);
+        e.printStackTrace(myPrinter);
+        return writerStr.toString();
+    }
 }

@@ -40,9 +40,9 @@
 
         <set name="appraisals" inverse="true">
             <key>
-                <column name="PYVPASJ_PIDM"/>
-                <column name="PYVPASJ_POSN"/>
-                <column name="PYVPASJ_SUFF"/>
+                <column name="JOB_PIDM"/>
+                <column name="POSITION_NUMBER"/>
+                <column name="JOB_SUFFIX"/>
             </key>
             <one-to-many class="edu.osu.cws.pass.models.Appraisal"/>
         </set>

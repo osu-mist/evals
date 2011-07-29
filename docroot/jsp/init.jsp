@@ -39,6 +39,7 @@ if (errorMsg != null && !errorMsg.equals("")) {
 <div id="osu-cws"> <!-- Full wrapper for portlet (closed in footer.jsp) -->
   
 <c:if test="${not empty menuHome}">
+    <liferay-ui:message key="performance-appraisal-software-system"/>
     <%@ include file="/jsp/menuHome.jsp"%>
 </c:if>
 <c:if test="${not empty menuMax}">

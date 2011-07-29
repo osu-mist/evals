@@ -40,9 +40,9 @@
         <property name="release2Date" type="timestamp" column="RELEASE2_DATE"/>
 
         <many-to-one name="job" class="edu.osu.cws.pass.models.Job" not-null="true">
-            <column name="PYVPASJ_PIDM"/>
-            <column name="PYVPASJ_POSN"/>
-            <column name="PYVPASJ_SUFF"/>
+            <column name="JOB_PIDM"/>
+            <column name="POSITION_NUMBER"/>
+            <column name="JOB_SUFFIX"/>
         </many-to-one>
         <many-to-one name="goalsApprover" class="edu.osu.cws.pass.models.Employee"
                      column="GOALS_APPROVER_PIDM"

@@ -19,21 +19,14 @@ import java.util.Properties;
 
 public class Mail {
     Address from;
-	Properties props = new Properties();  //this is the properties that holds the mailHost and is used to create a session.
+	Properties props = new Properties();
 
-	public Mail(String hostname, Address from)
-    {
-       //@todo
+	public Mail(String hostname, Address from) {
+         props.setProperty("mail.smtp.host", hostname);
+         this.from = from;
     }
 
 	public Message getMessage() throws MessagingException {
-
-        //props.setProperty()
-        // get these from portlet propeties later
-        props.setProperty("mail.smtp.host", "localhost");
-        props.setProperty("mail.from", "me@example.com");
-
-
         Session session = Session.getInstance(props, null);
         Message message = new MimeMessage(session);
         message.setFrom(from);
