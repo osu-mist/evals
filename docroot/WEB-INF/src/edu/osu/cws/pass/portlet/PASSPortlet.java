@@ -235,12 +235,13 @@ public class PASSPortlet extends GenericPortlet {
         CompositeConfiguration config = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
         String hostname = config.getString("mail.hostname");
         Address from = new InternetAddress(config.getString("mail.fromAddress"));
+        Address replyTo = new InternetAddress(config.getString("mail.replyToAddress"));
         String linkUrl = config.getString("mail.linkUrl");
         String mimeType = config.getString("mail.mimeType");
         Map<String, Configuration> configurationMap = (Map<String, Configuration>)
                 getPortletContext().getAttribute("configurations");
         Mail mail = new Mail(hostname, from);
-        Mailer mailer = new Mailer(resources, mail, linkUrl, mimeType, configurationMap, getLog());
+        Mailer mailer = new Mailer(resources, mail, linkUrl, mimeType, configurationMap, getLog(),replyTo);
         getPortletContext().setAttribute("mailer", mailer);
     }
 
