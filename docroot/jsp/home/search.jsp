@@ -2,14 +2,14 @@
     <div class="accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>Search');">
         <table>
             <tr>
-                <td align='left'><h2 class="accordion-header-left"></h2></td>
+                <td align='left'><div class="accordion-header-left"></div></td>
                 <td align='left' class="accordion-header-middle">
                     <span class="accordion-header-content" id="<portlet:namespace/>_header_1">
                         &nbsp;&nbsp;<img id="<portlet:namespace/>SearchImageToggle" src="/cps/images/accordion/accordion_arrow_down.png"/>
                     </span>
                     <span class="accordion-header-content"><liferay-ui:message key="search" /></span>
                 </td>
-                <td align='right'><h2 class="accordion-header-right"></h2></td>
+                <td align='right'><div class="accordion-header-right"></div></td>
             </tr>
         </table>
     </div>
@@ -19,7 +19,7 @@
             </portlet:actionURL>" method="post">
 
             <label for="<portlet:namespace/>osuid"><liferay-ui:message key="search-employee-osuid"/></label>
-            <input type="text" id="<portlet:namespace/>osuid" name="<portlet:namespace/>osuid" />
+            <input type="text" id="<portlet:namespace/>osuid" class="inline" name="<portlet:namespace/>osuid" />
             <input type="submit" value="<liferay-ui:message key="search"/>"/>
         </form>
     </div>

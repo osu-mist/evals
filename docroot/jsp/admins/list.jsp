@@ -45,7 +45,6 @@
     
 </c:if>
 
-<div class="separator"></div>
 <table class="taglib-search-iterator">
     <thead>
         <tr class="portlet-section-header results-header">
@@ -90,14 +89,14 @@
 
       // When user clicks cancel in add form, hide the form.
       jQuery("#<portlet:namespace/>cancel").click(function() {
-        jQuery("#pass-user-add").hide();
-        jQuery("#<portlet:namespace/>admin-add-link").show();
+        jQuery("#pass-user-add").hide("slow");
+        jQuery("#<portlet:namespace/>admin-add-link").show("slow");
         return false;
       });
       // When user clicks cancel in add form, hide the form.
       jQuery("#<portlet:namespace/>admin-add-link").click(function() {
-        jQuery("#pass-user-add").show();
-        jQuery("#<portlet:namespace/>admin-add-link").hide();
+        jQuery("#pass-user-add").show("slow");
+        jQuery("#<portlet:namespace/>admin-add-link").hide("slow");
       });
 
       // Validate form submission

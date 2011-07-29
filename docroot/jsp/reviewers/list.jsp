@@ -48,7 +48,6 @@ List criteria = (List) renderRequest.getAttribute("reviewersList");
     
 </c:if>
 
-<div class="separator"></div>
 <table class="taglib-search-iterator">
     <thead>
         <tr class="portlet-section-header results-header">
@@ -86,14 +85,14 @@ List criteria = (List) renderRequest.getAttribute("reviewersList");
 
       // When user clicks ADD in add form, hide the form.<portlet:namespace/>reviewer-add-link
       jQuery("#<portlet:namespace/>reviewer-add-link").click(function() {
-        jQuery("#pass-user-add").show();
-        jQuery("#<portlet:namespace/>reviewer-add-link").hide();
+        jQuery("#pass-user-add").show("slow");
+        jQuery("#<portlet:namespace/>reviewer-add-link").hide("slow");
       });
       
       // When user clicks CANCEL in add form, hide the form.
       jQuery("#<portlet:namespace/>cancel").click(function() {
-        jQuery("#pass-user-add").hide();
-        jQuery("#<portlet:namespace/>reviewer-add-link").show();
+        jQuery("#pass-user-add").hide("slow");
+        jQuery("#<portlet:namespace/>reviewer-add-link").show("slow");
         return false;
       });
       
