@@ -1,22 +1,12 @@
 <div id="<portlet:namespace/>accordionMenuPassNotification" class="accordion-menu pass-notification">
-    <div class="accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>passNotification');">
-        <table>
-            <tr>
-                <td align='left'><div class="accordion-header-left"></div></td>
-                <td align='left' class="accordion-header-middle">
-                    <span class="accordion-header-content" id="<portlet:namespace/>_header_1">
-                        &nbsp;&nbsp;<img id="<portlet:namespace/>passNotificationImageToggle" src="/cps/images/accordion/accordion_arrow_down.png"/>
-                    </span>
-                    <span class="accordion-header-content"><liferay-ui:message key="notifications"/></span>
-                </td>
-                <td align='right'><div class="accordion-header-right"></div></td>
-            </tr>
-        </table>
+    <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>passNotification');">
+      <img id="<portlet:namespace/>passNotificationImageToggle" src="/cps/images/accordion/accordion_arrow_down.png"/>
+      <liferay-ui:message key="notifications" />
     </div>
     <div class="accordion-content" id="<portlet:namespace/>passNotification" style="display: block;">
         <h3><liferay-ui:message key="my-eval-actions" /></h3>
         <c:if test="${!empty employeeActions}">
-            <ul>
+            <ul class="pass-menu-list">
                 <c:forEach var="reqAction" items="${employeeActions}">
                     <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
                     <c:forEach var="params" items="${reqAction.parameters}">
@@ -33,7 +23,7 @@
         <c:if test="${isSupervisor == 'true' || isReviewer == 'true'}">
             <h3><liferay-ui:message key="my-admin-actions" /></h3>
             <c:if test="${!empty administrativeActions}">
-                <ul>
+                <ul class="pass-menu-list">
                     <c:forEach var="reqAction" items="${administrativeActions}">
                         <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
                         <c:forEach var="params" items="${reqAction.parameters}">

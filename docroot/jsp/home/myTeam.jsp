@@ -1,19 +1,9 @@
 <c:if test="${isSupervisor == 'true'}">
 <jsp:useBean id="myTeamsActiveAppraisals" class="java.util.ArrayList" scope="request" />
     <div id="<portlet:namespace/>accordionMenuMyTeam" class="accordion-menu">
-        <div class="accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>MyTeam');">
-            <table>
-                <tr>
-                    <td align='left'><div class="accordion-header-left"></div></td>
-                    <td align='left' class="accordion-header-middle">
-                        <span class="accordion-header-content" id="<portlet:namespace/>_header_1">
-                            &nbsp;&nbsp;<img id="<portlet:namespace/>MyTeamImageToggle" src="/cps/images/accordion/accordion_arrow_down.png"/>
-                        </span>
-                        <span class="accordion-header-content"><liferay-ui:message key="myTeam" /></span>
-                    </td>
-                    <td align='right'><div class="accordion-header-right"></div></td>
-                </tr>
-            </table>
+        <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>MyTeam');">
+          <img id="<portlet:namespace/>MyTeamImageToggle" src="/cps/images/accordion/accordion_arrow_down.png"/>
+          <liferay-ui:message key="myTeam" />
         </div>
         <div class="accordion-content" id="<portlet:namespace/>MyTeam" style="display: block;">
             <c:if test="${!empty myTeamsActiveAppraisals}">
