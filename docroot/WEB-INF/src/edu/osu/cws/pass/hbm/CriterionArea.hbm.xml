@@ -5,7 +5,9 @@
 
     <class name="edu.osu.cws.pass.models.CriterionArea" table="criteria_areas">
         <id name="id" type="int" column="ID">
-            <generator class="native" />
+            <generator class="native">
+                <param name="sequence">passmgr.pass_seq</param>
+            </generator>
         </id>
         <property name="name" column="NAME"/>
         <property name="sequence" column="SEQUENCE"/>

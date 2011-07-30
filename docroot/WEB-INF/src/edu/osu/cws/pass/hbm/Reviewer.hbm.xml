@@ -5,7 +5,9 @@
 
     <class name="edu.osu.cws.pass.models.Reviewer" table="reviewers">
         <id name="id" type="int" column="ID">
-            <generator class="native" />
+            <generator class="native">
+                <param name="sequence">passmgr.pass_seq</param>
+            </generator>
         </id>
 
         <property name="businessCenterName" type="string" length="4" column="BUSINESS_CENTER_NAME"/>

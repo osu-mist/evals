@@ -31,7 +31,7 @@ public class Mailer {
     private String mimeType;
     private Map<String, Configuration> configMap;
     private String logHost;
-    private Address[] replyTo;
+    private Address[] replyTo = new Address[1];
     private PassLogger logger;
 
     public Mailer(ResourceBundle resources, Mail mail,

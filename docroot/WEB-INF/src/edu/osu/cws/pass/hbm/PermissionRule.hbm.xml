@@ -5,7 +5,9 @@
 
     <class name="edu.osu.cws.pass.models.PermissionRule" table="permission_rules">
         <id name="id" type="int" column="ID">
-            <generator class="native" />
+            <generator class="native">
+                <param name="sequence">passmgr.pass_seq</param>
+            </generator>
         </id>
 
         <property name="status" length="32" column="STATUS"/>

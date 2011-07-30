@@ -90,6 +90,7 @@ public class AppraisalMgr {
                     assessment.setCriterionDetail(detail);
                     assessment.setAppraisal(appraisal);
                     assessment.setCreateDate(new Date());
+                    assessment.setModifiedDate(new Date());
                     session.save(assessment);
 
                 }
