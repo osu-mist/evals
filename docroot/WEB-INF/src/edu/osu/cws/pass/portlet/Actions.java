@@ -741,8 +741,10 @@ public class Actions {
             adminMgr.add(onid,  isMaster, getLoggedOnUser(request));
             setPassAdmins();
             SessionMessages.add(request, "admin-added");
-        } catch (Exception e) {
+        } catch (ModelException e) {
             addErrorsToRequest(request, e.getMessage());
+        } catch (Exception e) {
+            throw e;
         }
 
         return listAdmin(request, response);
