@@ -83,7 +83,7 @@ public class CriteriaMgr {
 
         String description = request.get("description")[0];
         String name = request.get("name")[0];
-        boolean propagateEdit = request.get("propagateEdit") != null;
+        boolean propagateEdit = request.get("propagateEdit")[0] != null;
 
         try {
             Transaction tx = session.beginTransaction();
@@ -106,9 +106,6 @@ public class CriteriaMgr {
             if (!areaChanged && !descriptionChanged) {
                 return true;
             }
-
-            if (!areaChanged && !descriptionChanged)
-                return false;
 
             if (areaChanged && !descriptionChanged) {
                 // copy all the values from the old CriterionArea
