@@ -971,7 +971,7 @@ public class AppraisalMgr {
         }
 
         Transaction tx = session.beginTransaction();
-        Query hibernateQuery = session.createQuery(query).setInteger("osuid", osuid);
+        Query hibernateQuery = session.createQuery(query).setString("osuid", Integer.toString(osuid));
         if (!conditions.isEmpty()) {
             hibernateQuery.setString("bcName", bcName);
         }
