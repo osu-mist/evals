@@ -14,6 +14,13 @@ public class Appraisal extends Pass {
     public static final String signatureRequired =
             "Please click the box to acknowledge that you have read the appraisal";
 
+    /**
+     * Validation error message for rating is public because the appraisal.jsp
+     * needs to access this static variable in order to do js validation
+     */
+    public static final String ratingRequired =
+            "Please select a rating.";
+
     public static final String invalidType =
             "Appraisal type can only be: annual or trial. Please provide a valid type.";
 

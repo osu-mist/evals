@@ -100,7 +100,8 @@
         </c:if>
 
         <c:if test="${not empty permissionRule.submit}">
-        <input name="${permissionRule.submit}" type="submit" value="<liferay-ui:message key="${permissionRule.submit}" />">
+        <input name="${permissionRule.submit}" type="submit" id="<portlet:namespace />${permissionRule.submit}"
+        value="<liferay-ui:message key="${permissionRule.submit}" />">
         </c:if>
 
         <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}">
@@ -109,6 +110,8 @@
 
     <script type="text/javascript">
     jQuery(document).ready(function() {
+
+      // Handle acknowledge appraisal rebuttal read by supervisor
       jQuery("pass-appraisal-rebuttal").hide();
 
       jQuery("#<portlet:namespace />fm").submit(function() {
@@ -127,6 +130,29 @@
 
         return true;
       });
+
+      // Handle validation of rating
+      jQuery("#<portlet:namespace />submit-appraisal").click(function() {
+        var errors = "";
+        if (jQuery("input[name=submit-appraisal]").length > 0 &&
+              jQuery("input[name=<portlet:namespace />appraisal.rating]:checked",
+                "#<portlet:namespace />fm").val() == undefined) {
+          errors = "<li><%= Appraisal.ratingRequired %></li>";
+          alert("<%= Appraisal.ratingRequired %>");
+        }
+
+        if (errors != "") {
+          jQuery("#<portlet:namespace />flash").html(
+            '<span class="portlet-msg-error"><ul>'+errors+'</ul></span>'
+          );
+          return false;
+        }
+
+        return true;
+      });
+
+
+      // Handle rebuttal show/hide
       jQuery("#<portlet:namespace />show-rebuttal").click(function() {
         jQuery("#<portlet:namespace />show-rebuttal").hide();
         jQuery(".pass-appraisal-rebuttal").show();
