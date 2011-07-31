@@ -9,7 +9,7 @@ package edu.osu.cws.pass.models;
 
 
 public class AppointmentType extends Pass {
-    public static final String CLASSIFIED = "classified";
+    public static final String CLASSIFIED = "Classified";
 
     public static final String CLASSIFIED_IT = "classifiedIT";
 
