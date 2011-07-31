@@ -864,13 +864,17 @@ public class AppraisalMgr {
      */
     public List<Appraisal> search(int osuid, int pidm, boolean isAdmin, boolean isSupervisor, String bcName)
             throws Exception {
-        List<Appraisal> appraisals;
+        List<Appraisal> appraisals = new ArrayList<Appraisal>();
         Employee employee = employeeMgr.findByOsuid(osuid);
         Job appraisalJob;
         boolean isUpperSupervisorOfAJob = false;
         boolean isUpperSupervisor;
         ArrayList<Job> jobsWhiteList = new ArrayList<Job>();
         List<Appraisal> appraisalsCopy = new ArrayList<Appraisal>();
+
+        if (employee == null) {
+            return appraisals;
+        }
 
         if (!isAdmin && isSupervisor) {
             for (Job job : (Set<Job>) employee.getJobs()) {
