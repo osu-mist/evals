@@ -40,9 +40,19 @@ if (errorMsg != null && !errorMsg.equals("")) {
   
 <c:if test="${not empty menuHome}">
     <liferay-ui:message key="performance-appraisal-software-system"/>
+    <c:if test="${not empty isAdminHome}">
+    - <liferay-ui:message key="role-admin"/>
+    </c:if>
+    <c:if test="${not empty isSupervisorHome}">
+    - <liferay-ui:message key="role-supervisor"/>
+    </c:if>
     <%@ include file="/jsp/menuHome.jsp"%>
 </c:if>
 <c:if test="${not empty menuMax}">
+    <liferay-ui:message key="performance-appraisal-software-system"/>
+        <c:if test="${not empty isReviewerHome}">
+    - <liferay-ui:message key="role-reviewer"/>
+    </c:if>
     <%@ include file="/jsp/menuMax.jsp"%>
 </c:if>
 

@@ -279,6 +279,7 @@ public class Actions {
 
         setupActiveAppraisals(request, employeeId);
         helpLinks(request);
+        request.setAttribute("isHome", true);
 
         setRequiredActions(request);
         useNormalMenu(request);
@@ -319,6 +320,7 @@ public class Actions {
         setRequiredActions(request);
         useNormalMenu(request);
         helpLinks(request);
+        request.setAttribute("isAdminHome", true);
 
         return "admin-home-jsp";
     }
@@ -330,6 +332,7 @@ public class Actions {
         setTeamAppraisalStatus(request);
         useNormalMenu(request);
         helpLinks(request);
+        request.setAttribute("isSupervisorHome", true);
 
         return "supervisor-home-jsp";
     }
@@ -463,6 +466,7 @@ public class Actions {
         request.setAttribute("appraisals", appraisals);
         request.setAttribute("pageTitle", "pending-reviews");
         useMaximizedMenu(request);
+        request.setAttribute("isReviewerHome", true);
 
         return "review-list-jsp";
     }

@@ -1,6 +1,10 @@
 <div id="pass-top-menu" class="action-menu-wrapper">
     <ul class="portlet-action-menu">
-        <li><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
+        <li
+        <c:if test="${not empty isHome}">
+        class="active"
+        </c:if>
+        ><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
                         <portlet:param name="action" value="displayHomeView"/>
                         </portlet:renderURL>"><liferay-ui:message key="home"/></a></li>
         <li><a href="#"><liferay-ui:message key="settings"/></a>
