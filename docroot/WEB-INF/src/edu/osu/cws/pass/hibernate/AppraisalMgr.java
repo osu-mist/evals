@@ -841,7 +841,7 @@ public class AppraisalMgr {
         Transaction tx = session.beginTransaction();
         int count = session.createQuery("from edu.osu.cws.pass.models.Appraisal " +
                 "where status in ('reviewDue', 'reviewOverdue') " +
-                "and job.businessCenterName = :bcName and job.endDate is NULL")
+                "and job.businessCenterName = :bcName")
                 .setString("bcName", businessCenterName)
                 .list().size();
         tx.commit();
