@@ -899,6 +899,7 @@ public class Actions {
         if (id != 0) {
             try {
                 configurationMgr.edit(id, value);
+                setPassConfiguration();
             } catch (Exception e) {
                 return e.getMessage();
             }
