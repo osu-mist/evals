@@ -39,7 +39,9 @@ public class CriteriaMgr {
 
         area.setCreator(creator);
         area.setSequence(sequence);
+        area.setCreateDate(new Date());
         details.setCreator(creator);
+        details.setCreateDate(new Date());
 
         // validate both objects individually and then check for errors
         area.validate();
