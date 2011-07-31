@@ -317,7 +317,9 @@ public class AppraisalMgr {
                 mailer.sendMail(appraisal, emailType);
             }
         } catch (Exception e) {
-            session.close();
+            if (session.isOpen()) {
+                session.close();
+            }
             throw e;
         }
         return false;
