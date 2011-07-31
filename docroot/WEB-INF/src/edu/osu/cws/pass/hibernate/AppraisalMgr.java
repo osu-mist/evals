@@ -250,6 +250,9 @@ public class AppraisalMgr {
                 goalLog = new GoalLog();
                 goalLog.setCreateDate(new Date());
                 goalLog.setAuthor(loggedInUser);
+                if (updatedGoalTextGoalText.equals("")) {
+                    updatedGoalTextGoalText = "empty";
+                }
                 goalLog.setContent(updatedGoalTextGoalText);
                 assessment.addAssessmentLog(goalLog);
                 session.save(goalLog);
@@ -263,6 +266,9 @@ public class AppraisalMgr {
                 goalLog = new GoalLog();
                 goalLog.setCreateDate(new Date());
                 goalLog.setAuthor(loggedInUser);
+                if (updatedNewGoalText.equals("")) {
+                    updatedNewGoalText = "empty";
+                }
                 goalLog.setContent(updatedNewGoalText);
                 goalLog.setType(GoalLog.NEW_GOAL_TYPE);
                 assessment.addAssessmentLog(goalLog);
