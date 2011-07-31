@@ -32,6 +32,9 @@ public class Employee extends Pass {
     private Set jobs = new HashSet();
 
     public String getName() {
+        lastName = (lastName == null)? "" : lastName;
+        firstName = (firstName == null)? "" : firstName;
+
         return lastName + ", " + firstName;
     }
 

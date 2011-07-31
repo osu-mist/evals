@@ -268,6 +268,15 @@ public class Actions {
         Employee employee = getLoggedOnUser(request);
         int employeeId = employee.getId();
 
+        boolean isAdmin = isLoggedInUserAdmin(request);
+        boolean isReviewer = isLoggedInUserReviewer(request);
+        boolean hasAppraisals = !appraisalMgr.getAllMyActiveAppraisals(employeeId).isEmpty() ||
+                !appraisalMgr.getMyTeamsAppraisals(employeeId, true).isEmpty();
+
+        if (!isAdmin && !isReviewer && !hasAppraisals) {
+            request.setAttribute("hasNoPassAccess", true);
+        }
+
         setupActiveAppraisals(request, employeeId);
         helpLinks(request);
 
