@@ -1134,7 +1134,7 @@ public class Actions {
             if (rule != null) {
                 actionRequired = rule.getActionRequired();
             }
-            if (!actionRequired.equals("")) {
+            if (actionRequired != null && !actionRequired.equals("")) {
                 // compose a requiredAction object and add it to the outList.
                 anchorParams = new HashMap<String, String>();
                 anchorParams.put("action", "displayAppraisal");
