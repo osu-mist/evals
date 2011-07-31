@@ -49,7 +49,7 @@
         <c:if test="${not empty permissionRule.employeeResponse}">
             <input type="checkbox"  name="<portlet:namespace />acknowledge-read-appraisal"
                 id="<portlet:namespace />acknowledge-read-appraisal"
-                <c:if test="${appraisal.status != 'signature-due'}">
+                <c:if test="${appraisal.status != 'signatureDue' && appraisal.status != 'signatureOverdue'}">
                     checked="checked" disabled="disabled"
                 </c:if>
             >
