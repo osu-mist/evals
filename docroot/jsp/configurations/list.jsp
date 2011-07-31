@@ -7,51 +7,65 @@
 <c:forEach var="configuration" items="${configurations}" varStatus="loopStatus">
     <c:if test="${configuration.section != sectionName}">
         <c:if test="${sectionName != ''}">
-            </table> <!-- end of configuration section -->
+            </table>
+            </div>           
+             <!-- end of configuration section -->
             <br />
         </c:if>
 
         <c:set var="sectionName" value="${configuration.section}"/>
         
-
-        <table class="taglib-search-iterator configuration-list">
-            <caption><liferay-ui:message key="${configuration.section}"/></caption>
-            <thead>
-                <tr class="portlet-section-header results-header">
-                    <th><liferay-ui:message key="configurations-setting"/></th>
-                    <th><liferay-ui:message key="description"/></th>
-                    <th><liferay-ui:message key="value"/></th>
-                    <th><liferay-ui:message key="actions"/></th>
-                </tr>
-            </thead>
-    </c:if>
-    
-    <tr class="${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}"
-        id="<portlet:namespace/>users-${configuration.id}"
-    >
-        <td><strong><liferay-ui:message key="parameters-${configuration.name}"/></strong></td>
-        <td><liferay-ui:message key="parameters-${configuration.name}-description"/></td>
-        <td>
-            <div id="<portlet:namespace/>displayValue${configuration.id}">${configuration.value}</div>
-            <div id="<portlet:namespace/>form${configuration.id}" style="display:none;">
-            <form onSubmit="saveConfig(this.<portlet:namespace/>configId${configuration.id}.value, this.<portlet:namespace/>configValue${configuration.id}.value);return false;">
-                <input type="hidden" name="<portlet:namespace/>configId${configuration.id}"
-                    id="<portlet:namespace/>configId${configuration.id}" value="${configuration.id}">
-                <input name="<portlet:namespace/>configValue${configuration.id}"
-                    id="<portlet:namespace/>configValue${configuration.id}" value="${configuration.value}"
-                    type="text"/>
-                <input type="submit" value="Save">
-                <input type="submit" value="Cancel" onclick="toggleForm(${configuration.id}); return false;">
-            </form>
+        <div id="<portlet:namespace/>accordionMenuConfiguration${configuration.section}" class="accordion-menu">
+            <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>Configuration${configuration.section}');">
+              <img id="<portlet:namespace/>Configuration${configuration.section}ImageToggle" src="/cps/images/accordion/accordion_arrow_down.png"/>
+              <liferay-ui:message key="${configuration.section}"/>
             </div>
-        </td>
-        <td>
-            <a id="<portlet:namespace/>editAction${configuration.id}"
-            href="#" onclick="toggleForm(${configuration.id});">
-            <liferay-ui:message key="edit"/></a>
-        </td>
-    </tr>
-</c:forEach>
+            <div class="accordion-content" id="<portlet:namespace/>Configuration${configuration.section}"
+             <c:if test="${configuration.section == 'due-date'}">
+                style="display: block;"
+             </c:if>
+              <c:if test="${configuration.section != 'due-date'}">
+                style="display: none;"
+             </c:if>
+            >
+            
+                <table class="taglib-search-iterator configuration-list">
+                    <thead>
+                        <tr class="portlet-section-header results-header">
+                            <th><liferay-ui:message key="configurations-setting"/></th>
+                            <th><liferay-ui:message key="description"/></th>
+                            <th><liferay-ui:message key="value"/></th>
+                            <th><liferay-ui:message key="actions"/></th>
+                        </tr>
+                    </thead>
+            </c:if>
+            
+            <tr class="${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}"
+                id="<portlet:namespace/>users-${configuration.id}"
+            >
+                <td><strong><liferay-ui:message key="parameters-${configuration.name}"/></strong></td>
+                <td><liferay-ui:message key="parameters-${configuration.name}-description"/></td>
+                <td>
+                    <div id="<portlet:namespace/>displayValue${configuration.id}">${configuration.value}</div>
+                    <div id="<portlet:namespace/>form${configuration.id}" style="display:none;">
+                    <form onSubmit="saveConfig(this.<portlet:namespace/>configId${configuration.id}.value, this.<portlet:namespace/>configValue${configuration.id}.value);return false;">
+                        <input type="hidden" name="<portlet:namespace/>configId${configuration.id}"
+                            id="<portlet:namespace/>configId${configuration.id}" value="${configuration.id}">
+                        <input name="<portlet:namespace/>configValue${configuration.id}"
+                            id="<portlet:namespace/>configValue${configuration.id}" value="${configuration.value}"
+                            type="text"/>
+                        <input type="submit" value="Save">
+                        <input type="submit" value="Cancel" onclick="toggleForm(${configuration.id}); return false;">
+                    </form>
+                    </div>
+                </td>
+                <td>
+                    <a id="<portlet:namespace/>editAction${configuration.id}"
+                    href="#" onclick="toggleForm(${configuration.id});">
+                    <liferay-ui:message key="edit"/></a>
+                </td>
+            </tr>
+        </c:forEach>
 
 <portlet:resourceURL var="editAJAXURL" id="editConfiguration" escapeXml="false" />
 <script type="text/javascript">
