@@ -71,14 +71,14 @@ jQuery(document).ready(function() {
 
   // When user clicks cancel in add form, hide the form.
   jQuery("#<portlet:namespace/>cancel").click(function() {
-    jQuery("#pass-user-add").hide();
-    jQuery("#<portlet:namespace/>appraisal-search-link").show();
+    jQuery("#pass-user-add").hide("slow");
+    jQuery("#<portlet:namespace/>appraisal-search-link").show("slow");
     return false;
   });
   // When user clicks cancel in add form, hide the form.
   jQuery("#<portlet:namespace/>appraisal-search-link").click(function() {
-    jQuery("#pass-user-add").show();
-    jQuery("#<portlet:namespace/>appraisal-search-link").hide();
+    jQuery("#pass-user-add").show("slow");
+    jQuery("#<portlet:namespace/>appraisal-search-link").hide("slow");
   });
 
   // Validate form submission
