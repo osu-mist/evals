@@ -8,6 +8,8 @@ package edu.osu.cws.util;
  * To change this template use File | Settings | File Templates.
  */
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
@@ -209,5 +211,22 @@ public class CWSUtil
         PrintWriter myPrinter = new PrintWriter(writerStr);
         e.printStackTrace(myPrinter);
         return writerStr.toString();
+    }
+
+    /**
+     * Simple method that escapes user data, and converts \n to <br />
+     *
+     * @param dirtyText
+     * @return
+     */
+    public static String escapeHtml(String dirtyText) {
+        String out = "";
+        if (dirtyText != null) {
+            out = dirtyText;
+            out = StringEscapeUtils.escapeHtml(out);
+            out = out.replaceAll("\n", "<br />");
+        }
+
+        return out;
     }
 }

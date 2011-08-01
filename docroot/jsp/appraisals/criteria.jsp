@@ -14,7 +14,7 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
     <c:when test="${permissionRule.goals == 'v'}">
         <fieldset>
             <legend><liferay-ui:message key="appraisal-goals" /></legend>
-            <p class="pass-form-text"><%= formAssessment.getGoal().replaceAll("\n", "<br />") %></p>
+            <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAssessment.getGoal()) %></p>
         </fieldset>
     </c:when>
 </c:choose>
@@ -28,7 +28,7 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
     <c:when test="${permissionRule.newGoals == 'v'}">
         <fieldset>
             <legend><liferay-ui:message key="appraisal-newGoals" /></legend>
-            <p class="pass-form-text"><%= formAssessment.getNewGoals().replaceAll("\n", "<br />") %></p>
+            <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAssessment.getNewGoals()) %></p>
         </fieldset>
     </c:when>
 </c:choose>
@@ -42,7 +42,7 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
     <c:when test="${permissionRule.results == 'v'}">
         <fieldset>
             <legend><liferay-ui:message key="appraisal-employee-results" /></legend>
-            <p class="pass-form-text"><%= formAssessment.getEmployeeResult().replaceAll("\n", "<br />") %></p>
+            <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAssessment.getEmployeeResult()) %></p>
         </fieldset>
     </c:when>
 </c:choose>
@@ -56,7 +56,7 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
     <c:when test="${permissionRule.supervisorResults == 'v'}">
         <fieldset>
             <legend><liferay-ui:message key="appraisal-result-comments" /></legend>
-            <p class="pass-form-text"><%= formAssessment.getSupervisorResult().replaceAll("\n", "<br />") %></p>
+            <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAssessment.getSupervisorResult()) %></p>
         </fieldset>
     </c:when>
 </c:choose>

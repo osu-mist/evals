@@ -6,7 +6,7 @@
                 defaultValue="${appraisal.review}" />
         </c:when>
         <c:when test="${permissionRule.review == 'v'}">
-<p class="pass-form-text"><%= formAppraisal.getReview().replaceAll("\n", "<br />") %></p>
+<p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getReview()) %></p>
         </c:when>
     </c:choose>
 </fieldset><!-- end review -->

@@ -14,6 +14,7 @@
 
 <%@ page import="edu.osu.cws.pass.models.*" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="edu.osu.cws.util.CWSUtil" %>
 
 
 <%@ page import="java.util.List" %>

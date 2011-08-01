@@ -10,7 +10,7 @@
                 <c:when test="${permissionRule.evaluation == 'v'}">
                     <fieldset>
                         <legend>Evaluation</legend>
-                        <p class="pass-form-text"><%= formAppraisal.getEvaluation().replaceAll("\n", "<br />") %></p>
+                        <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getEvaluation()) %></p>
                     </fieldset>
                 </c:when>
             </c:choose>

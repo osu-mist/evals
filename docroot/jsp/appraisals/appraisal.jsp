@@ -33,7 +33,7 @@
         </c:when>
         <c:when test="${permissionRule.goalComments == 'v'}">
             <p><strong><liferay-ui:message key="appraisal-goals-comments" /></strong></p>
-    <p class="pass-form-text"><%= formAppraisal.getGoalsComments().replaceAll("\n", "<br />") %></p>
+    <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getGoalsComments()) %></p>
         </c:when>
     </c:choose>
 
@@ -72,7 +72,7 @@
             </c:when>
             <c:when test="${permissionRule.employeeResponse == 'v' && not empty appraisal.rebuttal}">
                 <p><strong><liferay-ui:message key="appraisal-employee-response" /></strong></p>
-        <p class="pass-form-text"><%= formAppraisal.getRebuttal().replaceAll("\n", "<br />") %></p>
+        <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getRebuttal()) %></p>
             </c:when>
 
         </c:choose>
