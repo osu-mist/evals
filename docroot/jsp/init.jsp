@@ -36,23 +36,26 @@ if (errorMsg != null && !errorMsg.equals("")) {
 }
 %>
 
-<div id="osu-cws"> <!-- Full wrapper for portlet (closed in footer.jsp) -->
+<div class="osu-cws"> <!-- Full wrapper for portlet (closed in footer.jsp) -->
   
 <c:if test="${not empty menuHome}">
-    <liferay-ui:message key="performance-appraisal-software-system"/>
-    <c:if test="${not empty isAdminHome}">
-    - <liferay-ui:message key="role-admin"/>
-    </c:if>
-    <c:if test="${not empty isSupervisorHome}">
-    - <liferay-ui:message key="role-supervisor"/>
-    </c:if>
+    <h2 class="portlet-header"><liferay-ui:message key="performance-appraisal-software-system"/>
+        <c:if test="${not empty isAdminHome}">
+        - <liferay-ui:message key="role-admin"/>
+        </c:if>
+        <c:if test="${not empty isSupervisorHome}">
+        - <liferay-ui:message key="role-supervisor"/>
+        </c:if>
+    </h2>
     <%@ include file="/jsp/menuHome.jsp"%>
 </c:if>
 <c:if test="${not empty menuMax}">
-    <liferay-ui:message key="performance-appraisal-software-system"/>
+    <h2 class="portlet-header">
+        <liferay-ui:message key="performance-appraisal-software-system"/>
         <c:if test="${not empty isReviewerHome}">
-    - <liferay-ui:message key="role-reviewer"/>
-    </c:if>
+            - <liferay-ui:message key="role-reviewer"/>
+        </c:if>
+    </h2>
     <%@ include file="/jsp/menuMax.jsp"%>
 </c:if>
 

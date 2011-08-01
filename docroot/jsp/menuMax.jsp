@@ -1,4 +1,4 @@
-<div id="pass-top-menu" class="action-menu-wrapper">
+<div id="pass-top-menu" class="action-menu-wrapper menu-max">
     <ul class="portlet-action-menu">
         <li><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
                         <portlet:param name="action" value="displayHomeView"/>

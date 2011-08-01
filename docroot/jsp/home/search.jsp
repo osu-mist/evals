@@ -9,7 +9,7 @@
             </portlet:actionURL>" method="post">
 
             <label for="<portlet:namespace/>osuid"><liferay-ui:message key="search-employee-osuid"/></label>
-            <input type="text" id="<portlet:namespace/>osuid" class="inline" name="<portlet:namespace/>osuid" />
+            <input type="text" id="<portlet:namespace/>osuid" class="inline narrow" name="<portlet:namespace/>osuid" />
             <input type="submit" value="<liferay-ui:message key="search"/>"/>
         </form>
     </div>
