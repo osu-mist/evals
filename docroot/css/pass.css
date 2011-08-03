@@ -39,7 +39,7 @@
 }
 
 .appraisal-criteria .pass-form-text {
-    font-style: italic;
+    color: #555;
 }
 
 /** JQuery UI Sortable */
