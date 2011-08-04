@@ -7,7 +7,7 @@
     </div>
     <div class="accordion-content" id="<portlet:namespace/>MyStatus" style="display: block;">
         <c:if test="${!empty myActiveAppraisals}">
-            <table class="taglib-search-iterator">
+            <table class="main taglib-search-iterator">
                 <thead>
                     <tr class="portlet-section-header results-header">
                         <th><liferay-ui:message key="job-title" /></th>
@@ -34,7 +34,7 @@
             </table>
         </c:if>
         <c:if test="${empty myActiveAppraisals}">
-            <p><em><liferay-ui:message key="noActiveAppraisals" /></em></p>
+            <p><liferay-ui:message key="noActiveAppraisals" /></p>
         </c:if>
     </div>
 </div>
