@@ -167,7 +167,7 @@ public class Mailer {
 
         bodyContent = getStatusMsg(appraisal, emailType);
         return MessageFormat.format(bodyWrapper, getEmployeeName(appraisal),
-                bodyContent, getBusinessCenterDescriptor(appraisal), linkURL);
+                bodyContent, getBusinessCenterDescriptor(appraisal), linkURL, linkURL);
     }
 
     /**
