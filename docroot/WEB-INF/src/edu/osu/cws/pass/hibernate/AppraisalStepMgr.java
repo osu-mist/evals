@@ -20,14 +20,13 @@ public class AppraisalStepMgr {
      */
     public HashMap list() throws Exception {
         HashMap stepsMap = new HashMap();
-        AppraisalStep step;
         String key;
         Session session = HibernateUtil.getCurrentSession();
         try {
-            Iterator stepIterator = this.list(session).iterator();
+            List<AppraisalStep> results = (List<AppraisalStep>) this.list(session);
+            results.size();
 
-            while (stepIterator.hasNext()) {
-                step = (AppraisalStep) stepIterator.next();
+            for (AppraisalStep step : results) {
                 key = step.getAction()+"-"+step.getAppointmentType();
                 stepsMap.put(key, step);
             }
