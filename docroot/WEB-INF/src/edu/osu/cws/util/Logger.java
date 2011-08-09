@@ -24,10 +24,12 @@ public class Logger {
 
     private String logHost;  //the logging server
     private String clientHost;     //client requesting logging.
+    private String facilityName;
 
-    public Logger(String logHost) {
+    public Logger(String logHost, String facilityName) {
         this.logHost = logHost;
         this.clientHost = CWSUtil.getLocalHostname();
+        this.facilityName = facilityName;
     }
 
     public void log(GelfMessage message) throws Exception {
@@ -40,11 +42,13 @@ public class Logger {
 
     public void log(String level, String shortMessage, String longMessage) throws Exception {
         GelfMessage message = new GelfMessage(shortMessage, longMessage, new Date(), level);
+        message.setFacility(facilityName);
         log(message);
     }
 
     public void log(String level, String shortMessage, String longMessage, Map<String,String> fields) throws Exception {
         GelfMessage message = new GelfMessage(shortMessage, longMessage, new Date(), level);
+        message.setFacility(facilityName);
         Set<String> keys = fields.keySet();
         for (String key : keys) {
             message.addField(key, fields.get(key));
