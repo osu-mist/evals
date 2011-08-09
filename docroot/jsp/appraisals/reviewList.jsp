@@ -34,7 +34,6 @@
                 <th><liferay-ui:message key="reviewPeriod"/></th>
                 <th><liferay-ui:message key="type"/></th>
                 <th><liferay-ui:message key="employee"/></th>
-                <th><liferay-ui:message key="supervisor"/></th>
                 <th><liferay-ui:message key="job-title"/></th>
                 <th><liferay-ui:message key="position-no"/></th>
                 <th><liferay-ui:message key="orgn-code-desc"/></th>
@@ -47,7 +46,6 @@
             <td>${appraisal.reviewPeriod}</td>
             <td><liferay-ui:message key="appraisal-type-${appraisal.type}"/></td>
             <td>${appraisal.job.employee.name}</td>
-            <td>${appraisal.job.supervisor.employee.name}</td>
             <td>${appraisal.job.jobTitle}</td>
             <td>${appraisal.job.positionNumber}</td>
             <td>${appraisal.job.orgCodeDescription}</td>

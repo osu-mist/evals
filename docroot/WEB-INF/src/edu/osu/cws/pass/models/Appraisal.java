@@ -213,30 +213,20 @@ public class Appraisal extends Pass {
      * @param firstName
      * @param evaluationSubmitDate
      * @param status
-     * @param supervisorLastName
-     * @param supervisorFirstName
      * @param orgCodeDescription
      */
     public Appraisal(int id, String jobTitle, String positionNumber, Date startDate, Date endDate,
                      String type, int employeeId, String lastName, String firstName, Date evaluationSubmitDate,
-                     String status, String supervisorLastName, String bcName, String supervisorFirstName,
-                     String orgCodeDescription, String suffix) {
+                     String status, String bcName, String orgCodeDescription, String suffix) {
         Employee employee = new Employee();
         employee.setId(employeeId);
         employee.setLastName(lastName);
         employee.setFirstName(firstName);
 
-        Employee supervisor = new Employee();
-        supervisor.setLastName(supervisorLastName);
-        supervisor.setFirstName(supervisorFirstName);
-        Job supervisorJob = new Job();
-        supervisorJob.setEmployee(supervisor);
-
         Job tempJob = new Job();
         tempJob.setJobTitle(jobTitle);
         tempJob.setOrgCodeDescription(orgCodeDescription);
         tempJob.setEmployee(employee);
-        tempJob.setSupervisor(supervisorJob);
         tempJob.setPositionNumber(positionNumber);
         tempJob.setBusinessCenterName(bcName);
         tempJob.setSuffix(suffix);

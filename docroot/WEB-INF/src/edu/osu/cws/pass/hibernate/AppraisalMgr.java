@@ -813,8 +813,7 @@ public class AppraisalMgr {
         Transaction tx = session.beginTransaction();
         String query = "select new edu.osu.cws.pass.models.Appraisal(id, job.jobTitle, job.positionNumber, " +
                 "startDate, endDate, type, job.employee.id, job.employee.lastName, job.employee.firstName, " +
-                "evaluationSubmitDate, status, job.supervisor.employee.lastName, job.businessCenterName, " +
-                "job.supervisor.employee.firstName, job.orgCodeDescription, job.suffix) " +
+                "evaluationSubmitDate, status, job.businessCenterName, job.orgCodeDescription, job.suffix) " +
                 "from edu.osu.cws.pass.models.Appraisal where job.businessCenterName = :bc " +
                 "and status in ('reviewDue', 'reviewOverdue') and job.endDate is NULL";
 
@@ -969,8 +968,7 @@ public class AppraisalMgr {
 
         String query = "select new edu.osu.cws.pass.models.Appraisal (id, job.jobTitle, job.positionNumber, " +
                 "startDate, endDate, type, job.employee.id, job.employee.lastName, job.employee.firstName, " +
-                "evaluationSubmitDate, status, job.supervisor.employee.lastName, job.businessCenterName, " +
-                "job.supervisor.employee.firstName, job.orgCodeDescription, job.suffix) " +
+                "evaluationSubmitDate, status, job.businessCenterName, job.orgCodeDescription, job.suffix) " +
                 "from edu.osu.cws.pass.models.Appraisal where job.employee.osuid = :osuid";
 
         if (!isAdmin) {
