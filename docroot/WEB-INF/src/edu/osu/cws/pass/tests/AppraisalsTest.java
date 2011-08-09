@@ -136,7 +136,7 @@ public class AppraisalsTest {
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
         tx.commit();
 
-        employee = employeeMgr.findByOnid("luf");
+        employee = employeeMgr.findByOnid("luf", null);
         updatedAppraisal.setId(appraisalID);
 
         updatedAppraisal.setEvaluator(employee);
@@ -187,7 +187,7 @@ public class AppraisalsTest {
         tx = hsession.beginTransaction();
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
         tx.commit();
-        employee = employeeMgr.findByOnid("luf");
+        employee = employeeMgr.findByOnid("luf", null);
 
         updatedAppraisal.setEvaluator(employee);
         updatedAppraisal.setGoalApprovedDate(new Date());
@@ -217,7 +217,7 @@ public class AppraisalsTest {
 
         // Grab the freshly created appraisal from the db before we start
         // updating the properties.
-        employee = employeeMgr.findByOnid("luf");
+        employee = employeeMgr.findByOnid("luf", null);
         hsession = HibernateUtil.getCurrentSession();
         tx = hsession.beginTransaction();
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
@@ -275,7 +275,7 @@ public class AppraisalsTest {
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assessment.setGoal("second edit of goal");
         }
-        appraisalMgr.setLoggedInUser(new EmployeeMgr().findByOnid("luf"));
+        appraisalMgr.setLoggedInUser(new EmployeeMgr().findByOnid("luf", null));
         session = HibernateUtil.getCurrentSession();
         tx = session.beginTransaction();
         appraisalMgr.updateAppraisal(modifiedAppraisal);

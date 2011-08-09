@@ -290,7 +290,7 @@ public class CriteriaTests {
 
         int id = 1;
         EmployeeMgr employeeMgr = new EmployeeMgr();
-        Employee employee = employeeMgr.findByOnid("cedenoj");
+        Employee employee = employeeMgr.findByOnid("cedenoj", null);
         CriterionArea criterionArea =  criteriaMgrObject.get(id);
 
         // grab old ids and properties to compare
@@ -344,7 +344,7 @@ public class CriteriaTests {
 
         int id = 1;
         EmployeeMgr employeeMgr = new EmployeeMgr();
-        Employee employee = employeeMgr.findByOnid("cedenoj");
+        Employee employee = employeeMgr.findByOnid("cedenoj", null);
         CriterionArea criterionArea =  criteriaMgrObject.get(id);
 
         // grab old ids and properties to compare
@@ -399,7 +399,7 @@ public class CriteriaTests {
 
         int id = 1;
         EmployeeMgr employeeMgr = new EmployeeMgr();
-        Employee employee = employeeMgr.findByOnid("cedenoj");
+        Employee employee = employeeMgr.findByOnid("cedenoj", null);
         CriterionArea criterionArea =  criteriaMgrObject.get(id);
 
         // grab old ids and properties to compare
@@ -457,7 +457,7 @@ public class CriteriaTests {
 
         int id = 1;
         EmployeeMgr employeeMgr = new EmployeeMgr();
-        Employee employee = employeeMgr.findByOnid("cedenoj");
+        Employee employee = employeeMgr.findByOnid("cedenoj", null);
         CriterionArea criterionArea =  criteriaMgrObject.get(id);
 
         // grab old ids and properties to compare

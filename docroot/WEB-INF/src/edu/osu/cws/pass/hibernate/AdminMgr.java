@@ -192,7 +192,7 @@ public class AdminMgr {
      */
     public boolean add(String onid, String isMasterValue, Employee loggedInUser) throws Exception {
         EmployeeMgr employeeMgr = new EmployeeMgr();
-        Employee employee = employeeMgr.findByOnid(onid);
+        Employee employee = employeeMgr.findByOnid(onid, null);
         boolean isMaster = isMasterValue.equals("1");
 
 

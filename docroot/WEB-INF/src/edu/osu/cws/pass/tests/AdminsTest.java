@@ -57,19 +57,19 @@ public class AdminsTest {
 
     @Test(expectedExceptions = {ModelException.class})
     public void shouldNotAddAdminEmployeeWhoIsNotActive() throws Exception {
-        Employee loggedInUser = new EmployeeMgr().findByOnid("cedenoj");
+        Employee loggedInUser = new EmployeeMgr().findByOnid("cedenoj", null);
         adminMgr.add("testing", "1", loggedInUser);
 
     }
 
     @Test(expectedExceptions = {ModelException.class})
     public void shouldNotAddAmindEmployeeWhoIsAlreadyAdmin() throws Exception {
-        Employee loggedInUser = new EmployeeMgr().findByOnid("cedenoj");
+        Employee loggedInUser = new EmployeeMgr().findByOnid("cedenoj", null);
         adminMgr.add("cedenoj", "0", loggedInUser);
     }
 
     public void shouldAddAdminUser() throws Exception {
-        Employee loggedInUser = new EmployeeMgr().findByOnid("cedenoj");
+        Employee loggedInUser = new EmployeeMgr().findByOnid("cedenoj", null);
         adminMgr.add("barlowc", "0", loggedInUser);
         Admin admin = adminMgr.findByOnid("barlowc");
         assert admin != null : "added admin user should not be null";

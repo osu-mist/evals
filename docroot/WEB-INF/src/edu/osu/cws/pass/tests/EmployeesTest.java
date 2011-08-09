@@ -18,7 +18,7 @@ public class EmployeesTest {
      */
     @Test(groups = {"unittest"})
     public void shouldFindAUserByUsername() throws Exception {
-        Employee employee = employeeMgr.findByOnid("cedenoj");
+        Employee employee = employeeMgr.findByOnid("cedenoj", null);
 
         assert employee != null : "The employee object should not be null";
         assert employee.getId() == 12345 : "Id should be valid";

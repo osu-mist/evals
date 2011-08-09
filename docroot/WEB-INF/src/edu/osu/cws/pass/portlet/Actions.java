@@ -851,7 +851,7 @@ public class Actions {
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
 
         // Check whether or not the user is already an admin user
-        Employee onidUser = employeeMgr.findByOnid(onid);
+        Employee onidUser = employeeMgr.findByOnid(onid, null);
         if (getReviewer(onidUser.getId()) != null) {
             addErrorsToRequest(request, "This user is already a reviewer.");
             return listReviewer(request, response);
@@ -945,7 +945,7 @@ public class Actions {
         Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
         if (loggedOnUser == null) {
             String loggedOnUsername = getLoggedOnUsername(request);
-            loggedOnUser = employeeMgr.findByOnid(loggedOnUsername);
+            loggedOnUser = employeeMgr.findByOnid(loggedOnUsername, "employee-with-jobs");
             session.setAttribute("loggedOnUser", loggedOnUser);
         }
 

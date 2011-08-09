@@ -236,7 +236,7 @@ public class ReviewerMgr {
      */
     public boolean add(String onid, String businessCenterName) throws Exception {
         EmployeeMgr employeeMgr = new EmployeeMgr();
-        Employee employee = employeeMgr.findByOnid(onid);
+        Employee employee = employeeMgr.findByOnid(onid, null);
 
         // Check that the employee object is valid
         if (employee.getStatus() == null || !employee.getStatus().equals("A")) {
