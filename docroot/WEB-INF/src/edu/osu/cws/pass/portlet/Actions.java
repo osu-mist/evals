@@ -403,14 +403,11 @@ public class Actions {
         request.setAttribute("isMasterAdmin", isMasterAdmin);
 
         Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        _log.error("isAdmin = "+isAdmin);
         if (refresh || isAdmin == null) {
-            _log.error("setting isAdmin again");
             isAdmin = getAdmin(employeeId) != null;
             session.setAttribute("isAdmin", isAdmin);
         }
         request.setAttribute("isAdmin", isAdmin);
-        _log.error("isAdmin = "+isAdmin);
 
     }
 
@@ -628,10 +625,10 @@ public class Actions {
      * @throws Exception
      */
     public String updateAppraisal(PortletRequest request, PortletResponse response) throws Exception {
-        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-            _log.error(entry.getKey() + "/" + entry.getValue()[0]);
-
-        }
+//        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+//            _log.error(entry.getKey() + "/" + entry.getValue()[0]);
+//
+//        }
 
         int id = ParamUtil.getInteger(request, "id", 0);
         if (id == 0) {
