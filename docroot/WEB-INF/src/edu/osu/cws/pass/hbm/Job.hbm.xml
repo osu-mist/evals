@@ -3,7 +3,7 @@
 
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
-    <class name="edu.osu.cws.pass.models.Job" table="PYVPASJ" mutable="false">
+    <class name="edu.osu.cws.pass.models.Job" table="PYVPASJ" mutable="false" batch-size="10">
         <composite-id>
             <key-many-to-one name="employee"
                              class="edu.osu.cws.pass.models.Employee"
@@ -32,13 +32,13 @@
         <!--<many-to-one name="employee" class="edu.osu.cws.pass.models.Employee"-->
                      <!--column="PYVPASJ_PIDM"-->
                      <!--not-null="false"/>-->
-        <many-to-one name="supervisor" class="edu.osu.cws.pass.models.Job" not-null="false">
+        <many-to-one name="supervisor" class="edu.osu.cws.pass.models.Job" not-null="false" fetch="join">
             <column name="PYVPASJ_SUPERVISOR_PIDM"/>
             <column name="PYVPASJ_SUPERVISOR_POSN"/>
             <column name="PYVPASJ_SUPERVISOR_SUFF"/>
         </many-to-one>
 
-        <set name="appraisals" inverse="true">
+        <set name="appraisals" inverse="true" lazy="true">
             <key>
                 <column name="JOB_PIDM"/>
                 <column name="POSITION_NUMBER"/>

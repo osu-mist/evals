@@ -3,7 +3,7 @@
 
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
-    <class name="edu.osu.cws.pass.models.Employee" table="PYVPASE" mutable="false">
+    <class name="edu.osu.cws.pass.models.Employee" table="PYVPASE" mutable="false" batch-size="10">
         <id name="id" column="PYVPASE_PIDM" type="int"/>
 
         <property name="firstName" column="PYVPASE_FIRST_NAME"/>
@@ -14,11 +14,14 @@
         <property name="email" column="PYVPASE_EMAIL"/>
         <property name="status" length="1" column="PYVPASE_EMPL_STATUS"/>
 
-        <set name="jobs" inverse="true">
+        <set name="jobs" lazy="true" batch-size="10">
             <key column="PYVPASJ_PIDM"/>
             <one-to-many class="edu.osu.cws.pass.models.Job"/>
-
         </set>
+
+        <fetch-profile name="employee-with-jobs">
+            <fetch association="jobs" style="select"/>
+        </fetch-profile>
     </class>
 
 </hibernate-mapping>

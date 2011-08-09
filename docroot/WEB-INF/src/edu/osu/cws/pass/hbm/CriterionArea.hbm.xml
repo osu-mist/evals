@@ -25,7 +25,7 @@
                      column="ORIGINAL_ID"
                      not-null="false"
                      unique="true"/>
-        <set name="details" inverse="true" order-by="createDate DESC">
+        <set name="details" inverse="true" order-by="createDate DESC" batch-size="10">
             <key column="AREA_ID"/>
             <one-to-many class="edu.osu.cws.pass.models.CriterionDetail"/>
 

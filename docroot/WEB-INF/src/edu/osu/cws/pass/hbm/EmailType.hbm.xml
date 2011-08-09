@@ -3,7 +3,7 @@
 
 <hibernate-mapping default-lazy="false" auto-import="false" >
 
-    <class name="edu.osu.cws.pass.models.EmailType" table="email_types">
+    <class name="edu.osu.cws.pass.models.EmailType" table="email_types" batch-size="50">
         <id name="type" type="string" column="TYPE"/>
 
         <property name="mailTo" length="64" column="MAILTO"/>

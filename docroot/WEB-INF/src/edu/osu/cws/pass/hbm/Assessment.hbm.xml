@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
-<hibernate-mapping default-lazy="false" auto-import="false" >
+<hibernate-mapping auto-import="false" >
 
     <class name="edu.osu.cws.pass.models.Assessment" table="assessments"
            dynamic-insert="true"
@@ -25,7 +25,7 @@
         <many-to-one name="criterionDetail" class="edu.osu.cws.pass.models.CriterionDetail"
                      column="CRITERION_DETAIL_ID"
                      not-null="true"/>
-        <set name="goalLogs" inverse="true" order-by="createDate DESC">
+        <set name="goalLogs" inverse="true" order-by="createDate DESC" batch-size="30">
             <key column="ASSESSMENT_ID"/>
             <one-to-many class="edu.osu.cws.pass.models.GoalLog"/>
         </set>
