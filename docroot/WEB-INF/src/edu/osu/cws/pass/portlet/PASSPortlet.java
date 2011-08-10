@@ -19,6 +19,7 @@ import edu.osu.cws.util.Mail;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
@@ -284,8 +285,9 @@ public class PASSPortlet extends GenericPortlet {
         CompositeConfiguration config = new CompositeConfiguration();
 
         // First load hostname.properties. Then try to load default.properties
-        PropertiesConfiguration propConfig =  new PropertiesConfiguration(propertyFile);
-        if (propConfig.getFile().exists()) {
+        File hostPropertyFile = new File("/WEB-INF/src/" + propertyFile);
+        if (hostPropertyFile.exists()) {
+            PropertiesConfiguration propConfig =  new PropertiesConfiguration(propertyFile);
             config.addConfiguration(propConfig);
             _log.error(propertyFile + " - loaded");
         } else {
