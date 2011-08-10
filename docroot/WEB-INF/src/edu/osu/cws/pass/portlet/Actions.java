@@ -481,7 +481,7 @@ public class Actions {
         int employeeID = Integer.parseInt(ParamUtil.getString(request, "employee.id"));
         Employee employee = new Employee();
         try {
-            employee = employeeMgr.findById(employeeID);
+            employee = employeeMgr.findById(employeeID, "employee-with-jobs");
         } catch (Exception e) {
             _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
         }
