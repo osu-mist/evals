@@ -426,5 +426,10 @@ public class Job extends Pass implements Serializable {
         Date endDate = getEndEvalDate(startDate, "initial");
         return CWSUtil.isWithinPeriod(startDate, cal.getTime(), target);
     }
+
+    public String getSignature()
+    {
+        return "employee " + getEmployee().getName() + ", position " + getPositionClass();
+    }
 }
 

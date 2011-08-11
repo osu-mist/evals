@@ -81,7 +81,7 @@ public class AppraisalMgr {
             Session session = HibernateUtil.getCurrentSession();
             try {
                 Transaction tx = session.beginTransaction();
-                session.save(appraisal);
+                session.save(appraisal);///441
 
                 // Create assessment and associate it to appraisal
                 for (CriterionArea criterion : criteriaList) {
