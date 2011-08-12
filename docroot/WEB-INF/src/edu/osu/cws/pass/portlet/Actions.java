@@ -409,6 +409,7 @@ public class Actions {
         }
         request.setAttribute("isAdmin", isAdmin);
 
+        request.setAttribute("employee", getLoggedOnUser(request));
     }
 
     /**
