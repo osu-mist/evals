@@ -283,6 +283,7 @@ public class Actions {
 
         setRequiredActions(request);
         useNormalMenu(request);
+        request.setAttribute("alertMsg", "display yellow alert message");
 
         return "home-jsp";
     }
@@ -321,6 +322,7 @@ public class Actions {
         useNormalMenu(request);
         helpLinks(request);
         request.setAttribute("isAdminHome", true);
+        request.setAttribute("alertMsg", "display yellow alert message");
 
         return "admin-home-jsp";
     }
@@ -333,6 +335,7 @@ public class Actions {
         useNormalMenu(request);
         helpLinks(request);
         request.setAttribute("isSupervisorHome", true);
+        request.setAttribute("alertMsg", "display yellow alert message");
 
         return "supervisor-home-jsp";
     }

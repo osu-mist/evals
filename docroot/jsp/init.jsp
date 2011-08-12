@@ -68,4 +68,8 @@ if (errorMsg != null && !errorMsg.equals("")) {
     <c:if test="${!empty hasNoPassAccess}">
     <span class="portlet-msg-error"><liferay-ui:message key="no-pass-access"/></span>
     </c:if>
+
+    <c:if test="${!empty alertMsg}">
+    <span class="portlet-msg-alert"><liferay-ui:message key="home-message-alert"/></span>
+    </c:if>
 </div>
