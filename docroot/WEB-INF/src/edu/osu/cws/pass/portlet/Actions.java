@@ -593,9 +593,17 @@ public class Actions {
             request.setAttribute("pendingReviews", reviews);
         }
 
+        boolean showDraftMessage = false;
+        if (appraisal.getStatus().equals("goalsDue") || appraisal.getStatus().equals("goalsOverdue")
+                || appraisal.getStatus().equals("goalsRequiredModification")
+                || appraisal.getStatus().equals("goalsReactivated")) {
+            showDraftMessage = true;
+        }
+
         request.setAttribute("appraisal", appraisal);
         request.setAttribute("permissionRule", permRule);
         request.setAttribute("showForm", showForm);
+        request.setAttribute("showDraftMessage", showDraftMessage);
         useMaximizedMenu(request);
 
         return "appraisal-jsp";

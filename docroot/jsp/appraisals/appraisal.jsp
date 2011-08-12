@@ -8,6 +8,18 @@
     <h2><liferay-ui:message key="appraisal-classified-title" /></h2>
     <liferay-ui:success key="draft-saved" message="draft-saved" />
 
+    <c:if test="${showDraftMessage == 'true'}">
+        <c:choose>
+            <c:when test="${isSupervisor == 'true' and employee.id != appraisal.job.employee.id}">
+                <span class="portlet-msg-alert"><liferay-ui:message key="appraisal-draft-alert"/>
+                by ${appraisal.job.employee.name}</span>
+            </c:when>
+            <c:otherwise>
+                <span class="portlet-msg-alert"><liferay-ui:message key="appraisal-draft-alert"/></span>
+            </c:otherwise>
+        </c:choose>
+    </c:if>
+
     <%@ include file="/jsp/appraisals/info.jsp"%>
 
     <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}">
