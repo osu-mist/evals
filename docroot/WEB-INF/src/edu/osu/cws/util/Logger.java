@@ -35,6 +35,7 @@ public class Logger {
     public void log(GelfMessage message) throws Exception {
         GelfSender gelfSender = new GelfSender(logHost);
         message.setHost(clientHost);
+        message.setFacility(facilityName);
         if (message.isValid()) {
             gelfSender.sendMessage(message);
         }
@@ -42,13 +43,11 @@ public class Logger {
 
     public void log(String level, String shortMessage, String longMessage) throws Exception {
         GelfMessage message = new GelfMessage(shortMessage, longMessage, new Date(), level);
-        message.setFacility(facilityName);
         log(message);
     }
 
     public void log(String level, String shortMessage, String longMessage, Map<String,String> fields) throws Exception {
         GelfMessage message = new GelfMessage(shortMessage, longMessage, new Date(), level);
-        message.setFacility(facilityName);
         Set<String> keys = fields.keySet();
         for (String key : keys) {
             message.addField(key, fields.get(key));
