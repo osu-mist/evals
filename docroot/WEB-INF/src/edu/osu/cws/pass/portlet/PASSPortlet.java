@@ -285,8 +285,9 @@ public class PASSPortlet extends GenericPortlet {
         CompositeConfiguration config = new CompositeConfiguration();
 
         // First load hostname.properties. Then try to load default.properties
-        File hostPropertyFile = new File("/WEB-INF/src/" + propertyFile);
-        if (hostPropertyFile.exists()) {
+        boolean hasHostPropertyFile = getPortletContext().getResourceAsStream("/WEB-INF/src/" + propertyFile) != null;
+        getPortletContext().getResourceAsStream("/WEB-INF/src/" + propertyFile).close();
+        if (hasHostPropertyFile) {
             PropertiesConfiguration propConfig =  new PropertiesConfiguration(propertyFile);
             config.addConfiguration(propConfig);
             _log.error(propertyFile + " - loaded");
