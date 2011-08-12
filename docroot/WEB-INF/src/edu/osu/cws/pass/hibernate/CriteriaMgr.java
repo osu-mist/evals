@@ -83,7 +83,10 @@ public class CriteriaMgr {
 
         String description = request.get("description")[0];
         String name = request.get("name")[0];
-        boolean propagateEdit = request.get("propagateEdit")[0] != null;
+        boolean propagateEdit = false;
+        if (request.get("propagateEdit") != null) {
+            propagateEdit = request.get("propagateEdit")[0] != null;
+        }
 
         try {
             Transaction tx = session.beginTransaction();
