@@ -576,7 +576,8 @@ public class Actions {
             addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
-        String userRole = appraisalMgr.getRoleAndSession(appraisal, currentlyLoggedOnUser.getId());
+        int userId = currentlyLoggedOnUser.getId();
+        String userRole = appraisalMgr.getRoleAndSession(appraisal, userId);
         appraisalMgr.setAppraisalStatus(appraisal, userRole);
 
         // Set flag whether or not the html form to update the appraisal needs to be displayed
@@ -586,8 +587,7 @@ public class Actions {
         }
 
         if (isLoggedInUserSupervisor(request)) {
-            int userID = currentlyLoggedOnUser.getId();
-            List<Appraisal> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(userID, true);
+            List<Appraisal> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(userId, true);
             request.setAttribute("myTeamsAppraisals", myTeamsActiveAppraisals);
         }
 

@@ -24,6 +24,13 @@
                 <th><liferay-ui:message key="supervisor" />:</th>
                 <td><c:out value="${appraisal.job.currentSupervisor.employee.name}" /></td>
             </tr>
+            <tr>
+                <th><liferay-ui:message key="appraisal-type"/>:</th>
+                <td><liferay-ui:message key="appraisal-type-${appraisal.type}"/></td>
+                <th><liferay-ui:message key="appraisal-employee-id"/>:</th>
+                <td>${appraisal.job.employee.osuid}</td>
+                <td colspan="4">&nbsp;</td>
+            </tr>
         </tbody>
     </table>
 </div>
