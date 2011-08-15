@@ -93,8 +93,9 @@
                     <liferay-ui:message key="appraisal-supervisor-ack-read-rebuttal" />
             </c:when>
             <c:when test="${permissionRule.rebuttalRead == 'v'}">
-            <input type="checkbox" id="<portlet:namespace />appraisal.readRebuttal" disabled="disabled"
-                checked="checked"/> <liferay-ui:message key="appraisal-supervisor-ack-read-rebuttal" />
+                <p><liferay-ui:message key="appraisal-supervisor-rebuttal-read" />
+                <fmt:formatDate value="${appraisal.supervisorRebuttalRead}" pattern="MM/dd/yy h:m a"/>
+                </p>
             </c:when>
         </c:choose>
     </div>
