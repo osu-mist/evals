@@ -597,9 +597,16 @@ public class Actions {
         }
 
         boolean showDraftMessage = false;
-        if (appraisal.getStatus().equals("goalsDue") || appraisal.getStatus().equals("goalsOverdue")
-                || appraisal.getStatus().equals("goalsRequiredModification")
-                || appraisal.getStatus().equals("goalsReactivated")) {
+        Job appraisalJob = appraisal.getJob();
+        Employee employee = appraisalJob.getEmployee();
+        boolean isUserOwnerOrSupervisor = userId == employee.getId() ||
+                userId == appraisalJob.getCurrentSupervisor().getEmployee().getId();
+
+        if (isUserOwnerOrSupervisor &&
+                (appraisal.getStatus().equals("goalsDue") || appraisal.getStatus().equals("goalsOverdue")
+                        || appraisal.getStatus().equals("goalsRequiredModification")
+                        || appraisal.getStatus().equals("goalsReactivated")
+                )) {
             showDraftMessage = true;
         }
 
