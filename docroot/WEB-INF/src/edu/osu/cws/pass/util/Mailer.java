@@ -6,21 +6,21 @@ package edu.osu.cws.pass.util;
  * @copyright Copyright 2011, Central Web Services, Oregon State University
  * @date: 6/24/11
  */
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import javax.mail.*;
+import javax.mail.internet.InternetAddress;
 import javax.swing.border.TitledBorder;
-import java.util.List;
+import java.util.*;
 
 import edu.osu.cws.pass.hibernate.AppraisalMgr;
 import edu.osu.cws.pass.hibernate.EmailMgr;
+import edu.osu.cws.pass.hibernate.ReviewerMgr;
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.util.*;
 import oracle.net.ano.SupervisorService;
 import sun.awt.image.OffScreenImage;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.ResourceBundle;
 import java.text.MessageFormat;
 
 public class Mailer {
@@ -52,6 +52,7 @@ public class Mailer {
      * @throws Exception
      */
     public void sendMail(Appraisal appraisal, EmailType emailType) throws Exception {
+
         String logShortMessage = "";
         String logLongMessage = "";
         if (!(appraisal.getJob().getStatus().equals("A"))) {
@@ -82,7 +83,9 @@ public class Mailer {
             msg.addRecipients(Message.RecipientType.BCC, bcc);
         }
 
-        String body = getBody(appraisal, emailType);
+        String addressee = getAddressee(appraisal,mailTo);
+
+        String body = getBody(appraisal, emailType, addressee);
 
         msg.setContent(body, mimeType);
    
@@ -113,7 +116,8 @@ public class Mailer {
      */
     private Address[] getRecipients(String mailTo, Appraisal appraisal) throws Exception {
         String[] mailToArray = mailTo.split(",");
-        Address[] recipients = new Address[mailToArray.length];
+        //Address[] recipients = new Address[mailToArray.length];
+        ArrayList recipients = new ArrayList();
         String contact = "";
         int i = 0;
         for (String recipient : mailToArray) {
@@ -125,9 +129,11 @@ public class Mailer {
                     logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
                     contact = "nobody@oregonstate.edu";
                 } else {
-                    contact = job.getEmployee().getEmail();
+                    recipients.add(job.getEmployee().getEmail());
+                    //recipients[i++] = email.stringToAddress(job.getEmployee().getEmail());
                 }
             }
+
             if (recipient.equals("supervisor")) {
                 if (job == null) {
                     String logShortMessage = "Supervisor email not sent";
@@ -138,19 +144,47 @@ public class Mailer {
                     Job supervisorJob = job.getSupervisor();
                     if (supervisorJob == null) {
                         String logShortMessage = "Supervisor email not sent";
-                        String logLongMessage = "Suppervisor for appraisal" + appraisal.getId() + "is null";
+                        String logLongMessage = "Supervisor for appraisal" + appraisal.getId() + "is null";
                         logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
                         contact = null;
                     } else {
-                        contact = supervisorJob.getEmployee().getEmail();
+                        recipients.add(supervisorJob.getEmployee().getEmail());
+                        //recipients[i++] = email.stringToAddress(supervisorJob.getEmployee().getEmail());
                     }
                 }
             }
-            if (contact != null) {
-                recipients[i++] = email.stringToAddress(contact);
+
+            if (recipient.equals("reviewer")) {
+                if (job == null) {
+                    String logShortMessage = "Reviewer email not sent";
+                    String logLongMessage = "Job for appraisal" + appraisal.getId() + "is null";
+                    logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
+                    contact = null;
+                } else {
+                    String bcName = job.getBusinessCenterName();
+                    List<Reviewer> reviewers = ReviewerMgr.getReviewers(bcName);
+                    if (reviewers == null) {
+                        String logShortMessage = "Reviewer email not sent";
+                        String logLongMessage = "Reviewers for appraisal" + appraisal.getId() + "is null";
+                        logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
+                        contact = null;
+                    } else {
+                        for (Reviewer reviewer : reviewers) {
+                            recipients.add(reviewer.getEmployee().getEmail());
+                            //recipients[i++] = email.stringToAddress(reviewer.getEmployee().getEmail());
+                        }
+                    }
+                }
             }
+
         }
-        return recipients;
+        //Object[] recipientsArray = recipients.toArray();
+        Address[] recipientsArray = new Address[recipients.size()];
+        for (Object address : recipients) {
+            recipientsArray[i++] = email.stringToAddress((String) address);
+        }
+
+        return recipientsArray;
     }
 
     /**
@@ -161,12 +195,12 @@ public class Mailer {
      * @return
      * @throws Exception
      */
-    private String getBody(Appraisal appraisal, EmailType emailType) throws Exception {
+    private String getBody(Appraisal appraisal, EmailType emailType, String addressee) throws Exception {
         String bodyWrapper = emailBundle.getString("email_body");
         String bodyContent = "";
 
         bodyContent = getStatusMsg(appraisal, emailType);
-        return MessageFormat.format(bodyWrapper, getEmployeeName(appraisal),
+        return MessageFormat.format(bodyWrapper, addressee,
                 bodyContent, getBusinessCenterDescriptor(appraisal), linkURL, linkURL);
     }
 
@@ -564,4 +598,23 @@ public class Mailer {
         return CWSUtil.getRemainDays(dueDay);
     }
 
+    /**
+     * Get the correct address name used in the "Dear ..." line
+     * @param appraisal
+     * @param mailTo
+     * @return
+     * @throws Exception
+     */
+    private String getAddressee(Appraisal appraisal, String mailTo) throws Exception {
+        if (mailTo.indexOf("employee") > -1) {
+            return appraisal.getJob().getEmployee().getConventionName();
+        }
+        if (mailTo.indexOf("supervisor") > -1) {
+            return appraisal.getJob().getSupervisor().getEmployee().getConventionName();
+        }
+        if (mailTo.indexOf("reviewer") > -1) {
+            return "Reviewer";
+        }
+        return "";
+    }
 }
