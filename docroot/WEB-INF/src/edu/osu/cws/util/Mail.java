@@ -39,8 +39,8 @@ public class Mail {
         return addresses;
     }
 
-	public Address stringToAddress(String emailAddress) throws AddressException {
-        Address address = new InternetAddress(emailAddress);
+	public InternetAddress stringToAddress(String emailAddress) throws AddressException {
+        InternetAddress address = new InternetAddress(emailAddress);
         return address;
     }
 }
