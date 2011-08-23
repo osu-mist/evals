@@ -1,5 +1,5 @@
 <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>AppraisalInfo');">
-  <img id="<portlet:namespace/>AppraisalInfoImageToggle" src="/cps/images/accordion/accordion_arrow_down.png"/> Appraisal Info
+  <img id="<portlet:namespace/>AppraisalInfoImageToggle" src="/cps/images/accordion/accordion_arrow_up.png"/> Appraisal Info
 </div>
 <div class="accordion-content" id="<portlet:namespace/>AppraisalInfo" style="display: block">
     <table class="appraisal-info collapses">

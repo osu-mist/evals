@@ -2,7 +2,7 @@
 
 <div id="<portlet:namespace/>accordionMenuMyStatus" class="accordion-menu">
     <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>MyStatus');">
-      <img id="<portlet:namespace/>MyStatusImageToggle" src="/cps/images/accordion/accordion_arrow_down.png"/>
+      <img id="<portlet:namespace/>MyStatusImageToggle" src="/cps/images/accordion/accordion_arrow_up.png"/>
       <liferay-ui:message key="myStatus" />
     </div>
     <div class="accordion-content" id="<portlet:namespace/>MyStatus" style="display: block;">
