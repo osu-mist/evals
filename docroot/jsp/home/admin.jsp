@@ -20,7 +20,7 @@ configurationListURL.setParameter("action", "listConfiguration");
 <c:if test="${isAdmin == 'true'}">
     <div id="<portlet:namespace/>accordionMenuPassAdmin" class="accordion-menu">
         <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>passAdmin');">
-          <img id="<portlet:namespace/>passAdminImageToggle" src="/cps/images/accordion/accordion_arrow_down.png"/>
+          <img id="<portlet:namespace/>passAdminImageToggle" src="/cps/images/accordion/accordion_arrow_up.png"/>
           PASS Administration
         </div>
         <div class="accordion-content" id="<portlet:namespace/>passAdmin" style="display: block;">

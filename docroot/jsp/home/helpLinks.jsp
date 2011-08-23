@@ -1,6 +1,6 @@
 <div id="<portlet:namespace/>accordionMenuPassHelpLinks" class="accordion-menu">
     <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>passHelpLinks');">
-      <img id="<portlet:namespace/>passHelpLinksImageToggle" src="/cps/images/accordion/accordion_arrow_down.png"/>
+      <img id="<portlet:namespace/>passHelpLinksImageToggle" src="/cps/images/accordion/accordion_arrow_up.png"/>
       Helpful Links
     </div>
     <div class="accordion-content" id="<portlet:namespace/>passHelpLinks" style="display: block;">

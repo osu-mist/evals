@@ -1,6 +1,6 @@
 <div id="<portlet:namespace/>accordionMenuSearch" class="accordion-menu">
     <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>Search');">
-      <img id="<portlet:namespace/>SearchImageToggle" src="/cps/images/accordion/accordion_arrow_down.png"/>
+      <img id="<portlet:namespace/>SearchImageToggle" src="/cps/images/accordion/accordion_arrow_up.png"/>
       <liferay-ui:message key="search" />
     </div>
     <div class="accordion-content pass-search" id="<portlet:namespace/>Search" style="display: block;">
