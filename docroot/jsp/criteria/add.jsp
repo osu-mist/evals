@@ -15,44 +15,43 @@ List appointmentTypes = (List) renderRequest.getAttribute("appointmentTypes");
 
 <h2><liferay-ui:message key="${titleKey}"/></h2>
 
-<div id="pass-add-criteria" class="osu-cws">
+<div id="pass-add-criteria">
     <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
         <portlet:param name="action" value="${action}"/>
         </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
+        <fieldset>
+            <legend><liferay-ui:message key="Criteria" /></legend>
+          
+            <input name="<portlet:namespace />criterionAreaId" type="hidden" value="${criterionArea.id}" />
 
-    <input name="<portlet:namespace />criterionAreaId" type="hidden" value="${criterionArea.id}" />
-
-    <label for="<portlet:namespace />name"><liferay-ui:message key="name" /></label>
-    <input type="text" id="<portlet:namespace />name" name="<portlet:namespace />name" value="${criterionArea.name}" />
+            <label for="<portlet:namespace />name"><liferay-ui:message key="name" /></label>
+            <input type="text" id="<portlet:namespace />name" name="<portlet:namespace />name" value="${criterionArea.name}" />
            
-    <label for="<portlet:namespace />description"><liferay-ui:message key="description" /></label>
-    <liferay-ui:input-textarea param="description" defaultValue="${criterionDetail.description}"/>
+            <label for="<portlet:namespace />description"><liferay-ui:message key="description" /></label>
+            <liferay-ui:input-textarea param="description" defaultValue="${criterionDetail.description}"/>
     
-    <c:if test="${action == 'addCriteria'}">
-      <label for="<portlet:namespace />appointmentTypeID"><liferay-ui:message key="appointment-type" /></label>
-      <select name="<portlet:namespace />appointmentTypeID">
-        <c:forEach var="appointmentType" items="${appointmentTypes}">
-          <option value="${appointmentType.name}"
-            ${(appointmentType.name == criterionArea.appointmentType)? 'selected="selected"': ''}>
-            ${appointmentType.name}
-          </option>
-        </c:forEach>
-      </select>
-    </c:if>
+            <c:if test="${action == 'addCriteria'}">
+              <label for="<portlet:namespace />appointmentTypeID"><liferay-ui:message key="appointment-type" /></label>
+              <select name="<portlet:namespace />appointmentTypeID">
+                <c:forEach var="appointmentType" items="${appointmentTypes}">
+                  <option value="${appointmentType.name}"
+                    ${(appointmentType.name == criterionArea.appointmentType)? 'selected="selected"': ''}>
+                    ${appointmentType.name}
+                  </option>
+                </c:forEach>
+              </select>
+            </c:if>
     
-    <c:if test="${action == 'editCriteria'}">
-      <input type="checkbox" id="<portlet:namespace />propagateEdit"name="<portlet:namespace />propagateEdit"/> 
-      <label for="<portlet:namespace />propagateEdit"><liferay-ui:message key="criteria-propagate-edit" /></label>
-    </c:if>
-
-
-    </table>
-    <br />
-    <input type="submit" value="<liferay-ui:message key="save" />" />
-    <input type="button" class="cancel" value="<liferay-ui:message key="cancel" />"
-        onClick="location.href = '<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-        <portlet:param name="action" value="listCriteria"/></portlet:renderURL>';" />
-
+            <c:if test="${action == 'editCriteria'}">
+              <input type="checkbox" id="<portlet:namespace />propagateEdit"name="<portlet:namespace />propagateEdit"/> 
+              <label for="<portlet:namespace />propagateEdit"><liferay-ui:message key="criteria-propagate-edit" /></label>
+            </c:if>
+        </fieldset>
+        
+        <input type="submit" value="<liferay-ui:message key="save" />" />
+        <input type="button" class="cancel" value="<liferay-ui:message key="cancel" />"
+            onClick="location.href = '<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+            <portlet:param name="action" value="listCriteria"/></portlet:renderURL>';" />
     </form>
 </div>
 
