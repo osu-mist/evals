@@ -10,7 +10,7 @@ List criteria = (List) renderRequest.getAttribute("reviewersList");
 <liferay-ui:success key="reviewer-saved" message="reviewer-saved" />
 <liferay-ui:success key="reviewer-deleted" message="reviewer-deleted" />
 
-<ul class="actions">
+<ul id="search-parent" class="actions">
     <li id="<portlet:namespace/>reviewer-add-link">
         <liferay-ui:icon
             image="add_user"
@@ -78,13 +78,13 @@ jQuery(document).ready(function() {
   // When user clicks ADD in add form, hide the form.<portlet:namespace/>reviewer-add-link
   jQuery("#<portlet:namespace/>reviewer-add-link").click(function() {
     jQuery("#pass-user-add").show("slow");
-    jQuery("#<portlet:namespace/>reviewer-add-link").hide("slow");
+    jQuery("#search-parent").hide("slow");
   });
 
   // When user clicks CANCEL in add form, hide the form.
   jQuery("#<portlet:namespace/>cancel").click(function() {
     jQuery("#pass-user-add").hide("slow");
-    jQuery("#<portlet:namespace/>reviewer-add-link").show("slow");
+    jQuery("#search-parent").show("slow");
     return false;
   });
 

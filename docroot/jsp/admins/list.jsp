@@ -7,7 +7,7 @@
 <liferay-ui:success key="admin-deleted" message="admin-deleted" />
 
 <c:if test="${isMaster == true}">
-    <ul class="actions">
+    <ul id="search-parent" class="actions">
         <li id="<portlet:namespace/>admin-add-link">
             <liferay-ui:icon
                 image="add_user"
@@ -90,13 +90,13 @@
       // When user clicks cancel in add form, hide the form.
       jQuery("#<portlet:namespace/>cancel").click(function() {
         jQuery("#pass-user-add").hide("slow");
-        jQuery("#<portlet:namespace/>admin-add-link").show("slow");
+        jQuery("#search-parent").show("slow");
         return false;
       });
       // When user clicks cancel in add form, hide the form.
       jQuery("#<portlet:namespace/>admin-add-link").click(function() {
         jQuery("#pass-user-add").show("slow");
-        jQuery("#<portlet:namespace/>admin-add-link").hide("slow");
+        jQuery("#search-parent").hide("slow");
       });
 
       // Validate form submission
