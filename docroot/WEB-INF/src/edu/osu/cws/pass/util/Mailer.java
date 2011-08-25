@@ -6,21 +6,18 @@ package edu.osu.cws.pass.util;
  * @copyright Copyright 2011, Central Web Services, Oregon State University
  * @date: 6/24/11
  */
-import java.lang.reflect.Array;
+
 import java.lang.reflect.Method;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
-import javax.swing.border.TitledBorder;
 import java.util.*;
-
+import java.util.Map;
+import java.util.HashMap;
 import edu.osu.cws.pass.hibernate.AppraisalMgr;
 import edu.osu.cws.pass.hibernate.EmailMgr;
 import edu.osu.cws.pass.hibernate.ReviewerMgr;
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.util.*;
-import oracle.net.ano.SupervisorService;
-import sun.awt.image.OffScreenImage;
-
 import java.text.MessageFormat;
 
 public class Mailer {
@@ -34,6 +31,8 @@ public class Mailer {
     private Address[] replyTo = new Address[1];
     private PassLogger logger;
 
+    Map<String, String> logFields = new HashMap<String, String>();
+
     public Mailer(ResourceBundle resources, Mail mail,
                   String linkURL, String mimeType, Map<String, Configuration> map, PassLogger logger, Address replyTo) {
         this.email = mail;
@@ -43,6 +42,9 @@ public class Mailer {
         configMap = map;
         this.logger = logger;
         this.replyTo[0] = replyTo;
+        //@todo make replyTo an address here, take a string in the constructor
+
+        logFields.put("sub-facility","Mailer");
     }
 
     /**
@@ -55,14 +57,16 @@ public class Mailer {
 
         String logShortMessage = "";
         String logLongMessage = "";
+
         if (!(appraisal.getJob().getStatus().equals("A"))) {
             logShortMessage = "Email not sent";
             logLongMessage = "Appraisal " + appraisal.getId() +
-                    " not available, job " + appraisal.getJob().getId() +
+                    " not available, job " + appraisal.getJob().getPositionNumber() +
                     " is not active.";
-            logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
+            logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
             return;
         }
+
         Message msg = email.getMessage();
         String mailTo = emailType.getMailTo();
         String mailCC = emailType.getCc();
@@ -98,12 +102,15 @@ public class Mailer {
 
         Email email = new Email(appraisal.getId(), emailType.getType());
         EmailMgr.add(email);
-        logShortMessage = emailType + " email sent for appraisal " + appraisal.getId();
-        logLongMessage = "email of type " + emailType
-                            + " mail sent to " + msg.getAllRecipients().toString()
-                            + " for appraisal " + appraisal.getId()
-                            + "for <job title> of <employee name> ";
-        logger.log(Logger.INFORMATIONAL, logShortMessage, logLongMessage);
+
+        String recipientString = InternetAddress.toString(msg.getAllRecipients());
+
+        logShortMessage = emailType.getType() + " email sent for appraisal " + appraisal.getId();
+        logLongMessage = "email of type " + emailType.getType() + " addressed to " + addressee
+                            + " sent to " + mailTo + " (" + recipientString + ")"
+                            + " regarding appraisal " + appraisal.getId()
+                            + " for " + getJobTitle(appraisal) + " " + getEmployeeName(appraisal);
+        logger.log(Logger.INFORMATIONAL, logShortMessage, logLongMessage, logFields);
    }
 
     /**
@@ -116,69 +123,62 @@ public class Mailer {
      */
     private Address[] getRecipients(String mailTo, Appraisal appraisal) throws Exception {
         String[] mailToArray = mailTo.split(",");
-        //Address[] recipients = new Address[mailToArray.length];
         ArrayList recipients = new ArrayList();
-        String contact = "";
+        String logShortMessage = "";
+        String logLongMessage = "";
+
         int i = 0;
         for (String recipient : mailToArray) {
             Job job = appraisal.getJob();
             if (recipient.equals("employee")) {
                 if (job == null) {
-                    String logShortMessage = "Employee email not sent";
-                    String logLongMessage = "Job for appraisal" + appraisal.getId() + "is null";
-                    logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
-                    contact = "nobody@oregonstate.edu";
+                    logShortMessage = "Employee email not sent";
+                    logLongMessage = "Job for appraisal " + appraisal.getId() + " is null";
+                    logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                 } else {
                     recipients.add(job.getEmployee().getEmail());
-                    //recipients[i++] = email.stringToAddress(job.getEmployee().getEmail());
                 }
             }
 
             if (recipient.equals("supervisor")) {
                 if (job == null) {
-                    String logShortMessage = "Supervisor email not sent";
-                    String logLongMessage = "Job for appraisal" + appraisal.getId() + "is null";
-                    logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
-                    contact = null;
+                    logShortMessage = "Supervisor email not sent";
+                    logLongMessage = "Job for appraisal " + appraisal.getId() + " is null";
+                    logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                 } else {
                     Job supervisorJob = job.getSupervisor();
                     if (supervisorJob == null) {
-                        String logShortMessage = "Supervisor email not sent";
-                        String logLongMessage = "Supervisor for appraisal" + appraisal.getId() + "is null";
-                        logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
-                        contact = null;
+                        logShortMessage = "Supervisor email not sent";
+                        logLongMessage = "Supervisor for appraisal " + appraisal.getId() + " is null";
+                        logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                     } else {
                         recipients.add(supervisorJob.getEmployee().getEmail());
-                        //recipients[i++] = email.stringToAddress(supervisorJob.getEmployee().getEmail());
                     }
                 }
             }
 
             if (recipient.equals("reviewer")) {
                 if (job == null) {
-                    String logShortMessage = "Reviewer email not sent";
-                    String logLongMessage = "Job for appraisal" + appraisal.getId() + "is null";
-                    logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
-                    contact = null;
+                    logShortMessage = "Reviewer email not sent";
+                    logLongMessage = "Job for appraisal " + appraisal.getId() + " is null";
+                    logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                 } else {
                     String bcName = job.getBusinessCenterName();
                     List<Reviewer> reviewers = ReviewerMgr.getReviewers(bcName);
                     if (reviewers == null) {
-                        String logShortMessage = "Reviewer email not sent";
-                        String logLongMessage = "Reviewers for appraisal" + appraisal.getId() + "is null";
-                        logger.log(Logger.NOTICE,logShortMessage,logLongMessage);
-                        contact = null;
+                        logShortMessage = "Reviewer email not sent";
+                        logLongMessage = "Reviewers for appraisal " + appraisal.getId() + " is null";
+                        logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                     } else {
                         for (Reviewer reviewer : reviewers) {
                             recipients.add(reviewer.getEmployee().getEmail());
-                            //recipients[i++] = email.stringToAddress(reviewer.getEmployee().getEmail());
                         }
                     }
                 }
             }
 
         }
-        //Object[] recipientsArray = recipients.toArray();
+
         Address[] recipientsArray = new Address[recipients.size()];
         for (Object address : recipients) {
             recipientsArray[i++] = email.stringToAddress((String) address);
@@ -547,7 +547,6 @@ public class Mailer {
      * @return
      * @throws Exception
      */
-    //@todo: create final body
     private String jobTerminatedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_jobTerminated_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal));
