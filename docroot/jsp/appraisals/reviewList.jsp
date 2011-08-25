@@ -1,7 +1,7 @@
 <%@ include file="/jsp/init.jsp" %>
 
 <h2><liferay-ui:message key="${pageTitle}" /></h2>
-<ul class="actions">
+<ul id="search-parent" class="actions">
     <li id="<portlet:namespace/>appraisal-search-link">
         <liferay-ui:icon
             image="search"
@@ -20,7 +20,7 @@
         <fieldset id="pass-user-add">
             <legend><liferay-ui:message key="search"/></legend>
             <label for="<portlet:namespace/>osuid"><liferay-ui:message key="osuid"/></label>
-            <input type="text" id="<portlet:namespace/>osuid" name="<portlet:namespace/>osuid" />
+            <input type="text" id="<portlet:namespace/>osuid" class="narrow" name="<portlet:namespace/>osuid" />
             <input type="submit" value="<liferay-ui:message key="search" />" />
             <input type="submit" class="cancel" value="<liferay-ui:message key="cancel" />" id="<portlet:namespace/>cancel" />
         </fieldset>    
@@ -70,13 +70,13 @@ jQuery(document).ready(function() {
   // When user clicks cancel in add form, hide the form.
   jQuery("#<portlet:namespace/>cancel").click(function() {
     jQuery("#pass-user-add").hide("slow");
-    jQuery("#<portlet:namespace/>appraisal-search-link").show("slow");
+    jQuery("#search-parent").show("slow");
     return false;
   });
   // When user clicks cancel in add form, hide the form.
   jQuery("#<portlet:namespace/>appraisal-search-link").click(function() {
     jQuery("#pass-user-add").show("slow");
-    jQuery("#<portlet:namespace/>appraisal-search-link").hide("slow");
+    jQuery("#search-parent").hide("slow");
   });
 
   // Validate form submission

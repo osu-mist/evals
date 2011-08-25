@@ -31,13 +31,16 @@
 
     <c:choose>
         <c:when test="${permissionRule.goalComments == 'e'}">
-            <label for="<portlet:namespace />.appraisal.goalsComments"><liferay-ui:message key="appraisal-goals-comments" /> </label>
-            <liferay-ui:input-textarea param="appraisal.goalsComments"
-                defaultValue="${appraisal.goalsComments}" /><br />
+            <fieldset>
+                <legend><liferay-ui:message key="appraisal-goals-legend" /></legend>
+                <label for="<portlet:namespace />.appraisal.goalsComments"><liferay-ui:message key="appraisal-goals-comments" /></label>
+                <liferay-ui:input-textarea param="appraisal.goalsComments"
+                    defaultValue="${appraisal.goalsComments}" />
+            </fieldset>
         </c:when>
         <c:when test="${permissionRule.goalComments == 'v'}">
             <p><strong><liferay-ui:message key="appraisal-goals-comments" /></strong></p>
-    <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getGoalsComments()) %></p>
+            <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getGoalsComments()) %></p>
         </c:when>
     </c:choose>
 
@@ -50,54 +53,58 @@
     </c:if>
 
     <div class="pass-employee-response">
-        <c:if test="${not empty permissionRule.employeeResponse}">
-            <input type="checkbox"  name="<portlet:namespace />acknowledge-read-appraisal"
-                id="<portlet:namespace />acknowledge-read-appraisal"
-                <c:if test="${appraisal.status != 'signatureDue' && appraisal.status != 'signatureOverdue'}">
-                    checked="checked" disabled="disabled"
-                </c:if>
-            >
-            <liferay-ui:message key="appraisal-acknowledge-read"/></input>
-
-            <br />
-            <p><c:if test="${not empty appraisal.employeeSignedDate}">
-            <liferay-ui:message key="appraisal-employee-signed" />
-            <fmt:formatDate value="${appraisal.employeeSignedDate}" pattern="MM/dd/yy h:m a"/>
-            </c:if></p>
-        </c:if>
-        <c:choose>
-            <c:when test="${permissionRule.employeeResponse == 'e'}">
-                <c:if test="${empty appraisal.rebuttal}">
-                    <br />
-                    <input type="submit" id="<portlet:namespace />show-rebuttal"
-                        value="<liferay-ui:message key="appraisal-want-rebuttal" />" />
-                    <div class="pass-hide pass-appraisal-rebuttal">
-                </c:if>
-                <label for="<portlet:namespace />appraisal.rebuttal"><liferay-ui:message key="appraisal-employee-response" /></label>
-                <liferay-ui:input-textarea param="appraisal.rebuttal"
-                    defaultValue="${appraisal.rebuttal}" /><br />
-                <c:if test="${empty appraisal.rebuttal}">
-                    </div><!-- end pass-hide-->
-                </c:if>
-            </c:when>
-            <c:when test="${permissionRule.employeeResponse == 'v' && not empty appraisal.rebuttal}">
-                <p><strong><liferay-ui:message key="appraisal-employee-response" /></strong></p>
-        <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getRebuttal()) %></p>
-            </c:when>
-
-        </c:choose>
-
-        <c:choose>
-            <c:when test="${permissionRule.rebuttalRead == 'e'}">
-                <input type="checkbox" id="<portlet:namespace />appraisal.readRebuttal">
-                    <liferay-ui:message key="appraisal-supervisor-ack-read-rebuttal" />
-            </c:when>
-            <c:when test="${permissionRule.rebuttalRead == 'v'}">
-                <p><liferay-ui:message key="appraisal-supervisor-rebuttal-read" />
-                <fmt:formatDate value="${appraisal.supervisorRebuttalRead}" pattern="MM/dd/yy h:m a"/>
+        <fieldset>
+            <legend><liferay-ui:message key="appraisal-employee-response-legend" /></legend>
+            <c:if test="${not empty permissionRule.employeeResponse}">
+            
+                <input type="checkbox"  name="<portlet:namespace />acknowledge-read-appraisal"
+                    id="<portlet:namespace />acknowledge-read-appraisal"
+                    <c:if test="${appraisal.status != 'signatureDue' && appraisal.status != 'signatureOverdue'}">
+                        checked="checked" disabled="disabled"
+                    </c:if>
+                >
+                    <liferay-ui:message key="appraisal-acknowledge-read"/>
+                </input>
+                <br />
+                <p><c:if test="${not empty appraisal.employeeSignedDate}">
+                        <liferay-ui:message key="appraisal-employee-signed" />
+                        <fmt:formatDate value="${appraisal.employeeSignedDate}" pattern="MM/dd/yy h:m a"/>
+                    </c:if>
                 </p>
-            </c:when>
-        </c:choose>
+            </c:if>
+            
+            <c:choose>
+                <c:when test="${permissionRule.employeeResponse == 'e'}">
+                    <c:if test="${empty appraisal.rebuttal}">
+                        <br />
+                        <input type="submit" id="<portlet:namespace />show-rebuttal"
+                            value="<liferay-ui:message key="appraisal-want-rebuttal" />" />
+                        <div class="pass-hide pass-appraisal-rebuttal">
+                    </c:if>
+                    <label for="<portlet:namespace />appraisal.rebuttal"><liferay-ui:message key="appraisal-employee-response" /></label>
+                    <liferay-ui:input-textarea param="appraisal.rebuttal"
+                        defaultValue="${appraisal.rebuttal}" /><br />
+                    <c:if test="${empty appraisal.rebuttal}">
+                        </div><!-- end pass-hide-->
+                    </c:if>
+                </c:when>
+                <c:when test="${permissionRule.employeeResponse == 'v' && not empty appraisal.rebuttal}">
+                    <p><strong><liferay-ui:message key="appraisal-employee-response" /></strong></p>
+                    <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getRebuttal()) %></p>
+                </c:when>
+            </c:choose>
+
+            <c:choose>
+                <c:when test="${permissionRule.rebuttalRead == 'e'}">
+                    <input type="checkbox" id="<portlet:namespace />appraisal.readRebuttal">
+                        <liferay-ui:message key="appraisal-supervisor-ack-read-rebuttal" />
+                </c:when>
+                <c:when test="${permissionRule.rebuttalRead == 'v'}">
+                <input type="checkbox" id="<portlet:namespace />appraisal.readRebuttal" disabled="disabled"
+                    checked="checked"/> <liferay-ui:message key="appraisal-supervisor-ack-read-rebuttal" />
+                </c:when>
+            </c:choose>
+        </fieldset>
     </div>
 
     <br />

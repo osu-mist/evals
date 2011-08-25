@@ -3,7 +3,7 @@
 <h2><liferay-ui:message key="my-information"/></h2>
 
 <div id="pass-my-info">
-      
+    <h3>Contact Information</h3>  
     <div class="section">
         <div class="col1">Name</div>
         <div class="col2">

@@ -2,18 +2,21 @@
 <jsp:useBean id="myTeamsActiveAppraisals" class="java.util.ArrayList" scope="request" />
     <div id="<portlet:namespace/>accordionMenuMyTeam" class="accordion-menu">
         <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>MyTeam');">
-          <img id="<portlet:namespace/>MyTeamImageToggle" src="/cps/images/accordion/accordion_arrow_down.png"/>
+          <img id="<portlet:namespace/>MyTeamImageToggle" src="/cps/images/accordion/accordion_arrow_up.png"/>
           <liferay-ui:message key="myTeam" />
         </div>
         <div class="accordion-content" id="<portlet:namespace/>MyTeam" style="display: block;">
             <c:if test="${!empty myTeamsActiveAppraisals}">
-                <table class="taglib-search-iterator">
-                    <tr class="portlet-section-header results-header">
-                        <th><liferay-ui:message key="name" /></th>
-                        <th><liferay-ui:message key="appointment-type" /></th>
-                        <th><liferay-ui:message key="reviewPeriod" /></th>
-                        <th><liferay-ui:message key="status" /></th>
-                    </tr>
+                <table class="taglib-search-iterator narrow">
+                    <thead>
+                        <tr class="portlet-section-header results-header">
+                            <th><liferay-ui:message key="name" /></th>
+                            <th><liferay-ui:message key="appointment-type" /></th>
+                            <th><liferay-ui:message key="reviewPeriod" /></th>
+                            <th><liferay-ui:message key="status" /></th>
+                        </tr>
+                    </thead>
+                    <tbody>
                     <c:forEach var="shortAppraisal" items="${myTeamsActiveAppraisals}" varStatus="loopStatus">
                         <tr class="${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}"
                         >
@@ -28,6 +31,7 @@
                             </td>
                         </tr>
                     </c:forEach>
+                    </tbody>
                 </table>
             </c:if>
             <c:if test="${empty myTeamsActiveAppraisals}">
