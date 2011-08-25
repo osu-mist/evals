@@ -32,6 +32,11 @@ public class Logger {
         this.facilityName = facilityName;
     }
 
+    /**
+     * send a GELF Message to graylog
+     * @param message
+     * @throws Exception
+     */
     public void log(GelfMessage message) throws Exception {
         GelfSender gelfSender = new GelfSender(logHost);
         message.setHost(clientHost);
@@ -41,11 +46,26 @@ public class Logger {
         }
     }
 
+    /**
+     * generate and log a simple GELF message
+     * @param level
+     * @param shortMessage
+     * @param longMessage
+     * @throws Exception
+     */
     public void log(String level, String shortMessage, String longMessage) throws Exception {
         GelfMessage message = new GelfMessage(shortMessage, longMessage, new Date(), level);
         log(message);
     }
 
+    /**
+     * generate and log a GELF message with a map of additional fields
+     * @param level
+     * @param shortMessage
+     * @param longMessage
+     * @param fields
+     * @throws Exception
+     */
     public void log(String level, String shortMessage, String longMessage, Map<String,String> fields) throws Exception {
         GelfMessage message = new GelfMessage(shortMessage, longMessage, new Date(), level);
         Set<String> keys = fields.keySet();
