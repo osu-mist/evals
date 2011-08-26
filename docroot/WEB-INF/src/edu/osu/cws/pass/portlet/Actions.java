@@ -2,16 +2,20 @@ package edu.osu.cws.pass.portlet;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.pass.hibernate.*;
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.pass.util.Mailer;
+import edu.osu.cws.pass.util.PassPDF;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
 
 import javax.portlet.*;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.util.*;
 
 /**
@@ -562,24 +566,31 @@ public class Actions {
      * @throws Exception
      */
     public String displayAppraisal(PortletRequest request, PortletResponse response) throws Exception {
+        Boolean showForm = false;
+        Appraisal appraisal;
+        PermissionRule permRule;
+        int userId = getLoggedOnUser(request).getId();
+
         int appraisalID = ParamUtil.getInteger(request, "id");
+        if (appraisalID == 0) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
         Employee currentlyLoggedOnUser = getLoggedOnUser(request);
         setAppraisalMgrParameters(currentlyLoggedOnUser);
 
-        Boolean showForm = false;
-
-        Appraisal appraisal = appraisalMgr.getAppraisal(appraisalID);
-        PermissionRule permRule = appraisalMgr.getAppraisalPermissionRule(appraisal, true);
+        // 1) Get the appraisal and permission rule
+        appraisal = appraisalMgr.getAppraisal(appraisalID);
+        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal, true);
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
             addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
-        int userId = currentlyLoggedOnUser.getId();
+
         String userRole = appraisalMgr.getRoleAndSession(appraisal, userId);
         appraisalMgr.setAppraisalStatus(appraisal, userRole);
-
         // Set flag whether or not the html form to update the appraisal needs to be displayed
         if (permRule.getSaveDraft() != null && permRule.getSubmit() != null
                 && permRule.getRequireModification() != null) {
@@ -608,6 +619,9 @@ public class Actions {
                         || appraisal.getStatus().equals("goalsReactivated")
                 )) {
             showDraftMessage = true;
+        }
+        if (isLoggedInUserAdmin(request) && appraisal.getEmployeeSignedDate() != null) {
+            request.setAttribute("displayResendNolij", true);
         }
 
         request.setAttribute("appraisal", appraisal);
@@ -644,11 +658,7 @@ public class Actions {
      * @throws Exception
      */
     public String updateAppraisal(PortletRequest request, PortletResponse response) throws Exception {
-//        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-//            _log.error(entry.getKey() + "/" + entry.getValue()[0]);
-//
-//        }
-
+        Appraisal appraisal;
         int id = ParamUtil.getInteger(request, "id", 0);
         if (id == 0) {
             addErrorsToRequest(request, "We couldn't find your appraisal. If you believe this is an " +
@@ -659,14 +669,20 @@ public class Actions {
         Employee currentlyLoggedOnUser = getLoggedOnUser(request);
         setAppraisalMgrParameters(currentlyLoggedOnUser);
 
-
         try {
             Map<String, Configuration> configurationMap =
                     (Map<String, Configuration>) portletContext.getAttribute("configurations");
             Configuration resultsDueConfig = configurationMap.get("resultsDue");
 
             Mailer mailer = (Mailer) portletContext.getAttribute("mailer");
-            appraisalMgr.processUpdateRequest(request.getParameterMap(), id, resultsDueConfig, mailer);
+            appraisal = appraisalMgr.processUpdateRequest(request.getParameterMap(), id, resultsDueConfig, mailer);
+
+            if (NolijCopies.sendPDFToNolij(appraisal)) {
+                CompositeConfiguration config = (CompositeConfiguration)
+                        portletContext.getAttribute("environmentProp");
+                String nolijDir = config.getString("pdf.nolijDir");
+                createNolijPDF(appraisal, nolijDir, "prod");
+            }
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
         }
@@ -682,6 +698,153 @@ public class Actions {
 
         return displayHomeView(request, response);
     }
+
+    /**
+     * Allows the end user to download a PDF copy of the appraisal
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String downloadPDF(PortletRequest request, PortletResponse response) throws Exception {
+        Appraisal appraisal;
+        PermissionRule permRule;
+
+        int appraisalID = ParamUtil.getInteger(request, "id");
+        if (appraisalID == 0) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+        Employee currentlyLoggedOnUser = getLoggedOnUser(request);
+        setAppraisalMgrParameters(currentlyLoggedOnUser);
+
+        // 1) Get the appraisal and permission rule
+        appraisal = appraisalMgr.getAppraisal(appraisalID);
+        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal, true);
+
+        // Check to see if the logged in user has permission to access the appraisal
+        if (permRule == null) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+
+        int userId = currentlyLoggedOnUser.getId();
+        String userRole = appraisalMgr.getRoleAndSession(appraisal, userId);
+        appraisalMgr.setAppraisalStatus(appraisal, userRole);
+
+        // 2) Compose a file name
+        CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
+        String tmpDir = config.getString("pdf.tmpDir");
+        String filename = PassPDF.getNolijFileName(appraisal, tmpDir, "dev2");
+
+        // 3) Create PDF
+        ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
+        String rootDir = portletContext.getRealPath("/");
+        PassPDF.createPDF(appraisal, permRule, filename, resource, rootDir);
+
+        // 4) Read the PDF file and provide to the user as attachment
+        if (response instanceof ResourceResponse) {
+            String title = appraisal.getJob().getJobTitle().replace(" ", "_");
+            String employeeName = appraisal.getJob().getEmployee().getName().replace(" ", "_");
+            String downloadFilename = "performance-appraisal-"+ title + "-" +
+                     employeeName + "-" + appraisal.getJob().getPositionNumber()
+                    + ".pdf";
+            ResourceResponse res = (ResourceResponse) response;
+            res.setContentType("application/pdf");
+            res.addProperty(HttpHeaders.CACHE_CONTROL, "max-age=3600, must-revalidate");
+            res.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+downloadFilename);
+
+            OutputStream out = res.getPortletOutputStream();
+            RandomAccessFile in = new RandomAccessFile(filename, "r");
+
+            byte[] buffer = new byte[4096];
+            int len;
+            while((len = in.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
+            }
+
+            out.flush();
+            in.close();
+            out.close();
+
+            // 5) Delete the temp PDF file generated
+            PassPDF.deletePDF(filename);
+        }
+
+
+        return null;
+    }
+
+    /**
+     * Sends the appraisal to NOLIJ. This is only allowed to reviewers and does not check whether or not
+     * the appraisal has been sent to nolij before. It calls createNolijPDF to do the work.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String resendAppraisalToNolij(PortletRequest request, PortletResponse response) throws Exception {
+        Appraisal appraisal;
+        PermissionRule permRule;
+
+        int appraisalID = ParamUtil.getInteger(request, "id");
+        if (appraisalID == 0) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+        Employee currentlyLoggedOnUser = getLoggedOnUser(request);
+        setAppraisalMgrParameters(currentlyLoggedOnUser);
+
+        // 1) Get the appraisal and permission rule
+        appraisal = appraisalMgr.getAppraisal(appraisalID);
+        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal, true);
+
+        // Check to see if the logged in user has permission to access the appraisal
+        if (permRule == null) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+
+        int userId = currentlyLoggedOnUser.getId();
+        String userRole = appraisalMgr.getRoleAndSession(appraisal, userId);
+        appraisalMgr.setAppraisalStatus(appraisal, userRole);
+
+        request.setAttribute("id", appraisal.getId());
+        if (!isLoggedInUserReviewer(request)) {
+            addErrorsToRequest(request, "Only reviewers can re-send the Evaluation to NOLIJ");
+            return displayAppraisal(request, response);
+        }
+
+        // If there is a problem, createNolijPDF will throw an exception
+        CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
+        String nolijDir = config.getString("pdf.nolijDir");
+        createNolijPDF(appraisal, nolijDir, "prod");
+        SessionMessages.add(request, "appraisal-sent-to-nolij-success");
+
+        return displayAppraisal(request, response);
+    }
+
+    private void createNolijPDF(Appraisal appraisal, String dirName, String env) throws Exception {
+        // 1) Compose a file name
+        CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
+        String filename = PassPDF.getNolijFileName(appraisal, dirName, env);
+
+        // 2) Grab the permissionRule
+        PermissionRule permRule = appraisalMgr.getAppraisalPermissionRule(appraisal, true);
+
+        // 2) Create PDF
+        ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
+        String rootDir = portletContext.getRealPath("/");
+        PassPDF.createPDF(appraisal, permRule, filename, resource, rootDir);
+
+        // 3) Insert a record into the nolij_copies table
+        String onlyFilename = filename.replaceFirst(dirName, "");
+        NolijCopies.add(appraisal.getId(), onlyFilename);
+    }
+
+
 
     /**
      * Handles listing the admin users. It only performs error checking. The list of

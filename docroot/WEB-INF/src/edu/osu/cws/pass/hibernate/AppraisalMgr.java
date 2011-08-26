@@ -284,18 +284,20 @@ public class AppraisalMgr {
      * moves the appraisal to the next appraisal step and sends any emails if necessary.
      *
      * @param request
-     * @param id
-     * @param resultsDueConfig
-     * @param mailer
-     * @return
+     * @param id                id of appraisal
+     * @param resultsDueConfig  Configuration object specifying when the results are due
+     * @param mailer            Mailer object to send emails to supervisor and employee
+     * @return appraisal        Appraisal object after processing the update request
      * @throws Exception
      */
-    public boolean processUpdateRequest(Map request, int id, Configuration resultsDueConfig, Mailer mailer)
+    public Appraisal processUpdateRequest(Map request, int id, Configuration resultsDueConfig, Mailer mailer)
             throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         try {
             Transaction tx = session.beginTransaction();
             Appraisal appraisal = (Appraisal) session.get(Appraisal.class, id);
+            Job supervisorJob = jobMgr.getSupervisor(appraisal.getJob());
+            appraisal.getJob().setCurrentSupervisor(supervisorJob);
             PermissionRule permRule = getAppraisalPermissionRule(appraisal);
 
             // Check to see if the logged in user has permission to access the appraisal
@@ -322,13 +324,14 @@ public class AppraisalMgr {
             if (emailType != null) {
                 mailer.sendMail(appraisal, emailType);
             }
+
+            return appraisal;
         } catch (Exception e) {
             if (session.isOpen()) {
                 session.close();
             }
             throw e;
         }
-        return false;
     }
 
     /**

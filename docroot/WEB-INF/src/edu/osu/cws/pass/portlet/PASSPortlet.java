@@ -130,9 +130,6 @@ public class PASSPortlet extends GenericPortlet {
         String resourceID;
         actionClass.setPortletContext(getPortletContext());
 
-        response.setContentType("text/html");
-        PrintWriter writer = response.getWriter();
-
         // The logic below is similar to delegate method, but instead we
         // need to return the value we get from Actions method instead of
         // assign it to viewJSP
@@ -144,6 +141,11 @@ public class PASSPortlet extends GenericPortlet {
 
                 // The resourceID methods return the init-param of the path
                 result = (String) actionMethod.invoke(actionClass, request, response);
+
+                // If there was no string returned by the Action method, we return immediately
+                if (result == null) {
+                    return;
+                }
             } catch (Exception e) {
                 handlePASSException(e, "Error in serveResource", Logger.ERROR, false);
                 result="There was an error performing your request";
@@ -151,6 +153,9 @@ public class PASSPortlet extends GenericPortlet {
         } else {
             result="There was an error performing your request";
         }
+
+        response.setContentType("text/html");
+        PrintWriter writer = response.getWriter();
         writer.print(result);
     }
 

@@ -16,7 +16,7 @@
             </c:choose>
 
         <fieldset>
-            <legend>Select a rating</legend>
+            <legend><liferay-ui:message key="appraisal-select-rating"/></legend>
             <ol>
               <li>
                 <input type="radio" name="<portlet:namespace />appraisal.rating" value="1"

@@ -3,14 +3,40 @@
 
 <jsp:useBean id="appraisal" class="edu.osu.cws.pass.models.Appraisal" scope="request" />
 <jsp:useBean id="permissionRule" class="edu.osu.cws.pass.models.PermissionRule" scope="request" />
+<portlet:resourceURL var="downloadPDFURL" id="downloadPDF" escapeXml="false">
+    <portlet:param name="id" value="${appraisal.id}"/>
+</portlet:resourceURL>
+<portlet:actionURL var="resendAppraisalToNolij" escapeXml="false">
+    <portlet:param name="id" value="${appraisal.id}"/>
+    <portlet:param name="action" value="resendAppraisalToNolij"/>
+</portlet:actionURL>
 
 <div id="pass-appraisal-form" class="osu-cws">
+
     <h2><liferay-ui:message key="appraisal-classified-title" /></h2>
     <liferay-ui:success key="draft-saved" message="draft-saved" />
 
     <c:if test="${showDraftMessage == 'true'}">
         <span class="portlet-msg-alert"><liferay-ui:message key="appraisal-draft-alert"/></span>
     </c:if>
+    <liferay-ui:success key="appraisal-sent-to-nolij-success" message="appraisal-sent-to-nolij-success" />
+
+    <ul class="actions">
+        <li><liferay-ui:icon
+            image="add_article"
+            url="<%=renderResponse.encodeURL(downloadPDFURL.toString())%>"
+            label="true"
+            message="appraisal-download-pdf"
+        /></li>
+        <c:if test="${not empty displayResendNolij}">
+            <li><liferay-ui:icon
+                image="copy"
+                url="<%=renderResponse.encodeURL(resendAppraisalToNolij.toString())%>"
+                label="true"
+                message="appraisal-resend-to-nolij"
+            /></li>
+        </c:if>
+    </ul>
 
     <%@ include file="/jsp/appraisals/info.jsp"%>
 
