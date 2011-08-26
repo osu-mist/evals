@@ -15,10 +15,6 @@
 
     <h2><liferay-ui:message key="appraisal-classified-title" /></h2>
     <liferay-ui:success key="draft-saved" message="draft-saved" />
-
-    <c:if test="${showDraftMessage == 'true'}">
-        <span class="portlet-msg-alert"><liferay-ui:message key="appraisal-draft-alert"/></span>
-    </c:if>
     <liferay-ui:success key="appraisal-sent-to-nolij-success" message="appraisal-sent-to-nolij-success" />
 
     <ul class="actions">

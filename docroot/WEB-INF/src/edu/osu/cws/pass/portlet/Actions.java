@@ -607,19 +607,6 @@ public class Actions {
             request.setAttribute("pendingReviews", reviews);
         }
 
-        boolean showDraftMessage = false;
-        Job appraisalJob = appraisal.getJob();
-        Employee employee = appraisalJob.getEmployee();
-        boolean isUserOwnerOrSupervisor = userId == employee.getId() ||
-                userId == appraisalJob.getCurrentSupervisor().getEmployee().getId();
-
-        if (isUserOwnerOrSupervisor &&
-                (appraisal.getStatus().equals("goalsDue") || appraisal.getStatus().equals("goalsOverdue")
-                        || appraisal.getStatus().equals("goalsRequiredModification")
-                        || appraisal.getStatus().equals("goalsReactivated")
-                )) {
-            showDraftMessage = true;
-        }
         if (isLoggedInUserAdmin(request) && appraisal.getEmployeeSignedDate() != null) {
             request.setAttribute("displayResendNolij", true);
         }
@@ -627,7 +614,6 @@ public class Actions {
         request.setAttribute("appraisal", appraisal);
         request.setAttribute("permissionRule", permRule);
         request.setAttribute("showForm", showForm);
-        request.setAttribute("showDraftMessage", showDraftMessage);
         useMaximizedMenu(request);
 
         return "appraisal-jsp";
