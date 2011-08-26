@@ -512,6 +512,10 @@ public class Actions {
      * @throws Exception
      */
     public String searchAppraisals(PortletRequest request, PortletResponse response) throws Exception {
+        List<Appraisal> appraisals = new ArrayList<Appraisal>();
+        request.setAttribute("pageTitle", "search-results");
+        ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
+
         boolean isAdmin = isLoggedInUserAdmin(request);
         boolean isReviewer = isLoggedInUserReviewer(request);
         boolean isSupervisor = isLoggedInUserSupervisor(request);
@@ -526,31 +530,25 @@ public class Actions {
         int osuid = ParamUtil.getInteger(request, "osuid");
         if (osuid == 0) {
             addErrorsToRequest(request, "Please enter an employee's OSU ID");
-            ((ActionResponse) response).setWindowState(WindowState.NORMAL);
-            return displayHomeView(request, response);
-        }
-
-        String bcName = "";
-        if (isReviewer) {
-            bcName = getReviewer(pidm).getBusinessCenterName();
-        }
-        List<Appraisal> appraisals = appraisalMgr.search(osuid, pidm, isAdmin, isSupervisor, bcName);
-
-        if (appraisals.isEmpty()) {
-            if (isAdmin) {
-                addErrorsToRequest(request, "No employee found.");
-            } else if (isReviewer) {
-                addErrorsToRequest(request, "No employee found in your business center.");
-            } else {
-                addErrorsToRequest(request, "No employee found under your supervising chain.");
+        } else {
+            String bcName = "";
+            if (isReviewer) {
+                bcName = getReviewer(pidm).getBusinessCenterName();
             }
+            appraisals = appraisalMgr.search(osuid, pidm, isAdmin, isSupervisor, bcName);
 
-            ((ActionResponse) response).setWindowState(WindowState.NORMAL);
-            return displayHomeView(request, response);
+            if (appraisals.isEmpty()) {
+                if (isAdmin) {
+                    addErrorsToRequest(request, resource.getString("appraisal-search-no-results-admin"));
+                } else if (isReviewer) {
+                    addErrorsToRequest(request, resource.getString("appraisal-search-no-results-reviewer"));
+                } else {
+                    addErrorsToRequest(request, resource.getString("appraisal-search-no-results-supervisor"));
+                }
+            }
         }
 
         request.setAttribute("appraisals", appraisals);
-        request.setAttribute("pageTitle", "search-results");
         useMaximizedMenu(request);
 
         return "review-list-jsp";
