@@ -14,7 +14,7 @@
 
         <property name="appraisalId" type="int" column="APPRAISAL_ID"/>
         <property name="emailType" column="EMAIL_TYPE"/>
-        <property name="sentDate" type="timestamp" column="SENT_TImE"/>
+        <property name="sentDate" type="timestamp" column="SENT_TIME"/>
 
     </class>
 
