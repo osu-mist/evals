@@ -444,7 +444,7 @@ public class AppraisalMgr {
             if (request.get("appraisal.review") != null) {
                 appraisal.setReview(request.get("appraisal.review")[0]);
             }
-            if (request.get("submit-appraisal") != null) {
+            if (request.get(permRule.getSubmit()) != null) {
                 appraisal.setReviewer(loggedInUser);
                 appraisal.setReviewSubmitDate(new Date());
             }
@@ -461,6 +461,11 @@ public class AppraisalMgr {
             if (request.get("submit-response") != null) {
                 appraisal.setRebuttalDate(new Date());
             }
+        }
+        // Save supervisor rebuttal read
+        if (permRule.getRebuttalRead() != null && permRule.getRebuttalRead().equals("e")
+                && request.get("read-appraisal-rebuttal") != null) {
+            appraisal.setSupervisorRebuttalRead(new Date());
         }
 
         // If the appraisalStep object has a new status, update the appraisal object
@@ -749,7 +754,9 @@ public class AppraisalMgr {
             Job supervisorJob = jobMgr.getSupervisor(appraisal.getJob());
             appraisal.getJob().setCurrentSupervisor(supervisorJob);
         } catch (Exception e) {
-            session.close();
+            if (session.isOpen()) {
+                session.close();
+            }
             throw e;
         }
 
