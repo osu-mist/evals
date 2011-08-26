@@ -76,26 +76,25 @@
 
     <div class="pass-employee-response">
         <fieldset>
-            <legend><liferay-ui:message key="appraisal-employee-response-legend" /></legend>
+            <legend><liferay-ui:message key="appraisal-employee-legend" /></legend>
             <c:if test="${not empty permissionRule.employeeResponse}">
-            
-                <input type="checkbox"  name="<portlet:namespace />acknowledge-read-appraisal"
-                    id="<portlet:namespace />acknowledge-read-appraisal"
-                    <c:if test="${appraisal.status != 'signatureDue' && appraisal.status != 'signatureOverdue'}">
-                        checked="checked" disabled="disabled"
-                    </c:if>
-                />
-                    <liferay-ui:message key="appraisal-acknowledge-checkbox"/>
-                    <liferay-ui:message key="appraisal-acknowledge-read"/>
-                </input>
-                <br />
-                <p><c:if test="${not empty appraisal.employeeSignedDate}">
-                    <strong>${appraisal.job.employee.name} on
-                    <fmt:formatDate value="${appraisal.employeeSignedDate}" pattern="MM/dd/yy"/> at
-                    <fmt:formatDate value="${appraisal.employeeSignedDate}" pattern="h:m a"/>
-                    </strong>
-                    </c:if>
-                </p>
+                <fieldset>
+                    <legend><liferay-ui:message key="appraisal-employee-signature" /></legend>
+                    <input type="checkbox"  name="<portlet:namespace />acknowledge-read-appraisal"
+                        id="<portlet:namespace />acknowledge-read-appraisal"
+                        <c:if test="${appraisal.status != 'signatureDue' && appraisal.status != 'signatureOverdue'}">
+                            checked="checked" disabled="disabled"
+                        </c:if>
+                    >
+                        <liferay-ui:message key="appraisal-acknowledge-read"/>
+                    </input>
+                    <br />
+                    <p><c:if test="${not empty appraisal.employeeSignedDate}">
+                            <liferay-ui:message key="appraisal-employee-signed" />
+                            <fmt:formatDate value="${appraisal.employeeSignedDate}" pattern="MM/dd/yy h:m a"/>
+                        </c:if>
+                    </p>
+                </fieldset>
             </c:if>
             
             <c:choose>
@@ -114,8 +113,10 @@
                     </c:if>
                 </c:when>
                 <c:when test="${permissionRule.employeeResponse == 'v' && not empty appraisal.rebuttal}">
-                    <p><strong><liferay-ui:message key="appraisal-employee-response" /></strong></p>
-                    <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getRebuttal()) %></p>
+                    <fieldset>
+                        <legend><liferay-ui:message key="appraisal-employee-response" /></legend>
+                        <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getRebuttal()) %></p>
+                    </fieldset>
                 </c:when>
             </c:choose>
 
