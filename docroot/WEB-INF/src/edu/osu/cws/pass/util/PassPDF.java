@@ -383,7 +383,7 @@ public class PassPDF {
             uncheckedBox.setVerticalAlignment(Element.ALIGN_BOTTOM);
             uncheckedBox.setBorder(Rectangle.NO_BORDER);
 
-            if (appraisal.getRating() == 1) {
+            if (appraisal.getRating() != null && appraisal.getRating() == 1) {
                 rating.addCell(checkedBox);
             } else {
                 rating.addCell(uncheckedBox);
@@ -393,7 +393,7 @@ public class PassPDF {
             cell.setBorder(Rectangle.NO_BORDER);
             rating.addCell(cell);
 
-            if (appraisal.getRating() == 2) {
+            if (appraisal.getRating() != null && appraisal.getRating() == 2) {
                 rating.addCell(checkedBox);
             } else {
                 rating.addCell(uncheckedBox);
@@ -403,7 +403,7 @@ public class PassPDF {
             cell.setBorder(Rectangle.NO_BORDER);
             rating.addCell(cell);
 
-            if (appraisal.getRating() == 3) {
+            if (appraisal.getRating() != null && appraisal.getRating() == 3) {
                 rating.addCell(checkedBox);
             } else {
                 rating.addCell(uncheckedBox);
@@ -413,7 +413,7 @@ public class PassPDF {
             cell.setBorder(Rectangle.NO_BORDER);
             rating.addCell(cell);
 
-            if (appraisal.getRating() == 4) {
+            if (appraisal.getRating() != null && appraisal.getRating() == 4) {
                 rating.addCell(checkedBox);
             } else {
                 rating.addCell(uncheckedBox);
@@ -542,7 +542,10 @@ public class PassPDF {
 
         c = new Chunk(resource.getString("appraisal-rating")+": ", FONT_10);
         p = new Paragraph(c);
-        String rating = resource.getString("appraisal-rating-pdf-" + appraisal.getRating());
+        String rating = "";
+        if (appraisal.getRating() != null) {
+            rating = resource.getString("appraisal-rating-pdf-" + appraisal.getRating());
+        }
         c = new Chunk(rating, FONT_BOLD_10);
         p.add(c);
         cell = new PdfPCell(p);
