@@ -84,13 +84,16 @@
                     <c:if test="${appraisal.status != 'signatureDue' && appraisal.status != 'signatureOverdue'}">
                         checked="checked" disabled="disabled"
                     </c:if>
-                >
+                />
+                    <liferay-ui:message key="appraisal-acknowledge-checkbox"/>
                     <liferay-ui:message key="appraisal-acknowledge-read"/>
                 </input>
                 <br />
                 <p><c:if test="${not empty appraisal.employeeSignedDate}">
-                        <liferay-ui:message key="appraisal-employee-signed" />
-                        <fmt:formatDate value="${appraisal.employeeSignedDate}" pattern="MM/dd/yy h:m a"/>
+                    <strong>${appraisal.job.employee.name} on
+                    <fmt:formatDate value="${appraisal.employeeSignedDate}" pattern="MM/dd/yy"/> at
+                    <fmt:formatDate value="${appraisal.employeeSignedDate}" pattern="h:m a"/>
+                    </strong>
                     </c:if>
                 </p>
             </c:if>
@@ -122,8 +125,11 @@
                         <liferay-ui:message key="appraisal-supervisor-ack-read-rebuttal" />
                 </c:when>
                 <c:when test="${permissionRule.rebuttalRead == 'v'}">
-                <input type="checkbox" id="<portlet:namespace />appraisal.readRebuttal" disabled="disabled"
-                    checked="checked"/> <liferay-ui:message key="appraisal-supervisor-ack-read-rebuttal" />
+                    <p><strong><liferay-ui:message key="appraisal-supervisor-rebuttal-read" />
+                    ${appraisal.job.supervisor.employee.name} on
+                    <fmt:formatDate value="${appraisal.supervisorRebuttalRead}" pattern="MM/dd/yy"/> at
+                    <fmt:formatDate value="${appraisal.supervisorRebuttalRead}" pattern="h:m a"/>
+                    </strong></p>
                 </c:when>
             </c:choose>
         </fieldset>

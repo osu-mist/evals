@@ -3,7 +3,9 @@
         <legend><liferay-ui:message key="appraisal-summary"/></legend>
             <c:choose>
                 <c:when test="${permissionRule.evaluation == 'e'}">
-                    <label for="<portlet:namespace />appraisal.evaluation">Evaluation</label>
+                    <label for="<portlet:namespace />appraisal.evaluation">
+                    <liferay-ui:message key="appraisal-evaluation" />
+                    </label>
                     <liferay-ui:input-textarea param="appraisal.evaluation"
                         defaultValue="${appraisal.evaluation}" /><br />
                 </c:when>
