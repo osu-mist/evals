@@ -25,6 +25,7 @@ public class PassPDF {
     public static final Font FONT_BOLD_10 = new Font(Font.FontFamily.TIMES_ROMAN, 10, Font.BOLD);
     public static final Font FONT_BOLDITALIC_10 = new Font(Font.FontFamily.TIMES_ROMAN, 10, Font.BOLDITALIC);
     public static final Font FONT_9 = new Font(Font.FontFamily.TIMES_ROMAN, 9);
+    public static final Font FONT_ITALIC_9 = new Font(Font.FontFamily.TIMES_ROMAN, 9, Font.BOLDITALIC);
     public static final Font FONT_BOLD_13 = new Font(Font.FontFamily.TIMES_ROMAN, 13, Font.BOLD);
 
     /** Images **/
@@ -134,7 +135,7 @@ public class PassPDF {
     private static PdfPTable getSignatureTable(Appraisal appraisal, PermissionRule rule,
                                                ResourceBundle resource, Document document) throws DocumentException {
         int signatureTableMaxCols = 29;
-        int signatureTableMaxRows = 6;
+        int signatureTableMaxRows = 7;
         int nameColSpan = 8;
         int dateColSpan = 5;
 
@@ -181,8 +182,8 @@ public class PassPDF {
         signatureTable.addCell(employeeDateCell);
 
         PdfPCell middlePaddingCell = new PdfPCell();
-        middlePaddingCell.setRowspan(signatureTableMaxRows);
-        middlePaddingCell.setBorder(Rectangle.TOP + Rectangle.BOTTOM);
+        middlePaddingCell.setRowspan(signatureTableMaxRows-2);
+        middlePaddingCell.setBorder(Rectangle.TOP);
         signatureTable.addCell(middlePaddingCell);
 
         signatureTable.addCell(supervisorCell);
@@ -233,8 +234,8 @@ public class PassPDF {
         PdfPCell employeeDescCell = new PdfPCell();
         employeeDescCell.setPhrase(new Paragraph(employeeSignDesc, FONT_9));
         employeeDescCell.setColspan(nameColSpan + dateColSpan);
-        employeeDescCell.setRowspan(dateColSpan);
-        employeeDescCell.setBorder(Rectangle.BOTTOM);
+        employeeDescCell.setRowspan(2);
+        employeeDescCell.setBorder(Rectangle.NO_BORDER);
         signatureTable.addCell(employeeDescCell);
 
         PdfPCell reviewerCell = new PdfPCell();
@@ -265,9 +266,18 @@ public class PassPDF {
         signatureTable.addCell(dateCell);
         /** End ROW 5 **/
 
-        // Empty ROW 6
+        /** Begin ROW 6 **/
+        String electronicSignature = resource.getString("appraisal-electronic-signature-desc");
+        PdfPCell electronicSignatureCell = new PdfPCell();
+        electronicSignatureCell.addElement(new Phrase(electronicSignature,  FONT_ITALIC_9));
+        electronicSignatureCell.setColspan(signatureTableMaxCols-2);
+        electronicSignatureCell.setBorder(Rectangle.NO_BORDER);
+        signatureTable.addCell(electronicSignatureCell);
+        /** End ROW 6 **/
+
+        // Empty ROW 7
         nameAndDateCell.setBorder(Rectangle.BOTTOM);
-        signatureTable.addCell(nameAndDateCell);
+        nameAndDateCell.setColspan(signatureTableMaxCols-2);
         signatureTable.addCell(nameAndDateCell);
 
         return signatureTable;
