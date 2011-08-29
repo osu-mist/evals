@@ -314,7 +314,11 @@ public class AppraisalMgr {
             updateAppraisal(appraisal);
 
             // Creates the first annual appraisal if needed
-            createFirstAnnualAppraisal(appraisal, resultsDueConfig);
+            String action = "";
+            if (request.get("sign-appraisal") != null) {
+                action = "sign-appraisal";
+            }
+            createFirstAnnualAppraisal(appraisal, resultsDueConfig, action);
             tx.commit();
 
             // Send email if needed
@@ -336,29 +340,29 @@ public class AppraisalMgr {
 
     /**
      * Creates the first annual appraisal if needed. The first annual appraisal is created if:
-     *  1) the appraisal status is closed, completed or rebuttalReaddue
-     *  2) the job status is not T
-     *  3) the job does not already have an initial annual appraisal
-     *  4) The current appraisal is of type: trial
-     *  5) The job annual_indicator != 0
+     *  1) The current appraisal is of type: trial
+     *  2) the action is sign-appraisal
+     *  3) The job annual_indicator != 0
      *
      * @param appraisal
+     * @param resultsDueConfig
+     * @param action
      * @throws Exception
      */
-    private void createFirstAnnualAppraisal(Appraisal appraisal, Configuration resultsDueConfig)
+    private void createFirstAnnualAppraisal(Appraisal appraisal, Configuration resultsDueConfig, String action)
             throws Exception {
-        String appraisalStatus = appraisal.getStatus();
-        boolean allowedStatus = appraisalStatus.equals("closed") || appraisalStatus.equals("completed") ||
-                appraisalStatus.equals("rebuttalReadDue");
         Job job = appraisal.getJob();
-        String jobStatus = job.getStatus();
 
-        boolean hasFirstAnnualAppraisal = AppraisalMgr.trialAppraisalExists(job);
-
-        if (appraisal.getType().equals(Appraisal.TYPE_TRIAL) && allowedStatus && !jobStatus.equals("T")
-                && job.getAnnualInd() != 0 && !hasFirstAnnualAppraisal) {
-            AppraisalMgr.createInitialAppraisalAfterTrial(appraisal, resultsDueConfig);
+        if (!appraisal.getType().equals(Appraisal.TYPE_TRIAL)) {
+            return;
         }
+        if (!action.equals("sign-appraisal")) {
+            return;
+        }
+        if (job.getAnnualInd() == 0) {
+            return;
+        }
+        AppraisalMgr.createInitialAppraisalAfterTrial(appraisal, resultsDueConfig);
     }
 
     /**
