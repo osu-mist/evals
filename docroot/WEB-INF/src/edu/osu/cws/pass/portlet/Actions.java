@@ -661,7 +661,8 @@ public class Actions {
             Mailer mailer = (Mailer) portletContext.getAttribute("mailer");
             appraisal = appraisalMgr.processUpdateRequest(request.getParameterMap(), id, resultsDueConfig, mailer);
 
-            if (NolijCopies.sendPDFToNolij(appraisal)) {
+            String signAppraisal = ParamUtil.getString(request, "sign-appraisal");
+            if (signAppraisal != null && !signAppraisal.equals("")) {
                 CompositeConfiguration config = (CompositeConfiguration)
                         portletContext.getAttribute("environmentProp");
                 String nolijDir = config.getString("pdf.nolijDir");

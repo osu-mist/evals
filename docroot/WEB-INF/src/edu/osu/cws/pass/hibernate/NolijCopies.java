@@ -38,31 +38,4 @@ public class NolijCopies {
 
     }
 
-    /**
-     * Specifies whether or not a PDF copy of the appraisal should be sent to NOLIJ. Basically we check that
-     * the appraisal has an employee signature, but does not have a record in nolij_copies. This is used
-     * by Actions.updateAppraisal.
-     *
-     * @param appraisal
-     * @return
-     * @throws Exception
-     */
-    public static boolean sendPDFToNolij(Appraisal appraisal) throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        try {
-            Transaction tx = session.beginTransaction();
-            String query = "from edu.osu.cws.pass.models.NolijCopy where appraisalId = :id";
-            NolijCopy nolijCopy = (NolijCopy) session.createQuery(query)
-                    .setInteger("id", appraisal.getId()).uniqueResult();
-            tx.commit();
-
-            if (nolijCopy != null && nolijCopy.getId() != 0 && appraisal.getEmployeeSignedDate() != null) {
-                return true;
-            }
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
-        return false;
-    }
 }
