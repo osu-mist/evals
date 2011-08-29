@@ -1052,6 +1052,42 @@ public class AppraisalMgr {
         return getReviewCountByStatus(bcName, "reviewOverdue");
     }
 
+    /**
+     * Updates the status of the given appraisal. This does not check permissions or
+     * the status String. This is just for demo purposes.
+     *
+     * @param id
+     * @param status
+     * @throws Exception
+     */
+    public void updateAppraisalStatus(int id, String status) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        ArrayList<HashMap> myActiveAppraisals;
+        try {
+            this.updateAppraisalStatus(id, status, session);
+        } catch (Exception e){
+            session.close();
+            throw e;
+        }
+    }
+
+    /**
+     * Updates the status of the given appraisal. This does not check permissions or
+     * the status String. This is just for demo purposes.
+     *
+     * @param id
+     * @param status
+     * @param session
+     * @throws Exception
+     */
+    private void updateAppraisalStatus(int id, String status, Session session) throws Exception {
+        Transaction tx = session.beginTransaction();
+        Appraisal appraisal = (Appraisal) session.get(Appraisal.class, id);
+        appraisal.setStatus(status);
+        session.update(appraisal);
+        tx.commit();
+    }
+
     public void setLoggedInUser(Employee loggedInUser) {
         this.loggedInUser = loggedInUser;
     }
