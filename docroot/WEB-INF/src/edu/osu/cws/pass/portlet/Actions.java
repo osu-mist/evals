@@ -774,6 +774,7 @@ public class Actions {
     public String resendAppraisalToNolij(PortletRequest request, PortletResponse response) throws Exception {
         Appraisal appraisal;
         PermissionRule permRule;
+        ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
 
         int appraisalID = ParamUtil.getInteger(request, "id");
         if (appraisalID == 0) {
@@ -799,7 +800,8 @@ public class Actions {
 
         request.setAttribute("id", appraisal.getId());
         if (!isLoggedInUserReviewer(request)) {
-            addErrorsToRequest(request, "Only reviewers can re-send the Evaluation to NOLIJ");
+            String errorMsg = resource.getString("appraisal-resend-permission-denied");
+            addErrorsToRequest(request, errorMsg);
             return displayAppraisal(request, response);
         }
 
