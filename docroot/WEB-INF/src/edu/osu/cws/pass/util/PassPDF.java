@@ -100,12 +100,13 @@ public class PassPDF {
         document.open();
 
         document.add(getLetterHead(resource, rootDir));
-        document.add(getInfoTable(appraisal, resource));
+        document.add(getInfoTable(appraisal, resource, rule));
         addAssessments(appraisal, rule, resource, document);
         addEvaluation(appraisal, rule, resource, document, rootDir);
         addRebuttal(appraisal, rule, resource, document);
-        document.add(getSignatureTable(appraisal, rule, resource, document));
-
+        if (appraisal.getEmployeeSignedDate() != null) {
+            document.add(getSignatureTable(appraisal, rule, resource, document));
+        }
         document.close();
     }
 
@@ -199,7 +200,7 @@ public class PassPDF {
         /** Begin ROW 2 **/
         PdfPCell employeeSignLabel = new PdfPCell();
         employeeSignLabel.setColspan(nameColSpan);
-        String employeeSignText = resource.getString("appraisal-employee-signature");
+        String employeeSignText = resource.getString("appraisal-employee-signature-pdf");
         employeeSignLabel.setPhrase(new Phrase(employeeSignText, FONT_10));
         employeeSignLabel.setBorder(Rectangle.NO_BORDER);
         signatureTable.addCell(employeeSignLabel);
@@ -432,9 +433,11 @@ public class PassPDF {
      *
      * @param appraisal Appraisal object
      * @param resource  ResourceBundle object
+     * @param rule      PermissionRule object
      * @return PdfPTable
      */
-    public static PdfPTable getInfoTable(Appraisal appraisal, ResourceBundle resource) {
+    public static PdfPTable getInfoTable(Appraisal appraisal, ResourceBundle resource,
+                                         PermissionRule rule) {
         PdfPTable info = new PdfPTable(4);
         info.setWidthPercentage(100f);
         info.setKeepTogether(true);
@@ -456,6 +459,26 @@ public class PassPDF {
         c = new Chunk(resource.getString("ts-org-code-desc")+": ", FONT_10);
         p = new Paragraph(c);
         c = new Chunk(appraisal.getJob().getOrgCodeDescription(), FONT_BOLD_10);
+        p.add(c);
+        cell = new PdfPCell(p);
+        cell.setColspan(2);
+        cell.setPaddingLeft(4);
+        cell.setPaddingBottom(4);
+        info.addCell(cell);
+
+        c = new Chunk(resource.getString("jobTitle")+": ", FONT_10);
+        p = new Paragraph(c);
+        c = new Chunk(appraisal.getJob().getJobTitle(), FONT_BOLD_10);
+        p.add(c);
+        cell = new PdfPCell(p);
+        cell.setColspan(2);
+        cell.setPaddingLeft(4);
+        cell.setPaddingBottom(4);
+        info.addCell(cell);
+
+        c = new Chunk(resource.getString("supervisor")+": ", FONT_10);
+        p = new Paragraph(c);
+        c = new Chunk(appraisal.getJob().getSupervisor().getEmployee().getName(), FONT_BOLD_10);
         p.add(c);
         cell = new PdfPCell(p);
         cell.setColspan(2);
@@ -500,26 +523,6 @@ public class PassPDF {
         cell.setColspan(2);
         info.addCell(cell);
 
-        c = new Chunk(resource.getString("jobTitle")+": ", FONT_10);
-        p = new Paragraph(c);
-        c = new Chunk(appraisal.getJob().getJobTitle(), FONT_BOLD_10);
-        p.add(c);
-        cell = new PdfPCell(p);
-        cell.setColspan(2);
-        cell.setPaddingLeft(4);
-        cell.setPaddingBottom(4);
-        info.addCell(cell);
-
-        c = new Chunk(resource.getString("supervisor")+": ", FONT_10);
-        p = new Paragraph(c);
-        c = new Chunk(appraisal.getJob().getSupervisor().getEmployee().getName(), FONT_BOLD_10);
-        p.add(c);
-        cell = new PdfPCell(p);
-        cell.setColspan(2);
-        cell.setPaddingLeft(4);
-        cell.setPaddingBottom(4);
-        info.addCell(cell);
-
         c = new Chunk(resource.getString("reviewPeriod")+": ", FONT_10);
         p = new Paragraph(c);
         c = new Chunk(appraisal.getReviewPeriod(), FONT_BOLD_10);
@@ -543,7 +546,8 @@ public class PassPDF {
         c = new Chunk(resource.getString("appraisal-rating")+": ", FONT_10);
         p = new Paragraph(c);
         String rating = "";
-        if (appraisal.getRating() != null) {
+        boolean displayRating = StringUtils.containsAny(rule.getEvaluation(), "ev");
+        if (appraisal.getRating() != null && displayRating) {
             rating = resource.getString("appraisal-rating-pdf-" + appraisal.getRating());
         }
         c = new Chunk(rating, FONT_BOLD_10);
@@ -616,7 +620,8 @@ public class PassPDF {
             String areaText = i + ". " + assessment.getCriterionDetail().getAreaID().getName().toUpperCase() + ":";
             String descriptionText = " (" + assessment.getCriterionDetail().getDescription() + ")";
 
-            Phrase area = new Phrase(areaText, FONT_BOLD_10);
+            Chunk area = new Chunk(areaText, FONT_BOLD_10);
+            area.setUnderline(1f, -2f);
 
             Phrase description = new Phrase(descriptionText, FONT_9);
             sectionText = new Paragraph();
@@ -624,9 +629,6 @@ public class PassPDF {
             sectionText.add(description);
             sectionText.setSpacingBefore(BEFORE_SPACING);
             document.add(sectionText);
-
-            LineSeparator line = new LineSeparator(1, 100, null, Element.ALIGN_CENTER, -2);
-            document.add(line);
 
             boolean displayGoals = StringUtils.containsAny(rule.getGoals(), "ev");
             boolean displayEmployeeResults = StringUtils.containsAny(rule.getResults(), "ev");
