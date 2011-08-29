@@ -19,7 +19,7 @@
 
     <ul class="actions">
         <li><liferay-ui:icon
-            image="add_article"
+            image="../document_library/pdf"
             url="<%=renderResponse.encodeURL(downloadPDFURL.toString())%>"
             label="true"
             message="appraisal-download-pdf"
