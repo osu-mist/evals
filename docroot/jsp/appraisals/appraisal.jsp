@@ -86,6 +86,7 @@
                             checked="checked" disabled="disabled"
                         </c:if>
                     >
+                        <liferay-ui:message key="appraisal-acknowledge-checkbox"/>
                         <liferay-ui:message key="appraisal-acknowledge-read"/>
                     </input>
                     <br />
