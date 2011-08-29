@@ -665,7 +665,8 @@ public class Actions {
                 CompositeConfiguration config = (CompositeConfiguration)
                         portletContext.getAttribute("environmentProp");
                 String nolijDir = config.getString("pdf.nolijDir");
-                createNolijPDF(appraisal, nolijDir, "prod");
+                String env = config.getString("pdf.env");
+                createNolijPDF(appraisal, nolijDir, env);
             }
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
@@ -804,7 +805,9 @@ public class Actions {
         // If there is a problem, createNolijPDF will throw an exception
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
         String nolijDir = config.getString("pdf.nolijDir");
-        createNolijPDF(appraisal, nolijDir, "prod");
+        String env = config.getString("pdf.env");
+        createNolijPDF(appraisal, nolijDir, env);
+
         SessionMessages.add(request, "appraisal-sent-to-nolij-success");
 
         return displayAppraisal(request, response);
