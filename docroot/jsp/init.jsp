@@ -40,23 +40,9 @@ if (errorMsg != null && !errorMsg.equals("")) {
 <div class="osu-cws"> <!-- Full wrapper for portlet (closed in footer.jsp) -->
   
 <c:if test="${not empty menuHome}">
-    <h2 class="portlet-header"><liferay-ui:message key="performance-appraisal-software-system"/>
-        <c:if test="${not empty isAdminHome}">
-        - <liferay-ui:message key="role-admin"/>
-        </c:if>
-        <c:if test="${not empty isSupervisorHome}">
-        - <liferay-ui:message key="role-supervisor"/>
-        </c:if>
-    </h2>
     <%@ include file="/jsp/menuHome.jsp"%>
 </c:if>
 <c:if test="${not empty menuMax}">
-    <h2 class="portlet-header">
-        <liferay-ui:message key="performance-appraisal-software-system"/>
-        <c:if test="${not empty isReviewerHome}">
-            - <liferay-ui:message key="role-reviewer"/>
-        </c:if>
-    </h2>
     <%@ include file="/jsp/menuMax.jsp"%>
 </c:if>
 
@@ -69,7 +55,24 @@ if (errorMsg != null && !errorMsg.equals("")) {
     <span class="portlet-msg-error"><liferay-ui:message key="no-pass-access"/></span>
     </c:if>
 
-    <c:if test="${!empty alertMsg}">
-    <span class="portlet-msg-alert"><liferay-ui:message key="home-message-alert"/></span>
+    <c:if test="${isAdmin == 'true' || isReviewer == 'true' || isSupervisor == 'true'}">
+        <span class="portlet-msg-alert">
+        <c:choose>
+            <c:when test="${isAdminHome == 'true'}">
+                <liferay-ui:message key="role-view-admin"/>
+            </c:when>
+            <c:when test="${isSupervisorHome == 'true'}">
+                <liferay-ui:message key="role-view-supervisor"/>
+            </c:when>
+            <c:when test="${isReviewerHome == 'true'}">
+                <liferay-ui:message key="role-view-reviewer"/>
+            </c:when>
+        </c:choose>
+        <liferay-ui:message key="role-help-message"/>
+        </span>
+    </c:if>
+
+    <c:if test="${!empty alertMsg and alertMsg == 'true'}">
+    <liferay-ui:message key="home-message-alert"/></span>
     </c:if>
 </div>
