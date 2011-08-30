@@ -8,6 +8,7 @@
 		<instanceable>true</instanceable>
 		<header-portlet-css>/css/pass.css</header-portlet-css>
 		<footer-portlet-javascript>/js/test.js</footer-portlet-javascript>
+		<footer-portlet-javascript>/js/jquery.autogrow-textarea.js</footer-portlet-javascript>
 	</portlet>
 	<role-mapper>
 		<role-name>administrator</role-name>

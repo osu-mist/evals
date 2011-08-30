@@ -61,8 +61,11 @@
             </fieldset>
         </c:when>
         <c:when test="${permissionRule.goalComments == 'v'}">
-            <p><strong><liferay-ui:message key="appraisal-goals-comments" /></strong></p>
-            <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getGoalsComments()) %></p>
+            <fieldset>
+                <legend><liferay-ui:message key="appraisal-goals-legend" /></legend>
+                <p><strong><liferay-ui:message key="appraisal-goals-comments" /></strong></p>
+                <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getGoalsComments()) %></p>
+            </fieldset>
         </c:when>
     </c:choose>
 
@@ -75,9 +78,9 @@
     </c:if>
 
     <div class="pass-employee-response">
-        <fieldset>
-            <legend><liferay-ui:message key="appraisal-employee-legend" /></legend>
-            <c:if test="${not empty permissionRule.employeeResponse}">
+        <c:if test="${not empty permissionRule.employeeResponse}">
+            <fieldset>
+                <legend><liferay-ui:message key="appraisal-employee-legend" /></legend>
                 <fieldset>
                     <legend><liferay-ui:message key="appraisal-employee-signature" /></legend>
                     <input type="checkbox"  name="<portlet:namespace />acknowledge-read-appraisal"
@@ -96,7 +99,7 @@
                         </c:if>
                     </p>
                 </fieldset>
-            </c:if>
+          </c:if>
             
             <c:choose>
                 <c:when test="${permissionRule.employeeResponse == 'e'}">
@@ -134,7 +137,9 @@
                     </strong></p>
                 </c:when>
             </c:choose>
-        </fieldset>
+        <c:if test="${not empty permissionRule.employeeResponse}">
+            </fieldset>
+        </c:if>
     </div>
 
     <br />
@@ -202,10 +207,14 @@
 
       // Handle rebuttal show/hide
       jQuery("#<portlet:namespace />show-rebuttal").click(function() {
-        jQuery("#<portlet:namespace />show-rebuttal").hide();
-        jQuery(".pass-appraisal-rebuttal").show();
-        return false;
+          jQuery("#<portlet:namespace />show-rebuttal").hide();
+          jQuery(".pass-appraisal-rebuttal").show();
+          return false;
       });
+      
+      // Using jQuery plugin to expand textareas as you type
+      jQuery('textarea').autogrow();
+      
     });
     </script>
     </c:if>
