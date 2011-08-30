@@ -17,7 +17,7 @@
     <hr />
 
     <h3><liferay-ui:message key="job-information"/></h3>
-    <c:forEach var="job" items="${employee.jobs}" varStatus="loopStatus">
+    <c:forEach var="job" items="${employee.nonTerminatedJobs}" varStatus="loopStatus">
         <div class="section">
             <div class="col1"><liferay-ui:message key="position-no"/></div>
             <div class="col2"><c:out value="${job.positionNumber}"/></div>

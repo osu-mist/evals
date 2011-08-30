@@ -29,13 +29,24 @@ public class Employee extends Pass {
      */
     private String status;
 
-    private Set jobs = new HashSet();
+    private Set<Job> jobs = new HashSet<Job>();
 
     public String getName() {
         lastName = (lastName == null)? "" : lastName;
         firstName = (firstName == null)? "" : firstName;
 
         return lastName + ", " + firstName;
+    }
+
+    public Set getNonTerminatedJobs() {
+        Set nonTerminatedJobs = new HashSet();
+
+        for (Job tempJob : jobs) {
+            if (!tempJob.getStatus().equals("T"))
+            nonTerminatedJobs.add(tempJob);
+        }
+
+        return nonTerminatedJobs;
     }
 
     public Employee() { }
