@@ -55,7 +55,8 @@ if (errorMsg != null && !errorMsg.equals("")) {
     <span class="portlet-msg-error"><liferay-ui:message key="no-pass-access"/></span>
     </c:if>
 
-    <c:if test="${isAdmin == 'true' || isReviewer == 'true' || isSupervisor == 'true'}">
+    <c:if test="${(isHome == 'true' && (isAdmin == 'true' || isReviewer == 'true' || isSupervisor == 'true'))
+            || isAdminHome == 'true' || isSupervisorHome == 'true'}">
         <span class="portlet-msg-alert">
         <c:choose>
             <c:when test="${isAdminHome == 'true'}">
@@ -63,9 +64,6 @@ if (errorMsg != null && !errorMsg.equals("")) {
             </c:when>
             <c:when test="${isSupervisorHome == 'true'}">
                 <liferay-ui:message key="role-view-supervisor"/>
-            </c:when>
-            <c:when test="${isReviewerHome == 'true'}">
-                <liferay-ui:message key="role-view-reviewer"/>
             </c:when>
         </c:choose>
         <liferay-ui:message key="role-help-message"/>
