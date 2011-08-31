@@ -90,11 +90,11 @@
                         </c:if>
                     >
                         <liferay-ui:message key="appraisal-acknowledge-checkbox"/>
-                        <liferay-ui:message key="appraisal-acknowledge-read"/>
                     </input>
                     <br />
                     <p><c:if test="${not empty appraisal.employeeSignedDate}">
                             <liferay-ui:message key="appraisal-employee-signed" />
+                            ${appraisal.job.employee.name}
                             <fmt:formatDate value="${appraisal.employeeSignedDate}" pattern="MM/dd/yy h:m a"/>
                         </c:if>
                     </p>
