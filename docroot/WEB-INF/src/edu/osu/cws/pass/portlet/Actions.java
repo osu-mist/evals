@@ -343,6 +343,7 @@ public class Actions {
         useNormalMenu(request);
         helpLinks(request);
         request.setAttribute("isAdminHome", true);
+        setupDemoSwitch(request, employee);
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
         request.setAttribute("alertMsg", config.getBoolean("alert.display"));
 
@@ -357,6 +358,7 @@ public class Actions {
         useNormalMenu(request);
         helpLinks(request);
         request.setAttribute("isSupervisorHome", true);
+        setupDemoSwitch(request, employee);
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
         request.setAttribute("alertMsg", config.getBoolean("alert.display"));
 
