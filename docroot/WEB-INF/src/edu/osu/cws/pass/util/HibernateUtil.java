@@ -14,7 +14,6 @@ public class HibernateUtil {
      */
 
     public static final String TEST_CONFIG = "hibernate-test.cfg.xml";
-    public static final String DEV_CONFIG = "hibernate-luminis-dev.cfg.xml";
 
     /**
      * Config value - path to hibernate xml config files from the root of the
@@ -27,7 +26,7 @@ public class HibernateUtil {
      * Static variable used to keep track of what hibernate config file the java
      * class should be using. By default it uses the test configuration db.
      */
-    private static String config = DEV_CONFIG;
+    private static String config = TEST_CONFIG;
 
     /**
      * Method used to create the Hibernate session. This method is private to ensure
