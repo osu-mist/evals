@@ -58,10 +58,11 @@ tr.ui-state-highlight {
 
 /* Top Menu */
 #pass-top-menu {
-    padding-bottom: 26px;
+    padding-bottom: 27px;
     position: relative;
     z-index: 1;
     border: 1px solid #ccc;
+    margin-bottom: 10px;
 }
 #pass-top-menu.action-menu-wrapper ul {
     background: #FFF;
