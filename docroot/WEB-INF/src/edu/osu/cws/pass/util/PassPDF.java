@@ -73,7 +73,7 @@ public class PassPDF {
         String positionNo = appraisal.getJob().getPositionNumber();
 
         filename = dirName;
-        filename += environment + "_pass-" + pidm + "_" + fiscalYear + "_" + positionNo + "-.pdf";
+        filename += environment + "_evals-" + pidm + "_" + fiscalYear + "_" + positionNo + "-.pdf";
 
         return filename;
     }
