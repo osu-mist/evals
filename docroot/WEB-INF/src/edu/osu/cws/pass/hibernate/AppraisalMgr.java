@@ -1140,28 +1140,44 @@ public class AppraisalMgr {
      * @param job
      * @return  true is a trial appraisal exist for the job, false otherwise
      */
-    public static boolean trialAppraisalExists(Job job)
-    {
+    public static boolean trialAppraisalExists(Job job) throws Exception {
         Date startDate = job.getTrialStartDate();
         return appraisalExists(job, startDate,  Appraisal.TYPE_TRIAL);
     }
 
-    /** @@todo: This will have to sesarch the database.
+    /**
      * @param job: job against which the appraisal was create
      * @param startDate: start date of appraisal period
      * @param type: "trial" or "annual".
      * @return true if an appraisal exist for job and startDate and type, false otherwise
      */
-    public static boolean appraisalExists(Job job, Date startDate, String type)
-    {
-        /*
-        for (Appraisal appraisal : (Set<Appraisal>) job.getAppraisals()) {
-            if (appraisal.getType().equals(type) &&
-                    appraisal.getStartDate().equals(startDate)) {
-                return true;
+    public static boolean appraisalExists(Job job, Date startDate, String type) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+
+        try {
+            Transaction tx = session.beginTransaction();
+            String query = "from edu.osu.cws.pass.models.Appraisal appraisal " +
+                    "where appraisal.job.employee.id = :pidm and appraisal.job.positionNumber = :positionNumber " +
+                    "and appraisal.job.suffix = :suffix";
+
+            List<Appraisal> appraisals = session.createQuery(query)
+                    .setInteger("pidm", job.getEmployee().getId())
+                    .setString("positionNumber", job.getPositionNumber())
+                    .setString("suffix", job.getSuffix())
+                    .list();
+            tx.commit();
+
+            for (Appraisal appraisal : appraisals) {
+                if (appraisal.getType().equals(type) &&
+                        appraisal.getStartDate().equals(startDate)) {
+                    return true;
+                }
             }
+        } catch (Exception e) {
+            session.close();
+            throw e;
         }
-        */
+
         return false;
     }
 

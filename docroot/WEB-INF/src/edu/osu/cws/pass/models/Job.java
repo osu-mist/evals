@@ -79,6 +79,26 @@ public class Job extends Pass implements Serializable {
     }
 
     /**
+     * Constructor used by JobMgr.getJob to only fetch the pk fields of the
+     * given job. The status and appointmentType fields are present for testing
+     * purposes.
+     *
+     * @param id
+     * @param positionNumber
+     * @param suffix
+     * @param status
+     * @param appointmentType
+     */
+    public Job(int id, String positionNumber, String suffix, String status, String appointmentType) {
+        this.employee = new Employee();
+        this.employee.setId(id);
+        this.status = status;
+        this.positionNumber = positionNumber;
+        this.suffix = suffix;
+        this.appointmentType = appointmentType;
+    }
+
+    /**
      * Implementing equals method needed by Hibernate to use composite-ide
      *
      * @param o

@@ -1,6 +1,7 @@
 package edu.osu.cws.pass.tests;
 
 import edu.osu.cws.pass.hibernate.JobMgr;
+import edu.osu.cws.pass.models.AppointmentType;
 import edu.osu.cws.pass.models.Employee;
 import edu.osu.cws.pass.models.Job;
 import edu.osu.cws.pass.models.ModelException;
@@ -84,5 +85,30 @@ public class JobsTest {
     @Test(groups={"pending"})
     public void shouldOnlyListJobsNotTerminatedByAppointmentType() throws Exception {
 
+    }
+
+    public void listShortNotTerminatedJobsShouldOnlyIncludePidmAndPosNoAndSuffix() throws Exception {
+        List<Job> jobs = JobMgr.listShortNotTerminatedJobs(AppointmentType.CLASSIFIED);
+        assert jobs.size() != 0 : "Missing jobs from list";
+        for (Job job : jobs) {
+            assert job.getEmployee().getId() != 0 : "Missing required property";
+            assert job.getPositionNumber() != null : "Missing required property";
+            assert job.getSuffix() != null : "Missing required property";
+            assert !job.getStatus().equals("T");
+            assert job.getAppointmentType().equals(AppointmentType.CLASSIFIED);
+        }
+    }
+
+    public void getJobShouldReturnNullWhenNotFound() throws Exception {
+        Job job = JobMgr.getJob(56198, "1234", "22");
+        assert job == null : "Job is not in db, and should be null";
+    }
+
+    public void getJobShouldReturnJob() throws Exception {
+        Job job = JobMgr.getJob(56198, "1234", "01");
+        assert job != null : "Job is in db, and should not be null";
+        assert job.getEmployee().getId() != 0;
+        assert job.getPositionNumber() != null;
+        assert job.getSuffix() != null;
     }
 }

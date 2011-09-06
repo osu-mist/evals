@@ -551,7 +551,7 @@ public class AppraisalsTest {
     public void shouldDetectIfAJobHasAnOpenTrialAppraisal() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
-        Employee employee = (Employee) session.load(Employee.class, "12345");
+        Employee employee = (Employee) session.load(Employee.class, 12345);
         Job job = (Job) employee.getJobs().toArray()[0];
         tx.commit();
         assert AppraisalMgr.appraisalExists(job, new Date(), "annual");
