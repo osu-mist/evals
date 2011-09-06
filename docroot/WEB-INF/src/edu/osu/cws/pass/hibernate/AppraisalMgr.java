@@ -115,7 +115,7 @@ public class AppraisalMgr {
      */
     private static void createAppraisalStatus(Date startDate, Configuration goalsDueConfig,
                                               Appraisal appraisal) throws Exception {
-        String Nov1st2011 = "11/01/2011";
+        String Nov1st2011 = "06/01/2011";
         SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
         Date startPointDate = fmt.parse(Nov1st2011);
         if (startDate.before(startPointDate)) {
@@ -1146,7 +1146,7 @@ public class AppraisalMgr {
         return appraisalExists(job, startDate,  Appraisal.TYPE_TRIAL);
     }
 
-    /**
+    /** @@todo: This will have to sesarch the database.
      * @param job: job against which the appraisal was create
      * @param startDate: start date of appraisal period
      * @param type: "trial" or "annual".
@@ -1154,12 +1154,14 @@ public class AppraisalMgr {
      */
     public static boolean appraisalExists(Job job, Date startDate, String type)
     {
+        /*
         for (Appraisal appraisal : (Set<Appraisal>) job.getAppraisals()) {
             if (appraisal.getType().equals(type) &&
                     appraisal.getStartDate().equals(startDate)) {
                 return true;
             }
         }
+        */
         return false;
     }
 
@@ -1170,6 +1172,7 @@ public class AppraisalMgr {
      */
     public static boolean openTrialAppraisalExists(Job job)
     {
+      /*
         for (Appraisal appraisal : (Set<Appraisal>) job.getAppraisals()) {
             if (appraisal.getType().equals(Appraisal.TYPE_TRIAL) &&
                     (!appraisal.getStatus().equals("closed") || !appraisal.getStatus().equals("completed")
@@ -1177,6 +1180,7 @@ public class AppraisalMgr {
                 return true;
             }
         }
+       */
         return false;
     }
 

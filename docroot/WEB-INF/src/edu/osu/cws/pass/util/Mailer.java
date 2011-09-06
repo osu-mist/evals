@@ -258,23 +258,25 @@ public class Mailer {
     }
 
     /**
-     * Send mail to all the reviewers
-     * @param subject
+     * Send email to reviewers of one business center
      * @param emailAddresses
-     * @param middleBody
+     * @param dueCount
+     * @param OverDueCount
      * @throws Exception
      */
-    public void sendReviewerMail(String subject, String[] emailAddresses, String middleBody) throws Exception {
+    public void sendReviewerMail(String[] emailAddresses, int dueCount, int OverDueCount, String bcName)
+            throws Exception {
         String bodyString = emailBundle.getString("email_reviewers");
+        String msgs = emailBundle.getString("email_reviewDue_body");
+        String middleBody = MessageFormat.format(msgs, dueCount, OverDueCount);
         String body = MessageFormat.format(bodyString, middleBody);
         Message msg = email.getMessage();
         String reviewerSubject = emailBundle.getString("email_reviewer_subject");
 
         Address[] recipients = new Address[emailAddresses.length];
-        String contact = "";
         int i = 0;
         for (String recipient : emailAddresses) {
-            recipients[i++] = email.stringToAddress(contact);
+            recipients[i++] = email.stringToAddress(recipient);
         }
 
         msg.addRecipients(Message.RecipientType.TO, recipients);
@@ -282,10 +284,8 @@ public class Mailer {
         msg.setSubject(reviewerSubject);
         Transport.send(msg);
 
-        for (String address : emailAddresses) {
-            logger.log("INFORMATION", "Email sent to reviewers",
-                    "Reviewer mail sent to " + address + ".");
-        }
+        logger.log("INFORMATION", "Email sent to reviewers of " + bcName, "");
+
     }
 
     /**

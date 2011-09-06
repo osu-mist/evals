@@ -163,7 +163,7 @@ public class JobMgr {
 
         try {
             Transaction tx = session.beginTransaction();
-            List<Job> result = session.createQuery("from edu.osu.cws.pass.models.Job job " +
+            jobs = session.createQuery("from edu.osu.cws.pass.models.Job job " +
                 "where job.status != 'T' and job.appointmentType = :appointmentType")
             .setString("appointmentType", appointmentType)
             .list();
@@ -173,6 +173,33 @@ public class JobMgr {
             throw e;
         }
         return jobs;
+
+    }
+
+    /**
+     * @@todo: queries for all the not terminated jobs of a certain appointment type.
+     * @@todo: Jobs returns only contain the primary key columns
+     * @param appointmentType
+     * @return
+     * @throws Exception
+     */
+    public static List<Job> listShortNotTerminatedJobs(String appointmentType)throws Exception
+    {
+        List<Job> jobs = new ArrayList<Job>();
+        return jobs;
+    }
+
+    /**
+     * @todo: returns the job corresponding to the primary keys, or null if not found.
+     * @param pidm
+     * @param posn
+     * @param suffix
+     * @return
+     * @throws Exception
+     */
+    public static Job getJob(int pidm, String posn, String suffix) throws Exception
+    {
+        return new Job();
 
     }
 }

@@ -381,6 +381,7 @@ public class Job extends Pass implements Serializable {
             myDate = evalDate;
         else
             myDate = beginDate;
+        System.out.println("in job, initialStartDate = " + CWSUtil.getFirstDayOfMonth(myDate));
         return(CWSUtil.getFirstDayOfMonth(myDate));
     }
 
