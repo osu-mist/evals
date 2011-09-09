@@ -111,4 +111,10 @@ public class JobsTest {
         assert job.getPositionNumber() != null;
         assert job.getSuffix() != null;
     }
+
+    public void getJobsShouldReturnJobs() throws Exception {
+        assert JobMgr.getJobs(56198).size() == 2;
+        assert JobMgr.getJobs(111).size() == 0;
+        assert JobMgr.getJobs(12345).size() == 3;
+    }
 }

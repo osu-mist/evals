@@ -24,17 +24,37 @@ public class EmailMgr {
      * @throws Exception
      */
     public static Email getLastEmail(int appraisalID, String emailType) throws Exception {
+        return getEmailBySortOrder(appraisalID, emailType, true);
+    }
+
+    /**
+     * Returns the first email sent for a given appraisal and emailType. It allows sorting of the
+     * email list asc or desc using sentDate. This method is used by getLastEmail and getFirstEmail.
+     *
+     * @param appraisalID
+     * @param emailType
+     * @param sortDesc
+     * @return
+     * @throws Exception
+     */
+    private static Email getEmailBySortOrder(int appraisalID, String emailType, boolean sortDesc) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
 
         try {
             Transaction tx = session.beginTransaction();
             String query = "from edu.osu.cws.pass.models.Email email " +
                     "where email.appraisalId = :appraisalId and email.emailType = :emailType " +
-                    "order by  sentDate desc";
+                    "order by  sentDate ";
+            if (sortDesc) {
+                query += "desc";
+            } else {
+                query += "asc";
+            }
 
             List<Email> emails = session.createQuery(query)
                     .setInteger("appraisalId", appraisalID)
                     .setString("emailType", emailType)
+                    .setMaxResults(1)
                     .list();
             tx.commit();
 
@@ -55,28 +75,7 @@ public class EmailMgr {
      * @throws Exception
      */
     public static Email getFirstEmail(int appraisalID, String emailType) throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-
-        try {
-            Transaction tx = session.beginTransaction();
-            String query = "from edu.osu.cws.pass.models.Email email " +
-                    "where email.appraisalId = :appraisalId and email.emailType = :emailType " +
-                    "order by  sentDate asc";
-
-            List<Email> emails = session.createQuery(query)
-                    .setInteger("appraisalId", appraisalID)
-                    .setString("emailType", emailType)
-                    .list();
-            tx.commit();
-
-            if (!emails.isEmpty()) {
-                return emails.get(0);
-            }
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
-        return null;
+        return getEmailBySortOrder(appraisalID, emailType, false);
     }
 
 
