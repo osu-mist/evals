@@ -55,4 +55,25 @@ public class EmailsTest {
 
         EmailMgr.add(emails);
     }
+
+    public void shouldReturnFirstEmail() throws Exception {
+        Email email = EmailMgr.getFirstEmail(1, "goals-submitted");
+        assert email.getId() == 1 : "The first sent email should have been returned";
+    }
+
+    public void shouldReturnNullIfThereIsNoFirstEmail() throws Exception {
+        Email email = EmailMgr.getFirstEmail(1, "goals-due");
+        assert email == null : "The return value should be null because there is no row in the db";
+    }
+
+    public void shouldReturnLastEmail() throws Exception {
+        Email email = EmailMgr.getLastEmail(1, "goals-submitted");
+        assert email.getId() == 3 : "The first sent email should have been returned";
+    }
+
+    public void shouldReturnNullIfThereIsNoLastEmail() throws Exception {
+        Email email = EmailMgr.getLastEmail(1, "goals-due");
+        assert email == null : "The return value should be null because there is no row in the db";
+
+    }
 }

@@ -549,13 +549,22 @@ public class AppraisalsTest {
 
     @Test(groups={"pending"})
     public void shouldDetectIfAJobHasAnOpenTrialAppraisal() throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        Employee employee = (Employee) session.load(Employee.class, 12345);
-        Job job = (Job) employee.getJobs().toArray()[0];
-        tx.commit();
-        assert AppraisalMgr.appraisalExists(job, new Date(), "annual");
-        //@todo: test openTrialAppraisalExists
+        Job job = new Job();
+        Employee employee = new Employee();
+        employee.setId(12345);
+        job.setEmployee(employee);
+        job.setPositionNumber("1234");
+        job.setSuffix("00");
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MONTH, Calendar.MAY);
+        cal.set(Calendar.DAY_OF_MONTH, 14);
+        Date startDate = cal.getTime();
+
+        assert AppraisalMgr.appraisalExists(job, startDate, "annual");
+
+        job.setPositionNumber("4444");
+        assert AppraisalMgr.openTrialAppraisalExists(job);
     }
 
     @Test(groups={"pending"})
