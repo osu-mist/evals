@@ -237,4 +237,31 @@ public class JobMgr {
         }
         return job;
     }
+
+    /**
+     * Returns the jobs corresponding to the employee pidm.
+     *
+     * @param pidm
+     * @return
+     * @throws Exception
+     */
+    public static List<Job> getJobs(int pidm) throws Exception {
+        List<Job> jobs;
+        Session session = HibernateUtil.getCurrentSession();
+
+        try {
+            Transaction tx = session.beginTransaction();
+            String query = "from edu.osu.cws.pass.models.Job job " +
+                    "where job.employee.id = :pidm";
+
+            jobs = session.createQuery(query)
+                    .setInteger("pidm", pidm)
+                    .list();
+            tx.commit();
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+        return jobs;
+    }
 }
