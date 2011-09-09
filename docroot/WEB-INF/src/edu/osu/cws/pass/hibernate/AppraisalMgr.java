@@ -1156,22 +1156,27 @@ public class AppraisalMgr {
 
         try {
             Transaction tx = session.beginTransaction();
-            String query = "from edu.osu.cws.pass.models.Appraisal appraisal " +
+            String query = "select count(*) from edu.osu.cws.pass.models.Appraisal appraisal " +
                     "where appraisal.job.employee.id = :pidm and appraisal.job.positionNumber = :positionNumber " +
-                    "and appraisal.job.suffix = :suffix";
+                    "and appraisal.job.suffix = :suffix and appraisal.type = :type " +
+                    "and appraisal.startDate = :startDate";
 
-            List<Appraisal> appraisals = session.createQuery(query)
+            Iterator resultMapIter = session.createQuery(query)
                     .setInteger("pidm", job.getEmployee().getId())
                     .setString("positionNumber", job.getPositionNumber())
                     .setString("suffix", job.getSuffix())
-                    .list();
-            tx.commit();
+                    .setString("type", type)
+                    .setDate("startDate", startDate)
+                    .setMaxResults(1)
+                    .list().iterator();
 
-            for (Appraisal appraisal : appraisals) {
-                if (appraisal.getType().equals(type) &&
-                        appraisal.getStartDate().equals(startDate)) {
-                    return true;
-                }
+            int appraisalCount = 0;
+            if (resultMapIter.hasNext()) {
+                appraisalCount =  Integer.parseInt(resultMapIter.next().toString());
+            }
+            tx.commit();
+            if (appraisalCount > 0) {
+                return true;
             }
         } catch (Exception e) {
             session.close();
@@ -1185,18 +1190,40 @@ public class AppraisalMgr {
      * @param job
      * @return true if there is a trial appraisal not in the status of "closed", "completed"
      *          or "archived". false otherwise.
+     * @throws Exception
      */
-    public static boolean openTrialAppraisalExists(Job job)
-    {
-      /*
-        for (Appraisal appraisal : (Set<Appraisal>) job.getAppraisals()) {
-            if (appraisal.getType().equals(Appraisal.TYPE_TRIAL) &&
-                    (!appraisal.getStatus().equals("closed") || !appraisal.getStatus().equals("completed")
-                            || !appraisal.getStatus().equals("completed"))) {
+    public static boolean openTrialAppraisalExists(Job job) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+
+        try {
+            Transaction tx = session.beginTransaction();
+            String query = "select count(*) from edu.osu.cws.pass.models.Appraisal appraisal " +
+                    "where appraisal.job.employee.id = :pidm and appraisal.job.positionNumber = :positionNumber " +
+                    "and appraisal.job.suffix = :suffix and appraisal.type = :type " +
+                    "and (appraisal.status != 'closed' or  appraisal.status != 'completed' or " +
+                    "appraisal.status != 'archived')";
+
+            Iterator resultMapIter = session.createQuery(query)
+                    .setInteger("pidm", job.getEmployee().getId())
+                    .setString("positionNumber", job.getPositionNumber())
+                    .setString("suffix", job.getSuffix())
+                    .setString("type", Appraisal.TYPE_TRIAL)
+                    .setMaxResults(1)
+                    .list().iterator();
+
+            int appraisalCount = 0;
+            if (resultMapIter.hasNext()) {
+                appraisalCount =  Integer.parseInt(resultMapIter.next().toString());
+            }
+            tx.commit();
+            if (appraisalCount > 0) {
                 return true;
             }
+        } catch (Exception e) {
+            session.close();
+            throw e;
         }
-       */
+
         return false;
     }
 

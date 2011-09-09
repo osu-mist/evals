@@ -18,28 +18,65 @@ import java.util.List;
 public class EmailMgr {
 
     /**
-     * @todo:
-     * from emails where apparaisalID, emailType ordered by sentDate Desc limit 1
      * @param appraisalID
      * @param emailType
-     * @return: the latest email for the appraisal and emailType
-     *          or null if none exists.
+     * @return the latest email for the appraisal and emailType or null if none exists.
+     * @throws Exception
      */
-    public static Email getLastEmail(int appraisalID, String emailType)
-    {
-        return new Email();
+    public static Email getLastEmail(int appraisalID, String emailType) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+
+        try {
+            Transaction tx = session.beginTransaction();
+            String query = "from edu.osu.cws.pass.models.Email email " +
+                    "where email.appraisalId = :appraisalId and email.emailType = :emailType " +
+                    "order by  sentDate desc";
+
+            List<Email> emails = session.createQuery(query)
+                    .setInteger("appraisalId", appraisalID)
+                    .setString("emailType", emailType)
+                    .list();
+            tx.commit();
+
+            if (!emails.isEmpty()) {
+                return emails.get(0);
+            }
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+        return null;
     }
 
     /**
-     * @todo:
      * @param appraisalID
      * @param emailType
-     * @return the latest email for the appraisal and emailType
-     *          or null if none exists.
+     * @return the first email for the appraisal and emailType or null if none exists.
+     * @throws Exception
      */
-    public static Email getFirstEmail(int appraisalID, String emailType)
-    {
-        return new Email();
+    public static Email getFirstEmail(int appraisalID, String emailType) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+
+        try {
+            Transaction tx = session.beginTransaction();
+            String query = "from edu.osu.cws.pass.models.Email email " +
+                    "where email.appraisalId = :appraisalId and email.emailType = :emailType " +
+                    "order by  sentDate asc";
+
+            List<Email> emails = session.createQuery(query)
+                    .setInteger("appraisalId", appraisalID)
+                    .setString("emailType", emailType)
+                    .list();
+            tx.commit();
+
+            if (!emails.isEmpty()) {
+                return emails.get(0);
+            }
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
+        return null;
     }
 
 

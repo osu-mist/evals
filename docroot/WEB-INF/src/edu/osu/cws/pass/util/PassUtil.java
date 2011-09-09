@@ -32,8 +32,7 @@ public class PassUtil {
      * name of the config should be "goalsDue".
      * @return a Date object presenting the date a certain status is due.
      */
-    public static Date getDueDate(Appraisal appraisal, Configuration config)
-    {
+    public static Date getDueDate(Appraisal appraisal, Configuration config) throws Exception {
         if (config == null)  //Should not need to do this.
             return null;
 
@@ -74,8 +73,7 @@ public class PassUtil {
      * name of the config should be "goalsDue".
      * @return <0 < overdue, 0 due, >0 due day in the future, or not due yet.
      */
-    public static int isDue(Appraisal appraisal, Configuration config)
-    {
+    public static int isDue(Appraisal appraisal, Configuration config) throws Exception {
         Date dueDate = getDueDate(appraisal, config);
         return (CWSUtil.daysBetween(dueDate, new Date()));  //@@@Need to check direction
     }
