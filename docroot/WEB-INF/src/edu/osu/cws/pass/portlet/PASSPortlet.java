@@ -105,6 +105,7 @@ public class PASSPortlet extends GenericPortlet {
         if (viewJSP == null) {
             delegate(renderRequest, renderResponse);
         }
+        actionClass.setRequestAttributes(renderRequest);
 
         include(viewJSP, renderRequest, renderResponse);
         viewJSP = null;
