@@ -5,7 +5,7 @@
         class="active"
         </c:if>
         ><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
-                        <portlet:param name="action" value="displayHomeView"/>
+                        <portlet:param name="action" value="${homeAction}"/>
                         </portlet:renderURL>"><liferay-ui:message key="home"/></a></li>
         <li><a href="#"><liferay-ui:message key="settings"/></a>
             <ul>
