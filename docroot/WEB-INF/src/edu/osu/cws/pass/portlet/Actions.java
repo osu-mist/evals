@@ -24,6 +24,10 @@ import java.util.*;
  */
 public class Actions {
     private static Log _log = LogFactoryUtil.getLog(Actions.class);
+    public static final String ROLE_ADMINISTRATOR = "administrator";
+    public static final String ROLE_REVIEWER = "reviewer";
+    public static final String ROLE_SUPERVISOR = "supervisor";
+    public static final String ROLE_SELF = "self";
 
     private EmployeeMgr employeeMgr = new EmployeeMgr();
 
@@ -272,6 +276,7 @@ public class Actions {
      * @throws Exception
      */
     public String displayHomeView(PortletRequest request, PortletResponse response) throws Exception {
+        PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
         int employeeId = employee.getId();
 
@@ -293,6 +298,7 @@ public class Actions {
         useNormalMenu(request);
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
         requestMap.put("alertMsg", config.getBoolean("alert.display"));
+        session.setAttribute("currentRole", ROLE_SELF);
 
         return "home-jsp";
     }
@@ -339,6 +345,13 @@ public class Actions {
     }
 
     public String displayAdminHomeView(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+
+        PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
         setupActiveAppraisals(request, employee.getId());
         setRequiredActions(request);
@@ -348,11 +361,19 @@ public class Actions {
         setupDemoSwitch(request, employee);
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
         requestMap.put("alertMsg", config.getBoolean("alert.display"));
+        session.setAttribute("currentRole", ROLE_ADMINISTRATOR);
 
         return "admin-home-jsp";
     }
 
     public String displaySupervisorHomeView(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserSupervisor(request)) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+
+        PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
         setupActiveAppraisals(request, employee.getId());
         setRequiredActions(request);
@@ -363,6 +384,7 @@ public class Actions {
         setupDemoSwitch(request, employee);
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
         requestMap.put("alertMsg", config.getBoolean("alert.display"));
+        session.setAttribute("currentRole", ROLE_SUPERVISOR);
 
         return "supervisor-home-jsp";
     }
@@ -1463,5 +1485,28 @@ public class Actions {
             request.setAttribute(entry.getKey(), entry.getValue());
         }
         requestMap.clear();
+
+    }
+
+    /**
+     *  It also sets the currentRole from session to request.
+     *
+     * @param request
+     */
+    public void setHomeURL(RenderRequest request) {
+        String homeAction = "displayHomeView";
+        PortletSession session = request.getPortletSession(true);
+        String currentRole = (String) session.getAttribute("currentRole");
+
+        request.setAttribute("currentRole", currentRole);
+        if (currentRole.equals(ROLE_ADMINISTRATOR)) {
+            homeAction = "displayAdminHomeView";
+        } else if (currentRole.equals(ROLE_REVIEWER)) {
+            homeAction = "displayReviewerHomeView";
+        } else if (currentRole.equals(ROLE_SUPERVISOR)) {
+            homeAction = "displaySupervisorHomeView";
+        }
+        _log.error("in setHomeURL setting action = " + homeAction);
+        request.setAttribute("homeAction", homeAction);
     }
 }
