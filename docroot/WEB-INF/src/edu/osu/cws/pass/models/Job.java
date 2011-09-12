@@ -408,7 +408,7 @@ public class Job extends Pass implements Serializable {
     /**
      *
      * @param startDate
-     * @param type: trial, initial, annual
+     * @param type: trial, or annual
      * @return
      */
     public Date getEndEvalDate(Date startDate, String type)
@@ -418,9 +418,9 @@ public class Job extends Pass implements Serializable {
       int interval = 0;
       if (type.equalsIgnoreCase("trial"))
         interval = trialInd;
-      else if (type.equalsIgnoreCase("initial"))
+      else if (startDate.equals(getInitialEvalStartDate())) //first annual appraisal
         interval = annualInd;
-      else if (type.equalsIgnoreCase("annual"))
+      else //annual, but not the first annual
         interval = 12;
 
       if (interval == 0) //No evaluation needed

@@ -115,6 +115,7 @@ public class AppraisalMgr {
      */
     private static void createAppraisalStatus(Date startDate, Configuration goalsDueConfig,
                                               Appraisal appraisal) throws Exception {
+        //@@todo: Need to change this back.
         String Nov1st2011 = "06/01/2011";
         SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
         Date startPointDate = fmt.parse(Nov1st2011);
@@ -1145,7 +1146,7 @@ public class AppraisalMgr {
         return appraisalExists(job, startDate,  Appraisal.TYPE_TRIAL);
     }
 
-    /**
+    /** select count(*) from appraisals where job.... and startDAte = startDate and type = type
      * @param job: job against which the appraisal was create
      * @param startDate: start date of appraisal period
      * @param type: "trial" or "annual".
@@ -1186,7 +1187,7 @@ public class AppraisalMgr {
         return false;
     }
 
-    /**
+    /**  @@todo: Jose to implement this
      * @param job
      * @return true if there is a trial appraisal not in the status of "closed", "completed"
      *          or "archived". false otherwise.
