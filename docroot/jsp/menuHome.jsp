@@ -24,8 +24,8 @@
                         </portlet:renderURL>"><liferay-ui:message key="role-admin"/></a></li>
                 </c:if>
                 <c:if test="${isReviewer == 'true'}">
-                <li><a href="<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-                        <portlet:param name="action" value="displayReviewList"/>
+                <li><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
+                        <portlet:param name="action" value="displayReviewerHomeView"/>
                         </portlet:renderURL>"><liferay-ui:message key="role-reviewer"/></a></li>
                 </c:if>
                 <c:if test="${isSupervisor == 'true'}">

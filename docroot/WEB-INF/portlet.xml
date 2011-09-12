@@ -18,6 +18,10 @@
             <value>/jsp/home/startSupervisor.jsp</value>
         </init-param>
         <init-param>
+            <name>reviewer-home-jsp</name>
+            <value>/jsp/home/startReviewer.jsp</value>
+        </init-param>
+        <init-param>
             <name>my-information-jsp</name>
             <value>/jsp/home/myInfo.jsp</value>
         </init-param>

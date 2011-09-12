@@ -357,7 +357,7 @@ public class AppraisalsTest {
     }
 
     public void shouldOnlyIncludeReviewDueOrReviewPastDueInAppraisalReviewList() throws Exception {
-        for (Appraisal appraisal : appraisalMgr.getReviews("UABC")) {
+        for (Appraisal appraisal : appraisalMgr.getReviews("UABC", -1)) {
             assert appraisal.getStatus().equals("reviewDue")
                     || appraisal.getStatus().equals("reviewOverdue");
         }
@@ -365,7 +365,7 @@ public class AppraisalsTest {
 
     public void getReviewsShouldIncludeOnlyNeededFields() throws Exception {
         //@todo: a couple of extra fields were added to the reviews: supervisor first/last name and tsOrgCode
-        for (Appraisal appraisal : appraisalMgr.getReviews("UABC")) {
+        for (Appraisal appraisal : appraisalMgr.getReviews("UABC", -1)) {
             assert appraisal.getId() != 0 : "Missing appraisalID";
             assert !appraisal.getJob().getEmployee().getName().equals("") : "Missing employeeName";
             assert !appraisal.getJob().getJobTitle().equals("") : "Missing jobTitle";

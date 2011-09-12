@@ -366,6 +366,34 @@ public class Actions {
         return "admin-home-jsp";
     }
 
+    public String displayReviewerHomeView(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserReviewer(request)) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+
+        PortletSession session = request.getPortletSession(true);
+        Employee employee = getLoggedOnUser(request);
+        setupActiveAppraisals(request, employee.getId());
+        CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
+        int maxResults = config.getInt("reviewer.home.pending.max");
+
+        ArrayList<Appraisal> appraisals = getReviewsForLoggedInUser(request, maxResults);
+        requestMap.put("appraisals", appraisals);
+
+        setRequiredActions(request);
+        useNormalMenu(request);
+        helpLinks(request);
+        requestMap.put("isReviewerHome", true);
+        requestMap.put("alertMsg", config.getBoolean("alert.display"));
+        session.setAttribute("currentRole", ROLE_REVIEWER);
+
+        setupDemoSwitch(request, employee);
+
+        return "reviewer-home-jsp";
+    }
+
     public String displaySupervisorHomeView(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserSupervisor(request)) {
@@ -563,11 +591,10 @@ public class Actions {
             return displayHomeView(request, response);
         }
 
-        ArrayList<Appraisal> appraisals = getReviewsForLoggedInUser(request);
+        ArrayList<Appraisal> appraisals = getReviewsForLoggedInUser(request, -1);
         requestMap.put("appraisals", appraisals);
         requestMap.put("pageTitle", "pending-reviews");
         useMaximizedMenu(request);
-        requestMap.put("isReviewerHome", true);
 
         return "review-list-jsp";
     }
@@ -590,13 +617,21 @@ public class Actions {
         requestMap.put("menuMax", true);
     }
 
-    private ArrayList<Appraisal> getReviewsForLoggedInUser(PortletRequest request) throws Exception {
+    /**
+     * Retrieves the pending reviews for the logged in user.
+     *
+     * @param request
+     * @param maxResults
+     * @return
+     * @throws Exception
+     */
+    private ArrayList<Appraisal> getReviewsForLoggedInUser(PortletRequest request, int maxResults) throws Exception {
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
         if (businessCenterName.equals("")) {
             int employeeID = getLoggedOnUser(request).getId();
             businessCenterName = getReviewer(employeeID).getBusinessCenterName();
         }
-        return appraisalMgr.getReviews(businessCenterName);
+        return appraisalMgr.getReviews(businessCenterName, maxResults);
     }
 
     /**
@@ -697,7 +732,7 @@ public class Actions {
         }
 
         if (isLoggedInUserReviewer(request)) {
-            ArrayList<Appraisal> reviews = getReviewsForLoggedInUser(request);
+            ArrayList<Appraisal> reviews = getReviewsForLoggedInUser(request, -1);
             requestMap.put("pendingReviews", reviews);
         }
 
@@ -1506,7 +1541,6 @@ public class Actions {
         } else if (currentRole.equals(ROLE_SUPERVISOR)) {
             homeAction = "displaySupervisorHomeView";
         }
-        _log.error("in setHomeURL setting action = " + homeAction);
         request.setAttribute("homeAction", homeAction);
     }
 }
