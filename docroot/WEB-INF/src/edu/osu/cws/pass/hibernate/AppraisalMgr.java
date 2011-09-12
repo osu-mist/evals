@@ -802,11 +802,21 @@ public class AppraisalMgr {
         return appraisal;
     }
 
-    public ArrayList<Appraisal> getReviews(String businessCenterName) throws Exception {
+    /**
+     * Returns an ArrayList of Appraisal which contain data about appraisals pending
+     * review. This method is used to display a list of pending reviews in the displayReview
+     * actions method. If maxResults > 0, it will limit the number of results.
+     *
+     * @param businessCenterName
+     * @param maxResults
+     * @return
+     * @throws Exception
+     */
+    public ArrayList<Appraisal> getReviews(String businessCenterName, int maxResults) throws Exception {
         ArrayList<Appraisal> reviewList;
         Session session = HibernateUtil.getCurrentSession();
         try {
-            reviewList = getReviews(businessCenterName, session);
+            reviewList = getReviews(businessCenterName, session, maxResults);
         } catch (Exception e){
             session.close();
             throw e;
@@ -818,13 +828,14 @@ public class AppraisalMgr {
     /**
      * Returns an ArrayList of Appraisal which contain data about appraisals pending
      * review. This method is used to display a list of pending reviews in the displayReview
-     * actions method.
+     * actions method. If maxResults > 0, it will limit the number of results.
      *
      * @param businessCenterName
      * @param session
+     * @param maxResults
      * @return
      */
-    private ArrayList<Appraisal> getReviews(String businessCenterName, Session session) {
+    private ArrayList<Appraisal> getReviews(String businessCenterName, Session session, int maxResults) {
         Transaction tx = session.beginTransaction();
         String query = "select new edu.osu.cws.pass.models.Appraisal(id, job.jobTitle, job.positionNumber, " +
                 "startDate, endDate, type, job.employee.id, job.employee.lastName, job.employee.firstName, " +
@@ -832,8 +843,12 @@ public class AppraisalMgr {
                 "from edu.osu.cws.pass.models.Appraisal where job.businessCenterName = :bc " +
                 "and status in ('reviewDue', 'reviewOverdue') and job.endDate is NULL";
 
-        ArrayList<Appraisal> result =  (ArrayList<Appraisal>) session.createQuery(query)
-                .setString("bc", businessCenterName).list();
+        Query hibernateQuery = session.createQuery(query)
+                .setString("bc", businessCenterName);
+        if (maxResults > 0) {
+            hibernateQuery.setMaxResults(maxResults);
+        }
+        ArrayList<Appraisal> result =  (ArrayList<Appraisal>) hibernateQuery.list();
         tx.commit();
         return result;
     }
