@@ -65,8 +65,8 @@ public class EmailMgr {
             session.close();
             throw e;
         }
-        return null;
-    }
+     return null;
+}
 
     /**
      * @param appraisalID

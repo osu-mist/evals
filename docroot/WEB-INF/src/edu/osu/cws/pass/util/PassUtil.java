@@ -44,10 +44,15 @@ public class PassUtil {
         Calendar dueDay = Calendar.getInstance();
         String ref = config.getReferencePoint();
 
+        System.out.println("reference point = " + ref);
+
         if (ref.equals("end"))
             refDate = appraisal.getEndDate();
-        else if (ref.equals("requiredModificationDate"))
+        else if (ref.equals("GOALS_REQUIRED_MOD_DATE"))
+        {
             refDate = appraisal.getGoalsRequiredModificationDate();
+            System.out.println("reference date = " + refDate);
+        }
         else if (ref.equals("employee_signed_date"))
             refDate = appraisal.getEmployeeSignedDate();
         else if (ref.equals("firstEmailSentDate"))
@@ -75,6 +80,7 @@ public class PassUtil {
      */
     public static int isDue(Appraisal appraisal, Configuration config) throws Exception {
         Date dueDate = getDueDate(appraisal, config);
+        System.out.println("due date = " + dueDate);
         return (CWSUtil.daysBetween(dueDate, new Date()));  //@@@Need to check direction
     }
 
