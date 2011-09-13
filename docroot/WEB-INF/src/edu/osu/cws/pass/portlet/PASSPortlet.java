@@ -105,6 +105,8 @@ public class PASSPortlet extends GenericPortlet {
         if (viewJSP == null) {
             delegate(renderRequest, renderResponse);
         }
+        actionClass.setRequestAttributes(renderRequest);
+        actionClass.setHomeURL(renderRequest);
 
         include(viewJSP, renderRequest, renderResponse);
         viewJSP = null;
@@ -217,16 +219,29 @@ public class PASSPortlet extends GenericPortlet {
     private void portletSetup(PortletRequest request) throws Exception {
         if (getPortletContext().getAttribute("environmentProp") == null) {
             actionClass.setPortletContext(getPortletContext());
-            loadEnvironmentProperties(request);
+            String message = loadEnvironmentProperties(request);
             createLogger();
-            actionClass.setPassConfiguration();
-            createMailer();
-            getPortletContext().setAttribute("permissionRules", permissionRuleMgr.list());
-            getPortletContext().setAttribute("appraisalSteps", appraisalStepMgr.list());
-            loadResourceBundle();
 
-            actionClass.setPassAdmins();
-            actionClass.setPassReviewers();
+            try {
+                actionClass.setPassConfiguration();
+                message += "Stored Configuration Map and List in portlet context\n";
+                createMailer();
+                message += "Mailer setup successfully\n";
+                getPortletContext().setAttribute("permissionRules", permissionRuleMgr.list());
+                message += "Stored Permission Rules in portlet context\n";
+                getPortletContext().setAttribute("appraisalSteps", appraisalStepMgr.list());
+                message += "Stored Appraisal Steps in portlet context\n";
+                loadResourceBundle();
+                message += "Stored resource bundle Language.properties in portlet context\n";
+
+                actionClass.setPassAdmins();
+                actionClass.setPassReviewers();
+                getLog().log(Logger.INFORMATIONAL, "Portlet Setup Success", message);
+            } catch (Exception e) {
+                getLog().log(Logger.ERROR, "Portlet Setup Failed", message);
+                throw e;
+            }
+
         }
     }
 
@@ -284,8 +299,11 @@ public class PASSPortlet extends GenericPortlet {
      *
      * @param request
      * @throws Exception
+     * @return message  Information logging to specify which files were loaded
      */
-    private void loadEnvironmentProperties(PortletRequest request) throws Exception {
+    private String loadEnvironmentProperties(PortletRequest request) throws Exception {
+        String message = "";
+        String infoMsg = "";
         String propertyFile = request.getServerName() +".properties";
         CompositeConfiguration config = new CompositeConfiguration();
 
@@ -295,18 +313,26 @@ public class PASSPortlet extends GenericPortlet {
         if (hasHostPropertyFile) {
             PropertiesConfiguration propConfig =  new PropertiesConfiguration(propertyFile);
             config.addConfiguration(propConfig);
-            _log.error(propertyFile + " - loaded");
+            infoMsg = propertyFile + " - loaded";
         } else {
-            _log.error(propertyFile + " - not found");
+            infoMsg = propertyFile + " - not found";
         }
+        _log.error(infoMsg);
+        message += infoMsg + "\n";
 
         config.addConfiguration(new PropertiesConfiguration(defaultProperties));
-        _log.error(defaultProperties + " - loaded");
+        infoMsg = defaultProperties + " - loaded";
+        _log.error(infoMsg);
+        message += infoMsg + "\n";
 
         // Set the Hibernate config file and store properties in portletContext
-        _log.error("using hibernate cfg file - "+config.getString("hibernate-cfg-file"));
+        infoMsg = "using hibernate cfg file - " + config.getString("hibernate-cfg-file");
+        _log.error(infoMsg);
+        message += infoMsg + "\n";
         HibernateUtil.setConfig(config.getString("hibernate-cfg-file"));
         getPortletContext().setAttribute("environmentProp", config);
+
+        return message;
     }
 
     /**

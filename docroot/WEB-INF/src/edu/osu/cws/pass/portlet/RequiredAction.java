@@ -46,7 +46,7 @@ public class RequiredAction {
      * @param configuration
      */
     public void setAnchorText(String key, Appraisal appraisal, ResourceBundle resource,
-                              Configuration configuration) throws ModelException {
+                              Configuration configuration) throws Exception {
 
         String pattern = resource.getString(key);
 

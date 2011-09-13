@@ -1,5 +1,5 @@
 <%@ include file="/jsp/init.jsp"%>
-<% Appraisal formAppraisal = (Appraisal) request.getAttribute("appraisal"); %>
+<% Appraisal formAppraisal = (Appraisal) renderRequest.getAttribute("appraisal"); %>
 
 <jsp:useBean id="appraisal" class="edu.osu.cws.pass.models.Appraisal" scope="request" />
 <jsp:useBean id="permissionRule" class="edu.osu.cws.pass.models.PermissionRule" scope="request" />

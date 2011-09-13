@@ -5,7 +5,7 @@
         class="active"
         </c:if>
         ><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
-                        <portlet:param name="action" value="displayHomeView"/>
+                        <portlet:param name="action" value="${homeAction}"/>
                         </portlet:renderURL>"><liferay-ui:message key="home"/></a></li>
         <li><a href="#"><liferay-ui:message key="settings"/></a>
             <ul>
@@ -24,8 +24,8 @@
                         </portlet:renderURL>"><liferay-ui:message key="role-admin"/></a></li>
                 </c:if>
                 <c:if test="${isReviewer == 'true'}">
-                <li><a href="<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-                        <portlet:param name="action" value="displayReviewList"/>
+                <li><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
+                        <portlet:param name="action" value="displayReviewerHomeView"/>
                         </portlet:renderURL>"><liferay-ui:message key="role-reviewer"/></a></li>
                 </c:if>
                 <c:if test="${isSupervisor == 'true'}">

@@ -53,14 +53,14 @@ public class PassPDFTest {
      * Test method to create a pdf without having to go through the web ui.
      */
 //    public void createPDFTesto() throws Exception {
-//        HibernateUtil.setConfig(HibernateUtil.DEV_CONFIG);
+//        HibernateUtil.setConfig("hibernate-luminis-dev.cfg.xml");
 //        String filename = PassPDF.getNolijFileName(appraisal, "/tmp/", "dev2");
 //        AppraisalMgr appraisalMgr = new AppraisalMgr();
 //        PermissionRuleMgr permissionRuleMgr = new PermissionRuleMgr();
 //        AdminMgr adminMgr = new AdminMgr();
 //        AppraisalStepMgr appraisalStepMgr = new AppraisalStepMgr();
 //        EmployeeMgr employeeMgr = new EmployeeMgr();
-//        Employee currentlyLoggedOnUser = employeeMgr.findByOnid("luf", "employee-with-jobs");
+//        Employee currentlyLoggedOnUser = employeeMgr.findByOnid("pass2", "employee-with-jobs");
 //
 //        appraisalMgr.setPermissionRules(permissionRuleMgr.list());
 //        appraisalMgr.setLoggedInUser(currentlyLoggedOnUser);

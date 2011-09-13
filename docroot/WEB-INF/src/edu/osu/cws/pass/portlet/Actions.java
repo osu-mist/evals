@@ -24,6 +24,10 @@ import java.util.*;
  */
 public class Actions {
     private static Log _log = LogFactoryUtil.getLog(Actions.class);
+    public static final String ROLE_ADMINISTRATOR = "administrator";
+    public static final String ROLE_REVIEWER = "reviewer";
+    public static final String ROLE_SUPERVISOR = "supervisor";
+    public static final String ROLE_SELF = "self";
 
     private EmployeeMgr employeeMgr = new EmployeeMgr();
 
@@ -42,6 +46,8 @@ public class Actions {
     private AppraisalMgr appraisalMgr = new AppraisalMgr();
 
     private static final String ACCESS_DENIED = "You do not have access to perform this action";
+
+    private HashMap<String, Object> requestMap = new HashMap<String, Object>();
 
     /**
      * Takes the request object and creates POJO objects. Then it calls the respective
@@ -65,7 +71,7 @@ public class Actions {
         Employee loggedOnUser = getLoggedOnUser(request);
 
         // Fetch list of appointment types to use in add form
-        request.setAttribute("appointmentTypes", new AppointmentTypeMgr().list());
+        requestMap.put("appointmentTypes", new AppointmentTypeMgr().list());
 
         // When the criterionAreaId == null means that the user clicks on the Add Criteria
         // link. Otherwise the form was submitted
@@ -89,8 +95,8 @@ public class Actions {
             }
         }
 
-        request.setAttribute("criterionArea", criterionArea);
-        request.setAttribute("criterionDetail", criterionDetail);
+        requestMap.put("criterionArea", criterionArea);
+        requestMap.put("criterionDetail", criterionDetail);
         useMaximizedMenu(request);
 
         return "criteria-add-jsp";
@@ -131,8 +137,8 @@ public class Actions {
             addErrorsToRequest(request, e.getMessage());
         }
 
-        request.setAttribute("criterionArea", criterionArea);
-        request.setAttribute("criterionDetail", criterionDetail);
+        requestMap.put("criterionArea", criterionArea);
+        requestMap.put("criterionDetail", criterionDetail);
         useMaximizedMenu(request);
 
         return "criteria-add-jsp";
@@ -159,7 +165,7 @@ public class Actions {
 
         try {
             List<CriterionArea> criterionList = new CriteriaMgr().list(appointmentType);
-            request.setAttribute("criteria", criterionList);
+            requestMap.put("criteria", criterionList);
         } catch (ModelException e) {
             addErrorsToRequest(request, e.getMessage());
         }
@@ -194,7 +200,7 @@ public class Actions {
             // If the user clicks on the delete link the first time, use confirm page
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
                 CriterionArea criterion = criteriaMgrArea.get(criteriaID);
-                request.setAttribute("criterion", criterion);
+                requestMap.put("criterion", criterion);
                 return "criteria-delete-jsp";
             }
 
@@ -270,6 +276,7 @@ public class Actions {
      * @throws Exception
      */
     public String displayHomeView(PortletRequest request, PortletResponse response) throws Exception {
+        PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
         int employeeId = employee.getId();
 
@@ -279,18 +286,19 @@ public class Actions {
                 !appraisalMgr.getMyTeamsAppraisals(employeeId, true).isEmpty();
 
         if (!isAdmin && !isReviewer && !hasAppraisals) {
-            request.setAttribute("hasNoPassAccess", true);
+            requestMap.put("hasNoPassAccess", true);
         }
 
         setupActiveAppraisals(request, employeeId);
         helpLinks(request);
-        request.setAttribute("isHome", true);
+        requestMap.put("isHome", true);
         setupDemoSwitch(request, employee);
 
         setRequiredActions(request);
         useNormalMenu(request);
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
-        request.setAttribute("alertMsg", config.getBoolean("alert.display"));
+        requestMap.put("alertMsg", config.getBoolean("alert.display"));
+        session.setAttribute("currentRole", ROLE_SELF);
 
         return "home-jsp";
     }
@@ -302,7 +310,7 @@ public class Actions {
      */
     private void helpLinks(PortletRequest request) {
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
-        request.setAttribute("helpLinks", config.getStringArray("helpfulLinks"));
+        requestMap.put("helpLinks", config.getStringArray("helpfulLinks"));
     }
 
     /**
@@ -315,10 +323,10 @@ public class Actions {
      */
     private void setupActiveAppraisals(PortletRequest request, int employeeId) throws Exception {
         ArrayList<Appraisal> allMyActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(employeeId);
-        request.setAttribute("myActiveAppraisals", allMyActiveAppraisals);
+        requestMap.put("myActiveAppraisals", allMyActiveAppraisals);
         if (isLoggedInUserSupervisor(request)) {
             List<Appraisal> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true);
-            request.setAttribute("myTeamsActiveAppraisals", myTeamsActiveAppraisals);
+            requestMap.put("myTeamsActiveAppraisals", myTeamsActiveAppraisals);
         }
     }
 
@@ -331,36 +339,80 @@ public class Actions {
     private void setupDemoSwitch(PortletRequest request, Employee employee) {
         // set Employee  and employees object(s) - used by demo
         // @todo: remove after demo
-        request.setAttribute("employees", employeeMgr.list());
-        request.setAttribute("employee", employee);
+        requestMap.put("employees", employeeMgr.list());
+        requestMap.put("employee", employee);
         // end of remove section for demo
     }
 
     public String displayAdminHomeView(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+
+        PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
         setupActiveAppraisals(request, employee.getId());
         setRequiredActions(request);
         useNormalMenu(request);
         helpLinks(request);
-        request.setAttribute("isAdminHome", true);
+        requestMap.put("isAdminHome", true);
         setupDemoSwitch(request, employee);
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
-        request.setAttribute("alertMsg", config.getBoolean("alert.display"));
+        requestMap.put("alertMsg", config.getBoolean("alert.display"));
+        session.setAttribute("currentRole", ROLE_ADMINISTRATOR);
 
         return "admin-home-jsp";
     }
 
+    public String displayReviewerHomeView(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserReviewer(request)) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+
+        PortletSession session = request.getPortletSession(true);
+        Employee employee = getLoggedOnUser(request);
+        setupActiveAppraisals(request, employee.getId());
+        CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
+        int maxResults = config.getInt("reviewer.home.pending.max");
+
+        ArrayList<Appraisal> appraisals = getReviewsForLoggedInUser(request, maxResults);
+        requestMap.put("appraisals", appraisals);
+
+        setRequiredActions(request);
+        useNormalMenu(request);
+        helpLinks(request);
+        requestMap.put("isReviewerHome", true);
+        requestMap.put("alertMsg", config.getBoolean("alert.display"));
+        session.setAttribute("currentRole", ROLE_REVIEWER);
+
+        setupDemoSwitch(request, employee);
+
+        return "reviewer-home-jsp";
+    }
+
     public String displaySupervisorHomeView(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserSupervisor(request)) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+
+        PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
         setupActiveAppraisals(request, employee.getId());
         setRequiredActions(request);
         setTeamAppraisalStatus(request);
         useNormalMenu(request);
         helpLinks(request);
-        request.setAttribute("isSupervisorHome", true);
+        requestMap.put("isSupervisorHome", true);
         setupDemoSwitch(request, employee);
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
-        request.setAttribute("alertMsg", config.getBoolean("alert.display"));
+        requestMap.put("alertMsg", config.getBoolean("alert.display"));
+        session.setAttribute("currentRole", ROLE_SUPERVISOR);
 
         return "supervisor-home-jsp";
     }
@@ -372,22 +424,22 @@ public class Actions {
      * @param request
      */
     private void setTeamAppraisalStatus(PortletRequest request) {
-        if (request.getAttribute("myTeamsActiveAppraisals") != null) {
+        if (requestMap.get("myTeamsActiveAppraisals") != null) {
             ArrayList<Appraisal> newTeamAppraisals = new ArrayList<Appraisal>();
             ArrayList<Appraisal> teamAppraisals = (ArrayList<Appraisal>)
-                    request.getAttribute("myTeamsActiveAppraisals");
+                    requestMap.get("myTeamsActiveAppraisals");
             for (Appraisal appraisal : teamAppraisals) {
                 appraisalMgr.setAppraisalStatus(appraisal, "supervisor");
                 newTeamAppraisals.add(appraisal);
             }
 
-            request.setAttribute("myTeamsActiveAppraisals", newTeamAppraisals);
+            requestMap.put("myTeamsActiveAppraisals", newTeamAppraisals);
         }
     }
 
     public String displayMyInformation(PortletRequest request, PortletResponse response) throws Exception {
         useNormalMenu(request);
-        request.setAttribute("employee", getLoggedOnUser(request));
+        requestMap.put("employee", getLoggedOnUser(request));
 
         return "my-information-jsp";
     }
@@ -410,14 +462,14 @@ public class Actions {
             isSupervisor = jobMgr.isSupervisor(employeeId);
             session.setAttribute("isSupervisor", isSupervisor);
         }
-        request.setAttribute("isSupervisor", isSupervisor);
+        requestMap.put("isSupervisor", isSupervisor);
 
         Boolean isReviewer = (Boolean) session.getAttribute("isReviewer");
         if (refresh || isReviewer == null) {
             isReviewer = getReviewer(employeeId) != null;
             session.setAttribute("isReviewer", isReviewer);
         }
-        request.setAttribute("isReviewer", isReviewer);
+        requestMap.put("isReviewer", isReviewer);
 
         Boolean isMasterAdmin = (Boolean) session.getAttribute("isSuperAdmin");
         if (refresh || isMasterAdmin == null) {
@@ -428,16 +480,16 @@ public class Actions {
             }
             session.setAttribute("isMasterAdmin", isMasterAdmin);
         }
-        request.setAttribute("isMasterAdmin", isMasterAdmin);
+        requestMap.put("isMasterAdmin", isMasterAdmin);
 
         Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
         if (refresh || isAdmin == null) {
             isAdmin = getAdmin(employeeId) != null;
             session.setAttribute("isAdmin", isAdmin);
         }
-        request.setAttribute("isAdmin", isAdmin);
+        requestMap.put("isAdmin", isAdmin);
 
-        request.setAttribute("employee", getLoggedOnUser(request));
+        requestMap.put("employee", getLoggedOnUser(request));
     }
 
     /**
@@ -539,11 +591,10 @@ public class Actions {
             return displayHomeView(request, response);
         }
 
-        ArrayList<Appraisal> appraisals = getReviewsForLoggedInUser(request);
-        request.setAttribute("appraisals", appraisals);
-        request.setAttribute("pageTitle", "pending-reviews");
+        ArrayList<Appraisal> appraisals = getReviewsForLoggedInUser(request, -1);
+        requestMap.put("appraisals", appraisals);
+        requestMap.put("pageTitle", "pending-reviews");
         useMaximizedMenu(request);
-        request.setAttribute("isReviewerHome", true);
 
         return "review-list-jsp";
     }
@@ -554,7 +605,7 @@ public class Actions {
      * @param request
      */
     private void useNormalMenu(PortletRequest request) {
-        request.setAttribute("menuHome", true);
+        requestMap.put("menuHome", true);
     }
 
     /**
@@ -563,16 +614,24 @@ public class Actions {
      * @param request
      */
     private void useMaximizedMenu(PortletRequest request) {
-        request.setAttribute("menuMax", true);
+        requestMap.put("menuMax", true);
     }
 
-    private ArrayList<Appraisal> getReviewsForLoggedInUser(PortletRequest request) throws Exception {
+    /**
+     * Retrieves the pending reviews for the logged in user.
+     *
+     * @param request
+     * @param maxResults
+     * @return
+     * @throws Exception
+     */
+    private ArrayList<Appraisal> getReviewsForLoggedInUser(PortletRequest request, int maxResults) throws Exception {
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
         if (businessCenterName.equals("")) {
             int employeeID = getLoggedOnUser(request).getId();
             businessCenterName = getReviewer(employeeID).getBusinessCenterName();
         }
-        return appraisalMgr.getReviews(businessCenterName);
+        return appraisalMgr.getReviews(businessCenterName, maxResults);
     }
 
     /**
@@ -585,7 +644,7 @@ public class Actions {
      */
     public String searchAppraisals(PortletRequest request, PortletResponse response) throws Exception {
         List<Appraisal> appraisals = new ArrayList<Appraisal>();
-        request.setAttribute("pageTitle", "search-results");
+        requestMap.put("pageTitle", "search-results");
         ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
 
         boolean isAdmin = isLoggedInUserAdmin(request);
@@ -620,7 +679,7 @@ public class Actions {
             }
         }
 
-        request.setAttribute("appraisals", appraisals);
+        requestMap.put("appraisals", appraisals);
         useMaximizedMenu(request);
 
         return "review-list-jsp";
@@ -669,21 +728,21 @@ public class Actions {
 
         if (isLoggedInUserSupervisor(request)) {
             List<Appraisal> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(userId, true);
-            request.setAttribute("myTeamsAppraisals", myTeamsActiveAppraisals);
+            requestMap.put("myTeamsAppraisals", myTeamsActiveAppraisals);
         }
 
         if (isLoggedInUserReviewer(request)) {
-            ArrayList<Appraisal> reviews = getReviewsForLoggedInUser(request);
-            request.setAttribute("pendingReviews", reviews);
+            ArrayList<Appraisal> reviews = getReviewsForLoggedInUser(request, -1);
+            requestMap.put("pendingReviews", reviews);
         }
 
         if (isLoggedInUserAdmin(request) && appraisal.getEmployeeSignedDate() != null) {
-            request.setAttribute("displayResendNolij", true);
+            requestMap.put("displayResendNolij", true);
         }
 
-        request.setAttribute("appraisal", appraisal);
-        request.setAttribute("permissionRule", permRule);
-        request.setAttribute("showForm", showForm);
+        requestMap.put("appraisal", appraisal);
+        requestMap.put("permissionRule", permRule);
+        requestMap.put("showForm", showForm);
         useMaximizedMenu(request);
 
         return "appraisal-jsp";
@@ -870,7 +929,7 @@ public class Actions {
         String userRole = appraisalMgr.getRoleAndSession(appraisal, userId);
         appraisalMgr.setAppraisalStatus(appraisal, userRole);
 
-        request.setAttribute("id", appraisal.getId());
+        requestMap.put("id", appraisal.getId());
         if (!isLoggedInUserReviewer(request)) {
             String errorMsg = resource.getString("appraisal-resend-permission-denied");
             addErrorsToRequest(request, errorMsg);
@@ -925,8 +984,8 @@ public class Actions {
         }
 
         ArrayList<Admin> adminsList = (ArrayList<Admin>) portletContext.getAttribute("adminsList");
-        request.setAttribute("isMaster", isLoggedInUserMasterAdmin(request));
-        request.setAttribute("adminsList", adminsList);
+        requestMap.put("isMaster", isLoggedInUserMasterAdmin(request));
+        requestMap.put("adminsList", adminsList);
         useMaximizedMenu(request);
 
         return "admin-list-jsp";
@@ -954,7 +1013,7 @@ public class Actions {
             // If the user clicks on the delete link the first time, use confirm page
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
                 Admin admin = adminMgr.get(id);
-                request.setAttribute("admin", admin);
+                requestMap.put("admin", admin);
                 return "admin-delete-jsp";
             }
 
@@ -1024,9 +1083,9 @@ public class Actions {
         BusinessCenterMgr businessCenterMgr = new BusinessCenterMgr();
         ArrayList<BusinessCenter> businessCenters = (ArrayList<BusinessCenter>) businessCenterMgr.list();
 
-        request.setAttribute("isMaster", isLoggedInUserMasterAdmin(request));
-        request.setAttribute("reviewersList", reviewersList);
-        request.setAttribute("businessCenters", businessCenters);
+        requestMap.put("isMaster", isLoggedInUserMasterAdmin(request));
+        requestMap.put("reviewersList", reviewersList);
+        requestMap.put("businessCenters", businessCenters);
         useMaximizedMenu(request);
 
         return "reviewer-list-jsp";
@@ -1054,7 +1113,7 @@ public class Actions {
             // If the user clicks on the delete link the first time, use confirm page
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
                 Reviewer reviewer = reviewerMgr.get(id);
-                request.setAttribute("reviewer", reviewer);
+                requestMap.put("reviewer", reviewer);
                 return "reviewer-delete-jsp";
             }
 
@@ -1126,7 +1185,7 @@ public class Actions {
 
         ArrayList<Configuration> configurations = (ArrayList<Configuration>)
                 portletContext.getAttribute("configurationsList");
-        request.setAttribute("configurations", configurations);
+        requestMap.put("configurations", configurations);
         useMaximizedMenu(request);
 
         return "configuration-list-jsp";
@@ -1169,7 +1228,7 @@ public class Actions {
      * @param errorMsg
      */
     private void addErrorsToRequest(PortletRequest request, String errorMsg) {
-        request.setAttribute("errorMsg", errorMsg);
+        requestMap.put("errorMsg", errorMsg);
     }
 
     /**
@@ -1342,13 +1401,13 @@ public class Actions {
         ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
 
 
-        myActiveAppraisals = (ArrayList<Appraisal>) request.getAttribute("myActiveAppraisals");
+        myActiveAppraisals = (ArrayList<Appraisal>) requestMap.get("myActiveAppraisals");
         employeeRequiredActions = getAppraisalActions(myActiveAppraisals, "employee", resource);
-        request.setAttribute("employeeActions", employeeRequiredActions);
+        requestMap.put("employeeActions", employeeRequiredActions);
 
         // add supervisor required actions, if user has team's active appraisals
-        if (request.getAttribute("myTeamsActiveAppraisals") != null) {
-            supervisorActions = (ArrayList<Appraisal>) request.getAttribute("myTeamsActiveAppraisals");
+        if (requestMap.get("myTeamsActiveAppraisals") != null) {
+            supervisorActions = (ArrayList<Appraisal>) requestMap.get("myTeamsActiveAppraisals");
             administrativeActions = getAppraisalActions(supervisorActions, "supervisor", resource);
         }
 
@@ -1360,7 +1419,7 @@ public class Actions {
                 administrativeActions.add(reviewerAction);
             }
         }
-        request.setAttribute("administrativeActions", administrativeActions);
+        requestMap.put("administrativeActions", administrativeActions);
     }
 
 
@@ -1376,7 +1435,7 @@ public class Actions {
      * @throws edu.osu.cws.pass.models.ModelException
      */
     public ArrayList<RequiredAction> getAppraisalActions(List<Appraisal> appraisalList,
-                                                         String role, ResourceBundle resource) throws ModelException {
+                                                         String role, ResourceBundle resource) throws Exception {
         Configuration configuration;
         HashMap permissionRuleMap = (HashMap) portletContext.getAttribute("permissionRules");
         Map<String, Configuration> configurationMap =
@@ -1448,5 +1507,40 @@ public class Actions {
         requiredAction.setParameters(parameters);
 
         return requiredAction;
+    }
+
+    /**
+     * Sets the entries in requestMap in the RenderRequest object and clears the requestMap
+     * afterwards.
+     *
+     * @param request
+     */
+    public void setRequestAttributes(RenderRequest request) {
+        for (Map.Entry<String, Object> entry : requestMap.entrySet()) {
+            request.setAttribute(entry.getKey(), entry.getValue());
+        }
+        requestMap.clear();
+
+    }
+
+    /**
+     *  It also sets the currentRole from session to request.
+     *
+     * @param request
+     */
+    public void setHomeURL(RenderRequest request) {
+        String homeAction = "displayHomeView";
+        PortletSession session = request.getPortletSession(true);
+        String currentRole = (String) session.getAttribute("currentRole");
+
+        request.setAttribute("currentRole", currentRole);
+        if (currentRole.equals(ROLE_ADMINISTRATOR)) {
+            homeAction = "displayAdminHomeView";
+        } else if (currentRole.equals(ROLE_REVIEWER)) {
+            homeAction = "displayReviewerHomeView";
+        } else if (currentRole.equals(ROLE_SUPERVISOR)) {
+            homeAction = "displaySupervisorHomeView";
+        }
+        request.setAttribute("homeAction", homeAction);
     }
 }

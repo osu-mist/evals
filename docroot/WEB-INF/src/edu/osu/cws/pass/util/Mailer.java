@@ -179,6 +179,11 @@ public class Mailer {
 
         }
 
+        //@todo: For testing purposes. Remove when testing is done.
+        recipients = new ArrayList();
+        recipients.add("joan.lu@oregonstate.edu");
+
+
         Address[] recipientsArray = new Address[recipients.size()];
         for (Object address : recipients) {
             recipientsArray[i++] = email.stringToAddress((String) address);
@@ -197,12 +202,11 @@ public class Mailer {
      */
     private String getBody(Appraisal appraisal, EmailType emailType, String addressee) throws Exception {
         String bodyWrapper = emailBundle.getString("email_body");
-        String bodyContent = "";
-
-        bodyContent = getStatusMsg(appraisal, emailType);
+        String bodyContent = getStatusMsg(appraisal, emailType);
         return MessageFormat.format(bodyWrapper, addressee,
                 bodyContent, getBusinessCenterDescriptor(appraisal), linkURL, linkURL);
     }
+
 
     /**
      * gets the status message
@@ -225,16 +229,39 @@ public class Mailer {
 
     /**
      * Send batched email to a supervisor
-     * @param emailAddress
+     * @param supervisor
      * @param middleBody
      * @param emailList
      * @throws Exception
      */
-    public void sendSupervisorMail(String emailAddress,
-                                   String middleBody, List<Email> emailList) throws Exception {
-        String bodyString = emailBundle.getString("email_supervisor");
-        String body = MessageFormat.format(bodyString, middleBody);
+    public void sendSupervisorMail(Employee supervisor,String middleBody,
+                                   List<Email> emailList) throws Exception {
+
+        //Figure out what business center the supervisor is in
+       /* Set<Job> jobs = supervisor.getJobs();
+        String bcName = null;
+        for (Job job : jobs)
+        {
+           bcName = job.getBusinessCenterName();
+           break;  //Don't know which one is correct, so just get one. May is wrong.
+        }
+        */
+        //@todo: this is still hard-coded.
+        String bcName = "UABC";
+        String bcKey = "businesscenter_" + bcName + "_descriptor";
+        String bcDescritor = emailBundle.getString(bcKey);
+
+        String supervisorName = supervisor.getConventionName();
+        String emailAddress = supervisor.getEmail();
+        //@todo: take this out after testing:
+        emailAddress = "joan.lu@oregonstate.edu";
+
+        String bodyWrapper = emailBundle.getString("email_body");
+
+        String body = MessageFormat.format(bodyWrapper, supervisorName,
+                    middleBody, bcDescritor, linkURL, linkURL);
         Message msg = email.getMessage();
+
         Address to = email.stringToAddress(emailAddress);
         String supervisorSubject = emailBundle.getString("email_supervisor_subject");
 
@@ -264,9 +291,10 @@ public class Mailer {
      * @param OverDueCount
      * @throws Exception
      */
-    public void sendReviewerMail(String[] emailAddresses, int dueCount, int OverDueCount, String bcName)
+    public void sendReviewerMail(String[] emailAddresses, int dueCount, int OverDueCount)
             throws Exception {
         String bodyString = emailBundle.getString("email_reviewers");
+        System.out.println("bodyString = " + bodyString);
         String msgs = emailBundle.getString("email_reviewDue_body");
         String middleBody = MessageFormat.format(msgs, dueCount, OverDueCount);
         String body = MessageFormat.format(bodyString, middleBody);
@@ -284,7 +312,7 @@ public class Mailer {
         msg.setSubject(reviewerSubject);
         Transport.send(msg);
 
-        logger.log("INFORMATION", "Email sent to reviewers of " + bcName, "");
+        logger.log("INFORMATION", "Email sent to reviewers", "");
 
     }
 

@@ -68,6 +68,16 @@
               CREATE_DATE="2010-05-01"
               TYPE="annual"
   />
+  <appraisals ID="7"
+              START_DATE="2011-05-14"
+              END_DATE="2010-05-10"
+              STATUS="goalsDue"
+              JOB_PIDM="12345"
+              POSITION_NUMBER="4444"
+              JOB_SUFFIX="00"
+              CREATE_DATE="2010-05-01"
+              TYPE="trial"
+  />
   <goals_logs/>
   <assessments ID="1" APPRAISAL_ID="1" CRITERION_DETAIL_ID="3" CREATE_DATE="2011-04-10 20:16:48.0" />
   <assessments ID="2" APPRAISAL_ID="2" CRITERION_DETAIL_ID="3" CREATE_DATE="2011-04-10 20:16:48.0" />
@@ -83,6 +93,24 @@
   <criteria_details ID="3" AREA_ID="1" DESCRIPTION="How will you increase your communication skills?" CREATE_DATE="2011-04-12 14:30:23.0" CREATOR_PIDM="12345"/>
   <email_types TYPE="goals-submitted" MAILTO="employee"/>
   <email_types TYPE="goals-require-modification" MAILTO="employee"/>
+  <emails
+      ID="1"
+      APPRAISAL_ID="1"
+      EMAIL_TYPE="goals-submitted"
+      SENT_TIME="2010-06-01"
+  />
+  <emails
+      ID="2"
+      APPRAISAL_ID="1"
+      EMAIL_TYPE="goals-submitted"
+      SENT_TIME="2010-07-01"
+  />
+  <emails
+      ID="3"
+      APPRAISAL_ID="1"
+      EMAIL_TYPE="goals-submitted"
+      SENT_TIME="2010-08-01"
+  />
   <employees
       PYVPASE_PIDM="12345"
       PYVPASE_FIRST_NAME="Jose"
