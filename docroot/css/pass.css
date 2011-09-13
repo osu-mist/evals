@@ -105,7 +105,7 @@ tr.ui-state-highlight {
 }
 
 #pass-top-menu select {
-  min-width: 10em;
+  min-width: 90px;
   float: right;
   margin: 2px 4px;
 }
