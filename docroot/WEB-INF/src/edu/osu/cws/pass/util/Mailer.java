@@ -15,8 +15,10 @@ import java.util.Map;
 import java.util.HashMap;
 import edu.osu.cws.pass.hibernate.AppraisalMgr;
 import edu.osu.cws.pass.hibernate.EmailMgr;
+import edu.osu.cws.pass.hibernate.JobMgr;
 import edu.osu.cws.pass.hibernate.ReviewerMgr;
 import edu.osu.cws.pass.models.*;
+import edu.osu.cws.pass.tests.JobsTest;
 import edu.osu.cws.util.*;
 import java.text.MessageFormat;
 
@@ -180,8 +182,8 @@ public class Mailer {
         }
 
         //@todo: For testing purposes. Remove when testing is done.
-        recipients = new ArrayList();
-        recipients.add("joan.lu@oregonstate.edu");
+        //recipients = new ArrayList();
+        //recipients.add("joan.lu@oregonstate.edu");
 
 
         Address[] recipientsArray = new Address[recipients.size()];
@@ -237,18 +239,9 @@ public class Mailer {
     public void sendSupervisorMail(Employee supervisor,String middleBody,
                                    List<Email> emailList) throws Exception {
 
-        //Figure out what business center the supervisor is in
-       /* Set<Job> jobs = supervisor.getJobs();
-        String bcName = null;
-        for (Job job : jobs)
-        {
-           bcName = job.getBusinessCenterName();
-           break;  //Don't know which one is correct, so just get one. May is wrong.
-        }
-        */
-        //@todo: this is still hard-coded.
-        String bcName = "UABC";
-        String bcKey = "businesscenter_" + bcName + "_descriptor";
+        List<Job> jobs = JobMgr.getJobs(supervisor.getId());
+        Job job = jobs.get(0);
+        String bcKey = "businesscenter_" + job.getBusinessCenterName() + "_descriptor";
         String bcDescritor = emailBundle.getString(bcKey);
 
         String supervisorName = supervisor.getConventionName();
@@ -294,10 +287,9 @@ public class Mailer {
     public void sendReviewerMail(String[] emailAddresses, int dueCount, int OverDueCount)
             throws Exception {
         String bodyString = emailBundle.getString("email_reviewers");
-        System.out.println("bodyString = " + bodyString);
         String msgs = emailBundle.getString("email_reviewDue_body");
         String middleBody = MessageFormat.format(msgs, dueCount, OverDueCount);
-        String body = MessageFormat.format(bodyString, middleBody);
+        String body = MessageFormat.format(bodyString, middleBody, linkURL, linkURL);
         Message msg = email.getMessage();
         String reviewerSubject = emailBundle.getString("email_reviewer_subject");
 
@@ -531,8 +523,10 @@ public class Mailer {
      */
     private String rebuttalReadDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_rebuttalReadDue_body");
-        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod());
+        String osuid = appraisal.getJob().getEmployee().getOsuid();
+
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal),
+                osuid, getJobTitle(appraisal), appraisal.getReviewPeriod());
     }
 
     /**

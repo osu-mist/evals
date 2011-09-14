@@ -372,6 +372,7 @@ public class PASSPortlet extends GenericPortlet {
             }
 		}
 		else {
+            _log.debug("Got the dispacther, path = " + path);
 			portletRequestDispatcher.include(renderRequest, renderResponse);
 		}
 	}
