@@ -181,6 +181,10 @@ tr.ui-state-highlight {
     font-weight: bold;
 }
 
+.ie .appraisal.accordion-menu {
+  overflow: hidden; /* Fixes an IE8 */
+}
+
 /* Appraisal Search */
 .accordion-content.pass-search form {
     padding: 0.5em 0 0.5em 1em;
