@@ -69,6 +69,12 @@ tr.ui-state-highlight {
     height: 28px;
     border-bottom: 1px solid #ccc;
 }
+
+.ie7 #pass-top-menu.action-menu-wrapper > ul,
+.ie7 #pass-top-menu.action-menu-wrapper {
+  min-width: 261px;
+}
+
 #pass-top-menu .portlet-action-menu li {
     background: #fff;
     float: left;
@@ -110,6 +116,25 @@ tr.ui-state-highlight {
   margin: 2px 4px;
 }
 
+.ie7 #column-3,
+.ie7 #layout-column_column-3,
+.ie7 #column-3 .portlet,
+.ie7 #layout-column_column-3 .portlet-content-bottom {
+  min-width: 300px;
+}
+
+.ie7 #pass-top-menu select {
+  position: absolute;
+  right: 0;
+  top: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+.ie7 #pass-top-menu li.pass-roles em {
+  margin-right: 99px;
+  float: right;
+}
 #pass-top-menu  .portlet-action-menu a:hover,
 #pass-top-menu  .portlet-action-menu a.active {
     border-bottom: 3px solid #d85a1a;
