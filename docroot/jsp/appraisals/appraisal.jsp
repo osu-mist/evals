@@ -111,7 +111,7 @@
                     </c:if>
                     <label for="<portlet:namespace />appraisal.rebuttal"><liferay-ui:message key="appraisal-employee-response" /></label>
                     <liferay-ui:input-textarea param="appraisal.rebuttal"
-                        defaultValue="${appraisal.rebuttal}" /><br />
+                        defaultValue="${appraisal.rebuttal}" />
                     <c:if test="${empty appraisal.rebuttal}">
                         </div><!-- end pass-hide-->
                     </c:if>
@@ -165,7 +165,7 @@
     jQuery(document).ready(function() {
 
       // Handle acknowledge appraisal rebuttal read by supervisor
-      jQuery("pass-appraisal-rebuttal").hide();
+      jQuery(".pass-appraisal-rebuttal").hide();
 
       jQuery("#<portlet:namespace />fm").submit(function() {
         var errors = "";
@@ -209,11 +209,16 @@
       jQuery("#<portlet:namespace />show-rebuttal").click(function() {
           jQuery("#<portlet:namespace />show-rebuttal").hide();
           jQuery(".pass-appraisal-rebuttal").show();
+          jQuery('textarea').autogrow();
           return false;
       });
       
+
       // Using jQuery plugin to expand textareas as you type
-      jQuery('textarea').autogrow();
+      <c:if test="${appraisal.status != 'signatureDue' && appraisal.status != 'signatureOverdue' ||  not empty appraisal.rebuttal}">
+        jQuery('textarea').autogrow();
+      </c:if>
+      
       
     });
     </script>
