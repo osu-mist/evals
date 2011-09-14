@@ -369,9 +369,13 @@ public class PASSPortlet extends GenericPortlet {
             } catch (Exception e) {
                 _log.error(path + " is not a valid include");
                 _log.error(CWSUtil.stackTraceString(e));
+                portletRequestDispatcher =
+			        getPortletContext().getRequestDispatcher("/jsp/home/start.jsp");
+                portletRequestDispatcher.include(renderRequest, renderResponse);
             }
 		}
 		else {
+            _log.error("Got the dispacther, path = " + path);
 			portletRequestDispatcher.include(renderRequest, renderResponse);
 		}
 	}

@@ -324,7 +324,18 @@ public class AppraisalMgr {
 
             // Send email if needed
             String appointmentType = appraisal.getJob().getAppointmentType();
-            AppraisalStep appraisalStep = getAppraisalStepKey(request, appointmentType, permRule);
+            AppraisalStep appraisalStep;
+            String employeeResponse = appraisal.getRebuttal();
+
+            // If the employee signs and provides a rebuttal, we want to use a different
+            // appraisal step so that we can send an email to the reviewer.
+            if (submittedRebuttal(request, employeeResponse)) {
+                String appraisalStepKey = "submit-response-" + appointmentType;
+                appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
+            } else {
+                appraisalStep = getAppraisalStepKey(request, appointmentType, permRule);
+            }
+
             EmailType emailType = appraisalStep.getEmailType();
             if (emailType != null) {
                 mailer.sendMail(appraisal, emailType);
@@ -463,7 +474,8 @@ public class AppraisalMgr {
         // Save employee response
         if (permRule.getEmployeeResponse() != null && permRule.getEmployeeResponse().equals("e")) {
             appraisal.setRebuttal(request.get("appraisal.rebuttal")[0]);
-            if (request.get("submit-response") != null) {
+            String employeeResponse = appraisal.getRebuttal();
+            if (submittedRebuttal(request, employeeResponse)) {
                 appraisal.setRebuttalDate(new Date());
             }
         }
@@ -478,17 +490,27 @@ public class AppraisalMgr {
         AppraisalStep appraisalStep = getAppraisalStepKey(request, appointmentType, permRule);
         String newStatus = appraisalStep.getNewStatus();
         if (newStatus != null && !newStatus.equals(appraisal.getStatus())) {
-//            _log.error("found appraisalStep "+appraisalStep.toString());
             appraisal.setStatus(newStatus);
             String employeeResponse = appraisal.getRebuttal();
-            if (request.get("sign-appraisal") != null &&
-                    employeeResponse != null && !employeeResponse.equals("")) {
+            if (submittedRebuttal(request, employeeResponse)) {
                 appraisal.setStatus("rebuttalReadDue");
             }
         }
         if (appraisal.getStatus().equals("goalsRequiredModification")) {
             appraisal.setGoalsRequiredModificationDate(new Date());
         }
+    }
+
+    /**
+     * Specifies whether or not the employee submitted a rebuttal when the appraisal was signed.
+     *
+     * @param request
+     * @param employeeResponse
+     * @return
+     */
+    private boolean submittedRebuttal(Map<String, String[]> request, String employeeResponse) {
+        return request.get("sign-appraisal") != null &&
+                employeeResponse != null && !employeeResponse.equals("");
     }
 
 
