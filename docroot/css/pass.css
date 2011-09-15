@@ -1,6 +1,7 @@
 .pass-hide {
     display: none;
 }
+
 /* Home View */
 .accordion-content .pass-menu-list {
     margin-top: 0em;
@@ -42,20 +43,6 @@
     color: #555;
 }
 
-/** JQuery UI Sortable */
-tr.ui-sortable-helper {
-    display: table;
-    background-color: #FFF;
-    border: 1px solid black;
-}
-tr.ui-state-highlight {
-    height: 2.25em;
-    line-height: 2.25em;
-}
-.pass-sortable-icon {
-    display: none;
-}
-
 /* Top Menu */
 #pass-top-menu {
     padding-bottom: 27px;
@@ -64,15 +51,45 @@ tr.ui-state-highlight {
     border: 1px solid #ccc;
     margin-bottom: 10px;
 }
+
 #pass-top-menu.action-menu-wrapper ul {
     background: #FFF;
-    height: 28px;
     border-bottom: 1px solid #ccc;
 }
 
-.ie7 #pass-top-menu.action-menu-wrapper > ul,
+#pass-top-menu .portlet-action-menu ul {
+  	-moz-box-shadow: 0 0 3px #666;
+  	-webkit-box-shadow:  0 0 3px #666;
+  	box-shadow: 0 1px 3px #666;
+}
+
+#pass-top-menu .portlet-action-menu {
+  height: 28px;
+}
+
+.osu-cws .portlet-action-menu li:hover ul,
+.osu-cws .portlet-action-menu li.sfHover ul {
+	  left: 0;
+	  top: 28px;
+}
+
+#pass-top-menu .portlet-action-menu li:hover, 
+#pass-top-menu .portlet-action-menu li.sfHover,
+#pass-top-menu .portlet-action-menu a:focus, 
+#pass-top-menu .portlet-action-menu a:hover,
+#pass-top-menu .portlet-action-menu a:active {
+    background: none repeat scroll 0 0 #FFF;
+    text-decoration: none;
+}
+
+.ie7 #pass-top-menu.action-menu-wrapper ul.portlet-action-menu,
 .ie7 #pass-top-menu.action-menu-wrapper {
   min-width: 261px;
+}
+
+#pass-top-menu ul.portlet-action-menu ul {
+    width: 14.8em;
+    overflow: hidden;
 }
 
 #pass-top-menu .portlet-action-menu li {
@@ -83,6 +100,7 @@ tr.ui-state-highlight {
 
 #pass-top-menu .portlet-action-menu li li {
     float: none;
+    width: auto;
 }
 
 #pass-top-menu .portlet-action-menu li li+li {
@@ -90,16 +108,22 @@ tr.ui-state-highlight {
     border-right: 0;
 }
 
+#pass-top-menu  .portlet-action-menu a:hover,
+#pass-top-menu  .portlet-action-menu a.active {
+    border-bottom: 3px solid #d85a1a;
+}
+
 #pass-top-menu .portlet-action-menu li.pass-roles {
     float: right;
     border: 0;
 }
 
-#pass-top-menu li.pass-roles em {
-    display: inline-block;
-    color: #686868;
-    font-weight: bold;
-    margin: 8px 3px;
+.ie #pass-top-menu ul.portlet-action-menu ul {
+    border: 1px solid #ccc;
+}
+
+#pass-top-menu .portlet-action-menu a {
+  white-space: normal; /* overwrites, so long names can break to next line down */
 }
   
 #pass-top-menu ul.portlet-action-menu li a {
@@ -110,17 +134,22 @@ tr.ui-state-highlight {
     border-bottom: 3px solid transparent;
 }
 
+#pass-top-menu ul.portlet-action-menu li li a { 
+    font-size: 12px;
+} 
+
+/* Roles - pass menu */
+#pass-top-menu li.pass-roles em {
+    display: inline-block;
+    color: #686868;
+    font-weight: bold;
+    margin: 8px 3px;
+}
+
 #pass-top-menu select {
   min-width: 90px;
   float: right;
   margin: 2px 4px;
-}
-
-.ie7 #column-3,
-.ie7 #layout-column_column-3,
-.ie7 #column-3 .portlet,
-.ie7 #layout-column_column-3 .portlet-content-bottom {
-  min-width: 300px;
 }
 
 .ie7 #pass-top-menu select {
@@ -134,36 +163,6 @@ tr.ui-state-highlight {
 .ie7 #pass-top-menu li.pass-roles em {
   margin-right: 99px;
   float: right;
-}
-#pass-top-menu  .portlet-action-menu a:hover,
-#pass-top-menu  .portlet-action-menu a.active {
-    border-bottom: 3px solid #d85a1a;
-}
-
-#pass-top-menu .portlet-action-menu ul {
-    width: auto;
-  	-moz-box-shadow: 0 0 3px #666;
-  	-webkit-box-shadow:  0 0 3px #666;
-  	box-shadow: 0 1px 3px #666;
-}
-
-.osu-cws .portlet-action-menu li:hover ul,
-.osu-cws .portlet-action-menu li.sfHover ul {
-	  right: 1px;
-	  top: 2.2em;
-}
-
-#pass-top-menu .portlet-action-menu ul li {
-    width: 100%;
-    font-size: 0.9em;
-}
-#pass-top-menu .portlet-action-menu li:hover, 
-#pass-top-menu .portlet-action-menu li.sfHover,
-#pass-top-menu .portlet-action-menu a:focus, 
-#pass-top-menu .portlet-action-menu a:hover,
-#pass-top-menu .portlet-action-menu a:active {
-    background: none repeat scroll 0 0 #FFF;
-    text-decoration: none;
 }
 
 .role-description {
@@ -182,7 +181,18 @@ tr.ui-state-highlight {
 }
 
 .ie .appraisal.accordion-menu {
-  overflow: hidden; /* Fixes an IE8 */
+    overflow: hidden; /* Fixes an IE8 */
+}
+
+.ie7 #pass-appraisal-form .osu-accordion-header img {
+    display: none;
+}
+
+.ie7 #column-3,
+.ie7 #layout-column_column-3,
+.ie7 #column-3 .portlet,
+.ie7 #layout-column_column-3 .portlet-content-bottom {
+  min-width: 300px;
 }
 
 /* Appraisal Search */
@@ -197,4 +207,18 @@ tr.ui-state-highlight {
 
 .osu-cws .accordion-content.pass-search input[type="text"] {
     min-width: 0;
+}
+
+/** JQuery UI Sortable */
+tr.ui-sortable-helper {
+    display: table;
+    background-color: #FFF;
+    border: 1px solid black;
+}
+tr.ui-state-highlight {
+    height: 2.25em;
+    line-height: 2.25em;
+}
+.pass-sortable-icon {
+    display: none;
 }
