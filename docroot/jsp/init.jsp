@@ -56,6 +56,8 @@ if (errorMsg != null && !errorMsg.equals("")) {
     </c:if>
 
     <c:if test="${!empty alertMsg and alertMsg == 'true'}">
-    <liferay-ui:message key="home-message-alert"/></span>
+    <span class="portlet-msg-alert">
+    <liferay-ui:message key="home-message-alert"/>
+    </span>
     </c:if>
 </div>
