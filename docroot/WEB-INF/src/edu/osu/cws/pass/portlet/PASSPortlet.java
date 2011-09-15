@@ -366,12 +366,15 @@ public class PASSPortlet extends GenericPortlet {
 		if (portletRequestDispatcher == null) {
             try {
                 getLog().log(Logger.ERROR, path + " is not a valid include", "");
-            } catch (Exception e) {
-                _log.error(path + " is not a valid include");
-                _log.error(CWSUtil.stackTraceString(e));
+                //@todo: temporary fix for the null dispatcher issue.
+                // Will come back to revisit next release.
                 portletRequestDispatcher =
 			        getPortletContext().getRequestDispatcher("/jsp/home/start.jsp");
                 portletRequestDispatcher.include(renderRequest, renderResponse);
+            } catch (Exception e) {
+                _log.error(path + " is not a valid include");
+                _log.error(CWSUtil.stackTraceString(e));
+
             }
 		}
 		else {
