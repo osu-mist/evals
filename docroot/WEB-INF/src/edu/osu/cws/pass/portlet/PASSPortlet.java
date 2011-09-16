@@ -95,18 +95,18 @@ public class PASSPortlet extends GenericPortlet {
         try {
             portletSetup(renderRequest);
             actionClass.setUpUserPermissionInSession(renderRequest, false);
+
+            // If processAction's delegate method was called, it set the viewJSP property to some
+            // jsp value, if viewJSP is null, it means processAction was not called and we need to
+            // call delegate
+            if (viewJSP == null) {
+                delegate(renderRequest, renderResponse);
+            }
+            actionClass.setRequestAttributes(renderRequest);
+            actionClass.setHomeURL(renderRequest);
         } catch (Exception e) {
             handlePASSException(e, "Error in doView", Logger.CRITICAL, true);
         }
-
-        // If processAction's delegate method was called, it set the viewJSP property to some
-        // jsp value, if viewJSP is null, it means processAction was not called and we need to
-        // call delegate
-        if (viewJSP == null) {
-            delegate(renderRequest, renderResponse);
-        }
-        actionClass.setRequestAttributes(renderRequest);
-        actionClass.setHomeURL(renderRequest);
 
         include(viewJSP, renderRequest, renderResponse);
         viewJSP = null;

@@ -1534,12 +1534,14 @@ public class Actions {
         String currentRole = (String) session.getAttribute("currentRole");
 
         request.setAttribute("currentRole", currentRole);
-        if (currentRole.equals(ROLE_ADMINISTRATOR)) {
-            homeAction = "displayAdminHomeView";
-        } else if (currentRole.equals(ROLE_REVIEWER)) {
-            homeAction = "displayReviewerHomeView";
-        } else if (currentRole.equals(ROLE_SUPERVISOR)) {
-            homeAction = "displaySupervisorHomeView";
+        if (currentRole != null) {
+            if (currentRole.equals(ROLE_ADMINISTRATOR)) {
+                homeAction = "displayAdminHomeView";
+            } else if (currentRole.equals(ROLE_REVIEWER)) {
+                homeAction = "displayReviewerHomeView";
+            } else if (currentRole.equals(ROLE_SUPERVISOR)) {
+                homeAction = "displaySupervisorHomeView";
+            }
         }
         request.setAttribute("homeAction", homeAction);
     }
