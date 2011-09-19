@@ -1,5 +1,6 @@
 package edu.osu.cws.pass.hibernate;
 
+import edu.osu.cws.pass.models.BusinessCenter;
 import edu.osu.cws.pass.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -13,8 +14,8 @@ public class BusinessCenterMgr {
      *
      * @return
      */
-    public List list() throws Exception {
-        List result;
+    public List<BusinessCenter> list() throws Exception {
+        List<BusinessCenter> result;
         Session hsession = HibernateUtil.getCurrentSession();
         try {
             Transaction tx = hsession.beginTransaction();

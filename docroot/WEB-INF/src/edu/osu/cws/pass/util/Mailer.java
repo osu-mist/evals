@@ -247,7 +247,7 @@ public class Mailer {
         String supervisorName = supervisor.getConventionName();
         String emailAddress = supervisor.getEmail();
         //@todo: take this out after testing:
-        emailAddress = "joan.lu@oregonstate.edu";
+        //emailAddress = "joan.lu@oregonstate.edu";
 
         String bodyWrapper = emailBundle.getString("email_body");
 
