@@ -141,6 +141,7 @@
 /* Roles - pass menu */
 #pass-top-menu li.pass-roles em {
     display: inline-block;
+    float: left;
     color: #686868;
     font-weight: bold;
     margin: 8px 3px;
@@ -149,7 +150,8 @@
 #pass-top-menu select {
   min-width: 90px;
   float: right;
-  margin: 2px 4px;
+  margin: 4px 4px;
+  padding: 1px;
 }
 
 .ie7 #pass-top-menu select {
