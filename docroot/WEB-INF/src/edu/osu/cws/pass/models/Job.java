@@ -449,7 +449,8 @@ public class Job extends Pass implements Serializable {
 
     public String getSignature()
     {
-        return "employee " + getEmployee().getName() + ", position " + getPositionClass();
+        return "employee " + getEmployee().getId() + ", " +getEmployee().getName()
+                 + ", position " + getPositionClass();
     }
 }
 

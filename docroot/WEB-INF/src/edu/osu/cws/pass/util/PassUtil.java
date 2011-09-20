@@ -11,6 +11,7 @@ package edu.osu.cws.pass.util;
 import edu.osu.cws.pass.hibernate.EmailMgr;
 import edu.osu.cws.util.CWSUtil;
 
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -21,6 +22,9 @@ import edu.osu.cws.pass.hibernate.JobMgr;
 import edu.osu.cws.pass.hibernate.AppraisalMgr;
 
 public class PassUtil {
+    private static final String ROOT_DIR = "WEB-INF/src/";
+    private static final String ECS_DEV_CONFIG = ROOT_DIR + "backend_ecs.dev.prop";
+    private static final String ECS_PROD_CONFIG = ROOT_DIR + "backend_ecs.prod.prop";
     /**
      *
      * @param appraisal
@@ -106,4 +110,52 @@ public class PassUtil {
         return MessageFormat.format("{0,date,MM/dd/yy}",new Object[]{date});
     }
 
+
+    /**
+     * This method assumes the existence of the following files:
+     *  WEB-INF/src/backend_ecs_dev.properties
+     *  WEB-INF/src/backend_ecs_prod.properties
+     *  WEB-INF/src/ecs_dev.properties
+     *  WEB-INF/src/ecs_prod.properties
+     * @param env:  Only valid values are: "web" from the web environment, "backend" from backend cron.
+     * @return: name of the configuration file specific to the hosting environment.
+     * If a properties file matches the hostname exists, it returns that.
+     * Else, it figures out if it's the ECS's development or production environment, and returns the appropriate filename.
+     * Else, it returns null.
+     */
+    public static String getSpecificConfigFile(String env)
+    {
+        if (!env.equals("web") && !env.equals("backend")) //invalid
+           return null;
+
+        String hostname = CWSUtil.getLocalHostname();
+        //System.out.println("hostname is " + hostname);
+
+        String filenameHead = ROOT_DIR;
+
+        if (env.equals("backend"))
+            filenameHead = filenameHead + "backend_";
+
+        String specificPropFile = filenameHead + hostname + ".properties";
+        //System.out.println("specificProfFile is " + specificPropFile);
+        File specificFile = new File(specificPropFile);
+        if (specificFile.exists())
+           return specificPropFile;
+
+        //If we get here, the specific config file based on hostname does not exist.
+        //Check for the ECS environment
+        specificPropFile = null;
+        if (hostname.indexOf("ucsadm") > 0) //ECS environment
+        {
+           if (hostname.indexOf("dev.") > 0) //ECS dev env
+              specificPropFile = filenameHead + "ecs_dev"  +  ".properties";
+            else  //production enviornment
+              specificPropFile = filenameHead + "ecs_prod"  +  ".properties";
+        }
+
+        specificFile = new File(specificPropFile);
+        if (specificFile.exists())
+           return specificPropFile;
+        return null;
+    }
 }
