@@ -12,7 +12,6 @@ import edu.osu.cws.pass.util.Mailer;
 import edu.osu.cws.pass.util.PassPDF;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.CompositeConfiguration;
 
 import javax.portlet.*;
 import java.io.OutputStream;
@@ -292,7 +291,6 @@ public class Actions {
         setupActiveAppraisals(request, employeeId);
         helpLinks(request);
         requestMap.put("isHome", true);
-        setupDemoSwitch(request, employee);
 
         setRequiredActions(request);
         useNormalMenu(request);
@@ -330,20 +328,6 @@ public class Actions {
         }
     }
 
-    /**
-     * Set up the attributes needed for the user switch used by the demo.
-     *
-     * @param request
-     * @param employee
-     */
-    private void setupDemoSwitch(PortletRequest request, Employee employee) {
-        // set Employee  and employees object(s) - used by demo
-        // @todo: remove after demo
-        requestMap.put("employees", employeeMgr.list());
-        requestMap.put("employee", employee);
-        // end of remove section for demo
-    }
-
     public String displayAdminHomeView(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!isLoggedInUserAdmin(request)) {
@@ -358,7 +342,6 @@ public class Actions {
         useNormalMenu(request);
         helpLinks(request);
         requestMap.put("isAdminHome", true);
-        setupDemoSwitch(request, employee);
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
         requestMap.put("alertMsg", config.getBoolean("alert.display"));
         session.setAttribute("currentRole", ROLE_ADMINISTRATOR);
@@ -389,8 +372,6 @@ public class Actions {
         requestMap.put("alertMsg", config.getBoolean("alert.display"));
         session.setAttribute("currentRole", ROLE_REVIEWER);
 
-        setupDemoSwitch(request, employee);
-
         return "reviewer-home-jsp";
     }
 
@@ -409,7 +390,6 @@ public class Actions {
         useNormalMenu(request);
         helpLinks(request);
         requestMap.put("isSupervisorHome", true);
-        setupDemoSwitch(request, employee);
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
         requestMap.put("alertMsg", config.getBoolean("alert.display"));
         session.setAttribute("currentRole", ROLE_SUPERVISOR);
@@ -523,57 +503,6 @@ public class Actions {
     public void setPassConfiguration() throws Exception {
         portletContext.setAttribute("configurations", configurationMgr.mapByName());
         portletContext.setAttribute("configurationsList", configurationMgr.list());
-    }
-
-    /*
-     * Handles switching the logged in user for demo purposes. This can be
-     * deleted after the demo. It updates the loggedOnUser attribute in the
-     * portletSession which is used by all the actions methods.
-     *
-     * @param request
-     * @param response
-     * @param portlet
-     * @return
-     */
-    public String demoSwitchUser(PortletRequest request, PortletResponse response) throws Exception {
-        PortletSession session = request.getPortletSession(true);
-        int employeeID = Integer.parseInt(ParamUtil.getString(request, "employee.id"));
-        Employee employee = new Employee();
-        try {
-            employee = employeeMgr.findById(employeeID, "employee-with-jobs");
-        } catch (Exception e) {
-            _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
-        }
-        session.setAttribute("loggedOnUser", employee);
-        setUpUserPermissionInSession(request, true);
-
-        return displayHomeView(request, response);
-    }
-
-    /**
-     * Handles the user clicking on a link to reset the status of the open appraisal to set the status
-     * to goals-due or results-due.
-     *
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
-     */
-    public String demoResetAppraisal(PortletRequest request, PortletResponse response) throws Exception {
-        int id = ParamUtil.getInteger(request, "id");
-        String status = ParamUtil.getString(request, "status");
-
-        if (id == 0 || status == null || status.equals("")) {
-            addErrorsToRequest(request, "Could not reset the appraisal. Invalid ID or Status.");
-        }
-
-        try {
-            appraisalMgr.updateAppraisalStatus(id, status);
-        } catch (Exception e) {
-            _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
-        }
-
-        return displayAppraisal(request, response);
     }
 
     /**
@@ -1270,15 +1199,7 @@ public class Actions {
      * @return username
      */
     private String getLoggedOnUsername(PortletRequest request) {
-        // Demo Settings to always get the loggeed on username to a valid user
-        CompositeConfiguration config = (CompositeConfiguration)
-                portletContext.getAttribute("environmentProp");
 
-        String loggedOnUser = config.getString("logged-on-user");
-        if (loggedOnUser != null && !loggedOnUser.equals("")) {
-            return loggedOnUser;
-        }
-        // end demo settings
 
         Map userInfo = getLoggedOnUserMap(request);
 

@@ -18,7 +18,6 @@ import edu.osu.cws.pass.hibernate.EmailMgr;
 import edu.osu.cws.pass.hibernate.JobMgr;
 import edu.osu.cws.pass.hibernate.ReviewerMgr;
 import edu.osu.cws.pass.models.*;
-import edu.osu.cws.pass.tests.JobsTest;
 import edu.osu.cws.util.*;
 import java.text.MessageFormat;
 
