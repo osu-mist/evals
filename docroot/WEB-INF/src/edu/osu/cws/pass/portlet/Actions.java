@@ -1200,10 +1200,24 @@ public class Actions {
      */
     private String getLoggedOnUsername(PortletRequest request) {
 
+        PortletSession session = request.getPortletSession(true);
+        String usernameSessionKey = "onidUsername";
+        String onidUsername = (String) session.getAttribute(usernameSessionKey);
+        _log.error("in getLoggedOnUsername, the value from session is = " + onidUsername);
+        if (onidUsername == null || onidUsername.equals("")) {
+            Map userInfo = getLoggedOnUserMap(request);
 
-        Map userInfo = getLoggedOnUserMap(request);
+            String screenName = "";
+            if (userInfo != null) {
+                screenName = (String) userInfo.get("user.name.nickName");
+            }
+            _log.error("in getLoggedOnUsername and screenName = " + screenName);
+            onidUsername = EmployeeMgr.getOnidUsername(screenName);
+            _log.error("onidUsername = " + onidUsername);
+            session.setAttribute(usernameSessionKey, onidUsername);
+        }
 
-        return (userInfo == null) ? "" : (String) userInfo.get("user.login.id");
+        return onidUsername;
     }
 
     /**

@@ -108,4 +108,8 @@
         <description>User Login Id</description>
         <name>user.login.id</name>
     </user-attribute>
+    <user-attribute>
+        <description>User Nickname</description>
+        <name>user.name.nickName</name>
+    </user-attribute>
 </portlet-app>
