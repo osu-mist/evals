@@ -6,7 +6,7 @@
           </c:if>
         ><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
                         <portlet:param name="action" value="${homeAction}"/>
-                        </portlet:renderURL>"><liferay-ui:message key="home"/></a></li>
+                        </portlet:renderURL>"><liferay-ui:message key="evals-home"/></a></li>
         <li><a href="#"><liferay-ui:message key="settings"/></a>
             <ul>
                 <li><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
