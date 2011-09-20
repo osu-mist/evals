@@ -23,8 +23,8 @@ import edu.osu.cws.pass.hibernate.AppraisalMgr;
 
 public class PassUtil {
     private static final String ROOT_DIR = "WEB-INF/src/";
-    private static final String ECS_DEV_CONFIG = ROOT_DIR + "backend_ecs.dev.prop";
-    private static final String ECS_PROD_CONFIG = ROOT_DIR + "backend_ecs.prod.prop";
+    //private static final String ECS_DEV_CONFIG = ROOT_DIR + "backend_ecs.dev.prop";
+    //private static final String ECS_PROD_CONFIG = ROOT_DIR + "backend_ecs.prod.prop";
     /**
      *
      * @param appraisal
@@ -118,12 +118,13 @@ public class PassUtil {
      *  WEB-INF/src/ecs_dev.properties
      *  WEB-INF/src/ecs_prod.properties
      * @param env:  Only valid values are: "web" from the web environment, "backend" from backend cron.
+     * @cwd: current working directory
      * @return: name of the configuration file specific to the hosting environment.
      * If a properties file matches the hostname exists, it returns that.
      * Else, it figures out if it's the ECS's development or production environment, and returns the appropriate filename.
      * Else, it returns null.
      */
-    public static String getSpecificConfigFile(String env)
+    public static String getSpecificConfigFile(String env, String cwd)
     {
         if (!env.equals("web") && !env.equals("backend")) //invalid
            return null;
@@ -131,7 +132,7 @@ public class PassUtil {
         String hostname = CWSUtil.getLocalHostname();
         //System.out.println("hostname is " + hostname);
 
-        String filenameHead = ROOT_DIR;
+        String filenameHead = cwd + ROOT_DIR;
 
         if (env.equals("backend"))
             filenameHead = filenameHead + "backend_";

@@ -1238,7 +1238,7 @@ public class AppraisalMgr {
             String query = "select count(*) from edu.osu.cws.pass.models.Appraisal appraisal " +
                     "where appraisal.job.employee.id = :pidm and appraisal.job.positionNumber = :positionNumber " +
                     "and appraisal.job.suffix = :suffix and appraisal.type = :type " +
-                    "and (appraisal.status != 'closed' or  appraisal.status != 'completed' or " +
+                    "and (appraisal.status != 'closed' AND  appraisal.status != 'completed' AND " +
                     "appraisal.status != 'archived')";
 
             Iterator resultMapIter = session.createQuery(query)

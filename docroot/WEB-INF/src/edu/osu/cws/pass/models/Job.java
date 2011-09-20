@@ -390,6 +390,14 @@ public class Job extends Pass implements Serializable {
         return cal;
     }
 
+    public Date getAnnualStartDateBasedOnJobBeginDate(int year)
+    {
+        Calendar mycal = Calendar.getInstance();
+        mycal.setTime(beginDate);
+        mycal.set(Calendar.YEAR, year);
+        return (CWSUtil.getFirstDayOfMonth(mycal.getTime()));
+    }
+
     /**
      *
      * @return a Date object representing the start date of the initial annual appraisal period
