@@ -1,0 +1,226 @@
+.pass-hide {
+    display: none;
+}
+
+/* Home View */
+.accordion-content .pass-menu-list {
+    margin-top: 0em;
+    padding-top: 1em;
+}
+
+.pass-menu-list a {
+    display: block;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    -moz-border-radius-topright: 8px;
+    -moz-border-radius-bottomright: 8px;
+    border: 1px dotted transparent;
+    border-left: none;
+}
+
+.pass-menu-list a:hover {
+    background-color: #f7f7f7;
+    border-color: #f2f2f2;
+}
+
+.pass-notification h3 {
+    color: #3B3737;
+    font-size: 12px;
+    border-bottom: 2px solid;
+    margin: 0 1em 0 0.5em;
+    padding: 0.3em 0 0 0.5em;
+}
+.pass-notification p {
+    margin:0.5em 1em;
+}
+
+.appraisal-criteria .instructions {
+    font-weight: bold;
+    font-size: 110%;
+}
+
+.appraisal-criteria .pass-form-text {
+    color: #555;
+}
+
+/* Top Menu */
+#pass-top-menu {
+    padding-bottom: 27px;
+    position: relative;
+    z-index: 1;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+#pass-top-menu.action-menu-wrapper ul {
+    background: #FFF;
+    border-bottom: 1px solid #ccc;
+}
+
+#pass-top-menu .portlet-action-menu ul {
+  	-moz-box-shadow: 0 0 3px #666;
+  	-webkit-box-shadow:  0 0 3px #666;
+  	box-shadow: 0 1px 3px #666;
+}
+
+#pass-top-menu .portlet-action-menu {
+  height: 28px;
+}
+
+.osu-cws .portlet-action-menu li:hover ul,
+.osu-cws .portlet-action-menu li.sfHover ul {
+	  left: 0;
+	  top: 28px;
+}
+
+#pass-top-menu .portlet-action-menu li:hover, 
+#pass-top-menu .portlet-action-menu li.sfHover,
+#pass-top-menu .portlet-action-menu a:focus, 
+#pass-top-menu .portlet-action-menu a:hover,
+#pass-top-menu .portlet-action-menu a:active {
+    background: none repeat scroll 0 0 #FFF;
+    text-decoration: none;
+}
+
+.ie7 #pass-top-menu.action-menu-wrapper ul.portlet-action-menu,
+.ie7 #pass-top-menu.action-menu-wrapper {
+  min-width: 261px;
+}
+
+#pass-top-menu ul.portlet-action-menu ul {
+    width: 14.8em;
+    overflow: hidden;
+}
+
+#pass-top-menu .portlet-action-menu li {
+    background: #fff;
+    float: left;
+    border-right: 1px solid #CCC;
+}
+
+#pass-top-menu .portlet-action-menu li li {
+    float: none;
+    width: auto;
+}
+
+#pass-top-menu .portlet-action-menu li li+li {
+    border-top: 1px solid #ccc;
+    border-right: 0;
+}
+
+#pass-top-menu  .portlet-action-menu a:hover,
+#pass-top-menu  .portlet-action-menu a.active {
+    border-bottom: 3px solid #d85a1a;
+}
+
+#pass-top-menu .portlet-action-menu li.pass-roles {
+    float: right;
+    border: 0;
+}
+
+.ie #pass-top-menu ul.portlet-action-menu ul {
+    border: 1px solid #ccc;
+}
+
+#pass-top-menu .portlet-action-menu a {
+  white-space: normal; /* overwrites, so long names can break to next line down */
+}
+  
+#pass-top-menu ul.portlet-action-menu li a {
+    color: #686868;
+    padding: 8px 6px 4px;
+    font-size: 13px;
+    display: block;
+    border-bottom: 3px solid transparent;
+}
+
+#pass-top-menu ul.portlet-action-menu li li a { 
+    font-size: 12px;
+} 
+
+/* Roles - pass menu */
+#pass-top-menu li.pass-roles em {
+    display: inline-block;
+    float: left;
+    color: #686868;
+    font-weight: bold;
+    margin: 8px 3px;
+}
+
+#pass-top-menu select {
+  min-width: 90px;
+  float: right;
+  margin: 4px 4px;
+  padding: 1px;
+}
+
+.ie7 #pass-top-menu select {
+  position: absolute;
+  right: 0;
+  top: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+.ie7 #pass-top-menu li.pass-roles em {
+  margin-right: 99px;
+  float: right;
+}
+
+.role-description {
+    background: #686868;
+    color: #fff;
+    font-size: 11px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    padding: 1px 5px;
+    border: 1px solid #ccc;
+}
+
+.role-description em {
+    border-bottom: 1px dotted #fff;
+    font-weight: bold;
+}
+
+.ie .appraisal.accordion-menu {
+    overflow: hidden; /* Fixes an IE8 */
+}
+
+.ie7 #pass-appraisal-form .osu-accordion-header img {
+    display: none;
+}
+
+.ie7 #column-3,
+.ie7 #layout-column_column-3,
+.ie7 #column-3 .portlet,
+.ie7 #layout-column_column-3 .portlet-content-bottom {
+  min-width: 300px;
+}
+
+/* Appraisal Search */
+.accordion-content.pass-search form {
+    padding: 0.5em 0 0.5em 1em;
+    color: #000;
+}
+.accordion-content.pass-search label,
+.accordion-content.pass-search input {
+    margin-right: 1em;
+}
+
+.osu-cws .accordion-content.pass-search input[type="text"] {
+    min-width: 0;
+}
+
+/** JQuery UI Sortable */
+tr.ui-sortable-helper {
+    display: table;
+    background-color: #FFF;
+    border: 1px solid black;
+}
+tr.ui-state-highlight {
+    height: 2.25em;
+    line-height: 2.25em;
+}
+.pass-sortable-icon {
+    display: none;
+}

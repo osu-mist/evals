@@ -2,7 +2,7 @@
 
 <portlet-app xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd" version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd">
 	<portlet>
-		<portlet-name>pass</portlet-name>
+		<portlet-name>evals</portlet-name>
 		<display-name>EvalS</display-name>
 		<portlet-class>edu.osu.cws.pass.portlet.PASSPortlet</portlet-class>
         <init-param>
@@ -75,9 +75,9 @@
 		</supports>
         <resource-bundle>edu.osu.cws.pass.portlet.Language</resource-bundle>
 		<portlet-info>
-			<title>PASS</title>
-			<short-title>pass</short-title>
-			<keywords>pass, Performance, Appraisal, HR</keywords>
+			<title>EvalS</title>
+			<short-title>evals</short-title>
+			<keywords>evals, Performance, Appraisal, HR</keywords>
 		</portlet-info>
 		<security-role-ref>
 			<role-name>administrator</role-name>

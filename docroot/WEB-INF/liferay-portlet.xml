@@ -3,10 +3,10 @@
 
 <liferay-portlet-app>
 	<portlet>
-		<portlet-name>pass</portlet-name>
+		<portlet-name>evals</portlet-name>
 		<icon>/icon.png</icon>
 		<instanceable>true</instanceable>
-		<header-portlet-css>/css/pass.css</header-portlet-css>
+		<header-portlet-css>/css/evals.css</header-portlet-css>
 		<footer-portlet-javascript>/js/test.js</footer-portlet-javascript>
 		<footer-portlet-javascript>/js/jquery.autogrow-textarea.js</footer-portlet-javascript>
 	</portlet>

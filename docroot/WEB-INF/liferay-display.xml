@@ -3,6 +3,6 @@
 
 <display>
 	<category name="HR">
-		<portlet id="pass" />
+		<portlet id="evals" />
 	</category>
 </display>
