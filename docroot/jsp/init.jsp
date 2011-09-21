@@ -20,10 +20,6 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.HashMap" %>
 
-<style>
-<%@ include file="/css/pass.css"%>
-</style>
-
 <%@ page isELIgnored ="false" %>
 
 <portlet:defineObjects />
