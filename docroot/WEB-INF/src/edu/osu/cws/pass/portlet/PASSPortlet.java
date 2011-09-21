@@ -316,17 +316,14 @@ public class PASSPortlet extends GenericPortlet {
         } else {
             infoMsg = propertyFile + " - not found";
         }
-        _log.error(infoMsg);
         message += infoMsg + "\n";
 
         config.addConfiguration(new PropertiesConfiguration(defaultProperties));
         infoMsg = defaultProperties + " - loaded";
-        _log.error(infoMsg);
         message += infoMsg + "\n";
 
         // Set the Hibernate config file and store properties in portletContext
         infoMsg = "using hibernate cfg file - " + config.getString("hibernate-cfg-file");
-        _log.error(infoMsg);
         message += infoMsg + "\n";
         HibernateUtil.setConfig(config.getString("hibernate-cfg-file"));
         getPortletContext().setAttribute("environmentProp", config);
@@ -345,6 +342,7 @@ public class PASSPortlet extends GenericPortlet {
         try {
             getLog().log(level, shortMessage, e);
         } catch (Exception exception) {
+            _log.error(CWSUtil.stackTraceString(e));
             _log.error(CWSUtil.stackTraceString(exception));
         }
         if (getInitParam) {
@@ -377,7 +375,6 @@ public class PASSPortlet extends GenericPortlet {
             }
 		}
 		else {
-            _log.error("Got the dispacther, path = " + path);
 			portletRequestDispatcher.include(renderRequest, renderResponse);
 		}
 	}

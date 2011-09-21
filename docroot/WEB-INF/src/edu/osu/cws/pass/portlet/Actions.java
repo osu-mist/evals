@@ -1203,7 +1203,6 @@ public class Actions {
         PortletSession session = request.getPortletSession(true);
         String usernameSessionKey = "onidUsername";
         String onidUsername = (String) session.getAttribute(usernameSessionKey);
-        _log.error("in getLoggedOnUsername, the value from session is = " + onidUsername);
         if (onidUsername == null || onidUsername.equals("")) {
             Map userInfo = getLoggedOnUserMap(request);
 
@@ -1211,9 +1210,7 @@ public class Actions {
             if (userInfo != null) {
                 screenName = (String) userInfo.get("user.name.nickName");
             }
-            _log.error("in getLoggedOnUsername and screenName = " + screenName);
             onidUsername = EmployeeMgr.getOnidUsername(screenName);
-            _log.error("onidUsername = " + onidUsername);
             session.setAttribute(usernameSessionKey, onidUsername);
         }
 
