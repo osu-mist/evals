@@ -17,6 +17,7 @@ import javax.portlet.*;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Actions class used to map user form actions to respective class methods.
@@ -1210,10 +1211,15 @@ public class Actions {
             if (userInfo != null) {
                 screenName = (String) userInfo.get("user.name.nickName");
             }
-            onidUsername = EmployeeMgr.getOnidUsername(screenName);
+            // If the screenName is numeric it means that we are using the Oracle db and
+            // we need to query banner to fetch the onid username
+            if (Pattern.matches("[0-9]+", screenName)) {
+                onidUsername = EmployeeMgr.getOnidUsername(screenName);
+            } else {
+                onidUsername = screenName;
+            }
             session.setAttribute(usernameSessionKey, onidUsername);
         }
-
         return onidUsername;
     }
 
