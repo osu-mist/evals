@@ -4,7 +4,7 @@
             <c:choose>
                 <c:when test="${permissionRule.evaluation == 'e'}">
                     <label for="<portlet:namespace />appraisal.evaluation">
-                    <liferay-ui:message key="appraisal-evaluation" />
+                        <liferay-ui:message key="appraisal-evaluation" />
                     </label>
                     <liferay-ui:input-textarea param="appraisal.evaluation"
                         defaultValue="${appraisal.evaluation}" /><br />
@@ -19,6 +19,9 @@
 
         <fieldset>
             <legend><liferay-ui:message key="appraisal-select-rating"/></legend>
+            <label for="<portlet:namespace />appraisal.rating">
+                <liferay-ui:message key="appraisal-rating-label" />
+            </label>
             <ol>
               <li>
                 <input type="radio" name="<portlet:namespace />appraisal.rating" value="1"

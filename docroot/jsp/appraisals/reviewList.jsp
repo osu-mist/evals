@@ -12,20 +12,17 @@
     </li>
 </ul>
 
-
-
-    <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-        <portlet:param name="action" value="searchAppraisals"/>
-        </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" class="search" method="post">
-        <fieldset id="pass-user-add">
-            <legend><liferay-ui:message key="search"/></legend>
-            <label for="<portlet:namespace/>osuid"><liferay-ui:message key="osuid"/></label>
-            <input type="text" id="<portlet:namespace/>osuid" class="narrow" name="<portlet:namespace/>osuid" />
-            <input type="submit" value="<liferay-ui:message key="search" />" />
-            <input type="submit" class="cancel" value="<liferay-ui:message key="cancel" />" id="<portlet:namespace/>cancel" />
-        </fieldset>    
-    </form>
-
+<form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+    <portlet:param name="action" value="searchAppraisals"/>
+    </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" class="search" method="post">
+    <fieldset id="pass-user-add">
+        <legend><liferay-ui:message key="search"/></legend>
+        <label for="<portlet:namespace/>osuid"><liferay-ui:message key="osuid"/></label>
+        <input type="text" id="<portlet:namespace/>osuid" class="narrow" name="<portlet:namespace/>osuid" />
+        <input type="submit" value="<liferay-ui:message key="search" />" />
+        <input type="submit" class="cancel" value="<liferay-ui:message key="cancel" />" id="<portlet:namespace/>cancel" />
+    </fieldset>    
+</form>
 
 <c:if test="${!empty appraisals}">
     <table class="taglib-search-iterator">

@@ -83,6 +83,9 @@
                 <legend><liferay-ui:message key="appraisal-employee-legend" /></legend>
                 <fieldset>
                     <legend><liferay-ui:message key="appraisal-employee-signature" /></legend>
+                    <label for="<portlet:namespace />acknowledge-read-appraisal">
+                        <liferay-ui:message key="appraisal-employee-signature-label" />
+                    </label>
                     <input type="checkbox"  name="<portlet:namespace />acknowledge-read-appraisal"
                         id="<portlet:namespace />acknowledge-read-appraisal"
                         <c:if test="${appraisal.status != 'signatureDue' && appraisal.status != 'signatureOverdue'}">
