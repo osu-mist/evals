@@ -1,3 +1,4 @@
+<h2 class="secret"><liferay-ui:message key="evals-title"/></h2>
 <div id="pass-top-menu" class="action-menu-wrapper">
     <ul class="portlet-action-menu">
         <li
