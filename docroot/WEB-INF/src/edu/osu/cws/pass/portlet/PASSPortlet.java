@@ -304,13 +304,12 @@ public class PASSPortlet extends GenericPortlet {
     private String loadEnvironmentProperties(PortletRequest request) throws Exception {
         String message = "";
         String infoMsg = "";
-        String propertyFile = request.getServerName() +".properties";
         CompositeConfiguration config = new CompositeConfiguration();
+        String portletRoot = getPortletContext().getRealPath("/");
+        String propertyFile = PassUtil.getSpecificConfigFile("web", portletRoot);
 
         // First load hostname.properties. Then try to load default.properties
-        boolean hasHostPropertyFile = getPortletContext().getResourceAsStream("/WEB-INF/src/" + propertyFile) != null;
-        getPortletContext().getResourceAsStream("/WEB-INF/src/" + propertyFile).close();
-        if (hasHostPropertyFile) {
+        if (propertyFile != null) {
             PropertiesConfiguration propConfig =  new PropertiesConfiguration(propertyFile);
             config.addConfiguration(propConfig);
             infoMsg = propertyFile + " - loaded";
