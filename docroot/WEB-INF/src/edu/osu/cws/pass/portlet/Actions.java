@@ -1200,7 +1200,6 @@ public class Actions {
      * @return username
      */
     private String getLoggedOnUsername(PortletRequest request) {
-
         PortletSession session = request.getPortletSession(true);
         String usernameSessionKey = "onidUsername";
         String onidUsername = (String) session.getAttribute(usernameSessionKey);
@@ -1214,7 +1213,9 @@ public class Actions {
             // If the screenName is numeric it means that we are using the Oracle db and
             // we need to query banner to fetch the onid username
             if (Pattern.matches("[0-9]+", screenName)) {
-                onidUsername = EmployeeMgr.getOnidUsername(screenName);
+                CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
+                String bannerHostname = config.getString("banner.hostname");
+                onidUsername = EmployeeMgr.getOnidUsername(screenName, bannerHostname);
             } else {
                 onidUsername = screenName;
             }
