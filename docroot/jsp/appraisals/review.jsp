@@ -1,4 +1,5 @@
 <fieldset class="pass-review">
+     <h3 class="secret"><liferay-ui:message key="appraisal-hr-review"/></h3>
     <legend><liferay-ui:message key="appraisal-hr-review"/></legend>
     <c:choose>
         <c:when test="${permissionRule.review == 'e'}">

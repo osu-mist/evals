@@ -1,5 +1,6 @@
 <div class="pass-evaluation">
     <fieldset>
+        <h3 class="secret"><liferay-ui:message key="appraisal-summary"/></h3>
         <legend><liferay-ui:message key="appraisal-summary"/></legend>
             <c:choose>
                 <c:when test="${permissionRule.evaluation == 'e'}">
@@ -18,6 +19,7 @@
             </c:choose>
 
         <fieldset>
+            <h3 class="secret"><liferay-ui:message key="appraisal-select-rating"/></h3>
             <legend><liferay-ui:message key="appraisal-select-rating"/></legend>
             <label for="<portlet:namespace />appraisal.rating">
                 <liferay-ui:message key="appraisal-rating-label" />

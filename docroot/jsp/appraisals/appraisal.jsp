@@ -54,6 +54,7 @@
     <c:choose>
         <c:when test="${permissionRule.goalComments == 'e'}">
             <fieldset>
+                <h3 class="secret"><liferay-ui:message key="appraisal-goals-legend" /></h3>
                 <legend><liferay-ui:message key="appraisal-goals-legend" /></legend>
                 <label for="<portlet:namespace />.appraisal.goalsComments"><liferay-ui:message key="appraisal-goals-comments" /></label>
                 <liferay-ui:input-textarea param="appraisal.goalsComments"
@@ -62,6 +63,7 @@
         </c:when>
         <c:when test="${permissionRule.goalComments == 'v'}">
             <fieldset>
+                <h3 class="secret"><liferay-ui:message key="appraisal-goals-legend" /></h3>
                 <legend><liferay-ui:message key="appraisal-goals-legend" /></legend>
                 <p><strong><liferay-ui:message key="appraisal-goals-comments" /></strong></p>
                 <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getGoalsComments()) %></p>
@@ -80,6 +82,7 @@
     <div class="pass-employee-response">
         <c:if test="${not empty permissionRule.employeeResponse}">
             <fieldset>
+                <h3 class="secret"><liferay-ui:message key="appraisal-employee-legend" /></h3>
                 <legend><liferay-ui:message key="appraisal-employee-legend" /></legend>
                 <fieldset>
                     <legend><liferay-ui:message key="appraisal-employee-signature" /></legend>
@@ -121,6 +124,7 @@
                 </c:when>
                 <c:when test="${permissionRule.employeeResponse == 'v' && not empty appraisal.rebuttal}">
                     <fieldset>
+                        <h4 class="secret"><liferay-ui:message key="appraisal-employee-response" /></h4>
                         <legend><liferay-ui:message key="appraisal-employee-response" /></legend>
                         <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getRebuttal()) %></p>
                     </fieldset>

@@ -2,6 +2,7 @@
 Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 %>
 <fieldset>
+<h3 class="secret"><c:out value="${assessment.criterionDetail.areaID.name}"/></h3>
 <legend><c:out value="${assessment.criterionDetail.areaID.name}"/></legend>
 <p class="instructions"><c:out value="${assessment.criterionDetail.description}" /></p>
 
