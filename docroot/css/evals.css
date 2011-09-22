@@ -211,6 +211,13 @@
     min-width: 0;
 }
 
+/* Table edits */
+.osu-cws .appraisal-info em {
+  font-weight: bold;
+  font-style: normal;
+  margin-left: 10px;
+}
+
 /** JQuery UI Sortable */
 tr.ui-sortable-helper {
     display: table;
