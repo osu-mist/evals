@@ -117,4 +117,8 @@ public class JobsTest {
         assert JobMgr.getJobs(111).size() == 0;
         assert JobMgr.getJobs(12345).size() == 3;
     }
+
+    public void shouldReturnBusinessCenter() throws Exception {
+        assert jobMgr.getBusinessCenter(56198).equals("UABC");
+    }
 }

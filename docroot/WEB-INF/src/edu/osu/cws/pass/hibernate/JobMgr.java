@@ -3,6 +3,7 @@ package edu.osu.cws.pass.hibernate;
 import edu.osu.cws.pass.models.Job;
 import edu.osu.cws.pass.models.ModelException;
 import edu.osu.cws.pass.util.HibernateUtil;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -263,5 +264,38 @@ public class JobMgr {
             throw e;
         }
         return jobs;
+    }
+
+    /**
+     * Returns the business center name of the first job that this pidm holds.
+     *
+     * @param pidm
+     * @return
+     * @throws Exception
+     */
+    public static String getBusinessCenter(int pidm) throws Exception {
+        String businessCenter = null;
+        Session session = HibernateUtil.getCurrentSession();
+
+        try {
+            Transaction tx = session.beginTransaction();
+            String query = "select businessCenterName from edu.osu.cws.pass.models.Job job " +
+                    "where job.employee.id = :pidm and job.status = 'A'";
+
+            Query hibernateQuery = session.createQuery(query)
+                    .setInteger("pidm", pidm)
+                    .setMaxResults(1);
+
+            if (hibernateQuery.iterate().hasNext()) {
+                businessCenter = (String) hibernateQuery.iterate().next();
+            }
+
+            tx.commit();
+
+            return businessCenter;
+        } catch (Exception e) {
+            session.close();
+            throw e;
+        }
     }
 }
