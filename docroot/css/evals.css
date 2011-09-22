@@ -73,6 +73,11 @@
 	  top: 28px;
 }
 
+.osu-cws .portlet-action-menu li.pass-roles:hover ul {
+	  right: 0;
+	  left: auto;
+}
+
 #pass-top-menu .portlet-action-menu li:hover, 
 #pass-top-menu .portlet-action-menu li.sfHover,
 #pass-top-menu .portlet-action-menu a:focus, 
@@ -115,7 +120,8 @@
 
 #pass-top-menu .portlet-action-menu li.pass-roles {
     float: right;
-    border: 0;
+    border-right: 0;
+    border-left: 1px solid #ccc;
 }
 
 .ie #pass-top-menu ul.portlet-action-menu ul {
@@ -136,7 +142,7 @@
 
 #pass-top-menu ul.portlet-action-menu li li a { 
     font-size: 12px;
-} 
+}
 
 /* Roles - pass menu */
 #pass-top-menu li.pass-roles em {
@@ -145,6 +151,7 @@
     color: #686868;
     font-weight: bold;
     margin: 8px 3px;
+    font-style: normal;
 }
 
 #pass-top-menu select {
