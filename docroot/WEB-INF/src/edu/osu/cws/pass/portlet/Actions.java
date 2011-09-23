@@ -10,7 +10,6 @@ import edu.osu.cws.pass.hibernate.*;
 import edu.osu.cws.pass.models.*;
 import edu.osu.cws.pass.util.Mailer;
 import edu.osu.cws.pass.util.PassPDF;
-import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
 
 import javax.portlet.*;
@@ -279,17 +278,20 @@ public class Actions {
         PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
         int employeeId = employee.getId();
+        setupActiveAppraisals(request, employeeId);
 
         boolean isAdmin = isLoggedInUserAdmin(request);
         boolean isReviewer = isLoggedInUserReviewer(request);
-        boolean hasAppraisals = !appraisalMgr.getAllMyActiveAppraisals(employeeId).isEmpty() ||
-                !appraisalMgr.getMyTeamsAppraisals(employeeId, true).isEmpty();
+        ArrayList<Appraisal> myActiveAppraisals = (ArrayList<Appraisal>) requestMap.get("myActiveAppraisals");
+        ArrayList<Appraisal> myTeamsActiveAppraisals  =
+                (ArrayList<Appraisal>) requestMap.get("myTeamsActiveAppraisals");
+        boolean hasAppraisals = (myActiveAppraisals != null && !myActiveAppraisals.isEmpty()) ||
+                (myTeamsActiveAppraisals != null && !myTeamsActiveAppraisals.isEmpty());
 
         if (!isAdmin && !isReviewer && !hasAppraisals) {
             requestMap.put("hasNoPassAccess", true);
         }
 
-        setupActiveAppraisals(request, employeeId);
         helpLinks(request);
         requestMap.put("isHome", true);
 
