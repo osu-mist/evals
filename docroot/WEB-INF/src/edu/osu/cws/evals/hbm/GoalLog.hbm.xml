@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping auto-import="false" >
+
+    <class name="edu.osu.cws.evals.models.GoalLog" table="goals_logs">
+        <id name="id" type="int" column="ID">
+            <generator class="native">
+                <param name="sequence">passmgr.pass_seq</param>
+            </generator>
+        </id>
+
+        <property name="content" type="text" column="CONTENT"/>
+        <property name="createDate" type="timestamp" column="CREATE_DATE"/>
+        <property name="type" length="45" column="TYPE"/>
+
+        <many-to-one name="assessment" class="edu.osu.cws.evals.models.Assessment"
+                     column="ASSESSMENT_ID"
+                     not-null="true"/>
+        <many-to-one name="author" class="edu.osu.cws.evals.models.Employee"
+                     column="AUTHOR_PIDM"
+                     not-null="true"/>
+    </class>
+
+</hibernate-mapping>

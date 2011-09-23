@@ -1,7 +1,7 @@
 <%@ include file="/jsp/init.jsp" %>
 
-<jsp:useBean id="criterionArea" class="edu.osu.cws.pass.models.CriterionArea" scope="request" />
-<jsp:useBean id="criterionDetail" class="edu.osu.cws.pass.models.CriterionDetail" scope="request" />
+<jsp:useBean id="criterionArea" class="edu.osu.cws.evals.models.CriterionArea" scope="request" />
+<jsp:useBean id="criterionDetail" class="edu.osu.cws.evals.models.CriterionDetail" scope="request" />
 <c:set var="action" value="addCriteria" scope="request"/>
 <c:set var="titleKey" value="criteria-add-classified" scope="request"/>
 <c:if test="${criterionArea.id != 0}">

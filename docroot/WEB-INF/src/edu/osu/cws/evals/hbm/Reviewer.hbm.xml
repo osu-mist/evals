@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false" >
+
+    <class name="edu.osu.cws.evals.models.Reviewer" table="reviewers">
+        <id name="id" type="int" column="ID">
+            <generator class="native">
+                <param name="sequence">passmgr.pass_seq</param>
+            </generator>
+        </id>
+
+        <property name="businessCenterName" type="string" length="4" column="BUSINESS_CENTER_NAME"/>
+
+        <many-to-one name="employee" class="edu.osu.cws.evals.models.Employee"
+                     column="EMPLOYEE_PIDM"
+                     not-null="true"/>
+    </class>
+
+</hibernate-mapping>

@@ -1,5 +1,5 @@
 <%@ include file="/jsp/init.jsp" %>
-<jsp:useBean id="reviewer" class="edu.osu.cws.pass.models.Reviewer" scope="request" />
+<jsp:useBean id="reviewer" class="edu.osu.cws.evals.models.Reviewer" scope="request" />
 
 <h2><liferay-ui:message key="reviewer-delete" /></h2>
 

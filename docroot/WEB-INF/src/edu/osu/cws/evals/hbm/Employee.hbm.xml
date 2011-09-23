@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false" >
+
+    <class name="edu.osu.cws.evals.models.Employee" table="PYVPASE" mutable="false" batch-size="10">
+        <id name="id" column="PYVPASE_PIDM" type="int"/>
+
+        <property name="firstName" column="PYVPASE_FIRST_NAME"/>
+        <property name="middleName" column="PYVPASE_MI"/>
+        <property name="lastName" column="PYVPASE_LAST_NAME"/>
+        <property name="osuid" column="PYVPASE_ID"/>
+        <property name="onid" column="PYVPASE_ONID_LOGIN"/>
+        <property name="email" column="PYVPASE_EMAIL"/>
+        <property name="status" length="1" column="PYVPASE_EMPL_STATUS"/>
+
+        <set name="jobs" lazy="true" batch-size="10">
+            <key column="PYVPASJ_PIDM"/>
+            <one-to-many class="edu.osu.cws.evals.models.Job"/>
+        </set>
+
+        <fetch-profile name="employee-with-jobs">
+            <fetch association="jobs" style="select"/>
+        </fetch-profile>
+    </class>
+
+</hibernate-mapping>

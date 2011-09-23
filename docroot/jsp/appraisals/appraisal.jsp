@@ -1,8 +1,8 @@
 <%@ include file="/jsp/init.jsp"%>
 <% Appraisal formAppraisal = (Appraisal) renderRequest.getAttribute("appraisal"); %>
 
-<jsp:useBean id="appraisal" class="edu.osu.cws.pass.models.Appraisal" scope="request" />
-<jsp:useBean id="permissionRule" class="edu.osu.cws.pass.models.PermissionRule" scope="request" />
+<jsp:useBean id="appraisal" class="edu.osu.cws.evals.models.Appraisal" scope="request" />
+<jsp:useBean id="permissionRule" class="edu.osu.cws.evals.models.PermissionRule" scope="request" />
 <portlet:resourceURL var="downloadPDFURL" id="downloadPDF" escapeXml="false">
     <portlet:param name="id" value="${appraisal.id}"/>
 </portlet:resourceURL>

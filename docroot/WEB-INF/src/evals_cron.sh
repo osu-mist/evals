@@ -5,5 +5,5 @@
 export CP_ROOT=/opt/luminis   #change this to your CP_ROOT
 export CLASSPATH
 SCRIPT=$CP_ROOT/products/tomcat/tomcat-admin
-SCRIPT=$SCRIPT/webapps/pass/WEB-INF/src/edu/osu/cws/pass/backend/evals_backend.sh
+SCRIPT=$SCRIPT/webapps/evals/WEB-INF/src/edu/osu/cws/evals/backend/evals_backend.sh
 $SCRIPT

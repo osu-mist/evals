@@ -1,4 +1,4 @@
-<jsp:useBean id="admin" class="edu.osu.cws.pass.models.Admin" scope="request" />
+<jsp:useBean id="admin" class="edu.osu.cws.evals.models.Admin" scope="request" />
 <%
 PortletURL criteriaListURL = renderResponse.createRenderURL();
 criteriaListURL.setWindowState(WindowState.MAXIMIZED);

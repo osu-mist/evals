@@ -12,7 +12,7 @@
 <%@ page import="javax.portlet.PortletURL" %>
 <%@ page import="javax.portlet.WindowState" %>
 
-<%@ page import="edu.osu.cws.pass.models.*" %>
+<%@ page import="edu.osu.cws.evals.models.*" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="edu.osu.cws.util.CWSUtil" %>
 
@@ -47,7 +47,7 @@ if (errorMsg != null && !errorMsg.equals("")) {
     <span class="portlet-msg-error">${errorMsg}</span>
     </c:if>
 
-    <c:if test="${!empty hasNoPassAccess}">
+    <c:if test="${!empty hasNoEvalsAccess}">
     <span class="portlet-msg-error"><liferay-ui:message key="no-pass-access"/></span>
     </c:if>
 

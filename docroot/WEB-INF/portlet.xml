@@ -4,7 +4,7 @@
 	<portlet>
 		<portlet-name>evals</portlet-name>
 		<display-name>EvalS</display-name>
-		<portlet-class>edu.osu.cws.pass.portlet.PASSPortlet</portlet-class>
+		<portlet-class>edu.osu.cws.evals.portlet.EvalsPortlet</portlet-class>
         <init-param>
             <name>home-jsp</name>
             <value>/jsp/home/start.jsp</value>
@@ -73,7 +73,7 @@
 		<supports>
 			<mime-type>text/html</mime-type>
 		</supports>
-        <resource-bundle>edu.osu.cws.pass.portlet.Language</resource-bundle>
+        <resource-bundle>edu.osu.cws.evals.portlet.Language</resource-bundle>
 		<portlet-info>
 			<title>EvalS</title>
 			<short-title>evals</short-title>

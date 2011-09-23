@@ -1,5 +1,5 @@
 <%@ include file="/jsp/init.jsp" %>
-<jsp:useBean id="criterion" class="edu.osu.cws.pass.models.CriterionArea" scope="request" />
+<jsp:useBean id="criterion" class="edu.osu.cws.evals.models.CriterionArea" scope="request" />
 
 <h2><liferay-ui:message key="criteria-delete" /></h2>
 
