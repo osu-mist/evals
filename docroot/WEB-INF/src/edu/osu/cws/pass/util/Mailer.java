@@ -238,9 +238,18 @@ public class Mailer {
     public void sendSupervisorMail(Employee supervisor,String middleBody,
                                    List<Email> emailList) throws Exception {
 
-        List<Job> jobs = JobMgr.getJobs(supervisor.getId());
-        Job job = jobs.get(0);
-        String bcKey = "businesscenter_" + job.getBusinessCenterName() + "_descriptor";
+        String bcName = JobMgr.getBusinessCenter(supervisor.getId());
+        //System.out.println("bcname = " +bcName);
+        if (bcName == null) //supervisor has no job, Error
+        {
+            String shortMsg = "From sendSupervisorMail: supervisor has no job";
+            String longMsg = "Supervisor " + supervisor.getName() + ", " +
+                    supervisor.getId() + ", has no job.";
+            logger.log(Logger.ERROR, shortMsg, longMsg);
+            return;
+        }
+
+        String bcKey = "businesscenter_" + bcName + "_descriptor";
         String bcDescritor = emailBundle.getString(bcKey);
 
         String supervisorName = supervisor.getConventionName();
