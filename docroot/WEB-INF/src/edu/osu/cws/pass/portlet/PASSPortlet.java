@@ -43,7 +43,7 @@ public class PASSPortlet extends GenericPortlet {
      * String used to store the view jsp used by the
      * doView method.
      */
-	protected String viewJSP;
+	protected String viewJSP = null;
 
     /**
      * Name of default properties file that is loaded the first time the
