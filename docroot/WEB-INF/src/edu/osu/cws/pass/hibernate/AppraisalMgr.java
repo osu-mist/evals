@@ -208,6 +208,7 @@ public class AppraisalMgr {
                     newAssessment.setCreateDate(new Date());
                     newAssessment.setEmployeeResult(origAssesment.getEmployeeResult());
                     newAssessment.setSupervisorResult(origAssesment.getSupervisorResult());
+                    newAssessment.setModifiedDate(new Date());
                     session.save(newAssessment);
                 }
             } catch (Exception e){
