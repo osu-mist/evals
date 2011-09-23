@@ -574,7 +574,12 @@ public class AppraisalMgr {
         String role = getRole(appraisal, loggedInUser.getId());
         permissionKey = appraisal.getStatus()+"-"+ role;
 
-        return (PermissionRule) permissionRules.get(permissionKey);
+        PermissionRule permissionRule = (PermissionRule) permissionRules.get(permissionKey);
+        if (permissionRule != null &&  appraisal.getStartDate().before(fullGoalsDate)) {
+            permissionRule.setGoals(null);
+            permissionRule.setResults(null);
+        }
+        return permissionRule;
     }
 
     /**
