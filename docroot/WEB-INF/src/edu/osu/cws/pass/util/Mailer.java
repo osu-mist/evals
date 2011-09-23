@@ -181,8 +181,8 @@ public class Mailer {
         }
 
         //@todo: For testing purposes. Remove when testing is done.
-        //recipients = new ArrayList();
-        //recipients.add("joan.lu@oregonstate.edu");
+        recipients = new ArrayList();
+        recipients.add("joan.lu@oregonstate.edu");
 
 
         Address[] recipientsArray = new Address[recipients.size()];
@@ -246,7 +246,7 @@ public class Mailer {
         String supervisorName = supervisor.getConventionName();
         String emailAddress = supervisor.getEmail();
         //@todo: take this out after testing:
-        //emailAddress = "joan.lu@oregonstate.edu";
+        emailAddress = "joan.lu@oregonstate.edu";
 
         String bodyWrapper = emailBundle.getString("email_body");
 

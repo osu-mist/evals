@@ -1,27 +1,26 @@
 #!/bin/sh
-#This script is meant to run as a cronjob to update the EvalS database.  It does the following:
-# 1. Creates Appraisal records a certain times before the appraisal period starts.
+# Sept. 20, 2011
+# Joan Lu joan.lu@oregonstate.edu
+# This script is meant to run as a cronjob to update the EvalS database.  It does the following:
+# 1. Creates Appraisal records a certain time before the appraisal period starts.
 # 2. updates appraisal status as time progress and send out emails. For example, change status from "gaals due" to "goals over due"
 # 3. Sends out follow up notification emails.
 # The work is done by the java program.  Errors are logged to CWS's graylogs.
 # This script is called from another script.  The other script
-#   export the CP_ROOT variable,
-#   add execute permissions to this script
+#   export the CP_ROOT and CLASSPATH variables,
 #   execute this script
-#   remove execute permissions from this script.
+
 #   The other script is supposed to be set as a cronjob under the luminis user.
 
 
 JAVA_HOME=$CP_ROOT/products/java
-PORTAL=$CP_ROOT/products/tomcat/tomcat-portal
+PORTAL=$CP_ROOT/products/tomcat/tomcat-admin
 PORTAL_LIB=$PORTAL/common/lib
 PORTAL_LIB_EXT=$PORTAL_LIB/ext
-PORTLET_ROOT=$PORTAL//webapps/pass
+PORTLET_ROOT=$PORTAL/webapps/evals
 WEB_INF=$PORTLET_ROOT/WEB-INF
 LIB_DIR=$WEB_INF/lib
 CLASS_DIR=$WEB_INF/classes
-
-echo $PORTAL_LIB_EXT
 
 CLASSPATH=$CLASSPATH:$CLASS_DIR
 CLASSPATH=$CLASSPATH:$LIB_DIR/c3p0-0.9.1.2.jar
@@ -52,5 +51,5 @@ CLASSPATH=$CLASSPATH:/$PORTAL_LIB_EXT/portal-kernel.jar
 CLASSPATH=$CLASSPATH:/$PORTAL_LIB_EXT/jta.jar
 
 cd $PORTLET_ROOT
-$JAVA_HOME/bin//java -classpath $CLASSPATH edu.osu.cws.pass.backend.BackendMgr
+$JAVA_HOME/bin/java -classpath $CLASSPATH edu.osu.cws.pass.backend.BackendMgr
 

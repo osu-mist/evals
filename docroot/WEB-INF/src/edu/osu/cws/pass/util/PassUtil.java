@@ -118,21 +118,21 @@ public class PassUtil {
      *  WEB-INF/src/ecs_dev.properties
      *  WEB-INF/src/ecs_prod.properties
      * @param env:  Only valid values are: "web" from the web environment, "backend" from backend cron.
-     * @cwd: current working directory
+     * @portletRoot: Root directory of the running portlet
      * @return: name of the configuration file specific to the hosting environment.
      * If a properties file matches the hostname exists, it returns that.
      * Else, it figures out if it's the ECS's development or production environment, and returns the appropriate filename.
      * Else, it returns null.
      */
-    public static String getSpecificConfigFile(String env, String cwd)
+    public static String getSpecificConfigFile(String env, String portletRoot)
     {
         if (!env.equals("web") && !env.equals("backend")) //invalid
            return null;
 
         String hostname = CWSUtil.getLocalHostname();
-        //System.out.println("hostname is " + hostname);
+        System.out.println("hostname is " + hostname);
 
-        String filenameHead = cwd + ROOT_DIR;
+        String filenameHead = portletRoot + ROOT_DIR;
 
         if (env.equals("backend"))
             filenameHead = filenameHead + "backend_";
@@ -154,6 +154,7 @@ public class PassUtil {
               specificPropFile = filenameHead + "ecs_prod"  +  ".properties";
         }
 
+        System.out.println("specificPropFile = " + specificPropFile);
         specificFile = new File(specificPropFile);
         if (specificFile.exists())
            return specificPropFile;

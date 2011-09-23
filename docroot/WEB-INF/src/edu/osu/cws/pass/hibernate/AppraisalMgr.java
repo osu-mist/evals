@@ -13,6 +13,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class AppraisalMgr {
+    //@todo: Need to change this back to 11/01/2011 after testing.
+    private static final String FULL_GOALS_DATE = "06/01/2011";
+    private static Date fullGoalsDate;
     private Employee loggedInUser;
 
     private Appraisal appraisal = new Appraisal();
@@ -34,6 +37,13 @@ public class AppraisalMgr {
         statusHiddenFromEmployee.add("reviewOverdue");
         statusHiddenFromEmployee.add("releaseDue");
         statusHiddenFromEmployee.add("releaseOverdue");
+        SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
+        try {
+            fullGoalsDate = fmt.parse(FULL_GOALS_DATE);
+        }catch (Exception e)
+        {
+        //Should not get here
+         }
     }
 
     /**
@@ -92,7 +102,6 @@ public class AppraisalMgr {
                     assessment.setCreateDate(new Date());
                     assessment.setModifiedDate(new Date());
                     session.save(assessment);
-
                 }
                 tx.commit();
             } catch (Exception e){
@@ -115,11 +124,7 @@ public class AppraisalMgr {
      */
     private static void createAppraisalStatus(Date startDate, Configuration goalsDueConfig,
                                               Appraisal appraisal) throws Exception {
-        //@@todo: Need to change this back.
-        String Nov1st2011 = "06/01/2011";
-        SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
-        Date startPointDate = fmt.parse(Nov1st2011);
-        if (startDate.before(startPointDate)) {
+        if (startDate.before(fullGoalsDate)) {
             appraisal.setStatus("appraisalDue");
         } else if (PassUtil.isDue(appraisal, goalsDueConfig) < 0) {
             appraisal.setStatus("goalsOverdue");
