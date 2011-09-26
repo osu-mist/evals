@@ -1347,7 +1347,7 @@ public class Actions {
         }
 
         reviewer = getReviewer(employeeID);
-        if (isLoggedInUserReviewer(request)) {
+        if (reviewer != null) {
             String businessCenterName = reviewer.getBusinessCenterName();
             reviewerAction = getReviewerAction(businessCenterName, resource);
             if (reviewerAction != null) {
