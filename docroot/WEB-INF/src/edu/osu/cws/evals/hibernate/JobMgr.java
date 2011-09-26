@@ -267,7 +267,7 @@ public class JobMgr {
     }
 
     /**
-     * Returns the business center name of the first job that this pidm holds.
+     * Returns the business center name of the first active job that this pidm holds.
      *
      * @param pidm
      * @return

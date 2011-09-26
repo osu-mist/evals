@@ -458,7 +458,7 @@ public class Job extends Evals implements Serializable {
     public String getSignature()
     {
         return "employee " + getEmployee().getId() + ", " +getEmployee().getName()
-                 + ", position " + getPositionClass();
+                 + ", position " + getPositionNumber();
     }
 }
 

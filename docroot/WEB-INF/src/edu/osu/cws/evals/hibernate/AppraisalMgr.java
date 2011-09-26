@@ -14,7 +14,7 @@ import java.util.*;
 
 public class AppraisalMgr {
     //@todo: Need to change this back to 11/01/2011 after testing.
-    private static final String FULL_GOALS_DATE = "06/01/2011";
+    private static final String FULL_GOALS_DATE = "11/01/2011";
     private static Date fullGoalsDate;
     private Employee loggedInUser;
 

@@ -242,9 +242,9 @@ public class Mailer {
         //System.out.println("bcname = " +bcName);
         if (bcName == null) //supervisor has no job, Error
         {
-            String shortMsg = "From sendSupervisorMail: supervisor has no job";
+            String shortMsg = "From sendSupervisorMail: supervisor has no active job";
             String longMsg = "Supervisor " + supervisor.getName() + ", " +
-                    supervisor.getId() + ", has no job.";
+                    supervisor.getId() + ", has no active job.";
             logger.log(Logger.ERROR, shortMsg, longMsg);
             return;
         }
@@ -278,7 +278,7 @@ public class Mailer {
             String emailType = email.getEmailType();
             email.getEmailType();
             String logStatus = Logger.INFORMATIONAL;
-            String logShortMessage = emailType + " email sent for appraisal " + appraisalId;
+            String logShortMessage = emailType + " email sent to for appraisal " + appraisalId;
             String logLongMessage = emailType + " mail sent to " + emailAddress + " for appraisal " + appraisalId; 
 
             logger.log(logStatus, logShortMessage, logLongMessage);
