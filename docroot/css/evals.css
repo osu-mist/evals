@@ -187,6 +187,7 @@
 .role-description em {
     border-bottom: 1px dotted #fff;
     font-weight: bold;
+    font-style: normal;
 }
 
 .ie .appraisal.accordion-menu {
