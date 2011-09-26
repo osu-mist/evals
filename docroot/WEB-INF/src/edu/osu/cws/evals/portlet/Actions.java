@@ -1248,10 +1248,7 @@ public class Actions {
         HashMap<Integer, Reviewer> reviewerMap =
                 (HashMap<Integer, Reviewer>) portletContext.getAttribute("reviewers");
 
-        if (reviewerMap.containsKey(pidm)) {
-            return reviewerMap.get(pidm);
-        }
-        return null;
+        return reviewerMap.get(pidm);
     }
 
     /**
@@ -1266,10 +1263,7 @@ public class Actions {
         HashMap<Integer, Admin> adminMap =
                 (HashMap<Integer, Admin>) portletContext.getAttribute("admins");
 
-        if (adminMap.containsKey(pidm)) {
-            return adminMap.get(pidm);
-        }
-        return null;
+        return adminMap.get(pidm);
     }
 
     /**
