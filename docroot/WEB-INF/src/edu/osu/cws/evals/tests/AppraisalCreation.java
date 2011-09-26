@@ -15,7 +15,7 @@ import java.util.*;
 public class AppraisalCreation {
 
     public static void main(String[] args) throws Exception {
-        HibernateUtil.setConfig("hibernate-oracle.cfg.xml");
+        HibernateUtil.setConfig("hibernate.c3p0.ecs.dev.cfg.xml");
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
         Configuration goalsDueConfig = (Configuration) session.load(Configuration.class, 1);
