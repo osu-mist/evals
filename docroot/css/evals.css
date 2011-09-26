@@ -124,6 +124,10 @@
     border-left: 1px solid #ccc;
 }
 
+#pass-top-menu ul.portlet-action-menu li.pass-roles ul {
+    width: 10em;
+}
+
 .ie #pass-top-menu ul.portlet-action-menu ul {
     border: 1px solid #ccc;
 }
