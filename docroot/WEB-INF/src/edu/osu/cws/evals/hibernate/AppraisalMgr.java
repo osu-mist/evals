@@ -72,6 +72,7 @@ public class AppraisalMgr {
         appraisal.setJob(job);
         appraisal.setStartDate(startDate);
         appraisal.setCreateDate(new Date());
+        appraisal.setRating(0);
 
         // In the db, we only store: annual or trial.
         String dbType = type;
@@ -180,6 +181,7 @@ public class AppraisalMgr {
         appraisal.setGoalsSubmitDate(trialAppraisal.getGoalsSubmitDate());
         appraisal.setGoalsApprover(trialAppraisal.getGoalsApprover());
         appraisal.setGoalApprovedDate(trialAppraisal.getGoalApprovedDate());
+        appraisal.setRating(0);
 
         Date endDate = appraisal.getJob().getEndEvalDate(appraisal.getStartDate(), Appraisal.TYPE_INITIAL);
         appraisal.setEndDate(endDate);
