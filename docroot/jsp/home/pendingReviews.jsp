@@ -21,7 +21,7 @@
                         <tr class="${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}"
                         >
                             <td>${shortAppraisal.job.employee.name}</td>
-                            <td><liferay-ui:message key="appraisal-type-${appraisal.type}"/></td>
+                            <td><liferay-ui:message key="appraisal-type-${shortAppraisal.type}"/></td>
                             <td>${shortAppraisal.reviewPeriod}
                             </td>
                             <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
