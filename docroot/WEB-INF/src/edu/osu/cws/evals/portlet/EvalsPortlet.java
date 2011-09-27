@@ -235,9 +235,17 @@ public class EvalsPortlet extends GenericPortlet {
 
                 actionClass.setEvalsAdmins();
                 actionClass.setEvalsReviewers();
-                getLog().log(Logger.INFORMATIONAL, "Portlet Setup Success", message);
+                EvalsLogger logger =  getLog();
+                if (logger != null)
+                {
+                    logger.log(Logger.INFORMATIONAL, "Portlet Setup Success", message);
+                }
             } catch (Exception e) {
-                getLog().log(Logger.ERROR, "Portlet Setup Failed", message);
+                EvalsLogger logger =  getLog();
+                if (logger != null)
+                {
+                    logger.log(Logger.ERROR, "Portlet Setup Failed", message);
+                }
                 throw e;
             }
 
@@ -339,7 +347,12 @@ public class EvalsPortlet extends GenericPortlet {
      */
     private void handlePASSException(Exception e, String shortMessage, String level, boolean getInitParam) {
         try {
-            getLog().log(level, shortMessage, e);
+            //getLog().log(level, shortMessage, e);
+            EvalsLogger logger = getLog();
+            if (logger != null)
+            {
+                logger.log(level, shortMessage,e);
+            }
         } catch (Exception exception) {
             _log.error(CWSUtil.stackTraceString(e));
             _log.error(CWSUtil.stackTraceString(exception));

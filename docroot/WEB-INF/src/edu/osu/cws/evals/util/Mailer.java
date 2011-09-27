@@ -239,7 +239,6 @@ public class Mailer {
                                    List<Email> emailList) throws Exception {
 
         String bcName = JobMgr.getBusinessCenter(supervisor.getId());
-        //System.out.println("bcname = " +bcName);
         if (bcName == null) //supervisor has no job, Error
         {
             String shortMsg = "From sendSupervisorMail: supervisor has no active job";
