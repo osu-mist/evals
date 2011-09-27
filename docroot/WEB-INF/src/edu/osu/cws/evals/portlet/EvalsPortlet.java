@@ -292,11 +292,12 @@ public class EvalsPortlet extends GenericPortlet {
      * @throws Exception
      */
     private EvalsLogger getLog() throws Exception {
-        EvalsLogger log = (EvalsLogger) getPortletContext().getAttribute("log");
-        if (log == null) {
+        return (EvalsLogger) getPortletContext().getAttribute("log");
+        /* if (log == null) {
             throw new Exception("Could not get instance of EvalsLogger from portletContext");
         }
-        return log;
+        */
+       // return log;
     }
 
     /**
