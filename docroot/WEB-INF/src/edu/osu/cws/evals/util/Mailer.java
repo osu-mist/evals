@@ -10,6 +10,8 @@ package edu.osu.cws.evals.util;
 import java.lang.reflect.Method;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
+import java.security.PrivateKey;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map;
 import java.util.HashMap;
@@ -23,6 +25,8 @@ import java.text.MessageFormat;
 
 public class Mailer {
 
+    private static final String EMAIL_START_DATE = "01/01/2012";
+    private Date emailStartDate;
     private ResourceBundle emailBundle;
 	private Mail email;
     private String linkURL;
@@ -44,8 +48,15 @@ public class Mailer {
         this.logger = logger;
         this.replyTo[0] = replyTo;
         //@todo make replyTo an address here, take a string in the constructor
-
+        SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
+        try {
+            emailStartDate = fmt.parse(EMAIL_START_DATE);
+        }catch(Exception e)
+        {
+            //should not get here.
+        }
         logFields.put("sub-facility","Mailer");
+
     }
 
     /**
@@ -55,6 +66,8 @@ public class Mailer {
      * @throws Exception
      */
     public void sendMail(Appraisal appraisal, EmailType emailType) throws Exception {
+        if (beforeEmailStartDate()) //don't send email before email start date
+            return;
 
         String logShortMessage = "";
         String logLongMessage = "";
@@ -644,5 +657,11 @@ public class Mailer {
             return "Reviewer";
         }
         return "";
+    }
+
+    private boolean beforeEmailStartDate()
+    {
+        Date today = new Date();
+        return today.before(emailStartDate);
     }
 }
