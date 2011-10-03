@@ -72,6 +72,7 @@ public class JobMgr {
         Job supervisorJob = job.getSupervisor();
 
         // If the current job has no supervisor return false right away
+        //@todo: Joan: I would take this block out.
         if (supervisorJob == null) {
             return false;
         }
@@ -86,6 +87,10 @@ public class JobMgr {
             supervisorJob = supervisorJob.getSupervisor();
         }
 
+        //@todo: Joan: I would replace the rest of the code with this:
+        //if (supervisorJob == null)
+        //     return false;
+        //return true;
         if (supervisorJob == null || !supervisorJob.getStatus().equals("A")
                 || !supervisorJob.getEmployee().getStatus().equals("A")) {
             return false;
@@ -104,6 +109,8 @@ public class JobMgr {
      * @throws Exception
      */
     public boolean isSupervisor(int pidm) throws Exception {
+        //@todo: Can't use endDate as an indicator. And I would do employee.status != "T'.
+        //@todo: For now, we should also limit the appointment type to "Classified".
         String query = "select count(*) from edu.osu.cws.evals.models.Job where endDate IS NULL " +
                 "AND supervisor.employee.id = :pidm AND employee.status = 'A'";
 
@@ -125,6 +132,7 @@ public class JobMgr {
      * Retrieves a list of Jobs from the database.
      * @return
      */
+    //@todo: Where do you use this method.  This is a very expensive operation.
     public List<Job> list() {
         Session session = HibernateUtil.getCurrentSession();
         List results = new ArrayList();
@@ -204,7 +212,7 @@ public class JobMgr {
     }
 
     /**
-     * Returns the job corresponding to the primary keys, or null if not found.
+     * Returns the first job corresponding to the primary keys, or null if not found.
      *
      * @param pidm
      * @param posn

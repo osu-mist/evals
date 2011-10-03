@@ -204,7 +204,7 @@ public class AppraisalMgr {
                 for (Assessment origAssesment: trialAppraisal.getAssessments()) {
                     newAssessment = new Assessment();
                     newAssessment.setCriterionDetail(origAssesment.getCriterionDetail());
-                    newAssessment.setNewGoals(origAssesment.getNewGoals());
+                    newAssessment.setNewGoals(origAssesment.getNewGoals()); //@todo: Joan: no need to set newGoals.
                     newAssessment.setGoal(origAssesment.getGoal());
                     newAssessment.setAppraisal(appraisal);
                     newAssessment.setCreateDate(new Date());
@@ -249,7 +249,7 @@ public class AppraisalMgr {
 
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assessment.setModifiedDate(new Date());
-            session.saveOrUpdate(assessment);
+            session.saveOrUpdate(assessment);  //@todo: joan: Do we need to do this everytime?
 
             // Create new assessment log if necessary
             originalGoalText = assessment.getLastGoalLog(GoalLog.DEFAULT_GOAL_TYPE).getContent();
@@ -306,11 +306,11 @@ public class AppraisalMgr {
             Transaction tx = session.beginTransaction();
             Appraisal appraisal = (Appraisal) session.get(Appraisal.class, id);
             Job supervisorJob = jobMgr.getSupervisor(appraisal.getJob());
-            appraisal.getJob().setCurrentSupervisor(supervisorJob);
+            appraisal.getJob().setCurrentSupervisor(supervisorJob); //@todo: Joan: why this?
             PermissionRule permRule = getAppraisalPermissionRule(appraisal);
 
             // Check to see if the logged in user has permission to access the appraisal
-            if (permRule == null) {
+            if (permRule == null) { //@todo: Joan: where is permRule set?
                 throw new ModelException("You do  not have permission to view the appraisal");
             }
             // update appraisal & assessment fields based on permission rules
@@ -799,8 +799,6 @@ public class AppraisalMgr {
             }
             throw e;
         }
-
-
         return appraisal;
     }
 
@@ -870,6 +868,7 @@ public class AppraisalMgr {
      * @param maxResults
      * @return
      */
+    //@todo: Joan: don't do anything with job.endDate, that's not reliable.
     private ArrayList<Appraisal> getReviews(String businessCenterName, Session session, int maxResults) {
         Transaction tx = session.beginTransaction();
         String query = "select new edu.osu.cws.evals.models.Appraisal(id, job.jobTitle, job.positionNumber, " +
@@ -880,6 +879,7 @@ public class AppraisalMgr {
 
         Query hibernateQuery = session.createQuery(query)
                 .setString("bc", businessCenterName);
+        //@todo: Joan: can we set the maxResults before querying the database?
         if (maxResults > 0) {
             hibernateQuery.setMaxResults(maxResults);
         }
@@ -907,6 +907,7 @@ public class AppraisalMgr {
         return reviewCount;
     }
 
+    //@todo: Joan: Should just get count(*).
     private int getReviewCount(String businessCenterName, Session session) {
         Transaction tx = session.beginTransaction();
         int count = session.createQuery("from edu.osu.cws.evals.models.Appraisal " +
@@ -995,6 +996,7 @@ public class AppraisalMgr {
      * @param appraisals
      * @throws Exception
      */
+    //@todo: Joan: this Seems expensive.
     private void setAppraisalsStatusByRole(int pidm, List<Appraisal> appraisals) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Appraisal tempAppraisal;
@@ -1212,6 +1214,7 @@ public class AppraisalMgr {
                     "and appraisal.job.suffix = :suffix and appraisal.type = :type " +
                     "and appraisal.startDate = :startDate";
 
+            //@todo: Joan: Why do we set a maxResults when we are just getting count(*)?
             Iterator resultMapIter = session.createQuery(query)
                     .setInteger("pidm", job.getEmployee().getId())
                     .setString("positionNumber", job.getPositionNumber())
@@ -1226,6 +1229,10 @@ public class AppraisalMgr {
                 appraisalCount =  Integer.parseInt(resultMapIter.next().toString());
             }
             tx.commit();
+            //@todo: Joan: I would just do:
+            //return (appraisalCount > 0);
+            //And get rid of the last line of this method.
+            //Same for next method.
             if (appraisalCount > 0) {
                 return true;
             }
@@ -1258,8 +1265,8 @@ public class AppraisalMgr {
                     .setInteger("pidm", job.getEmployee().getId())
                     .setString("positionNumber", job.getPositionNumber())
                     .setString("suffix", job.getSuffix())
-                    .setString("type", Appraisal.TYPE_TRIAL)
-                    .setMaxResults(1)
+                    .setString("type", Appraisal.TYPE_TRIAL)   //@todo: Joan: it's always going to be trial, right?
+                    .setMaxResults(1)  //@todo: Joan: No need to set maxResuls?
                     .list().iterator();
 
             int appraisalCount = 0;
@@ -1292,7 +1299,7 @@ public class AppraisalMgr {
                     "originalStatus = :origStatus where id = :id";
             session.createQuery(query).setString("status", appraisal.getStatus())
                     .setString("origStatus", appraisal.getOriginalStatus())
-                    .setInteger("id", appraisal.getId())
+                    .setInteger("id", appraisal.getId()) //@todo: Joan: No need to set ID.
                     .executeUpdate();
             tx.commit();
         } catch (Exception e){
