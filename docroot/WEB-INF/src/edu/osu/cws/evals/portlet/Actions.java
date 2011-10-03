@@ -663,15 +663,18 @@ public class Actions {
         }
 
         if (isLoggedInUserSupervisor(request)) {
+            //@todo: Joan: Let's think about putting some basic information of myAppraisals and myTeam appraisals in the session.
             List<Appraisal> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(userId, true);
             requestMap.put("myTeamsAppraisals", myTeamsActiveAppraisals);
         }
 
         if (isLoggedInUserReviewer(request)) {
+            //@todo: Joan: Maybe put this in the session too.
             ArrayList<Appraisal> reviews = getReviewsForLoggedInUser(request, -1);
             requestMap.put("pendingReviews", reviews);
         }
 
+        //@todo: Joan: we only let reviewers resend to nolij.
         if (isLoggedInUserAdmin(request) && appraisal.getEmployeeSignedDate() != null) {
             requestMap.put("displayResendNolij", true);
         }
@@ -694,6 +697,8 @@ public class Actions {
         HashMap<Integer, Admin> admins = (HashMap<Integer, Admin>) portletContext.getAttribute("admins");
         HashMap appraisalSteps = (HashMap) portletContext.getAttribute("appraisalSteps");
 
+        //@todo: Joan: Maybe we should just set the one permissionRule object as we have it. So we are only calling
+        //the getRoles method once, which is expensive.
         appraisalMgr.setPermissionRules(permissionRules);
         appraisalMgr.setLoggedInUser(currentlyLoggedOnUser);
         appraisalMgr.setAdmins(admins);
