@@ -637,11 +637,15 @@ public class Actions {
             addErrorsToRequest(request, ACCESS_DENIED);
             return displayHomeView(request, response);
         }
+
+        //@todo: This is executed twice. Move this before the userId line.
         Employee currentlyLoggedOnUser = getLoggedOnUser(request);
         setAppraisalMgrParameters(currentlyLoggedOnUser);
 
         // 1) Get the appraisal and permission rule
         appraisal = appraisalMgr.getAppraisal(appraisalID);
+
+        //@@todo: Joan: This calls appraisalMgr.getRoleAndSession, which is called again a few lines later.
         permRule = appraisalMgr.getAppraisalPermissionRule(appraisal, true);
 
         // Check to see if the logged in user has permission to access the appraisal
