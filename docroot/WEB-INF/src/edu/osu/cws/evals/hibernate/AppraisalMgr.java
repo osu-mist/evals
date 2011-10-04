@@ -1307,4 +1307,51 @@ public class AppraisalMgr {
             throw e;
         }
     }
+
+
+    /**
+     * Get all the appraisals first using job-pidm, and then filter through to remove
+     * extra appraisals for reviewer and supervisor.
+     * @param osuid
+     * @param pidm
+     * @param isAdmin
+     * @param isSupervisor
+     * @param bcName
+     * @return
+     * @throws Exception
+     */
+    public List<Appraisal> searchJoan(int osuid, int pidm, boolean isAdmin, boolean isSupervisor, String bcName)
+            throws Exception {
+
+        List<Appraisal> appraisals;
+        int searchUserID = employeeMgr.findByOsuid(osuid).getId(); //pidm of the employee we are searching for.
+
+        Session session = HibernateUtil.getCurrentSession();
+
+		String query = "select new edu.osu.cws.evals.models.Appraisal (id, job.jobTitle, job.positionNumber, " +
+		                "startDate, endDate, type, job.employee.id, job.employee.lastName, job.employee.firstName, " +
+		                "evaluationSubmitDate, status, job.businessCenterName, job.orgCodeDescription, job.suffix) " +
+		                "from edu.osu.cws.evals.models.Appraisal where JOB_PIDM = :pidm";
+
+        //@todo: this is probably wrong
+	    Query hibernateQuery = session.createQuery(query).setInteger("pidm", searchUserID);
+
+		//@todo: this is incorrect, you will have to look through the results and compose the objects.
+        appraisals =  (ArrayList<Appraisal>) hibernateQuery.list();
+
+        for (Appraisal appraisal : appraisals)
+        {
+		    if (bcName != null && !bcName.equals("")) //reviewer
+		    {
+			    if (!(appraisal.getJob().getBusinessCenterName().equals(bcName)))
+                   appraisals.remove(appraisal);
+			} else if (isSupervisor)
+            {
+                Job job = appraisal.getJob();
+                if (jobMgr.isUpperSupervisor(job, pidm))
+                        appraisals.remove(appraisals);
+        }
+
+        return appraisals;
+    }
 }
