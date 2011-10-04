@@ -1348,10 +1348,11 @@ public class AppraisalMgr {
 			} else if (isSupervisor)
             {
                 Job job = appraisal.getJob();
-                if (jobMgr.isUpperSupervisor(job, pidm))
+                if (!jobMgr.isUpperSupervisor(job, pidm))
                         appraisals.remove(appraisals);
+            }
         }
-
         return appraisals;
-    }
+
+   }
 }
