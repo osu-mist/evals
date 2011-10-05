@@ -1331,12 +1331,12 @@ public class AppraisalMgr {
 		String query = "select new edu.osu.cws.evals.models.Appraisal (id, job.jobTitle, job.positionNumber, " +
 		                "startDate, endDate, type, job.employee.id, job.employee.lastName, job.employee.firstName, " +
 		                "evaluationSubmitDate, status, job.businessCenterName, job.orgCodeDescription, job.suffix) " +
-		                "from edu.osu.cws.evals.models.Appraisal where JOB_PIDM = :pidm";
+		                "from edu.osu.cws.evals.models.Appraisal where appraisal.job.pidm = :pidm";
+        //@todo: Joan: I am sure the last part of the query is wrong.
 
-        //@todo: this is probably wrong
+        //@todo: Joan: this is wrong but don't know what's right.
 	    Query hibernateQuery = session.createQuery(query).setInteger("pidm", searchUserID);
 
-		//@todo: this is incorrect, you will have to look through the results and compose the objects.
         appraisals =  (ArrayList<Appraisal>) hibernateQuery.list();
 
         for (Appraisal appraisal : appraisals)
