@@ -6,6 +6,7 @@ import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.type.StandardBasicTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,18 +110,16 @@ public class JobMgr {
      * @throws Exception
      */
     public boolean isSupervisor(int pidm) throws Exception {
-        //@todo: Can't use endDate as an indicator. And I would do employee.status != "T'.
-        //@todo: For now, we should also limit the appointment type to "Classified".
-        String query = "select count(*) from edu.osu.cws.evals.models.Job where endDate IS NULL " +
-                "AND supervisor.employee.id = :pidm AND employee.status = 'A'";
-
         Session session = HibernateUtil.getCurrentSession();
-        int employeeCount = 0;
+        int employeeCount;
         try {
-            Transaction tx = session.beginTransaction();
-            employeeCount = ((Long) session.createQuery(query).setInteger("pidm", pidm)
-                    .iterate().next()).intValue();
-            tx.commit();
+            employeeCount = 0;
+            List<Object> results = session.getNamedQuery("job.isSupervisor")
+                    .setInteger("pidm", pidm)
+                    .list();
+            if (!results.isEmpty()) {
+                employeeCount = Integer.parseInt(results.get(0).toString());
+            }
         } catch (Exception e){
             session.close();
             throw e;

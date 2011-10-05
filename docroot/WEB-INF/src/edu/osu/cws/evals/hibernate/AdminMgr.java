@@ -61,7 +61,7 @@ public class AdminMgr {
     private List<Admin> list(Session session) throws Exception {
         Transaction tx = session.beginTransaction();
         List<Admin> result = session.createQuery("from edu.osu.cws.evals.models.Admin admin " +
-                "order by admin.isMaster, admin.employee.lastName, admin.employee.firstName").list();
+                "order by admin.isMaster").list();
         tx.commit();
         return result;
     }

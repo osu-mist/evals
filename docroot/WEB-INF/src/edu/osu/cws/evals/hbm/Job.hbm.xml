@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
-<hibernate-mapping default-lazy="false" auto-import="false" >
+<hibernate-mapping auto-import="false" >
 
     <class name="edu.osu.cws.evals.models.Job" table="PYVPASJ" mutable="false" batch-size="10">
         <composite-id>
@@ -29,16 +29,13 @@
         <property name="annualInd" length="45" type="int" column="PYVPASJ_ANNUAL_IND"/>
         <property name="evalDate" length="45" type="timestamp" column="PYVPASJ_EVAL_DATE"/>
 
-        <!--<many-to-one name="employee" class="edu.osu.cws.evalss.models.Employee"-->
-                     <!--column="PYVPASJ_PIDM"-->
-                     <!--not-null="false"/>-->
-        <many-to-one name="supervisor" class="edu.osu.cws.evals.models.Job" not-null="false" fetch="join">
+        <many-to-one name="supervisor" class="edu.osu.cws.evals.models.Job" not-null="false" fetch="select">
             <column name="PYVPASJ_SUPERVISOR_PIDM"/>
             <column name="PYVPASJ_SUPERVISOR_POSN"/>
             <column name="PYVPASJ_SUPERVISOR_SUFF"/>
         </many-to-one>
 
-        <set name="appraisals" inverse="true" lazy="true">
+        <set name="appraisals" inverse="true">
             <key>
                 <column name="JOB_PIDM"/>
                 <column name="POSITION_NUMBER"/>
@@ -48,4 +45,14 @@
         </set>
     </class>
 
+    <sql-query name="job.isSupervisor"><![CDATA[
+        SELECT
+            count(*) AS countNum
+        FROM
+            PYVPASJ
+        WHERE
+            PYVPASJ_SUPERVISOR_PIDM = :pidm AND
+            PYVPASJ_APPOINTMENT_TYPE = 'Classified' AND
+            PYVPASJ_STATUS != 'T'
+    ]]></sql-query>
 </hibernate-mapping>

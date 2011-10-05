@@ -4,10 +4,13 @@ import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
+import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.type.StandardBasicTypes;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -641,7 +644,6 @@ public class AppraisalMgr {
      * @return
      */
     private ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm, Session session) {
-        Transaction tx = session.beginTransaction();
         //@todo: the query below should have a where clause => job.employee.id = pidm
         String query = "select new edu.osu.cws.evals.models.Appraisal(id, job.jobTitle, startDate, endDate, status)" +
                 " from edu.osu.cws.evals.models.Appraisal where " +
@@ -649,7 +651,6 @@ public class AppraisalMgr {
         ArrayList<Appraisal> result = (ArrayList<Appraisal>) session.createQuery(query)
                 .setInteger("pidm", pidm)
                 .list();
-        tx.commit();
 
         // Check the status of the appraisal and check to see if it needs to be replaced
         for(Appraisal appraisal : result) {
@@ -689,20 +690,63 @@ public class AppraisalMgr {
      * @return List of Hashmaps that contains the jobs this employee supervises.
      */
     private List<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive, Session session) {
-        Transaction tx = session.beginTransaction();
-        String query = "select new edu.osu.cws.evals.models.Appraisal(id, job.jobTitle, job.employee.lastName, " +
-                "job.employee.firstName, job.appointmentType, startDate, endDate, status, " +
-                "goalsRequiredModificationDate, employeeSignedDate) " +
-                "from edu.osu.cws.evals.models.Appraisal where job.supervisor.employee.id = :pidm ";
+        List<Appraisal> appraisals = new ArrayList<Appraisal>();
+        List<Integer> pidms = new ArrayList<Integer>();
+
+        String query = "select ap.ID, jobs.PYVPASJ_DESC, jobs.PYVPASJ_APPOINTMENT_TYPE, " +
+                "ap.START_DATE, ap.END_DATE, ap.STATUS, ap.GOALS_REQUIRED_MOD_DATE, " +
+                "ap.EMPLOYEE_SIGNED_DATE, jobs.PYVPASJ_PIDM " +
+                "FROM appraisals ap, PYVPASJ jobs " +
+                "WHERE ap.JOB_PIDM=jobs.PYVPASJ_PIDM AND ap.POSITION_NUMBER=jobs.PYVPASJ_POSN " +
+                "AND ap.JOB_SUFFIX=jobs.PYVPASJ_SUFF AND jobs.PYVPASJ_SUPERVISOR_PIDM=:pidm ";
 
         if (onlyActive) {
-            query += "and status not in ('archived') ";
+            query += "AND status NOT IN ('archived') ";
         }
 
-        List result =  session.createQuery(query).setInteger("pidm", pidm).list();
+        List<Object[]> result =  session.createSQLQuery(query)
+                .addScalar("ID", StandardBasicTypes.INTEGER)
+                .addScalar("PYVPASJ_DESC", StandardBasicTypes.STRING)
+                .addScalar("PYVPASJ_APPOINTMENT_TYPE", StandardBasicTypes.STRING)
+                .addScalar("START_DATE", StandardBasicTypes.DATE)
+                .addScalar("END_DATE", StandardBasicTypes.DATE)
+                .addScalar("STATUS", StandardBasicTypes.STRING)
+                .addScalar("GOALS_REQUIRED_MOD_DATE", StandardBasicTypes.DATE)
+                .addScalar("EMPLOYEE_SIGNED_DATE", StandardBasicTypes.DATE)
+                .addScalar("PYVPASJ_PIDM", StandardBasicTypes.INTEGER)
+                .setInteger("pidm", pidm).list();
 
-        tx.commit();
-        return result;
+        // Build list of appraisals from sql results
+        for (Object[] aResult : result) {
+            Integer id = (Integer) aResult[0];
+            String jobTitle = (String) aResult[1];
+            String appointmentType = (String) aResult[2];
+            Date startDate = (Date) aResult[3];
+            Date endDate = (Date) aResult[4];
+            String status = (String) aResult[5];
+            Date goalsReqModDate = (Date) aResult[6];
+            Date employeeSignDate = (Date) aResult[7];
+            Integer employeePidm = (Integer) aResult[8];
+
+            appraisal = new Appraisal(id, jobTitle, null, null, appointmentType,
+                    startDate, endDate, status, goalsReqModDate, employeeSignDate);
+
+            pidms.add(employeePidm);
+        }
+
+        List<Employee> employees = session.getNamedQuery("employee.firstAndLastNameByPidm")
+                .setParameterList("ids", pidms).list();
+        HashMap<Integer, Employee> employeeHashMap = new HashMap<Integer, Employee>();
+        for (Employee employee : employees) {
+            employeeHashMap.put(employee.getId(), employee);
+        }
+
+        for (Appraisal ap : appraisals) {
+            Integer employeePidm = ap.getJob().getEmployee().getId();
+            Employee employee = employeeHashMap.get(employeePidm);
+            ap.getJob().setEmployee(employee);
+        }
+        return appraisals;
     }
 
     /**
@@ -787,9 +831,7 @@ public class AppraisalMgr {
     public Appraisal getAppraisal(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         try {
-            Transaction tx = session.beginTransaction();
             appraisal = getAppraisal(id, session);
-            tx.commit();
 
             Job supervisorJob = jobMgr.getSupervisor(appraisal.getJob());
             appraisal.getJob().setCurrentSupervisor(supervisorJob);
@@ -870,21 +912,13 @@ public class AppraisalMgr {
      */
     //@todo: Joan: don't do anything with job.endDate, that's not reliable.
     private ArrayList<Appraisal> getReviews(String businessCenterName, Session session, int maxResults) {
-        Transaction tx = session.beginTransaction();
-        String query = "select new edu.osu.cws.evals.models.Appraisal(id, job.jobTitle, job.positionNumber, " +
-                "startDate, endDate, type, job.employee.id, job.employee.lastName, job.employee.firstName, " +
-                "evaluationSubmitDate, status, job.businessCenterName, job.orgCodeDescription, job.suffix) " +
-                "from edu.osu.cws.evals.models.Appraisal where job.businessCenterName = :bc " +
-                "and status in ('reviewDue', 'reviewOverdue') and job.endDate is NULL";
-
-        Query hibernateQuery = session.createQuery(query)
+        Query hibernateQuery = session.getNamedQuery("appraisal.getReviews")
                 .setString("bc", businessCenterName);
         //@todo: Joan: can we set the maxResults before querying the database?
         if (maxResults > 0) {
             hibernateQuery.setMaxResults(maxResults);
         }
         ArrayList<Appraisal> result =  (ArrayList<Appraisal>) hibernateQuery.list();
-        tx.commit();
         return result;
     }
 
@@ -909,14 +943,15 @@ public class AppraisalMgr {
 
     //@todo: Joan: Should just get count(*).
     private int getReviewCount(String businessCenterName, Session session) {
-        Transaction tx = session.beginTransaction();
-        int count = session.createQuery("from edu.osu.cws.evals.models.Appraisal " +
-                "where status in ('reviewDue', 'reviewOverdue') " +
-                "and job.businessCenterName = :bcName")
+        int reviewCount = 0;
+
+        List results = session.getNamedQuery("appraisal.reviewCount")
                 .setString("bcName", businessCenterName)
-                .list().size();
-        tx.commit();
-        return count;
+                .list();
+        if (!results.isEmpty()) {
+            reviewCount = Integer.parseInt(results.get(0).toString());
+        }
+        return reviewCount;
     }
 
     /**

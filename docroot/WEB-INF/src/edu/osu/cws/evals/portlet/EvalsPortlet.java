@@ -18,6 +18,8 @@ import edu.osu.cws.util.Logger;
 import edu.osu.cws.util.Mail;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -93,6 +95,9 @@ public class EvalsPortlet extends GenericPortlet {
 
         try {
             portletSetup(renderRequest);
+            Session hibSession = HibernateUtil.getCurrentSession();
+            Transaction tx = hibSession.beginTransaction();
+
             actionClass.setUpUserPermissionInSession(renderRequest, false);
 
             // If processAction's delegate method was called, it set the viewJSP property to some
@@ -103,6 +108,7 @@ public class EvalsPortlet extends GenericPortlet {
             }
             actionClass.setRequestAttributes(renderRequest);
             actionClass.setHomeURL(renderRequest);
+            tx.commit();
         } catch (Exception e) {
             handlePASSException(e, "Error in doView", Logger.CRITICAL, true);
         }

@@ -63,7 +63,7 @@ public class ReviewerMgr {
     private List<Reviewer> list(Session session) throws Exception {
         Transaction tx = session.beginTransaction();
         List<Reviewer> result = session.createQuery("from edu.osu.cws.evals.models.Reviewer reviewer " +
-                "order by reviewer.businessCenterName, reviewer.employee.lastName, reviewer.employee.firstName").list();
+                "order by reviewer.businessCenterName").list();
         tx.commit();
         return result;
     }

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
-<hibernate-mapping default-lazy="false" auto-import="false" >
+<hibernate-mapping auto-import="false" >
 
     <class name="edu.osu.cws.evals.models.Employee" table="PYVPASE" mutable="false" batch-size="10">
         <id name="id" column="PYVPASE_PIDM" type="int"/>
@@ -14,7 +14,7 @@
         <property name="email" column="PYVPASE_EMAIL"/>
         <property name="status" length="1" column="PYVPASE_EMPL_STATUS"/>
 
-        <set name="jobs" lazy="true" batch-size="10">
+        <set name="jobs" batch-size="10">
             <key column="PYVPASJ_PIDM"/>
             <one-to-many class="edu.osu.cws.evals.models.Job"/>
         </set>
@@ -23,5 +23,10 @@
             <fetch association="jobs" style="select"/>
         </fetch-profile>
     </class>
+
+    <query name="employee.firstAndLastNameByPidm">
+        SELECT new edu.osu.cws.evals.models.Employee(id, firstName, lastName)
+        FROM edu.osu.cws.evals.models.Employee where id in (:ids)
+    </query>
 
 </hibernate-mapping>

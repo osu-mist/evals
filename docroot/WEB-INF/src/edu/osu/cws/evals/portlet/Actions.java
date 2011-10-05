@@ -9,6 +9,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsPDF;
+import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
 import org.apache.commons.configuration.CompositeConfiguration;
 
