@@ -173,17 +173,22 @@ public class Appraisal extends Evals {
      *
      * @param id
      * @param jobTitle
+     * @param jobTitle
      * @param lastName
      * @param firstName
      * @param appointmentType
      * @param startDate
      * @param endDate
      * @param status
+     * @param goalsRequiredModificationDate
+     * @param employeeSignedDate
+     * @param employeeId
      */
     public Appraisal(int id, String jobTitle, String lastName, String firstName, String appointmentType,
                      Date startDate, Date endDate, String status, Date goalsRequiredModificationDate,
-                     Date employeeSignedDate) {
+                     Date employeeSignedDate, int employeeId) {
         Employee employee = new Employee();
+        employee.setId(employeeId);
         employee.setLastName(lastName);
         employee.setFirstName(firstName);
         this.id = id;

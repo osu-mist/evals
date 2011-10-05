@@ -729,8 +729,8 @@ public class AppraisalMgr {
             Integer employeePidm = (Integer) aResult[8];
 
             appraisal = new Appraisal(id, jobTitle, null, null, appointmentType,
-                    startDate, endDate, status, goalsReqModDate, employeeSignDate);
-
+                    startDate, endDate, status, goalsReqModDate, employeeSignDate, employeePidm);
+            appraisals.add(appraisal);
             pidms.add(employeePidm);
         }
 
@@ -1036,13 +1036,11 @@ public class AppraisalMgr {
         Session session = HibernateUtil.getCurrentSession();
         Appraisal tempAppraisal;
         try {
-            Transaction tx = session.beginTransaction();
             for (Appraisal appraisal : appraisals) {
                 tempAppraisal = (Appraisal) session.load(Appraisal.class, appraisal.getId());
                 String userRole = getRole(tempAppraisal, pidm);
                 setAppraisalStatus(appraisal, userRole);
             }
-            tx.commit();
         } catch (Exception e){
             session.close();
             throw e;
