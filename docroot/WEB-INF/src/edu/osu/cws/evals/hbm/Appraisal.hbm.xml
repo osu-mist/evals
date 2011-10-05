@@ -100,4 +100,15 @@
             job.businessCenterName = :bc
             AND status IN ('reviewDue', 'reviewOverdue')
     ]]></sql-query>
+    <query name="appraisal.search"><![CDATA[
+        SELECT new edu.osu.cws.evals.models.Appraisal (
+            id, job.jobTitle, job.positionNumber, startDate, endDate, type,
+            job.employee.id, job.employee.lastName, job.employee.firstName,
+            evaluationSubmitDate, status, job.businessCenterName,
+            job.orgCodeDescription, job.suffix)
+        FROM
+            edu.osu.cws.evals.models.Appraisal
+        WHERE
+            job.employee.id = :pidm
+    ]]></query>
 </hibernate-mapping>

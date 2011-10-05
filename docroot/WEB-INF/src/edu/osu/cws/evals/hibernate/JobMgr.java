@@ -72,12 +72,6 @@ public class JobMgr {
     public boolean isUpperSupervisor(Job job, int pidm) throws ModelException {
         Job supervisorJob = job.getSupervisor();
 
-        // If the current job has no supervisor return false right away
-        //@todo: Joan: I would take this block out.
-        if (supervisorJob == null) {
-            return false;
-        }
-
         // Iterate over the supervising chain. If the supervisor has no employee associated
         // or if the supervisor pidm doesn't match what we're looking for go up the supervising
         // chain.
@@ -88,18 +82,7 @@ public class JobMgr {
             supervisorJob = supervisorJob.getSupervisor();
         }
 
-        //@todo: Joan: I would replace the rest of the code with this:
-        //if (supervisorJob == null)
-        //     return false;
-        //return true;
-        if (supervisorJob == null || !supervisorJob.getStatus().equals("A")
-                || !supervisorJob.getEmployee().getStatus().equals("A")) {
-            return false;
-        } else if (supervisorJob.getEmployee().getId() == pidm) {
-            return true;
-        }
-
-        return false;
+        return supervisorJob != null;
     }
 
     /**

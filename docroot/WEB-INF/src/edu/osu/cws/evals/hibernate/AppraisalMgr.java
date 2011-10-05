@@ -955,76 +955,6 @@ public class AppraisalMgr {
     }
 
     /**
-     * Returns a list of appraisals. It searches for all the appraisals of the employee using the
-     * osuid. The parameters specify if the logged in user is: admin, supervisor of the business
-     * center the logged in user belongs to. It also sets the status of the each appraisal based
-     * on the user role.
-     *
-     * @param osuid OSU ID to use when searching appraisals
-     * @param pidm  Pidm of currently logged in user
-     * @param isAdmin   Whether or not the logged in user is admin
-     * @param isSupervisor Whether or not the logged in user is a supervisor
-     * @param bcName Business Center Name of logged in user reviewer
-     * @return
-     * @throws Exception
-     */
-    public List<Appraisal> search(int osuid, int pidm, boolean isAdmin, boolean isSupervisor, String bcName)
-            throws Exception {
-        List<Appraisal> appraisals = new ArrayList<Appraisal>();
-        Employee employee = employeeMgr.findByOsuid(osuid);
-        Job appraisalJob;
-        boolean isUpperSupervisorOfAJob = false;
-        boolean isUpperSupervisor;
-        ArrayList<Job> jobsWhiteList = new ArrayList<Job>();
-        List<Appraisal> appraisalsCopy = new ArrayList<Appraisal>();
-
-        if (employee == null) {
-            return appraisals;
-        }
-
-        if (!isAdmin && isSupervisor) {
-            for (Job job : (Set<Job>) employee.getJobs()) {
-                isUpperSupervisor = jobMgr.isUpperSupervisor(job, pidm);
-                isUpperSupervisorOfAJob = isUpperSupervisorOfAJob || isUpperSupervisor;
-
-                // Keep track of the jobs the pidm user is upper supervisor, so that we can use them to filter out
-                // appraisals
-                if (isUpperSupervisor || job.getBusinessCenterName().equals(bcName)) {
-                    jobsWhiteList.add(job);
-                }
-            }
-        }
-
-        Session session = HibernateUtil.getCurrentSession();
-        try {
-            appraisals = search(osuid, pidm, isAdmin, isUpperSupervisorOfAJob, bcName, session);
-            if (!isAdmin && isSupervisor) {
-                // Iterate over the appraisals and add only the ones with jobs in the jobsWhiteList
-                for (Appraisal appraisal : appraisals) {
-                    for (Job accessibleJobs : jobsWhiteList) {
-                        appraisalJob = appraisal.getJob();
-                        if (accessibleJobs.getPositionNumber().equals(appraisalJob.getPositionNumber()) &&
-                                accessibleJobs.getSuffix().equals(appraisalJob.getSuffix()) &&
-                                accessibleJobs.getEmployee().getId() == appraisalJob.getEmployee().getId()
-                                ) {
-                            appraisalsCopy.add(appraisal);
-                        }
-                    }
-                }
-            } else {
-                appraisalsCopy = appraisals;
-            }
-
-        } catch (Exception e){
-            session.close();
-            throw e;
-        }
-        setAppraisalsStatusByRole(pidm, appraisalsCopy);
-
-        return appraisalsCopy;
-    }
-
-    /**
      * Iterates over list of appraisal and sets the status based on the role of the user (pidm).
      *
      * @param pidm
@@ -1045,51 +975,6 @@ public class AppraisalMgr {
             session.close();
             throw e;
         }
-    }
-
-    /**
-     * Returns a list of appraisals. It searches for all the appraisals of the employee using the
-     * osuid. The parameters specify if the logged in user is: admin, supervisor of the business
-     * center the logged in user belongs to.
-     *
-     * @param osuid
-     * @param pidm
-     * @param isAdmin
-     * @param isUpperSupervisor
-     * @param bcName
-     * @param session
-     * @return
-     * @throws Exception
-     */
-    public List<Appraisal> search(int osuid, int pidm, boolean isAdmin, boolean isUpperSupervisor, String bcName,
-                                  Session session) throws Exception {
-        List<Appraisal> result = new ArrayList<Appraisal>();
-        ArrayList<String> conditions = new ArrayList<String>();
-
-        String query = "select new edu.osu.cws.evals.models.Appraisal (id, job.jobTitle, job.positionNumber, " +
-                "startDate, endDate, type, job.employee.id, job.employee.lastName, job.employee.firstName, " +
-                "evaluationSubmitDate, status, job.businessCenterName, job.orgCodeDescription, job.suffix) " +
-                "from edu.osu.cws.evals.models.Appraisal where job.employee.osuid = :osuid";
-
-        if (!isAdmin) {
-            if (bcName != null && !bcName.equals("")) {
-                conditions.add("job.businessCenterName = :bcName");
-            }
-            if (!conditions.isEmpty()) {
-                query += " AND ( " + StringUtils.join(conditions, " OR ") + " )";
-            }
-        }
-
-        Transaction tx = session.beginTransaction();
-        Query hibernateQuery = session.createQuery(query).setString("osuid", Integer.toString(osuid));
-        if (!conditions.isEmpty()) {
-            hibernateQuery.setString("bcName", bcName);
-        }
-
-        result =  (ArrayList<Appraisal>) hibernateQuery.list();
-        tx.commit();
-
-        return result;
     }
 
     /**
@@ -1345,47 +1230,50 @@ public class AppraisalMgr {
     /**
      * Get all the appraisals first using job-pidm, and then filter through to remove
      * extra appraisals for reviewer and supervisor.
-     * @param osuid
-     * @param pidm
+     * @param osuid     osu id of the employee's appraisals we are searching
+     * @param pidm      pidm of the logged in user
      * @param isAdmin
      * @param isSupervisor
      * @param bcName
      * @return
      * @throws Exception
      */
-    public List<Appraisal> searchJoan(int osuid, int pidm, boolean isAdmin, boolean isSupervisor, String bcName)
+    public List<Appraisal> search(int osuid, int pidm, boolean isAdmin, boolean isSupervisor, String bcName)
             throws Exception {
-
-        List<Appraisal> appraisals;
-        int searchUserID = employeeMgr.findByOsuid(osuid).getId(); //pidm of the employee we are searching for.
-
         Session session = HibernateUtil.getCurrentSession();
+        List<Appraisal> appraisals = new ArrayList<Appraisal>();
 
-		String query = "select new edu.osu.cws.evals.models.Appraisal (id, job.jobTitle, job.positionNumber, " +
-		                "startDate, endDate, type, job.employee.id, job.employee.lastName, job.employee.firstName, " +
-		                "evaluationSubmitDate, status, job.businessCenterName, job.orgCodeDescription, job.suffix) " +
-		                "from edu.osu.cws.evals.models.Appraisal where appraisal.job.pidm = :pidm";
-        //@todo: Joan: I am sure the last part of the query is wrong.
+        Employee employee = employeeMgr.findByOsuid(osuid);
+        if (employee == null) {
+            return appraisals;
+        }
 
-        //@todo: Joan: this is wrong but don't know what's right.
-	    Query hibernateQuery = session.createQuery(query).setInteger("pidm", searchUserID);
+        int searchUserID = employee.getId(); //pidm of the employee we are searching for.
+        Query hibernateQuery = session.getNamedQuery("appraisal.search")
+                .setInteger("pidm", searchUserID);
 
-        appraisals =  (ArrayList<Appraisal>) hibernateQuery.list();
-
-        for (Appraisal appraisal : appraisals)
-        {
-		    if (bcName != null && !bcName.equals("")) //reviewer
-		    {
-			    if (!(appraisal.getJob().getBusinessCenterName().equals(bcName)))
-                   appraisals.remove(appraisal);
-			} else if (isSupervisor)
-            {
-                Job job = appraisal.getJob();
-                if (!jobMgr.isUpperSupervisor(job, pidm))
-                        appraisals.remove(appraisals);
+        List<Appraisal> appraisalsTemp =  (ArrayList<Appraisal>) hibernateQuery.list();
+        appraisals.addAll(appraisalsTemp);
+        for (Appraisal appraisal : appraisalsTemp) {
+            Job appJob = appraisal.getJob();
+            if (bcName != null && !bcName.equals("")) { //reviewer
+                if (!(appJob.getBusinessCenterName().equals(bcName))) {
+                    appraisals.remove(appraisal);
+                }
+            } else if (isSupervisor) {
+                // Fetch the appraisal job from the db because the isSupervisor method needs to
+                // traverse up the supervising chain.
+                Employee employee1 = new Employee(appJob.getEmployee().getId());
+                Job dbJob = new Job(employee1, appJob.getPositionNumber(), appJob.getSuffix());
+                Job job = (Job) session.load(Job.class, dbJob);
+                if (!jobMgr.isUpperSupervisor(job, pidm)) {
+                    appraisals.remove(appraisal);
+                }
             }
         }
+
+        setAppraisalsStatusByRole(pidm, appraisals);
         return appraisals;
 
-   }
+    }
 }

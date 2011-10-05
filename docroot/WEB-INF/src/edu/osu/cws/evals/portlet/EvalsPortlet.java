@@ -123,8 +123,11 @@ public class EvalsPortlet extends GenericPortlet {
 
         try {
             portletSetup(actionRequest);
+            Session hibSession = HibernateUtil.getCurrentSession();
+            Transaction tx = hibSession.beginTransaction();
             actionClass.setUpUserPermissionInSession(actionRequest, false);
             delegate(actionRequest, actionResponse);
+            tx.commit();
         } catch (Exception e) {
             handlePASSException(e, "Error in processAction", Logger.CRITICAL, true);
         }
