@@ -479,7 +479,11 @@ public class EvalsPDF {
 
         c = new Chunk(resource.getString("supervisor")+": ", INFO_FONT);
         p = new Paragraph(c);
-        c = new Chunk(appraisal.getJob().getSupervisor().getEmployee().getName(), FONT_BOLD_11);
+        String name = "";
+        if (appraisal.getJob().getSupervisor() != null) {
+            appraisal.getJob().getSupervisor().getEmployee().getName();
+        }
+        c = new Chunk(name, FONT_BOLD_11);
         p.add(c);
         cell = new PdfPCell(p);
         cell.setColspan(2);
