@@ -606,9 +606,7 @@ public class AppraisalMgr {
         Session session = HibernateUtil.getCurrentSession();
         PermissionRule permissionRule;
         try {
-            Transaction tx = session.beginTransaction();
             permissionRule = getAppraisalPermissionRule(appraisal);
-            tx.commit();
         } catch (Exception e) {
             session.close();
             throw e;
@@ -815,9 +813,7 @@ public class AppraisalMgr {
         String role;
 
         try {
-            Transaction tx = session.beginTransaction();
             role = getRole(appraisal, pidm);
-            tx.commit();
         } catch (Exception e) {
             session.close();
             throw e;

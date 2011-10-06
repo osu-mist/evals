@@ -94,21 +94,15 @@ public class EvalsPortlet extends GenericPortlet {
 		throws IOException, PortletException {
 
         try {
-            portletSetup(renderRequest);
-            Session hibSession = HibernateUtil.getCurrentSession();
-            Transaction tx = hibSession.beginTransaction();
-
-            actionClass.setUpUserPermissionInSession(renderRequest, false);
-
             // If processAction's delegate method was called, it set the viewJSP property to some
             // jsp value, if viewJSP is null, it means processAction was not called and we need to
             // call delegate
             if (viewJSP == null) {
                 delegate(renderRequest, renderResponse);
             }
+
             actionClass.setRequestAttributes(renderRequest);
             actionClass.setHomeURL(renderRequest);
-            tx.commit();
         } catch (Exception e) {
             handlePASSException(e, "Error in doView", Logger.CRITICAL, true);
         }
@@ -122,12 +116,7 @@ public class EvalsPortlet extends GenericPortlet {
 		throws IOException, PortletException {
 
         try {
-            portletSetup(actionRequest);
-            Session hibSession = HibernateUtil.getCurrentSession();
-            Transaction tx = hibSession.beginTransaction();
-            actionClass.setUpUserPermissionInSession(actionRequest, false);
             delegate(actionRequest, actionResponse);
-            tx.commit();
         } catch (Exception e) {
             handlePASSException(e, "Error in processAction", Logger.CRITICAL, true);
         }
@@ -178,26 +167,39 @@ public class EvalsPortlet extends GenericPortlet {
      * @param request   PortletRequest
      * @param response  PortletResponse
      */
-    public void delegate(PortletRequest request, PortletResponse response) {
+    public void delegate(PortletRequest request, PortletResponse response) throws Exception {
         Method actionMethod;
         String action;
         actionClass.setPortletContext(getPortletContext());
         viewJSP = "home-jsp";
+        Session hibSession = null;
 
-        // The portlet action can be set by the action/renderURLs using "action" as the parameter
-        // name
-        action =  ParamUtil.getString(request, "action", "displayHomeView");
+        try {
+            portletSetup(request);
+            hibSession = HibernateUtil.getCurrentSession();
+            Transaction tx = hibSession.beginTransaction();
+            actionClass.setUpUserPermissionInSession(request, false);
 
-        if (!action.equals("")) {
-            try {
-                actionMethod = Actions.class.getDeclaredMethod(action, PortletRequest.class,
-                        PortletResponse.class);
+            // The portlet action can be set by the action/renderURLs using "action" as the parameter
+            // name
+            action =  ParamUtil.getString(request, "action", "displayHomeView");
 
-                // The action methods return the init-param of the path
-                viewJSP = (String) actionMethod.invoke(actionClass, request, response);
-            } catch (Exception e) {
-                handlePASSException(e, action, Logger.ERROR, false);
+            if (!action.equals("")) {
+                try {
+                    actionMethod = Actions.class.getDeclaredMethod(action, PortletRequest.class,
+                            PortletResponse.class);
+
+                    // The action methods return the init-param of the path
+                    viewJSP = (String) actionMethod.invoke(actionClass, request, response);
+                } catch (Exception e) {
+                    handlePASSException(e, action, Logger.ERROR, false);
+                }
             }
+        } catch (Exception e) {
+            if (hibSession != null && hibSession.isOpen()) {
+                hibSession.close();
+            }
+            throw e;
         }
 
         // viewJSP holds an init parameter that maps to a jsp file
@@ -245,14 +247,12 @@ public class EvalsPortlet extends GenericPortlet {
                 actionClass.setEvalsAdmins();
                 actionClass.setEvalsReviewers();
                 EvalsLogger logger =  getLog();
-                if (logger != null)
-                {
+                if (logger != null) {
                     logger.log(Logger.INFORMATIONAL, "Portlet Setup Success", message);
                 }
             } catch (Exception e) {
                 EvalsLogger logger =  getLog();
-                if (logger != null)
-                {
+                if (logger != null) {
                     logger.log(Logger.ERROR, "Portlet Setup Failed", message);
                 }
                 throw e;

@@ -631,7 +631,8 @@ public class Actions {
         Boolean showForm = false;
         Appraisal appraisal;
         PermissionRule permRule;
-        int userId = getLoggedOnUser(request).getId();
+        Employee currentlyLoggedOnUser = getLoggedOnUser(request);
+        int userId = currentlyLoggedOnUser.getId();
 
         int appraisalID = ParamUtil.getInteger(request, "id");
         if (appraisalID == 0) {
@@ -639,8 +640,6 @@ public class Actions {
             return displayHomeView(request, response);
         }
 
-        //@todo: This is executed twice. Move this before the userId line.
-        Employee currentlyLoggedOnUser = getLoggedOnUser(request);
         setAppraisalMgrParameters(currentlyLoggedOnUser);
 
         // 1) Get the appraisal and permission rule
