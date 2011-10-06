@@ -639,4 +639,4 @@ public class Appraisal extends Evals {
     public void setOriginalStatus(String originalStatus) {
         this.originalStatus = originalStatus;
     }
-    }
+}

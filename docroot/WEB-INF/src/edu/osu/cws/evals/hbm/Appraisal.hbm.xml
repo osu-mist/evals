@@ -86,7 +86,7 @@
              AND JOB_SUFFIX=PYVPASJ_SUFF
              AND PYVPASJ_BCTR_TITLE=:bcName)
     ]]></sql-query>
-    <sql-query name="appraisal.getReviews"><![CDATA[
+    <query name="appraisal.getReviews"><![CDATA[
         SELECT new edu.osu.cws.evals.models.Appraisal
             (
                 id, job.jobTitle, job.positionNumber,
@@ -99,7 +99,7 @@
         WHERE
             job.businessCenterName = :bc
             AND status IN ('reviewDue', 'reviewOverdue')
-    ]]></sql-query>
+    ]]></query>
     <query name="appraisal.search"><![CDATA[
         SELECT new edu.osu.cws.evals.models.Appraisal (
             id, job.jobTitle, job.positionNumber, startDate, endDate, type,
