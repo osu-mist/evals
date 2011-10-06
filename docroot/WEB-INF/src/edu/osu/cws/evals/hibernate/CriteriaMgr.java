@@ -53,11 +53,9 @@ public class CriteriaMgr {
 
         Session session = HibernateUtil.getCurrentSession();
         try {
-            Transaction tx = session.beginTransaction();
             session.save(area);
             area.addDetails(details);
             session.save(details);
-            tx.commit();
         } catch (Exception e){
             session.close();
             throw e;
@@ -89,7 +87,6 @@ public class CriteriaMgr {
         }
 
         try {
-            Transaction tx = session.beginTransaction();
             criterion = get(id, session);
 
             boolean areaChanged = false;
@@ -171,7 +168,6 @@ public class CriteriaMgr {
                         .setInteger("oldDetail", currentDetail.getId())
                         .executeUpdate();
             }
-            tx.commit();
 
             //@todo: ajax
         } catch (Exception e) {
@@ -255,12 +251,10 @@ public class CriteriaMgr {
      * @throws Exception
      */
     private List<CriterionArea> list(String appointmentType, Session session) throws Exception {
-        Transaction tx = session.beginTransaction();
         List result = session.createQuery("from edu.osu.cws.evals.models.CriterionArea where " +
                 "appointmentType = :appointmentType AND deleteDate IS NULL ORDER BY sequence")
                 .setString("appointmentType", appointmentType)
                 .list();
-        tx.commit();
         return result;
 
     }
@@ -278,7 +272,6 @@ public class CriteriaMgr {
         Session session = HibernateUtil.getCurrentSession();
         CriterionArea criterion;
         try {
-            Transaction tx = session.beginTransaction();
             criterion = get(id, session);
 
             // check that the criteria is valid
@@ -290,7 +283,6 @@ public class CriteriaMgr {
             setCriteriaDeleteProperties(deleter, criterion);
 
             session.update(criterion);
-            tx.commit();
         } catch (Exception e) {
             session.close();
             throw e;
@@ -357,7 +349,6 @@ public class CriteriaMgr {
     private void updateSequence(int newPosition, int originalPosition, String appointmentType,
                                 int lowerBound, int upperBound,
                                 boolean moveCriteriaToSmallerSequence, Session session) {
-        Transaction tx = session.beginTransaction();
         String query = "from edu.osu.cws.evals.models.CriterionArea where deleteDate is null " +
                 "and appointmentType = :appointmentType and sequence >= :lowerBound and " +
                 "sequence <= :upperBound";
@@ -379,7 +370,6 @@ public class CriteriaMgr {
             }
             session.update(criteria);
         }
-        tx.commit();
     }
 
     /**
@@ -392,7 +382,6 @@ public class CriteriaMgr {
         int availableSequence = 0;
         Session hsession = HibernateUtil.getCurrentSession();
         try {
-            Transaction tx = hsession.beginTransaction();
             Query countQry = hsession.createQuery("select count(*) from edu.osu.cws.evals.models.CriterionArea " +
                     "where appointmentType = :appointmentType AND deleteDate IS NULL");
 
@@ -403,8 +392,6 @@ public class CriteriaMgr {
             if (results.hasNext()) {
                 availableSequence =  Integer.parseInt(results.next().toString());
             }
-
-            tx.commit();
         } catch (Exception e){
             hsession.close();
             throw e;
@@ -424,9 +411,7 @@ public class CriteriaMgr {
         Session session = HibernateUtil.getCurrentSession();
         CriterionArea criterion;
         try {
-            Transaction tx = session.beginTransaction();
             criterion = get(id, session);
-            tx.commit();
         } catch (Exception e) {
             session.close();
             throw e;

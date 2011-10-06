@@ -64,10 +64,8 @@ public class ConfigurationMgr {
      * @throws Exception
      */
     private List<Configuration> list(Session session) throws Exception {
-        Transaction tx = session.beginTransaction();
         List<Configuration> result = session.createQuery("from edu.osu.cws.evals.models.Configuration configuration " +
                 "order by configuration.section, configuration.sequence").list();
-        tx.commit();
         return result;
     }
 
@@ -84,14 +82,12 @@ public class ConfigurationMgr {
     }
 
     private void edit(int id, String value, Session session) throws Exception {
-        Transaction tx = session.beginTransaction();
         Configuration configuration = (Configuration) session.get(Configuration.class, id);
         if (configuration == null) {
             throw new ModelException("Configuration Parameter not found");
         }
         configuration.setValue(value);
         session.update(configuration);
-        tx.commit();
     }
 
     /**

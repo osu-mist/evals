@@ -17,9 +17,7 @@ public class AppointmentTypeMgr {
         List result;
         Session hsession = HibernateUtil.getCurrentSession();
         try {
-            Transaction tx = hsession.beginTransaction();
             result = hsession.createQuery("from edu.osu.cws.evals.models.AppointmentType").list();
-            tx.commit();
         } catch (Exception e){
             hsession.close();
             throw e;

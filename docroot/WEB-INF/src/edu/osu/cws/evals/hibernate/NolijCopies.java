@@ -25,10 +25,8 @@ public class NolijCopies {
 
         Session session = HibernateUtil.getCurrentSession();
         try {
-            Transaction tx = session.beginTransaction();
             nolijCopy.validate();
             session.save(nolijCopy);
-            tx.commit();
         } catch (Exception e) {
             session.close();
             throw e;

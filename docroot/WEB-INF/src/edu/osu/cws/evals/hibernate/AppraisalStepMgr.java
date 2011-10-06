@@ -45,9 +45,7 @@ public class AppraisalStepMgr {
      * @throws Exception
      */
     public List list(Session session) throws Exception {
-        Transaction tx = session.beginTransaction();
         List result = session.createQuery("from edu.osu.cws.evals.models.AppraisalStep").list();
-        tx.commit();
         return result;
     }
 }

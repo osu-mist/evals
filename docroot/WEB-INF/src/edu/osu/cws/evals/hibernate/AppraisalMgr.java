@@ -90,7 +90,6 @@ public class AppraisalMgr {
             List<CriterionArea> criteriaList = criteriaMgr.list(appointmentType);
             Session session = HibernateUtil.getCurrentSession();
             try {
-                Transaction tx = session.beginTransaction();
                 session.save(appraisal);///441
 
                 // Create assessment and associate it to appraisal
@@ -103,7 +102,6 @@ public class AppraisalMgr {
                     assessment.setModifiedDate(new Date());
                     session.save(assessment);
                 }
-                tx.commit();
             } catch (Exception e){
                 session.close();
                 throw e;
@@ -943,7 +941,6 @@ public class AppraisalMgr {
         Session session = HibernateUtil.getCurrentSession();
         int count = 0;
         try {
-            Transaction tx = session.beginTransaction();
             String query = "select count(*) "+
                     "from edu.osu.cws.evals.models.Appraisal where job.businessCenterName = :bc " +
                     "and status in (:status) and job.endDate is NULL";
@@ -953,7 +950,6 @@ public class AppraisalMgr {
                     .setString("status", status)
                     .list().get(0);
             count =   Integer.parseInt(countObj.toString());
-            tx.commit();
         } catch (Exception e){
             session.close();
             throw e;
@@ -998,11 +994,9 @@ public class AppraisalMgr {
      * @throws Exception
      */
     private void updateAppraisalStatus(int id, String status, Session session) throws Exception {
-        Transaction tx = session.beginTransaction();
         Appraisal appraisal = (Appraisal) session.get(Appraisal.class, id);
         appraisal.setStatus(status);
         session.update(appraisal);
-        tx.commit();
     }
 
     public void setLoggedInUser(Employee loggedInUser) {
@@ -1046,7 +1040,6 @@ public class AppraisalMgr {
         List result;
         Session session = HibernateUtil.getCurrentSession();
         try {
-            Transaction tx = session.beginTransaction();
             String query = "select appraisal.id from edu.osu.cws.evals.models.Appraisal appraisal " +
                     "where status not in ('completed', 'closed', 'archived')";
 
@@ -1055,7 +1048,6 @@ public class AppraisalMgr {
             for (int i = 0; i < result.size(); i++) {
                 ids[i] = (Integer) result.get(i);
             }
-            tx.commit();
         } catch (Exception e) {
             session.close();
             throw e;
@@ -1084,7 +1076,6 @@ public class AppraisalMgr {
         Session session = HibernateUtil.getCurrentSession();
 
         try {
-            Transaction tx = session.beginTransaction();
             String query = "select count(*) from edu.osu.cws.evals.models.Appraisal appraisal " +
                     "where appraisal.job.employee.id = :pidm and appraisal.job.positionNumber = :positionNumber " +
                     "and appraisal.job.suffix = :suffix and appraisal.type = :type " +
@@ -1104,7 +1095,6 @@ public class AppraisalMgr {
             if (resultMapIter.hasNext()) {
                 appraisalCount =  Integer.parseInt(resultMapIter.next().toString());
             }
-            tx.commit();
             //@todo: Joan: I would just do:
             //return (appraisalCount > 0);
             //And get rid of the last line of this method.
@@ -1130,7 +1120,6 @@ public class AppraisalMgr {
         Session session = HibernateUtil.getCurrentSession();
 
         try {
-            Transaction tx = session.beginTransaction();
             String query = "select count(*) from edu.osu.cws.evals.models.Appraisal appraisal " +
                     "where appraisal.job.employee.id = :pidm and appraisal.job.positionNumber = :positionNumber " +
                     "and appraisal.job.suffix = :suffix and appraisal.type = :type " +
@@ -1149,7 +1138,6 @@ public class AppraisalMgr {
             if (resultMapIter.hasNext()) {
                 appraisalCount =  Integer.parseInt(resultMapIter.next().toString());
             }
-            tx.commit();
             if (appraisalCount > 0) {
                 return true;
             }
@@ -1170,14 +1158,12 @@ public class AppraisalMgr {
     public static void updateAppraisalStatus(Appraisal appraisal) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         try {
-            Transaction tx = session.beginTransaction();
             String query = "update edu.osu.cws.evals.models.Appraisal appraisal set status = :status, " +
                     "originalStatus = :origStatus where id = :id";
             session.createQuery(query).setString("status", appraisal.getStatus())
                     .setString("origStatus", appraisal.getOriginalStatus())
                     .setInteger("id", appraisal.getId()) //@todo: Joan: No need to set ID.
                     .executeUpdate();
-            tx.commit();
         } catch (Exception e){
             session.close();
             throw e;

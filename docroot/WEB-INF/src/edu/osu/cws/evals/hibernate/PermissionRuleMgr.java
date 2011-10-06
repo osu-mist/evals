@@ -47,9 +47,7 @@ public class PermissionRuleMgr {
      * @throws Exception
      */
     public List list(Session session) throws Exception {
-        Transaction tx = session.beginTransaction();
         List result = session.createQuery("from edu.osu.cws.evals.models.PermissionRule").list();
-        tx.commit();
         return result;
     }
 }

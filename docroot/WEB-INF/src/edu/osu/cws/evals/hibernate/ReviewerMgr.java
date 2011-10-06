@@ -61,10 +61,8 @@ public class ReviewerMgr {
      * @throws Exception
      */
     private List<Reviewer> list(Session session) throws Exception {
-        Transaction tx = session.beginTransaction();
         List<Reviewer> result = session.createQuery("from edu.osu.cws.evals.models.Reviewer reviewer " +
                 "order by reviewer.businessCenterName").list();
-        tx.commit();
         return result;
     }
 
@@ -98,14 +96,12 @@ public class ReviewerMgr {
      * @throws Exception
      */
     private void delete(int id, Session session) throws Exception {
-        Transaction tx = session.beginTransaction();
         Reviewer admin = (Reviewer) session.get(Reviewer.class, id);
         if (admin == null) {
             throw new ModelException("Invalid Reviewer ID");
         }
 
         session.delete(admin);
-        tx.commit();
     }
 
     /**
@@ -119,9 +115,7 @@ public class ReviewerMgr {
         Session session = HibernateUtil.getCurrentSession();
         Reviewer reviewer;
         try {
-            Transaction tx = session.beginTransaction();
             reviewer = get(id, session);
-            tx.commit();
         } catch (Exception e) {
             session.close();
             throw e;
@@ -152,9 +146,7 @@ public class ReviewerMgr {
         Session session = HibernateUtil.getCurrentSession();
         ArrayList<Reviewer> reviewerList;
         try {
-            Transaction tx = session.beginTransaction();
             reviewerList = (ArrayList<Reviewer>) findByOnid(onid, session);
-            tx.commit();
         } catch (Exception e) {
             session.close();
             throw e;
@@ -192,9 +184,7 @@ public class ReviewerMgr {
         Session session = HibernateUtil.getCurrentSession();
         Reviewer reviewer;
         try {
-            Transaction tx = session.beginTransaction();
             reviewer = findByOnidBC(onid, businessCenterName, session);
-            tx.commit();
         } catch (Exception e) {
             session.close();
             throw e;
@@ -270,10 +260,8 @@ public class ReviewerMgr {
      * @throws Exception
      */
     private void add(Reviewer reviewer, Session session) throws Exception {
-        Transaction tx = session.beginTransaction();
         reviewer.validate();
         session.save(reviewer);
-        tx.commit();
     }
 
     /**
@@ -287,12 +275,10 @@ public class ReviewerMgr {
         Session session = HibernateUtil.getCurrentSession();
         List<Reviewer> results = new ArrayList<Reviewer>();
         try {
-            Transaction tx = session.beginTransaction();
             String query = "from edu.osu.cws.evals.models.Reviewer where businessCenterName = :bcName";
             results = (List<Reviewer>) session.createQuery(query)
                     .setString("bcName", bcName)
                     .list();
-            tx.commit();
         } catch (Exception e) {
             session.close();
             throw e;

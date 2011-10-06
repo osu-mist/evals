@@ -29,10 +29,8 @@ public class EmailTypeMgr {
         HashMap<String, EmailType> typeMap = new HashMap<String, EmailType    >();
         Session session = HibernateUtil.getCurrentSession();
         try {
-            Transaction tx = session.beginTransaction();
             String query = "from edu.osu.cws.evals.models.EmailType";
             List<EmailType> results = (List<EmailType>) session.createQuery(query).list();
-            tx.commit();
 
             for (EmailType emailType : results) {
                 typeMap.put(emailType.getType(),  emailType);

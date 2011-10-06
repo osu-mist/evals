@@ -18,9 +18,7 @@ public class BusinessCenterMgr {
         List<BusinessCenter> result;
         Session hsession = HibernateUtil.getCurrentSession();
         try {
-            Transaction tx = hsession.beginTransaction();
             result = hsession.createQuery("from edu.osu.cws.evals.models.BusinessCenter order by name").list();
-            tx.commit();
         } catch (Exception e){
             hsession.close();
             throw e;

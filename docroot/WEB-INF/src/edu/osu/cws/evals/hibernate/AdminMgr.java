@@ -59,10 +59,8 @@ public class AdminMgr {
      * @throws Exception
      */
     private List<Admin> list(Session session) throws Exception {
-        Transaction tx = session.beginTransaction();
         List<Admin> result = session.createQuery("from edu.osu.cws.evals.models.Admin admin " +
                 "order by admin.isMaster").list();
-        tx.commit();
         return result;
     }
 
@@ -94,14 +92,12 @@ public class AdminMgr {
      * @throws Exception
      */
     private void delete(int id, Session session) throws Exception {
-        Transaction tx = session.beginTransaction();
         Admin admin = (Admin) session.get(Admin.class, id);
         if (admin == null) {
             throw new ModelException("Invalid Admin ID");
         }
 
         session.delete(admin);
-        tx.commit();
     }
 
 
@@ -116,9 +112,7 @@ public class AdminMgr {
         Session session = HibernateUtil.getCurrentSession();
         Admin admin;
         try {
-            Transaction tx = session.beginTransaction();
             admin = get(id, session);
-            tx.commit();
         } catch (Exception e) {
             session.close();
             throw e;
@@ -150,9 +144,7 @@ public class AdminMgr {
         Session session = HibernateUtil.getCurrentSession();
         Admin admin;
         try {
-            Transaction tx = session.beginTransaction();
             admin = findByOnid(onid, session);
-            tx.commit();
         } catch (Exception e) {
             session.close();
             throw e;
@@ -231,9 +223,7 @@ public class AdminMgr {
      * @throws Exception
      */
     private void add(Admin admin, Session session) throws Exception {
-        Transaction tx = session.beginTransaction();
         admin.validate();
         session.save(admin);
-        tx.commit();
     }
 }

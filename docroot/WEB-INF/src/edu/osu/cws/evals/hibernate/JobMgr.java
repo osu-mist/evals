@@ -136,9 +136,7 @@ public class JobMgr {
      * @throws Exception
      */
     private List<Job> list(Session session) throws Exception {
-        Transaction tx = session.beginTransaction();
         List<Job> result = session.createQuery("from edu.osu.cws.evals.models.Job").list();
-        tx.commit();
         return result;
     }
 
@@ -153,12 +151,10 @@ public class JobMgr {
         Session session = HibernateUtil.getCurrentSession();
 
         try {
-            Transaction tx = session.beginTransaction();
             jobs = session.createQuery("from edu.osu.cws.evals.models.Job job " +
                 "where job.status != 'T' and job.appointmentType = :appointmentType")
             .setString("appointmentType", appointmentType)
             .list();
-            tx.commit();
         } catch (Exception e) {
             session.close();
             throw e;
@@ -178,14 +174,12 @@ public class JobMgr {
         Session session = HibernateUtil.getCurrentSession();
 
         try {
-            Transaction tx = session.beginTransaction();
             String query = "select new edu.osu.cws.evals.models.Job(employee.id, positionNumber, suffix, " +
                     "status, appointmentType) from edu.osu.cws.evals.models.Job job " +
                     "where job.status != 'T' and job.appointmentType = :appointmentType";
             jobs = session.createQuery(query)
                     .setString("appointmentType", appointmentType)
                     .list();
-            tx.commit();
         } catch (Exception e) {
             session.close();
             throw e;
@@ -207,7 +201,6 @@ public class JobMgr {
         Session session = HibernateUtil.getCurrentSession();
 
         try {
-            Transaction tx = session.beginTransaction();
             String query = "from edu.osu.cws.evals.models.Job job " +
                     "where job.employee.id = :pidm and job.positionNumber = :positionNumber " +
                     "and job.suffix = :suffix";
@@ -217,7 +210,6 @@ public class JobMgr {
                     .setString("positionNumber", posn)
                     .setString("suffix", suffix)
                     .list();
-            tx.commit();
 
             if (!jobs.isEmpty()) {
                 job = jobs.get(0);
@@ -241,14 +233,12 @@ public class JobMgr {
         Session session = HibernateUtil.getCurrentSession();
 
         try {
-            Transaction tx = session.beginTransaction();
             String query = "from edu.osu.cws.evals.models.Job job " +
                     "where job.employee.id = :pidm";
 
             jobs = session.createQuery(query)
                     .setInteger("pidm", pidm)
                     .list();
-            tx.commit();
         } catch (Exception e) {
             session.close();
             throw e;
@@ -268,7 +258,6 @@ public class JobMgr {
         Session session = HibernateUtil.getCurrentSession();
 
         try {
-            Transaction tx = session.beginTransaction();
             String query = "select businessCenterName from edu.osu.cws.evals.models.Job job " +
                     "where job.employee.id = :pidm and job.status = 'A'";
 
@@ -279,8 +268,6 @@ public class JobMgr {
             if (hibernateQuery.iterate().hasNext()) {
                 businessCenter = (String) hibernateQuery.iterate().next();
             }
-
-            tx.commit();
 
             return businessCenter;
         } catch (Exception e) {

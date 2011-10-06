@@ -41,7 +41,6 @@ public class EmailMgr {
         Session session = HibernateUtil.getCurrentSession();
 
         try {
-            Transaction tx = session.beginTransaction();
             String query = "from edu.osu.cws.evals.models.Email email " +
                     "where email.appraisalId = :appraisalId and email.emailType = :emailType " +
                     "order by  sentDate ";
@@ -56,7 +55,6 @@ public class EmailMgr {
                     .setString("emailType", emailType)
                     .setMaxResults(1)
                     .list();
-            tx.commit();
 
             if (!emails.isEmpty()) {
                 return emails.get(0);
@@ -119,12 +117,10 @@ public class EmailMgr {
     public static void add(List<Email> emails) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         try {
-            Transaction tx = session.beginTransaction();
             for (Email email : emails) {
                 email.validate();
                 session.save(email);
             }
-            tx.commit();
         } catch (Exception e){
             session.close();
             throw e;
