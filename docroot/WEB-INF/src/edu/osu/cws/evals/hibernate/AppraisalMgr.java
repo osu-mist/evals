@@ -11,9 +11,14 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.type.StandardBasicTypes;
+import org.hsqldb.lib.*;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class AppraisalMgr {
     //Need to change this back to 11/01/2011 after testing.
@@ -1242,6 +1247,8 @@ public class AppraisalMgr {
             throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         List<Appraisal> appraisals = new ArrayList<Appraisal>();
+        Set<Job> notBelongJobs = new HashSet<Job>();//jobs the logged in user has no access
+        Set<Job> belongJobs = new HashSet<Job>(); //jobs the logged in user has access
 
         Employee employee = employeeMgr.findByOsuid(osuid);
         if (employee == null) {
@@ -1253,22 +1260,39 @@ public class AppraisalMgr {
                 .setInteger("pidm", searchUserID);
 
         List<Appraisal> appraisalsTemp =  (ArrayList<Appraisal>) hibernateQuery.list();
-        appraisals.addAll(appraisalsTemp);
+
+        if (isAdmin) //Admin gets to see all, so no filtering needed
+            return appraisalsTemp;
+
         for (Appraisal appraisal : appraisalsTemp) {
             Job appJob = appraisal.getJob();
+            if (belongJobs.contains(appJob) || notBelongJobs.contains(appJob))
+            {
+                if (belongJobs.contains(appJob))
+                    appraisals.add(appraisal);
+                continue;
+            }
+
+            //If we get here, we haven't checked this job yet.
             if (bcName != null && !bcName.equals("")) { //reviewer
-                if (!(appJob.getBusinessCenterName().equals(bcName))) {
-                    appraisals.remove(appraisal);
-                }
+               if (appJob.getBusinessCenterName().equals(bcName)) {
+                  appraisals.add(appraisal);
+                  belongJobs.add(appJob);
+               }
+               else
+                  notBelongJobs.add(appJob);
             } else if (isSupervisor) {
                 // Fetch the appraisal job from the db because the isSupervisor method needs to
                 // traverse up the supervising chain.
-                Employee employee1 = new Employee(appJob.getEmployee().getId());
-                Job dbJob = new Job(employee1, appJob.getPositionNumber(), appJob.getSuffix());
-                Job job = (Job) session.load(Job.class, dbJob);
-                if (!jobMgr.isUpperSupervisor(job, pidm)) {
-                    appraisals.remove(appraisal);
+                //Employee employee1 = new Employee(appJob.getEmployee().getId());
+                //Job dbJob = new Job(employee, appJob.getPositionNumber(), appJob.getSuffix());
+                Job job = (Job) session.load(Job.class, appJob);
+                if (jobMgr.isUpperSupervisor(job, pidm)) {
+                    appraisals.add(appraisal);
+                    belongJobs.add(appJob);
                 }
+                else
+                    notBelongJobs.add(appJob);
             }
         }
 
