@@ -127,6 +127,7 @@ public class EvalsPortlet extends GenericPortlet {
         String result = "";
         Method actionMethod;
         String resourceID;
+        Session hibSession = null;
         actionClass.setPortletContext(getPortletContext());
 
         // The logic below is similar to delegate method, but instead we
@@ -135,17 +136,23 @@ public class EvalsPortlet extends GenericPortlet {
         resourceID = request.getResourceID();
         if (resourceID != null) {
             try {
+                hibSession = HibernateUtil.getCurrentSession();
+                Transaction tx = hibSession.beginTransaction();
                 actionMethod = Actions.class.getDeclaredMethod(resourceID, PortletRequest.class,
                         PortletResponse.class);
 
                 // The resourceID methods return the init-param of the path
                 result = (String) actionMethod.invoke(actionClass, request, response);
+                tx.commit();
 
                 // If there was no string returned by the Action method, we return immediately
                 if (result == null) {
                     return;
                 }
             } catch (Exception e) {
+                if (hibSession != null && hibSession.isOpen()) {
+                    hibSession.close();
+                }
                 handlePASSException(e, "Error in serveResource", Logger.ERROR, false);
                 result="There was an error performing your request";
             }
