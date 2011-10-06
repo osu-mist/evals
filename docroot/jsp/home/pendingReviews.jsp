@@ -27,7 +27,7 @@
                             <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
                                 <portlet:param name="id" value="${shortAppraisal.id}"/>
                                 <portlet:param  name="action" value="displayAppraisal"/>
-                               </portlet:actionURL>"><liferay-ui:message key="${shortAppraisal.status}" /></a>
+                               </portlet:actionURL>"><liferay-ui:message key="${shortAppraisal.viewStatus}" /></a>
                             </td>
                         </tr>
                     </c:forEach>

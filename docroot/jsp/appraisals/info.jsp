@@ -35,7 +35,7 @@
                         ${appraisal.reviewPeriod}
                     </td>
                     <td><em><liferay-ui:message key="status" />:</em>
-                        <liferay-ui:message key="${appraisal.status}" />
+                        <liferay-ui:message key="${appraisal.viewStatus}" />
                     </td>
                     <td><em><liferay-ui:message key="appraisal-rating"/>:</em>
                         <c:if test="${not empty appraisal.rating and (permissionRule.evaluation == 'v' or permissionRule.evaluation == 'e')}">

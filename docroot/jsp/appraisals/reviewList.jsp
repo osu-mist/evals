@@ -50,7 +50,7 @@
                                 <portlet:param name="id" value="${appraisal.id}"/>
                                 <portlet:param  name="action" value="displayAppraisal"/>
                                </portlet:actionURL>">
-               <liferay-ui:message key="${appraisal.status}"/></a></td>
+               <liferay-ui:message key="${appraisal.viewStatus}"/></a></td>
         </tr>
     </c:forEach>
         </tbody>

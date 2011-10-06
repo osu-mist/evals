@@ -34,24 +34,14 @@ public class AppraisalMgr {
     private HashMap permissionRules;
     private HashMap<Integer, Admin> admins = new HashMap<Integer, Admin>();
 
-    // Holds a list of appraisal status that are hidden from the employee and
-    // instead we display in-review
-    private ArrayList<String> statusHiddenFromEmployee = new ArrayList<String>();
 
     public AppraisalMgr() {
-        statusHiddenFromEmployee.add("appraisalDue");
-        statusHiddenFromEmployee.add("appraisalOverdue");
-        statusHiddenFromEmployee.add("reviewDue");
-        statusHiddenFromEmployee.add("reviewOverdue");
-        statusHiddenFromEmployee.add("releaseDue");
-        statusHiddenFromEmployee.add("releaseOverdue");
         SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
         try {
             fullGoalsDate = fmt.parse(FULL_GOALS_DATE);
-        }catch (Exception e)
-        {
-        //Should not get here
-         }
+        } catch (Exception e) {
+            //Should not get here
+        }
     }
 
     /**
@@ -560,7 +550,6 @@ public class AppraisalMgr {
             if (request.get(button) != null) {
                 appraisalStepKey = button + "-" + appointmentType;
                 appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
-//                _log.error("appraisalStepKey = "+appraisalStepKey);
                 if (appraisalStep != null) {
                     return appraisalStep;
                 }
@@ -657,7 +646,7 @@ public class AppraisalMgr {
 
         // Check the status of the appraisal and check to see if it needs to be replaced
         for(Appraisal appraisal : result) {
-            setAppraisalStatus(appraisal, "employee");
+            appraisal.setRole("employee");
         }
         return result;
     }
@@ -846,26 +835,6 @@ public class AppraisalMgr {
     }
 
     /**
-     * Checks the appraisal status and if we need to change the status based on the user role, the status
-     * is changed. Right now, if the supervisor submitted the appraisal or hr submitted comments, the status
-     * displayed to the user is in review. If the status contains rebuttalRead, we set the status to
-     * completed.
-     *
-     * @param appraisal
-     * @param role
-     */
-    public void setAppraisalStatus(Appraisal appraisal, String role) {
-        if (role.equals("employee") && statusHiddenFromEmployee.contains(appraisal.getStatus())) {
-            appraisal.setStatus("inReview");
-        }
-
-        // Whenever the status is rebuttalReadDue or rebuttalReadOverdue, we set it as completed.
-        if (appraisal.getStatus().contains("rebuttalRead")) {
-            appraisal.setStatus("completed");
-        }
-    }
-
-    /**
      * This method is just a wrapper for getAppraisal(int id). It performs the hibernate
      * call to retrieve the appraisal.
      *
@@ -970,7 +939,7 @@ public class AppraisalMgr {
             for (Appraisal appraisal : appraisals) {
                 tempAppraisal = (Appraisal) session.load(Appraisal.class, appraisal.getId());
                 String userRole = getRole(tempAppraisal, pidm);
-                setAppraisalStatus(appraisal, userRole);
+                appraisal.setRole(userRole);
             }
         } catch (Exception e){
             session.close();

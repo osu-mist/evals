@@ -146,6 +146,14 @@ public class Appraisal extends Evals {
 
     private Set<Assessment> assessments = new HashSet<Assessment>();
 
+    /**
+     * Read only propety not stored in the db. It is the role of the logged in user with
+     * regards to this appraisal.
+     */
+    private String role;
+
+    private ArrayList<String> statusHiddenFromEmployee = new ArrayList<String>();
+
     public Appraisal() { }
 
     /**
@@ -329,6 +337,36 @@ public class Appraisal extends Evals {
         }
 
         return lastModified;
+    }
+
+    /**
+     *  Checks the appraisal status and if we need to change the status based on the user role, the status
+     * is changed. Right now, if the supervisor submitted the appraisal or hr submitted comments, the status
+     * displayed to the user is in review. If the status contains rebuttalRead, we set the status to
+     * completed.
+     *
+     * @return status
+     */
+    public String getViewStatus() {
+        String viewStatus = status;
+
+        statusHiddenFromEmployee.add("appraisalDue");
+        statusHiddenFromEmployee.add("appraisalOverdue");
+        statusHiddenFromEmployee.add("reviewDue");
+        statusHiddenFromEmployee.add("reviewOverdue");
+        statusHiddenFromEmployee.add("releaseDue");
+        statusHiddenFromEmployee.add("releaseOverdue");
+
+        if (getRole().equals("employee") &&  statusHiddenFromEmployee.contains(viewStatus)) {
+            viewStatus = "inReview";
+        }
+
+        // Whenever the status is rebuttalReadDue or rebuttalReadOverdue, we set it as completed.
+        if (viewStatus.contains("rebuttalRead")) {
+            viewStatus = "completed";
+        }
+
+        return viewStatus;
     }
 
     public int getId() {
@@ -638,5 +676,22 @@ public class Appraisal extends Evals {
 
     public void setOriginalStatus(String originalStatus) {
         this.originalStatus = originalStatus;
+    }
+
+    /**
+     * Role of the logged in user for this appraisal. This is used
+     * in the getViewStatus() method.
+     *
+     * @return
+     */
+    public String getRole() {
+        if (role == null) {
+            role = "";
+        }
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

@@ -13,7 +13,7 @@
 
 <div id="pass-appraisal-form" class="osu-cws">
 
-    <h2><liferay-ui:message key="appraisal-classified-title" />: <liferay-ui:message key="${appraisal.status}" /></h2>
+    <h2><liferay-ui:message key="appraisal-classified-title" />: <liferay-ui:message key="${appraisal.viewStatus}" /></h2>
     <liferay-ui:success key="draft-saved" message="draft-saved" />
     <liferay-ui:success key="appraisal-sent-to-nolij-success" message="appraisal-sent-to-nolij-success" />
 
@@ -88,7 +88,7 @@
                     <legend><liferay-ui:message key="appraisal-employee-signature" /></legend>
                     <input type="checkbox"  name="<portlet:namespace />acknowledge-read-appraisal"
                         id="<portlet:namespace />acknowledge-read-appraisal"
-                        <c:if test="${appraisal.status != 'signatureDue' && appraisal.status != 'signatureOverdue'}">
+                        <c:if test="${appraisal.viewStatus != 'signatureDue' && appraisal.viewStatus != 'signatureOverdue'}">
                             checked="checked" disabled="disabled"
                         </c:if>
                     />
@@ -222,7 +222,7 @@
       
 
       // Using jQuery plugin to expand textareas as you type
-      <c:if test="${appraisal.status != 'signatureDue' && appraisal.status != 'signatureOverdue' ||  not empty appraisal.rebuttal}">
+      <c:if test="${appraisal.viewStatus != 'signatureDue' && appraisal.viewStatus != 'signatureOverdue' ||  not empty appraisal.rebuttal}">
         jQuery('textarea').autogrow();
       </c:if>
       

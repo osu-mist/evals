@@ -413,7 +413,7 @@ public class Actions {
             ArrayList<Appraisal> teamAppraisals = (ArrayList<Appraisal>)
                     requestMap.get("myTeamsActiveAppraisals");
             for (Appraisal appraisal : teamAppraisals) {
-                appraisalMgr.setAppraisalStatus(appraisal, "supervisor");
+                appraisal.setRole("supervisor");
                 newTeamAppraisals.add(appraisal);
             }
 
@@ -655,7 +655,7 @@ public class Actions {
         }
 
         String userRole = appraisalMgr.getRoleAndSession(appraisal, userId);
-        appraisalMgr.setAppraisalStatus(appraisal, userRole);
+        appraisal.setRole(userRole);
         // Set flag whether or not the html form to update the appraisal needs to be displayed
         if (permRule.getSaveDraft() != null && permRule.getSubmit() != null
                 && permRule.getRequireModification() != null) {
@@ -678,6 +678,15 @@ public class Actions {
         if (isLoggedInUserAdmin(request) && appraisal.getEmployeeSignedDate() != null) {
             requestMap.put("displayResendNolij", true);
         }
+
+        // Initialze lazy appraisal assocations
+        appraisal.getJob().toString();
+        appraisal.getJob().getEmployee().toString();
+        appraisal.getSortedAssessments().size();
+        for (Assessment assessment : appraisal.getAssessments()) {
+            assessment.getCriterionDetail().getAreaID();
+        }
+        // End of initialze lazy appraisal assocations
 
         requestMap.put("appraisal", appraisal);
         requestMap.put("permissionRule", permRule);
@@ -789,7 +798,7 @@ public class Actions {
 
         int userId = currentlyLoggedOnUser.getId();
         String userRole = appraisalMgr.getRoleAndSession(appraisal, userId);
-        appraisalMgr.setAppraisalStatus(appraisal, userRole);
+        appraisal.setRole(userRole);
 
         // 2) Compose a file name
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
@@ -868,7 +877,7 @@ public class Actions {
 
         int userId = currentlyLoggedOnUser.getId();
         String userRole = appraisalMgr.getRoleAndSession(appraisal, userId);
-        appraisalMgr.setAppraisalStatus(appraisal, userRole);
+        appraisal.setRole(userRole);
 
         requestMap.put("id", appraisal.getId());
         if (!isLoggedInUserReviewer(request)) {

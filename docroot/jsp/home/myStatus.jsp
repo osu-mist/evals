@@ -25,7 +25,7 @@
                             <portlet:param name="id" value="${shortAppraisal.id}"/>
                             <portlet:param  name="action" value="displayAppraisal"/>
                            </portlet:actionURL>">
-                                <liferay-ui:message key="${shortAppraisal.status}" />
+                                <liferay-ui:message key="${shortAppraisal.viewStatus}" />
                            </a>
                         </td>
                     </tr>
