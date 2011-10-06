@@ -192,9 +192,11 @@ public class EvalsPortlet extends GenericPortlet {
                     // The action methods return the init-param of the path
                     viewJSP = (String) actionMethod.invoke(actionClass, request, response);
                 } catch (Exception e) {
+                    hibSession.close();
                     handlePASSException(e, action, Logger.ERROR, false);
                 }
             }
+            tx.commit();
         } catch (Exception e) {
             if (hibSession != null && hibSession.isOpen()) {
                 hibSession.close();

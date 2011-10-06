@@ -4,14 +4,10 @@ import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
-import edu.osu.cws.util.CWSUtil;
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.type.StandardBasicTypes;
-import org.hsqldb.lib.*;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -33,6 +29,11 @@ public class AppraisalMgr {
     private HashMap appraisalSteps;
     private HashMap permissionRules;
     private HashMap<Integer, Admin> admins = new HashMap<Integer, Admin>();
+    private HashMap<Integer, Reviewer> reviewers = new HashMap<Integer, Reviewer>();
+    private Mailer mailer;
+    Map<String, Configuration> configurationMap;
+    private PermissionRule permissionRule;
+
 
 
     public AppraisalMgr() {
@@ -291,29 +292,21 @@ public class AppraisalMgr {
      * moves the appraisal to the next appraisal step and sends any emails if necessary.
      *
      * @param request
-     * @param id                id of appraisal
-     * @param resultsDueConfig  Configuration object specifying when the results are due
-     * @param mailer            Mailer object to send emails to supervisor and employee
-     * @return appraisal        Appraisal object after processing the update request
+     * @param appraisal
+     * @param permRule
      * @throws Exception
      */
-    public Appraisal processUpdateRequest(Map request, int id, Configuration resultsDueConfig, Mailer mailer)
+    public void processUpdateRequest(Map request, Appraisal appraisal, PermissionRule permRule)
             throws Exception {
         Session session = HibernateUtil.getCurrentSession();
+        Configuration resultsDueConfig = configurationMap.get("resultsDue");
+
         try {
-            Transaction tx = session.beginTransaction();
-            Appraisal appraisal = (Appraisal) session.get(Appraisal.class, id);
             Job supervisorJob = jobMgr.getSupervisor(appraisal.getJob());
             appraisal.getJob().setCurrentSupervisor(supervisorJob); //@todo: Joan: why this?
-            PermissionRule permRule = getAppraisalPermissionRule(appraisal);
 
-            // Check to see if the logged in user has permission to access the appraisal
-            if (permRule == null) { //@todo: Joan: where is permRule set?
-                throw new ModelException("You do  not have permission to view the appraisal");
-            }
             // update appraisal & assessment fields based on permission rules
             setAppraisalFields(request, appraisal, permRule);
-
 
             //@todo: validate appraisal
 
@@ -326,7 +319,6 @@ public class AppraisalMgr {
                 action = "sign-appraisal";
             }
             createFirstAnnualAppraisal(appraisal, resultsDueConfig, action);
-            tx.commit();
 
             // Send email if needed
             String appointmentType = appraisal.getJob().getAppointmentType();
@@ -346,8 +338,6 @@ public class AppraisalMgr {
             if (emailType != null) {
                 mailer.sendMail(appraisal, emailType);
             }
-
-            return appraisal;
         } catch (Exception e) {
             if (session.isOpen()) {
                 session.close();
@@ -752,15 +742,21 @@ public class AppraisalMgr {
      * @throws Exception
      */
     public String getRole(Appraisal appraisal, int pidm) throws Exception {
+        if (appraisal.getRole() != null && !appraisal.getRole().equals("")) {
+            return appraisal.getRole();
+        }
+
         Session session = HibernateUtil.getCurrentSession();
         Job supervisor;
         if (pidm == appraisal.getJob().getEmployee().getId()) {
-            return "employee";
+            appraisal.setRole("employee");
+            return appraisal.getRole();
         }
 
         supervisor = jobMgr.getSupervisor(appraisal.getJob());
         if (supervisor != null && pidm == supervisor.getEmployee().getId()) {
-            return "supervisor";
+            appraisal.setRole("supervisor");
+            return appraisal.getRole();
         }
 
         String query = "from edu.osu.cws.evals.models.Reviewer where " +
@@ -772,16 +768,19 @@ public class AppraisalMgr {
                 .list();
 
         if (reviewerList.size() != 0) {
-            return "reviewer";
+            appraisal.setRole("reviewer");
+            return appraisal.getRole();
         }
 
         if (jobMgr.isUpperSupervisor(appraisal.getJob(), pidm)) {
-            return "upper-supervisor";
+            appraisal.setRole("upper-supervisor");
+            return appraisal.getRole();
         }
 
         //@todo: the admin role below needs tests
         if (admins.containsKey(pidm)) {
-            return "admin";
+            appraisal.setRole("admin");
+            return appraisal.getRole();
         }
 
         return "";
@@ -925,29 +924,6 @@ public class AppraisalMgr {
     }
 
     /**
-     * Iterates over list of appraisal and sets the status based on the role of the user (pidm).
-     *
-     * @param pidm
-     * @param appraisals
-     * @throws Exception
-     */
-    //@todo: Joan: this Seems expensive.
-    private void setAppraisalsStatusByRole(int pidm, List<Appraisal> appraisals) throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        Appraisal tempAppraisal;
-        try {
-            for (Appraisal appraisal : appraisals) {
-                tempAppraisal = (Appraisal) session.load(Appraisal.class, appraisal.getId());
-                String userRole = getRole(tempAppraisal, pidm);
-                appraisal.setRole(userRole);
-            }
-        } catch (Exception e){
-            session.close();
-            throw e;
-        }
-    }
-
-    /**
      * @param bcName: name of the business center
      * @return  the number of appraisals that are due for review for a business center.
      */
@@ -1043,6 +1019,18 @@ public class AppraisalMgr {
 
     public void setAdmins(HashMap<Integer, Admin> admins) {
         this.admins = admins;
+    }
+
+    public void setMailer(Mailer mailer) {
+        this.mailer = mailer;
+    }
+
+    public void setConfigurationMap(Map<String, Configuration> configurationMap) {
+        this.configurationMap = configurationMap;
+    }
+
+    public void setReviewers(HashMap<Integer, Reviewer> reviewers) {
+        this.reviewers = reviewers;
     }
 
     /**
@@ -1231,10 +1219,10 @@ public class AppraisalMgr {
 
         for (Appraisal appraisal : appraisalsTemp) {
             Job appJob = appraisal.getJob();
-            if (belongJobs.contains(appJob) || notBelongJobs.contains(appJob))
-            {
-                if (belongJobs.contains(appJob))
+            if (belongJobs.contains(appJob) || notBelongJobs.contains(appJob)) {
+                if (belongJobs.contains(appJob)) {
                     appraisals.add(appraisal);
+                }
                 continue;
             }
 
@@ -1244,8 +1232,9 @@ public class AppraisalMgr {
                   appraisals.add(appraisal);
                   belongJobs.add(appJob);
                }
-               else
+               else {
                   notBelongJobs.add(appJob);
+               }
             } else if (isSupervisor) {
                 // Fetch the appraisal job from the db because the isSupervisor method needs to
                 // traverse up the supervising chain.
@@ -1255,13 +1244,12 @@ public class AppraisalMgr {
                 if (jobMgr.isUpperSupervisor(job, pidm)) {
                     appraisals.add(appraisal);
                     belongJobs.add(appJob);
-                }
-                else
+                } else {
                     notBelongJobs.add(appJob);
+                }
             }
         }
 
-        setAppraisalsStatusByRole(pidm, appraisals);
         return appraisals;
 
     }

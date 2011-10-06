@@ -12,6 +12,7 @@ import edu.osu.cws.evals.util.EvalsPDF;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.hibernate.Session;
 
 import javax.portlet.*;
 import java.io.OutputStream;
@@ -679,8 +680,9 @@ public class Actions {
             requestMap.put("displayResendNolij", true);
         }
 
-        // Initialze lazy appraisal assocations
+        // Initialze lazy appraisal associations
         appraisal.getJob().toString();
+        appraisal.getJob().getCurrentSupervisor();
         appraisal.getJob().getEmployee().toString();
         appraisal.getSortedAssessments().size();
         for (Assessment assessment : appraisal.getAssessments()) {
@@ -704,14 +706,20 @@ public class Actions {
     private void setAppraisalMgrParameters(Employee currentlyLoggedOnUser) {
         HashMap permissionRules = (HashMap) portletContext.getAttribute("permissionRules");
         HashMap<Integer, Admin> admins = (HashMap<Integer, Admin>) portletContext.getAttribute("admins");
+        HashMap<Integer, Reviewer> reviewers = (HashMap<Integer, Reviewer>) portletContext.getAttribute("reviewers");
         HashMap appraisalSteps = (HashMap) portletContext.getAttribute("appraisalSteps");
+        Mailer mailer = (Mailer) portletContext.getAttribute("mailer");
+        Map<String, Configuration> configurationMap =
+                (Map<String, Configuration>) portletContext.getAttribute("configurations");
 
-        //@todo: Joan: Maybe we should just set the one permissionRule object as we have it. So we are only calling
-        //the getRoles method once, which is expensive.
         appraisalMgr.setPermissionRules(permissionRules);
         appraisalMgr.setLoggedInUser(currentlyLoggedOnUser);
         appraisalMgr.setAdmins(admins);
+        appraisalMgr.setReviewers(reviewers);
         appraisalMgr.setAppraisalSteps(appraisalSteps);
+        appraisalMgr.setMailer(mailer);
+        appraisalMgr.setConfigurationMap(configurationMap);
+
     }
 
     /**
@@ -723,7 +731,8 @@ public class Actions {
      * @throws Exception
      */
     public String updateAppraisal(PortletRequest request, PortletResponse response) throws Exception {
-        Appraisal appraisal;
+        Session session = HibernateUtil.getCurrentSession();
+        CompositeConfiguration config;
         int id = ParamUtil.getInteger(request, "id", 0);
         if (id == 0) {
             addErrorsToRequest(request, "We couldn't find your appraisal. If you believe this is an " +
@@ -733,19 +742,21 @@ public class Actions {
 
         Employee currentlyLoggedOnUser = getLoggedOnUser(request);
         setAppraisalMgrParameters(currentlyLoggedOnUser);
+        Appraisal appraisal = (Appraisal) session.get(Appraisal.class, id);
+        PermissionRule permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
+
+        // Check to see if the logged in user has permission to access the appraisal
+        if (permRule == null) {
+            SessionErrors.add(request, "You do  not have permission to view the appraisal");
+            return displayHomeView(request, response);
+        }
 
         try {
-            Map<String, Configuration> configurationMap =
-                    (Map<String, Configuration>) portletContext.getAttribute("configurations");
-            Configuration resultsDueConfig = configurationMap.get("resultsDue");
-
-            Mailer mailer = (Mailer) portletContext.getAttribute("mailer");
-            appraisal = appraisalMgr.processUpdateRequest(request.getParameterMap(), id, resultsDueConfig, mailer);
+            appraisalMgr.processUpdateRequest(request.getParameterMap(), appraisal, permRule);
 
             String signAppraisal = ParamUtil.getString(request, "sign-appraisal");
             if (signAppraisal != null && !signAppraisal.equals("")) {
-                CompositeConfiguration config = (CompositeConfiguration)
-                        portletContext.getAttribute("environmentProp");
+                config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
                 String nolijDir = config.getString("pdf.nolijDir");
                 String env = config.getString("pdf.env");
                 createNolijPDF(appraisal, nolijDir, env);

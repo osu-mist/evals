@@ -101,10 +101,8 @@ public class EmailMgr {
     public static void add(Email email)  throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         try {
-            Transaction tx = session.beginTransaction();
             email.validate();
             session.save(email);
-            tx.commit();
         } catch (Exception e){
             session.close();
             throw e;
