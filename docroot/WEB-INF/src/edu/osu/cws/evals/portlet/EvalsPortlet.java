@@ -173,6 +173,7 @@ public class EvalsPortlet extends GenericPortlet {
      *
      * @param request   PortletRequest
      * @param response  PortletResponse
+     * @throws Exception
      */
     public void delegate(PortletRequest request, PortletResponse response) throws Exception {
         Method actionMethod;
@@ -237,11 +238,14 @@ public class EvalsPortlet extends GenericPortlet {
      */
     private void portletSetup(PortletRequest request) throws Exception {
         if (getPortletContext().getAttribute("environmentProp") == null) {
+            Session hibSession = null;
             actionClass.setPortletContext(getPortletContext());
             String message = loadEnvironmentProperties(request);
             createLogger();
 
             try {
+                hibSession = HibernateUtil.getCurrentSession();
+                Transaction tx = hibSession.beginTransaction();
                 actionClass.setEvalsConfiguration();
                 message += "Stored Configuration Map and List in portlet context\n";
                 createMailer();
@@ -255,11 +259,15 @@ public class EvalsPortlet extends GenericPortlet {
 
                 actionClass.setEvalsAdmins();
                 actionClass.setEvalsReviewers();
+                tx.commit();
                 EvalsLogger logger =  getLog();
                 if (logger != null) {
                     logger.log(Logger.INFORMATIONAL, "Portlet Setup Success", message);
                 }
             } catch (Exception e) {
+                if (hibSession != null && hibSession.isOpen()) {
+                    hibSession.close();
+                }
                 EvalsLogger logger =  getLog();
                 if (logger != null) {
                     logger.log(Logger.ERROR, "Portlet Setup Failed", message);
