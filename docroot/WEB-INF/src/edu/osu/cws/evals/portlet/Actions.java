@@ -485,7 +485,14 @@ public class Actions {
      */
     public void setEvalsAdmins() throws Exception {
         portletContext.setAttribute("admins", adminMgr.mapByEmployeeId());
-        portletContext.setAttribute("adminsList", adminMgr.list());
+        List<Admin> admins = adminMgr.list();
+        // Call getName on the admins object to initialize the employee name
+        for (Admin admin : admins) {
+            if (admin.getEmployee() != null) {
+                admin.getEmployee().getName();
+            }
+        }
+        portletContext.setAttribute("adminsList", admins);
     }
 
     /**
@@ -496,7 +503,14 @@ public class Actions {
      */
     public void setEvalsReviewers() throws Exception {
         portletContext.setAttribute("reviewers", reviewerMgr.mapByEmployeeId());
-        portletContext.setAttribute("reviewersList", reviewerMgr.list());
+        List<Reviewer> reviewers = reviewerMgr.list();
+        // Call getName on the reviewers object to initialize the employee name
+        for (Reviewer reviewer : reviewers) {
+            if (reviewer.getEmployee() != null) {
+                reviewer.getEmployee().getName();
+            }
+        }
+        portletContext.setAttribute("reviewersList", reviewers);
     }
 
     /**
@@ -974,6 +988,9 @@ public class Actions {
             // If the user clicks on the delete link the first time, use confirm page
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
                 Admin admin = adminMgr.get(id);
+                if (admin.getEmployee() != null) { // initialize name due to lazy-loading
+                    admin.getEmployee().getName();
+                }
                 requestMap.put("admin", admin);
                 return "admin-delete-jsp";
             }
@@ -1074,6 +1091,9 @@ public class Actions {
             // If the user clicks on the delete link the first time, use confirm page
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
                 Reviewer reviewer = reviewerMgr.get(id);
+                if (reviewer.getEmployee() != null) {
+                    reviewer.getEmployee().getName(); // initialize name due to lazy-loading
+                }
                 requestMap.put("reviewer", reviewer);
                 return "reviewer-delete-jsp";
             }
