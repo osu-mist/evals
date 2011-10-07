@@ -166,6 +166,9 @@ public class Actions {
 
         try {
             List<CriterionArea> criterionList = new CriteriaMgr().list(appointmentType);
+            for (CriterionArea criteria : criterionList) {
+                criteria.getCurrentDetail().toString();
+            }
             requestMap.put("criteria", criterionList);
         } catch (ModelException e) {
             addErrorsToRequest(request, e.getMessage());
