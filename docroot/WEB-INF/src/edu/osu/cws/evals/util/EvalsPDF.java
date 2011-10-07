@@ -481,7 +481,7 @@ public class EvalsPDF {
         p = new Paragraph(c);
         String name = "";
         if (appraisal.getJob().getSupervisor() != null) {
-            appraisal.getJob().getSupervisor().getEmployee().getName();
+            name = appraisal.getJob().getSupervisor().getEmployee().getName();
         }
         c = new Chunk(name, FONT_BOLD_11);
         p.add(c);
