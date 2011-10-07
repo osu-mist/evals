@@ -24,7 +24,6 @@ import java.util.regex.Pattern;
  * Actions class used to map user form actions to respective class methods.
  */
 public class Actions {
-    private static Log _log = LogFactoryUtil.getLog(Actions.class);
     public static final String ROLE_ADMINISTRATOR = "administrator";
     public static final String ROLE_REVIEWER = "reviewer";
     public static final String ROLE_SUPERVISOR = "supervisor";

@@ -6,7 +6,6 @@ import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.type.StandardBasicTypes;
 
 import java.text.SimpleDateFormat;
@@ -184,7 +183,9 @@ public class AppraisalMgr {
         appraisal.setEndDate(endDate);
 
         int resultsDue = EvalsUtil.isDue(appraisal, resultsDueConfig);
-        if (resultsDue == 0) {
+        if (appraisal.getStartDate().before(fullGoalsDate)) {
+            appraisal.setStatus("appraisalDue");
+        } else if (resultsDue == 0) {
             appraisal.setStatus("resultsDue");
         } else if (resultsDue < 0) {
             appraisal.setStatus("resultsOverdue");
