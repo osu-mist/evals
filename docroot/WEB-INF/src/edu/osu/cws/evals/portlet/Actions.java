@@ -1,7 +1,5 @@
 package edu.osu.cws.evals.portlet;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -282,7 +280,8 @@ public class Actions {
         PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
         int employeeId = employee.getId();
-        setupActiveAppraisals(request, employeeId);
+        setupMyActiveAppraisals(request, employeeId, false);
+        setupMyTeamActiveAppraisals(request, employeeId, false);
 
         boolean isAdmin = isLoggedInUserAdmin(request);
         boolean isReviewer = isLoggedInUserReviewer(request);
@@ -323,14 +322,41 @@ public class Actions {
      * piece.
      *
      * @param request
-     * @param employeeId
+     * @param employeeId    Id/Pidm of the currently logged in user
+     * @param refresh       Force refresh of the list of appraisals in session
      * @throws Exception
      */
-    private void setupActiveAppraisals(PortletRequest request, int employeeId) throws Exception {
-        ArrayList<Appraisal> allMyActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(employeeId);
+    private void setupMyActiveAppraisals(PortletRequest request, int employeeId, boolean refresh) throws Exception {
+        PortletSession session = request.getPortletSession(true);
+        List<Appraisal> allMyActiveAppraisals;
+
+        allMyActiveAppraisals = (ArrayList<Appraisal>) session.getAttribute("allMyActiveAppraisals");
+        if (refresh || allMyActiveAppraisals == null) {
+            allMyActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(employeeId);
+            session.setAttribute("allMyActiveAppraisals", allMyActiveAppraisals);
+        }
         requestMap.put("myActiveAppraisals", allMyActiveAppraisals);
+    }
+
+    /**
+     * Fetches the supervisor's team active appraisal and stores the list in session. Then it places the list
+     * in the requestMap so that the view can access it.
+     *
+     * @param request
+     * @param employeeId    Id/Pidm of the currently logged in user
+     * @param refresh       Force refresh of the list of appraisals in session
+     * @throws Exception
+     */
+    private void setupMyTeamActiveAppraisals(PortletRequest request, int employeeId, boolean refresh) throws Exception {
+        PortletSession session = request.getPortletSession(true);
+        List<Appraisal> myTeamsActiveAppraisals;
+
         if (isLoggedInUserSupervisor(request)) {
-            List<Appraisal> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true);
+            myTeamsActiveAppraisals = (ArrayList<Appraisal>)  session.getAttribute("myTeamsActiveAppraisals");
+            if (refresh || myTeamsActiveAppraisals == null) {
+                myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true);
+                session.setAttribute("myTeamsActiveAppraisals", myTeamsActiveAppraisals);
+            }
             requestMap.put("myTeamsActiveAppraisals", myTeamsActiveAppraisals);
         }
     }
@@ -344,7 +370,8 @@ public class Actions {
 
         PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
-        setupActiveAppraisals(request, employee.getId());
+        setupMyActiveAppraisals(request, employee.getId(), false);
+        setupMyTeamActiveAppraisals(request, employee.getId(), false);
         setRequiredActions(request);
         useNormalMenu(request);
         helpLinks(request);
@@ -365,7 +392,8 @@ public class Actions {
 
         PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
-        setupActiveAppraisals(request, employee.getId());
+        setupMyActiveAppraisals(request, employee.getId(), false);
+        setupMyTeamActiveAppraisals(request, employee.getId(), false);
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
         int maxResults = config.getInt("reviewer.home.pending.max");
 
@@ -391,7 +419,8 @@ public class Actions {
 
         PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
-        setupActiveAppraisals(request, employee.getId());
+        setupMyActiveAppraisals(request, employee.getId(), false);
+        setupMyTeamActiveAppraisals(request, employee.getId(), false);
         setRequiredActions(request);
         setTeamAppraisalStatus(request);
         useNormalMenu(request);
@@ -776,6 +805,12 @@ public class Actions {
                 String nolijDir = config.getString("pdf.nolijDir");
                 String env = config.getString("pdf.env");
                 createNolijPDF(appraisal, nolijDir, env);
+            }
+
+            if (appraisal.getRole().equals("supervisor")) {
+                setupMyTeamActiveAppraisals(request, currentlyLoggedOnUser.getId(), true);
+            } else if (appraisal.getRole().equals("employee")) {
+                setupMyActiveAppraisals(request, currentlyLoggedOnUser.getId(), true);
             }
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
@@ -1229,6 +1264,17 @@ public class Actions {
         if (loggedOnUser == null) {
             String loggedOnUsername = getLoggedOnUsername(request);
             loggedOnUser = employeeMgr.findByOnid(loggedOnUsername, "employee-with-jobs");
+
+            // Initialize the jobs and supervisor of the jobs so that display employment
+            // information has the data it needs.
+            Set<Job> jobs = loggedOnUser.getJobs();
+            if (jobs != null && !jobs.isEmpty()) {
+                for (Job job : jobs) {
+                    if (job.getSupervisor() != null && job.getSupervisor().getEmployee() != null) {
+                        job.getSupervisor().getEmployee().getName();
+                    }
+                }
+            }
             session.setAttribute("loggedOnUser", loggedOnUser);
         }
 
