@@ -26,6 +26,8 @@ public class Actions {
     public static final String ROLE_REVIEWER = "reviewer";
     public static final String ROLE_SUPERVISOR = "supervisor";
     public static final String ROLE_SELF = "self";
+    public static final String ALL_MY_ACTIVE_APPRAISALS = "allMyActiveAppraisals";
+    public static final String MY_TEAMS_ACTIVE_APPRAISALS = "myTeamsActiveAppraisals";
 
     private EmployeeMgr employeeMgr = new EmployeeMgr();
 
@@ -281,8 +283,8 @@ public class Actions {
         PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
         int employeeId = employee.getId();
-        setupMyActiveAppraisals(request, employeeId, false);
-        setupMyTeamActiveAppraisals(request, employeeId, false);
+        setupMyActiveAppraisals(request, employeeId);
+        setupMyTeamActiveAppraisals(request, employeeId);
 
         boolean isAdmin = isLoggedInUserAdmin(request);
         boolean isReviewer = isLoggedInUserReviewer(request);
@@ -324,19 +326,16 @@ public class Actions {
      *
      * @param request
      * @param employeeId    Id/Pidm of the currently logged in user
-     * @param refresh       Force refresh of the list of appraisals in session
      * @throws Exception
      */
-    //@@todo: Joan: allMyActiveAppraisals is only null for the first time.  After the first time, it can be empty, but not null.
-    // @@todo: Joan: So the parameter refresh is not needed.
-    private void setupMyActiveAppraisals(PortletRequest request, int employeeId, boolean refresh) throws Exception {
+    private void setupMyActiveAppraisals(PortletRequest request, int employeeId) throws Exception {
         PortletSession session = request.getPortletSession(true);
         List<Appraisal> allMyActiveAppraisals;
 
-        allMyActiveAppraisals = (ArrayList<Appraisal>) session.getAttribute("allMyActiveAppraisals");
-        if (refresh || allMyActiveAppraisals == null) {
+        allMyActiveAppraisals = (ArrayList<Appraisal>) session.getAttribute(ALL_MY_ACTIVE_APPRAISALS);
+        if (allMyActiveAppraisals == null) {
             allMyActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(employeeId);
-            session.setAttribute("allMyActiveAppraisals", allMyActiveAppraisals);
+            session.setAttribute(ALL_MY_ACTIVE_APPRAISALS, allMyActiveAppraisals);
         }
         requestMap.put("myActiveAppraisals", allMyActiveAppraisals);
     }
@@ -347,20 +346,19 @@ public class Actions {
      *
      * @param request
      * @param employeeId    Id/Pidm of the currently logged in user
-     * @param refresh       Force refresh of the list of appraisals in session
      * @throws Exception
      */
-    private void setupMyTeamActiveAppraisals(PortletRequest request, int employeeId, boolean refresh) throws Exception {
+    private void setupMyTeamActiveAppraisals(PortletRequest request, int employeeId) throws Exception {
         PortletSession session = request.getPortletSession(true);
         List<Appraisal> myTeamsActiveAppraisals;
 
         if (isLoggedInUserSupervisor(request)) {
-            myTeamsActiveAppraisals = (ArrayList<Appraisal>)  session.getAttribute("myTeamsActiveAppraisals");
-            if (refresh || myTeamsActiveAppraisals == null) {
+            myTeamsActiveAppraisals = (ArrayList<Appraisal>)  session.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
+            if (myTeamsActiveAppraisals == null) {
                 myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true);
-                session.setAttribute("myTeamsActiveAppraisals", myTeamsActiveAppraisals);
+                session.setAttribute(MY_TEAMS_ACTIVE_APPRAISALS, myTeamsActiveAppraisals);
             }
-            requestMap.put("myTeamsActiveAppraisals", myTeamsActiveAppraisals);
+            requestMap.put(MY_TEAMS_ACTIVE_APPRAISALS, myTeamsActiveAppraisals);
         }
     }
 
@@ -373,8 +371,8 @@ public class Actions {
 
         PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
-        setupMyActiveAppraisals(request, employee.getId(), false);
-        setupMyTeamActiveAppraisals(request, employee.getId(), false);
+        setupMyActiveAppraisals(request, employee.getId());
+        setupMyTeamActiveAppraisals(request, employee.getId());
         setRequiredActions(request);
         useNormalMenu(request);
         helpLinks(request);
@@ -395,8 +393,8 @@ public class Actions {
 
         PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
-        setupMyActiveAppraisals(request, employee.getId(), false);
-        setupMyTeamActiveAppraisals(request, employee.getId(), false);
+        setupMyActiveAppraisals(request, employee.getId());
+        setupMyTeamActiveAppraisals(request, employee.getId());
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
         int maxResults = config.getInt("reviewer.home.pending.max");
 
@@ -422,8 +420,8 @@ public class Actions {
 
         PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
-        setupMyActiveAppraisals(request, employee.getId(), false);
-        setupMyTeamActiveAppraisals(request, employee.getId(), false);
+        setupMyActiveAppraisals(request, employee.getId());
+        setupMyTeamActiveAppraisals(request, employee.getId());
         setRequiredActions(request);
         setTeamAppraisalStatus(request);
         useNormalMenu(request);
@@ -711,20 +709,13 @@ public class Actions {
             showForm = true;
         }
 
-        if (isLoggedInUserSupervisor(request)) {
-            //@todo: Joan: Let's think about putting some basic information of myAppraisals and myTeam appraisals in the session.
-            List<Appraisal> myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(userId, true);
-            requestMap.put("myTeamsAppraisals", myTeamsActiveAppraisals);
-        }
-
+        setupMyTeamActiveAppraisals(request, userId);
         if (isLoggedInUserReviewer(request)) {
-            //@todo: Joan: Maybe put this in the session too.
             ArrayList<Appraisal> reviews = getReviewsForLoggedInUser(request, -1);
             requestMap.put("pendingReviews", reviews);
         }
 
-        //@todo: Joan: we only let reviewers resend to nolij.
-        if (isLoggedInUserAdmin(request) && appraisal.getEmployeeSignedDate() != null) {
+        if (isLoggedInUserReviewer(request) && appraisal.getEmployeeSignedDate() != null) {
             requestMap.put("displayResendNolij", true);
         }
 
@@ -736,7 +727,7 @@ public class Actions {
         for (Assessment assessment : appraisal.getAssessments()) {
             assessment.getCriterionDetail().getAreaID();
         }
-        // End of initialze lazy appraisal assocations
+        // End of initialize lazy appraisal associations
 
         requestMap.put("appraisal", appraisal);
         requestMap.put("permissionRule", permRule);
@@ -811,9 +802,9 @@ public class Actions {
             }
 
             if (appraisal.getRole().equals("supervisor")) {
-                setupMyTeamActiveAppraisals(request, currentlyLoggedOnUser.getId(), true);
+                setupMyTeamActiveAppraisals(request, currentlyLoggedOnUser.getId());
             } else if (appraisal.getRole().equals("employee")) {
-                setupMyActiveAppraisals(request, currentlyLoggedOnUser.getId(), true);
+                setupMyActiveAppraisals(request, currentlyLoggedOnUser.getId());
             }
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
@@ -827,30 +818,34 @@ public class Actions {
             }
             return displayAppraisal(request, response);
         }
-
-
-        //@@todo: Joan: Some code here to update the appraisal record in the session
         updateAppraisalInSession(request, appraisal);
 
         return displayHomeView(request, response);
     }
 
-    private void updateAppraisalInSession(PortletRequest request, Appraisal appraisal)
-    {
+    /***
+     * This method updates the status of the appraisal in myTeam or myStatus to reflect the
+     * changes from the updateAppraisal method.
+     *
+     * @param request
+     * @param appraisal
+     */
+    private void updateAppraisalInSession(PortletRequest request, Appraisal appraisal) {
         List<Appraisal>  appraisals;
         PortletSession pSession = request.getPortletSession();
-        if (appraisal.getRole().equals("employee"))
-            appraisals = (List) pSession.getAttribute("myActiveAppraisals");
-        else if (appraisal.getRole().equals("supervisor"))
-            appraisals = (List) pSession.getAttribute("myTeamActiveAppraisals");
-        else
+        if (appraisal.getRole().equals("employee")) {
+            appraisals = (List) pSession.getAttribute(ALL_MY_ACTIVE_APPRAISALS);
+        } else if (appraisal.getRole().equals(ROLE_SUPERVISOR)) {
+            appraisals = (List) pSession.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
+        } else {
             return;
+        }
 
-        for (Appraisal appraisalInSession: appraisals)
-        {
-            if (appraisalInSession.getId() == appraisal.getId())
+        for (Appraisal appraisalInSession: appraisals) {
+            if (appraisalInSession.getId() == appraisal.getId()) {
                 appraisalInSession.setStatus(appraisal.getStatus());
-            break;
+                break;
+            }
         }
     }
 
