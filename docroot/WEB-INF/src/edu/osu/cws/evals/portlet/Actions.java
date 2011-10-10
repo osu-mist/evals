@@ -276,6 +276,7 @@ public class Actions {
      * @return jsp      JSP file to display (defined in portlet.xml)
      * @throws Exception
      */
+    //@@todo: Joan: I don't see the need to have several displayHomeView methods.  Let's talk about this.
     public String displayHomeView(PortletRequest request, PortletResponse response) throws Exception {
         PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
@@ -326,6 +327,8 @@ public class Actions {
      * @param refresh       Force refresh of the list of appraisals in session
      * @throws Exception
      */
+    //@@todo: Joan: allMyActiveAppraisals is only null for the first time.  After the first time, it can be empty, but not null.
+    // @@todo: Joan: So the parameter refresh is not needed.
     private void setupMyActiveAppraisals(PortletRequest request, int employeeId, boolean refresh) throws Exception {
         PortletSession session = request.getPortletSession(true);
         List<Appraisal> allMyActiveAppraisals;
@@ -825,7 +828,30 @@ public class Actions {
             return displayAppraisal(request, response);
         }
 
+
+        //@@todo: Joan: Some code here to update the appraisal record in the session
+        updateAppraisalInSession(request, appraisal);
+
         return displayHomeView(request, response);
+    }
+
+    private void updateAppraisalInSession(PortletRequest request, Appraisal appraisal)
+    {
+        List<Appraisal>  appraisals;
+        PortletSession pSession = request.getPortletSession();
+        if (appraisal.getRole().equals("employee"))
+            appraisals = (List) pSession.getAttribute("myActiveAppraisals");
+        else if (appraisal.getRole().equals("supervisor"))
+            appraisals = (List) pSession.getAttribute("myTeamActiveAppraisals");
+        else
+            return;
+
+        for (Appraisal appraisalInSession: appraisals)
+        {
+            if (appraisalInSession.getId() == appraisal.getId())
+                appraisalInSession.setStatus(appraisal.getStatus());
+            break;
+        }
     }
 
     /**
