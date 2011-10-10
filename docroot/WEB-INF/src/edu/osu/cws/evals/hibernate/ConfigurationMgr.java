@@ -24,13 +24,7 @@ public class ConfigurationMgr {
         List<Configuration> configsList = new ArrayList<Configuration>();
         Session session = HibernateUtil.getCurrentSession();
 
-        try {
-            configsList = list(session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
-
+        configsList = list(session);
         for (Configuration configuration : configsList) {
             configs.put(configuration.getName(), configuration);
         }
@@ -44,16 +38,8 @@ public class ConfigurationMgr {
      * @return
      */
     public List<Configuration> list() throws Exception {
-        List<Configuration> configurations = new ArrayList<Configuration>();
         Session session = HibernateUtil.getCurrentSession();
-
-        try {
-            configurations = list(session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
-        return configurations;
+        return list(session);
     }
 
     /**
@@ -71,13 +57,7 @@ public class ConfigurationMgr {
 
     public boolean edit(int id, String value) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            edit(id, value, session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
-
+        edit(id, value, session);
         return true;
     }
 

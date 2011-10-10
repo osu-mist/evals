@@ -16,14 +16,8 @@ public class BusinessCenterMgr {
      */
     public List<BusinessCenter> list() throws Exception {
         List<BusinessCenter> result;
-        Session hsession = HibernateUtil.getCurrentSession();
-        try {
-            result = hsession.createQuery("from edu.osu.cws.evals.models.BusinessCenter order by name").list();
-        } catch (Exception e){
-            hsession.close();
-            throw e;
-        }
-        return result;
+        Session session = HibernateUtil.getCurrentSession();
+        return session.createQuery("from edu.osu.cws.evals.models.BusinessCenter order by name").list();
     }
 
 }

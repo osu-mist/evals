@@ -24,18 +24,12 @@ public class PermissionRuleMgr {
         PermissionRule rule;
         String key;
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            Iterator rulesIterator = this.list(session).iterator();
-            while (rulesIterator.hasNext()) {
-                rule = (PermissionRule) rulesIterator.next();
-                key = rule.getStatus()+"-"+rule.getRole();
-                ruleMap.put(key, rule);
-            }
-        } catch (Exception e){
-            session.close();
-            throw e;
+        Iterator rulesIterator = this.list(session).iterator();
+        while (rulesIterator.hasNext()) {
+            rule = (PermissionRule) rulesIterator.next();
+            key = rule.getStatus()+"-"+rule.getRole();
+            ruleMap.put(key, rule);
         }
-
         return ruleMap;
     }
 

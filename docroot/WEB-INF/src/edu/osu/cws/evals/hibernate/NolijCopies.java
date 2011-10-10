@@ -24,15 +24,9 @@ public class NolijCopies {
         nolijCopy.setSubmitDate(new Date());
 
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            nolijCopy.validate();
-            session.save(nolijCopy);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        nolijCopy.validate();
+        session.save(nolijCopy);
         return true;
-
     }
 
 }

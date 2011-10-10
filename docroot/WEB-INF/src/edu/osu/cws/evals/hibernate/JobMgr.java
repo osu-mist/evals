@@ -24,14 +24,7 @@ public class JobMgr {
      */
     public Job getSupervisor(Job job) throws  Exception {
         Session session = HibernateUtil.getCurrentSession();
-        Job supervisorJob = null;
-        try {
-            supervisorJob = this.getSupervisor(job, session);
-        } catch (Exception e){
-            session.close();
-            throw e;
-        }
-        return supervisorJob;
+        return this.getSupervisor(job, session);
     }
 
     /**
@@ -95,17 +88,12 @@ public class JobMgr {
     public boolean isSupervisor(int pidm) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         int employeeCount;
-        try {
-            employeeCount = 0;
-            List<Object> results = session.getNamedQuery("job.isSupervisor")
-                    .setInteger("pidm", pidm)
-                    .list();
-            if (!results.isEmpty()) {
-                employeeCount = Integer.parseInt(results.get(0).toString());
-            }
-        } catch (Exception e){
-            session.close();
-            throw e;
+        employeeCount = 0;
+        List<Object> results = session.getNamedQuery("job.isSupervisor")
+                .setInteger("pidm", pidm)
+                .list();
+        if (!results.isEmpty()) {
+            employeeCount = Integer.parseInt(results.get(0).toString());
         }
         return employeeCount > 0;
     }
@@ -115,17 +103,9 @@ public class JobMgr {
      * @return
      */
     //@todo: Where do you use this method.  This is a very expensive operation.
-    public List<Job> list() {
+    public List<Job> list() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        List results = new ArrayList();
-        try {
-            results = this.list(session);
-
-        } catch (Exception e) {
-            session.close();
-        }
-
-        return results;
+        return this.list(session);
     }
 
     /**
@@ -150,17 +130,11 @@ public class JobMgr {
         List<Job> jobs = new ArrayList<Job>();
         Session session = HibernateUtil.getCurrentSession();
 
-        try {
-            jobs = session.createQuery("from edu.osu.cws.evals.models.Job job " +
+        jobs = session.createQuery("from edu.osu.cws.evals.models.Job job " +
                 "where job.status != 'T' and job.appointmentType = :appointmentType")
-            .setString("appointmentType", appointmentType)
-            .list();
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+                .setString("appointmentType", appointmentType)
+                .list();
         return jobs;
-
     }
 
     /**
@@ -173,17 +147,12 @@ public class JobMgr {
         List<Job> jobs;
         Session session = HibernateUtil.getCurrentSession();
 
-        try {
-            String query = "select new edu.osu.cws.evals.models.Job(employee.id, positionNumber, suffix, " +
-                    "status, appointmentType) from edu.osu.cws.evals.models.Job job " +
-                    "where job.status != 'T' and job.appointmentType = :appointmentType";
-            jobs = session.createQuery(query)
-                    .setString("appointmentType", appointmentType)
-                    .list();
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        String query = "select new edu.osu.cws.evals.models.Job(employee.id, positionNumber, suffix, " +
+                "status, appointmentType) from edu.osu.cws.evals.models.Job job " +
+                "where job.status != 'T' and job.appointmentType = :appointmentType";
+        jobs = session.createQuery(query)
+                .setString("appointmentType", appointmentType)
+                .list();
         return jobs;
     }
 
@@ -200,23 +169,18 @@ public class JobMgr {
         Job job = null;
         Session session = HibernateUtil.getCurrentSession();
 
-        try {
-            String query = "from edu.osu.cws.evals.models.Job job " +
-                    "where job.employee.id = :pidm and job.positionNumber = :positionNumber " +
-                    "and job.suffix = :suffix";
+        String query = "from edu.osu.cws.evals.models.Job job " +
+                "where job.employee.id = :pidm and job.positionNumber = :positionNumber " +
+                "and job.suffix = :suffix";
 
-            List<Job> jobs = session.createQuery(query)
-                    .setInteger("pidm", pidm)
-                    .setString("positionNumber", posn)
-                    .setString("suffix", suffix)
-                    .list();
+        List<Job> jobs = session.createQuery(query)
+                .setInteger("pidm", pidm)
+                .setString("positionNumber", posn)
+                .setString("suffix", suffix)
+                .list();
 
-            if (!jobs.isEmpty()) {
-                job = jobs.get(0);
-            }
-        } catch (Exception e) {
-            session.close();
-            throw e;
+        if (!jobs.isEmpty()) {
+            job = jobs.get(0);
         }
         return job;
     }
@@ -232,17 +196,12 @@ public class JobMgr {
         List<Job> jobs;
         Session session = HibernateUtil.getCurrentSession();
 
-        try {
-            String query = "from edu.osu.cws.evals.models.Job job " +
-                    "where job.employee.id = :pidm";
+        String query = "from edu.osu.cws.evals.models.Job job " +
+                "where job.employee.id = :pidm";
 
-            jobs = session.createQuery(query)
-                    .setInteger("pidm", pidm)
-                    .list();
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        jobs = session.createQuery(query)
+                .setInteger("pidm", pidm)
+                .list();
         return jobs;
     }
 
@@ -257,22 +216,17 @@ public class JobMgr {
         String businessCenter = null;
         Session session = HibernateUtil.getCurrentSession();
 
-        try {
-            String query = "select businessCenterName from edu.osu.cws.evals.models.Job job " +
-                    "where job.employee.id = :pidm and job.status = 'A'";
+        String query = "select businessCenterName from edu.osu.cws.evals.models.Job job " +
+                "where job.employee.id = :pidm and job.status = 'A'";
 
-            Query hibernateQuery = session.createQuery(query)
-                    .setInteger("pidm", pidm)
-                    .setMaxResults(1);
+        Query hibernateQuery = session.createQuery(query)
+                .setInteger("pidm", pidm)
+                .setMaxResults(1);
 
-            if (hibernateQuery.iterate().hasNext()) {
-                businessCenter = (String) hibernateQuery.iterate().next();
-            }
-
-            return businessCenter;
-        } catch (Exception e) {
-            session.close();
-            throw e;
+        if (hibernateQuery.iterate().hasNext()) {
+            businessCenter = (String) hibernateQuery.iterate().next();
         }
+
+        return businessCenter;
     }
 }

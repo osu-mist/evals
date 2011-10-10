@@ -21,17 +21,12 @@ public class AppraisalStepMgr {
         HashMap stepsMap = new HashMap();
         String key;
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            List<AppraisalStep> results = (List<AppraisalStep>) this.list(session);
-            results.size();
+        List<AppraisalStep> results = (List<AppraisalStep>) this.list(session);
+        results.size();
 
-            for (AppraisalStep step : results) {
-                key = step.getAction()+"-"+step.getAppointmentType();
-                stepsMap.put(key, step);
-            }
-        } catch (Exception e) {
-            session.close();
-            throw e;
+        for (AppraisalStep step : results) {
+            key = step.getAction()+"-"+step.getAppointmentType();
+            stepsMap.put(key, step);
         }
 
         return stepsMap;

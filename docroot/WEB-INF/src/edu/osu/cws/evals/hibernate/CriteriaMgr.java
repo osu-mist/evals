@@ -52,14 +52,10 @@ public class CriteriaMgr {
         }
 
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            session.save(area);
-            area.addDetails(details);
-            session.save(details);
-        } catch (Exception e){
-            session.close();
-            throw e;
-        }
+        session.save(area);
+        area.addDetails(details);
+        session.save(details);
+
         return true;
 
     }
@@ -86,94 +82,89 @@ public class CriteriaMgr {
             propagateEdit = request.get("propagateEdit")[0] != null;
         }
 
-        try {
-            criterion = get(id, session);
+        criterion = get(id, session);
 
-            boolean areaChanged = false;
-            boolean descriptionChanged = false;
-            CriterionDetail currentDetail = criterion.getCurrentDetail();
-            String criterionDescription = currentDetail.getDescription();
-            int descHash = criterionDescription.hashCode();
+        boolean areaChanged = false;
+        boolean descriptionChanged = false;
+        CriterionDetail currentDetail = criterion.getCurrentDetail();
+        String criterionDescription = currentDetail.getDescription();
+        int descHash = criterionDescription.hashCode();
 
-            int updatedDescHash = description.hashCode();
+        int updatedDescHash = description.hashCode();
 
-            if (!criterion.getName().equals(name)) {
-                areaChanged = true;
-            }
-            if (descHash != updatedDescHash) {
-                descriptionChanged = true;
-            }
-            if (!areaChanged && !descriptionChanged) {
-                return true;
-            }
-
-            if (areaChanged && !descriptionChanged) {
-                // copy all the values from the old CriterionArea
-                copyCriterion(loggedInUser, newCriterion, criterion);
-                newCriterion.setName(name);
-
-                // copy all the values form the old CriterionDetail
-                copyDetails(loggedInUser, newDetails, criterion, criterionDescription);
-
-                // validate both new area + description
-                newCriterion.validate();
-                newDetails.validate();
-
-                // set old criteria as deleted
-                setCriteriaDeleteProperties(loggedInUser, criterion);
-
-                // save pojos
-                session.save(newCriterion);
-                session.update(criterion);
-                newCriterion.addDetails(newDetails);
-                session.save(newDetails);
-            } else if (!areaChanged && descriptionChanged) {
-                // copy all the values form the old CriterionDetail
-                copyDetails(loggedInUser, newDetails, criterion, description);
-
-                // validate both new area + description
-                newDetails.validate();
-
-                // save pojo
-                criterion.addDetails(newDetails);
-                session.save(newDetails);
-            } else if (areaChanged && descriptionChanged) {
-                // copy all the values from the old CriterionArea
-                copyCriterion(loggedInUser, newCriterion, criterion);
-                newCriterion.setName(name);
-
-                // copy all the values form the old CriterionDetail
-                copyDetails(loggedInUser, newDetails, criterion, description);
-
-                // validate both new area + description
-                newCriterion.validate();
-                newDetails.validate();
-
-                // set old criteria as deleted
-                setCriteriaDeleteProperties(loggedInUser, criterion);
-
-                // save pojos
-                session.save(newCriterion);
-                session.update(criterion);
-                newCriterion.addDetails(newDetails);
-                session.save(newDetails);
-            }
-            if (propagateEdit) {
-                String sqlUpdate = "UPDATE assessments a SET a.CRITERION_DETAIL_ID = :newDetail " +
-                        "WHERE a.CRITERION_DETAIL_ID = :oldDetail AND a.APPRAISAL_ID in ( " +
-                            "SELECT ID FROM appraisals WHERE STATUS not in ('completed', 'closed', 'archived')" +
-                        ")";
-                session.createSQLQuery(sqlUpdate)
-                        .setInteger("newDetail", newDetails.getId())
-                        .setInteger("oldDetail", currentDetail.getId())
-                        .executeUpdate();
-            }
-
-            //@todo: ajax
-        } catch (Exception e) {
-            session.close();
-            throw e;
+        if (!criterion.getName().equals(name)) {
+            areaChanged = true;
         }
+        if (descHash != updatedDescHash) {
+            descriptionChanged = true;
+        }
+        if (!areaChanged && !descriptionChanged) {
+            return true;
+        }
+
+        if (areaChanged && !descriptionChanged) {
+            // copy all the values from the old CriterionArea
+            copyCriterion(loggedInUser, newCriterion, criterion);
+            newCriterion.setName(name);
+
+            // copy all the values form the old CriterionDetail
+            copyDetails(loggedInUser, newDetails, criterion, criterionDescription);
+
+            // validate both new area + description
+            newCriterion.validate();
+            newDetails.validate();
+
+            // set old criteria as deleted
+            setCriteriaDeleteProperties(loggedInUser, criterion);
+
+            // save pojos
+            session.save(newCriterion);
+            session.update(criterion);
+            newCriterion.addDetails(newDetails);
+            session.save(newDetails);
+        } else if (!areaChanged && descriptionChanged) {
+            // copy all the values form the old CriterionDetail
+            copyDetails(loggedInUser, newDetails, criterion, description);
+
+            // validate both new area + description
+            newDetails.validate();
+
+            // save pojo
+            criterion.addDetails(newDetails);
+            session.save(newDetails);
+        } else if (areaChanged && descriptionChanged) {
+            // copy all the values from the old CriterionArea
+            copyCriterion(loggedInUser, newCriterion, criterion);
+            newCriterion.setName(name);
+
+            // copy all the values form the old CriterionDetail
+            copyDetails(loggedInUser, newDetails, criterion, description);
+
+            // validate both new area + description
+            newCriterion.validate();
+            newDetails.validate();
+
+            // set old criteria as deleted
+            setCriteriaDeleteProperties(loggedInUser, criterion);
+
+            // save pojos
+            session.save(newCriterion);
+            session.update(criterion);
+            newCriterion.addDetails(newDetails);
+            session.save(newDetails);
+        }
+        if (propagateEdit) {
+            String sqlUpdate = "UPDATE assessments a SET a.CRITERION_DETAIL_ID = :newDetail " +
+                    "WHERE a.CRITERION_DETAIL_ID = :oldDetail AND a.APPRAISAL_ID in ( " +
+                    "SELECT ID FROM appraisals WHERE STATUS not in ('completed', 'closed', 'archived')" +
+                    ")";
+            session.createSQLQuery(sqlUpdate)
+                    .setInteger("newDetail", newDetails.getId())
+                    .setInteger("oldDetail", currentDetail.getId())
+                    .executeUpdate();
+        }
+
+        //@todo: ajax
         return true;
     }
 
@@ -230,15 +221,8 @@ public class CriteriaMgr {
      * @throws edu.osu.cws.evals.models.ModelException
      */
     public List<CriterionArea> list(String appointmentType) throws ModelException, Exception {
-        List<CriterionArea> criteriaList;
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            criteriaList = this.list(appointmentType, session);
-        } catch (Exception e){
-            session.close();
-            throw e;
-        }
-        return criteriaList;
+        return this.list(appointmentType, session);
     }
 
     /**
@@ -271,22 +255,17 @@ public class CriteriaMgr {
     public boolean delete(int id, Employee deleter) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         CriterionArea criterion;
-        try {
-            criterion = get(id, session);
+        criterion = get(id, session);
 
-            // check that the criteria is valid
-            if (criterion == null || criterion.getDeleteDate() != null) {
-                throw new ModelException("Invalid Evaluation Criteria");
-            }
-
-            // delete criteria and save it back
-            setCriteriaDeleteProperties(deleter, criterion);
-
-            session.update(criterion);
-        } catch (Exception e) {
-            session.close();
-            throw e;
+        // check that the criteria is valid
+        if (criterion == null || criterion.getDeleteDate() != null) {
+            throw new ModelException("Invalid Evaluation Criteria");
         }
+
+        // delete criteria and save it back
+        setCriteriaDeleteProperties(deleter, criterion);
+
+        session.update(criterion);
 
         return true;
     }
@@ -325,13 +304,8 @@ public class CriteriaMgr {
         }
 
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            updateSequence(newPosition, originalPosition, appointmentType, lowerBound, upperBound,
-                    moveCriteriaToSmallerSequence, session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        updateSequence(newPosition, originalPosition, appointmentType, lowerBound, upperBound,
+                moveCriteriaToSmallerSequence, session);
         return true;
     }
 
@@ -381,21 +355,17 @@ public class CriteriaMgr {
     public int getNextSequence(String appointmentType) throws Exception {
         int availableSequence = 0;
         Session hsession = HibernateUtil.getCurrentSession();
-        try {
-            Query countQry = hsession.createQuery("select count(*) from edu.osu.cws.evals.models.CriterionArea " +
-                    "where appointmentType = :appointmentType AND deleteDate IS NULL");
+        Query countQry = hsession.createQuery("select count(*) from edu.osu.cws.evals.models.CriterionArea " +
+                "where appointmentType = :appointmentType AND deleteDate IS NULL");
 
-            countQry.setString("appointmentType", appointmentType);
-            countQry.setMaxResults(1);
-            Iterator results = countQry.list().iterator();
+        countQry.setString("appointmentType", appointmentType);
+        countQry.setMaxResults(1);
+        Iterator results = countQry.list().iterator();
 
-            if (results.hasNext()) {
-                availableSequence =  Integer.parseInt(results.next().toString());
-            }
-        } catch (Exception e){
-            hsession.close();
-            throw e;
+        if (results.hasNext()) {
+            availableSequence =  Integer.parseInt(results.next().toString());
         }
+
         return ++availableSequence;
 
     }
@@ -409,15 +379,7 @@ public class CriteriaMgr {
      */
     public CriterionArea get(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        CriterionArea criterion;
-        try {
-            criterion = get(id, session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
-
-        return criterion;
+        return get(id, session);
     }
 
     /**

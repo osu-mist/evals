@@ -14,15 +14,8 @@ public class AppointmentTypeMgr {
      * @return
      */
     public List list() throws Exception {
-        List result;
-        Session hsession = HibernateUtil.getCurrentSession();
-        try {
-            result = hsession.createQuery("from edu.osu.cws.evals.models.AppointmentType").list();
-        } catch (Exception e){
-            hsession.close();
-            throw e;
-        }
-        return result;
+        Session session = HibernateUtil.getCurrentSession();
+        return session.createQuery("from edu.osu.cws.evals.models.AppointmentType").list();
     }
 
 }

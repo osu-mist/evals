@@ -88,22 +88,17 @@ public class AppraisalMgr {
             String appointmentType = job.getAppointmentType();
             List<CriterionArea> criteriaList = criteriaMgr.list(appointmentType);
             Session session = HibernateUtil.getCurrentSession();
-            try {
-                session.save(appraisal);///441
+            session.save(appraisal);///441
 
-                // Create assessment and associate it to appraisal
-                for (CriterionArea criterion : criteriaList) {
-                    detail = criterion.getCurrentDetail();
-                    assessment = new Assessment();
-                    assessment.setCriterionDetail(detail);
-                    assessment.setAppraisal(appraisal);
-                    assessment.setCreateDate(new Date());
-                    assessment.setModifiedDate(new Date());
-                    session.save(assessment);
-                }
-            } catch (Exception e){
-                session.close();
-                throw e;
+            // Create assessment and associate it to appraisal
+            for (CriterionArea criterion : criteriaList) {
+                detail = criterion.getCurrentDetail();
+                assessment = new Assessment();
+                assessment.setCriterionDetail(detail);
+                assessment.setAppraisal(appraisal);
+                assessment.setCreateDate(new Date());
+                assessment.setModifiedDate(new Date());
+                session.save(assessment);
             }
         }
 
@@ -195,25 +190,20 @@ public class AppraisalMgr {
 
         if (appraisal.validate()) {
             Session session = HibernateUtil.getCurrentSession();
-            try {
-                session.save(appraisal);
+            session.save(appraisal);
 
-                Assessment newAssessment;
-                for (Assessment origAssesment: trialAppraisal.getAssessments()) {
-                    newAssessment = new Assessment();
-                    newAssessment.setCriterionDetail(origAssesment.getCriterionDetail());
-                    newAssessment.setNewGoals(origAssesment.getNewGoals()); //@todo: Joan: no need to set newGoals.
-                    newAssessment.setGoal(origAssesment.getGoal());
-                    newAssessment.setAppraisal(appraisal);
-                    newAssessment.setCreateDate(new Date());
-                    newAssessment.setEmployeeResult(origAssesment.getEmployeeResult());
-                    newAssessment.setSupervisorResult(origAssesment.getSupervisorResult());
-                    newAssessment.setModifiedDate(new Date());
-                    session.save(newAssessment);
-                }
-            } catch (Exception e){
-                session.close();
-                throw e;
+            Assessment newAssessment;
+            for (Assessment origAssesment: trialAppraisal.getAssessments()) {
+                newAssessment = new Assessment();
+                newAssessment.setCriterionDetail(origAssesment.getCriterionDetail());
+                newAssessment.setNewGoals(origAssesment.getNewGoals()); //@todo: Joan: no need to set newGoals.
+                newAssessment.setGoal(origAssesment.getGoal());
+                newAssessment.setAppraisal(appraisal);
+                newAssessment.setCreateDate(new Date());
+                newAssessment.setEmployeeResult(origAssesment.getEmployeeResult());
+                newAssessment.setSupervisorResult(origAssesment.getSupervisorResult());
+                newAssessment.setModifiedDate(new Date());
+                session.save(newAssessment);
             }
         }
 
@@ -300,48 +290,41 @@ public class AppraisalMgr {
         Session session = HibernateUtil.getCurrentSession();
         Configuration resultsDueConfig = configurationMap.get("resultsDue");
 
-        try {
-            Job supervisorJob = jobMgr.getSupervisor(appraisal.getJob());
-            appraisal.getJob().setCurrentSupervisor(supervisorJob); //@todo: Joan: why this?
+        Job supervisorJob = jobMgr.getSupervisor(appraisal.getJob());
+        appraisal.getJob().setCurrentSupervisor(supervisorJob); //@todo: Joan: why this?
 
-            // update appraisal & assessment fields based on permission rules
-            setAppraisalFields(request, appraisal, permRule);
+        // update appraisal & assessment fields based on permission rules
+        setAppraisalFields(request, appraisal, permRule);
 
-            //@todo: validate appraisal
+        //@todo: validate appraisal
 
-            // save changes to db
-            updateAppraisal(appraisal);
+        // save changes to db
+        updateAppraisal(appraisal);
 
-            // Creates the first annual appraisal if needed
-            String action = "";
-            if (request.get("sign-appraisal") != null) {
-                action = "sign-appraisal";
-            }
-            createFirstAnnualAppraisal(appraisal, resultsDueConfig, action);
+        // Creates the first annual appraisal if needed
+        String action = "";
+        if (request.get("sign-appraisal") != null) {
+            action = "sign-appraisal";
+        }
+        createFirstAnnualAppraisal(appraisal, resultsDueConfig, action);
 
-            // Send email if needed
-            String appointmentType = appraisal.getJob().getAppointmentType();
-            AppraisalStep appraisalStep;
-            String employeeResponse = appraisal.getRebuttal();
+        // Send email if needed
+        String appointmentType = appraisal.getJob().getAppointmentType();
+        AppraisalStep appraisalStep;
+        String employeeResponse = appraisal.getRebuttal();
 
-            // If the employee signs and provides a rebuttal, we want to use a different
-            // appraisal step so that we can send an email to the reviewer.
-            if (submittedRebuttal(request, employeeResponse)) {
-                String appraisalStepKey = "submit-response-" + appointmentType;
-                appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
-            } else {
-                appraisalStep = getAppraisalStepKey(request, appointmentType, permRule);
-            }
+        // If the employee signs and provides a rebuttal, we want to use a different
+        // appraisal step so that we can send an email to the reviewer.
+        if (submittedRebuttal(request, employeeResponse)) {
+            String appraisalStepKey = "submit-response-" + appointmentType;
+            appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
+        } else {
+            appraisalStep = getAppraisalStepKey(request, appointmentType, permRule);
+        }
 
-            EmailType emailType = appraisalStep.getEmailType();
-            if (emailType != null) {
-                mailer.sendMail(appraisal, emailType);
-            }
-        } catch (Exception e) {
-            if (session.isOpen()) {
-                session.close();
-            }
-            throw e;
+        EmailType emailType = appraisalStep.getEmailType();
+        if (emailType != null) {
+            mailer.sendMail(appraisal, emailType);
         }
     }
 
@@ -571,29 +554,6 @@ public class AppraisalMgr {
     }
 
     /**
-     * Wrapper method for getAppraisalPermissionRule(appraisal). It starts a session and
-     * transaction and calls that method.
-     *
-     * @param appraisal
-     * @param startSession
-     * @return
-     * @throws Exception
-     */
-    public PermissionRule getAppraisalPermissionRule(Appraisal appraisal, boolean startSession)
-            throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        PermissionRule permissionRule;
-        try {
-            permissionRule = getAppraisalPermissionRule(appraisal);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
-
-        return permissionRule;
-    }
-
-    /**
      * Returns a list of active appraisals for all the jobs that the current pidm holds.
      * The fields that are returned in the appraisal are:
      *      id
@@ -608,14 +568,7 @@ public class AppraisalMgr {
      */
     public ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        ArrayList<Appraisal> myActiveAppraisals;
-        try {
-            myActiveAppraisals = this.getAllMyActiveAppraisals(pidm, session);
-        } catch (Exception e){
-            session.close();
-            throw e;
-        }
-        return myActiveAppraisals;
+        return this.getAllMyActiveAppraisals(pidm, session);
     }
 
     /**
@@ -650,14 +603,7 @@ public class AppraisalMgr {
      */
     public List<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        List<Appraisal> teamActiveAppraisals;
-        try {
-            teamActiveAppraisals = this.getMyTeamsAppraisals(pidm, onlyActive, session);
-        } catch (Exception e){
-            session.close();
-            throw e;
-        }
-        return teamActiveAppraisals;
+        return this.getMyTeamsAppraisals(pidm, onlyActive, session);
     }
 
     /**
@@ -786,29 +732,6 @@ public class AppraisalMgr {
     }
 
     /**
-     * Returns the role (employee, supervisor, immediate supervisor or reviewer) of the pidm
-     * in the given appraisal. Return empty string if the pidm does not have any role on the
-     * appraisal. This method creates a new session and calls the getRole method.
-     *
-     * @param appraisal     appraisal to check role in
-     * @param pidm          pidm of the user to check
-     * @return role
-     * @throws Exception
-     */
-    public String getRoleAndSession(Appraisal appraisal, int pidm) throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        String role;
-
-        try {
-            role = getRole(appraisal, pidm);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
-
-        return role;
-    }
-    /**
      * This method is just a wrapper for session.get. It returns the appraisal that
      * matches the id. It also adds the currentSupervisor to the appraisal object.
      *
@@ -818,17 +741,10 @@ public class AppraisalMgr {
      */
     public Appraisal getAppraisal(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            appraisal = getAppraisal(id, session);
+        appraisal = getAppraisal(id, session);
+        Job supervisorJob = jobMgr.getSupervisor(appraisal.getJob());
+        appraisal.getJob().setCurrentSupervisor(supervisorJob);
 
-            Job supervisorJob = jobMgr.getSupervisor(appraisal.getJob());
-            appraisal.getJob().setCurrentSupervisor(supervisorJob);
-        } catch (Exception e) {
-            if (session.isOpen()) {
-                session.close();
-            }
-            throw e;
-        }
         return appraisal;
     }
 
@@ -856,15 +772,8 @@ public class AppraisalMgr {
      * @throws Exception
      */
     public ArrayList<Appraisal> getReviews(String businessCenterName, int maxResults) throws Exception {
-        ArrayList<Appraisal> reviewList;
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            reviewList = getReviews(businessCenterName, session, maxResults);
-        } catch (Exception e){
-            session.close();
-            throw e;
-        }
-        return reviewList;
+        return getReviews(businessCenterName, session, maxResults);
     }
 
 
@@ -898,15 +807,8 @@ public class AppraisalMgr {
      * @throws Exception
      */
     public int getReviewCount(String businessCenterName) throws Exception {
-        int reviewCount = 0;
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            reviewCount = getReviewCount(businessCenterName, session);
-        } catch (Exception e){
-            session.close();
-            throw e;
-        }
-        return reviewCount;
+        return getReviewCount(businessCenterName, session);
     }
 
     //@todo: Joan: Should just get count(*).
@@ -940,22 +842,16 @@ public class AppraisalMgr {
      */
     private static int getReviewCountByStatus(String bcName, String status) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        int count = 0;
-        try {
-            String query = "select count(*) "+
-                    "from edu.osu.cws.evals.models.Appraisal where job.businessCenterName = :bc " +
-                    "and status in (:status) and job.endDate is NULL";
+        String query = "select count(*) "+
+                "from edu.osu.cws.evals.models.Appraisal where job.businessCenterName = :bc " +
+                "and status in (:status) and job.endDate is NULL";
 
-            Object countObj = session.createQuery(query)
-                    .setString("bc", bcName)
-                    .setString("status", status)
-                    .list().get(0);
-            count =   Integer.parseInt(countObj.toString());
-        } catch (Exception e){
-            session.close();
-            throw e;
-        }
-        return count;
+        Object countObj = session.createQuery(query)
+                .setString("bc", bcName)
+                .setString("status", status)
+                .list().get(0);
+
+        return Integer.parseInt(countObj.toString());
     }
 
     /**
@@ -977,12 +873,7 @@ public class AppraisalMgr {
     public void updateAppraisalStatus(int id, String status) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         ArrayList<HashMap> myActiveAppraisals;
-        try {
-            this.updateAppraisalStatus(id, status, session);
-        } catch (Exception e){
-            session.close();
-            throw e;
-        }
+        this.updateAppraisalStatus(id, status, session);
     }
 
     /**
@@ -1040,19 +931,15 @@ public class AppraisalMgr {
         int[] ids;
         List result;
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            String query = "select appraisal.id from edu.osu.cws.evals.models.Appraisal appraisal " +
-                    "where status not in ('completed', 'closed', 'archived')";
+        String query = "select appraisal.id from edu.osu.cws.evals.models.Appraisal appraisal " +
+                "where status not in ('completed', 'closed', 'archived')";
 
-            result =  session.createQuery(query).list();
-            ids = new int[result.size()];
-            for (int i = 0; i < result.size(); i++) {
-                ids[i] = (Integer) result.get(i);
-            }
-        } catch (Exception e) {
-            session.close();
-            throw e;
+        result =  session.createQuery(query).list();
+        ids = new int[result.size()];
+        for (int i = 0; i < result.size(); i++) {
+            ids[i] = (Integer) result.get(i);
         }
+
 
         return ids;
     }
@@ -1076,39 +963,25 @@ public class AppraisalMgr {
     public static boolean appraisalExists(Job job, Date startDate, String type) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
 
-        try {
-            String query = "select count(*) from edu.osu.cws.evals.models.Appraisal appraisal " +
-                    "where appraisal.job.employee.id = :pidm and appraisal.job.positionNumber = :positionNumber " +
-                    "and appraisal.job.suffix = :suffix and appraisal.type = :type " +
-                    "and appraisal.startDate = :startDate";
+        String query = "select count(*) from edu.osu.cws.evals.models.Appraisal appraisal " +
+                "where appraisal.job.employee.id = :pidm and appraisal.job.positionNumber = :positionNumber " +
+                "and appraisal.job.suffix = :suffix and appraisal.type = :type " +
+                "and appraisal.startDate = :startDate";
 
-            //@todo: Joan: Why do we set a maxResults when we are just getting count(*)?
-            Iterator resultMapIter = session.createQuery(query)
-                    .setInteger("pidm", job.getEmployee().getId())
-                    .setString("positionNumber", job.getPositionNumber())
-                    .setString("suffix", job.getSuffix())
-                    .setString("type", type)
-                    .setDate("startDate", startDate)
-                    .setMaxResults(1)
-                    .list().iterator();
+        Iterator resultMapIter = session.createQuery(query)
+                .setInteger("pidm", job.getEmployee().getId())
+                .setString("positionNumber", job.getPositionNumber())
+                .setString("suffix", job.getSuffix())
+                .setString("type", type)
+                .setDate("startDate", startDate)
+                .setMaxResults(1)
+                .list().iterator();
 
-            int appraisalCount = 0;
-            if (resultMapIter.hasNext()) {
-                appraisalCount =  Integer.parseInt(resultMapIter.next().toString());
-            }
-            //@todo: Joan: I would just do:
-            //return (appraisalCount > 0);
-            //And get rid of the last line of this method.
-            //Same for next method.
-            if (appraisalCount > 0) {
-                return true;
-            }
-        } catch (Exception e) {
-            session.close();
-            throw e;
+        int appraisalCount = 0;
+        if (resultMapIter.hasNext()) {
+            appraisalCount =  Integer.parseInt(resultMapIter.next().toString());
         }
-
-        return false;
+        return (appraisalCount > 0);
     }
 
     /**  @@todo: Jose to implement this
@@ -1120,36 +993,26 @@ public class AppraisalMgr {
     public static boolean openTrialAppraisalExists(Job job) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
 
-        try {
-            String query = "select count(*) from edu.osu.cws.evals.models.Appraisal appraisal " +
-                    "where appraisal.job.employee.id = :pidm and appraisal.job.positionNumber = :positionNumber " +
-                    "and appraisal.job.suffix = :suffix and appraisal.type = :type " +
-                    "and (appraisal.status != 'closed' AND  appraisal.status != 'completed' AND " +
-                    "appraisal.status != 'archived')";
+        String query = "select count(*) from edu.osu.cws.evals.models.Appraisal appraisal " +
+                "where appraisal.job.employee.id = :pidm and appraisal.job.positionNumber = :positionNumber " +
+                "and appraisal.job.suffix = :suffix and appraisal.type = :type " +
+                "and (appraisal.status != 'closed' AND  appraisal.status != 'completed' AND " +
+                "appraisal.status != 'archived')";
 
-            Iterator resultMapIter = session.createQuery(query)
-                    .setInteger("pidm", job.getEmployee().getId())
-                    .setString("positionNumber", job.getPositionNumber())
-                    .setString("suffix", job.getSuffix())
-                    .setString("type", Appraisal.TYPE_TRIAL)   //@todo: Joan: it's always going to be trial, right?
-                    .setMaxResults(1)  //@todo: Joan: No need to set maxResuls?
-                    .list().iterator();
+        Iterator resultMapIter = session.createQuery(query)
+                .setInteger("pidm", job.getEmployee().getId())
+                .setString("positionNumber", job.getPositionNumber())
+                .setString("suffix", job.getSuffix())
+                .setString("type", Appraisal.TYPE_TRIAL)   //@todo: Joan: it's always going to be trial, right?
+                .setMaxResults(1)  //@todo: Joan: No need to set maxResuls?
+                .list().iterator();
 
-            int appraisalCount = 0;
-            if (resultMapIter.hasNext()) {
-                appraisalCount =  Integer.parseInt(resultMapIter.next().toString());
-            }
-            if (appraisalCount > 0) {
-                return true;
-            }
-        } catch (Exception e) {
-            session.close();
-            throw e;
+        int appraisalCount = 0;
+        if (resultMapIter.hasNext()) {
+            appraisalCount =  Integer.parseInt(resultMapIter.next().toString());
         }
-
-        return false;
+        return (appraisalCount > 0);
     }
-
 
     /**
      * Updates the appraisal status and originalStatus using the id of the appraisal and hsql query.
@@ -1158,17 +1021,13 @@ public class AppraisalMgr {
      */
     public static void updateAppraisalStatus(Appraisal appraisal) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            String query = "update edu.osu.cws.evals.models.Appraisal appraisal set status = :status, " +
-                    "originalStatus = :origStatus where id = :id";
-            session.createQuery(query).setString("status", appraisal.getStatus())
-                    .setString("origStatus", appraisal.getOriginalStatus())
-                    .setInteger("id", appraisal.getId()) //@todo: Joan: No need to set ID.
-                    .executeUpdate();
-        } catch (Exception e){
-            session.close();
-            throw e;
-        }
+        String query = "update edu.osu.cws.evals.models.Appraisal appraisal set status = :status, " +
+                "originalStatus = :origStatus where id = :id";
+        session.createQuery(query).setString("status", appraisal.getStatus())
+                .setString("origStatus", appraisal.getOriginalStatus())
+                .setInteger("id", appraisal.getId()) //@todo: Joan: No need to set ID.
+                .executeUpdate();
+
     }
 
 

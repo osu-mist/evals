@@ -28,16 +28,11 @@ public class EmailTypeMgr {
     public static Map<String, EmailType>  getMap() throws Exception {
         HashMap<String, EmailType> typeMap = new HashMap<String, EmailType    >();
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            String query = "from edu.osu.cws.evals.models.EmailType";
-            List<EmailType> results = (List<EmailType>) session.createQuery(query).list();
+        String query = "from edu.osu.cws.evals.models.EmailType";
+        List<EmailType> results = (List<EmailType>) session.createQuery(query).list();
 
-            for (EmailType emailType : results) {
-                typeMap.put(emailType.getType(),  emailType);
-            }
-        } catch (Exception e) {
-            session.close();
-            throw e;
+        for (EmailType emailType : results) {
+            typeMap.put(emailType.getType(),  emailType);
         }
         return typeMap;
     }

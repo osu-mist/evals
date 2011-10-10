@@ -30,7 +30,7 @@ public class EmployeesTest {
      * Tests that the employees view is not empty
      * Before you run this test method make sure that the beforeMehtod in this class is commented out.
      */
-    public void shouldHaveEmployeesInView() {
+    public void shouldHaveEmployeesInView() throws Exception {
         List<Employee> results = employeeMgr.list();
         Employee employee;
 

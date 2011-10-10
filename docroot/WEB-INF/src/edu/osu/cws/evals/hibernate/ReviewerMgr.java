@@ -22,15 +22,9 @@ public class ReviewerMgr {
     public HashMap<Integer, Reviewer> mapByEmployeeId() throws Exception {
         HashMap<Integer, Reviewer> reviewers = new HashMap<Integer, Reviewer>();
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            for (Reviewer reviewer : this.list(session)) {
-                reviewers.put(reviewer.getEmployee().getId(), reviewer);
-            }
-        } catch (Exception e){
-            session.close();
-            throw e;
+        for (Reviewer reviewer : this.list(session)) {
+            reviewers.put(reviewer.getEmployee().getId(), reviewer);
         }
-
         return reviewers;
     }
 
@@ -41,16 +35,8 @@ public class ReviewerMgr {
      * @return
      */
     public List<Reviewer> list() throws Exception {
-        List<Reviewer> reviewers = new ArrayList<Reviewer>();
         Session session = HibernateUtil.getCurrentSession();
-
-        try {
-            reviewers = list(session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
-        return reviewers;
+        return list(session);
     }
 
     /**
@@ -77,12 +63,7 @@ public class ReviewerMgr {
      */
     public boolean delete(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            delete(id, session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        delete(id, session);
         return true;
     }
 
@@ -113,15 +94,7 @@ public class ReviewerMgr {
      */
     public Reviewer get(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        Reviewer reviewer;
-        try {
-            reviewer = get(id, session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
-
-        return reviewer;
+        return get(id, session);
     }
 
     /**
@@ -144,15 +117,7 @@ public class ReviewerMgr {
      */
     public List<Reviewer> findByOnid(String onid) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        ArrayList<Reviewer> reviewerList;
-        try {
-            reviewerList = (ArrayList<Reviewer>) findByOnid(onid, session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
-
-        return reviewerList;
+        return findByOnid(onid, session);
     }
 
     /**
@@ -182,15 +147,7 @@ public class ReviewerMgr {
      */
     public Reviewer findByOnidAndBC(String onid, String businessCenterName) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        Reviewer reviewer;
-        try {
-            reviewer = findByOnidBC(onid, businessCenterName, session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
-
-        return reviewer;
+        return findByOnidBC(onid, businessCenterName, session);
     }
 
     /**
@@ -243,12 +200,7 @@ public class ReviewerMgr {
         reviewer.setBusinessCenterName(businessCenterName);
 
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            add(reviewer, session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        add(reviewer, session);
         return true;
     }
 
@@ -274,15 +226,10 @@ public class ReviewerMgr {
     public static List<Reviewer> getReviewers(String bcName) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         List<Reviewer> results = new ArrayList<Reviewer>();
-        try {
-            String query = "from edu.osu.cws.evals.models.Reviewer where businessCenterName = :bcName";
-            results = (List<Reviewer>) session.createQuery(query)
-                    .setString("bcName", bcName)
-                    .list();
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        String query = "from edu.osu.cws.evals.models.Reviewer where businessCenterName = :bcName";
+        results = (List<Reviewer>) session.createQuery(query)
+                .setString("bcName", bcName)
+                .list();
         return results;
     }
 }

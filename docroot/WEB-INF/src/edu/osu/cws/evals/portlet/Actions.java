@@ -691,9 +691,7 @@ public class Actions {
 
         // 1) Get the appraisal and permission rule
         appraisal = appraisalMgr.getAppraisal(appraisalID);
-
-        //@@todo: Joan: This calls appraisalMgr.getRoleAndSession, which is called again a few lines later.
-        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal, true);
+        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
@@ -701,7 +699,7 @@ public class Actions {
             return displayHomeView(request, response);
         }
 
-        String userRole = appraisalMgr.getRoleAndSession(appraisal, userId);
+        String userRole = appraisalMgr.getRole(appraisal, userId);
         appraisal.setRole(userRole);
         // Set flag whether or not the html form to update the appraisal needs to be displayed
         if (permRule.getSaveDraft() != null && permRule.getSubmit() != null
@@ -871,7 +869,7 @@ public class Actions {
 
         // 1) Get the appraisal and permission rule
         appraisal = appraisalMgr.getAppraisal(appraisalID);
-        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal, true);
+        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
@@ -880,7 +878,7 @@ public class Actions {
         }
 
         int userId = currentlyLoggedOnUser.getId();
-        String userRole = appraisalMgr.getRoleAndSession(appraisal, userId);
+        String userRole = appraisalMgr.getRole(appraisal, userId);
         appraisal.setRole(userRole);
 
         // 2) Compose a file name
@@ -950,7 +948,7 @@ public class Actions {
 
         // 1) Get the appraisal and permission rule
         appraisal = appraisalMgr.getAppraisal(appraisalID);
-        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal, true);
+        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
@@ -959,7 +957,7 @@ public class Actions {
         }
 
         int userId = currentlyLoggedOnUser.getId();
-        String userRole = appraisalMgr.getRoleAndSession(appraisal, userId);
+        String userRole = appraisalMgr.getRole(appraisal, userId);
         appraisal.setRole(userRole);
 
         requestMap.put("id", appraisal.getId());
@@ -986,7 +984,7 @@ public class Actions {
         String filename = EvalsPDF.getNolijFileName(appraisal, dirName, env);
 
         // 2) Grab the permissionRule
-        PermissionRule permRule = appraisalMgr.getAppraisalPermissionRule(appraisal, true);
+        PermissionRule permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
 
         // 2) Create PDF
         ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");

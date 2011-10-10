@@ -40,31 +40,26 @@ public class EmailMgr {
     private static Email getEmailBySortOrder(int appraisalID, String emailType, boolean sortDesc) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
 
-        try {
-            String query = "from edu.osu.cws.evals.models.Email email " +
-                    "where email.appraisalId = :appraisalId and email.emailType = :emailType " +
-                    "order by  sentDate ";
-            if (sortDesc) {
-                query += "desc";
-            } else {
-                query += "asc";
-            }
-
-            List<Email> emails = session.createQuery(query)
-                    .setInteger("appraisalId", appraisalID)
-                    .setString("emailType", emailType)
-                    .setMaxResults(1)
-                    .list();
-
-            if (!emails.isEmpty()) {
-                return emails.get(0);
-            }
-        } catch (Exception e) {
-            session.close();
-            throw e;
+        String query = "from edu.osu.cws.evals.models.Email email " +
+                "where email.appraisalId = :appraisalId and email.emailType = :emailType " +
+                "order by  sentDate ";
+        if (sortDesc) {
+            query += "desc";
+        } else {
+            query += "asc";
         }
-     return null;
-}
+
+        List<Email> emails = session.createQuery(query)
+                .setInteger("appraisalId", appraisalID)
+                .setString("emailType", emailType)
+                .setMaxResults(1)
+                .list();
+
+        if (!emails.isEmpty()) {
+            return emails.get(0);
+        }
+        return null;
+    }
 
     /**
      * @param appraisalID
@@ -98,13 +93,8 @@ public class EmailMgr {
      */
     public static void add(Email email)  throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            email.validate();
-            session.save(email);
-        } catch (Exception e){
-            session.close();
-            throw e;
-        }
+        email.validate();
+        session.save(email);
     }
 
     /**
@@ -116,14 +106,9 @@ public class EmailMgr {
      */
     public static void add(List<Email> emails) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            for (Email email : emails) {
-                email.validate();
-                session.save(email);
-            }
-        } catch (Exception e){
-            session.close();
-            throw e;
+        for (Email email : emails) {
+            email.validate();
+            session.save(email);
         }
     }
 

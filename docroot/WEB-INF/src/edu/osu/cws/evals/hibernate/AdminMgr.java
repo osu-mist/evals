@@ -21,14 +21,10 @@ public class AdminMgr {
     public HashMap<Integer, Admin> mapByEmployeeId() throws Exception {
         HashMap<Integer, Admin> admins = new HashMap<Integer, Admin>();
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            for (Admin admin : this.list(session)) {
-                admins.put(admin.getEmployee().getId(),  admin);
-            }
-        } catch (Exception e) {
-            session.close();
-            throw e;
+        for (Admin admin : this.list(session)) {
+            admins.put(admin.getEmployee().getId(),  admin);
         }
+
         return admins;
     }
 
@@ -41,13 +37,7 @@ public class AdminMgr {
     public List<Admin> list() throws Exception {
         List<Admin> admins = new ArrayList<Admin>();
         Session session = HibernateUtil.getCurrentSession();
-
-        try {
-            admins = list(session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        admins = list(session);
         return admins;
     }
 
@@ -74,12 +64,7 @@ public class AdminMgr {
      */
     public boolean delete(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            delete(id, session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        delete(id, session);
         return true;
     }
 
@@ -110,15 +95,7 @@ public class AdminMgr {
      */
     public Admin get(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        Admin admin;
-        try {
-            admin = get(id, session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
-
-        return admin;
+        return get(id, session);
     }
 
     /**
@@ -142,15 +119,7 @@ public class AdminMgr {
      */
     public Admin findByOnid(String onid) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        Admin admin;
-        try {
-            admin = findByOnid(onid, session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
-
-        return admin;
+        return findByOnid(onid, session);
     }
 
     /**
@@ -206,12 +175,8 @@ public class AdminMgr {
         admin.setScope("test");
 
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            add(admin, session);
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        add(admin, session);
+
         return true;
     }
 

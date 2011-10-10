@@ -65,7 +65,7 @@ public class JobsTest {
      * Tests that the jobs view is not empty.
      * Before you run this test method make sure that the beforeMethod in this class is commented out.
      */
-    public void shouldHaveJobsInView() {
+    public void shouldHaveJobsInView() throws Exception {
         List<Job> results = jobMgr.list();
         int i = 0;
 
