@@ -14,6 +14,9 @@ public class Appraisal extends Evals {
     public static final String signatureRequired =
             "Please click the box to acknowledge that you have read the appraisal";
 
+    public static final String rebuttalReadRequired =
+            "Please click the box to acknowledge that you have read the rebuttal";
+
     /**
      * Validation error message for rating is public because the appraisal.jsp
      * needs to access this static variable in order to do js validation

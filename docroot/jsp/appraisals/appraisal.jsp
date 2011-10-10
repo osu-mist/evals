@@ -131,8 +131,8 @@
 
             <c:choose>
                 <c:when test="${permissionRule.rebuttalRead == 'e'}">
-                    <input type="checkbox" id="<portlet:namespace />appraisal.readRebuttal">
-                        <label for="<portlet:namespace />appraisal.readRebuttal">
+                    <input type="checkbox" id="<portlet:namespace />appraisal-readRebuttal">
+                        <label for="<portlet:namespace />appraisal-readRebuttal">
                             <liferay-ui:message key="appraisal-supervisor-ack-read-rebuttal" />
                         </label>
                 </c:when>
@@ -180,6 +180,10 @@
                 !jQuery("#<portlet:namespace />acknowledge-read-appraisal").is(':checked')) {
           errors = "<li><%= Appraisal.signatureRequired %></li>";
           alert("<%= Appraisal.signatureRequired %>");
+        }
+        if (jQuery("#<portlet:namespace />appraisal-readRebuttal").length > 0 && !jQuery("#<portlet:namespace />appraisal-readRebuttal").is(':checked')) {
+          errors = "<li><%= Appraisal.rebuttalReadRequired %></li>";
+          alert("<%= Appraisal.rebuttalReadRequired %>");
         }
         if (errors != "") {
           jQuery("#<portlet:namespace />flash").html(
