@@ -755,6 +755,10 @@ public class Actions {
         }
         updateAppraisalInSession(request, appraisal);
 
+        if (appraisal.getStatus().equals("releaseDue") && isLoggedInUserReviewer(request)) {
+            return displayReviewList(request, response);
+        }
+
         return displayHomeView(request, response);
     }
 

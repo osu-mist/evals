@@ -806,7 +806,6 @@ public class AppraisalMgr {
         return getReviewCount(businessCenterName, session);
     }
 
-    //@todo: Joan: Should just get count(*).
     private int getReviewCount(String businessCenterName, Session session) {
         int reviewCount = 0;
 
