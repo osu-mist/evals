@@ -283,7 +283,7 @@ public class Actions {
         PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
         int employeeId = employee.getId();
-        setupMyActiveAppraisals(request, employeeId);
+        setupMyActiveAppraisals(request, employeeId, null);
         setupMyTeamActiveAppraisals(request, employeeId);
 
         boolean isAdmin = isLoggedInUserAdmin(request);
@@ -326,9 +326,11 @@ public class Actions {
      *
      * @param request
      * @param employeeId    Id/Pidm of the currently logged in user
+     * @param firstAnnual   First annual appraisal created after trial appraisal is completed
      * @throws Exception
      */
-    private void setupMyActiveAppraisals(PortletRequest request, int employeeId) throws Exception {
+    private void setupMyActiveAppraisals(PortletRequest request, int employeeId, Appraisal firstAnnual)
+            throws Exception {
         PortletSession session = request.getPortletSession(true);
         List<Appraisal> allMyActiveAppraisals;
 
@@ -336,6 +338,9 @@ public class Actions {
         if (allMyActiveAppraisals == null) {
             allMyActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(employeeId);
             session.setAttribute(ALL_MY_ACTIVE_APPRAISALS, allMyActiveAppraisals);
+        }
+        if (firstAnnual != null) {
+            allMyActiveAppraisals.add(firstAnnual);
         }
         requestMap.put("myActiveAppraisals", allMyActiveAppraisals);
     }
@@ -371,7 +376,7 @@ public class Actions {
 
         PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
-        setupMyActiveAppraisals(request, employee.getId());
+        setupMyActiveAppraisals(request, employee.getId(), null);
         setupMyTeamActiveAppraisals(request, employee.getId());
         setRequiredActions(request);
         useNormalMenu(request);
@@ -393,7 +398,7 @@ public class Actions {
 
         PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
-        setupMyActiveAppraisals(request, employee.getId());
+        setupMyActiveAppraisals(request, employee.getId(), null);
         setupMyTeamActiveAppraisals(request, employee.getId());
         CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
         int maxResults = config.getInt("reviewer.home.pending.max");
@@ -420,7 +425,7 @@ public class Actions {
 
         PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
-        setupMyActiveAppraisals(request, employee.getId());
+        setupMyActiveAppraisals(request, employee.getId(), null);
         setupMyTeamActiveAppraisals(request, employee.getId());
         setRequiredActions(request);
         setTeamAppraisalStatus(request);
@@ -799,10 +804,22 @@ public class Actions {
                 createNolijPDF(appraisal, nolijDir, env);
             }
 
+
+            // Creates the first annual appraisal if needed
+            Map<String, Configuration> configurationMap =
+                    (Map<String, Configuration>) portletContext.getAttribute("configurations");
+            Configuration resultsDueConfig = configurationMap.get("resultsDue");
+            String action = "";
+            if (signAppraisal != null && !signAppraisal.equals("")) {
+                action = "sign-appraisal";
+            }
+            Appraisal firstAnnual = appraisalMgr.createFirstAnnualAppraisal(appraisal, resultsDueConfig, action);
+
+
             if (appraisal.getRole().equals("supervisor")) {
                 setupMyTeamActiveAppraisals(request, currentlyLoggedOnUser.getId());
             } else if (appraisal.getRole().equals("employee")) {
-                setupMyActiveAppraisals(request, currentlyLoggedOnUser.getId());
+                setupMyActiveAppraisals(request, currentlyLoggedOnUser.getId(), firstAnnual);
             }
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());

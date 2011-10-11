@@ -158,8 +158,9 @@ public class AppraisalMgr {
      * PYVPASJ.annual_eval_ind.
      *
      * @param  trialAppraisal: this is the newly closed or completed trial appraisal
+     * @param resultsDueConfig
      * @return the newly created appraisal
-     *
+     * @throws Exception
      */
     public static Appraisal createInitialAppraisalAfterTrial(Appraisal trialAppraisal,
                                                              Configuration resultsDueConfig) throws Exception {
@@ -301,13 +302,6 @@ public class AppraisalMgr {
         // save changes to db
         updateAppraisal(appraisal);
 
-        // Creates the first annual appraisal if needed
-        String action = "";
-        if (request.get("sign-appraisal") != null) {
-            action = "sign-appraisal";
-        }
-        createFirstAnnualAppraisal(appraisal, resultsDueConfig, action);
-
         // Send email if needed
         String appointmentType = appraisal.getJob().getAppointmentType();
         AppraisalStep appraisalStep;
@@ -338,21 +332,22 @@ public class AppraisalMgr {
      * @param resultsDueConfig
      * @param action
      * @throws Exception
+     * @return appraisal    The first annual appraisal created, null otherwise
      */
-    private void createFirstAnnualAppraisal(Appraisal appraisal, Configuration resultsDueConfig, String action)
+    public Appraisal createFirstAnnualAppraisal(Appraisal appraisal, Configuration resultsDueConfig, String action)
             throws Exception {
         Job job = appraisal.getJob();
 
         if (!appraisal.getType().equals(Appraisal.TYPE_TRIAL)) {
-            return;
+            return null;
         }
         if (!action.equals("sign-appraisal")) {
-            return;
+            return null;
         }
         if (job.getAnnualInd() == 0) {
-            return;
+            return null;
         }
-        AppraisalMgr.createInitialAppraisalAfterTrial(appraisal, resultsDueConfig);
+        return AppraisalMgr.createInitialAppraisalAfterTrial(appraisal, resultsDueConfig);
     }
 
     /**
