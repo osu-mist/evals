@@ -97,8 +97,8 @@
         FROM
             edu.osu.cws.evals.models.Appraisal
         WHERE
-            job.businessCenterName = :bc
-            AND status IN ('reviewDue', 'reviewOverdue')
+            status IN ('reviewDue', 'reviewOverdue')
+            AND job.businessCenterName = :bc
     ]]></query>
     <query name="appraisal.search"><![CDATA[
         SELECT new edu.osu.cws.evals.models.Appraisal (
