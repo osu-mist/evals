@@ -102,7 +102,6 @@ public class EvalsPortlet extends GenericPortlet {
             }
 
             actionClass.setRequestAttributes(renderRequest);
-            actionClass.setHomeURL(renderRequest);
         } catch (Exception e) {
             handlePASSException(e, "Error in doView", Logger.CRITICAL, true);
         }

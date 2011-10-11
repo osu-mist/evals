@@ -6,7 +6,7 @@
             class="active"
           </c:if>
         ><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
-                        <portlet:param name="action" value="${homeAction}"/>
+                        <portlet:param name="action" value="displayHomeView"/>
                         </portlet:renderURL>"><liferay-ui:message key="evals-home"/></a></li>
         <li><a href="#"><liferay-ui:message key="settings"/></a>
             <ul>
@@ -22,24 +22,28 @@
             <ul>
               <c:if test="${isAdmin == 'true'}">
                   <li><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
-                      <portlet:param name="action" value="displayAdminHomeView"/>
+                      <portlet:param name="action" value="displayHomeView"/>
+                      <portlet:param name="currentRole" value="<%= Actions.ROLE_ADMINISTRATOR %>"/>
                       </portlet:renderURL>"><liferay-ui:message key="role-admin"/></a>
                   </li>
               </c:if>
               <c:if test="${isReviewer == 'true'}">
                   <li><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
-                      <portlet:param name="action" value="displayReviewerHomeView"/>
+                      <portlet:param name="action" value="displayHomeView"/>
+                      <portlet:param name="currentRole" value="<%= Actions.ROLE_REVIEWER %>"/>
                       </portlet:renderURL>"> <liferay-ui:message key="role-reviewer"/> </a>
                   </li>
               </c:if>
               <c:if test="${isSupervisor == 'true'}">
                   <li><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
-                      <portlet:param name="action" value="displaySupervisorHomeView"/>
+                      <portlet:param name="action" value="displayHomeView"/>
+                      <portlet:param name="currentRole" value="<%= Actions.ROLE_SUPERVISOR %>"/>
                           </portlet:renderURL>"><liferay-ui:message key="role-supervisor"/></a>
                   </li>
               </c:if>
                   <li><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
                       <portlet:param name="action" value="displayHomeView"/>
+                      <portlet:param name="currentRole" value="<%= Actions.ROLE_SELF %>"/>
                       </portlet:renderURL>"><liferay-ui:message key="role-self"/></a>
                   </li>
             </ul>

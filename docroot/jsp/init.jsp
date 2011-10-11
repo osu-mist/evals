@@ -15,6 +15,7 @@
 <%@ page import="edu.osu.cws.evals.models.*" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="edu.osu.cws.util.CWSUtil" %>
+<%@ page import="edu.osu.cws.evals.portlet.Actions" %>
 
 
 <%@ page import="java.util.List" %>

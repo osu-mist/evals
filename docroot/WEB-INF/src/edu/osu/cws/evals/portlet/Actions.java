@@ -278,19 +278,25 @@ public class Actions {
      * @return jsp      JSP file to display (defined in portlet.xml)
      * @throws Exception
      */
-    //@@todo: Joan: I don't see the need to have several displayHomeView methods.  Let's talk about this.
     public String displayHomeView(PortletRequest request, PortletResponse response) throws Exception {
-        PortletSession session = request.getPortletSession(true);
-        Employee employee = getLoggedOnUser(request);
-        int employeeId = employee.getId();
-        setupMyActiveAppraisals(request, employeeId, null);
-        setupMyTeamActiveAppraisals(request, employeeId);
-
+        int employeeId = getLoggedOnUser(request).getId();
+        String homeJSP = getHomeJSP(request);
+        CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
         boolean isAdmin = isLoggedInUserAdmin(request);
         boolean isReviewer = isLoggedInUserReviewer(request);
+
+        // specify menu type, help links and yellow box to display in home view
+        useNormalMenu(request);
+        helpLinks(request);
+        requestMap.put("alertMsg", config.getBoolean("alert.display"));
+        requestMap.put("isHome", true);
+
+        setupMyActiveAppraisals(request, employeeId, null);
+        setupMyTeamActiveAppraisals(request, employeeId);
         ArrayList<Appraisal> myActiveAppraisals = (ArrayList<Appraisal>) requestMap.get("myActiveAppraisals");
         ArrayList<Appraisal> myTeamsActiveAppraisals  =
                 (ArrayList<Appraisal>) requestMap.get("myTeamsActiveAppraisals");
+
         boolean hasAppraisals = (myActiveAppraisals != null && !myActiveAppraisals.isEmpty()) ||
                 (myTeamsActiveAppraisals != null && !myTeamsActiveAppraisals.isEmpty());
 
@@ -298,16 +304,13 @@ public class Actions {
             requestMap.put("hasNoEvalsAccess", true);
         }
 
-        helpLinks(request);
-        requestMap.put("isHome", true);
-
         setRequiredActions(request);
-        useNormalMenu(request);
-        CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
-        requestMap.put("alertMsg", config.getBoolean("alert.display"));
-        session.setAttribute("currentRole", ROLE_SELF);
-
-        return "home-jsp";
+        if (homeJSP.equals("reviewer-home-jsp")) {
+            int maxResults = config.getInt("reviewer.home.pending.max");
+            ArrayList<Appraisal> appraisals = getReviewsForLoggedInUser(request, maxResults);
+            requestMap.put("appraisals", appraisals);
+        }
+        return homeJSP;
     }
 
     /**
@@ -355,107 +358,24 @@ public class Actions {
      */
     private void setupMyTeamActiveAppraisals(PortletRequest request, int employeeId) throws Exception {
         PortletSession session = request.getPortletSession(true);
-        List<Appraisal> myTeamsActiveAppraisals;
+        List<Appraisal> dbTeamAppraisals;
+        ArrayList<Appraisal> myTeamAppraisals;
 
         if (isLoggedInUserSupervisor(request)) {
-            myTeamsActiveAppraisals = (ArrayList<Appraisal>)  session.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
-            if (myTeamsActiveAppraisals == null) {
-                myTeamsActiveAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true);
-                session.setAttribute(MY_TEAMS_ACTIVE_APPRAISALS, myTeamsActiveAppraisals);
+            myTeamAppraisals = (ArrayList<Appraisal>)  session.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
+            if (myTeamAppraisals == null) {
+                dbTeamAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true);
+                myTeamAppraisals = new ArrayList<Appraisal>();
+
+                if (dbTeamAppraisals != null) {
+                    for (Appraisal appraisal : dbTeamAppraisals) {
+                        appraisal.setRole("supervisor");
+                        myTeamAppraisals.add(appraisal);
+                    }
+                }
+                session.setAttribute(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals);
             }
-            requestMap.put(MY_TEAMS_ACTIVE_APPRAISALS, myTeamsActiveAppraisals);
-        }
-    }
-
-    public String displayAdminHomeView(PortletRequest request, PortletResponse response) throws Exception {
-        // Check that the logged in user is admin
-        if (!isLoggedInUserAdmin(request)) {
-            addErrorsToRequest(request, ACCESS_DENIED);
-            return displayHomeView(request, response);
-        }
-
-        PortletSession session = request.getPortletSession(true);
-        Employee employee = getLoggedOnUser(request);
-        setupMyActiveAppraisals(request, employee.getId(), null);
-        setupMyTeamActiveAppraisals(request, employee.getId());
-        setRequiredActions(request);
-        useNormalMenu(request);
-        helpLinks(request);
-        requestMap.put("isAdminHome", true);
-        CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
-        requestMap.put("alertMsg", config.getBoolean("alert.display"));
-        session.setAttribute("currentRole", ROLE_ADMINISTRATOR);
-
-        return "admin-home-jsp";
-    }
-
-    public String displayReviewerHomeView(PortletRequest request, PortletResponse response) throws Exception {
-        // Check that the logged in user is admin
-        if (!isLoggedInUserReviewer(request)) {
-            addErrorsToRequest(request, ACCESS_DENIED);
-            return displayHomeView(request, response);
-        }
-
-        PortletSession session = request.getPortletSession(true);
-        Employee employee = getLoggedOnUser(request);
-        setupMyActiveAppraisals(request, employee.getId(), null);
-        setupMyTeamActiveAppraisals(request, employee.getId());
-        CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
-        int maxResults = config.getInt("reviewer.home.pending.max");
-
-        ArrayList<Appraisal> appraisals = getReviewsForLoggedInUser(request, maxResults);
-        requestMap.put("appraisals", appraisals);
-
-        setRequiredActions(request);
-        useNormalMenu(request);
-        helpLinks(request);
-        requestMap.put("isReviewerHome", true);
-        requestMap.put("alertMsg", config.getBoolean("alert.display"));
-        session.setAttribute("currentRole", ROLE_REVIEWER);
-
-        return "reviewer-home-jsp";
-    }
-
-    public String displaySupervisorHomeView(PortletRequest request, PortletResponse response) throws Exception {
-        // Check that the logged in user is admin
-        if (!isLoggedInUserSupervisor(request)) {
-            addErrorsToRequest(request, ACCESS_DENIED);
-            return displayHomeView(request, response);
-        }
-
-        PortletSession session = request.getPortletSession(true);
-        Employee employee = getLoggedOnUser(request);
-        setupMyActiveAppraisals(request, employee.getId(), null);
-        setupMyTeamActiveAppraisals(request, employee.getId());
-        setRequiredActions(request);
-        setTeamAppraisalStatus(request);
-        useNormalMenu(request);
-        helpLinks(request);
-        requestMap.put("isSupervisorHome", true);
-        CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
-        requestMap.put("alertMsg", config.getBoolean("alert.display"));
-        session.setAttribute("currentRole", ROLE_SUPERVISOR);
-
-        return "supervisor-home-jsp";
-    }
-
-    /**
-     * Goes through the team appraisals in the request object, and sets their status accordingly by calling
-     * AppraisalMgr.setAppraisalStatus.
-     *
-     * @param request
-     */
-    private void setTeamAppraisalStatus(PortletRequest request) {
-        if (requestMap.get("myTeamsActiveAppraisals") != null) {
-            ArrayList<Appraisal> newTeamAppraisals = new ArrayList<Appraisal>();
-            ArrayList<Appraisal> teamAppraisals = (ArrayList<Appraisal>)
-                    requestMap.get("myTeamsActiveAppraisals");
-            for (Appraisal appraisal : teamAppraisals) {
-                appraisal.setRole("supervisor");
-                newTeamAppraisals.add(appraisal);
-            }
-
-            requestMap.put("myTeamsActiveAppraisals", newTeamAppraisals);
+            requestMap.put(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals);
         }
     }
 
@@ -1584,6 +1504,9 @@ public class Actions {
      * @param request
      */
     public void setRequestAttributes(RenderRequest request) {
+        String currentRole = getCurrentRole(request);
+        requestMap.put("currentRole", currentRole);
+
         for (Map.Entry<String, Object> entry : requestMap.entrySet()) {
             request.setAttribute(entry.getKey(), entry.getValue());
         }
@@ -1592,25 +1515,70 @@ public class Actions {
     }
 
     /**
-     *  It also sets the currentRole from session to request.
+     * Returns the currentRole that the logged in user last selected. It
+     * tries to grab it from the request and it stores it in session.
      *
      * @param request
+     * @return
      */
-    public void setHomeURL(RenderRequest request) {
-        String homeAction = "displayHomeView";
+    public String getCurrentRole(PortletRequest request) {
         PortletSession session = request.getPortletSession(true);
         String currentRole = (String) session.getAttribute("currentRole");
 
-        request.setAttribute("currentRole", currentRole);
-        if (currentRole != null) {
-            if (currentRole.equals(ROLE_ADMINISTRATOR)) {
-                homeAction = "displayAdminHomeView";
-            } else if (currentRole.equals(ROLE_REVIEWER)) {
-                homeAction = "displayReviewerHomeView";
-            } else if (currentRole.equals(ROLE_SUPERVISOR)) {
-                homeAction = "displaySupervisorHomeView";
+        String roleFromRequest = ParamUtil.getString(request, "currentRole");
+        if (!roleFromRequest.equals("")) {
+            currentRole = roleFromRequest;
+            session.setAttribute("currentRole", currentRole);
+        }
+
+        if (currentRole == null || currentRole.equals("")) {
+            currentRole = ROLE_SELF;
+            session.setAttribute("currentRole", currentRole);
+        }
+
+        return currentRole;
+    }
+
+    /**
+     * Returns the value of the home jsp file to render. It also performs
+     * the code check to make sure that the logged in user is allowed to
+     * view that file. If the user doesn't have access to that view, it
+     * returns the default home-jsp.
+     *
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    public String getHomeJSP(PortletRequest request) throws Exception {
+        String homeJsp = "home-jsp";
+        String currentRole = getCurrentRole(request);
+
+        if (currentRole.equals(ROLE_ADMINISTRATOR)) {
+            if (!isLoggedInUserAdmin(request)) {
+                addErrorsToRequest(request, ACCESS_DENIED);
+            } else {
+                homeJsp = "admin-home-jsp";
+            }
+            return homeJsp;
+        }
+
+        if (currentRole.equals(ROLE_REVIEWER)) {
+            if (!isLoggedInUserReviewer(request)) {
+                addErrorsToRequest(request, ACCESS_DENIED);
+            } else {
+                homeJsp = "reviewer-home-jsp";
+            }
+            return homeJsp;
+        }
+
+        if (currentRole.equals(ROLE_SUPERVISOR)) {
+            if (!isLoggedInUserSupervisor(request)) {
+                addErrorsToRequest(request, ACCESS_DENIED);
+            } else {
+                homeJsp = "supervisor-home-jsp";
             }
         }
-        request.setAttribute("homeAction", homeAction);
+
+        return homeJsp;
     }
 }
