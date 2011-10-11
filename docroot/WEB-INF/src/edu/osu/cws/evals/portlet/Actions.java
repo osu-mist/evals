@@ -756,6 +756,7 @@ public class Actions {
         updateAppraisalInSession(request, appraisal);
 
         if (appraisal.getStatus().equals("releaseDue") && isLoggedInUserReviewer(request)) {
+            ((ActionResponse) response).setWindowState(WindowState.MAXIMIZED);
             return displayReviewList(request, response);
         }
 
