@@ -390,7 +390,7 @@ public class EvalsPDF {
             } else {
                 rating.addCell(uncheckedBox);
             }
-            cell = new PdfPCell(new Paragraph("1. " + resource.getString("appraisal-rating-1"), FONT_10));
+            cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-1"), FONT_10));
             cell.setColspan(ratingMaxCols - 2);
             cell.setBorder(Rectangle.NO_BORDER);
             rating.addCell(cell);
@@ -400,7 +400,7 @@ public class EvalsPDF {
             } else {
                 rating.addCell(uncheckedBox);
             }
-            cell = new PdfPCell(new Paragraph("2. " + resource.getString("appraisal-rating-2"), FONT_10));
+            cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-2"), FONT_10));
             cell.setColspan(ratingMaxCols - 2);
             cell.setBorder(Rectangle.NO_BORDER);
             rating.addCell(cell);
@@ -410,7 +410,7 @@ public class EvalsPDF {
             } else {
                 rating.addCell(uncheckedBox);
             }
-            cell = new PdfPCell(new Paragraph("3. " + resource.getString("appraisal-rating-3"), FONT_10));
+            cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-3"), FONT_10));
             cell.setColspan(ratingMaxCols - 2);
             cell.setBorder(Rectangle.NO_BORDER);
             rating.addCell(cell);
@@ -420,7 +420,7 @@ public class EvalsPDF {
             } else {
                 rating.addCell(uncheckedBox);
             }
-            cell = new PdfPCell(new Paragraph("4. " + resource.getString("appraisal-rating-4"), FONT_10));
+            cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-4"), FONT_10));
             cell.setColspan(ratingMaxCols - 2);
             cell.setBorder(Rectangle.NO_BORDER);
             rating.addCell(cell);
