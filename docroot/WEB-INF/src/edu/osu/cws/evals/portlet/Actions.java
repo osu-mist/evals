@@ -789,7 +789,9 @@ public class Actions {
     {
         PortletSession session = request.getPortletSession(true);
         List<Appraisal> reviewList = (List<Appraisal>) session.getAttribute(REVIEW_LIST);
-        for (Appraisal appraisalInSession: reviewList)
+        List<Appraisal> tempList = new ArrayList<Appraisal>();
+        tempList.addAll(reviewList);
+        for (Appraisal appraisalInSession: tempList)
         {
             if (appraisalInSession.getId() == appraisal.getId())
             {
