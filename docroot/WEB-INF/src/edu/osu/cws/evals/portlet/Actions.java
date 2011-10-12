@@ -308,7 +308,7 @@ public class Actions {
         setRequiredActions(request);
         if (homeJSP.equals("reviewer-home-jsp")) {
             int maxResults = config.getInt("reviewer.home.pending.max");
-            List<Appraisal> appraisals = getReviewsForLoggedInUser(request, maxResults);
+            ArrayList<Appraisal> appraisals = getReviewsForLoggedInUser(request, maxResults);
             requestMap.put("appraisals", appraisals);
         }
         return homeJSP;
@@ -497,7 +497,7 @@ public class Actions {
             return displayHomeView(request, response);
         }
 
-        List<Appraisal> appraisals = getReviewsForLoggedInUser(request, -1);
+        ArrayList<Appraisal> appraisals = getReviewsForLoggedInUser(request, -1);
         requestMap.put("appraisals", appraisals);
         requestMap.put("pageTitle", "pending-reviews");
         useMaximizedMenu(request);
@@ -531,32 +531,38 @@ public class Actions {
      * @return
      * @throws Exception
      */
-    private List<Appraisal> getReviewsForLoggedInUser(PortletRequest request, int maxResults) throws Exception {
-        List<Appraisal> reviewList;
-        int toIndex;
+    private ArrayList<Appraisal> getReviewsForLoggedInUser(PortletRequest request, int maxResults) throws Exception {
+           ArrayList<Appraisal> reviewList;
+           int toIndex;
+           ArrayList<Appraisal> outList = new ArrayList<Appraisal>();
 
-        PortletSession session = request.getPortletSession(true);
-        reviewList = (List<Appraisal>) session.getAttribute(REVIEW_LIST);
+           PortletSession session = request.getPortletSession(true);
+           reviewList = (ArrayList<Appraisal>) session.getAttribute(REVIEW_LIST);
 
-        if (reviewList == null) //No data yet, need to get it from the database.
-        {
-            String businessCenterName = ParamUtil.getString(request, "businessCenterName");
+           if (reviewList == null) { //No data yet, need to get it from the database.
+               String businessCenterName = ParamUtil.getString(request, "businessCenterName");
 
-            if (businessCenterName.equals("")) {
-                int employeeID = getLoggedOnUser(request).getId();
-                businessCenterName = getReviewer(employeeID).getBusinessCenterName();
-            }
-            reviewList = appraisalMgr.getReviews(businessCenterName, -1);
-            session.setAttribute(REVIEW_LIST, reviewList);
-        }
+               if (businessCenterName.equals("")) {
+                   int employeeID = getLoggedOnUser(request).getId();
+                   businessCenterName = getReviewer(employeeID).getBusinessCenterName();
+               }
+               reviewList = appraisalMgr.getReviews(businessCenterName, -1);
+               session.setAttribute(REVIEW_LIST, reviewList);
+           }
 
-        if (maxResults == -1 || reviewList.size() < maxResults)
-            toIndex = reviewList.size();
-        else
-            toIndex = maxResults;
+           if (maxResults == -1 || reviewList.size() < maxResults) {
+               toIndex = reviewList.size();
+           } else {
+               toIndex = maxResults;
+           }
 
-        return reviewList.subList(0, toIndex);
-    }
+           for (int i = 0; i < toIndex; i++) {
+               outList.add(reviewList.get(i));
+           }
+
+           return outList;
+       }
+
 
     /**
      * Renders a list of appraisals based on the search criteria.
@@ -653,7 +659,7 @@ public class Actions {
 
         setupMyTeamActiveAppraisals(request, userId);
         if (isLoggedInUserReviewer(request)) {
-            List<Appraisal> reviews = getReviewsForLoggedInUser(request, -1);
+            ArrayList<Appraisal> reviews = getReviewsForLoggedInUser(request, -1);
             requestMap.put("pendingReviews", reviews);
         }
 
