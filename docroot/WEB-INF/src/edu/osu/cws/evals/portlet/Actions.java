@@ -775,8 +775,6 @@ public class Actions {
 
 
         if (appraisal.getStatus().equals("releaseDue") && isLoggedInUserReviewer(request)) {
-            //((ActionResponse) response).setWindowState(WindowState.MAXIMIZED);
-            //return displayReviewList(request, response);
             removeReviewAppraisalInSession(request, appraisal);
         }
         else
@@ -785,17 +783,22 @@ public class Actions {
         return displayHomeView(request, response);
     }
 
+    /**
+     * Handles removing an appraisal from the reviewList stored in session. This method is called
+     * by the updateAppraisal method after a reviewer submits a review.
+     *
+     * @param request
+     * @param appraisal
+     */
     private void removeReviewAppraisalInSession(PortletRequest request, Appraisal appraisal)
     {
         PortletSession session = request.getPortletSession(true);
         List<Appraisal> reviewList = (List<Appraisal>) session.getAttribute(REVIEW_LIST);
         List<Appraisal> tempList = new ArrayList<Appraisal>();
         tempList.addAll(reviewList);
-        for (Appraisal appraisalInSession: tempList)
-        {
-            if (appraisalInSession.getId() == appraisal.getId())
-            {
-                reviewList.remove(appraisal);
+        for (Appraisal appraisalInSession: tempList) {
+            if (appraisalInSession.getId() == appraisal.getId()) {
+                reviewList.remove(appraisalInSession);
                 break;
             }
         }
@@ -1445,7 +1448,7 @@ public class Actions {
         reviewer = getReviewer(employeeID);
         if (reviewer != null) {
             String businessCenterName = reviewer.getBusinessCenterName();
-            reviewerAction = getReviewerAction(businessCenterName, resource);
+            reviewerAction = getReviewerAction(businessCenterName, resource, request);
             if (reviewerAction != null) {
                 administrativeActions.add(reviewerAction);
             }
@@ -1523,9 +1526,16 @@ public class Actions {
      * @return
      * @throws Exception
      */
-    private RequiredAction getReviewerAction(String businessCenterName, ResourceBundle resource)
-            throws Exception {
-        int reviewCount = appraisalMgr.getReviewCount(businessCenterName);
+    private RequiredAction getReviewerAction(String businessCenterName, ResourceBundle resource,
+                                             PortletRequest request) throws Exception {
+        int reviewCount;
+        PortletSession session = request.getPortletSession(true);
+        List<Appraisal> reviewList = (List<Appraisal>) session.getAttribute(REVIEW_LIST);
+        if (reviewList != null) {
+            reviewCount = reviewList.size();
+        } else {
+            reviewCount = appraisalMgr.getReviewCount(businessCenterName);
+        }
 
         RequiredAction requiredAction = new RequiredAction();
         if (reviewCount == 0) {
