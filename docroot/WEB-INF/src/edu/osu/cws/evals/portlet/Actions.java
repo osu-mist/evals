@@ -28,6 +28,7 @@ public class Actions {
     public static final String ROLE_SELF = "self";
     public static final String ALL_MY_ACTIVE_APPRAISALS = "allMyActiveAppraisals";
     public static final String MY_TEAMS_ACTIVE_APPRAISALS = "myTeamsActiveAppraisals";
+    private static final String REVIEW_LIST = "reviewList";
 
     private EmployeeMgr employeeMgr = new EmployeeMgr();
 
@@ -307,7 +308,7 @@ public class Actions {
         setRequiredActions(request);
         if (homeJSP.equals("reviewer-home-jsp")) {
             int maxResults = config.getInt("reviewer.home.pending.max");
-            ArrayList<Appraisal> appraisals = getReviewsForLoggedInUser(request, maxResults);
+            List<Appraisal> appraisals = getReviewsForLoggedInUser(request, maxResults);
             requestMap.put("appraisals", appraisals);
         }
         return homeJSP;
@@ -496,7 +497,7 @@ public class Actions {
             return displayHomeView(request, response);
         }
 
-        ArrayList<Appraisal> appraisals = getReviewsForLoggedInUser(request, -1);
+        List<Appraisal> appraisals = getReviewsForLoggedInUser(request, -1);
         requestMap.put("appraisals", appraisals);
         requestMap.put("pageTitle", "pending-reviews");
         useMaximizedMenu(request);
@@ -530,13 +531,31 @@ public class Actions {
      * @return
      * @throws Exception
      */
-    private ArrayList<Appraisal> getReviewsForLoggedInUser(PortletRequest request, int maxResults) throws Exception {
-        String businessCenterName = ParamUtil.getString(request, "businessCenterName");
-        if (businessCenterName.equals("")) {
-            int employeeID = getLoggedOnUser(request).getId();
-            businessCenterName = getReviewer(employeeID).getBusinessCenterName();
+    private List<Appraisal> getReviewsForLoggedInUser(PortletRequest request, int maxResults) throws Exception {
+        List<Appraisal> reviewList;
+        int toIndex;
+
+        PortletSession session = request.getPortletSession(true);
+        reviewList = (List<Appraisal>) session.getAttribute(REVIEW_LIST);
+
+        if (reviewList == null) //No data yet, need to get it from the database.
+        {
+            String businessCenterName = ParamUtil.getString(request, "businessCenterName");
+
+            if (businessCenterName.equals("")) {
+                int employeeID = getLoggedOnUser(request).getId();
+                businessCenterName = getReviewer(employeeID).getBusinessCenterName();
+            }
+            reviewList = appraisalMgr.getReviews(businessCenterName, -1);
+            session.setAttribute(REVIEW_LIST, reviewList);
         }
-        return appraisalMgr.getReviews(businessCenterName, maxResults);
+
+        if (maxResults == -1 || reviewList.size() < maxResults)
+            toIndex = reviewList.size();
+        else
+            toIndex = maxResults;
+
+        return reviewList.subList(0, toIndex);
     }
 
     /**
@@ -634,7 +653,7 @@ public class Actions {
 
         setupMyTeamActiveAppraisals(request, userId);
         if (isLoggedInUserReviewer(request)) {
-            ArrayList<Appraisal> reviews = getReviewsForLoggedInUser(request, -1);
+            List<Appraisal> reviews = getReviewsForLoggedInUser(request, -1);
             requestMap.put("pendingReviews", reviews);
         }
 
@@ -753,14 +772,31 @@ public class Actions {
             }
             return displayAppraisal(request, response);
         }
-        updateAppraisalInSession(request, appraisal);
+
 
         if (appraisal.getStatus().equals("releaseDue") && isLoggedInUserReviewer(request)) {
-            ((ActionResponse) response).setWindowState(WindowState.MAXIMIZED);
-            return displayReviewList(request, response);
+            //((ActionResponse) response).setWindowState(WindowState.MAXIMIZED);
+            //return displayReviewList(request, response);
+            removeReviewAppraisalInSession(request, appraisal);
         }
+        else
+            updateAppraisalInSession(request, appraisal);
 
         return displayHomeView(request, response);
+    }
+
+    private void removeReviewAppraisalInSession(PortletRequest request, Appraisal appraisal)
+    {
+        PortletSession session = request.getPortletSession(true);
+        List<Appraisal> reviewList = (List<Appraisal>) session.getAttribute(REVIEW_LIST);
+        for (Appraisal appraisalInSession: reviewList)
+        {
+            if (appraisalInSession.getId() == appraisal.getId())
+            {
+                reviewList.remove(appraisal);
+                break;
+            }
+        }
     }
 
     /***
