@@ -10,6 +10,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 @Test
@@ -25,7 +26,6 @@ public class ConfigurationsTest {
     public void setUp() throws Exception {
         DBUnit dbunit = new DBUnit();
         dbunit.seedDatabase();
-        int i = 1;
     }
 
     public void shouldSortConfigurationsBySectionThenBySequence() throws Exception {
@@ -69,6 +69,20 @@ public class ConfigurationsTest {
         Transaction tx = session.beginTransaction();
         Configuration config = (Configuration) session.get(Configuration.class, 1);
         assert config.getValue().equals(newConfigValue);
+        tx.commit();
+    }
+
+    public void shouldReturnContextLastUpdate() throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+        assert ConfigurationMgr.getContextLastUpdate() != null;
+        tx.commit();
+    }
+
+    public void shouldUpdateContextTimestamp() throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+        ConfigurationMgr.updateContextTimestamp();
         tx.commit();
     }
 }

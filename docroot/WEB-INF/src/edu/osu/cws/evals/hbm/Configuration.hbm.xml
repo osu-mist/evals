@@ -18,4 +18,13 @@
         <property name="action" column="ACTION"/>
     </class>
 
+    <sql-query name="configuration.getContextDatetime"><![CDATA[
+        SELECT
+            CONTEXT_DATETIME
+        FROM
+            config_times
+    ]]></sql-query>
+    <sql-query name="configuration.updateContextDatetime"><![CDATA[
+        UPDATE config_times SET CONTEXT_DATETIME = :now
+    ]]></sql-query>
 </hibernate-mapping>

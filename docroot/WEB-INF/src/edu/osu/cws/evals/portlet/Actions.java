@@ -15,6 +15,7 @@ import org.hibernate.Session;
 import javax.portlet.*;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -439,9 +440,10 @@ public class Actions {
      * Updates the admins List in the portletContext. This method is called by
      * EvalsPortlet.portletSetup and by Actions.addAdmin methods.
      *
+     * @param updateContextTimestamp    Whether or not to update the context timestamp in config_times
      * @throws Exception
      */
-    public void setEvalsAdmins() throws Exception {
+    public void setEvalsAdmins(boolean updateContextTimestamp) throws Exception {
         portletContext.setAttribute("admins", adminMgr.mapByEmployeeId());
         List<Admin> admins = adminMgr.list();
         // Call getName on the admins object to initialize the employee name
@@ -451,15 +453,19 @@ public class Actions {
             }
         }
         portletContext.setAttribute("adminsList", admins);
+        if (updateContextTimestamp) {
+            updateContextTimestamp();
+        }
     }
 
     /**
      * Updates the reviewers List in the portletContext. This method is called by
      * EvalsPortlet.portletSetup and by Actions.addReviewer methods.
      *
+     * @param updateContextTimestamp    Whether or not to update the context timestamp in config_times
      * @throws Exception
      */
-    public void setEvalsReviewers() throws Exception {
+    public void setEvalsReviewers(boolean updateContextTimestamp) throws Exception {
         portletContext.setAttribute("reviewers", reviewerMgr.mapByEmployeeId());
         List<Reviewer> reviewers = reviewerMgr.list();
         // Call getName on the reviewers object to initialize the employee name
@@ -469,17 +475,24 @@ public class Actions {
             }
         }
         portletContext.setAttribute("reviewersList", reviewers);
+        if (updateContextTimestamp) {
+            updateContextTimestamp();
+        }
     }
 
     /**
      * Updates the configuration List in the portletContext. This method is called by
      * EvalsPortlet.portletSetup and by Actions.editConfiguration methods.
      *
+     * @param updateContextTimestamp    Whether or not to update the context timestamp in config_times
      * @throws Exception
      */
-    public void setEvalsConfiguration() throws Exception {
+    public void setEvalsConfiguration(boolean updateContextTimestamp) throws Exception {
         portletContext.setAttribute("configurations", configurationMgr.mapByName());
         portletContext.setAttribute("configurationsList", configurationMgr.list());
+        if (updateContextTimestamp) {
+            updateContextTimestamp();
+        }
     }
 
     /**
@@ -1003,12 +1016,40 @@ public class Actions {
             return displayHomeView(request, response);
         }
 
+        refreshContextCache();
         ArrayList<Admin> adminsList = (ArrayList<Admin>) portletContext.getAttribute("adminsList");
         requestMap.put("isMaster", isLoggedInUserMasterAdmin(request));
         requestMap.put("adminsList", adminsList);
         useMaximizedMenu(request);
 
         return "admin-list-jsp";
+    }
+
+    /**
+     * Checks if the context cache is outdated and refreshes the context cache:
+     * admins, reviewers and configuration lists and maps. If the context cache is refreshed, it
+     * updates the context cache timestamp in the portlet context.
+     *
+     * @throws Exception
+     */
+    private void refreshContextCache() throws Exception {
+        Date contextCacheTimestamp = (Date) portletContext.getAttribute(EvalsPortlet.CONTEXT_CACHE_TIMESTAMP);
+        Timestamp contextLastUpdate = ConfigurationMgr.getContextLastUpdate();
+        if (contextLastUpdate.after(contextCacheTimestamp)) {
+            setEvalsAdmins(false);
+            setEvalsReviewers(false);
+            setEvalsConfiguration(false);
+            portletContext.setAttribute(EvalsPortlet.CONTEXT_CACHE_TIMESTAMP, new Date());
+        }
+    }
+
+    /**
+     * Updates the context timestamp in the db and also in the portletContext.
+     * @throws Exception
+     */
+    private void updateContextTimestamp() throws Exception {
+        Date currentTimestamp = ConfigurationMgr.updateContextTimestamp();
+        portletContext.setAttribute(EvalsPortlet.CONTEXT_CACHE_TIMESTAMP, currentTimestamp);
     }
 
     /**
@@ -1046,7 +1087,7 @@ public class Actions {
             }
 
             adminMgr.delete(id);
-            setEvalsAdmins();
+            setEvalsAdmins(true);
             SessionMessages.add(request, "admin-deleted");
         } catch (ModelException e) {
             addErrorsToRequest(request, e.getMessage());
@@ -1075,7 +1116,7 @@ public class Actions {
 
         try {
             adminMgr.add(onid,  isMaster, getLoggedOnUser(request));
-            setEvalsAdmins();
+            setEvalsAdmins(true);
             SessionMessages.add(request, "admin-added");
         } catch (ModelException e) {
             addErrorsToRequest(request, e.getMessage());
@@ -1102,6 +1143,7 @@ public class Actions {
             return displayHomeView(request, response);
         }
 
+        refreshContextCache();
         ArrayList<Reviewer> reviewersList = (ArrayList<Reviewer>) portletContext.getAttribute("reviewersList");
         BusinessCenterMgr businessCenterMgr = new BusinessCenterMgr();
         ArrayList<BusinessCenter> businessCenters = (ArrayList<BusinessCenter>) businessCenterMgr.list();
@@ -1149,7 +1191,7 @@ public class Actions {
             }
 
             reviewerMgr.delete(id);
-            setEvalsReviewers();
+            setEvalsReviewers(true);
             SessionMessages.add(request, "reviewer-deleted");
         } catch (ModelException e) {
             addErrorsToRequest(request, e.getMessage());
@@ -1185,7 +1227,7 @@ public class Actions {
 
         try {
             reviewerMgr.add(onid, businessCenterName);
-            setEvalsReviewers();
+            setEvalsReviewers(true);
             SessionMessages.add(request, "reviewer-added");
         } catch (Exception e) {
             addErrorsToRequest(request, e.getMessage());
@@ -1209,6 +1251,7 @@ public class Actions {
             return displayHomeView(request, response);
         }
 
+        refreshContextCache();
         ArrayList<Configuration> configurations = (ArrayList<Configuration>)
                 portletContext.getAttribute("configurationsList");
         requestMap.put("configurations", configurations);
@@ -1238,7 +1281,7 @@ public class Actions {
         if (id != 0) {
             try {
                 configurationMgr.edit(id, value);
-                setEvalsConfiguration();
+                setEvalsConfiguration(true);
             } catch (Exception e) {
                 return e.getMessage();
             }
@@ -1284,6 +1327,7 @@ public class Actions {
                 }
             }
             session.setAttribute("loggedOnUser", loggedOnUser);
+            refreshContextCache();
         }
 
         return loggedOnUser;

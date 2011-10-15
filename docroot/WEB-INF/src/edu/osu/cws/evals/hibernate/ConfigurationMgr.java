@@ -3,13 +3,12 @@ package edu.osu.cws.evals.hibernate;
 import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.models.ModelException;
 import edu.osu.cws.evals.util.HibernateUtil;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.util.*;
 
 public class ConfigurationMgr {
 
@@ -78,5 +77,46 @@ public class ConfigurationMgr {
     {
         Map<String, Configuration> configMap = new HashMap();
         return configMap;
+    }
+
+    /**
+     * Returns the Timestamp of the last time the context cache data was modified in the db. If the
+     * value is not found in the db, calls ConfigurationMgr.updateContextTimestamp and returns its value.
+     *
+     * @return
+     * @throws Exception
+     */
+    public static Timestamp getContextLastUpdate() throws Exception {
+        Timestamp contextLastUpdate;
+        Session session = HibernateUtil.getCurrentSession();
+
+        List<Object> results = session.getNamedQuery("configuration.getContextDatetime")
+                .setMaxResults(1)
+                .list();
+        if (!results.isEmpty()) {
+            contextLastUpdate = (Timestamp) results.get(0);
+        } else {
+            contextLastUpdate = new Timestamp(ConfigurationMgr.updateContextTimestamp().getTime());
+        }
+
+        return contextLastUpdate;
+    }
+
+    /**
+     * Updates the context_datetime. This is called only after adding/editing admins, reviewers or
+     * configuration values through the admin interface.
+     *
+     * @return
+     * @throws Exception
+     */
+    public static Date updateContextTimestamp() throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+
+        Date newTimestamp = new Date();
+        Query query = session.getNamedQuery("configuration.updateContextDatetime")
+                .setTimestamp("now", newTimestamp);
+        query.executeUpdate();
+
+        return newTimestamp;
     }
 }
