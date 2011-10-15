@@ -24,6 +24,7 @@ import org.hibernate.Transaction;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -40,6 +41,7 @@ import javax.portlet.*;
  */
 public class EvalsPortlet extends GenericPortlet {
 
+    public static final String CONTEXT_CACHE_TIMESTAMP = "contextCacheTimestamp";
     /**
      * String used to store the view jsp used by the
      * doView method.
@@ -245,7 +247,7 @@ public class EvalsPortlet extends GenericPortlet {
             try {
                 hibSession = HibernateUtil.getCurrentSession();
                 Transaction tx = hibSession.beginTransaction();
-                actionClass.setEvalsConfiguration();
+                actionClass.setEvalsConfiguration(false);
                 message += "Stored Configuration Map and List in portlet context\n";
                 createMailer();
                 message += "Mailer setup successfully\n";
@@ -255,9 +257,12 @@ public class EvalsPortlet extends GenericPortlet {
                 message += "Stored Appraisal Steps in portlet context\n";
                 loadResourceBundle();
                 message += "Stored resource bundle Language.properties in portlet context\n";
+                Date currentTimestamp = new Date();
+                getPortletContext().setAttribute(CONTEXT_CACHE_TIMESTAMP, currentTimestamp);
+                message += "Stored contextCacheTimestamp of " + currentTimestamp.toString() + "\n";
 
-                actionClass.setEvalsAdmins();
-                actionClass.setEvalsReviewers();
+                actionClass.setEvalsAdmins(false);
+                actionClass.setEvalsReviewers(false);
                 tx.commit();
                 EvalsLogger logger =  getLog();
                 if (logger != null) {
