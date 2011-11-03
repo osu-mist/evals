@@ -32,11 +32,16 @@
                         </tr>
                     </c:forEach>
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4">
+                                  <a href="<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                                    <portlet:param name="action" value="displayReviewList"/>
+                                    </portlet:renderURL>" class="more-link"><span><liferay-ui:message key="pending-reviews-more"/></span></a>
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
-
-                <a href="<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-                        <portlet:param name="action" value="displayReviewList"/>
-                        </portlet:renderURL>"><liferay-ui:message key="pending-reviews-more"/></a>
             </c:if>
             <c:if test="${empty appraisals}">
                 <p><em><liferay-ui:message key="no-pending-reviews" /></em></p>
