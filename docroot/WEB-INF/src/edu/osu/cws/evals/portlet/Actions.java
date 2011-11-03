@@ -1530,10 +1530,6 @@ public class Actions {
         RequiredAction actionReq;
         HashMap<String, String> anchorParams;
 
-        if (appraisalList == null) {
-            return outList;
-        }
-
         for (Appraisal appraisal : appraisalList) {
             //get the status, compose the key "status"-"role"
             String appraisalStatus = appraisal.getStatus();

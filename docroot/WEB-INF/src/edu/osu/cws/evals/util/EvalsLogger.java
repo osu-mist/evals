@@ -18,7 +18,7 @@ import java.util.Map;
 public class EvalsLogger {
 
     private Logger logger;
-    private String appName = "CWS-EvalS";
+    private String appName = "EvalS";
 
     private Map<String, String> fields = new HashMap<String, String>();
 
