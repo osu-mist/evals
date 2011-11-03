@@ -101,7 +101,7 @@ public class Actions {
         requestMap.put("criterionDetail", criterionDetail);
         useMaximizedMenu(request);
 
-        return "criteria-add-jsp";
+        return Constants_JSP.CRITERIA_ADD;
     }
 
     /**
@@ -143,7 +143,7 @@ public class Actions {
         requestMap.put("criterionDetail", criterionDetail);
         useMaximizedMenu(request);
 
-        return "criteria-add-jsp";
+        return Constants_JSP.CRITERIA_ADD;
     }
 
     /**
@@ -176,7 +176,7 @@ public class Actions {
         }
 
         useMaximizedMenu(request);
-        return "criteria-list-jsp";
+        return Constants_JSP.CRITERIA_LIST;
     }
 
     /**
@@ -206,7 +206,7 @@ public class Actions {
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
                 CriterionArea criterion = criteriaMgrArea.get(criteriaID);
                 requestMap.put("criterion", criterion);
-                return "criteria-delete-jsp";
+                return Constants_JSP.CRITERIA_DELETE;
             }
 
             // If user hits cancel, send them to list criteria page
@@ -385,7 +385,7 @@ public class Actions {
         useNormalMenu(request);
         requestMap.put("employee", getLoggedOnUser(request));
 
-        return "my-information-jsp";
+        return Constants_JSP.MY_INFO;
     }
 
     /**
@@ -515,7 +515,7 @@ public class Actions {
         requestMap.put("pageTitle", "pending-reviews");
         useMaximizedMenu(request);
 
-        return "review-list-jsp";
+        return Constants_JSP.REVIEW_LIST;
     }
 
     /**
@@ -625,7 +625,7 @@ public class Actions {
         requestMap.put("appraisals", appraisals);
         useMaximizedMenu(request);
 
-        return "review-list-jsp";
+        return Constants_JSP.REVIEW_LIST;
     }
 
     /**
@@ -695,7 +695,7 @@ public class Actions {
         requestMap.put("showForm", showForm);
         useMaximizedMenu(request);
 
-        return "appraisal-jsp";
+        return Constants_JSP.APPRAISAL;
     }
 
     /**
@@ -1022,7 +1022,7 @@ public class Actions {
         requestMap.put("adminsList", adminsList);
         useMaximizedMenu(request);
 
-        return "admin-list-jsp";
+        return Constants_JSP.ADMIN_LIST;
     }
 
     /**
@@ -1078,7 +1078,7 @@ public class Actions {
                     admin.getEmployee().getName();
                 }
                 requestMap.put("admin", admin);
-                return "admin-delete-jsp";
+                return Constants_JSP.ADMIN_DELETE;
             }
 
             // If user hits cancel, send them to list admin page
@@ -1153,7 +1153,7 @@ public class Actions {
         requestMap.put("businessCenters", businessCenters);
         useMaximizedMenu(request);
 
-        return "reviewer-list-jsp";
+        return Constants_JSP.REVIEWER_LIST;
     }
 
     /**
@@ -1182,7 +1182,7 @@ public class Actions {
                     reviewer.getEmployee().getName(); // initialize name due to lazy-loading
                 }
                 requestMap.put("reviewer", reviewer);
-                return "reviewer-delete-jsp";
+                return Constants_JSP.REVIEWER_DELETE;
             }
 
             // If user hits cancel, send them to list admin page
@@ -1257,7 +1257,7 @@ public class Actions {
         requestMap.put("configurations", configurations);
         useMaximizedMenu(request);
 
-        return "configuration-list-jsp";
+        return Constants_JSP.CONFIGURATION_LIST;
     }
 
     /**
@@ -1653,14 +1653,14 @@ public class Actions {
      * @throws Exception
      */
     public String getHomeJSP(PortletRequest request) throws Exception {
-        String homeJsp = "home-jsp";
+        String homeJsp = Constants_JSP.HOME;
         String currentRole = getCurrentRole(request);
 
         if (currentRole.equals(ROLE_ADMINISTRATOR)) {
             if (!isLoggedInUserAdmin(request)) {
                 addErrorsToRequest(request, ACCESS_DENIED);
             } else {
-                homeJsp = "admin-home-jsp";
+                homeJsp = Constants_JSP.HOME_ADMIN;
             }
             return homeJsp;
         }
@@ -1669,7 +1669,7 @@ public class Actions {
             if (!isLoggedInUserReviewer(request)) {
                 addErrorsToRequest(request, ACCESS_DENIED);
             } else {
-                homeJsp = "reviewer-home-jsp";
+                homeJsp = Constants_JSP.HOME_REVIEWER;
             }
             return homeJsp;
         }
@@ -1678,7 +1678,7 @@ public class Actions {
             if (!isLoggedInUserSupervisor(request)) {
                 addErrorsToRequest(request, ACCESS_DENIED);
             } else {
-                homeJsp = "supervisor-home-jsp";
+                homeJsp = Constants_JSP.HOME_SUPERVISOR;
             }
         }
 

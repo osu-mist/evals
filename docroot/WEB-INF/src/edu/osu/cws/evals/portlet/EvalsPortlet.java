@@ -24,10 +24,7 @@ import org.hibernate.Transaction;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import javax.mail.Address;
 import javax.mail.internet.InternetAddress;
@@ -145,7 +142,7 @@ public class EvalsPortlet extends GenericPortlet {
                 if (hibSession != null && hibSession.isOpen()) {
                     hibSession.close();
                 }
-                handlePASSException(e, "Error in serveResource", Logger.ERROR, false);
+                handlePASSException(e, "Error in serveResource", Logger.ERROR);
                 result="There was an error performing your request";
             }
         } else {
@@ -170,7 +167,7 @@ public class EvalsPortlet extends GenericPortlet {
     public void delegate(PortletRequest request, PortletResponse response) {
         Method actionMethod;
         String action = "delegate";
-        viewJSP = "home-jsp";
+        viewJSP = Constants_JSP.HOME;
         Session hibSession = null;
 
         try {
@@ -193,11 +190,8 @@ public class EvalsPortlet extends GenericPortlet {
             if (hibSession != null && hibSession.isOpen()) {
                 hibSession.close();
             }
-            handlePASSException(e, action, Logger.ERROR, false);
+            handlePASSException(e, action, Logger.ERROR);
         }
-
-        // viewJSP holds an init parameter that maps to a jsp file
-        viewJSP = getInitParameter(viewJSP);
     }
 
     /**
@@ -357,9 +351,8 @@ public class EvalsPortlet extends GenericPortlet {
      * processAction and delegate's catch block.
      *
      * @param e Exception
-     * @param getInitParam  Whether or not to use getInitParameter when setting viewJSP
      */
-    private void handlePASSException(Exception e, String shortMessage, String level, boolean getInitParam) {
+    private void handlePASSException(Exception e, String shortMessage, String level) {
         try {
             //getLog().log(level, shortMessage, e);
             EvalsLogger logger = getLog();
@@ -371,11 +364,8 @@ public class EvalsPortlet extends GenericPortlet {
             _log.error(CWSUtil.stackTraceString(e));
             _log.error(CWSUtil.stackTraceString(exception));
         }
-        if (getInitParam) {
-            viewJSP = getInitParameter("error-jsp");
-        } else {
-            viewJSP = "error-jsp";
-        }
+
+        viewJSP = Constants_JSP.ERROR;
     }
 
     protected void include(
@@ -392,7 +382,7 @@ public class EvalsPortlet extends GenericPortlet {
                 //@todo: temporary fix for the null dispatcher issue.
                 // Will come back to revisit next release.
                 portletRequestDispatcher =
-			        getPortletContext().getRequestDispatcher("/jsp/home/start.jsp");
+			        getPortletContext().getRequestDispatcher(Constants_JSP.HOME);
                 portletRequestDispatcher.include(renderRequest, renderResponse);
             } catch (Exception e) {
                 _log.error(path + " is not a valid include");
