@@ -19,13 +19,14 @@ public class EvalsLogger {
 
     private Logger logger;
     private String appName = "EvalS";
+    private String environment;
 
     private Map<String, String> fields = new HashMap<String, String>();
 
 
-    public EvalsLogger(String serverName, String logName)
+    public EvalsLogger(String serverName, String environment)
     {
-        logger = new Logger(serverName, appName);
+        logger = new Logger(serverName, appName, environment);
     }
 
     public void log(String level, String shortMessage, String longMessage,

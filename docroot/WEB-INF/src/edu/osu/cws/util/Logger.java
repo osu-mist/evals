@@ -24,12 +24,14 @@ public class Logger {
 
     private String logHost;  //the logging server
     private String clientHost;     //client requesting logging.
-    private String facilityName;
+    private String facilityName;   // name of the app
+    private String environment;
 
-    public Logger(String logHost, String facilityName) {
+    public Logger(String logHost, String facilityName, String environment) {
         this.logHost = logHost;
         this.clientHost = CWSUtil.getLocalHostname();
         this.facilityName = facilityName;
+        this.environment = environment;
     }
 
     /**
@@ -41,6 +43,7 @@ public class Logger {
         GelfSender gelfSender = new GelfSender(logHost);
         message.setHost(clientHost);
         message.setFacility(facilityName);
+        message.addField("environment", environment);
         if (message.isValid()) {
             gelfSender.sendMessage(message);
         }

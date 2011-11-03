@@ -288,8 +288,8 @@ public class EvalsPortlet extends GenericPortlet {
     private void createLogger() {
         CompositeConfiguration config = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
         String serverName = config.getString("log.serverName");
-        String clientHost = config.getString("log.clientHost");
-        EvalsLogger evalsLogger = new EvalsLogger(serverName, clientHost);
+        String environment = config.getString("log.environment");
+        EvalsLogger evalsLogger = new EvalsLogger(serverName, environment);
         getPortletContext().setAttribute("log", evalsLogger);
     }
 
