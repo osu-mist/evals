@@ -638,6 +638,10 @@ public class AppraisalMgr {
                 .addScalar("PYVPASJ_PIDM", StandardBasicTypes.INTEGER)
                 .setInteger("pidm", pidm).list();
 
+        if (result.isEmpty()) {
+            return appraisals;
+        }
+
         // Build list of appraisals from sql results
         for (Object[] aResult : result) {
             Integer id = (Integer) aResult[0];
