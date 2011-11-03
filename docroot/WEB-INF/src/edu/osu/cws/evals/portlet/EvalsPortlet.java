@@ -95,18 +95,13 @@ public class EvalsPortlet extends GenericPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-        try {
-            // If processAction's delegate method was called, it set the viewJSP property to some
-            // jsp value, if viewJSP is null, it means processAction was not called and we need to
-            // call delegate
-            if (viewJSP == null) {
-                delegate(renderRequest, renderResponse);
-            }
-
-            actionClass.setRequestAttributes(renderRequest);
-        } catch (Exception e) {
-            handlePASSException(e, "Error in doView", Logger.CRITICAL, true);
+        // If processAction's delegate method was called, it set the viewJSP property to some
+        // jsp value, if viewJSP is null, it means processAction was not called and we need to
+        // call delegate
+        if (viewJSP == null) {
+            delegate(renderRequest, renderResponse);
         }
+        actionClass.setRequestAttributes(renderRequest);
 
         include(viewJSP, renderRequest, renderResponse);
         viewJSP = null;
@@ -116,11 +111,7 @@ public class EvalsPortlet extends GenericPortlet {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws IOException, PortletException {
 
-        try {
-            delegate(actionRequest, actionResponse);
-        } catch (Exception e) {
-            handlePASSException(e, "Error in processAction", Logger.CRITICAL, true);
-        }
+        delegate(actionRequest, actionResponse);
 	}
 
     public void serveResource(ResourceRequest request, ResourceResponse response)
@@ -176,14 +167,14 @@ public class EvalsPortlet extends GenericPortlet {
      * @param response  PortletResponse
      * @throws Exception
      */
-    public void delegate(PortletRequest request, PortletResponse response) throws Exception {
+    public void delegate(PortletRequest request, PortletResponse response) {
         Method actionMethod;
-        String action;
-        actionClass.setPortletContext(getPortletContext());
+        String action = "delegate";
         viewJSP = "home-jsp";
         Session hibSession = null;
 
         try {
+            actionClass.setPortletContext(getPortletContext());
             portletSetup(request);
             hibSession = HibernateUtil.getCurrentSession();
             Transaction tx = hibSession.beginTransaction();
@@ -194,23 +185,15 @@ public class EvalsPortlet extends GenericPortlet {
             action =  ParamUtil.getString(request, "action", "displayHomeView");
 
             if (!action.equals("")) {
-                try {
-                    actionMethod = Actions.class.getDeclaredMethod(action, PortletRequest.class,
-                            PortletResponse.class);
-
-                    // The action methods return the init-param of the path
-                    viewJSP = (String) actionMethod.invoke(actionClass, request, response);
-                } catch (Exception e) {
-                    hibSession.close();
-                    handlePASSException(e, action, Logger.ERROR, false);
-                }
+                actionMethod = Actions.class.getDeclaredMethod(action, PortletRequest.class, PortletResponse.class);
+                viewJSP = (String) actionMethod.invoke(actionClass, request, response);
             }
             tx.commit();
         } catch (Exception e) {
             if (hibSession != null && hibSession.isOpen()) {
                 hibSession.close();
             }
-            throw e;
+            handlePASSException(e, action, Logger.ERROR, false);
         }
 
         // viewJSP holds an init parameter that maps to a jsp file
