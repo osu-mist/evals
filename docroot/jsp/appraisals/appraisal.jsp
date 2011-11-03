@@ -88,7 +88,7 @@
                     <legend><liferay-ui:message key="appraisal-employee-signature" /></legend>
                     <input type="checkbox"  name="<portlet:namespace />acknowledge-read-appraisal"
                         id="<portlet:namespace />acknowledge-read-appraisal"
-                        <c:if test="${appraisal.viewStatus != 'signatureDue' && appraisal.viewStatus != 'signatureOverdue'}">
+                        <c:if test="${appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_DUE%>' && appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_OVERDUE%>'}">
                             checked="checked" disabled="disabled"
                         </c:if>
                     />
@@ -226,7 +226,7 @@
       
 
       // Using jQuery plugin to expand textareas as you type
-      <c:if test="${appraisal.viewStatus != 'signatureDue' && appraisal.viewStatus != 'signatureOverdue' ||  not empty appraisal.rebuttal}">
+      <c:if test="${appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_DUE%>' && appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_OVERDUE%>' ||  not empty appraisal.rebuttal}">
         jQuery('textarea').autogrow();
       </c:if>
       

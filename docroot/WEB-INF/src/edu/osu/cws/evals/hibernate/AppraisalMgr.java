@@ -117,11 +117,11 @@ public class AppraisalMgr {
     private static void createAppraisalStatus(Date startDate, Configuration goalsDueConfig,
                                               Appraisal appraisal) throws Exception {
         if (startDate.before(fullGoalsDate)) {
-            appraisal.setStatus("appraisalDue");
+            appraisal.setStatus(Appraisal.STATUS_APPRAISAL_DUE);
         } else if (EvalsUtil.isDue(appraisal, goalsDueConfig) < 0) {
-            appraisal.setStatus("goalsOverdue");
+            appraisal.setStatus(Appraisal.STATUS_GOALS_OVERDUE);
         } else {
-            appraisal.setStatus("goalsDue");
+            appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
         }
     }
 
@@ -180,13 +180,13 @@ public class AppraisalMgr {
 
         int resultsDue = EvalsUtil.isDue(appraisal, resultsDueConfig);
         if (appraisal.getStartDate().before(fullGoalsDate)) {
-            appraisal.setStatus("appraisalDue");
+            appraisal.setStatus(Appraisal.STATUS_APPRAISAL_DUE);
         } else if (resultsDue == 0) {
-            appraisal.setStatus("resultsDue");
+            appraisal.setStatus(Appraisal.STATUS_RESULTS_DUE);
         } else if (resultsDue < 0) {
-            appraisal.setStatus("resultsOverdue");
+            appraisal.setStatus(Appraisal.STATUS_RESULTS_OVERDUE);
         } else {
-            appraisal.setStatus("goalsApproved");
+            appraisal.setStatus(Appraisal.STATUS_GOALS_APPROVED);
         }
 
         if (appraisal.validate()) {
@@ -289,7 +289,7 @@ public class AppraisalMgr {
     public void processUpdateRequest(Map request, Appraisal appraisal, PermissionRule permRule)
             throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        Configuration resultsDueConfig = configurationMap.get("resultsDue");
+        Configuration resultsDueConfig = configurationMap.get(Appraisal.STATUS_RESULTS_DUE);
 
         Job supervisorJob = jobMgr.getSupervisor(appraisal.getJob());
         appraisal.getJob().setCurrentSupervisor(supervisorJob); //@todo: Joan: why this?
@@ -466,10 +466,10 @@ public class AppraisalMgr {
             appraisal.setStatus(newStatus);
             String employeeResponse = appraisal.getRebuttal();
             if (submittedRebuttal(request, employeeResponse)) {
-                appraisal.setStatus("rebuttalReadDue");
+                appraisal.setStatus(Appraisal.STATUS_REBUTTAL_READ_DUE);
             }
         }
-        if (appraisal.getStatus().equals("goalsRequiredModification")) {
+        if (appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
             appraisal.setGoalsRequiredModificationDate(new Date());
         }
     }
@@ -823,7 +823,7 @@ public class AppraisalMgr {
      * @return  the number of appraisals that are due for review for a business center.
      */
     public static int getReviewDueCount(String bcName) throws Exception {
-        return getReviewCountByStatus(bcName, "reviewDue");
+        return getReviewCountByStatus(bcName, Appraisal.STATUS_REVIEW_DUE);
     }
 
     /**
@@ -853,7 +853,7 @@ public class AppraisalMgr {
      * @return  the number of appraisals that are overdue for review for a business center.
      */
     public static int getReviewOvedDueCount(String bcName) throws Exception {
-        return getReviewCountByStatus(bcName, "reviewOverdue");
+        return getReviewCountByStatus(bcName, Appraisal.STATUS_REVIEW_OVERDUE);
     }
 
     /**

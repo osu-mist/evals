@@ -28,5 +28,5 @@ public class Constants_JSP {
     public static final String CRITERIA_DELETE = "/jsp/criteria/delete.jsp";
 
     public static final String APPRAISAL = "/jsp/appraisals/appraisal.jsp";
-    public static final String REVIEW_LIST = "/jsp/appraisals/appraisal.jsp";
+    public static final String REVIEW_LIST = "/jsp/appraisals/reviewList.jsp";
 }

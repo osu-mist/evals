@@ -33,6 +33,32 @@ public class Appraisal extends Evals {
 
     public static final String TYPE_TRIAL = "trial";
 
+    public static final String STATUS_APPRAISAL_DUE = "appraisalDue";
+    public static final String STATUS_APPRAISAL_OVERDUE = "appraisalOverdue";
+    public static final String STATUS_ARCHIVED = "archived";
+    public static final String STATUS_BACK_ORIG_STATUS = "backToOriginalStatus";
+    public static final String STATUS_CLOSED = "closed";
+    public static final String STATUS_COMPLETED = "completed";
+    public static final String STATUS_GOALS_APPROVAL_DUE = "goalsApprovalDue";
+    public static final String STATUS_GOALS_APPROVAL_OVERDUE = "goalsApprovalOverdue";
+    public static final String STATUS_GOALS_APPROVED = "goalsApproved";
+    public static final String STATUS_GOALS_DUE = "goalsDue";
+    public static final String STATUS_GOALS_OVERDUE = "goalsOverdue";
+    public static final String STATUS_GOALS_REACTIVATED = "goalsReactivated";
+    public static final String STATUS_GOALS_REQUIRED_MODIFICATION = "goalsRequiredModification";
+    public static final String STATUS_REBUTTAL_READ_DUE = "rebuttalReadDue";
+    public static final String STATUS_REBUTTAL_READ_OVERDUE = "rebuttalReadOverdue";
+    public static final String STATUS_RELEASE_DUE = "releaseDue";
+    public static final String STATUS_RELEASE_OVERDUE = "releaseOverdue";
+    public static final String STATUS_RESULTS_DUE = "resultsDue";
+    public static final String STATUS_RESULTS_OVERDUE = "resultsOverdue";
+    public static final String STATUS_REVIEW_DUE = "reviewDue";
+    public static final String STATUS_REVIEW_OVERDUE = "reviewOverdue";
+    public static final String STATUS_SIGNATURE_DUE = "signatureDue";
+    public static final String STATUS_SIGNATURE_OVERDUE = "signatureOverdue";
+    public static final String STATUS_IN_REVIEW = "inReview";
+
+
     private int id;
 
     /**
@@ -353,20 +379,20 @@ public class Appraisal extends Evals {
     public String getViewStatus() {
         String viewStatus = status;
 
-        statusHiddenFromEmployee.add("appraisalDue");
-        statusHiddenFromEmployee.add("appraisalOverdue");
-        statusHiddenFromEmployee.add("reviewDue");
-        statusHiddenFromEmployee.add("reviewOverdue");
-        statusHiddenFromEmployee.add("releaseDue");
-        statusHiddenFromEmployee.add("releaseOverdue");
+        statusHiddenFromEmployee.add(STATUS_APPRAISAL_DUE);
+        statusHiddenFromEmployee.add(STATUS_APPRAISAL_OVERDUE);
+        statusHiddenFromEmployee.add(STATUS_REVIEW_DUE);
+        statusHiddenFromEmployee.add(STATUS_REVIEW_OVERDUE);
+        statusHiddenFromEmployee.add(STATUS_RELEASE_DUE);
+        statusHiddenFromEmployee.add(STATUS_RELEASE_OVERDUE);
 
         if (getRole().equals("employee") &&  statusHiddenFromEmployee.contains(viewStatus)) {
-            viewStatus = "inReview";
+            viewStatus = STATUS_IN_REVIEW;
         }
 
         // Whenever the status is rebuttalReadDue or rebuttalReadOverdue, we set it as completed.
         if (viewStatus.contains("rebuttalRead")) {
-            viewStatus = "completed";
+            viewStatus = STATUS_COMPLETED;
         }
 
         return viewStatus;

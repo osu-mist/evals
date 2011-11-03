@@ -74,7 +74,7 @@ public class AppraisalsTest {
     @DataProvider(name = "jobAndGoalsDueConfiguration")
     public Object[][] loadJobAndGoalsDueConfiguration() {
         Configuration configuration = new Configuration();
-        configuration.setName("goalsDue");
+        configuration.setName(Appraisal.STATUS_GOALS_DUE);
         configuration.setValue("30");
         configuration.setReferencePoint("start");
         configuration.setAction("substract");
@@ -97,13 +97,13 @@ public class AppraisalsTest {
     @DataProvider(name = "jobAndGoalsDueAndResultsDueConfiguration")
     public Object[][] loadJobAndGoalsDueAndResultsDueConfiguration() {
         Configuration configuration = new Configuration();
-        configuration.setName("goalsDue");
+        configuration.setName(Appraisal.STATUS_GOALS_DUE);
         configuration.setValue("30");
         configuration.setReferencePoint("start");
         configuration.setAction("substract");
 
         Configuration configuration2 = new Configuration();
-        configuration2.setName("goalsDue");
+        configuration2.setName(Appraisal.STATUS_GOALS_DUE);
         configuration2.setValue("30");
         configuration2.setReferencePoint("start");
         configuration2.setAction("substract");
@@ -358,8 +358,8 @@ public class AppraisalsTest {
 
     public void shouldOnlyIncludeReviewDueOrReviewPastDueInAppraisalReviewList() throws Exception {
         for (Appraisal appraisal : appraisalMgr.getReviews("UABC", -1)) {
-            assert appraisal.getStatus().equals("reviewDue")
-                    || appraisal.getStatus().equals("reviewOverdue");
+            assert appraisal.getStatus().equals(Appraisal.STATUS_REVIEW_DUE)
+                    || appraisal.getStatus().equals(Appraisal.STATUS_REVIEW_OVERDUE);
         }
     }
 
@@ -477,7 +477,7 @@ public class AppraisalsTest {
 
         appraisal = AppraisalMgr.createAppraisal(job, startPointDate, Appraisal.TYPE_ANNUAL, configuration);
         assert appraisal.getStartDate().equals(startPointDate) : "Start date should be set correctly.";
-        assert appraisal.getStatus().equals("appraisalDue") :
+        assert appraisal.getStatus().equals(Appraisal.STATUS_APPRAISAL_DUE) :
                 "appraisal status should have been appraisalDue, instead got - " + appraisal.getStatus();
     }
 
@@ -504,7 +504,7 @@ public class AppraisalsTest {
 
         appraisal = AppraisalMgr.createAppraisal(job, startPointDate, Appraisal.TYPE_ANNUAL, configuration);
         assert appraisal.getStartDate().equals(startPointDate) : "Start date should be set correctly.";
-        assert appraisal.getStatus().equals("goalsDue") :
+        assert appraisal.getStatus().equals(Appraisal.STATUS_GOALS_DUE) :
                 "appraisal status should have been goalsDue, instead got - " + appraisal.getStatus();
     }
 
@@ -579,8 +579,8 @@ public class AppraisalsTest {
         Transaction tx = session.beginTransaction();
         Appraisal appraisal = (Appraisal) session.load(Appraisal.class, 1);
         tx.commit();
-        appraisal.setStatus("closed");
-        appraisal.setOriginalStatus("goalsDue");
+        appraisal.setStatus(Appraisal.STATUS_CLOSED);
+        appraisal.setOriginalStatus(Appraisal.STATUS_GOALS_DUE);
         AppraisalMgr.updateAppraisalStatus(appraisal);
     }
 }

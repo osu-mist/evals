@@ -766,7 +766,7 @@ public class Actions {
             // Creates the first annual appraisal if needed
             Map<String, Configuration> configurationMap =
                     (Map<String, Configuration>) portletContext.getAttribute("configurations");
-            Configuration resultsDueConfig = configurationMap.get("resultsDue");
+            Configuration resultsDueConfig = configurationMap.get(Appraisal.STATUS_RESULTS_DUE);
             String action = "";
             if (signAppraisal != null && !signAppraisal.equals("")) {
                 action = "sign-appraisal";
@@ -793,7 +793,7 @@ public class Actions {
         }
 
 
-        if (appraisal.getStatus().equals("releaseDue") && isLoggedInUserReviewer(request)) {
+        if (appraisal.getStatus().equals(Appraisal.STATUS_RELEASE_DUE) && isLoggedInUserReviewer(request)) {
             removeReviewAppraisalInSession(request, appraisal);
         }
         else
@@ -1551,8 +1551,9 @@ public class Actions {
                 anchorParams.put("action", "displayAppraisal");
                 String appraisalID = Integer.toString(appraisal.getId());
                 anchorParams.put("id", appraisalID);
-                if (appraisalStatus.equals("goalsRequiredModification") || appraisalStatus.equals("goalsReactivated")) {
-                    configuration = configurationMap.get("goalsDue");
+                if (appraisalStatus.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION) ||
+                        appraisalStatus.equals(Appraisal.STATUS_GOALS_REACTIVATED)) {
+                    configuration = configurationMap.get(Appraisal.STATUS_GOALS_DUE);
                 } else {
                     if (appraisalStatus.contains("Overdue")) {
                         appraisalStatus = appraisalStatus.replace("Overdue", "Due");
