@@ -137,4 +137,18 @@ public class Employee extends Evals {
     {
         return (firstName + " " + lastName);
     }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", middleName='" + middleName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", osuid='" + osuid + '\'' +
+                ", onid='" + onid + '\'' +
+                ", email='" + email + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }

@@ -12,6 +12,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppraisalStepMgr;
 import edu.osu.cws.evals.hibernate.PermissionRuleMgr;
 import edu.osu.cws.evals.models.Configuration;
+import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.util.*;
 import edu.osu.cws.util.CWSUtil;
 import edu.osu.cws.util.Logger;
@@ -142,7 +143,7 @@ public class EvalsPortlet extends GenericPortlet {
                 if (hibSession != null && hibSession.isOpen()) {
                     hibSession.close();
                 }
-                handlePASSException(e, "Error in serveResource", Logger.ERROR);
+                handleEvalsException(e, "Error in serveResource", Logger.ERROR, request);
                 result="There was an error performing your request";
             }
         } else {
@@ -190,7 +191,7 @@ public class EvalsPortlet extends GenericPortlet {
             if (hibSession != null && hibSession.isOpen()) {
                 hibSession.close();
             }
-            handlePASSException(e, action, Logger.ERROR);
+            handleEvalsException(e, action, Logger.ERROR, request);
         }
     }
 
@@ -351,14 +352,24 @@ public class EvalsPortlet extends GenericPortlet {
      * processAction and delegate's catch block.
      *
      * @param e Exception
+     * @param shortMessage
+     * @param level
+     * @param request
      */
-    private void handlePASSException(Exception e, String shortMessage, String level) {
+    private void handleEvalsException(Exception e, String shortMessage, String level, PortletRequest request) {
         try {
-            //getLog().log(level, shortMessage, e);
+            String employee = "";
+            Map<String, String> grayLogFields = new HashMap<String, String>();
+            PortletSession session = request.getPortletSession(true);
             EvalsLogger logger = getLog();
-            if (logger != null)
-            {
-                logger.log(level, shortMessage,e);
+
+            if (logger != null) {
+                Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
+                if (loggedOnUser != null) {
+                    employee = loggedOnUser.toString();
+                }
+                grayLogFields.put("employee", employee);
+                logger.log(level, shortMessage, e, grayLogFields);
             }
         } catch (Exception exception) {
             _log.error(CWSUtil.stackTraceString(e));
