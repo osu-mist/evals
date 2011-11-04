@@ -368,7 +368,9 @@ public class EvalsPortlet extends GenericPortlet {
                 if (loggedOnUser != null) {
                     employee = loggedOnUser.toString();
                 }
-                grayLogFields.put("employee", employee);
+                grayLogFields.put("logged-in-user", employee);
+                String onidUsername = actionClass.getLoggedOnUsername(request);
+                grayLogFields.put("onid-username", onidUsername);
                 logger.log(level, shortMessage, e, grayLogFields);
             }
         } catch (Exception exception) {

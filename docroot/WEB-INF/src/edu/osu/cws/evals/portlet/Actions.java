@@ -1350,7 +1350,7 @@ public class Actions {
      * @param request
      * @return username
      */
-    private String getLoggedOnUsername(PortletRequest request) {
+    public String getLoggedOnUsername(PortletRequest request) {
         PortletSession session = request.getPortletSession(true);
         String usernameSessionKey = "onidUsername";
         String onidUsername = (String) session.getAttribute(usernameSessionKey);
