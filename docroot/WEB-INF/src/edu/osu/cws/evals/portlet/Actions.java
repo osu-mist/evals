@@ -307,7 +307,7 @@ public class Actions {
         }
 
         setRequiredActions(request);
-        if (homeJSP.equals("reviewer-home-jsp")) {
+        if (homeJSP.equals(Constants_JSP.HOME_REVIEWER)) {
             int maxResults = config.getInt("reviewer.home.pending.max");
             ArrayList<Appraisal> appraisals = getReviewsForLoggedInUser(request, maxResults);
             requestMap.put("appraisals", appraisals);
