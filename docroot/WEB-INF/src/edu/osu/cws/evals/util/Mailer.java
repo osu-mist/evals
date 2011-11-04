@@ -25,7 +25,7 @@ import java.text.MessageFormat;
 
 public class Mailer {
 
-    private static final String EMAIL_START_DATE = "01/01/2012";
+    private static final String EMAIL_START_DATE = "12/01/2011";
     private Date emailStartDate;
     private ResourceBundle emailBundle;
 	private Mail email;
