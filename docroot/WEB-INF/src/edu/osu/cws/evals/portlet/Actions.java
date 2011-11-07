@@ -101,7 +101,7 @@ public class Actions {
         requestMap.put("criterionDetail", criterionDetail);
         useMaximizedMenu(request);
 
-        return Constants_JSP.CRITERIA_ADD;
+        return Constants.JSP_CRITERIA_ADD;
     }
 
     /**
@@ -143,7 +143,7 @@ public class Actions {
         requestMap.put("criterionDetail", criterionDetail);
         useMaximizedMenu(request);
 
-        return Constants_JSP.CRITERIA_ADD;
+        return Constants.JSP_CRITERIA_ADD;
     }
 
     /**
@@ -176,7 +176,7 @@ public class Actions {
         }
 
         useMaximizedMenu(request);
-        return Constants_JSP.CRITERIA_LIST;
+        return Constants.JSP_CRITERIA_LIST;
     }
 
     /**
@@ -206,7 +206,7 @@ public class Actions {
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
                 CriterionArea criterion = criteriaMgrArea.get(criteriaID);
                 requestMap.put("criterion", criterion);
-                return Constants_JSP.CRITERIA_DELETE;
+                return Constants.JSP_CRITERIA_DELETE;
             }
 
             // If user hits cancel, send them to list criteria page
@@ -307,7 +307,7 @@ public class Actions {
         }
 
         setRequiredActions(request);
-        if (homeJSP.equals(Constants_JSP.HOME_REVIEWER)) {
+        if (homeJSP.equals(Constants.JSP_HOME_REVIEWER)) {
             int maxResults = config.getInt("reviewer.home.pending.max");
             ArrayList<Appraisal> appraisals = getReviewsForLoggedInUser(request, maxResults);
             requestMap.put("appraisals", appraisals);
@@ -385,7 +385,7 @@ public class Actions {
         useNormalMenu(request);
         requestMap.put("employee", getLoggedOnUser(request));
 
-        return Constants_JSP.MY_INFO;
+        return Constants.JSP_MY_INFO;
     }
 
     /**
@@ -515,7 +515,7 @@ public class Actions {
         requestMap.put("pageTitle", "pending-reviews");
         useMaximizedMenu(request);
 
-        return Constants_JSP.REVIEW_LIST;
+        return Constants.JSP_REVIEW_LIST;
     }
 
     /**
@@ -625,7 +625,7 @@ public class Actions {
         requestMap.put("appraisals", appraisals);
         useMaximizedMenu(request);
 
-        return Constants_JSP.REVIEW_LIST;
+        return Constants.JSP_REVIEW_LIST;
     }
 
     /**
@@ -695,7 +695,7 @@ public class Actions {
         requestMap.put("showForm", showForm);
         useMaximizedMenu(request);
 
-        return Constants_JSP.APPRAISAL;
+        return Constants.JSP_APPRAISAL;
     }
 
     /**
@@ -1022,7 +1022,7 @@ public class Actions {
         requestMap.put("adminsList", adminsList);
         useMaximizedMenu(request);
 
-        return Constants_JSP.ADMIN_LIST;
+        return Constants.JSP_ADMIN_LIST;
     }
 
     /**
@@ -1078,7 +1078,7 @@ public class Actions {
                     admin.getEmployee().getName();
                 }
                 requestMap.put("admin", admin);
-                return Constants_JSP.ADMIN_DELETE;
+                return Constants.JSP_ADMIN_DELETE;
             }
 
             // If user hits cancel, send them to list admin page
@@ -1153,7 +1153,7 @@ public class Actions {
         requestMap.put("businessCenters", businessCenters);
         useMaximizedMenu(request);
 
-        return Constants_JSP.REVIEWER_LIST;
+        return Constants.JSP_REVIEWER_LIST;
     }
 
     /**
@@ -1182,7 +1182,7 @@ public class Actions {
                     reviewer.getEmployee().getName(); // initialize name due to lazy-loading
                 }
                 requestMap.put("reviewer", reviewer);
-                return Constants_JSP.REVIEWER_DELETE;
+                return Constants.JSP_REVIEWER_DELETE;
             }
 
             // If user hits cancel, send them to list admin page
@@ -1257,7 +1257,7 @@ public class Actions {
         requestMap.put("configurations", configurations);
         useMaximizedMenu(request);
 
-        return Constants_JSP.CONFIGURATION_LIST;
+        return Constants.JSP_CONFIGURATION_LIST;
     }
 
     /**
@@ -1654,32 +1654,26 @@ public class Actions {
      * @throws Exception
      */
     public String getHomeJSP(PortletRequest request) throws Exception {
-        String homeJsp = Constants_JSP.HOME;
+        String homeJsp = Constants.JSP_HOME;
         String currentRole = getCurrentRole(request);
 
         if (currentRole.equals(ROLE_ADMINISTRATOR)) {
             if (!isLoggedInUserAdmin(request)) {
                 addErrorsToRequest(request, ACCESS_DENIED);
             } else {
-                homeJsp = Constants_JSP.HOME_ADMIN;
+                homeJsp = Constants.JSP_HOME_ADMIN;
             }
-            return homeJsp;
-        }
-
-        if (currentRole.equals(ROLE_REVIEWER)) {
+        } else if (currentRole.equals(ROLE_REVIEWER)) {
             if (!isLoggedInUserReviewer(request)) {
                 addErrorsToRequest(request, ACCESS_DENIED);
             } else {
-                homeJsp = Constants_JSP.HOME_REVIEWER;
+                homeJsp = Constants.JSP_HOME_REVIEWER;
             }
-            return homeJsp;
-        }
-
-        if (currentRole.equals(ROLE_SUPERVISOR)) {
+        } else if (currentRole.equals(ROLE_SUPERVISOR)) {
             if (!isLoggedInUserSupervisor(request)) {
                 addErrorsToRequest(request, ACCESS_DENIED);
             } else {
-                homeJsp = Constants_JSP.HOME_SUPERVISOR;
+                homeJsp = Constants.JSP_HOME_SUPERVISOR;
             }
         }
 

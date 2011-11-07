@@ -168,7 +168,7 @@ public class EvalsPortlet extends GenericPortlet {
     public void delegate(PortletRequest request, PortletResponse response) {
         Method actionMethod;
         String action = "delegate";
-        viewJSP = Constants_JSP.HOME;
+        viewJSP = Constants.JSP_HOME;
         Session hibSession = null;
 
         try {
@@ -378,7 +378,7 @@ public class EvalsPortlet extends GenericPortlet {
             _log.error(CWSUtil.stackTraceString(exception));
         }
 
-        viewJSP = Constants_JSP.ERROR;
+        viewJSP = Constants.JSP_ERROR;
     }
 
     protected void include(
@@ -395,7 +395,7 @@ public class EvalsPortlet extends GenericPortlet {
                 //@todo: temporary fix for the null dispatcher issue.
                 // Will come back to revisit next release.
                 portletRequestDispatcher =
-			        getPortletContext().getRequestDispatcher(Constants_JSP.HOME);
+			        getPortletContext().getRequestDispatcher(Constants.JSP_HOME);
                 portletRequestDispatcher.include(renderRequest, renderResponse);
             } catch (Exception e) {
                 _log.error(path + " is not a valid include");
