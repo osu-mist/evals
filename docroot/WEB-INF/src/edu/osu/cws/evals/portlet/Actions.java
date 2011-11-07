@@ -638,7 +638,6 @@ public class Actions {
      * @throws Exception
      */
     public String displayAppraisal(PortletRequest request, PortletResponse response) throws Exception {
-        Boolean showForm = false;
         Appraisal appraisal;
         PermissionRule permRule;
         Employee currentlyLoggedOnUser = getLoggedOnUser(request);
@@ -664,11 +663,6 @@ public class Actions {
 
         String userRole = appraisalMgr.getRole(appraisal, userId);
         appraisal.setRole(userRole);
-        // Set flag whether or not the html form to update the appraisal needs to be displayed
-        if (permRule.getSaveDraft() != null && permRule.getSubmit() != null
-                && permRule.getRequireModification() != null) {
-            showForm = true;
-        }
 
         setupMyTeamActiveAppraisals(request, userId);
         if (isLoggedInUserReviewer(request)) {
@@ -692,7 +686,6 @@ public class Actions {
 
         requestMap.put("appraisal", appraisal);
         requestMap.put("permissionRule", permRule);
-        requestMap.put("showForm", showForm);
         useMaximizedMenu(request);
 
         return Constants.JSP_APPRAISAL;
