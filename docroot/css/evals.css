@@ -73,8 +73,8 @@
 	  top: 28px;
 }
 
-.osu-cws .portlet-action-menu li.pass-roles:hover ul,
-.osu-cws .portlet-action-menu li.pass-roles.sfHover ul {
+.osu-cws #pass-top-menu .portlet-action-menu li.pass-roles:hover ul,
+.osu-cws #pass-top-menu .portlet-action-menu li.pass-roles.sfHover ul {
 	  right: 0;
 	  left: auto;
 }
@@ -127,6 +127,8 @@
 
 #pass-top-menu ul.portlet-action-menu li.pass-roles ul {
     width: 8em;
+    top: auto;
+    left: -999em;
 }
 
 .ie #pass-top-menu ul.portlet-action-menu ul {
