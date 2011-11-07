@@ -168,7 +168,6 @@ public class EvalsPortlet extends GenericPortlet {
     public void delegate(PortletRequest request, PortletResponse response) {
         Method actionMethod;
         String action = "delegate";
-        viewJSP = Constants.JSP_HOME;
         Session hibSession = null;
 
         try {
