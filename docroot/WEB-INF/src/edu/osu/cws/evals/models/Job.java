@@ -12,7 +12,6 @@ import java.util.Set;
 import edu.osu.cws.util.CWSUtil;
 
 public class Job extends Evals implements Serializable {
-    public static final String TYPE_CLASSIFIED = "classified";
     private int id;
 
     private Employee employee;
