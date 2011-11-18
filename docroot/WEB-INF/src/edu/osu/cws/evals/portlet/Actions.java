@@ -30,6 +30,7 @@ public class Actions {
     public static final String ALL_MY_ACTIVE_APPRAISALS = "allMyActiveAppraisals";
     public static final String MY_TEAMS_ACTIVE_APPRAISALS = "myTeamsActiveAppraisals";
     private static final String REVIEW_LIST = "reviewList";
+    private static final String REVIEW_LIST_MAX_RESULTS = "reviewListMaxResults";
 
     private EmployeeMgr employeeMgr = new EmployeeMgr();
 
@@ -336,6 +337,23 @@ public class Actions {
      */
     private void setupMyActiveAppraisals(PortletRequest request, int employeeId, Appraisal firstAnnual)
             throws Exception {
+        List<Appraisal> allMyActiveAppraisals = getMyActiveAppraisals(request, employeeId);
+        if (firstAnnual != null) {
+            allMyActiveAppraisals.add(firstAnnual);
+        }
+        requestMap.put("myActiveAppraisals", allMyActiveAppraisals);
+    }
+
+    /**
+     * Tries to fetch the employee active appraisals from session and if they are null, it grabs them from
+     * the db.
+     *
+     * @param request
+     * @param employeeId
+     * @return
+     * @throws Exception
+     */
+    private List<Appraisal> getMyActiveAppraisals(PortletRequest request, int employeeId) throws Exception {
         PortletSession session = request.getPortletSession(true);
         List<Appraisal> allMyActiveAppraisals;
 
@@ -344,10 +362,7 @@ public class Actions {
             allMyActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(employeeId);
             session.setAttribute(ALL_MY_ACTIVE_APPRAISALS, allMyActiveAppraisals);
         }
-        if (firstAnnual != null) {
-            allMyActiveAppraisals.add(firstAnnual);
-        }
-        requestMap.put("myActiveAppraisals", allMyActiveAppraisals);
+        return allMyActiveAppraisals;
     }
 
     /**
@@ -359,26 +374,40 @@ public class Actions {
      * @throws Exception
      */
     private void setupMyTeamActiveAppraisals(PortletRequest request, int employeeId) throws Exception {
-        PortletSession session = request.getPortletSession(true);
-        List<Appraisal> dbTeamAppraisals;
-        ArrayList<Appraisal> myTeamAppraisals;
-
         if (isLoggedInUserSupervisor(request)) {
-            myTeamAppraisals = (ArrayList<Appraisal>)  session.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
-            if (myTeamAppraisals == null) {
-                dbTeamAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true);
-                myTeamAppraisals = new ArrayList<Appraisal>();
-
-                if (dbTeamAppraisals != null) {
-                    for (Appraisal appraisal : dbTeamAppraisals) {
-                        appraisal.setRole("supervisor");
-                        myTeamAppraisals.add(appraisal);
-                    }
-                }
-                session.setAttribute(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals);
-            }
+            ArrayList<Appraisal> myTeamAppraisals = getMyTeamActiveAppraisals(request, employeeId);
             requestMap.put(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals);
         }
+    }
+
+    /**
+     * Tries to fetch the my teams active appraisals from session. If they list is null, it fetches them
+     * from the db.
+     *
+     * @param request       PortletRequest
+     * @param employeeId    Id of the logged in user
+     * @return              ArrayList<Appraisal>
+     * @throws Exception
+     */
+    private ArrayList<Appraisal> getMyTeamActiveAppraisals(PortletRequest request, int employeeId) throws Exception {
+        PortletSession session = request.getPortletSession(true);
+
+        ArrayList<Appraisal> myTeamAppraisals;
+        List<Appraisal> dbTeamAppraisals;
+        myTeamAppraisals = (ArrayList<Appraisal>) session.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
+        if (myTeamAppraisals == null) {
+            dbTeamAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true);
+            myTeamAppraisals = new ArrayList<Appraisal>();
+
+            if (dbTeamAppraisals != null) {
+                for (Appraisal appraisal : dbTeamAppraisals) {
+                    appraisal.setRole("supervisor");
+                    myTeamAppraisals.add(appraisal);
+                }
+            }
+            session.setAttribute(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals);
+        }
+        return myTeamAppraisals;
     }
 
     public String displayMyInformation(PortletRequest request, PortletResponse response) throws Exception {
@@ -537,6 +566,26 @@ public class Actions {
     }
 
     /**
+     * Returns the reviews for the logged on User. It is a wrapper for
+     * getReviewsForLoggedInUser(request, maxResults). It basically looks up in session what is
+     * the number of maxResults and calls the getReviewsForLoggedInUser method.
+     *
+     * @param request       PortletRequest object
+     * @return              ArrayList<Appraisal>
+     * @throws Exception
+     */
+    private ArrayList<Appraisal> getReviewsForLoggedInUser(PortletRequest request) throws Exception {
+        int defaultMaxResults = -1;
+        PortletSession session = request.getPortletSession(true);
+        Integer maxResults = (Integer) session.getAttribute(REVIEW_LIST_MAX_RESULTS);
+        if (maxResults == null) {
+            maxResults = defaultMaxResults;
+        }
+
+        return getReviewsForLoggedInUser(request, maxResults);
+    }
+
+    /**
      * Retrieves the pending reviews for the logged in user.
      *
      * @param request
@@ -545,37 +594,37 @@ public class Actions {
      * @throws Exception
      */
     private ArrayList<Appraisal> getReviewsForLoggedInUser(PortletRequest request, int maxResults) throws Exception {
-           ArrayList<Appraisal> reviewList;
-           int toIndex;
-           ArrayList<Appraisal> outList = new ArrayList<Appraisal>();
+        ArrayList<Appraisal> reviewList;
+        int toIndex;
+        ArrayList<Appraisal> outList = new ArrayList<Appraisal>();
 
-           PortletSession session = request.getPortletSession(true);
-           reviewList = (ArrayList<Appraisal>) session.getAttribute(REVIEW_LIST);
+        PortletSession session = request.getPortletSession(true);
+        reviewList = (ArrayList<Appraisal>) session.getAttribute(REVIEW_LIST);
+        session.setAttribute(REVIEW_LIST_MAX_RESULTS, maxResults);
 
-           if (reviewList == null) { //No data yet, need to get it from the database.
-               String businessCenterName = ParamUtil.getString(request, "businessCenterName");
+        if (reviewList == null) { //No data yet, need to get it from the database.
+            String businessCenterName = ParamUtil.getString(request, "businessCenterName");
 
-               if (businessCenterName.equals("")) {
-                   int employeeID = getLoggedOnUser(request).getId();
-                   businessCenterName = getReviewer(employeeID).getBusinessCenterName();
-               }
-               reviewList = appraisalMgr.getReviews(businessCenterName, -1);
-               session.setAttribute(REVIEW_LIST, reviewList);
-           }
+            if (businessCenterName.equals("")) {
+                int employeeID = getLoggedOnUser(request).getId();
+                businessCenterName = getReviewer(employeeID).getBusinessCenterName();
+            }
+            reviewList = appraisalMgr.getReviews(businessCenterName, -1);
+            session.setAttribute(REVIEW_LIST, reviewList);
+        }
 
-           if (maxResults == -1 || reviewList.size() < maxResults) {
-               toIndex = reviewList.size();
-           } else {
-               toIndex = maxResults;
-           }
+        if (maxResults == -1 || reviewList.size() < maxResults) {
+            toIndex = reviewList.size();
+        } else {
+            toIndex = maxResults;
+        }
 
-           for (int i = 0; i < toIndex; i++) {
-               outList.add(reviewList.get(i));
-           }
+        for (int i = 0; i < toIndex; i++) {
+            outList.add(reviewList.get(i));
+        }
 
-           return outList;
-       }
-
+        return outList;
+    }
 
     /**
      * Renders a list of appraisals based on the search criteria.
@@ -801,11 +850,10 @@ public class Actions {
      *
      * @param request
      * @param appraisal
+     * @throws Exception
      */
-    private void removeReviewAppraisalInSession(PortletRequest request, Appraisal appraisal)
-    {
-        PortletSession session = request.getPortletSession(true);
-        List<Appraisal> reviewList = (List<Appraisal>) session.getAttribute(REVIEW_LIST);
+    private void removeReviewAppraisalInSession(PortletRequest request, Appraisal appraisal) throws Exception {
+        List<Appraisal> reviewList = getReviewsForLoggedInUser(request);
         List<Appraisal> tempList = new ArrayList<Appraisal>();
         tempList.addAll(reviewList);
         for (Appraisal appraisalInSession: tempList) {
@@ -814,22 +862,27 @@ public class Actions {
                 break;
             }
         }
+
+        PortletSession session = request.getPortletSession(true);
+        session.setAttribute(REVIEW_LIST, reviewList);
     }
 
     /***
      * This method updates the status of the appraisal in myTeam or myStatus to reflect the
      * changes from the updateAppraisal method.
      *
-     * @param request
-     * @param appraisal
+     * @param request       PortletRequest
+     * @param appraisal     appraisal to update in session
+     * @throws Exception
      */
-    private void updateAppraisalInSession(PortletRequest request, Appraisal appraisal) {
+    private void updateAppraisalInSession(PortletRequest request, Appraisal appraisal) throws Exception {
         List<Appraisal>  appraisals;
-        PortletSession pSession = request.getPortletSession();
+        Employee loggedOnUser = getLoggedOnUser(request);
+        int employeeId = loggedOnUser.getId();
         if (appraisal.getRole().equals("employee")) {
-            appraisals = (List) pSession.getAttribute(ALL_MY_ACTIVE_APPRAISALS);
+            appraisals = getMyActiveAppraisals(request, employeeId);
         } else if (appraisal.getRole().equals(ROLE_SUPERVISOR)) {
-            appraisals = (List) pSession.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
+            appraisals = getMyTeamActiveAppraisals(request, employeeId);
         } else {
             return;
         }
@@ -1417,7 +1470,12 @@ public class Actions {
      */
     private boolean isLoggedInUserAdmin(PortletRequest request) throws Exception {
         PortletSession session = request.getPortletSession(true);
-        return (Boolean) session.getAttribute("isAdmin");
+        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
+        if (isAdmin == null) {
+            setUpUserPermissionInSession(request, false);
+            isAdmin = (Boolean) session.getAttribute("isAdmin");
+        }
+        return isAdmin;
     }
 
     /**
@@ -1429,7 +1487,12 @@ public class Actions {
      */
     private boolean isLoggedInUserMasterAdmin(PortletRequest request) throws Exception {
         PortletSession session = request.getPortletSession(true);
-        return (Boolean) session.getAttribute("isMasterAdmin");
+        Boolean isMasterAdmin = (Boolean) session.getAttribute("isMasterAdmin");
+        if (isMasterAdmin == null) {
+            setUpUserPermissionInSession(request, false);
+            isMasterAdmin = (Boolean) session.getAttribute("isMasterAdmin");
+        }
+        return isMasterAdmin;
     }
 
     /**
@@ -1441,7 +1504,12 @@ public class Actions {
      */
     private boolean isLoggedInUserReviewer(PortletRequest request) throws Exception {
         PortletSession session = request.getPortletSession(true);
-        return (Boolean) session.getAttribute("isReviewer");
+        Boolean isReviewer = (Boolean) session.getAttribute("isReviewer");
+        if (isReviewer == null) {
+            setUpUserPermissionInSession(request, false);
+            isReviewer = (Boolean) session.getAttribute("isReviewer");
+        }
+        return isReviewer;
     }
 
     /**
@@ -1453,7 +1521,12 @@ public class Actions {
      */
     private boolean isLoggedInUserSupervisor(PortletRequest request) throws Exception {
         PortletSession session = request.getPortletSession(true);
-        return (Boolean) session.getAttribute("isSupervisor");
+        Boolean isSupervisor = (Boolean) session.getAttribute("isSupervisor");
+        if (isSupervisor == null) {
+            setUpUserPermissionInSession(request, false);
+            isSupervisor = (Boolean) session.getAttribute("isSupervisor");
+        }
+        return isSupervisor;
     }
 
     /**
@@ -1573,8 +1646,7 @@ public class Actions {
     private RequiredAction getReviewerAction(String businessCenterName, ResourceBundle resource,
                                              PortletRequest request) throws Exception {
         int reviewCount;
-        PortletSession session = request.getPortletSession(true);
-        List<Appraisal> reviewList = (List<Appraisal>) session.getAttribute(REVIEW_LIST);
+        List<Appraisal> reviewList = getReviewsForLoggedInUser(request);
         if (reviewList != null) {
             reviewCount = reviewList.size();
         } else {
