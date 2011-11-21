@@ -1364,10 +1364,12 @@ public class Actions {
 
             // Initialize the jobs and supervisor of the jobs so that display employment
             // information has the data it needs.
-            Set<Job> jobs = loggedOnUser.getJobs();
+            Set<Job> jobs = loggedOnUser.getNonTerminatedJobs();
             if (jobs != null && !jobs.isEmpty()) {
                 for (Job job : jobs) {
                     if (job.getSupervisor() != null && job.getSupervisor().getEmployee() != null) {
+                        job.getSupervisor();
+                        job.getSupervisor().getEmployee();
                         job.getSupervisor().getEmployee().getName();
                     }
                 }
