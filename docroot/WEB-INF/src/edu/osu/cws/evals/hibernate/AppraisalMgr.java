@@ -291,8 +291,7 @@ public class AppraisalMgr {
         Session session = HibernateUtil.getCurrentSession();
         Configuration resultsDueConfig = configurationMap.get(Appraisal.STATUS_RESULTS_DUE);
 
-        Job supervisorJob = jobMgr.getSupervisor(appraisal.getJob());
-        appraisal.getJob().setCurrentSupervisor(supervisorJob); //@todo: Joan: why this?
+        Job supervisorJob = appraisal.getJob().getSupervisor();
 
         // update appraisal & assessment fields based on permission rules
         setAppraisalFields(request, appraisal, permRule);
@@ -697,7 +696,7 @@ public class AppraisalMgr {
             return appraisal.getRole();
         }
 
-        supervisor = jobMgr.getSupervisor(appraisal.getJob());
+        supervisor = appraisal.getJob().getSupervisor();
         if (supervisor != null && pidm == supervisor.getEmployee().getId()) {
             appraisal.setRole("supervisor");
             return appraisal.getRole();
@@ -741,8 +740,6 @@ public class AppraisalMgr {
     public Appraisal getAppraisal(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         appraisal = getAppraisal(id, session);
-        Job supervisorJob = jobMgr.getSupervisor(appraisal.getJob());
-        appraisal.getJob().setCurrentSupervisor(supervisorJob);
 
         return appraisal;
     }

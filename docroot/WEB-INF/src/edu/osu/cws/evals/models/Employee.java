@@ -42,8 +42,9 @@ public class Employee extends Evals {
         Set nonTerminatedJobs = new HashSet();
 
         for (Job tempJob : jobs) {
-            if (!tempJob.getStatus().equals("T"))
-            nonTerminatedJobs.add(tempJob);
+            if (!tempJob.getStatus().equals("T")) {
+                nonTerminatedJobs.add(tempJob);
+            }
         }
 
         return nonTerminatedJobs;

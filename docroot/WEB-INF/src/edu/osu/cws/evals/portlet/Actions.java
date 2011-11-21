@@ -725,7 +725,7 @@ public class Actions {
 
         // Initialze lazy appraisal associations
         appraisal.getJob().toString();
-        appraisal.getJob().getCurrentSupervisor();
+        appraisal.getJob().getSupervisor();
         appraisal.getJob().getEmployee().toString();
         appraisal.getSortedAssessments().size();
         for (Assessment assessment : appraisal.getAssessments()) {

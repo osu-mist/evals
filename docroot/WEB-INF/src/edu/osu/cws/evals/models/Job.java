@@ -291,14 +291,6 @@ public class Job extends Evals implements Serializable {
         this.businessCenterName = businessCenterName;
     }
 
-    public Job getCurrentSupervisor() {
-        return currentSupervisor;
-    }
-
-    public void setCurrentSupervisor(Job currentSupervisor) {
-        this.currentSupervisor = currentSupervisor;
-    }
-
     public String getSalaryGrade() {
         return salaryGrade;
     }

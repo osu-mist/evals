@@ -24,17 +24,6 @@ public class JobsTest {
         dbunit.seedDatabase();
     }
 
-    public void shouldFindSupervisorIfNoDirectSupervisor() throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        job = (Job) session.load(Job.class, new Job(new Employee(12345), "333", "00"));
-        tx.commit();
-
-        Job supervisor = jobMgr.getSupervisor(job);
-        assert supervisor != null;
-        assert supervisor.getEmployee().getId() == 12345 : "Incorrect supervisor pidm found";
-    }
-
     public void shouldFindUppserSupervisor() throws ModelException {
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();

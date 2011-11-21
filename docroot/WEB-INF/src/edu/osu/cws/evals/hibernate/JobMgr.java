@@ -14,46 +14,6 @@ import java.util.List;
 public class JobMgr {
 
     /**
-     * Given a job, it finds the matching supervisor even if the direct supervising
-     * job associated to it is not active. Return null is the job has no supervisor
-     * associated to it.
-     *
-     * @param job
-     * @return
-     * @throws Exception
-     */
-    public Job getSupervisor(Job job) throws  Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        return this.getSupervisor(job, session);
-    }
-
-    /**
-     * Given a job, it finds the matching supervisor even if the direct supervising
-     * job associated to it is not active. Return null is the job has no supervisor
-     * associated to it.
-     *
-     * @param job   The job we are looking for a supervisor
-     * @param session
-     * @return supervisor job
-     */
-    private Job getSupervisor(Job job, Session session) {
-        Job supervisorJob = job.getSupervisor();
-
-        if (supervisorJob == null) {
-            return null;
-        }
-
-        // Iterate up the supervising chain. If the current supervisor doesn't have an
-        // active employee or supervisorJob associated, look at the supervisor higher up
-        while (supervisorJob != null && (!supervisorJob.getStatus().equals("A") ||
-                !supervisorJob.getEmployee().getStatus().equals("A"))) {
-            supervisorJob = supervisorJob.getSupervisor();
-        }
-
-        return supervisorJob;
-    }
-
-    /**
      * Traverses up the supervising chain of the given job and if the given pidm matches
      * a supervisor it returns true.
      *

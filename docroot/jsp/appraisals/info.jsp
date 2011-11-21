@@ -12,7 +12,7 @@
                         <c:out value="${appraisal.job.employee.name}" />
                     </td>
                     <td><em><liferay-ui:message key="supervisor" />:</em>
-                        <c:out value="${appraisal.job.currentSupervisor.employee.name}" />
+                        <c:out value="${appraisal.job.supervisor.employee.name}" />
                     </td>
                     <td><em><liferay-ui:message key="job-title" />:</em>
                         <c:out value="${appraisal.job.jobTitle}" />
