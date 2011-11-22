@@ -726,6 +726,7 @@ public class Actions {
         // Initialze lazy appraisal associations
         appraisal.getJob().toString();
         appraisal.getJob().getSupervisor();
+        appraisal.getJob().getSupervisor().getEmployee().toString();
         appraisal.getJob().getEmployee().toString();
         appraisal.getSortedAssessments().size();
         for (Assessment assessment : appraisal.getAssessments()) {
@@ -837,9 +838,9 @@ public class Actions {
 
         if (appraisal.getStatus().equals(Appraisal.STATUS_RELEASE_DUE) && isLoggedInUserReviewer(request)) {
             removeReviewAppraisalInSession(request, appraisal);
-        }
-        else
+        } else {
             updateAppraisalInSession(request, appraisal);
+        }
 
         return displayHomeView(request, response);
     }
