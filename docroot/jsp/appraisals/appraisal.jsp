@@ -88,7 +88,7 @@
                     <legend><liferay-ui:message key="appraisal-employee-signature" /></legend>
                     <input type="checkbox"  name="<portlet:namespace />acknowledge-read-appraisal"
                         id="<portlet:namespace />acknowledge-read-appraisal"
-                        <c:if test="${appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_DUE%>' && appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_OVERDUE%>'}">
+                        <c:if test="${not empty appraisal.employeeSignedDate}">
                             checked="checked" disabled="disabled"
                         </c:if>
                     />
