@@ -724,10 +724,15 @@ public class Actions {
         }
 
         // Initialze lazy appraisal associations
-        appraisal.getJob().toString();
-        appraisal.getJob().getSupervisor();
-        appraisal.getJob().getSupervisor().getEmployee().toString();
-        appraisal.getJob().getEmployee().toString();
+        Job job = appraisal.getJob();
+        job.toString();
+        Job supervisor = job.getSupervisor();
+        if (supervisor != null && supervisor.getEmployee() != null) {
+            supervisor.getEmployee().toString();
+        }
+        if (job.getEmployee() != null) {
+            job.getEmployee().toString();
+        }
         appraisal.getSortedAssessments().size();
         for (Assessment assessment : appraisal.getAssessments()) {
             assessment.getCriterionDetail().getAreaID();
