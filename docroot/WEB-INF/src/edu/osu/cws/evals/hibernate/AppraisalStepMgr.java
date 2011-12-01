@@ -26,6 +26,9 @@ public class AppraisalStepMgr {
 
         for (AppraisalStep step : results) {
             key = step.getAction()+"-"+step.getAppointmentType();
+            if (step.getEmailType() != null) {
+                step.getEmailType().toString();
+            }
             stepsMap.put(key, step);
         }
 
