@@ -13,6 +13,10 @@
 
 <div id="pass-appraisal-form" class="osu-cws">
 
+    <span class="portlet-msg-alert">
+    <liferay-ui:message key="appraisal-info-msg"/>
+    </span>
+
     <h2><liferay-ui:message key="appraisal-classified-title" />: <liferay-ui:message key="${appraisal.viewStatus}" /></h2>
     <liferay-ui:success key="draft-saved" message="draft-saved" />
     <liferay-ui:success key="appraisal-sent-to-nolij-success" message="appraisal-sent-to-nolij-success" />
