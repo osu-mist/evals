@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping auto-import="false" >
+
+    <class name="edu.osu.cws.evals.models.CloseOutReason" table="closeout_reasons">
+        <id name="id" type="int" column="ID">
+            <generator class="native">
+                <param name="sequence">passmgr.pass_seq</param>
+            </generator>
+        </id>
+
+        <property name="reason" column="REASON"/>
+        <property name="createDate" type="timestamp" column="CREATE_DATE"/>
+        <property name="deleteDate" type="timestamp" column="DELETE_DATE"/>
+
+        <many-to-one name="creator" class="edu.osu.cws.evals.models.Employee"
+                     column="CREATOR_PIDM"
+                     not-null="true"/>
+    </class>
+    <query name="reason.delete"><![CDATA[
+        update edu.osu.cws.evals.models.CloseOutReason closeOutReason
+            set deleteDate = :deleteDate where id = :id
+    ]]></query>
+    <query name="reason.getReason"><![CDATA[
+        from edu.osu.cws.evals.models.CloseOutReason closeOutReason
+            where reason = :reason
+    ]]></query>
+</hibernate-mapping>

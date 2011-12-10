@@ -1180,6 +1180,94 @@ public class Actions {
     }
 
     /**
+     * Handles listing the close out reasons.
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    public String listCloseOutReasons(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+
+        ArrayList<CloseOutReason> reasonsList = CloseOutReasonMgr.list(false);
+        requestMap.put("reasonsList", reasonsList);
+        useMaximizedMenu(request);
+
+        return Constants.JSP_CLOSEOUT_REASON_LIST;
+    }
+
+    /**
+     * Handles adding a close out reason. If successful, it displays the list of close out reasons.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String addCloseOutReason(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+
+        String onid = ParamUtil.getString(request, "reason");
+        try {
+            CloseOutReasonMgr.add(onid, getLoggedOnUser(request));
+            SessionMessages.add(request, "closeout-reason-added");
+        } catch (ModelException e) {
+            addErrorsToRequest(request, e.getMessage());
+        } catch (Exception e) {
+            throw e;
+        }
+
+        return listCloseOutReasons(request, response);
+    }
+
+    /**
+     * Handles performing a soft delete of a single close out reason.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String deleteCloseOutReason(PortletRequest request, PortletResponse response) throws Exception {
+        // Check that the logged in user is admin
+        if (!isLoggedInUserAdmin(request)) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+
+        int id = ParamUtil.getInteger(request, "id");
+        try {
+
+            // If the user clicks on the delete link the first time, use confirm page
+            if (request instanceof RenderRequest && response instanceof RenderResponse) {
+                CloseOutReason reason = CloseOutReasonMgr.get(id);
+                requestMap.put("reason", reason);
+                return Constants.JSP_CLOSEOUT_REASON_DELETE;
+            }
+
+            // If user hits cancel, send them to list admin page
+            if (!ParamUtil.getString(request, "cancel").equals("")) {
+                return listCloseOutReasons(request, response);
+            }
+
+            CloseOutReasonMgr.delete(id);
+            SessionMessages.add(request, "closeout-reason-deleted");
+        } catch (ModelException e) {
+            addErrorsToRequest(request, e.getMessage());
+        }
+        useNormalMenu(request);
+        return listCloseOutReasons(request, response);
+    }
+
+    /**
      * Handles listing the reviewer users. It only performs error checking. The list of
      * reviewers is already set by EvalsPortlet.portletSetup, so we don't need to do
      * anything else in this method.

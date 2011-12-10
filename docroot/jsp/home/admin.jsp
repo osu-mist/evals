@@ -15,6 +15,10 @@ reviewerListURL.setParameter("action", "listReviewer");
 PortletURL configurationListURL = renderResponse.createRenderURL();
 configurationListURL.setWindowState(WindowState.MAXIMIZED);
 configurationListURL.setParameter("action", "listConfiguration");
+
+PortletURL closeOutReasonListURL = renderResponse.createRenderURL();
+closeOutReasonListURL.setWindowState(WindowState.MAXIMIZED);
+closeOutReasonListURL.setParameter("action", "listCloseOutReasons");
 %>
 
 <c:if test="${isAdmin == 'true'}">
@@ -36,6 +40,10 @@ configurationListURL.setParameter("action", "listConfiguration");
                 </li>
                 <li>
                     <a href="<%= configurationListURL.toString() %>"><liferay-ui:message key="configurations-list-title"/></a>
+                </li>
+                <li>
+                    <a href="<%= closeOutReasonListURL.toString() %>">
+                        <liferay-ui:message key="closeout-reason-list-title"/></a>
                 </li>
             </ul>
         </div>
