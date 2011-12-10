@@ -323,8 +323,8 @@ public class Mailer {
         msg.setContent(body, mimeType);
         msg.setSubject(reviewerSubject);
         Transport.send(msg);
-
-        logger.log("INFORMATION", "Email sent to reviewers", "");
+        String longMsg = "Emails sent to: " + Arrays.toString(emailAddresses);
+        logger.log(Logger.INFORMATIONAL, "Reviewer emails sent to", longMsg);
 
     }
 
