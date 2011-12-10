@@ -37,9 +37,6 @@
         <property name="releaseDate" type="timestamp" column="RELEASE_DATE"/>
         <property name="supervisorRebuttalRead" type="timestamp" column="SUPERVISOR_REBUTTAL_READ"/>
         <property name="type" column="TYPE"/>
-        <property name="evaluation2Date" type="timestamp" column="EVALUATION2_DATE"/>
-        <property name="review2Date" type="timestamp" column="REVIEW2_DATE"/>
-        <property name="release2Date" type="timestamp" column="RELEASE2_DATE"/>
 
         <many-to-one name="job" class="edu.osu.cws.evals.models.Job" not-null="true">
             <column name="JOB_PIDM"/>
@@ -60,12 +57,6 @@
                      not-null="false"/>
         <many-to-one name="reopenedBy" class="edu.osu.cws.evals.models.Employee"
                      column="REOPENER_PIDM"
-                     not-null="false"/>
-        <many-to-one name="evaluator2" class="edu.osu.cws.evals.models.Employee"
-                     column="EVALUATOR2_PIDM"
-                     not-null="false"/>
-        <many-to-one name="reviewer2" class="edu.osu.cws.evals.models.Employee"
-                     column="REVIEWER2_PIDM"
                      not-null="false"/>
         <set name="assessments" inverse="true">
             <key column="APPRAISAL_ID"/>

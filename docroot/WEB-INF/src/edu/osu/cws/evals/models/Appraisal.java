@@ -149,16 +149,6 @@ public class Appraisal extends Evals {
 
     private String type;
 
-    private Date evaluation2Date;
-
-    private Date review2Date;
-
-    private Date release2Date;
-
-    private Employee evaluator2;
-
-    private Employee reviewer2;
-
     private Date closeOutDate;
 
     private Employee closeOutBy;
@@ -596,46 +586,6 @@ public class Appraisal extends Evals {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public Date getEvaluation2Date() {
-        return evaluation2Date;
-    }
-
-    public void setEvaluation2Date(Date evaluation2Date) {
-        this.evaluation2Date = evaluation2Date;
-    }
-
-    public Date getReview2Date() {
-        return review2Date;
-    }
-
-    public void setReview2Date(Date review2Date) {
-        this.review2Date = review2Date;
-    }
-
-    public Employee getEvaluator2() {
-        return evaluator2;
-    }
-
-    public void setEvaluator2(Employee evaluator2) {
-        this.evaluator2 = evaluator2;
-    }
-
-    public Employee getReviewer2() {
-        return reviewer2;
-    }
-
-    public void setReviewer2(Employee reviewer2) {
-        this.reviewer2 = reviewer2;
-    }
-
-    public Date getRelease2Date() {
-        return release2Date;
-    }
-
-    public void setRelease2Date(Date release2Date) {
-        this.release2Date = release2Date;
     }
 
     public Date getCloseOutDate() {
