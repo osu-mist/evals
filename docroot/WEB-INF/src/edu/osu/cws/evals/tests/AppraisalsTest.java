@@ -153,7 +153,6 @@ public class AppraisalsTest {
         updatedAppraisal.setEmployeeSignedDate(new Date());
         updatedAppraisal.setCloseOutDate(new Date());
         updatedAppraisal.setCloseOutBy(employee);
-        updatedAppraisal.setCloseOutReason("close out reason");
 
         return updatedAppraisal;
     }

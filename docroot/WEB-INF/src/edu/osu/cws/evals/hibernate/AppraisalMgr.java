@@ -4,10 +4,10 @@ import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
+import edu.osu.cws.evals.portlet.Actions;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.type.StandardBasicTypes;
-
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.HashMap;
@@ -457,6 +457,19 @@ public class AppraisalMgr {
             appraisal.setSupervisorRebuttalRead(new Date());
         }
 
+        // Save the close out reason
+        if (appraisal.getRole().equals(Actions.ROLE_REVIEWER) || appraisal.getRole().equals("admin")) {
+            if (request.get("appraisal.closeOutReasonId") != null) {
+                int closeOutReasonId = Integer.parseInt(request.get("appraisal.closeOutReasonId")[0]);
+                CloseOutReason reason = CloseOutReasonMgr.get(closeOutReasonId);
+
+                appraisal.setCloseOutBy(loggedInUser);
+                appraisal.setCloseOutDate(new Date());
+                appraisal.setCloseOutReason(reason);
+                appraisal.setOriginalStatus(appraisal.getStatus());
+            }
+        }
+
         // If the appraisalStep object has a new status, update the appraisal object
         String appointmentType = appraisal.getJob().getAppointmentType();
         AppraisalStep appraisalStep = getAppraisalStepKey(request, appointmentType, permRule);
@@ -509,6 +522,8 @@ public class AppraisalMgr {
         if (permRule.getSubmit() != null) {
             appraisalButtons.add(permRule.getSubmit());
         }
+        // close out button
+        appraisalButtons.add("close-appraisal");
 
         for (String button : appraisalButtons) {
             // If this button is the one the user clicked, use it to look up the

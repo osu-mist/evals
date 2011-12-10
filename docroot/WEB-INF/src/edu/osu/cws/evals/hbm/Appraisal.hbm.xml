@@ -29,7 +29,6 @@
         <property name="rebuttalDate" type="timestamp" column="REBUTTAL_DATE"/>
         <property name="employeeSignedDate" type="timestamp" column="EMPLOYEE_SIGNED_DATE"/>
         <property name="closeOutDate" type="timestamp" column="CLOSEOUT_DATE"/>
-        <property name="closeOutReason" type="text" column="CLOSEOUT_REASON"/>
         <property name="status" length="32" column="STATUS"/>
         <property name="reopenedDate" type="timestamp" column="REOPENED_DATE"/>
         <property name="reopenReason" type="text" column="REOPEN_REASON"/>
@@ -43,6 +42,9 @@
             <column name="POSITION_NUMBER"/>
             <column name="JOB_SUFFIX"/>
         </many-to-one>
+        <many-to-one name="closeOutReason" class="edu.osu.cws.evals.models.CloseOutReason"
+                     column="CLOSEOUT_REASON_ID"
+                     not-null="false"/>
         <many-to-one name="goalsApprover" class="edu.osu.cws.evals.models.Employee"
                      column="GOALS_APPROVER_PIDM"
                      not-null="false"/>

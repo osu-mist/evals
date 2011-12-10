@@ -31,12 +31,12 @@ public class Actions {
     public static final String MY_TEAMS_ACTIVE_APPRAISALS = "myTeamsActiveAppraisals";
     private static final String REVIEW_LIST = "reviewList";
     private static final String REVIEW_LIST_MAX_RESULTS = "reviewListMaxResults";
+    public static final String APPRAISAL_NOT_FOUND = "We couldn't find your appraisal. If you believe this is an " +
+            "error, please contact your supervisor.";
 
     private EmployeeMgr employeeMgr = new EmployeeMgr();
 
     private JobMgr jobMgr = new JobMgr();
-
-    private AppointmentTypeMgr appointmentTypeMgr = new AppointmentTypeMgr();
 
     private AdminMgr adminMgr = new AdminMgr();
 
@@ -722,6 +722,9 @@ public class Actions {
         if (isLoggedInUserReviewer(request) && appraisal.getEmployeeSignedDate() != null) {
             requestMap.put("displayResendNolij", true);
         }
+        if ((isLoggedInUserReviewer(request) || isLoggedInUserAdmin(request)) && appraisal.isOpen()) {
+            requestMap.put("displayCloseOutAppraisal", true);
+        }
 
         // Initialze lazy appraisal associations
         Job job = appraisal.getJob();
@@ -732,6 +735,9 @@ public class Actions {
         }
         if (job.getEmployee() != null) {
             job.getEmployee().toString();
+        }
+        if (appraisal.getCloseOutReason() != null) {
+            appraisal.getCloseOutReason().getReason();
         }
         appraisal.getSortedAssessments().size();
         for (Assessment assessment : appraisal.getAssessments()) {
@@ -783,8 +789,7 @@ public class Actions {
         CompositeConfiguration config;
         int id = ParamUtil.getInteger(request, "id", 0);
         if (id == 0) {
-            addErrorsToRequest(request, "We couldn't find your appraisal. If you believe this is an " +
-                    "error, please contact your supervisor.");
+            addErrorsToRequest(request, APPRAISAL_NOT_FOUND);
             return displayHomeView(request, response);
         }
 
@@ -1265,6 +1270,51 @@ public class Actions {
         }
         useNormalMenu(request);
         return listCloseOutReasons(request, response);
+    }
+
+    /**
+     * Handles an admin/reviewer closing an appraisal. We only display the form to close it. The
+     * logic to handle closing is done by updateAppraisal method.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String closeOutAppraisal(PortletRequest request, PortletResponse response) throws Exception {
+        Appraisal appraisal;
+        PermissionRule permRule;
+        Employee currentlyLoggedOnUser = getLoggedOnUser(request);
+        int userId = currentlyLoggedOnUser.getId();
+
+        int appraisalID = ParamUtil.getInteger(request, "id");
+        if (appraisalID == 0) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+
+        setAppraisalMgrParameters(currentlyLoggedOnUser);
+
+        // 1) Get the appraisal, permission rule and userRole
+        appraisal = appraisalMgr.getAppraisal(appraisalID);
+        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
+        String userRole = appraisalMgr.getRole(appraisal, userId);
+
+        // Check to see if the logged in user has permission to access the appraisal
+        boolean isAdminOrReviewer = userRole.equals("admin") || userRole.equals("reviewer");
+        if (permRule == null || !isAdminOrReviewer) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+
+        List<CloseOutReason> reasonList = CloseOutReasonMgr.list(false);
+        appraisal.getJob().getEmployee().toString();
+
+        requestMap.put("reasonsList", reasonList);
+        requestMap.put("appraisal", appraisal);
+        useMaximizedMenu(request);
+
+        return Constants.JSP_APPRAISAL_CLOSEOUT;
     }
 
     /**

@@ -10,6 +10,10 @@
     <portlet:param name="id" value="${appraisal.id}"/>
     <portlet:param name="action" value="resendAppraisalToNolij"/>
 </portlet:actionURL>
+<portlet:actionURL var="closeAppraisal" escapeXml="false">
+    <portlet:param name="id" value="${appraisal.id}"/>
+    <portlet:param name="action" value="closeOutAppraisal"/>
+</portlet:actionURL>
 
 <div id="pass-appraisal-form" class="osu-cws">
 
@@ -34,6 +38,14 @@
                 url="<%=renderResponse.encodeURL(resendAppraisalToNolij.toString())%>"
                 label="true"
                 message="appraisal-resend-to-nolij"
+            /></li>
+        </c:if>
+        <c:if test="${not empty displayCloseOutAppraisal}">
+            <li><liferay-ui:icon
+                image="copy"
+                url="<%=renderResponse.encodeURL(closeAppraisal.toString())%>"
+                label="true"
+                message="appraisal-closeout"
             /></li>
         </c:if>
     </ul>

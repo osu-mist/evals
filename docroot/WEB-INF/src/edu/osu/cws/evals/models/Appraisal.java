@@ -153,7 +153,7 @@ public class Appraisal extends Evals {
 
     private Employee closeOutBy;
 
-    private String closeOutReason;
+    private CloseOutReason closeOutReason;
 
     private Employee reopenedBy;
 
@@ -388,6 +388,11 @@ public class Appraisal extends Evals {
         return viewStatus;
     }
 
+    public boolean isOpen() {
+        return !status.equals(STATUS_CLOSED) &&
+                !status.equals(STATUS_COMPLETED) && !status.equals(STATUS_ARCHIVED);
+    }
+
     public int getId() {
         return id;
     }
@@ -604,11 +609,11 @@ public class Appraisal extends Evals {
         this.closeOutBy = closeOutBy;
     }
 
-    public String getCloseOutReason() {
+    public CloseOutReason getCloseOutReason() {
         return closeOutReason;
     }
 
-    public void setCloseOutReason(String closeOutReason) {
+    public void setCloseOutReason(CloseOutReason closeOutReason) {
         this.closeOutReason = closeOutReason;
     }
 

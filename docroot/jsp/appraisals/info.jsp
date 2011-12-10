@@ -36,6 +36,9 @@
                     </td>
                     <td><em><liferay-ui:message key="status" />:</em>
                         <liferay-ui:message key="${appraisal.viewStatus}" />
+                        <c:if test="${appraisal.viewStatus == 'closed'}">
+                            (Reason:<c:out value="${appraisal.closeOutReason.reason}" />)
+                        </c:if>
                     </td>
                     <td><em><liferay-ui:message key="appraisal-rating"/>:</em>
                         <c:if test="${not empty appraisal.rating and (permissionRule.evaluation == 'v' or permissionRule.evaluation == 'e')}">
