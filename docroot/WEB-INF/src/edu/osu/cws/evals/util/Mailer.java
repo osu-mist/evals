@@ -30,6 +30,7 @@ public class Mailer {
     private ResourceBundle emailBundle;
 	private Mail email;
     private String linkURL;
+    private String helpLinkURL;
     private String mimeType;
     private Map<String, Configuration> configMap;
     private String logHost;
@@ -38,11 +39,24 @@ public class Mailer {
 
     Map<String, String> logFields = new HashMap<String, String>();
 
-    public Mailer(ResourceBundle resources, Mail mail,
-                  String linkURL, String mimeType, Map<String, Configuration> map, EvalsLogger logger, Address replyTo) {
+    /**
+     * Constructors that sets the object parameters and initializes the email start date.
+     *
+     * @param resources
+     * @param mail
+     * @param linkURL
+     * @param helpLinkURL
+     * @param mimeType
+     * @param map
+     * @param logger
+     * @param replyTo
+     */
+    public Mailer(ResourceBundle resources, Mail mail, String linkURL, String helpLinkURL,
+                  String mimeType, Map<String, Configuration> map, EvalsLogger logger, Address replyTo) {
         this.email = mail;
         this.emailBundle = resources;
         this.linkURL = linkURL;
+        this.helpLinkURL = helpLinkURL;
         this.mimeType = mimeType;
         configMap = map;
         this.logger = logger;
@@ -268,7 +282,7 @@ public class Mailer {
         String bodyWrapper = emailBundle.getString("email_body");
         String bodyContent = getStatusMsg(appraisal, emailType);
         return MessageFormat.format(bodyWrapper, addressee,
-                bodyContent, getBusinessCenterDescriptor(appraisal), linkURL, linkURL);
+                bodyContent, getBusinessCenterDescriptor(appraisal), linkURL, linkURL, helpLinkURL, helpLinkURL);
     }
 
 

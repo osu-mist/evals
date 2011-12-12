@@ -272,11 +272,12 @@ public class EvalsPortlet extends GenericPortlet {
         Address from = new InternetAddress(config.getString("mail.fromAddress"));
         Address replyTo = new InternetAddress(config.getString("mail.replyToAddress"));
         String linkUrl = config.getString("mail.linkUrl");
+        String helpLinkUrl = config.getString("helpfulLinks.url");
         String mimeType = config.getString("mail.mimeType");
         Map<String, Configuration> configurationMap = (Map<String, Configuration>)
                 getPortletContext().getAttribute("configurations");
         Mail mail = new Mail(hostname, from);
-        Mailer mailer = new Mailer(resources, mail, linkUrl, mimeType, configurationMap, getLog(),replyTo);
+        Mailer mailer = new Mailer(resources, mail, linkUrl,  helpLinkUrl, mimeType, configurationMap, getLog(),replyTo);
         getPortletContext().setAttribute("mailer", mailer);
     }
 
