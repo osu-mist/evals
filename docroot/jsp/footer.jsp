@@ -14,4 +14,20 @@
                 jQuery('#' + id).show('slow');
             }
         }
+    jQuery(document).ready(function() {
+        // Handle submit buttons that need confirmation
+        jQuery("input.evals-show-confirm").click(function() {
+            return confirm("<liferay-ui:message key="appraisal-confirm-message" />");
+        });
+        // Handle buttons in action menu bar that need confirmation
+        jQuery("span.evals-show-confirm a").click(function() {
+            var response = confirm("<liferay-ui:message key="appraisal-confirm-message" />");
+            if (response) {
+                Liferay.Util.forcePost(this);
+                return false;
+            }
+            return false;
+        });
+        jQuery("span.evals-show-confirm a").attr("onClick","");
+    });
 </script>

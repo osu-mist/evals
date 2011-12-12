@@ -36,7 +36,8 @@
 
     </fieldset>
 
-    <input type="submit" name="close-appraisal" value="<liferay-ui:message key="close" />" />
+    <input type="submit" name="close-appraisal" value="<liferay-ui:message key="close" />"
+           class="<portlet:namespace />show-confirm" />
     <input type="submit" name="cancel" value="<liferay-ui:message key="cancel" />" />
 </form>
 <%@ include file="/jsp/footer.jsp" %>

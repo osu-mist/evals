@@ -43,6 +43,7 @@
                 url="<%=renderResponse.encodeURL(resendAppraisalToNolij.toString())%>"
                 label="true"
                 message="appraisal-resend-to-nolij"
+                cssClass="evals-show-confirm"
             /></li>
         </c:if>
         <c:if test="${not empty displayCloseOutAppraisal}">
@@ -59,6 +60,7 @@
                 url="<%=renderResponse.encodeURL(setAppraisalStatus.toString())%>"
                 label="true"
                 message="appraisal-move-to-results-due"
+                cssClass="evals-show-confirm"
             /></li>
         </c:if>
     </ul>
@@ -185,11 +187,13 @@
         </c:if>
 
         <c:if test="${not empty permissionRule.requireModification}">
-        <input name="${permissionRule.requireModification}" type="submit" value="<liferay-ui:message key="${permissionRule.requireModification}" />">
+        <input name="${permissionRule.requireModification}" class="evals-show-confirm"
+               type="submit" value="<liferay-ui:message key="${permissionRule.requireModification}" />">
         </c:if>
 
         <c:if test="${not empty permissionRule.submit}">
-        <input name="${permissionRule.submit}" type="submit" id="<portlet:namespace />${permissionRule.submit}"
+        <input name="${permissionRule.submit}" class="evals-show-confirm"
+               type="submit" id="<portlet:namespace />${permissionRule.submit}"
         value="<liferay-ui:message key="${permissionRule.submit}" />">
         </c:if>
 
