@@ -85,20 +85,38 @@ public class Mailer {
         String mailTo = emailType.getMailTo();
         String mailCC = emailType.getCc();
         String mailBCC = emailType.getBcc();
+        boolean hasRecipients = false;
 
         if (mailTo != null && !mailTo.equals("")) {
             Address[] to = getRecipients(mailTo, appraisal);
-            msg.addRecipients(Message.RecipientType.TO, to);
+            if (to.length != 0) {
+                msg.addRecipients(Message.RecipientType.TO, to);
+                hasRecipients = true;
+            }
         }
 
 	    if (mailCC != null && !mailCC.equals("")) {
             Address[] cc = getRecipients(mailCC, appraisal);
-            msg.addRecipients(Message.RecipientType.CC, cc);
+            if (cc.length != 0) {
+                msg.addRecipients(Message.RecipientType.CC, cc);
+                hasRecipients = true;
+            }
         }
 
 	    if (mailBCC != null && !mailBCC.equals("")) {
             Address[] bcc = getRecipients(mailBCC, appraisal);
-            msg.addRecipients(Message.RecipientType.BCC, bcc);
+            if (bcc.length != 0) {
+                msg.addRecipients(Message.RecipientType.BCC, bcc);
+                hasRecipients = true;
+            }
+        }
+
+        if (!hasRecipients) {
+            logShortMessage = "Email could not be sent for appraisal.id = " + appraisal.getId();
+            logLongMessage = "Email type " + emailType.getType() + " could not be sent. There were no "+
+                    "valid recipients for appraisal.id = " + appraisal.getId();
+            logger.log(Logger.ERROR,logShortMessage,logLongMessage,logFields);
+            return;
         }
 
         String addressee = getAddressee(appraisal,mailTo);
@@ -150,7 +168,13 @@ public class Mailer {
                     logLongMessage = "Job for appraisal " + appraisal.getId() + " is null";
                     logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                 } else {
-                    recipients.add(job.getEmployee().getEmail());
+                    String employeeEmail = job.getEmployee().getEmail();
+                    if (employeeEmail == null || employeeEmail.equals("")) {
+                        String employeeName = appraisal.getJob().getEmployee().getName();
+                        logNullEmail(employeeName);
+                    } else {
+                        recipients.add(employeeEmail);
+                    }
                 }
             }
 
@@ -166,7 +190,13 @@ public class Mailer {
                         logLongMessage = "Supervisor for appraisal " + appraisal.getId() + " is null";
                         logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                     } else {
-                        recipients.add(supervisorJob.getEmployee().getEmail());
+                        String supervisorEmail = supervisorJob.getEmployee().getEmail();
+                        if (supervisorEmail == null || supervisorEmail.equals("")) {
+                            String supervisorName = supervisorJob.getEmployee().getName();
+                            logNullEmail(supervisorName);
+                        } else {
+                            recipients.add(supervisorEmail);
+                        }
                     }
                 }
             }
@@ -185,7 +215,13 @@ public class Mailer {
                         logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                     } else {
                         for (Reviewer reviewer : reviewers) {
-                            recipients.add(reviewer.getEmployee().getEmail());
+                            String reviewerEmail = reviewer.getEmployee().getEmail();
+                            if (reviewerEmail == null || reviewerEmail.equals("")) {
+                                String reviewerName = reviewer.getEmployee().getName();
+                                logNullEmail(reviewerName);
+                            } else {
+                                recipients.add(reviewerEmail);
+                            }
                         }
                     }
                 }
@@ -204,6 +240,20 @@ public class Mailer {
         }
 
         return recipientsArray;
+    }
+
+    /**
+     * Handles logging employees that have a null email address.
+     *
+     * @param employeeName
+     * @throws Exception
+     */
+    private void logNullEmail(String employeeName) throws Exception {
+        String logShortMessage;
+        String logLongMessage;
+        logShortMessage = "User's email is null";
+        logLongMessage = "Email of user " + employeeName + " is null";
+        logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
     }
 
     /**
@@ -266,8 +316,11 @@ public class Mailer {
 
         String supervisorName = supervisor.getConventionName();
         String emailAddress = supervisor.getEmail();
-        // take this out after testing:
-        //emailAddress = "joan.lu@oregonstate.edu";
+
+        if (emailAddress == null || emailAddress.equals("")) {
+            logNullEmail(supervisorName);
+            return;
+        }
 
         String bodyWrapper = emailBundle.getString("email_body");
 
@@ -316,7 +369,9 @@ public class Mailer {
         Address[] recipients = new Address[emailAddresses.length];
         int i = 0;
         for (String recipient : emailAddresses) {
-            recipients[i++] = email.stringToAddress(recipient);
+            if (recipient != null && !recipient.equals("")) {
+                recipients[i++] = email.stringToAddress(recipient);
+            }
         }
 
         msg.addRecipients(Message.RecipientType.TO, recipients);
