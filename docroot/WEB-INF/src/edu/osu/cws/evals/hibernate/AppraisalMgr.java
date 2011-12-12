@@ -1,6 +1,7 @@
 package edu.osu.cws.evals.hibernate;
 
 import edu.osu.cws.evals.models.*;
+import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
@@ -328,14 +329,16 @@ public class AppraisalMgr {
      *  3) The job annual_indicator != 0
      *
      * @param appraisal
-     * @param resultsDueConfig
+     * @param configurationMap
      * @param action
      * @throws Exception
      * @return appraisal    The first annual appraisal created, null otherwise
      */
-    public Appraisal createFirstAnnualAppraisal(Appraisal appraisal, Configuration resultsDueConfig, String action)
+    public Appraisal createFirstAnnualAppraisal(Appraisal appraisal,
+                                                Map<String, Configuration>  configurationMap, String action)
             throws Exception {
         Job job = appraisal.getJob();
+        Configuration resultsDueConfig = configurationMap.get(Appraisal.STATUS_RESULTS_DUE);
 
         if (!appraisal.getType().equals(Appraisal.TYPE_TRIAL)) {
             return null;
@@ -344,6 +347,13 @@ public class AppraisalMgr {
             return null;
         }
         if (job.getAnnualInd() == 0) {
+            return null;
+        }
+        Date startDate = appraisal.getStartDate();
+        int daysBeforeAppraisalDue = EvalsUtil.daysBeforeAppraisalDue(job, startDate, Appraisal.TYPE_TRIAL,
+                configurationMap);
+        if (startDate.before(fullGoalsDate)  &&
+                daysBeforeAppraisalDue > Constants.DAYS_BEFORE_APPRAISAL_DUE_To_CREATE) {
             return null;
         }
         return AppraisalMgr.createInitialAppraisalAfterTrial(appraisal, resultsDueConfig);

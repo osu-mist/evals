@@ -15,6 +15,8 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
+
 import edu.osu.cws.evals.models.*;
 
 public class EvalsUtil {
@@ -155,5 +157,21 @@ public class EvalsUtil {
         if (specificFile.exists())
            return specificPropFile;
         return null;
+    }
+
+    public static int daysBeforeAppraisalDue(Job job, Date appraisalStartDate, String appraisalType,
+                                             Map<String, Configuration> configMap) {
+        Configuration appraisalDueConfig = configMap.get(Appraisal.STATUS_APPRAISAL_DUE);
+        int offset = appraisalDueConfig.getIntValue();    //number of days before end date of appraisal
+
+        //determine appraisal due date.
+        Date appraisalEndDate = job.getEndEvalDate(appraisalStartDate, appraisalType);
+
+        Calendar appraisalDueCal = Calendar.getInstance();
+        appraisalDueCal.setTime(appraisalEndDate);
+        appraisalDueCal.add(Calendar.DAY_OF_MONTH, -offset);
+        Date appraisalDueDate = appraisalDueCal.getTime();
+        System.out.println("appraisalDueDate = " + appraisalDueDate);
+        return CWSUtil.daysBetween(appraisalDueDate, new Date());
     }
 }

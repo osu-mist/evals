@@ -829,7 +829,7 @@ public class Actions {
             if (signAppraisal != null && !signAppraisal.equals("")) {
                 action = "sign-appraisal";
             }
-            Appraisal firstAnnual = appraisalMgr.createFirstAnnualAppraisal(appraisal, resultsDueConfig, action);
+            Appraisal firstAnnual = appraisalMgr.createFirstAnnualAppraisal(appraisal, configurationMap, action);
 
 
             if (appraisal.getRole().equals("supervisor")) {
