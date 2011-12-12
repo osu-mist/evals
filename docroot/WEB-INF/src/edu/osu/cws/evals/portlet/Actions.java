@@ -725,6 +725,11 @@ public class Actions {
         if ((isLoggedInUserReviewer(request) || isLoggedInUserAdmin(request)) && appraisal.isOpen()) {
             requestMap.put("displayCloseOutAppraisal", true);
         }
+        String status = appraisal.getStatus();
+        if ((isLoggedInUserAdmin(request) || isLoggedInUserReviewer(request)) &&
+                status.equals(Appraisal.STATUS_GOALS_APPROVED)) {
+            requestMap.put("displaySetAppraisalStatus", true);
+        }
 
         // Initialze lazy appraisal associations
         Job job = appraisal.getJob();
@@ -1055,7 +1060,46 @@ public class Actions {
         NolijCopies.add(appraisal.getId(), onlyFilename);
     }
 
+    /**
+     * Handles setting the status of an appraisal record to results due.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String setStatusToResultsDue(PortletRequest request, PortletResponse response) throws Exception {
+        Appraisal appraisal;
+        Employee currentlyLoggedOnUser = getLoggedOnUser(request);
+        int userId = currentlyLoggedOnUser.getId();
 
+        int appraisalID = ParamUtil.getInteger(request, "id");
+        if (appraisalID == 0) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+
+        setAppraisalMgrParameters(currentlyLoggedOnUser);
+
+        // 1) Get the appraisal and role
+        appraisal = appraisalMgr.getAppraisal(appraisalID);
+        String userRole = appraisalMgr.getRole(appraisal, userId);
+        appraisal.setRole(userRole);
+        if (!userRole.equals("admin") && !userRole.equals(ROLE_REVIEWER)) {
+            addErrorsToRequest(request, ACCESS_DENIED);
+            return displayHomeView(request, response);
+        }
+
+        if (request instanceof ActionRequest && response instanceof ActionResponse) {
+            appraisal.setOriginalStatus(appraisal.getStatus());
+            appraisal.setStatus(Appraisal.STATUS_RESULTS_DUE);
+            AppraisalMgr.updateAppraisalStatus(appraisal);
+            SessionMessages.add(request, "appraisal-set-status-success");
+            return displayAppraisal(request, response);
+        }
+
+        return displayHomeView(request, response);
+    }
 
     /**
      * Handles listing the admin users. It only performs error checking. The list of

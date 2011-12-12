@@ -14,6 +14,10 @@
     <portlet:param name="id" value="${appraisal.id}"/>
     <portlet:param name="action" value="closeOutAppraisal"/>
 </portlet:actionURL>
+<portlet:actionURL var="setAppraisalStatus" escapeXml="false">
+    <portlet:param name="id" value="${appraisal.id}"/>
+    <portlet:param name="action" value="setStatusToResultsDue"/>
+</portlet:actionURL>
 
 <div id="pass-appraisal-form" class="osu-cws">
 
@@ -24,6 +28,7 @@
     <h2><liferay-ui:message key="appraisal-classified-title" />: <liferay-ui:message key="${appraisal.viewStatus}" /></h2>
     <liferay-ui:success key="draft-saved" message="draft-saved" />
     <liferay-ui:success key="appraisal-sent-to-nolij-success" message="appraisal-sent-to-nolij-success" />
+    <liferay-ui:success key="appraisal-set-status-success" message="appraisal-set-status-success" />
 
     <ul class="actions">
         <li><liferay-ui:icon
@@ -46,6 +51,14 @@
                 url="<%=renderResponse.encodeURL(closeAppraisal.toString())%>"
                 label="true"
                 message="appraisal-closeout"
+            /></li>
+        </c:if>
+        <c:if test="${not empty displaySetAppraisalStatus}">
+            <li><liferay-ui:icon
+                image="action_right"
+                url="<%=renderResponse.encodeURL(setAppraisalStatus.toString())%>"
+                label="true"
+                message="appraisal-move-to-results-due"
             /></li>
         </c:if>
     </ul>

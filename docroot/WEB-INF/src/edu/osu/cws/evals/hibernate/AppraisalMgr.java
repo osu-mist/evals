@@ -874,7 +874,7 @@ public class AppraisalMgr {
 
     /**
      * Updates the status of the given appraisal. This does not check permissions or
-     * the status String. This is just for demo purposes.
+     * the status String.
      *
      * @param id
      * @param status
