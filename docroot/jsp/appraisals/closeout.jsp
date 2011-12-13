@@ -15,9 +15,9 @@
         <h3 class="secret"><liferay-ui:message key="appraisal-closeout"/></h3>
         <legend><liferay-ui:message key="appraisal-closeout"/></legend>
 
-        <p><liferay-ui:message key="appraisal-closeout-confirm"/>
+        <p><strong><liferay-ui:message key="appraisal-closeout-confirm"/>
             <c:out value="${appraisal.job.employee.name}" /> for the
-            review period <c:out value="${appraisal.reviewPeriod}"/> ?</p>
+            review period <c:out value="${appraisal.reviewPeriod}"/> ?</strong></p>
 
         <fieldset class="pass-closeout-reasons">
             <legend>
