@@ -728,7 +728,7 @@ public class Actions {
         }
         String status = appraisal.getStatus();
         if ((isLoggedInUserAdmin(request) || isLoggedInUserReviewer(request)) &&
-                status.equals(Appraisal.STATUS_GOALS_APPROVED)) {
+                status.equals(Appraisal.STATUS_GOALS_APPROVED) && !userRole.equals("employee")) {
             requestMap.put("displaySetAppraisalStatus", true);
         }
 
