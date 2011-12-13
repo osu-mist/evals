@@ -350,7 +350,7 @@ public class AppraisalMgr {
             return null;
         }
         Date startDate = appraisal.getStartDate();
-        int daysBeforeAppraisalDue = EvalsUtil.daysBeforeAppraisalDue(job, startDate, Appraisal.TYPE_TRIAL,
+        int daysBeforeAppraisalDue = EvalsUtil.daysBeforeAppraisalDue(job, startDate, Appraisal.TYPE_ANNUAL,
                 configurationMap);
         if (startDate.before(fullGoalsDate)  &&
                 daysBeforeAppraisalDue > Constants.DAYS_BEFORE_APPRAISAL_DUE_To_CREATE) {
