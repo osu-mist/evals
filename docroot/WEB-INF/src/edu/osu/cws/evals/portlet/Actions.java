@@ -722,7 +722,8 @@ public class Actions {
         if (isLoggedInUserReviewer(request) && appraisal.getEmployeeSignedDate() != null) {
             requestMap.put("displayResendNolij", true);
         }
-        if ((isLoggedInUserReviewer(request) || isLoggedInUserAdmin(request)) && appraisal.isOpen()) {
+        if ((isLoggedInUserReviewer(request) || isLoggedInUserAdmin(request)) && appraisal.isOpen()
+                && !userRole.equals("employee")) {
             requestMap.put("displayCloseOutAppraisal", true);
         }
         String status = appraisal.getStatus();
