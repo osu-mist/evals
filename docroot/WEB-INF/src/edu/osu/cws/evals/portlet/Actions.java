@@ -1267,9 +1267,9 @@ public class Actions {
             return displayHomeView(request, response);
         }
 
-        String onid = ParamUtil.getString(request, "reason");
+        String reason = ParamUtil.getString(request, "reason");
         try {
-            CloseOutReasonMgr.add(onid, getLoggedOnUser(request));
+            CloseOutReasonMgr.add(reason, getLoggedOnUser(request));
             SessionMessages.add(request, "closeout-reason-added");
         } catch (ModelException e) {
             addErrorsToRequest(request, e.getMessage());
@@ -1302,6 +1302,7 @@ public class Actions {
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
                 CloseOutReason reason = CloseOutReasonMgr.get(id);
                 requestMap.put("reason", reason);
+                useNormalMenu(request);
                 return Constants.JSP_CLOSEOUT_REASON_DELETE;
             }
 
@@ -1315,7 +1316,6 @@ public class Actions {
         } catch (ModelException e) {
             addErrorsToRequest(request, e.getMessage());
         }
-        useNormalMenu(request);
         return listCloseOutReasons(request, response);
     }
 
