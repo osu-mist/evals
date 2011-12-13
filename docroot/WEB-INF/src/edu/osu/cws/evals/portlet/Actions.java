@@ -48,9 +48,12 @@ public class Actions {
 
     private AppraisalMgr appraisalMgr = new AppraisalMgr();
 
-    private static final String ACCESS_DENIED = "You do not have access to perform this action";
+    private static final String ACCESS_DENIED = "You do not have access to perform this action.";
 
     private HashMap<String, Object> requestMap = new HashMap<String, Object>();
+
+    private static Log _log = LogFactoryUtil.getLog(Actions.class);
+
 
     /**
      * Takes the request object and creates POJO objects. Then it calls the respective
