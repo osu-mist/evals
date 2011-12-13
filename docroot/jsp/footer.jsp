@@ -20,18 +20,26 @@
      * name of the pressed button along with the confirmation message.
      * @param button The button pressed by the end user
      */
-    function <portlet:namespace/>confirmBox(button) {
-        var question_suffix = " " + jQuery(button).val() + "?";
+    function <portlet:namespace/>confirmBox(buttonText) {
+        var question_suffix = " " + buttonText + "?";
         return confirm("<liferay-ui:message key="appraisal-confirm-message" />" + question_suffix);
     }
     jQuery(document).ready(function() {
         // Handle submit buttons that need confirmation
         jQuery("input.evals-show-confirm").click(function() {
-            return <portlet:namespace/>confirmBox(this);
+            var buttonText = jQuery(this).val();
+            return <portlet:namespace/>confirmBox(buttonText);
         });
-        // Handle buttons in action menu bar that need confirmation
+        // Handle the links in action menu bar that need confirmation
         jQuery("span.evals-show-confirm a").click(function() {
-            var response = <portlet:namespace/>confirmBox(this);
+            var buttonText = "";
+            if (jQuery(this).children()[0] != undefined) {
+                buttonText = jQuery(this).children("img").attr("alt");
+            } else {
+                buttonText = jQuery(this).html();
+            }
+
+            var response = <portlet:namespace/>confirmBox(buttonText);
             if (response) {
                 Liferay.Util.forcePost(this);
                 return false;

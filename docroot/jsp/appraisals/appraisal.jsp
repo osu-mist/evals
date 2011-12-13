@@ -61,6 +61,7 @@
                 label="true"
                 message="appraisal-move-to-results-due"
                 cssClass="evals-show-confirm"
+                toolTip="appraisal-move-to-results-due"
             /></li>
         </c:if>
     </ul>
