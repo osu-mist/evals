@@ -52,9 +52,6 @@ public class Actions {
 
     private HashMap<String, Object> requestMap = new HashMap<String, Object>();
 
-    private static Log _log = LogFactoryUtil.getLog(Actions.class);
-
-
     /**
      * Takes the request object and creates POJO objects. Then it calls the respective
      * Hibernate util classes passing the POJOs to handle the saving of data and
