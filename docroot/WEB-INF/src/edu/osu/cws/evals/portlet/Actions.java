@@ -851,7 +851,9 @@ public class Actions {
         }
 
 
-        if (appraisal.getStatus().equals(Appraisal.STATUS_RELEASE_DUE) && isLoggedInUserReviewer(request)) {
+        String status = appraisal.getStatus();
+        if ((status.equals(Appraisal.STATUS_RELEASE_DUE) || status.equals(Appraisal.STATUS_CLOSED))
+                && isLoggedInUserReviewer(request)) {
             removeReviewAppraisalInSession(request, appraisal);
         } else {
             updateAppraisalInSession(request, appraisal);
