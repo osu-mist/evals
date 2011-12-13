@@ -14,14 +14,24 @@
                 jQuery('#' + id).show('slow');
             }
         }
+
+    /**
+     * Handles displaying a confirmation pop-up box to the end user. Displays the
+     * name of the pressed button along with the confirmation message.
+     * @param button The button pressed by the end user
+     */
+    function <portlet:namespace/>confirmBox(button) {
+        var question_suffix = " " + jQuery(button).val() + "?";
+        return confirm("<liferay-ui:message key="appraisal-confirm-message" />" + question_suffix);
+    }
     jQuery(document).ready(function() {
         // Handle submit buttons that need confirmation
         jQuery("input.evals-show-confirm").click(function() {
-            return confirm("<liferay-ui:message key="appraisal-confirm-message" />");
+            return <portlet:namespace/>confirmBox(this);
         });
         // Handle buttons in action menu bar that need confirmation
         jQuery("span.evals-show-confirm a").click(function() {
-            var response = confirm("<liferay-ui:message key="appraisal-confirm-message" />");
+            var response = <portlet:namespace/>confirmBox(this);
             if (response) {
                 Liferay.Util.forcePost(this);
                 return false;
