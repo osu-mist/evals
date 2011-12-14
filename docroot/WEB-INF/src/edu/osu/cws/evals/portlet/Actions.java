@@ -843,8 +843,10 @@ public class Actions {
         }
 
         // If the user hit the save draft button, we stay in the same view
-        if (request.getParameter("save-draft") != null) {
-            SessionMessages.add(request, "draft-saved");
+        if (request.getParameter("save-draft") != null || request.getParameter("cancel") != null) {
+            if (request.getParameter("save-draft") != null) {
+                SessionMessages.add(request, "draft-saved");
+            }
             if (response instanceof ActionResponse) {
                 ((ActionResponse) response).setWindowState(WindowState.MAXIMIZED);
             }
