@@ -1304,7 +1304,6 @@ public class Actions {
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
                 CloseOutReason reason = CloseOutReasonMgr.get(id);
                 requestMap.put("reason", reason);
-                useNormalMenu(request);
                 return Constants.JSP_CLOSEOUT_REASON_DELETE;
             }
 
