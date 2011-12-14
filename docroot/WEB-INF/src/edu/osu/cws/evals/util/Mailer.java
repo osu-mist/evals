@@ -336,7 +336,7 @@ public class Mailer {
         String bodyWrapper = emailBundle.getString("email_body");
 
         String body = MessageFormat.format(bodyWrapper, supervisorName,
-                    middleBody, bcDescritor, linkURL, linkURL);
+                    middleBody, bcDescritor, linkURL, helpLinkURL);
         Message msg = email.getMessage();
 
         Address to = email.stringToAddress(emailAddress);
