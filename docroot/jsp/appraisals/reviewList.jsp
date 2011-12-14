@@ -56,8 +56,8 @@
         </tbody>
     </table>
 </c:if>
-<c:if test="${empty appraisals}">
-<p><liferay-ui:message key="no-pending-reviews"/></p>
+<c:if test="${empty appraisals and pageTitle == 'pending-reviews'}">
+    <p><liferay-ui:message key="no-pending-reviews"/></p>
 </c:if>
 
 <script type="text/javascript">
