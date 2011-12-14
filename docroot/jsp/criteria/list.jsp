@@ -26,7 +26,7 @@ addCriteriaURL.setParameter("action", "addCriteria");
             <th><!-- place holder for sortable icon --></th>
             <th>Name</th>
             <th>Description</th>
-            <th>Actions</th>
+            <th><liferay-ui:message key="actions"/></th>
         </tr>
     </thead>
     <tbody>
