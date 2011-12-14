@@ -17,7 +17,7 @@ addCriteriaURL.setParameter("action", "addCriteria");
         image="add_article"
         url="<%= addCriteriaURL.toString() %>"
         label="true"
-        message="Add Evaluation Criteria"
+        message="criteria-add-short"
     /></li>
 </ul>
 <table class="taglib-search-iterator" id="<portlet:namespace/>criteria-list">

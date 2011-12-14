@@ -16,7 +16,7 @@ List criteria = (List) renderRequest.getAttribute("reviewersList");
             image="add_user"
             url="#"
             label="true"
-            message="Add Reviewer"
+            message="reviewer-add"
         />
 
     </li>

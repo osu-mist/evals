@@ -12,7 +12,7 @@
             image="add_article"
             url="#"
             label="true"
-            message="Add Close Out Reason"
+            message="closeout-reason-add"
         />
     </li>
 </ul>

@@ -13,7 +13,7 @@
                 image="add_user"
                 url="#"
                 label="true"
-                message="Add Admin User"
+                message="admin-add"
             />
         </li>
     </ul>
