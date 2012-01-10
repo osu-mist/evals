@@ -103,7 +103,7 @@ public class Mailer {
 
             if (mailTo != null && !mailTo.equals("")) {
                 Address[] to = getRecipients(mailTo, appraisal);
-                if (to.length != 0) {
+                if (to != null && to.length != 0) {
                     msg.addRecipients(Message.RecipientType.TO, to);
                     hasRecipients = true;
                 }
@@ -111,7 +111,7 @@ public class Mailer {
 
             if (mailCC != null && !mailCC.equals("")) {
                 Address[] cc = getRecipients(mailCC, appraisal);
-                if (cc.length != 0) {
+                if (cc != null && cc.length != 0) {
                     msg.addRecipients(Message.RecipientType.CC, cc);
                     hasRecipients = true;
                 }
@@ -119,7 +119,7 @@ public class Mailer {
 
             if (mailBCC != null && !mailBCC.equals("")) {
                 Address[] bcc = getRecipients(mailBCC, appraisal);
-                if (bcc.length != 0) {
+                if (bcc != null && bcc.length != 0) {
                     msg.addRecipients(Message.RecipientType.BCC, bcc);
                     hasRecipients = true;
                 }
