@@ -10,7 +10,6 @@ package edu.osu.cws.evals.util;
 import java.lang.reflect.Method;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
-import java.security.PrivateKey;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map;
@@ -79,80 +78,92 @@ public class Mailer {
      * @param emailType - an EmailType
      * @throws Exception
      */
-    public void sendMail(Appraisal appraisal, EmailType emailType) throws Exception {
-        if (beforeEmailStartDate()) //don't send email before email start date
-            return;
-
+    public void sendMail(Appraisal appraisal, EmailType emailType) {
         String logShortMessage = "";
         String logLongMessage = "";
 
-        if (!(appraisal.getJob().getStatus().equals("A"))) {
-            logShortMessage = "Email not sent";
-            logLongMessage = "Appraisal " + appraisal.getId() +
-                    " not available, job " + appraisal.getJob().getPositionNumber() +
-                    " is not active.";
-            logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
-            return;
-        }
+        try {
+            if (beforeEmailStartDate()) //don't send email before email start date
+                return;
 
-        Message msg = email.getMessage();
-        String mailTo = emailType.getMailTo();
-        String mailCC = emailType.getCc();
-        String mailBCC = emailType.getBcc();
-        boolean hasRecipients = false;
-
-        if (mailTo != null && !mailTo.equals("")) {
-            Address[] to = getRecipients(mailTo, appraisal);
-            if (to.length != 0) {
-                msg.addRecipients(Message.RecipientType.TO, to);
-                hasRecipients = true;
+            if (!(appraisal.getJob().getStatus().equals("A"))) {
+                logShortMessage = "Email not sent";
+                logLongMessage = "Appraisal " + appraisal.getId() +
+                        " not available, job " + appraisal.getJob().getPositionNumber() +
+                        " is not active.";
+                logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
+                return;
             }
-        }
 
-	    if (mailCC != null && !mailCC.equals("")) {
-            Address[] cc = getRecipients(mailCC, appraisal);
-            if (cc.length != 0) {
-                msg.addRecipients(Message.RecipientType.CC, cc);
-                hasRecipients = true;
+            Message msg = email.getMessage();
+            String mailTo = emailType.getMailTo();
+            String mailCC = emailType.getCc();
+            String mailBCC = emailType.getBcc();
+            boolean hasRecipients = false;
+
+            if (mailTo != null && !mailTo.equals("")) {
+                Address[] to = getRecipients(mailTo, appraisal);
+                if (to.length != 0) {
+                    msg.addRecipients(Message.RecipientType.TO, to);
+                    hasRecipients = true;
+                }
             }
-        }
 
-	    if (mailBCC != null && !mailBCC.equals("")) {
-            Address[] bcc = getRecipients(mailBCC, appraisal);
-            if (bcc.length != 0) {
-                msg.addRecipients(Message.RecipientType.BCC, bcc);
-                hasRecipients = true;
+            if (mailCC != null && !mailCC.equals("")) {
+                Address[] cc = getRecipients(mailCC, appraisal);
+                if (cc.length != 0) {
+                    msg.addRecipients(Message.RecipientType.CC, cc);
+                    hasRecipients = true;
+                }
             }
+
+            if (mailBCC != null && !mailBCC.equals("")) {
+                Address[] bcc = getRecipients(mailBCC, appraisal);
+                if (bcc.length != 0) {
+                    msg.addRecipients(Message.RecipientType.BCC, bcc);
+                    hasRecipients = true;
+                }
+            }
+
+            if (!hasRecipients) {
+                return;
+            }
+
+            String addressee = getAddressee(appraisal,mailTo);
+
+            String body = getBody(appraisal, emailType, addressee);
+
+            msg.setContent(body, mimeType);
+
+            msg.setReplyTo(replyTo);
+
+            String subject = emailBundle.getString( "email_" + emailType.getType() + "_subject");
+
+            msg.setSubject(subject);
+            Transport.send(msg);
+
+            Email email = new Email(appraisal.getId(), emailType.getType());
+            EmailMgr.add(email);
+
+            String recipientString = InternetAddress.toString(msg.getAllRecipients());
+
+            logShortMessage = emailType.getType() + " email sent for appraisal " + appraisal.getId();
+            logLongMessage = "email of type " + emailType.getType() + " addressed to " + addressee
+                                + " sent to " + mailTo + " (" + recipientString + ")"
+                                + " regarding appraisal " + appraisal.getId()
+                                + " for " + getJobTitle(appraisal) + " " + getEmployeeName(appraisal);
+            logger.log(Logger.INFORMATIONAL, logShortMessage, logLongMessage, logFields);
+        } catch (Exception e) {
+            try {
+                logShortMessage = "Email not sent";
+                Employee employee = appraisal.getJob().getEmployee();
+                logLongMessage = "Error encountered when sending mail to employee " + employee.getName() +
+                        " with OSU ID = " + employee.getOsuid() +", PIDM = " + employee.getId() +
+                        ", job = " + appraisal.getJob().getPositionNumber() + ", appraisal = " +
+                        appraisal.getId() + "\n" + CWSUtil.stackTraceString(e);
+                logger.log(Logger.ERROR,logShortMessage,logLongMessage);
+            } catch (Exception logError) { }
         }
-
-        if (!hasRecipients) {
-            return;
-        }
-
-        String addressee = getAddressee(appraisal,mailTo);
-
-        String body = getBody(appraisal, emailType, addressee);
-
-        msg.setContent(body, mimeType);
-   
-        msg.setReplyTo(replyTo);
-
-        String subject = emailBundle.getString( "email_" + emailType.getType() + "_subject");
-
-        msg.setSubject(subject);
-        Transport.send(msg);
-
-        Email email = new Email(appraisal.getId(), emailType.getType());
-        EmailMgr.add(email);
-
-        String recipientString = InternetAddress.toString(msg.getAllRecipients());
-
-        logShortMessage = emailType.getType() + " email sent for appraisal " + appraisal.getId();
-        logLongMessage = "email of type " + emailType.getType() + " addressed to " + addressee
-                            + " sent to " + mailTo + " (" + recipientString + ")"
-                            + " regarding appraisal " + appraisal.getId()
-                            + " for " + getJobTitle(appraisal) + " " + getEmployeeName(appraisal);
-        logger.log(Logger.INFORMATIONAL, logShortMessage, logLongMessage, logFields);
    }
 
     /**
@@ -310,54 +321,65 @@ public class Mailer {
      * @throws Exception
      */
     public void sendSupervisorMail(Employee supervisor,String middleBody,
-                                   List<Email> emailList) throws Exception {
+                                   List<Email> emailList) {
 
-        String bcName = JobMgr.getBusinessCenter(supervisor.getId());
-        if (bcName == null) //supervisor has no job, Error
-        {
-            String shortMsg = "From sendSupervisorMail: supervisor has no active job";
-            String longMsg = "Supervisor " + supervisor.getName() + ", " +
-                    supervisor.getId() + ", has no active job.";
-            logger.log(Logger.ERROR, shortMsg, longMsg);
-            return;
-        }
+        try {
+            String bcName = JobMgr.getBusinessCenter(supervisor.getId());
+            if (bcName == null) //supervisor has no job, Error
+            {
+                String shortMsg = "From sendSupervisorMail: supervisor has no active job";
+                String longMsg = "Supervisor " + supervisor.getName() + ", " +
+                        supervisor.getId() + ", has no active job.";
+                logger.log(Logger.ERROR, shortMsg, longMsg);
+                return;
+            }
 
-        String bcKey = "businesscenter_" + bcName + "_descriptor";
-        String bcDescritor = emailBundle.getString(bcKey);
+            String bcKey = "businesscenter_" + bcName + "_descriptor";
+            String bcDescritor = emailBundle.getString(bcKey);
 
-        String supervisorName = supervisor.getConventionName();
-        String emailAddress = supervisor.getEmail();
+            String supervisorName = supervisor.getConventionName();
+            String emailAddress = supervisor.getEmail();
 
-        if (emailAddress == null || emailAddress.equals("")) {
-            logNullEmail(supervisor);
-            return;
-        }
+            if (emailAddress == null || emailAddress.equals("")) {
+                logNullEmail(supervisor);
+                return;
+            }
 
-        String bodyWrapper = emailBundle.getString("email_body");
+            String bodyWrapper = emailBundle.getString("email_body");
 
-        String body = MessageFormat.format(bodyWrapper, supervisorName,
-                    middleBody, bcDescritor, linkURL, linkURL, helpLinkURL, helpLinkURL);
-        Message msg = email.getMessage();
+            String body = MessageFormat.format(bodyWrapper, supervisorName,
+                        middleBody, bcDescritor, linkURL, linkURL, helpLinkURL, helpLinkURL);
+            Message msg = email.getMessage();
 
-        Address to = email.stringToAddress(emailAddress);
-        String supervisorSubject = emailBundle.getString("email_supervisor_subject");
+            Address to = email.stringToAddress(emailAddress);
+            String supervisorSubject = emailBundle.getString("email_supervisor_subject");
 
-        msg.addRecipient(Message.RecipientType.TO, to);
-        msg.setContent(body, mimeType);
-        msg.setSubject(supervisorSubject);
+            msg.addRecipient(Message.RecipientType.TO, to);
+            msg.setContent(body, mimeType);
+            msg.setSubject(supervisorSubject);
 
-        Transport.send(msg);
-        EmailMgr.add(emailList);
+            Transport.send(msg);
+            EmailMgr.add(emailList);
 
-        for (Email email : emailList) {
-            Integer appraisalId = email.getAppraisalId();
-            String emailType = email.getEmailType();
-            email.getEmailType();
-            String logStatus = Logger.INFORMATIONAL;
-            String logShortMessage = emailType + " email sent to for appraisal " + appraisalId;
-            String logLongMessage = emailType + " mail sent to " + emailAddress + " for appraisal " + appraisalId; 
+            for (Email email : emailList) {
+                Integer appraisalId = email.getAppraisalId();
+                String emailType = email.getEmailType();
+                email.getEmailType();
+                String logStatus = Logger.INFORMATIONAL;
+                String logShortMessage = emailType + " email sent to for appraisal " + appraisalId;
+                String logLongMessage = emailType + " mail sent to " + emailAddress + " for appraisal " + appraisalId;
 
-            logger.log(logStatus, logShortMessage, logLongMessage);
+                logger.log(logStatus, logShortMessage, logLongMessage);
+            }
+        } catch (Exception e) {
+            String logLongMessage = "";
+            String shortMessage = "Error in sendSupervisorMail";
+            try {
+                logLongMessage = "Error encountered when sending mail to supervisor " +
+                        supervisor.getName() + " with OSU ID = " + supervisor.getOsuid() +
+                        ", PIDM = " + supervisor.getId() + "\n" + CWSUtil.stackTraceString(e);
+                logger.log(Logger.ERROR, shortMessage, logLongMessage);
+            } catch (Exception logError) { }
         }
     }
 
@@ -368,29 +390,38 @@ public class Mailer {
      * @param OverDueCount
      * @throws Exception
      */
-    public void sendReviewerMail(String[] emailAddresses, int dueCount, int OverDueCount)
-            throws Exception {
-        String bodyString = emailBundle.getString("email_reviewers");
-        String msgs = emailBundle.getString("email_reviewDue_body");
-        String middleBody = MessageFormat.format(msgs, dueCount, OverDueCount);
-        String body = MessageFormat.format(bodyString, middleBody, linkURL, linkURL);
-        Message msg = email.getMessage();
-        String reviewerSubject = emailBundle.getString("email_reviewer_subject");
+    public void sendReviewerMail(String[] emailAddresses, int dueCount, int OverDueCount) {
+        try {
+            String bodyString = emailBundle.getString("email_reviewers");
+            String msgs = emailBundle.getString("email_reviewDue_body");
+            String middleBody = MessageFormat.format(msgs, dueCount, OverDueCount);
+            String body = MessageFormat.format(bodyString, middleBody, linkURL, linkURL);
+            Message msg = email.getMessage();
+            String reviewerSubject = emailBundle.getString("email_reviewer_subject");
 
-        Address[] recipients = new Address[emailAddresses.length];
-        int i = 0;
-        for (String recipient : emailAddresses) {
-            if (recipient != null && !recipient.equals("")) {
-                recipients[i++] = email.stringToAddress(recipient);
+            Address[] recipients = new Address[emailAddresses.length];
+            int i = 0;
+            for (String recipient : emailAddresses) {
+                if (recipient != null && !recipient.equals("")) {
+                    recipients[i++] = email.stringToAddress(recipient);
+                }
             }
-        }
 
-        msg.addRecipients(Message.RecipientType.TO, recipients);
-        msg.setContent(body, mimeType);
-        msg.setSubject(reviewerSubject);
-        Transport.send(msg);
-        String longMsg = "Emails sent to: " + Arrays.toString(emailAddresses);
-        logger.log(Logger.INFORMATIONAL, "Reviewer emails sent to", longMsg);
+            msg.addRecipients(Message.RecipientType.TO, recipients);
+            msg.setContent(body, mimeType);
+            msg.setSubject(reviewerSubject);
+            Transport.send(msg);
+            String longMsg = "Emails sent to: " + Arrays.toString(emailAddresses);
+            logger.log(Logger.INFORMATIONAL, "Reviewer emails sent to", longMsg);
+        } catch (Exception e) {
+            String logLongMessage = "";
+            String shortMessage = "Error in sendReviewerMail";
+            try {
+                logLongMessage = "Error encountered when sending mail to reviewers =  " +
+                        emailAddresses.toString() + "\n" + CWSUtil.stackTraceString(e);
+                logger.log(Logger.ERROR, shortMessage, logLongMessage);
+            } catch (Exception logError) { }
+        }
 
     }
 
