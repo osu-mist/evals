@@ -294,7 +294,7 @@ public class Actions {
         requestMap.put("alertMsg", config.getBoolean("alert.display"));
         requestMap.put("isHome", true);
 
-        setupMyActiveAppraisals(request, employeeId, null);
+        setupMyActiveAppraisals(request, employeeId);
         setupMyTeamActiveAppraisals(request, employeeId);
         ArrayList<Appraisal> myActiveAppraisals = (ArrayList<Appraisal>) requestMap.get("myActiveAppraisals");
         ArrayList<Appraisal> myTeamsActiveAppraisals  =
@@ -332,15 +332,11 @@ public class Actions {
      *
      * @param request
      * @param employeeId    Id/Pidm of the currently logged in user
-     * @param firstAnnual   First annual appraisal created after trial appraisal is completed
      * @throws Exception
      */
-    private void setupMyActiveAppraisals(PortletRequest request, int employeeId, Appraisal firstAnnual)
+    private void setupMyActiveAppraisals(PortletRequest request, int employeeId)
             throws Exception {
         List<Appraisal> allMyActiveAppraisals = getMyActiveAppraisals(request, employeeId);
-        if (firstAnnual != null) {
-            allMyActiveAppraisals.add(firstAnnual);
-        }
         requestMap.put("myActiveAppraisals", allMyActiveAppraisals);
     }
 
@@ -830,13 +826,11 @@ public class Actions {
             if (signAppraisal != null && !signAppraisal.equals("")) {
                 action = "sign-appraisal";
             }
-            Appraisal firstAnnual = appraisalMgr.createFirstAnnualAppraisal(appraisal, configurationMap, action);
-
 
             if (appraisal.getRole().equals("supervisor")) {
                 setupMyTeamActiveAppraisals(request, currentlyLoggedOnUser.getId());
             } else if (appraisal.getRole().equals("employee")) {
-                setupMyActiveAppraisals(request, currentlyLoggedOnUser.getId(), firstAnnual);
+                setupMyActiveAppraisals(request, currentlyLoggedOnUser.getId());
             }
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
