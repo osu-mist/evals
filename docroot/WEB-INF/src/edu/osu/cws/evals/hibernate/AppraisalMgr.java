@@ -198,7 +198,6 @@ public class AppraisalMgr {
             for (Assessment origAssesment: trialAppraisal.getAssessments()) {
                 newAssessment = new Assessment();
                 newAssessment.setCriterionDetail(origAssesment.getCriterionDetail());
-                newAssessment.setNewGoals(origAssesment.getNewGoals()); //@todo: Joan: no need to set newGoals.
                 newAssessment.setGoal(origAssesment.getGoal());
                 newAssessment.setAppraisal(appraisal);
                 newAssessment.setCreateDate(new Date());
@@ -325,25 +324,20 @@ public class AppraisalMgr {
     /**
      * Creates the first annual appraisal if needed. The first annual appraisal is created if:
      *  1) The current appraisal is of type: trial
-     *  2) the action is sign-appraisal
-     *  3) The job annual_indicator != 0
+     *  2) The job annual_indicator != 0
      *
      * @param appraisal
      * @param configurationMap
-     * @param action
      * @throws Exception
      * @return appraisal    The first annual appraisal created, null otherwise
      */
-    public Appraisal createFirstAnnualAppraisal(Appraisal appraisal,
-                                                Map<String, Configuration>  configurationMap, String action)
+    public static Appraisal createFirstAnnualAppraisal(Appraisal appraisal,
+                                                Map<String, Configuration>  configurationMap)
             throws Exception {
         Job job = appraisal.getJob();
         Configuration resultsDueConfig = configurationMap.get(Appraisal.STATUS_RESULTS_DUE);
 
         if (!appraisal.getType().equals(Appraisal.TYPE_TRIAL)) {
-            return null;
-        }
-        if (!action.equals("sign-appraisal")) {
             return null;
         }
         if (job.getAnnualInd() == 0) {
@@ -357,6 +351,23 @@ public class AppraisalMgr {
             return null;
         }
         return AppraisalMgr.createInitialAppraisalAfterTrial(appraisal, resultsDueConfig);
+    }
+
+    /**
+     * Returns the first trial appraisal for the given job.
+     *
+     * @param job
+     * @return trialAppraisal
+     */
+    public static Appraisal getFirstTrialAppraisal(Job job) {
+        Session session = HibernateUtil.getCurrentSession();
+
+        Appraisal trialAppraisal = (Appraisal) session.getNamedQuery("appraisal.getFirstTrialAppraisal")
+                .setInteger("pidm", job.getEmployee().getId())
+                .setString("posno", job.getPositionNumber())
+                .setString("suffix", job.getSuffix())
+                .uniqueResult();
+        return trialAppraisal;
     }
 
     /**
