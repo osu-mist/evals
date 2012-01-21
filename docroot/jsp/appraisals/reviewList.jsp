@@ -13,7 +13,8 @@
 </ul>
 
 <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-    <portlet:param name="action" value="searchAppraisals"/>
+    <portlet:param name="action" value="search"/>
+    <portlet:param name="controller" value="AppraisalsAction"/>
     </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" class="search" method="post">
     <fieldset id="pass-user-add">
         <legend><liferay-ui:message key="search"/></legend>
@@ -48,7 +49,8 @@
             <td>${appraisal.job.orgCodeDescription}</td>
             <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
                                 <portlet:param name="id" value="${appraisal.id}"/>
-                                <portlet:param  name="action" value="displayAppraisal"/>
+                                <portlet:param  name="action" value="display"/>
+                                <portlet:param  name="controller" value="AppraisalsAction"/>
                                </portlet:actionURL>">
                <liferay-ui:message key="${appraisal.viewStatus}"/></a></td>
         </tr>

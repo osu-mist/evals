@@ -1,6 +1,6 @@
 /**
  * Portlet class for PASS project, used to handle the processAction and doView
- * requests. It relies heavily on the Actions class to figure out which classes
+ * requests. It relies heavily on the ActionHelper class to figure out which classes
  * to delegate the work to.
  */
 
@@ -63,7 +63,7 @@ public class EvalsPortlet extends GenericPortlet {
     /**
      * The actions class
      */
-    private Actions actionClass = new Actions();
+    private ActionHelper actionHelper = new ActionHelper();
 
     public void doDispatch(
 			RenderRequest renderRequest, RenderResponse renderResponse)
@@ -81,7 +81,7 @@ public class EvalsPortlet extends GenericPortlet {
 
     /**
      * This method expects an "action" as a renderRequest parameter. If there is one, it tries
-     * to call Actions.action method. If that method does not exist it calls the default home
+     * to call ActionHelper.action method. If that method does not exist it calls the default home
      * action.
      *
      * @param renderRequest     Portlet RenderRequest object
@@ -99,7 +99,7 @@ public class EvalsPortlet extends GenericPortlet {
         if (viewJSP == null) {
             delegate(renderRequest, renderResponse);
         }
-        actionClass.setRequestAttributes(renderRequest);
+        actionHelper.setRequestAttributes(renderRequest);
 
         include(viewJSP, renderRequest, renderResponse);
         viewJSP = null;
@@ -118,21 +118,29 @@ public class EvalsPortlet extends GenericPortlet {
         Method actionMethod;
         String resourceID;
         Session hibSession = null;
-        actionClass.setPortletContext(getPortletContext());
+        actionHelper.setPortletContext(getPortletContext());
 
         // The logic below is similar to delegate method, but instead we
-        // need to return the value we get from Actions method instead of
+        // need to return the value we get from ActionHelper method instead of
         // assign it to viewJSP
         resourceID = request.getResourceID();
-        if (resourceID != null) {
+        String controllerClass =  ParamUtil.getString(request, "controller", "HomeAction");
+        if (resourceID != null && controllerClass != null) {
             try {
+                controllerClass = "edu.osu.cws.evals.portlet." + controllerClass;
+                ActionInterface controller = (ActionInterface) Class.forName(controllerClass).newInstance();
+                controller.setActionHelper(actionHelper);
+                HomeAction homeAction = new HomeAction();
+                homeAction.setActionHelper(actionHelper);
+                controller.setHomeAction(homeAction);
+
                 hibSession = HibernateUtil.getCurrentSession();
                 Transaction tx = hibSession.beginTransaction();
-                actionMethod = Actions.class.getDeclaredMethod(resourceID, PortletRequest.class,
-                        PortletResponse.class);
+                Method controllerMethod = controller.getClass().getDeclaredMethod(
+                        resourceID, PortletRequest.class, PortletResponse.class);
 
                 // The resourceID methods return the init-param of the path
-                result = (String) actionMethod.invoke(actionClass, request, response);
+                result = (String) controllerMethod.invoke(controller, request, response);
                 tx.commit();
 
                 // If there was no string returned by the Action method, we return immediately
@@ -156,9 +164,9 @@ public class EvalsPortlet extends GenericPortlet {
     }
 
     /**
-     * Delegate method will call the respective method in the Actions class and pass the request
-     * and response objects. The method called in Actions is based on the "action" parameter value.
-     * The delegated methods in Actions class return the path to the jsp file that should be loaded.
+     * Delegate method will call the respective method in the ActionHelper class and pass the request
+     * and response objects. The method called in ActionHelper is based on the "action" parameter value.
+     * The delegated methods in ActionHelper class return the path to the jsp file that should be loaded.
      * Those methods also set any parameters needed by the jsp files.
      *
      * @param request   PortletRequest
@@ -166,24 +174,32 @@ public class EvalsPortlet extends GenericPortlet {
      * @throws Exception
      */
     public void delegate(PortletRequest request, PortletResponse response) {
-        Method actionMethod;
         String action = "delegate";
         Session hibSession = null;
 
         try {
-            actionClass.setPortletContext(getPortletContext());
+            actionHelper.setPortletContext(getPortletContext());
             portletSetup(request);
             hibSession = HibernateUtil.getCurrentSession();
             Transaction tx = hibSession.beginTransaction();
-            actionClass.setUpUserPermissionInSession(request, false);
+            actionHelper.setUpUserPermissionInSession(request, false);
 
             // The portlet action can be set by the action/renderURLs using "action" as the parameter
             // name
-            action =  ParamUtil.getString(request, "action", "displayHomeView");
+            action =  ParamUtil.getString(request, "action", "display");
+            String controllerClass =  ParamUtil.getString(request, "controller", "HomeAction");
+            if (controllerClass != null && !action.equals("")) {
+                controllerClass = "edu.osu.cws.evals.portlet." + controllerClass;
 
-            if (!action.equals("")) {
-                actionMethod = Actions.class.getDeclaredMethod(action, PortletRequest.class, PortletResponse.class);
-                viewJSP = (String) actionMethod.invoke(actionClass, request, response);
+                ActionInterface controller = (ActionInterface) Class.forName(controllerClass).newInstance();
+                controller.setActionHelper(actionHelper);
+                HomeAction homeAction = new HomeAction();
+                homeAction.setActionHelper(actionHelper);
+                controller.setHomeAction(homeAction);
+
+                Method controllerMethod = controller.getClass().getDeclaredMethod(
+                        action, PortletRequest.class, PortletResponse.class);
+                viewJSP = (String) controllerMethod.invoke(controller, request, response);
             }
             tx.commit();
         } catch (Exception e) {
@@ -217,14 +233,14 @@ public class EvalsPortlet extends GenericPortlet {
     private void portletSetup(PortletRequest request) throws Exception {
         if (getPortletContext().getAttribute("environmentProp") == null) {
             Session hibSession = null;
-            actionClass.setPortletContext(getPortletContext());
+            actionHelper.setPortletContext(getPortletContext());
             String message = loadEnvironmentProperties(request);
             createLogger();
 
             try {
                 hibSession = HibernateUtil.getCurrentSession();
                 Transaction tx = hibSession.beginTransaction();
-                actionClass.setEvalsConfiguration(false);
+                actionHelper.setEvalsConfiguration(false);
                 message += "Stored Configuration Map and List in portlet context\n";
                 createMailer();
                 message += "Mailer setup successfully\n";
@@ -238,8 +254,8 @@ public class EvalsPortlet extends GenericPortlet {
                 getPortletContext().setAttribute(CONTEXT_CACHE_TIMESTAMP, currentTimestamp);
                 message += "Stored contextCacheTimestamp of " + currentTimestamp.toString() + "\n";
 
-                actionClass.setEvalsAdmins(false);
-                actionClass.setEvalsReviewers(false);
+                actionHelper.setEvalsAdmins(false);
+                actionHelper.setEvalsReviewers(false);
                 tx.commit();
                 EvalsLogger logger =  getLog();
                 if (logger != null) {
@@ -369,7 +385,7 @@ public class EvalsPortlet extends GenericPortlet {
                     employee = loggedOnUser.toString();
                 }
                 grayLogFields.put("logged-in-user", employee);
-                String onidUsername = actionClass.getLoggedOnUsername(request);
+                String onidUsername = actionHelper.getLoggedOnUsername(request);
                 grayLogFields.put("onid-username", onidUsername);
                 logger.log(level, shortMessage, e, grayLogFields);
             }

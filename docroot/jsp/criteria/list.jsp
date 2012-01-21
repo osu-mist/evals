@@ -3,9 +3,10 @@
 <%
 List criteria = (List) renderRequest.getAttribute("criteria");
 
-PortletURL addCriteriaURL = renderResponse.createRenderURL();
-addCriteriaURL.setWindowState(WindowState.MAXIMIZED);
-addCriteriaURL.setParameter("action", "addCriteria");
+PortletURL addURL = renderResponse.createRenderURL();
+addURL.setWindowState(WindowState.MAXIMIZED);
+addURL.setParameter("action", "add");
+addURL.setParameter("controller", "CriteriaAreasAction");
 %>
 
 <h2><liferay-ui:message key="Criteria" /></h2>
@@ -15,7 +16,7 @@ addCriteriaURL.setParameter("action", "addCriteria");
 <ul class="actions">
     <li><liferay-ui:icon
         image="add_article"
-        url="<%= addCriteriaURL.toString() %>"
+        url="<%= addURL.toString() %>"
         label="true"
         message="criteria-add-short"
     /></li>
@@ -45,13 +46,15 @@ addCriteriaURL.setParameter("action", "addCriteria");
             onclick="return <portlet:namespace/>edit(${criterion.id});" href="<portlet:renderURL
             windowState="<%= WindowState.MAXIMIZED.toString() %>">
             <portlet:param name="criterionAreaId" value="${criterion.id}"/>
-            <portlet:param name="action" value="editCriteria"/>
+            <portlet:param name="action" value="edit"/>
+            <portlet:param name="controller" value="CriteriaAreasAction"/>
         </portlet:renderURL>"><liferay-ui:message key="edit"/></a>
         <a class="<portlet:namespace/>criterion-delete"
             onclick="return <portlet:namespace/>delete(${criterion.id}, '${criterion.name}');" href="<portlet:renderURL
             windowState="<%= WindowState.MAXIMIZED.toString() %>">
             <portlet:param name="id" value="${criterion.id}"/>
-            <portlet:param name="action" value="deleteCriteria"/>
+            <portlet:param name="action" value="delete"/>
+            <portlet:param name="controller" value="CriteriaAreasAction"/>
         </portlet:renderURL>"><liferay-ui:message key="delete"/></a></td>
     </tr>
 </c:forEach>
@@ -59,8 +62,8 @@ addCriteriaURL.setParameter("action", "addCriteria");
 
 </table>
 
-<portlet:resourceURL var="deleteAJAXURL" id="deleteCriteria" escapeXml="false" />
-<portlet:resourceURL var="updateSequenceAJAXURL" id="updateCriteriaSequence" escapeXml="false" />
+<portlet:resourceURL var="deleteAJAXURL" id="delete" escapeXml="false" />
+<portlet:resourceURL var="updateSequenceAJAXURL" id="updateSequence" escapeXml="false" />
 <script type="text/javascript">
   // Delete Criteria JS
   function <portlet:namespace/>delete(id, name) {
@@ -68,7 +71,7 @@ addCriteriaURL.setParameter("action", "addCriteria");
     if (answer == false) {
       return false;
     }
-    var querystring = {'id': id};
+    var querystring = {'id': id, 'controller': "CriteriaAreasAction"};
     jQuery.ajax({
       type: "POST",
       url: "<%=renderResponse.encodeURL(deleteAJAXURL.toString())%>",

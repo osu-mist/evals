@@ -5,7 +5,8 @@
 
 <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
     <portlet:param name="id" value="${reviewer.id}"/>
-    <portlet:param name="action" value="deleteReviewer"/>
+    <portlet:param name="action" value="delete"/>
+    <portlet:param name="controller" value="ReviewersAction"/>
     </portlet:actionURL>" method="post">
 
     <p><liferay-ui:message key="reviewer-delete-confirm"/>: ${reviewer.employee.name} ?</p>

@@ -5,7 +5,8 @@
 
 <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
     <portlet:param name="id" value="${criterion.id}"/>
-    <portlet:param name="action" value="deleteCriteria"/>
+    <portlet:param name="action" value="delete"/>
+    <portlet:param name="controller" value="CriteriaAreasAction"/>
     </portlet:actionURL>" method="post">
 
     <p><liferay-ui:message key="criteria-delete-confirm"/>: ${criterion.name} ?</p>

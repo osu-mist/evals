@@ -1,6 +1,6 @@
 <%@ include file="/jsp/init.jsp"%>
-<c:set var="deleteAction" value="deleteReviewer"/>
-<c:set var="addAction" value="addReviewer"/>
+<c:set var="deleteAction" value="delete"/>
+<c:set var="addAction" value="add"/>
 
 <%
 List criteria = (List) renderRequest.getAttribute("reviewersList");
@@ -25,6 +25,7 @@ List criteria = (List) renderRequest.getAttribute("reviewersList");
 
   <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
       <portlet:param name="action" value="${addAction}"/>
+      <portlet:param name="controller" value="ReviewersAction"/>
       </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
       <fieldset id="pass-user-add">
           <legend><liferay-ui:message key="reviewer-add"/></legend>
@@ -65,6 +66,7 @@ List criteria = (List) renderRequest.getAttribute("reviewersList");
                 windowState="<%= WindowState.MAXIMIZED.toString() %>">
                 <portlet:param name="id" value="${user.id}"/>
                 <portlet:param name="action" value="${deleteAction}"/>
+                <portlet:param name="controller" value="ReviewersAction"/>
             </portlet:renderURL>"><liferay-ui:message key="delete"/></a></td>
         </tr>
         </c:forEach>

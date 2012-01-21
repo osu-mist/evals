@@ -1,11 +1,11 @@
 package edu.osu.cws.evals.hibernate;
 
 import edu.osu.cws.evals.models.*;
+import edu.osu.cws.evals.portlet.ActionHelper;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
-import edu.osu.cws.evals.portlet.Actions;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.type.StandardBasicTypes;
@@ -33,8 +33,6 @@ public class AppraisalMgr {
     private Mailer mailer;
     Map<String, Configuration> configurationMap;
     private PermissionRule permissionRule;
-
-
 
     public AppraisalMgr() {
         SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
@@ -479,7 +477,7 @@ public class AppraisalMgr {
         }
 
         // Save the close out reason
-        if (appraisal.getRole().equals(Actions.ROLE_REVIEWER) || appraisal.getRole().equals("admin")) {
+        if (appraisal.getRole().equals(ActionHelper.ROLE_REVIEWER) || appraisal.getRole().equals("admin")) {
             if (request.get("appraisal.closeOutReasonId") != null) {
                 int closeOutReasonId = Integer.parseInt(request.get("appraisal.closeOutReasonId")[0]);
                 CloseOutReason reason = CloseOutReasonMgr.get(closeOutReasonId);

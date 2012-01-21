@@ -2,23 +2,28 @@
 <%
 PortletURL criteriaListURL = renderResponse.createRenderURL();
 criteriaListURL.setWindowState(WindowState.MAXIMIZED);
-criteriaListURL.setParameter("action", "listCriteria");
+criteriaListURL.setParameter("action", "list");
+criteriaListURL.setParameter("controller", "CriteriaAreasAction");
 
 PortletURL adminListURL = renderResponse.createRenderURL();
 adminListURL.setWindowState(WindowState.MAXIMIZED);
-adminListURL.setParameter("action", "listAdmin");
+adminListURL.setParameter("action", "list");
+adminListURL.setParameter("controller", "AdminsAction");
 
 PortletURL reviewerListURL = renderResponse.createRenderURL();
 reviewerListURL.setWindowState(WindowState.MAXIMIZED);
-reviewerListURL.setParameter("action", "listReviewer");
+reviewerListURL.setParameter("action", "list");
+reviewerListURL.setParameter("controller", "ReviewersAction");
 
 PortletURL configurationListURL = renderResponse.createRenderURL();
 configurationListURL.setWindowState(WindowState.MAXIMIZED);
-configurationListURL.setParameter("action", "listConfiguration");
+configurationListURL.setParameter("action", "list");
+configurationListURL.setParameter("controller", "ConfigurationsAction");
 
 PortletURL closeOutReasonListURL = renderResponse.createRenderURL();
 closeOutReasonListURL.setWindowState(WindowState.MAXIMIZED);
-closeOutReasonListURL.setParameter("action", "listCloseOutReasons");
+closeOutReasonListURL.setParameter("action", "list");
+closeOutReasonListURL.setParameter("controller", "CloseOutAction");
 %>
 
 <c:if test="${isAdmin == 'true'}">

@@ -4,7 +4,8 @@
 
 <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
     <portlet:param name="id" value="${reason.id}"/>
-    <portlet:param name="action" value="deleteCloseOutReason"/>
+    <portlet:param name="action" value="delete"/>
+    <portlet:param name="controller" value="CloseOutAction"/>
     </portlet:actionURL>" method="post">
 
     <p><liferay-ui:message key="closeout-reason-delete-confirm"/> "<c:out value="${reason.reason}"/>" ?</p>

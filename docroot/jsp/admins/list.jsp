@@ -1,6 +1,6 @@
 <%@ include file="/jsp/init.jsp"%>
-<c:set var="deleteAction" value="deleteAdmin"/>
-<c:set var="addAction" value="addAdmin"/>
+<c:set var="deleteAction" value="delete"/>
+<c:set var="addAction" value="add"/>
 
 <h2><liferay-ui:message key="admins-list-title"/></h2>
 <liferay-ui:success key="admin-saved" message="admin-saved" />
@@ -22,6 +22,7 @@
 
     <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
         <portlet:param name="action" value="${addAction}"/>
+        <portlet:param name="controller" value="AdminsAction"/>
         </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
         <fieldset id="pass-user-add">
             <legend><liferay-ui:message key="admin-add"/></legend>
@@ -75,6 +76,7 @@
                     windowState="<%= WindowState.MAXIMIZED.toString() %>">
                     <portlet:param name="id" value="${user.id}"/>
                     <portlet:param name="action" value="${deleteAction}"/>
+                    <portlet:param name="controller" value="AdminsAction"/>
                 </portlet:renderURL>"><liferay-ui:message key="delete"/></a></td>
             </c:if>
         </tr>

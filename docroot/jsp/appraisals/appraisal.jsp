@@ -5,18 +5,22 @@
 <jsp:useBean id="permissionRule" class="edu.osu.cws.evals.models.PermissionRule" scope="request" />
 <portlet:resourceURL var="downloadPDFURL" id="downloadPDF" escapeXml="false">
     <portlet:param name="id" value="${appraisal.id}"/>
+    <portlet:param name="controller" value="AppraisalsAction"/>
 </portlet:resourceURL>
 <portlet:actionURL var="resendAppraisalToNolij" escapeXml="false">
     <portlet:param name="id" value="${appraisal.id}"/>
     <portlet:param name="action" value="resendAppraisalToNolij"/>
+    <portlet:param name="controller" value="AppraisalsAction"/>
 </portlet:actionURL>
 <portlet:actionURL var="closeAppraisal" escapeXml="false">
     <portlet:param name="id" value="${appraisal.id}"/>
     <portlet:param name="action" value="closeOutAppraisal"/>
+    <portlet:param name="controller" value="AppraisalsAction"/>
 </portlet:actionURL>
 <portlet:actionURL var="setAppraisalStatus" escapeXml="false">
     <portlet:param name="id" value="${appraisal.id}"/>
     <portlet:param name="action" value="setStatusToResultsDue"/>
+    <portlet:param name="controller" value="AppraisalsAction"/>
 </portlet:actionURL>
 
 <div id="pass-appraisal-form" class="osu-cws">
@@ -71,7 +75,8 @@
     <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}">
     <form class="appraisal" id="<portlet:namespace />fm"
         action="<portlet:actionURL windowState="<%= WindowState.NORMAL.toString() %>">
-        <portlet:param name="action" value="updateAppraisal" />
+        <portlet:param name="action" value="update" />
+        <portlet:param name="controller" value="AppraisalsAction" />
         </portlet:actionURL>" method="post" name="<portlet:namespace />request_form">
 
         <input type="hidden" name="id" value="${appraisal.id}"/>

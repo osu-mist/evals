@@ -75,10 +75,10 @@
             </tr>
         </c:forEach>
 
-<portlet:resourceURL var="editAJAXURL" id="editConfiguration" escapeXml="false" />
+<portlet:resourceURL var="editAJAXURL" id="edit" escapeXml="false" />
 <script type="text/javascript">
     function saveConfig(settingId, settingValue) {
-        var querystring = {'id': settingId, 'value': settingValue};
+        var querystring = {'id': settingId, 'value': settingValue, 'controller': "ConfigurationsAction"};
         jQuery.ajax({
             type: "POST",
             url: "<%=renderResponse.encodeURL(editAJAXURL.toString())%>",

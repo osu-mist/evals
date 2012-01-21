@@ -5,7 +5,8 @@
 
 <form action="<portlet:actionURL windowState="<%= WindowState.NORMAL.toString() %>">
     <portlet:param name="id" value="${appraisal.id}"/>
-    <portlet:param name="action" value="updateAppraisal"/>
+    <portlet:param name="action" value="update"/>
+    <portlet:param name="controller" value="AppraisalsAction"/>
     </portlet:actionURL>" method="post">
 
     <input type="hidden" name="id" value="${appraisal.id}"/>

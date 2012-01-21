@@ -5,7 +5,8 @@
 
 <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
     <portlet:param name="id" value="${admin.id}"/>
-    <portlet:param name="action" value="deleteAdmin"/>
+    <portlet:param name="action" value="delete"/>
+    <portlet:param name="controller" value="AdminsAction"/>
     </portlet:actionURL>" method="post">
 
     <p><liferay-ui:message key="admin-delete-confirm"/>: ${admin.employee.name} ?</p>

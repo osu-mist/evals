@@ -1,6 +1,6 @@
 <%@ include file="/jsp/init.jsp"%>
-<c:set var="addAction" value="addCloseOutReason"/>
-<c:set var="deleteAction" value="deleteCloseOutReason"/>
+<c:set var="addAction" value="add"/>
+<c:set var="deleteAction" value="delete"/>
 
 <h2><liferay-ui:message key="closeout-reason-list-title"/></h2>
 <liferay-ui:success key="closeout-reason-added" message="closeout-reason-added" />
@@ -21,6 +21,7 @@
 
 <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
     <portlet:param name="action" value="${addAction}"/>
+    <portlet:param name="controller" value="CloseOutAction"/>
     </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
     <fieldset id="pass-user-add">
         <legend><liferay-ui:message key="closeout-reason-add"/></legend>
@@ -52,6 +53,7 @@
                     windowState="<%= WindowState.MAXIMIZED.toString() %>">
                     <portlet:param name="id" value="${closeOutReason.id}"/>
                     <portlet:param name="action" value="${deleteAction}"/>
+                    <portlet:param name="controller" value="CloseOutAction"/>
                 </portlet:renderURL>"><liferay-ui:message key="delete"/></a>
             </td>
         </tr>

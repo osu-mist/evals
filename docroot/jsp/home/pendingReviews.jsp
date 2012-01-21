@@ -26,7 +26,8 @@
                             </td>
                             <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
                                 <portlet:param name="id" value="${shortAppraisal.id}"/>
-                                <portlet:param  name="action" value="displayAppraisal"/>
+                                <portlet:param  name="action" value="display"/>
+                                <portlet:param  name="controller" value="AppraisalsAction"/>
                                </portlet:actionURL>"><liferay-ui:message key="${shortAppraisal.viewStatus}" /></a>
                             </td>
                         </tr>
@@ -36,7 +37,8 @@
                         <tr>
                             <td colspan="4">
                                   <a href="<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-                                    <portlet:param name="action" value="displayReviewList"/>
+                                    <portlet:param name="action" value="reviewList"/>
+                                    <portlet:param name="controller" value="AppraisalsAction"/>
                                     </portlet:renderURL>" class="more-link"><span><liferay-ui:message key="pending-reviews-more"/></span></a>
                             </td>
                         </tr>

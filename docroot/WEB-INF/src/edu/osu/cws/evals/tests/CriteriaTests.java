@@ -276,7 +276,7 @@ public class CriteriaTests {
     }
 
     /**
-     * Tests that when only the criteria name is modified in the editCriteria action,
+     * Tests that when only the criteria name is modified in the edit action,
      * it creates two pojos, and the old criteria is set to deleted.
      * @throws Exception
      */
@@ -329,7 +329,7 @@ public class CriteriaTests {
     }
 
     /**
-     * Tests that when only the criteria description is modified in the editCriteria action,
+     * Tests that when only the criteria description is modified in the edit action,
      * it creates one pojo for the description
      * @throws Exception
      */
@@ -384,7 +384,7 @@ public class CriteriaTests {
     }
 
     /**
-     * Tests that when both criteria name and description are modified in the editCriteria action,
+     * Tests that when both criteria name and description are modified in the edit action,
      * it creates two pojos, and the old criteria is set to deleted.
      * @throws Exception
      */
@@ -441,12 +441,12 @@ public class CriteriaTests {
     }
 
     /**
-     * Tests that when only the criteria description is modified in the editCriteria action,
+     * Tests that when only the criteria description is modified in the edit action,
      * it creates one pojo for the description
      * @throws Exception
      */
     @Test(groups = {"unittest"})
-    public void editCriteriaPropagateShouldOnlyPropagateOnOpenAppraisals() throws Exception {
+    public void editPropagateShouldOnlyPropagateOnOpenAppraisals() throws Exception {
         Map<String, String[]> request = new HashMap<String, String[]>();
         String newCriterionName = "COMMUNICATION SKILLS";
         request.put("name", new String[] {newCriterionName});

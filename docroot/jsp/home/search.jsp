@@ -5,7 +5,8 @@
     </div>
     <div class="accordion-content pass-search" id="<portlet:namespace/>Search" style="display: block;">
         <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-            <portlet:param name="action" value="searchAppraisals" />
+            <portlet:param name="action" value="search" />
+            <portlet:param name="controller" value="AppraisalsAction" />
             </portlet:actionURL>" method="post">
 
             <label for="<portlet:namespace/>osuid"><liferay-ui:message key="search-employee-osuid"/></label>

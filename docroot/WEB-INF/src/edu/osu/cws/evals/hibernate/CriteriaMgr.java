@@ -1,5 +1,5 @@
 /**
- * This class is a hibernate class that is called by the Actions class methods and
+ * This class is a hibernate class that is called by the ActionHelper class methods and
  * receives POJOs. It performs business logic with POJOs and uses Hibernate to save
  * them back to database if appropriate.
  */
