@@ -105,7 +105,7 @@
             job.employee.id = :pidm
     ]]></query>
     <query name="appraisal.getFirstTrialAppraisal"><![CDATA[
-        from new edu.osu.cws.evals.models.Appraisal
+        from edu.osu.cws.evals.models.Appraisal
         WHERE
             job.employee.id = :pidm AND
             job.positionNumber = :posno AND
