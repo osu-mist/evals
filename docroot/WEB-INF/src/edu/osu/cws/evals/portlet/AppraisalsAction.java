@@ -144,7 +144,8 @@ public class AppraisalsAction implements ActionInterface {
             actionHelper.addToRequestMap("pendingReviews", reviews);
         }
 
-        if (actionHelper.isLoggedInUserReviewer(request) && appraisal.getEmployeeSignedDate() != null) {
+        if (actionHelper.isLoggedInUserReviewer(request) && appraisal.getEmployeeSignedDate() != null &&
+                !appraisal.getRole().equals("employee")) {
             actionHelper.addToRequestMap("displayResendNolij", true);
         }
         if ((actionHelper.isLoggedInUserReviewer(request) || actionHelper.isLoggedInUserAdmin(request)) && appraisal.isOpen()
@@ -418,6 +419,12 @@ public class AppraisalsAction implements ActionInterface {
         // 1) Get the appraisal and permission rule
         appraisal = appraisalMgr.getAppraisal(appraisalID);
         permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
+
+        // Permission checks
+        if (permRule != null && actionHelper.isLoggedInUserReviewer(request)
+                && appraisal.getEmployeeSignedDate() != null && !appraisal.getRole().equals("employee")) {
+            permRule = null;
+        }
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
