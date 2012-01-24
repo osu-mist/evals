@@ -1,5 +1,7 @@
 package edu.osu.cws.evals.hibernate;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.ActionHelper;
 import edu.osu.cws.evals.portlet.Constants;
@@ -34,7 +36,7 @@ public class AppraisalMgr {
     private HashMap<Integer, Reviewer> reviewers = new HashMap<Integer, Reviewer>();
     private Mailer mailer;
     Map<String, Configuration> configurationMap;
-    private PermissionRule permissionRule;
+    private static Log _log = LogFactoryUtil.getLog(AppraisalMgr.class);
 
     public AppraisalMgr() {
         SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
@@ -921,35 +923,6 @@ public class AppraisalMgr {
         return getReviewCountByStatus(bcName, Appraisal.STATUS_REVIEW_OVERDUE);
     }
 
-    /**
-     * Updates the status of the given appraisal. This does not check permissions or
-     * the status String.
-     *
-     * @param id
-     * @param status
-     * @throws Exception
-     */
-    public void updateAppraisalStatus(int id, String status) throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        ArrayList<HashMap> myActiveAppraisals;
-        this.updateAppraisalStatus(id, status, session);
-    }
-
-    /**
-     * Updates the status of the given appraisal. This does not check permissions or
-     * the status String. This is just for demo purposes.
-     *
-     * @param id
-     * @param status
-     * @param session
-     * @throws Exception
-     */
-    private void updateAppraisalStatus(int id, String status, Session session) throws Exception {
-        Appraisal appraisal = (Appraisal) session.get(Appraisal.class, id);
-        appraisal.setStatus(status);
-        session.update(appraisal);
-    }
-
     public void setLoggedInUser(Employee loggedInUser) {
         this.loggedInUser = loggedInUser;
     }
@@ -1083,20 +1056,23 @@ public class AppraisalMgr {
     public static void updateAppraisalStatus(Appraisal appraisal, boolean updateOverdue) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         String query = "update edu.osu.cws.evals.models.Appraisal appraisal set status = :status, " +
-                "originalStatus = :origStatus";
+                "originalStatus = :origStatus ";
 
         if (updateOverdue) {
             query += ", overdue = :overdue ";
         }
         query += "where id = :id";
 
-        Query hibQuery = session.createQuery(query).setString("status", appraisal.getStatus())
-                .setString("origStatus", appraisal.getOriginalStatus())
-                .setInteger("id", appraisal.getId());
+        Query hibQuery = session.createQuery(query);
+        hibQuery.setString("status", appraisal.getStatus());
+        hibQuery.setString("origStatus", appraisal.getOriginalStatus());
+        hibQuery.setInteger("id", appraisal.getId());
+
         if (updateOverdue) {
             hibQuery.setInteger("overdue", appraisal.getOverdue());
         }
 
+        _log.error(" the execute update is about to run");
         hibQuery.executeUpdate();
     }
 

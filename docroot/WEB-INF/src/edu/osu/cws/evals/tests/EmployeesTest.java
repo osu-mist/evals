@@ -31,7 +31,7 @@ public class EmployeesTest {
      * Before you run this test method make sure that the beforeMehtod in this class is commented out.
      */
     public void shouldHaveEmployeesInView() throws Exception {
-        List<Employee> results = employeeMgr.list();
+        List<Employee> results = EmployeeMgr.list();
         Employee employee;
 
         // place a breakpoint below if you want to step through the records to make sure

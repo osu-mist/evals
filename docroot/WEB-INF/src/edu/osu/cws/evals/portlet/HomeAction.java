@@ -1,14 +1,24 @@
 package edu.osu.cws.evals.portlet;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
+import edu.osu.cws.evals.hibernate.AppraisalMgr;
+import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.models.Appraisal;
+import edu.osu.cws.evals.models.Employee;
+import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
+import javax.portlet.PortletSession;
 import java.util.ArrayList;
 
 public class HomeAction implements ActionInterface {
     private ActionHelper actionHelper = new ActionHelper();
+    private static Log _log = LogFactoryUtil.getLog(HomeAction.class);
+
 
     /**
      * Takes care of grabbing all the information needed to display the home view sections
@@ -21,7 +31,8 @@ public class HomeAction implements ActionInterface {
      * @throws Exception
      */
     public String display(PortletRequest request, PortletResponse response) throws Exception {
-        int employeeId = actionHelper.getLoggedOnUser(request).getId();
+        Employee employee = actionHelper.getLoggedOnUser(request);
+        int employeeId = employee.getId();
         String homeJSP = getHomeJSP(request);
         CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
         boolean isAdmin = actionHelper.isLoggedInUserAdmin(request);
@@ -46,6 +57,7 @@ public class HomeAction implements ActionInterface {
             actionHelper.addToRequestMap("hasNoEvalsAccess", true);
         }
 
+        setupDemoSwitch(request, employee);
         actionHelper.setRequiredActions(request);
         if (homeJSP.equals(Constants.JSP_HOME_REVIEWER)) {
             int maxResults = config.getInt("reviewer.home.pending.max");
@@ -71,6 +83,86 @@ public class HomeAction implements ActionInterface {
         CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
         actionHelper.addToRequestMap("helpLinks", config.getStringArray("helpfulLinks"));
     }
+
+    /**
+     * Set up the attributes needed for the user switch used by the demo.
+     *
+     * @param request
+     * @param employee
+     */
+    private void setupDemoSwitch(PortletRequest request, Employee employee) throws Exception {
+        // set Employee  and employees object(s) - used by demo
+        // @todo: remove after demo
+        actionHelper.addToRequestMap("employees", EmployeeMgr.list());
+        actionHelper.addToRequestMap("employee", employee);
+        // end of remove section for demo
+    }
+
+    /**
+     * Handles the user clicking on a link to reset the status of the open appraisal to set the status
+     * to goals-due or results-due.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String demoResetAppraisal(PortletRequest request, PortletResponse response) throws Exception {
+        int id = ParamUtil.getInteger(request, "id");
+        String status = ParamUtil.getString(request, "status");
+
+        _log.error("id = " + id + " status = " + status);
+        if (id == 0 || status == null || status.equals("")) {
+            actionHelper.addErrorsToRequest(request, "Could not reset the appraisal. Invalid ID or Status.");
+        }
+
+        _log.error("in demo reset appraisal after 1st if");
+        try {
+            Appraisal appraisal = new Appraisal();
+            appraisal.setId(id);
+            appraisal.setStatus(status);
+            appraisal.setOriginalStatus(status);
+
+            _log.error("about to call update status on appraisal");
+            AppraisalMgr.updateAppraisalStatus(appraisal, false);
+            _log.error("done calling update status");
+        } catch (Exception e) {
+            _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
+        }
+        AppraisalsAction appraisalsAction = new AppraisalsAction();
+        appraisalsAction.setHomeAction(this);
+        appraisalsAction.setActionHelper(actionHelper);
+
+        return appraisalsAction.display(request, response);
+    }
+
+    /*
+     * Handles switching the logged in user for demo purposes. This can be
+     * deleted after the demo. It updates the loggedOnUser attribute in the
+     * portletSession which is used by all the actions methods.
+     *
+     * @param request
+     * @param response
+     * @param portlet
+     * @return
+     */
+    public String demoSwitchUser(PortletRequest request, PortletResponse response) throws Exception {
+        PortletSession session = request.getPortletSession(true);
+        int employeeID = Integer.parseInt(ParamUtil.getString(request, "employee.id"));
+        Employee employee = new Employee();
+        try {
+            employee = EmployeeMgr.findById(employeeID, "employee-with-jobs");
+        } catch (Exception e) {
+            _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
+        }
+        session.setAttribute("loggedOnUser", employee);
+        session.removeAttribute(ActionHelper.ALL_MY_ACTIVE_APPRAISALS);
+        session.removeAttribute(ActionHelper.MY_TEAMS_ACTIVE_APPRAISALS);
+        actionHelper.setUpUserPermissionInSession(request, true);
+
+        return display(request, response);
+    }
+
 
     /**
      * Returns the value of the home jsp file to render. It also performs

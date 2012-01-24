@@ -4,4 +4,5 @@
 <%@ include file="/jsp/home/pendingReviews.jsp" %>
 <%@ include file="/jsp/home/search.jsp" %>
 <%@ include file="/jsp/home/helpLinks.jsp" %>
+<%@ include file="/jsp/home/switchUser.jsp" %>
 <%@ include file="/jsp/footer.jsp" %>

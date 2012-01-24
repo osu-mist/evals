@@ -278,5 +278,6 @@
     </script>
     </c:if>
 
+<%@ include file="/jsp/appraisals/demoSettings.jsp"%>
 </div><!-- end appraisal -->
 <%@ include file="/jsp/footer.jsp" %>
