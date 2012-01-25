@@ -9,6 +9,7 @@ package edu.osu.cws.evals.util;
  */
 
 import edu.osu.cws.evals.hibernate.EmailMgr;
+import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.util.CWSUtil;
 
 import java.io.File;
@@ -20,9 +21,6 @@ import java.util.Map;
 import edu.osu.cws.evals.models.*;
 
 public class EvalsUtil {
-    private static final String ROOT_DIR = "WEB-INF/src/";
-    //private static final String ECS_DEV_CONFIG = ROOT_DIR + "backend_ecs.dev.prop";
-    //private static final String ECS_PROD_CONFIG = ROOT_DIR + "backend_ecs.prod.prop";
     /**
      *
      * @param appraisal
@@ -130,7 +128,7 @@ public class EvalsUtil {
         String hostname = CWSUtil.getLocalHostname();
         System.out.println("hostname is " + hostname);
 
-        String filenameHead = portletRoot + ROOT_DIR;
+        String filenameHead = portletRoot + Constants.ROOT_DIR;
 
         if (env.equals("backend"))
             filenameHead = filenameHead + "backend_";
