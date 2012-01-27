@@ -19,7 +19,7 @@
         <portlet:param name="action" value="report"/>
         <portlet:param name="controller" value="ReportsAction"/>
         <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
-        <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${unit}"/>
-    </portlet:actionURL>">${unit}</a></li>
+        <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${unit.key}"/>
+    </portlet:actionURL>">${unit.key} - ${unit.value}</a></li>
 </c:forEach>
 </ul>

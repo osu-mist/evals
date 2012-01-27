@@ -55,7 +55,7 @@ public class ReportsAction implements ActionInterface {
     /**
      * Value displayed when generating the drill down links in data table.
      */
-    HashSet<String> units = new HashSet<String>();
+    HashMap<String, Integer> units = new HashMap<String, Integer>();
 
 
     public String report(PortletRequest request, PortletResponse response) throws Exception {
@@ -78,12 +78,17 @@ public class ReportsAction implements ActionInterface {
     private void setupDataForJSP() {
         for (Object[] row : reportAppraisals) {
             if (row.length != 0 && row[0] != null) {
-                units.add(row[0].toString());
+                Integer unitCount = 1;
+                String unitName = row[0].toString();
+                if (units.containsKey(unitName)) {
+                    unitCount = units.get(unitName) + 1;
+                }
+                units.put(unitName, unitCount);
             }
 //            debug(row);
         }
-//        for (String unit : units) {
-//            _log.error("unit = " + unit);
+//        for (Map.Entry<String, Integer> unit : units.entrySet()) {
+//            _log.error("unit.key = " + unit.getKey() + " unit.value = " + unit.getValue());
 //        }
         actionHelper.addToRequestMap("reportAppraisals", reportAppraisals);
         actionHelper.addToRequestMap("units", units);
