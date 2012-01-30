@@ -34,8 +34,6 @@ public class Constants {
     public static final String JSP_CLOSEOUT_REASON_DELETE = "/jsp/closeout_reasons/delete.jsp";
     public static final String JSP_APPRAISAL_CLOSEOUT = "/jsp/appraisals/closeout.jsp";
 
-    public static final String JSP_REPORT = "/jsp/reports/report.jsp";
-
     //if appraisalStartDate is before FUL__GOALS_DUE date, create the appraisal these many
     //days before appraialsDue.
     public static final int DAYS_BEFORE_APPRAISAL_DUE_To_CREATE = 60;
