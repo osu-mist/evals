@@ -3,6 +3,8 @@
 
 <jsp:useBean id="appraisal" class="edu.osu.cws.evals.models.Appraisal" scope="request" />
 <jsp:useBean id="permissionRule" class="edu.osu.cws.evals.models.PermissionRule" scope="request" />
+<c:set var="showForm" scope="request"
+       value="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}"/>
 <portlet:resourceURL var="downloadPDFURL" id="downloadPDF" escapeXml="false">
     <portlet:param name="id" value="${appraisal.id}"/>
     <portlet:param name="controller" value="AppraisalsAction"/>
@@ -25,9 +27,11 @@
 
 <div id="pass-appraisal-form" class="osu-cws">
 
+<c:if test="${showForm}">
     <span class="portlet-msg-alert">
     <liferay-ui:message key="appraisal-info-msg"/>
     </span>
+</c:if>
 
     <h2><liferay-ui:message key="appraisal-classified-title" />: <liferay-ui:message key="${appraisal.viewStatus}" /></h2>
     <liferay-ui:success key="draft-saved" message="draft-saved" />
@@ -72,7 +76,7 @@
 
     <%@ include file="/jsp/appraisals/info.jsp"%>
 
-    <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}">
+    <c:if test="${showForm}">
     <form class="appraisal" id="<portlet:namespace />fm"
         action="<portlet:actionURL windowState="<%= WindowState.NORMAL.toString() %>">
         <portlet:param name="action" value="update" />
