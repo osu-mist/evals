@@ -360,7 +360,7 @@ public class AppraisalMgr {
     public static Appraisal getFirstTrialAppraisal(Job job) {
         Session session = HibernateUtil.getCurrentSession();
 
-        Appraisal trialAppraisal = (Appraisal) session.getNamedQuery("appraisal.getFirstTrialAppraisal")
+        Appraisal trialAppraisal = (Appraisal) session.getNamedQuery("appraisal.getTrialAppraisal")
                 .setInteger("pidm", job.getEmployee().getId())
                 .setString("posno", job.getPositionNumber())
                 .setString("suffix", job.getSuffix())

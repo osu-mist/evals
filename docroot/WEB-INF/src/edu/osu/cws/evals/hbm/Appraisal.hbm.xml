@@ -104,11 +104,12 @@
         WHERE
             job.employee.id = :pidm
     ]]></query>
-    <query name="appraisal.getFirstTrialAppraisal"><![CDATA[
+    <query name="appraisal.getTrialAppraisal"><![CDATA[
         from edu.osu.cws.evals.models.Appraisal
         WHERE
             job.employee.id = :pidm AND
             job.positionNumber = :posno AND
-            job.suffix = :suffix
+            job.suffix = :suffix AND
+            type = 'trial'
     ]]></query>
 </hibernate-mapping>
