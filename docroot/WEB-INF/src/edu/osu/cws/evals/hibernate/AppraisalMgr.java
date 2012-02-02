@@ -325,11 +325,12 @@ public class AppraisalMgr {
      *  2) The job annual_indicator != 0
      *
      * @param appraisal
+     * @param startDate
      * @param configurationMap
      * @throws Exception
      * @return appraisal    The first annual appraisal created, null otherwise
      */
-    public static Appraisal createFirstAnnualAppraisal(Appraisal appraisal,
+    public static Appraisal createFirstAnnualAppraisal(Appraisal appraisal, Date startDate,
                                                 Map<String, Configuration>  configurationMap)
             throws Exception {
         Job job = appraisal.getJob();
@@ -341,7 +342,6 @@ public class AppraisalMgr {
         if (job.getAnnualInd() == 0) {
             return null;
         }
-        Date startDate = appraisal.getStartDate();
         int daysBeforeAppraisalDue = EvalsUtil.daysBeforeAppraisalDue(job, startDate, Appraisal.TYPE_ANNUAL,
                 configurationMap);
         if (startDate.before(fullGoalsDate)  &&
