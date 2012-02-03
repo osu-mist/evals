@@ -324,31 +324,25 @@ public class AppraisalMgr {
      *  1) The current appraisal is of type: trial
      *  2) The job annual_indicator != 0
      *
-     * @param appraisal
+     * @param trialAppraisal
      * @param startDate
      * @param configurationMap
      * @throws Exception
      * @return appraisal    The first annual appraisal created, null otherwise
      */
-    public static Appraisal createFirstAnnualAppraisal(Appraisal appraisal, Date startDate,
+    public static Appraisal createFirstAnnualAppraisal(Appraisal trialAppraisal, Date startDate,
                                                 Map<String, Configuration>  configurationMap)
             throws Exception {
-        Job job = appraisal.getJob();
+        Job job = trialAppraisal.getJob();
         Configuration resultsDueConfig = configurationMap.get(Appraisal.STATUS_RESULTS_DUE);
 
-        if (!appraisal.getType().equals(Appraisal.TYPE_TRIAL)) {
+        if (!trialAppraisal.getType().equals(Appraisal.TYPE_TRIAL)) {
             return null;
         }
         if (job.getAnnualInd() == 0) {
             return null;
         }
-        int daysBeforeAppraisalDue = EvalsUtil.daysBeforeAppraisalDue(job, startDate, Appraisal.TYPE_ANNUAL,
-                configurationMap);
-        if (startDate.before(fullGoalsDate)  &&
-                daysBeforeAppraisalDue > Constants.DAYS_BEFORE_APPRAISAL_DUE_To_CREATE) {
-            return null;
-        }
-        return AppraisalMgr.createInitialAppraisalAfterTrial(appraisal, resultsDueConfig);
+        return AppraisalMgr.createInitialAppraisalAfterTrial(trialAppraisal, resultsDueConfig);
     }
 
     /**
