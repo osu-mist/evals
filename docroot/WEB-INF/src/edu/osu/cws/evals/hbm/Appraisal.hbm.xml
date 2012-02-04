@@ -36,6 +36,15 @@
         <property name="releaseDate" type="timestamp" column="RELEASE_DATE"/>
         <property name="supervisorRebuttalRead" type="timestamp" column="SUPERVISOR_REBUTTAL_READ"/>
         <property name="type" column="TYPE"/>
+        <property name="overdue" type="int" column="OVERDUE"/>
+        <property name="goalsOverdue" type="int" column="GOALS_OVERDUE"/>
+        <property name="goalsApprovalOverdue" type="int" column="GOALS_APPROVAL_OVERDUE"/>
+        <property name="resultsOverdue" type="int" column="RESULTS_OVERDUE"/>
+        <property name="appraisalOverdue" type="int" column="APPRAISAL_OVERDUE"/>
+        <property name="reviewOverdue" type="int" column="REVIEW_OVERDUE"/>
+        <property name="releaseOverdue" type="int" column="RELEASE_OVERDUE"/>
+        <property name="signatureOverdue" type="int" column="SIGNATURE_OVERDUE"/>
+        <property name="rebuttalReadOverdue" type="int" column="REBUTTAL_READ_OVERDUE"/>
 
         <many-to-one name="job" class="edu.osu.cws.evals.models.Job" not-null="true">
             <column name="JOB_PIDM"/>
@@ -111,5 +120,12 @@
             job.positionNumber = :posno AND
             job.suffix = :suffix AND
             type = 'trial'
+    ]]></query>
+    <query name="appraisal.saveOverdue"><![CDATA[
+        update edu.osu.cws.evals.models.Appraisal appraisal
+        set
+            overdue = :overdue
+        where
+            id = :id
     ]]></query>
 </hibernate-mapping>

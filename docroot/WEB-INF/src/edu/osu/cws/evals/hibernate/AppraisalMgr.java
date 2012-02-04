@@ -9,6 +9,8 @@ import edu.osu.cws.evals.util.Mailer;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.type.StandardBasicTypes;
+
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.HashMap;
@@ -288,11 +290,31 @@ public class AppraisalMgr {
             throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Configuration resultsDueConfig = configurationMap.get(Appraisal.STATUS_RESULTS_DUE);
-
         Job supervisorJob = appraisal.getJob().getSupervisor();
+
+        // set the overdue value before updating the status
+        String beforeUpdateStatus = appraisal.getStatus();
+        boolean activeOverdueStatus = AppraisalMgr.isActiveOverdueStatus(beforeUpdateStatus);
+        if (activeOverdueStatus) {
+            AppraisalMgr.updateOverdue(appraisal, configurationMap);
+        }
 
         // update appraisal & assessment fields based on permission rules
         setAppraisalFields(request, appraisal, permRule);
+
+        if (!appraisal.getStatus().equals(beforeUpdateStatus)&& activeOverdueStatus) {
+            // Using the old status value call setStatusOverdue()
+            String overdueMethod = beforeUpdateStatus.substring(0, 1).toUpperCase() + beforeUpdateStatus.substring(1);
+            overdueMethod = "set" + overdueMethod.replace("Due", "Overdue");
+            Method controllerMethod = appraisal.getClass().getDeclaredMethod(overdueMethod, Integer.class);
+            controllerMethod.invoke(appraisal, appraisal.getOverdue());
+
+            // If the new status is valid for overdue, refresh the overdue value
+            if (AppraisalMgr.isActiveOverdueStatus(appraisal.getStatus())) {
+                AppraisalMgr.updateOverdue(appraisal, configurationMap);
+            }
+        }
+
 
         //@todo: validate appraisal
 
@@ -317,6 +339,20 @@ public class AppraisalMgr {
         if (emailType != null) {
             mailer.sendMail(appraisal, emailType);
         }
+    }
+
+    /**
+     * This method figures out if the status is an active status where we should
+     * update the appraisal overdue value
+     *
+     * @param status
+     * @return
+     */
+    public static boolean isActiveOverdueStatus(String status) {
+        return !status.equals(Appraisal.STATUS_COMPLETED) &&
+                !status.equals(Appraisal.STATUS_CLOSED) &&
+                !status.equals(Appraisal.STATUS_GOALS_APPROVED) &&
+                !status.equals(Appraisal.STATUS_GOALS_REACTIVATED);
     }
 
     /**
@@ -1041,16 +1077,27 @@ public class AppraisalMgr {
      * Updates the appraisal status and originalStatus using the id of the appraisal and hsql query.
      *
      * @param appraisal
+     * @param updateOverdue     Whether or not to update the overdue value
+     * @throws Exception
      */
-    public static void updateAppraisalStatus(Appraisal appraisal) throws Exception {
+    public static void updateAppraisalStatus(Appraisal appraisal, boolean updateOverdue) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         String query = "update edu.osu.cws.evals.models.Appraisal appraisal set status = :status, " +
-                "originalStatus = :origStatus where id = :id";
-        session.createQuery(query).setString("status", appraisal.getStatus())
-                .setString("origStatus", appraisal.getOriginalStatus())
-                .setInteger("id", appraisal.getId()) //@todo: Joan: No need to set ID.
-                .executeUpdate();
+                "originalStatus = :origStatus";
 
+        if (updateOverdue) {
+            query += ", overdue = :overdue ";
+        }
+        query += "where id = :id";
+
+        Query hibQuery = session.createQuery(query).setString("status", appraisal.getStatus())
+                .setString("origStatus", appraisal.getOriginalStatus())
+                .setInteger("id", appraisal.getId());
+        if (updateOverdue) {
+            hibQuery.setInteger("overdue", appraisal.getOverdue());
+        }
+
+        hibQuery.executeUpdate();
     }
 
 
@@ -1121,5 +1168,32 @@ public class AppraisalMgr {
 
         return appraisals;
 
+    }
+
+    /**
+     * Calculates the overdue value for the appraisal object and updates the value in the object.
+     * It does not update the db.
+     *
+     * @param appraisal
+     * @param configurationMap
+     * @throws Exception
+     */
+    public static void updateOverdue(Appraisal appraisal, Map<String, Configuration> configurationMap)
+            throws Exception {
+        int overdue = EvalsUtil.getOverdue(appraisal, configurationMap);
+        appraisal.setOverdue(overdue);
+    }
+
+    /**
+     * Saves the overdue value by itself in the appraisal record.
+     *
+     * @param appraisal
+     */
+    public static void saveOverdue(Appraisal appraisal) {
+        Session session = HibernateUtil.getCurrentSession();
+        session.getNamedQuery("appraisal.saveOverdue")
+                .setInteger("id", appraisal.getId())
+                .setInteger("overdue", appraisal.getOverdue())
+                .executeUpdate();
     }
 }

@@ -163,7 +163,25 @@ public class Appraisal extends Evals {
 
     private String originalStatus;
 
+    private Integer overdue;
+
     private Set<Assessment> assessments = new HashSet<Assessment>();
+
+    private Integer goalsOverdue;
+
+    private Integer goalsApprovalOverdue;
+
+    private Integer resultsOverdue;
+
+    private Integer appraisalOverdue;
+
+    private Integer reviewOverdue;
+
+    private Integer releaseOverdue;
+
+    private Integer signatureOverdue;
+
+    private Integer rebuttalReadOverdue;
 
     /**
      * Read only propety not stored in the db. It is the role of the logged in user with
@@ -662,6 +680,78 @@ public class Appraisal extends Evals {
 
     public void setOriginalStatus(String originalStatus) {
         this.originalStatus = originalStatus;
+    }
+
+    public Integer getOverdue() {
+        return overdue;
+    }
+
+    public void setOverdue(Integer overdue) {
+        this.overdue = overdue;
+    }
+
+    public Integer getGoalsOverdue() {
+        return goalsOverdue;
+    }
+
+    public void setGoalsOverdue(Integer goalsOverdue) {
+        this.goalsOverdue = goalsOverdue;
+    }
+
+    public Integer getGoalsApprovalOverdue() {
+        return goalsApprovalOverdue;
+    }
+
+    public void setGoalsApprovalOverdue(Integer goalsApprovalOverdue) {
+        this.goalsApprovalOverdue = goalsApprovalOverdue;
+    }
+
+    public Integer getResultsOverdue() {
+        return resultsOverdue;
+    }
+
+    public void setResultsOverdue(Integer resultsOverdue) {
+        this.resultsOverdue = resultsOverdue;
+    }
+
+    public Integer getAppraisalOverdue() {
+        return appraisalOverdue;
+    }
+
+    public void setAppraisalOverdue(Integer appraisalOverdue) {
+        this.appraisalOverdue = appraisalOverdue;
+    }
+
+    public Integer getReviewOverdue() {
+        return reviewOverdue;
+    }
+
+    public void setReviewOverdue(Integer reviewOverdue) {
+        this.reviewOverdue = reviewOverdue;
+    }
+
+    public Integer getReleaseOverdue() {
+        return releaseOverdue;
+    }
+
+    public void setReleaseOverdue(Integer releaseOverdue) {
+        this.releaseOverdue = releaseOverdue;
+    }
+
+    public Integer getSignatureOverdue() {
+        return signatureOverdue;
+    }
+
+    public void setSignatureOverdue(Integer signatureOverdue) {
+        this.signatureOverdue = signatureOverdue;
+    }
+
+    public Integer getRebuttalReadOverdue() {
+        return rebuttalReadOverdue;
+    }
+
+    public void setRebuttalReadOverdue(Integer rebuttalReadOverdue) {
+        this.rebuttalReadOverdue = rebuttalReadOverdue;
     }
 
     /**

@@ -16,6 +16,7 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import edu.osu.cws.evals.models.*;
@@ -171,5 +172,43 @@ public class EvalsUtil {
         Date appraisalDueDate = appraisalDueCal.getTime();
         System.out.println("appraisalDueDate = " + appraisalDueDate);
         return CWSUtil.daysBetween(appraisalDueDate, new Date());
+    }
+
+    /**
+     * This method calculates the # of days an evaluation record is overdue. The are three
+     * possible types of values:
+     *   0 - due today
+     * < 0 - x number of days before it's due
+     * > 0 - overdue by x number of days
+     */
+    public static int getOverdue(Appraisal appraisal, Map<String, Configuration> configurationMap)
+            throws Exception {
+        int INVALID_PARAM = -999;
+        String status = appraisal.getStatus();
+        Configuration config = null;
+
+        if (status.equals(Appraisal.STATUS_GOALS_REACTIVATED) || status.equals(Appraisal.STATUS_GOALS_APPROVED)) {
+            return INVALID_PARAM;
+        }
+
+        if (status.equals(Appraisal.STATUS_COMPLETED) || status.equals(Appraisal.STATUS_CLOSED)) {
+            return appraisal.getOverdue();
+        }
+
+        if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
+            config = configurationMap.get(Appraisal.STATUS_GOALS_DUE);
+        } else {
+            if (status.contains("Overdue")) {
+                status = status.replace("Overdue", "Due");
+            }
+            config = configurationMap.get(status);
+        }
+
+        if (config != null) {
+            Date dueDate = EvalsUtil.getDueDate(appraisal, config);
+            return -1 * CWSUtil.getRemainDays(dueDate);
+        }
+
+        return 0;
     }
 }
