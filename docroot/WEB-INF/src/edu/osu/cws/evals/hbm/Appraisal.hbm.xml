@@ -88,6 +88,108 @@
              AND JOB_SUFFIX=PYVPASJ_SUFF
              AND PYVPASJ_BCTR_TITLE=:bcName)
     ]]></sql-query>
+    <sql-query name="report.allActiveOSU"><![CDATA[
+            SELECT
+                PYVPASJ.PYVPASJ_BCTR_TITLE,
+                appraisals.id,
+                appraisals.status
+            FROM
+                appraisals,
+                PYVPASJ
+            WHERE
+            appraisals.status not in ('completed', 'archived', 'closed')
+            AND PYVPASJ.PYVPASJ_PIDM = appraisals.job_pidm
+            AND PYVPASJ.PYVPASJ_POSN = appraisals.position_number
+            AND PYVPASJ.PYVPASJ_SUFF = appraisals.JOB_SUFFIX
+            and PYVPASJ.PYVPASJ_APPOINTMENT_TYPE IN (:appointmentTypes)
+    ]]></sql-query>
+    <sql-query name="report.allActiveBC"><![CDATA[
+            SELECT
+                SUBSTR(PYVPASJ_ORGN_DESC, 1, 3),
+                appraisals.id,
+                appraisals.status,
+                PYVPASJ.PYVPASJ_BCTR_TITLE,
+                PYVPASJ.PYVPASJ_ORGN_CODE_TS,
+                PYVPASJ.PYVPASJ_ORGN_DESC
+            FROM
+                appraisals,
+                PYVPASJ
+            WHERE
+            appraisals.status not in ('completed', 'archived', 'closed')
+            AND PYVPASJ.PYVPASJ_PIDM = appraisals.job_pidm
+            AND PYVPASJ.PYVPASJ_POSN = appraisals.position_number
+            AND PYVPASJ.PYVPASJ_SUFF = appraisals.JOB_SUFFIX
+            and PYVPASJ.PYVPASJ_APPOINTMENT_TYPE IN (:appointmentTypes)
+            and PYVPASJ.PYVPASJ_BCTR_TITLE = :bcName
+    ]]></sql-query>
+    <sql-query name="report.allActiveOrgPrefix"><![CDATA[
+            SELECT
+                PYVPASJ.PYVPASJ_ORGN_CODE_TS,
+                appraisals.id,
+                appraisals.status,
+                PYVPASJ.PYVPASJ_ORGN_DESC
+            FROM
+                appraisals,
+                PYVPASJ
+            WHERE
+            appraisals.status not in ('completed', 'archived', 'closed')
+            AND PYVPASJ.PYVPASJ_PIDM = appraisals.job_pidm
+            AND PYVPASJ.PYVPASJ_POSN = appraisals.position_number
+            AND PYVPASJ.PYVPASJ_SUFF = appraisals.JOB_SUFFIX
+            AND PYVPASJ.PYVPASJ_APPOINTMENT_TYPE IN (:appointmentTypes)
+            AND PYVPASJ.PYVPASJ_BCTR_TITLE = :bcName
+            AND PYVPASJ.PYVPASJ_ORGN_DESC LIKE :orgPrefix
+    ]]></sql-query>
+    <sql-query name="report.allActiveOrgCode"><![CDATA[
+            SELECT
+                appraisals.id,
+                appraisals.status,
+                PYVPASJ.PYVPASJ_ORGN_DESC,
+                PYVPASJ.PYVPASJ_ORGN_CODE_TS,
+                PYVPASE.PYVPASE_FIRST_NAME,
+                PYVPASE.PYVPASE_LAST_NAME
+            FROM
+                appraisals,
+                PYVPASJ,
+                PYVPASE
+            WHERE
+            appraisals.status not in ('completed', 'archived', 'closed')
+            AND PYVPASE.PYVPASE_PIDM = PYVPASJ.PYVPASJ_SUPERVISOR_PIDM
+            AND PYVPASJ.PYVPASJ_PIDM = appraisals.job_pidm
+            AND PYVPASJ.PYVPASJ_POSN = appraisals.position_number
+            AND PYVPASJ.PYVPASJ_SUFF = appraisals.JOB_SUFFIX
+            AND PYVPASJ.PYVPASJ_APPOINTMENT_TYPE IN (:appointmentTypes)
+            AND PYVPASJ.PYVPASJ_BCTR_TITLE = :bcName
+            AND PYVPASJ.PYVPASJ_ORGN_CODE_TS = :tsOrgCode
+    ]]></sql-query>
+    <sql-query name="report.allActiveSupervisor"><![CDATA[
+            SELECT
+                appraisals.id,
+                appraisals.status,
+                PYVPASE.PYVPASE_FIRST_NAME,
+                PYVPASE.PYVPASE_LAST_NAME
+            FROM
+                appraisals,
+                PYVPASJ,
+                PYVPASE
+            WHERE
+                pyvpasj_status = 'A'
+                AND pyvpasj_pidm = pyvpase_pidm
+                AND appraisals.status not in ('completed', 'archived', 'closed')
+                AND PYVPASE.PYVPASE_PIDM = appraisals.job_pidm
+                AND PYVPASJ.PYVPASJ_POSN = appraisals.position_number
+                AND PYVPASJ.PYVPASJ_SUFF = appraisals.JOB_SUFFIX
+                AND PYVPASJ.PYVPASJ_APPOINTMENT_TYPE IN (:appointmentTypes)
+                AND PYVPASJ.PYVPASJ_BCTR_TITLE = :bcName
+                AND PYVPASJ.PYVPASJ_ORGN_DESC LIKE 'VMD%'
+            start with
+                pyvpasj_pidm = 1318621 and pyvpasj_posn ='C30134' and pyvpasj_suff = '00'
+            connect by
+                pyvpasj_supervisor_pidm = prior pyvpasj_pidm and
+                pyvpasj_supervisor_posn = prior pyvpasj_posn and
+                pyvpasj_supervisor_suff = prior pyvpasj_suff;
+    ]]></sql-query>
+
     <query name="appraisal.getReviews"><![CDATA[
         SELECT new edu.osu.cws.evals.models.Appraisal
             (
