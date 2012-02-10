@@ -1,20 +1,12 @@
 <%@ page import="edu.osu.cws.evals.portlet.ReportsAction" %>
 <%@ include file="/jsp/init.jsp"%>
 
-<h1>Scope: ${scope} , ScopeValue: ${scopeValue}</h1>
+<h2><liferay-ui:message key="reports"/></h2>
 <%@ include file="breadcrumbs.jsp"%>
-
-<%--<h2>Data</h2>--%>
-<%--<c:forEach var="row" items="${reportAppraisals}">--%>
-    <%--<c:forEach var="column" items="${row}">--%>
-        <%--<c:out value="${column}"/><br/>--%>
-    <%--</c:forEach>--%>
-    <%-----------------------------------------------------------------<br />--%>
-<%--</c:forEach>--%>
 
 <div id="<portlet:namespace/>chartDiv"></div>
 
-<h2>Report Types</h2>
+<h3><liferay-ui:message key="report-types"/></h3>
 <ul>
     <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                         <portlet:param name="action" value="report"/>
@@ -60,19 +52,12 @@
                         </portlet:actionURL>"><liferay-ui:message key="report-title-stageWayOverdue"/></a></li>
 </ul>
 
-<h2>Chart Types</h2>
+<h3><liferay-ui:message key="report-chart-types"/></h3>
 <ul>
     <li><a href="#" id ="<portlet:namespace/>changeToPieType">Pie Chart</a></li>
     <li><a href="#" id ="<portlet:namespace/>changeToColumnType">Column Chart</a></li>
     <li><a href="#" id ="<portlet:namespace/>changeToBarType">Bar Chart</a></li>
 </ul>
-<h2>Chart Data</h2>
-<c:forEach var="row" items="${chartData}">
-    <c:forEach var="column" items="${row}">
-        <c:out value="${column}"/><br/>
-    </c:forEach>
-    ---------------------------------------------------------------<br />
-</c:forEach>
 
 <table>
     <caption><liferay-ui:message key="report-drilldown"/></caption>
@@ -95,6 +80,27 @@
     </tr>
 </c:forEach>
 </table>
+
+<h2>Debug Information</h2>
+<h3>Scope: ${scope} , ScopeValue: ${scopeValue}</h3>
+
+<%--<h2>Data</h2>--%>
+<%--<c:forEach var="row" items="${reportAppraisals}">--%>
+    <%--<c:forEach var="column" items="${row}">--%>
+        <%--<c:out value="${column}"/><br/>--%>
+    <%--</c:forEach>--%>
+    <%-----------------------------------------------------------------<br />--%>
+<%--</c:forEach>--%>
+
+
+<h3>Chart Data</h3>
+<c:forEach var="row" items="${chartData}">
+    <c:forEach var="column" items="${row}">
+        <c:out value="${column}"/><br/>
+    </c:forEach>
+    ---------------------------------------------------------------<br />
+</c:forEach>
+
 
 <!--Load the AJAX API-->
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
