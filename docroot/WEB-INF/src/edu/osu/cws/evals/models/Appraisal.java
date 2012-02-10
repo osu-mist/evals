@@ -58,6 +58,17 @@ public class Appraisal extends Evals {
     public static final String STATUS_SIGNATURE_OVERDUE = "signatureOverdue";
     public static final String STATUS_IN_REVIEW = "inReview";
 
+    public static final String STAGE_GOALS = "goals";
+    public static final String STAGE_RESULTS = "results";
+    public static final String STAGE_APPRAISAL = "appraisal";
+    public static final String STAGE_EVALUATION = "evaluation";
+    public static final String STAGE_RELEASE = "release";
+    public static final String STAGE_SIGNATURE = "signature";
+    public static final String STAGE_COMPLETED = "completed";
+    public static final String STAGE_REBUTTAL = "rebuttal";
+    public static final String STAGE_CLOSED = "closed";
+    public static final String STAGE_ARCHIVED = "archived";
+
 
     private int id;
 
@@ -411,6 +422,26 @@ public class Appraisal extends Evals {
         return !status.equals(STATUS_CLOSED) && !viewStatus.equals(STATUS_COMPLETED)
                 && !status.equals(STATUS_ARCHIVED) && !status.equals(STATUS_SIGNATURE_DUE)
                 && !status.equals(STATUS_SIGNATURE_OVERDUE);
+    }
+
+
+    /**
+     * Given a status, it returns the respective stage.
+     *
+     * @param status
+     * @return
+     */
+    public static String getStage(String status) {
+        String stage;
+        if (status.equals(Appraisal.STATUS_GOALS_APPROVED) ) {
+            stage = Appraisal.STAGE_RESULTS;
+        } else if (status.contains("goals")) {
+            stage = Appraisal.STAGE_GOALS;
+        } else {
+            stage = status.replace("Due", "").replace("Overdue", "");
+        }
+
+        return stage;
     }
 
     public int getId() {
