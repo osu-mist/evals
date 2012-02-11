@@ -78,19 +78,10 @@ public class ReportsAction implements ActionInterface {
      * @throws Exception
      */
     public String report(PortletRequest request, PortletResponse response) throws Exception {
-        _log.error("report0 = " + paramMap.get("report"));
         setParamMap(request);
-        _log.error("report1 = " + paramMap.get("report"));
         PortletSession session = request.getPortletSession();
-        _log.error("report2 = " + paramMap.get("report"));
         session.removeAttribute("paramMap");
         session.setAttribute("paramMap", paramMap);
-        _log.error("report3 = " + paramMap.get("report"));
-
-        HashMap sessionParam = (HashMap) session.getAttribute("paramMap");
-        _log.error("report4 = " + sessionParam.get("report"));
-
-
 
         String breadcrumbSessKey = "breadcrumbList";
         List<Breadcrumb> sessionBreadcrumbs = (List<Breadcrumb>) session.getAttribute(breadcrumbSessKey);
@@ -223,11 +214,9 @@ public class ReportsAction implements ActionInterface {
      * @param request
      */
     private void setParamMap(PortletRequest request) {
-        _log.error("reporta = " + paramMap.get("report"));
         PortletSession session = request.getPortletSession();
         HashMap sessionParam = (HashMap) session.getAttribute("paramMap");
         if (sessionParam == null) {
-            _log.error("session param was null :(");
             sessionParam = new HashMap();
         }
 
@@ -248,19 +237,13 @@ public class ReportsAction implements ActionInterface {
 
         String requestReport = ParamUtil.getString(request, REPORT);
         String sessionReport = (String) sessionParam.get(REPORT);
-        _log.error("requestReport = " + requestReport);
-        _log.error("sessionReport = " + sessionReport);
         if (!requestReport.equals("") ) {
             paramMap.put(REPORT, requestReport);
-            _log.error("using request report");
         } else if (sessionReport != null) {
             paramMap.put(REPORT, sessionReport);
-            _log.error("session report");
         } else {
             paramMap.put(REPORT, REPORT_DEFAULT);
-            _log.error("using default report value");
         }
-        _log.error("reportb = " + paramMap.get("report"));
 
 
         int breadcrumbIndex = ParamUtil.getInteger(request, BREADCRUMB_INDEX, -1);
