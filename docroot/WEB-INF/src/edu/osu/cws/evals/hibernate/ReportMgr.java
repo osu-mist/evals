@@ -181,8 +181,10 @@ public class ReportMgr {
      * @return List of arrays of objects. The objects are strings
      */
     public static List<Object[]> getDrillDownData(HashMap paramMap, List<Breadcrumb> crumbs) {
-        paramMap.put(ReportsAction.REPORT, ReportsAction.REPORT_DEFAULT);
-        return getChartData(paramMap, crumbs);
+        HashMap copyParamMap = new HashMap();
+        copyParamMap.putAll(paramMap);
+        copyParamMap.put(ReportsAction.REPORT, ReportsAction.REPORT_DEFAULT);
+        return getChartData(copyParamMap, crumbs);
     }
 
     /**

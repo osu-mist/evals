@@ -72,7 +72,6 @@
             <portlet:param name="controller" value="ReportsAction"/>
             <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
             <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${unit[1]}"/>
-            <portlet:param name="<%= ReportsAction.REPORT %>" value="<%= ReportsAction.REPORT_UNIT_BREAKDOWN%>"/>
             </portlet:actionURL>">${unit[1]}
             </a>
         </td>
