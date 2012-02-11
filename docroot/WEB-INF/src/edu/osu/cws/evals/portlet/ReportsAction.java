@@ -26,6 +26,7 @@ public class ReportsAction implements ActionInterface {
     // The various types of reports supported
     public static final String REPORT = "report";
     public static final String REPORT_DEFAULT = "unitBreakdown";
+    public static final String REPORT_UNIT_BREAKDOWN = "unitBreakdown";
     public static final String REPORT_UNIT_OVERDUE = "unitOverdue";
     public static final String REPORT_UNIT_WAYOVERDUE = "unitWayOverdue";
     public static final String REPORT_STAGE_BREAKDOWN = "stageBreakdown";

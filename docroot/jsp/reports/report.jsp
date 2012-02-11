@@ -72,7 +72,7 @@
             <portlet:param name="controller" value="ReportsAction"/>
             <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
             <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${unit[1]}"/>
-            <portlet:param name="<%= ReportsAction.REPORT %>" value="unitBreakdown"/>
+            <portlet:param name="<%= ReportsAction.REPORT %>" value="<%= ReportsAction.REPORT_UNIT_BREAKDOWN%>"/>
             </portlet:actionURL>">${unit[1]}
             </a>
         </td>
@@ -115,6 +115,7 @@
   var chart;
   var chartType = "pie";
   var data;
+  var report = "${report}";
 
   // Callback that creates and populates a data table,
   // instantiates the pie chart, passes in the data and
@@ -157,6 +158,20 @@
       google.visualization.events.addListener(chart, 'select', function() {
           var chartSelection = chart.getSelection();
           alert("row selected => " + data.getValue(chartSelection[0].row, 0));
+
+          if (report == "<%= ReportsAction.REPORT_UNIT_BREAKDOWN%>") {
+            var unitName = data.getValue(chartSelection[0].row, 0);
+            var drillDownURL= '<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                <portlet:param name="action" value="report"/>
+                <portlet:param name="controller" value="ReportsAction"/>
+                <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
+                <portlet:param name="<%= ReportsAction.REPORT %>" value="<%= ReportsAction.REPORT_UNIT_BREAKDOWN%>"/>
+                <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="unitName"/>
+                </portlet:actionURL>';
+
+            drillDownURL = drillDownURL.replace("unitName", unitName);
+            window.location = drillDownURL;
+          }
       });
   }
 
