@@ -60,7 +60,8 @@
 </ul>
 
 <table>
-    <caption><liferay-ui:message key="report-drilldown"/></caption>
+    <caption><liferay-ui:message key="report-drilldown"/> -
+        <liferay-ui:message key="report-title-unitBreakdown${scope}"/></caption>
     <tr>
         <th><liferay-ui:message key="report-drilldown-unit"/></th>
         <th><liferay-ui:message key="report-drilldown-num-evals"/></th>
@@ -106,7 +107,7 @@
     // Create the data table.
     data = new google.visualization.DataTable();
     data.addColumn('string', 'unit');
-    data.addColumn('number', 'evals');
+    data.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evals"/>');
     data.addRows([
         <c:forEach var="row" items="${chartData}" varStatus="loopStatus">
             ['${row[1]}', ${row[0]}]
