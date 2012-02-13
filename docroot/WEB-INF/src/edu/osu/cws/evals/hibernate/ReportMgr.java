@@ -72,11 +72,12 @@ public class ReportMgr {
      * Returns the sql needed to grab the raw appraisal data (only the needed columns) so that
      * the java code can process the data for the charts.
      *
-     * @param scope
-     * @param reportType
+     * @param scope         The drill down scope: root, bc, orgPrefix, orgCode
+     * @param reportType    The type of report to fetch data for
+     * @param sortByCount   Whether the data should be sorted by the count first
      * @return
      */
-    public static String getChartSQL(String scope, String reportType) {
+    public static String getChartSQL(String scope, String reportType, boolean sortByCount) {
         String select = "";
         String from = " FROM appraisals, PYVPASJ ";
         String where = " WHERE appraisals.status not in ('completed', 'archived', 'closed') " +
@@ -85,6 +86,7 @@ public class ReportMgr {
                 "AND PYVPASJ_POSN = appraisals.position_number " +
                 "AND PYVPASJ_SUFF = appraisals.job_suffix ";
         String group = " GROUP BY ";
+        String order = " ORDER BY ";
 
         String col1 = "";
         if (scope.equals(ReportsAction.DEFAULT_SCOPE)) {
@@ -105,9 +107,19 @@ public class ReportMgr {
         if (reportType.contains(UNIT)) {
             select = "SELECT count(*), " + col1 + from;
             group += col1;
+            if (sortByCount) {
+                order += "count(*) DESC, " + col1;
+            } else {
+                order += col1 + ", count(*) DESC";
+            }
         } else if (reportType.contains(STAGE)) {
             select = "SELECT count(*), status " + from;
             group += " status";
+            if (sortByCount) {
+                order += "count(*) DESC, status";
+            } else {
+                order += "status, count(*) DESC";
+            }
         }
 
         if (reportType.contains("WayOverdue")) {
@@ -116,7 +128,7 @@ public class ReportMgr {
             where += " AND appraisals.overdue > 0";
         }
 
-        return select + where + group;
+        return select + where + group + order;
     }
 
     /**
@@ -124,9 +136,10 @@ public class ReportMgr {
      *
      * @param paramMap
      * @param crumbs
+     * @param sortByCount       Whether the data should be sorted by the count first
      * @return
      */
-    public static List<Object[]> getChartData(HashMap paramMap, List<Breadcrumb> crumbs) {
+    public static List<Object[]> getChartData(HashMap paramMap, List<Breadcrumb> crumbs, boolean sortByCount) {
         Session session = HibernateUtil.getCurrentSession();
 
         List results;
@@ -138,7 +151,7 @@ public class ReportMgr {
             bcName = crumbs.get(1).getScopeValue();
         }
 
-        String sqlQuery = getChartSQL(scope, report);
+        String sqlQuery = getChartSQL(scope, report, sortByCount);
         if (scope.equals(ReportsAction.SCOPE_BC)) {
             results = session.createSQLQuery(sqlQuery)
                     .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
@@ -180,11 +193,11 @@ public class ReportMgr {
      * @param crumbs list of breadcrumbs
      * @return List of arrays of objects. The objects are strings
      */
-    public static List<Object[]> getDrillDownData(HashMap paramMap, List<Breadcrumb> crumbs) {
+    public static List<Object[]> getDrillDownData(HashMap paramMap, List<Breadcrumb> crumbs, boolean sortByCount) {
         HashMap copyParamMap = new HashMap();
         copyParamMap.putAll(paramMap);
         copyParamMap.put(ReportsAction.REPORT, ReportsAction.REPORT_DEFAULT);
-        return getChartData(copyParamMap, crumbs);
+        return getChartData(copyParamMap, crumbs, sortByCount);
     }
 
     /**

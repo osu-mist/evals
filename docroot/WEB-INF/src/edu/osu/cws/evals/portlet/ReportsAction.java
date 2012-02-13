@@ -149,8 +149,8 @@ public class ReportsAction implements ActionInterface {
 
     private String activeReport(List<Breadcrumb> crumbs) {
 //        reportAppraisals = ReportMgr.activeReport(paramMap, crumbs);
-        chartData = ReportMgr.getChartData(paramMap, crumbs);
-        drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs);
+        chartData = ReportMgr.getChartData(paramMap, crumbs, true);
+        drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false);
 
         return Constants.JSP_REPORT;
     }
