@@ -30,7 +30,7 @@ public class ReportsTest {
                 "appraisals.status not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE " +
                 "in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm AND " +
                 "PYVPASJ_POSN = appraisals.position_number AND PYVPASJ_SUFF = appraisals.job_suffix " +
-                " AND appraisals.overdue > 0 AND appraisals.overdue < 30 GROUP BY PYVPASJ_BCTR_TITLE";
+                " AND appraisals.overdue > 0 GROUP BY PYVPASJ_BCTR_TITLE";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL("root", "unitWayOverdue");
@@ -54,7 +54,7 @@ public class ReportsTest {
                 "appraisals.status not in ('completed', 'archived', 'closed') AND " +
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
                 "AND PYVPASJ_POSN = appraisals.position_number AND PYVPASJ_SUFF = appraisals.job_suffix " +
-                " AND appraisals.overdue > 0 AND appraisals.overdue < 30 GROUP BY  status";
+                " AND appraisals.overdue > 0 GROUP BY  status";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL("root", "stageWayOverdue");
@@ -81,8 +81,8 @@ public class ReportsTest {
                 " WHERE appraisals.status not in ('completed', 'archived', 'closed') AND " +
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
                 "AND PYVPASJ_POSN = appraisals.position_number AND PYVPASJ_SUFF = appraisals.job_suffix  " +
-                "AND PYVPASJ_BCTR_TITLE = :bcName AND appraisals.overdue > 0 AND " +
-                "appraisals.overdue < 30 GROUP BY SUBSTR(PYVPASJ_ORGN_DESC, 1, 3)";
+                "AND PYVPASJ_BCTR_TITLE = :bcName AND appraisals.overdue > 0 " +
+                "GROUP BY SUBSTR(PYVPASJ_ORGN_DESC, 1, 3)";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "unitWayOverdue");
@@ -106,7 +106,7 @@ public class ReportsTest {
                 "in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes " +
                 "AND PYVPASJ_PIDM = appraisals.job_pidm AND PYVPASJ_POSN = appraisals.position_number AND " +
                 "PYVPASJ_SUFF = appraisals.job_suffix  AND PYVPASJ_BCTR_TITLE = :bcName AND " +
-                "appraisals.overdue > 0 AND appraisals.overdue < 30 GROUP BY  status";
+                "appraisals.overdue > 0 GROUP BY  status";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "stageWayOverdue");
@@ -135,7 +135,7 @@ public class ReportsTest {
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
                 "AND PYVPASJ_POSN = appraisals.position_number AND PYVPASJ_SUFF = appraisals.job_suffix " +
                 " AND PYVPASJ_BCTR_TITLE = :bcName AND PYVPASJ_ORGN_DESC LIKE :orgPrefix AND " +
-                "appraisals.overdue > 0 AND appraisals.overdue < 30 GROUP BY PYVPASJ_ORGN_CODE_TS";
+                "appraisals.overdue > 0 GROUP BY PYVPASJ_ORGN_CODE_TS";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "unitWayOverdue");
@@ -161,7 +161,7 @@ public class ReportsTest {
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
                 "AND PYVPASJ_POSN = appraisals.position_number AND PYVPASJ_SUFF = appraisals.job_suffix " +
                 " AND PYVPASJ_BCTR_TITLE = :bcName AND PYVPASJ_ORGN_DESC LIKE :orgPrefix AND" +
-                " appraisals.overdue > 0 AND appraisals.overdue < 30 GROUP BY  status";
+                " appraisals.overdue > 0 GROUP BY  status";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "stageWayOverdue");
@@ -191,7 +191,7 @@ public class ReportsTest {
                 "in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
                 "AND PYVPASJ_POSN = appraisals.position_number AND PYVPASJ_SUFF = appraisals.job_suffix " +
                 " AND PYVPASJ_BCTR_TITLE = :bcName AND PYVPASJ_ORGN_CODE_TS = :tsOrgCode " +
-                " AND appraisals.overdue > 0 AND appraisals.overdue < 30 GROUP BY PYVPASJ_SUPERVISOR_PIDM";
+                " AND appraisals.overdue > 0 GROUP BY PYVPASJ_SUPERVISOR_PIDM";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "unitWayOverdue");
@@ -217,7 +217,7 @@ public class ReportsTest {
                 "AND PYVPASJ_PIDM = appraisals.job_pidm AND PYVPASJ_POSN = appraisals.position_number " +
                 "AND PYVPASJ_SUFF = appraisals.job_suffix  AND PYVPASJ_BCTR_TITLE = :bcName AND" +
                 " PYVPASJ_ORGN_CODE_TS = :tsOrgCode  AND appraisals.overdue > 0 " +
-                "AND appraisals.overdue < 30 GROUP BY  status";
+                "GROUP BY  status";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "stageWayOverdue");

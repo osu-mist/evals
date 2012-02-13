@@ -113,7 +113,7 @@ public class ReportMgr {
         if (reportType.contains("WayOverdue")) {
             where += " AND appraisals.overdue > 30";
         } else if (reportType.contains("Overdue")) {
-            where += " AND appraisals.overdue > 0 AND appraisals.overdue < 30";
+            where += " AND appraisals.overdue > 0";
         }
 
         return select + where + group;
