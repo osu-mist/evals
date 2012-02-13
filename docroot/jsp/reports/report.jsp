@@ -80,26 +80,9 @@
 </c:forEach>
 </table>
 
-<h2>Debug Information</h2>
-<h3>Scope: ${scope} , ScopeValue: ${scopeValue}</h3>
-
-<%--<h2>Data</h2>--%>
-<%--<c:forEach var="row" items="${reportAppraisals}">--%>
-    <%--<c:forEach var="column" items="${row}">--%>
-        <%--<c:out value="${column}"/><br/>--%>
-    <%--</c:forEach>--%>
-    <%-----------------------------------------------------------------<br />--%>
-<%--</c:forEach>--%>
-
-
-<h3>Chart Data</h3>
-<c:forEach var="row" items="${chartData}">
-    <c:forEach var="column" items="${row}">
-        <c:out value="${column}"/><br/>
-    </c:forEach>
-    ---------------------------------------------------------------<br />
-</c:forEach>
-
+<div class="pass-hide">
+    <%@ include file="/jsp/reports/debug.jsp"%>
+</div>
 
 <!--Load the AJAX API-->
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -156,7 +139,7 @@
       // When the table is selected, update the orgchart.
       google.visualization.events.addListener(chart, 'select', function() {
           var chartSelection = chart.getSelection();
-          alert("row selected => " + data.getValue(chartSelection[0].row, 0));
+          console.log("row selected => " + data.getValue(chartSelection[0].row, 0));
 
           if (report == "<%= ReportsAction.REPORT_UNIT_BREAKDOWN%>") {
             var unitName = data.getValue(chartSelection[0].row, 0);
