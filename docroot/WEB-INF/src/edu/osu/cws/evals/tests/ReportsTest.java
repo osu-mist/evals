@@ -261,10 +261,10 @@ public class ReportsTest {
     public void shouldReturnDifferentReportTitleForAUnitBasedReport() {
         HashMap paramMap = new HashMap();
         paramMap.put(ReportsAction.REPORT, "unitOverdue");
-        paramMap.put(ReportsAction.SCOPE_VALUE, ReportsAction.SCOPE_BC);
+        paramMap.put(ReportsAction.SCOPE, ReportsAction.SCOPE_BC);
         assert ReportMgr.getReportTitle(paramMap).equals("report-title-unitOverduebc");
 
-        paramMap.put(ReportsAction.SCOPE_VALUE, ReportsAction.SCOPE_ORG_CODE);
+        paramMap.put(ReportsAction.SCOPE, ReportsAction.SCOPE_ORG_CODE);
         assert ReportMgr.getReportTitle(paramMap).equals("report-title-unitOverdueorgCode");
     }
 }
