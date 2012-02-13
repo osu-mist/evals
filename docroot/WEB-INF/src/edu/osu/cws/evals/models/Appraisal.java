@@ -441,6 +441,10 @@ public class Appraisal extends Evals {
             stage = status.replace("Due", "").replace("Overdue", "");
         }
 
+        if (stage.equals("rebuttalRead")) {
+            stage = Appraisal.STAGE_REBUTTAL;
+        }
+
         return stage;
     }
 
