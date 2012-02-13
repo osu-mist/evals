@@ -6,8 +6,7 @@ import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.util.Breadcrumb;
 import org.hibernate.Session;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class ReportMgr {
 
@@ -180,10 +179,42 @@ public class ReportMgr {
         }
 
         if (report.contains(STAGE)) {
-            results = convertStatusToStage(results);
+            if (!results.isEmpty()) {
+                results = convertStatusToStage(results);
+                results = combineAndSortStages(results);
+            }
         }
 
         return results;
+    }
+
+    /**
+     * Combines and sorts stages such as goals(Approval), goals(Due) and goals(Overdue)
+     * into one.
+     *
+     * @param results       List<Object[]> data that we get back from sql select
+     * @return
+     */
+    public static List<Object[]> combineAndSortStages(List<Object[]> results) {
+        TreeMap<String, Integer> sortedMap = new TreeMap<String, Integer>();
+        ArrayList<Object[]> sortedResults = new ArrayList<Object[]>();
+
+        for (Object[] row : (List<Object[]>) results) {
+            String status = (String) row[1];
+            int count = Integer.parseInt(row[0].toString());
+
+            if (sortedMap.containsKey(status)) {
+                count += sortedMap.get(status);
+            }
+            sortedMap.put(status, count);
+        }
+
+        for (String key : sortedMap.descendingKeySet()) {
+            Object[] row = {sortedMap.get(key), key};
+            sortedResults.add(row);
+        }
+
+        return sortedResults;
     }
 
     /**

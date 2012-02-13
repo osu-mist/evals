@@ -6,7 +6,9 @@ import edu.osu.cws.evals.portlet.ReportsAction;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @Test
 public class ReportsTest {
@@ -294,5 +296,31 @@ public class ReportsTest {
                 " AND PYVPASJ_BCTR_TITLE = :bcName AND PYVPASJ_ORGN_CODE_TS = :tsOrgCode " +
                 " AND appraisals.overdue > 30 GROUP BY  status ORDER BY status, count(*) DESC";
         assert sql.equals(expectedSQL);
+    }
+
+    public void shouldCombineAndSortStagesCorrectly() {
+        List<Object[]> mixedData = new ArrayList<Object[]>();
+        List<Object[]> combinedSortedData = new ArrayList<Object[]>();
+
+        Object[] row1 = {5, "goals"};
+        Object[] row2 = {10, "goals"};
+        Object[] row3 = {20, "goals"};
+        Object[] row4 = {30, "results"};
+        Object[] row5 = {20, "results"};
+
+        mixedData.add(row1);
+        mixedData.add(row2);
+        mixedData.add(row3);
+        mixedData.add(row4);
+        mixedData.add(row5);
+
+        combinedSortedData = ReportMgr.combineAndSortStages(mixedData);
+
+        assert combinedSortedData.size() == 2;
+        assert combinedSortedData.get(0)[1].equals("results");
+        assert combinedSortedData.get(0)[0].equals(50);
+
+        assert combinedSortedData.get(1)[1].equals("goals");
+        assert combinedSortedData.get(1)[0].equals(35);
     }
 }
