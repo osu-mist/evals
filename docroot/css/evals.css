@@ -251,3 +251,83 @@ tr.ui-state-highlight {
 .pass-sortable-icon {
     display: none;
 }
+/** Reports **/
+.osu-cws-report-left {
+    float: left;
+}
+.osu-cws-report-right {
+    margin-left: 58em;
+    width: 30em;
+}
+.osu-cws-report-right a {
+    font-size: 1.18em;
+}
+.chart-div {
+    height: 42em;
+}
+.chart-menu ul {
+    margin: 0;
+    z-index:5
+}
+.chart-menu ul.chart-type-menu {
+    left: 42.3em;
+    position:absolute;
+}
+.chart-menu ul ul {
+    overflow: hidden;
+    display: none;
+}
+.chart-menu li {
+    float: right;
+    border-left: 1px solid #ccc;
+    list-style: none outside none;
+    min-width: 8em;
+    padding-bottom: 0.125em;
+}
+.chart-menu li ul li {
+    background-color:#fff;
+    float: none;
+    border: 1px solid #ccc;
+    border-left: 0;
+    border-top: 0;
+    list-style: none outside none;
+}
+.chart-menu li a {
+    border-bottom: 3px solid #e8e8e8;
+    color: #686868;
+    display: block;
+    height: 1.4em;
+    padding-left: 0.4em;
+    text-decoration: none;
+}
+.chart-menu li li a {
+    border-bottom: 3px solid #fff;
+}
+.chart-menu li a:hover, .chart-menu li a.active {
+    border-bottom: 3px solid #D85A1A;
+}
+.chart-menu ul li:hover ul {
+    display: block;
+}
+/* @todo: the report-data table is no longer needed, remove plz */
+.osu-cws table.report-data {
+    display: inline-table;
+    margin: 0 2em 0 0;
+    width: 30em;
+}
+/* @todo: end the report-data table is no longer needed, remove plz */
+.osu-cws div.chart-area {
+    width: 60em;
+}
+.osu-cws div.chart-content {
+    padding: 0 1.5em 1.5em 1em;
+}
+/** Breadcrumbs **/
+.osu-cws-breadcrumbs {
+    margin: 1em 0 0 0;
+}
+
+/** Generic OSU CSS **/
+.osu-cws-clear-both {
+    clear: both;
+}

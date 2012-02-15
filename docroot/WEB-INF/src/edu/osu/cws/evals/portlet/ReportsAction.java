@@ -122,6 +122,7 @@ public class ReportsAction implements ActionInterface {
         actionHelper.addToRequestMap("scopeValue", scopeValue);
         actionHelper.addToRequestMap("report", paramMap.get(REPORT));
         actionHelper.addToRequestMap("reportTitle", ReportMgr.getReportTitle(paramMap));
+        actionHelper.addToRequestMap("reportHeader", ReportMgr.getReportHeader(paramMap));
 
         String nextScope = nextScopeInDrillDown(scope);
         actionHelper.addToRequestMap("nextScope", nextScope);

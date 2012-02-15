@@ -13,10 +13,6 @@ public class ReportMgr {
     public static final String STAGE = "stage";
     public static final String UNIT = "unit";
 
-    //@todo: needed for charts:
-    // 1 - column headers for the data at each level - # of evaluations & (bc|orgPrefix|orgCode|supervisor)
-    // 2 - chart title different for each report?
-
     /**
      * Performs sql query to fetch appraisals and only the needed fields. In order to
      * optimize sql, depending on the scope a different sql query is used.
@@ -263,6 +259,28 @@ public class ReportMgr {
         String title = "report-title-" + report;
         if (report.contains(UNIT)) {
             title += scope;
+        }
+
+        return title;
+    }
+
+    /**
+     * Returns the report header key, to be used when displaying the header of the
+     * report (visualization chart). The actual text can be found in the
+     * Language.properties file. Header examples: BC, OrgCode, Stage
+     *
+     * @param paramMap  search/request parameters
+     * @return  report header key
+     */
+    public static String getReportHeader(HashMap paramMap) {
+        String report = (String) paramMap.get(ReportsAction.REPORT);
+        String scope = (String) paramMap.get(ReportsAction.SCOPE);
+
+        String title = "report-header-";
+        if (report.contains(UNIT)) {
+            title += scope;
+        } else {
+            title += "stages";
         }
 
         return title;
