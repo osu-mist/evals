@@ -78,19 +78,20 @@ public class ReportsAction implements ActionInterface {
      * @throws Exception
      */
     public String report(PortletRequest request, PortletResponse response) throws Exception {
-        setParamMap(request);
         PortletSession session = request.getPortletSession();
-        session.removeAttribute("paramMap");
-        session.setAttribute("paramMap", paramMap);
+        setParamMap(request);
 
         String breadcrumbSessKey = "breadcrumbList";
         List<Breadcrumb> sessionBreadcrumbs = (List<Breadcrumb>) session.getAttribute(breadcrumbSessKey);
         breadcrumbList = getBreadcrumbs(sessionBreadcrumbs);
-        session.setAttribute(breadcrumbSessKey, breadcrumbList);
 
         String jspFile = activeReport(breadcrumbList);
         setupDataForJSP();
         actionHelper.useMaximizedMenu(request);
+
+        // Save session values only if we didn't throw an exception before we got here.
+        session.setAttribute(breadcrumbSessKey, breadcrumbList);
+        session.setAttribute("paramMap", paramMap);
 
         return jspFile;
     }
@@ -166,8 +167,9 @@ public class ReportsAction implements ActionInterface {
 	 *    3. return breadCrumbFromSession.add(new Breadcumb(...))
      *    4. if somebody clicks on a previous scope of the breadcrumb, we need to remove
      *    the rest of the scopes down the chain.
+     * @param sessionBreadcrumbs
+     * @return
      */
-
     private List<Breadcrumb> getBreadcrumbs(List<Breadcrumb> sessionBreadcrumbs) {
         List<Breadcrumb> crumbs = new ArrayList<Breadcrumb>();
         Breadcrumb rootBreadcrumb = new Breadcrumb("OSU", DEFAULT_SCOPE, DEFAULT_SCOPE_VALUE);
