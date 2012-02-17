@@ -1,7 +1,5 @@
 package edu.osu.cws.evals.hibernate;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.ActionHelper;
 import edu.osu.cws.evals.portlet.Constants;
@@ -36,7 +34,6 @@ public class AppraisalMgr {
     private HashMap<Integer, Reviewer> reviewers = new HashMap<Integer, Reviewer>();
     private Mailer mailer;
     Map<String, Configuration> configurationMap;
-    private static Log _log = LogFactoryUtil.getLog(AppraisalMgr.class);
 
     public AppraisalMgr() {
         SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
@@ -1072,7 +1069,6 @@ public class AppraisalMgr {
             hibQuery.setInteger("overdue", appraisal.getOverdue());
         }
 
-        _log.error(" the execute update is about to run");
         hibQuery.executeUpdate();
     }
 

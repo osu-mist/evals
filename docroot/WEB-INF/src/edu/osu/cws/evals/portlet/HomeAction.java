@@ -57,7 +57,6 @@ public class HomeAction implements ActionInterface {
             actionHelper.addToRequestMap("hasNoEvalsAccess", true);
         }
 
-        setupDemoSwitch(request, employee);
         actionHelper.setRequiredActions(request);
         if (homeJSP.equals(Constants.JSP_HOME_REVIEWER)) {
             int maxResults = config.getInt("reviewer.home.pending.max");
@@ -85,20 +84,6 @@ public class HomeAction implements ActionInterface {
     }
 
     /**
-     * Set up the attributes needed for the user switch used by the demo.
-     *
-     * @param request
-     * @param employee
-     */
-    private void setupDemoSwitch(PortletRequest request, Employee employee) throws Exception {
-        // set Employee  and employees object(s) - used by demo
-        // @todo: remove after demo
-        actionHelper.addToRequestMap("employees", EmployeeMgr.list());
-        actionHelper.addToRequestMap("employee", employee);
-        // end of remove section for demo
-    }
-
-    /**
      * Handles the user clicking on a link to reset the status of the open appraisal to set the status
      * to goals-due or results-due.
      *
@@ -108,24 +93,25 @@ public class HomeAction implements ActionInterface {
      * @throws Exception
      */
     public String demoResetAppraisal(PortletRequest request, PortletResponse response) throws Exception {
+        if (!actionHelper.isDemo()) {
+            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            return display(request, response);
+        }
+
         int id = ParamUtil.getInteger(request, "id");
         String status = ParamUtil.getString(request, "status");
 
-        _log.error("id = " + id + " status = " + status);
         if (id == 0 || status == null || status.equals("")) {
             actionHelper.addErrorsToRequest(request, "Could not reset the appraisal. Invalid ID or Status.");
         }
 
-        _log.error("in demo reset appraisal after 1st if");
         try {
             Appraisal appraisal = new Appraisal();
             appraisal.setId(id);
             appraisal.setStatus(status);
             appraisal.setOriginalStatus(status);
 
-            _log.error("about to call update status on appraisal");
             AppraisalMgr.updateAppraisalStatus(appraisal, false);
-            _log.error("done calling update status");
         } catch (Exception e) {
             _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
         }
@@ -147,6 +133,11 @@ public class HomeAction implements ActionInterface {
      * @return
      */
     public String demoSwitchUser(PortletRequest request, PortletResponse response) throws Exception {
+        if (!actionHelper.isDemo()) {
+            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            return display(request, response);
+        }
+
         PortletSession session = request.getPortletSession(true);
         int employeeID = Integer.parseInt(ParamUtil.getString(request, "employee.id"));
         Employee employee = new Employee();

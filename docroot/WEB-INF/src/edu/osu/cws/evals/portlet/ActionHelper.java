@@ -9,6 +9,7 @@ import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsPDF;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
+import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.hibernate.Session;
 
@@ -802,6 +803,37 @@ public class ActionHelper {
         }
 
         return currentRole;
+    }
+
+    /**
+     * Whether the current instance of the portlet should enable demo features.
+     * The hostname of the demo server is specified in default.properties.
+     *
+     * @return
+     */
+    public boolean isDemo() {
+        CompositeConfiguration config = (CompositeConfiguration)
+                getPortletContextAttribute("environmentProp");
+        String demoHostname = config.getString("demo.hostname");
+        String serverHostname = CWSUtil.getLocalHostname();
+
+        return demoHostname.equals(serverHostname);
+    }
+
+    /**
+     * Set up the attributes needed for the user switch used by the demo.
+     *
+     * @param request
+     * @throws Exception
+     */
+    public void setupDemoSwitch(PortletRequest request) throws Exception {
+        if (!isDemo()) {
+            return;
+        }
+
+        // set Employee  and employees object(s)
+        addToRequestMap("employees", EmployeeMgr.list());
+        addToRequestMap("employee", getLoggedOnUser(request));
     }
 
 }

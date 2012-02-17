@@ -6,5 +6,7 @@
 </c:if>
 
 <%@ include file="/jsp/home/helpLinks.jsp" %>
-<%@ include file="/jsp/home/switchUser.jsp" %>
+<c:if test="${isDemo}">
+    <%@ include file="/jsp/home/switchUser.jsp" %>
+</c:if>
 <%@ include file="/jsp/footer.jsp" %>
