@@ -127,10 +127,6 @@
 
 <div class="osu-cws-clear-both"></div>
 
-<div class="pass-hide">
-    <%@ include file="/jsp/reports/debug.jsp"%>
-</div>
-
 <!--Load the AJAX API-->
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 

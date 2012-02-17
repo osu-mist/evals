@@ -16,6 +16,7 @@ public class ReportMgr {
     /**
      * Performs sql query to fetch appraisals and only the needed fields. In order to
      * optimize sql, depending on the scope a different sql query is used.
+     * @todo: if we don't use this method to download csv data, remove it
      *
      * @param paramMap  Parameter map with search/filter options.
      * @param crumbs    Breadcrumb list so that we can refer back to previous filter options.
@@ -164,10 +165,6 @@ public class ReportMgr {
                     .setParameter("bcName", bcName)
                     .setParameter("tsOrgCode", scopeValue)
                     .list();
-//        } else if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
-//            results = session.getNamedQuery("report.allActiveOSU")
-//                    .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
-//                    .list();
         } else {
             results = session.createSQLQuery(sqlQuery)
                     .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)

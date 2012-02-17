@@ -65,8 +65,6 @@ public class ReportsAction implements ActionInterface {
      * Value displayed when generating the drill down links in data table.
      */
     HashMap<String, Integer> units = new HashMap<String, Integer>();
-    private static Log _log = LogFactoryUtil.getLog(ReportsAction.class);
-
 
     /**
      * Main method used in this class. It responds to the user request when the user is viewing
@@ -97,23 +95,6 @@ public class ReportsAction implements ActionInterface {
     }
 
     private void setupDataForJSP() {
-//        for (Object[] row : reportAppraisals) {
-//            if (row.length != 0 && row[0] != null) {
-//                Integer unitCount = 1;
-//                String unitName = row[0].toString();
-//                if (units.containsKey(unitName)) {
-//                    unitCount = units.get(unitName) + 1;
-//                }
-//                units.put(unitName, unitCount);
-//            }
-//            debug(row);
-//        }
-//        for (Map.Entry<String, Integer> unit : units.entrySet()) {
-//            _log.error("unit.key = " + unit.getKey() + " unit.value = " + unit.getValue());
-//        }
-//        actionHelper.addToRequestMap("reportAppraisals", reportAppraisals);
-//        actionHelper.addToRequestMap("units", units);
-
         actionHelper.addToRequestMap("chartData", chartData);
         actionHelper.addToRequestMap("drillDownData", drillDownData);
 
@@ -139,18 +120,7 @@ public class ReportsAction implements ActionInterface {
         return (String) DRILL_DOWN_INDEX[nextDrillDownScope];
     }
 
-    private void debug(Object[] row) {
-        int i = 0;
-        for (Object column : row) {
-            if (column != null) {
-                _log.error("column [" + i + "] = " + column.toString());
-            }
-            i++;
-        }
-    }
-
     private String activeReport(List<Breadcrumb> crumbs) {
-//        reportAppraisals = ReportMgr.activeReport(paramMap, crumbs);
         chartData = ReportMgr.getChartData(paramMap, crumbs, true);
         drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false);
 
