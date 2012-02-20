@@ -13,17 +13,20 @@
                         <li><a href="#" id ="<portlet:namespace/>changeToBarType">Bar Chart</a></li>
                     </ul>
                 </li>
-                <c:if test="${scope != 'orgCode'}">
+                <c:if test="${scope != 'orgCode' && (allowAllDrillDown || reviewerBCName != '')}">
                     <li><a href="#"><liferay-ui:message key="report-drilldown"/></a>
                         <ul>
                         <c:forEach var="unit" items="${drillDownData}" varStatus="loopStatus">
-                            <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-                                <portlet:param name="action" value="report"/>
-                                <portlet:param name="controller" value="ReportsAction"/>
-                                <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
-                                <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${unit[1]}"/>
-                                </portlet:actionURL>">${unit[1]}</a>
-                            </li>
+                            <c:if test="${(scope == 'root' && reviewerBCName == unit[1])
+                            || allowAllDrillDown || scope != 'root'}">
+                                <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                                    <portlet:param name="action" value="report"/>
+                                    <portlet:param name="controller" value="ReportsAction"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${unit[1]}"/>
+                                    </portlet:actionURL>">${unit[1]}</a>
+                                </li>
+                            </c:if>
                         </c:forEach>
                         </ul>
                     </li>
@@ -158,23 +161,40 @@
 
       // When the table is selected, update the orgchart.
       google.visualization.events.addListener(chart, 'select', function() {
-          var chartSelection = chart.getSelection();
-          console.log("row selected => " + data.getValue(chartSelection[0].row, 0));
-
-          if (report == "<%= ReportsAction.REPORT_UNIT_BREAKDOWN%>") {
-            var unitName = data.getValue(chartSelection[0].row, 0);
-            var drillDownURL= '<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-                <portlet:param name="action" value="report"/>
-                <portlet:param name="controller" value="ReportsAction"/>
-                <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
-                <portlet:param name="<%= ReportsAction.REPORT %>" value="<%= ReportsAction.REPORT_UNIT_BREAKDOWN%>"/>
-                <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="unitName"/>
-                </portlet:actionURL>';
-
-            drillDownURL = drillDownURL.replace("unitName", unitName);
-            window.location = drillDownURL;
-          }
+          chartDrillDown();
       });
+  }
+
+  /**
+   * Handles the user clicking on the drill down links
+   */
+  function chartDrillDown() {
+    var chartSelection = chart.getSelection();
+
+    if (report == "<%= ReportsAction.REPORT_UNIT_BREAKDOWN%>") {
+      var unitName = data.getValue(chartSelection[0].row, 0);
+
+      var scope = '${scope}';
+      var allowAllDrillDown = ${allowAllDrillDown};
+      var reviewerBCName = "${reviewerBCName}";
+
+      if (scope == "<%= ReportsAction.DEFAULT_SCOPE%>") {
+        if (!allowAllDrillDown && reviewerBCName != unitName) {
+          return;
+        }
+      }
+
+      var drillDownURL= '<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+        <portlet:param name="action" value="report"/>
+        <portlet:param name="controller" value="ReportsAction"/>
+        <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
+        <portlet:param name="<%= ReportsAction.REPORT %>" value="<%= ReportsAction.REPORT_UNIT_BREAKDOWN%>"/>
+        <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="unitName"/>
+        </portlet:actionURL>';
+
+      drillDownURL = drillDownURL.replace("unitName", unitName);
+      window.location = drillDownURL;
+    }
   }
 
 jQuery(document).ready(function() {

@@ -7,9 +7,7 @@ import edu.osu.cws.evals.hibernate.ReportMgr;
 import edu.osu.cws.util.Breadcrumb;
 import org.apache.commons.lang.ArrayUtils;
 
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-import javax.portlet.PortletSession;
+import javax.portlet.*;
 import java.util.*;
 
 public class ReportsAction implements ActionInterface {
@@ -83,8 +81,16 @@ public class ReportsAction implements ActionInterface {
         List<Breadcrumb> sessionBreadcrumbs = (List<Breadcrumb>) session.getAttribute(breadcrumbSessKey);
         breadcrumbList = getBreadcrumbs(sessionBreadcrumbs);
 
+        if (!canViewReport(request)) {
+            if (response instanceof ActionResponse) {
+                ((ActionResponse) response ).setWindowState(WindowState.NORMAL);
+            }
+            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            return homeAction.display(request, response);
+        }
+
         String jspFile = activeReport(breadcrumbList);
-        setupDataForJSP();
+        setupDataForJSP(request);
         actionHelper.useMaximizedMenu(request);
 
         // Save session values only if we didn't throw an exception before we got here.
@@ -94,7 +100,7 @@ public class ReportsAction implements ActionInterface {
         return jspFile;
     }
 
-    private void setupDataForJSP() {
+    private void setupDataForJSP(PortletRequest request) throws Exception {
         actionHelper.addToRequestMap("chartData", chartData);
         actionHelper.addToRequestMap("drillDownData", drillDownData);
 
@@ -109,6 +115,19 @@ public class ReportsAction implements ActionInterface {
         String nextScope = nextScopeInDrillDown(scope);
         actionHelper.addToRequestMap("nextScope", nextScope);
         actionHelper.addToRequestMap("breadcrumbList", breadcrumbList);
+
+        boolean allowAllDrillDown = false;
+        if (actionHelper.isLoggedInUserAdmin(request)) {
+            allowAllDrillDown = true;
+        }
+        actionHelper.addToRequestMap("allowAllDrillDown", allowAllDrillDown);
+
+        String reviewerBCName = "";
+        if (actionHelper.isLoggedInUserReviewer(request)) {
+            int employeeID = actionHelper.getLoggedOnUser(request).getId();
+            reviewerBCName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
+        }
+        actionHelper.addToRequestMap("reviewerBCName", reviewerBCName);
     }
 
     private String nextScopeInDrillDown(String currentScope) {
@@ -237,5 +256,35 @@ public class ReportsAction implements ActionInterface {
 
     public void setHomeAction(HomeAction homeAction) {
         this.homeAction = homeAction;
+    }
+
+    /**
+     * Checks the permissions of the logged in user to determine if they can view
+     * the current report they are requesting.
+     *
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    public boolean canViewReport(PortletRequest request) throws Exception {
+        if (actionHelper.isLoggedInUserAdmin(request)) {
+            return true;
+        }
+
+        if (getScope().equals(DEFAULT_SCOPE)) {
+            return true;
+        }
+
+        if (actionHelper.isLoggedInUserReviewer(request)) {
+            int employeeID = actionHelper.getLoggedOnUser(request).getId();
+            String businessCenterName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
+            if (breadcrumbList.size() > 1) {
+                Breadcrumb bcBreadcrumb = breadcrumbList.get(1);
+                if (bcBreadcrumb.getScopeValue().equals(businessCenterName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
