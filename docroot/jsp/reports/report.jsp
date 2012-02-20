@@ -38,21 +38,6 @@
 </div>
 
 <div class="osu-cws-report-right">
-
-    <%--remove after demo--%>
-    <div id="<portlet:namespace/>accordionMenupassNotification" class="accordion-menu">
-        <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>passNotification');">
-            <img id="<portlet:namespace/>passNotificationImageToggle" src="/cps/images/accordion/accordion_arrow_up.png"/>
-            <liferay-ui:message key="notifications" />
-        </div>
-        <div class="accordion-content pass-notification" id="<portlet:namespace/>passNotification" style="display: block;">
-            <h3><liferay-ui:message key="my-eval-actions" /></h3>
-            <ul class="pass-menu-list">
-                <li><a href="#">Software Architect Goals Overdue for 06/01/11 - 12/31/11 by 258 day(s)</a></li>
-            </ul>
-        </div>
-    </div>
-    <%--end of remove after demo--%>
         
     <div id="<portlet:namespace/>accordionMenuChooseReport" class="accordion-menu">
         <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>ChooseReport');">
@@ -106,22 +91,6 @@
             </ul>
         </div>
     </div>
-
-    <%--remove after demo--%>
-    <div id="<portlet:namespace/>accordionMenukeyStatistics" class="accordion-menu">
-        <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>keyStatistics');">
-            <img id="<portlet:namespace/>keyStatisticsImageToggle" src="/cps/images/accordion/accordion_arrow_up.png"/>
-            <liferay-ui:message key="report-key-statistics" />
-        </div>
-        <div class="accordion-content" id="<portlet:namespace/>keyStatistics" style="display: block;">
-            <ul class="pass-menu-list">
-                <li><a href="#">20 Evaluations Overdue</a></li>
-                <li><a href="#">10 Evaluations 30+ days overdue</a></li>
-                <li><a href="#">5 Evaluations recently completed</a></li>
-            </ul>
-        </div>
-    </div>
-    <%-- end remove after demo--%>
 
 </div>
 
