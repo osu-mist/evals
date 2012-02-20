@@ -219,6 +219,14 @@ public class ReportsAction implements ActionInterface {
         }
 
 
+        // If the user is about to enter the org code scope and the chart is by Unit, use stage
+        String selectedReport = (String) paramMap.get(REPORT);
+        String selectedScope = (String) paramMap.get(SCOPE);
+        if (selectedScope.equals(SCOPE_ORG_CODE) && selectedReport.contains(ReportMgr.UNIT)) {
+            paramMap.put(REPORT,  REPORT_STAGE_BREAKDOWN);
+        }
+
+
         int breadcrumbIndex = ParamUtil.getInteger(request, BREADCRUMB_INDEX, -1);
         paramMap.put(BREADCRUMB_INDEX, breadcrumbIndex);
     }
