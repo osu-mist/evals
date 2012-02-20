@@ -270,8 +270,8 @@ tr.ui-state-highlight {
     z-index:5
 }
 .chart-menu ul.chart-type-menu {
-    left: 42.3em;
     position:absolute;
+    width: 53.8em;
 }
 .chart-menu ul ul {
     overflow: hidden;
@@ -283,6 +283,7 @@ tr.ui-state-highlight {
     list-style: none outside none;
     min-width: 8em;
     padding-bottom: 0.125em;
+    position: relative;
 }
 .chart-menu li ul li {
     background-color:#fff;
