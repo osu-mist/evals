@@ -323,4 +323,177 @@ public class ReportsTest {
         assert combinedSortedData.get(1)[1].equals("goals");
         assert combinedSortedData.get(1)[0].equals(35);
     }
+
+    public void shouldProduceCorrectListHQLForRootLevel() {
+        String scope;
+        String hql;
+        String expectedHQL;
+        scope = ReportsAction.DEFAULT_SCOPE;
+
+        hql = ReportMgr.getListHQL(scope, "unitBreakdown");
+        expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
+                "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
+                " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
+                 " from edu.osu.cws.evals.models.Appraisal " +
+                " where status not in ('completed', 'archived', 'closed') " +
+                " and job.appointmentType in :appointmentTypes ";
+        assert hql.equals(expectedHQL);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN);
+        assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
+
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE);
+        expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
+                "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
+                " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
+                 " from edu.osu.cws.evals.models.Appraisal " +
+                " where status not in ('completed', 'archived', 'closed') " +
+                " and job.appointmentType in :appointmentTypes  and overdue > 0";
+        assert hql.equals(expectedHQL);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE);
+        assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
+
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE);
+        expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
+                "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
+                " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
+                 " from edu.osu.cws.evals.models.Appraisal " +
+                " where status not in ('completed', 'archived', 'closed') " +
+                " and job.appointmentType in :appointmentTypes  and overdue > 30";
+        assert hql.equals(expectedHQL);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE);
+        assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
+    }
+
+    public void shouldProduceCorrectListHQLForBCLevel() {
+        String scope;
+        String hql;
+        String expectedHQL;
+        scope = ReportsAction.SCOPE_BC;
+
+        hql = ReportMgr.getListHQL(scope, "unitBreakdown");
+        expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
+                "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
+                " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
+                 " from edu.osu.cws.evals.models.Appraisal " +
+                " where status not in ('completed', 'archived', 'closed') " +
+                " and job.appointmentType in :appointmentTypes " +
+                " and job.businessCenterName = :bcName";
+        assert hql.equals(expectedHQL);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN);
+        assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
+
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE);
+        expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
+                "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
+                " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
+                 " from edu.osu.cws.evals.models.Appraisal " +
+                " where status not in ('completed', 'archived', 'closed') " +
+                " and job.appointmentType in :appointmentTypes " +
+                " and job.businessCenterName = :bcName and overdue > 0";
+        assert hql.equals(expectedHQL);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE);
+        assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
+
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE);
+        expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
+                "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
+                " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
+                 " from edu.osu.cws.evals.models.Appraisal " +
+                " where status not in ('completed', 'archived', 'closed') " +
+                " and job.appointmentType in :appointmentTypes " +
+                " and job.businessCenterName = :bcName and overdue > 30";
+        assert hql.equals(expectedHQL);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE);
+        assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
+    }
+
+    public void shouldProduceCorrectListHQLForOrgPrefixLevel() {
+        String scope = ReportsAction.SCOPE_ORG_PREFIX;
+        String hql;
+        String expectedHQL;
+
+
+        hql = ReportMgr.getListHQL(scope, "unitBreakdown");
+        expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
+                "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
+                " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
+                 " from edu.osu.cws.evals.models.Appraisal " +
+                " where status not in ('completed', 'archived', 'closed') " +
+                " and job.appointmentType in :appointmentTypes " +
+                " and job.businessCenterName = :bcName and job.orgCodeDescription LIKE :orgPrefix";
+        assert hql.equals(expectedHQL);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN);
+        assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
+
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE);
+        expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
+                "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
+                " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
+                 " from edu.osu.cws.evals.models.Appraisal " +
+                " where status not in ('completed', 'archived', 'closed') " +
+                " and job.appointmentType in :appointmentTypes " +
+                " and job.businessCenterName = :bcName and job.orgCodeDescription LIKE :orgPrefix" +
+                " and overdue > 0";
+        assert hql.equals(expectedHQL);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE);
+        assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
+
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE);
+        expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
+                "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
+                " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
+                 " from edu.osu.cws.evals.models.Appraisal " +
+                " where status not in ('completed', 'archived', 'closed') " +
+                " and job.appointmentType in :appointmentTypes " +
+                " and job.businessCenterName = :bcName and job.orgCodeDescription LIKE :orgPrefix" +
+                " and overdue > 30";
+        assert hql.equals(expectedHQL);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE);
+        assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
+    }
+
+    public void shouldProduceCorrectListHQLForOrgCodeLevel() {
+        String scope = ReportsAction.SCOPE_ORG_CODE;
+        String hql;
+        String expectedHQL;
+
+
+        hql = ReportMgr.getListHQL(scope, "unitBreakdown");
+        expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
+                "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
+                " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
+                 " from edu.osu.cws.evals.models.Appraisal " +
+                " where status not in ('completed', 'archived', 'closed') " +
+                " and job.appointmentType in :appointmentTypes " +
+                " and job.businessCenterName = :bcName and job.tsOrgCode = :tsOrgCode";
+        assert hql.equals(expectedHQL);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN);
+        assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
+
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE);
+        expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
+                "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
+                " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
+                " from edu.osu.cws.evals.models.Appraisal " +
+                " where status not in ('completed', 'archived', 'closed') " +
+                " and job.appointmentType in :appointmentTypes " +
+                " and job.businessCenterName = :bcName and job.tsOrgCode = :tsOrgCode" +
+                " and overdue > 0";
+        assert hql.equals(expectedHQL);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE);
+        assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
+
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE);
+        expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
+                "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
+                " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
+                 " from edu.osu.cws.evals.models.Appraisal " +
+                " where status not in ('completed', 'archived', 'closed') " +
+                " and job.appointmentType in :appointmentTypes " +
+                " and job.businessCenterName = :bcName and job.tsOrgCode = :tsOrgCode" +
+                " and overdue > 30";
+        assert hql.equals(expectedHQL);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE);
+        assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
+    }
 }

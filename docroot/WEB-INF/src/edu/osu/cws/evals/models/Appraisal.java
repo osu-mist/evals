@@ -301,6 +301,42 @@ public class Appraisal extends Evals {
         this.job = tempJob;
     }
 
+    /**
+     * Constructor used by ReportMgr.getListHQL. It only fetches the data that it needs. The
+     * employee.id and job's pidm, posno and suffix are dummy data since they are only needed
+     * to construct the object.
+     *
+     * @param id
+     * @param firstName
+     * @param lastName
+     * @param startDate
+     * @param endDate
+     * @param status
+     * @param overdue
+     * @param employeeId
+     * @param positionNumber
+     * @param suffix
+     */
+    public Appraisal(int id, String firstName, String lastName, Date startDate, Date endDate,
+                     String status, int overdue, int employeeId, String positionNumber, String suffix) {
+        Employee employee = new Employee();
+        employee.setId(employeeId);
+        employee.setLastName(lastName);
+        employee.setFirstName(firstName);
+
+        Job tempJob = new Job();
+        tempJob.setPositionNumber(positionNumber);
+        tempJob.setSuffix(suffix);
+        tempJob.setEmployee(employee);
+
+        this.id = id;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = status;
+        this.job = tempJob;
+        this.overdue = overdue;
+    }
+
     public boolean validateJob() {
         ArrayList<String> jobErrors = new ArrayList<String>();
 
@@ -446,6 +482,18 @@ public class Appraisal extends Evals {
         }
 
         return stage;
+    }
+
+    /**
+     * Used by the report list data. If the object is not overdue, we display - .
+     *
+     * @return
+     */
+    public String getViewOverdue() {
+        if (overdue < 1) {
+            return "-";
+        }
+        return overdue.toString();
     }
 
     public int getId() {

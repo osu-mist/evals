@@ -282,4 +282,86 @@ public class ReportMgr {
 
         return title;
     }
+
+    /**
+     * Returns the hql needed to display the list of evaluation records in the reports.
+     *
+     * @param scope
+     * @param reportType
+     * @return
+     */
+    //@todo: how do we sort this data?
+    public static String getListHQL(String scope, String reportType) {
+        String select = "select new edu.osu.cws.evals.models.Appraisal (" +
+                "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
+                " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
+                " from edu.osu.cws.evals.models.Appraisal ";
+        String where = " where status not in ('completed', 'archived', 'closed') " +
+                " and job.appointmentType in :appointmentTypes ";
+        String order = " order by ";
+
+        if (scope.equals(ReportsAction.SCOPE_BC)) {
+            where += " and job.businessCenterName = :bcName";
+        } else if (scope.equals(ReportsAction.SCOPE_ORG_PREFIX)) {
+            where += " and job.businessCenterName = :bcName" +
+                    " and job.orgCodeDescription LIKE :orgPrefix";
+        } else if (scope.equals(ReportsAction.SCOPE_ORG_CODE)) {
+            where += " and job.businessCenterName = :bcName" +
+                    " and job.tsOrgCode = :tsOrgCode";
+        }
+
+        if (reportType.contains("WayOverdue")) {
+            where += " and overdue > 30";
+        } else if (reportType.contains("Overdue")) {
+            where += " and overdue > 0";
+        }
+
+        return select + where;
+    }
+
+    /**
+     * Returns the data needed to generate the google charts and nothing more.
+     *
+     * @param paramMap
+     * @param crumbs
+     * @return
+     */
+    public static List<Appraisal> getListData(HashMap paramMap, List<Breadcrumb> crumbs) {
+        Session session = HibernateUtil.getCurrentSession();
+
+        List<Appraisal> results;
+        String scope = (String) paramMap.get(ReportsAction.SCOPE);
+        String scopeValue = (String) paramMap.get(ReportsAction.SCOPE_VALUE);
+        String report = (String) paramMap.get(ReportsAction.REPORT);
+        String bcName = "";
+        if (crumbs.size() > 1) {
+            bcName = crumbs.get(1).getScopeValue();
+        }
+
+        String hqlQuery = getListHQL(scope, report);
+        if (scope.equals(ReportsAction.SCOPE_BC)) {
+            results = (ArrayList<Appraisal>) session.createQuery(hqlQuery)
+                    .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+                    .setParameter("bcName", scopeValue)
+                    .list();
+        } else if (scope.equals(ReportsAction.SCOPE_ORG_PREFIX)) {
+            results = (ArrayList<Appraisal>) session.createQuery(hqlQuery)
+                    .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+                    .setParameter("orgPrefix", scopeValue + "%")
+                    .setParameter("bcName", bcName)
+                    .list();
+        } else if (scope.equals(ReportsAction.SCOPE_ORG_CODE)) {
+            results = (ArrayList<Appraisal>) session.createQuery(hqlQuery)
+                    .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+                    .setParameter("bcName", bcName)
+                    .setParameter("tsOrgCode", scopeValue)
+                    .list();
+        } else {
+            results = (ArrayList<Appraisal>) session.createQuery(hqlQuery)
+                    .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+                    .list();
+        }
+
+        return results;
+    }
 }

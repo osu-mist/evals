@@ -102,6 +102,8 @@
 
 <div class="osu-cws-clear-both"></div>
 
+<%@ include file="/jsp/reports/reportList.jsp"%>
+
 <!--Load the AJAX API-->
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 

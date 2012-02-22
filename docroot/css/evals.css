@@ -312,9 +312,8 @@ tr.ui-state-highlight {
 }
 /* @todo: the report-data table is no longer needed, remove plz */
 .osu-cws table.report-data {
-    display: inline-table;
     margin: 0 2em 0 0;
-    width: 30em;
+    width: 55em;
 }
 /* @todo: end the report-data table is no longer needed, remove plz */
 .osu-cws div.chart-area {

@@ -1,9 +1,9 @@
 package edu.osu.cws.evals.portlet;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.ReportMgr;
+import edu.osu.cws.evals.models.Appraisal;
+import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.util.Breadcrumb;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -55,7 +55,7 @@ public class ReportsAction implements ActionInterface {
      */
     private HashMap paramMap = new HashMap();
 
-    private List<Object[]> reportAppraisals;
+    private List<Appraisal> listAppraisals;
     private List<Object[]> chartData;
     private List<Object[]> drillDownData;
 
@@ -103,6 +103,7 @@ public class ReportsAction implements ActionInterface {
     private void setupDataForJSP(PortletRequest request) throws Exception {
         actionHelper.addToRequestMap("chartData", chartData);
         actionHelper.addToRequestMap("drillDownData", drillDownData);
+        actionHelper.addToRequestMap("listAppraisals", listAppraisals);
 
         String scope = getScope();
         String scopeValue = getScopeValue();
@@ -142,8 +143,39 @@ public class ReportsAction implements ActionInterface {
     private String activeReport(List<Breadcrumb> crumbs) {
         chartData = ReportMgr.getChartData(paramMap, crumbs, true);
         drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false);
+        if (shouldListAppraisals()) {
+            listAppraisals = ReportMgr.getListData(paramMap, crumbs);
+        }
 
         return Constants.JSP_REPORT;
+    }
+
+    /**
+     * Whether or not we should be listing the evaluation records that match the paramMap
+     * search criteria.
+     *
+     * Right now, we display the data list when:
+     * 1) the scope level is orgCode
+     * 2) if the # of evaluation records is less than a configuration value
+     *
+     * @return
+     */
+    private boolean shouldListAppraisals() {
+        if (getScope().equals(SCOPE_ORG_CODE)) {
+            return true;
+        }
+
+        int numberOfEvalRecords = 0;
+        Map<String, Configuration> configurationMap =
+                (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
+        Configuration config = configurationMap.get("reportMaxDataForList");
+        int maxDataForList = Integer.parseInt(config.getValue());
+
+        for (Object[] row : chartData ) {
+            numberOfEvalRecords += Integer.parseInt(row[0].toString());
+        }
+
+        return numberOfEvalRecords <= maxDataForList;
     }
 
     /**
