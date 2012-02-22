@@ -116,7 +116,8 @@
   google.setOnLoadCallback(drawChart);
   var chart;
   var chartType = "pie";
-  var data;
+  var chartData;
+  var trimmedChartData;
   var report = "${report}";
 
   // Callback that creates and populates a data table,
@@ -124,11 +125,23 @@
   // draws it.
   function drawChart() {
     // Create the data table.
-    data = new google.visualization.DataTable();
-    data.addColumn('string', '<liferay-ui:message key="${reportHeader}"/>');
-    data.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evals"/>');
-    data.addRows([
+    chartData = new google.visualization.DataTable();
+    chartData.addColumn('string', '<liferay-ui:message key="${reportHeader}"/>');
+    chartData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evals"/>');
+    chartData.addRows([
         <c:forEach var="row" items="${chartData}" varStatus="loopStatus">
+            ['${row[1]}', ${row[0]}]
+            <c:if test="${!loopStatus.last}">
+                ,
+            </c:if>
+        </c:forEach>
+    ]);
+      
+    trimmedChartData = new google.visualization.DataTable();
+    trimmedChartData.addColumn('string', '<liferay-ui:message key="${reportHeader}"/>');
+    trimmedChartData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evals"/>');
+    trimmedChartData.addRows([
+        <c:forEach var="row" items="${trimmedChartData}" varStatus="loopStatus">
             ['${row[1]}', ${row[0]}]
             <c:if test="${!loopStatus.last}">
                 ,
@@ -156,10 +169,10 @@
       }
 
       // Instantiate and draw our chart, passing in some options.
-      chart.draw(data, options);
+      chart.draw(trimmedChartData, options);
 
       var table = new google.visualization.Table(document.getElementById('<portlet:namespace/>chart-data-div'));
-      table.draw(data, {});
+      table.draw(chartData, {});
 
       // When the table is selected, update the orgchart.
       google.visualization.events.addListener(chart, 'select', function() {
@@ -174,7 +187,7 @@
     var chartSelection = chart.getSelection();
 
     if (report == "<%= ReportsAction.REPORT_UNIT_BREAKDOWN%>") {
-      var unitName = data.getValue(chartSelection[0].row, 0);
+      var unitName = trimmedChartData.getValue(chartSelection[0].row, 0);
 
       var scope = '${scope}';
       var allowAllDrillDown = ${allowAllDrillDown};
@@ -184,6 +197,11 @@
         if (!allowAllDrillDown && reviewerBCName != unitName) {
           return;
         }
+      }
+
+      // right now we don't support drilling down to the grouped "other"
+      if (unitName == "other") {
+          return;
       }
 
       var drillDownURL= '<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">

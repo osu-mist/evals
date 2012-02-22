@@ -303,10 +303,10 @@ public class ReportsTest {
         List<Object[]> combinedSortedData = new ArrayList<Object[]>();
 
         Object[] row1 = {5, "goals"};
-        Object[] row2 = {10, "goals"};
-        Object[] row3 = {20, "goals"};
-        Object[] row4 = {30, "results"};
-        Object[] row5 = {20, "results"};
+        Object[] row2 = {10, "results"};
+        Object[] row3 = {5, "goals"};
+        Object[] row4 = {30, "goals"};
+        Object[] row5 = {30, "results"};
 
         mixedData.add(row1);
         mixedData.add(row2);
@@ -317,11 +317,62 @@ public class ReportsTest {
         combinedSortedData = ReportMgr.combineAndSortStages(mixedData);
 
         assert combinedSortedData.size() == 2;
-        assert combinedSortedData.get(0)[1].equals("results");
-        assert combinedSortedData.get(0)[0].equals(50);
+        assert combinedSortedData.get(0)[1].equals("goals");
+        assert combinedSortedData.get(0)[0].equals(40);
+        assert combinedSortedData.get(1)[1].equals("results");
+        assert combinedSortedData.get(1)[0].equals(40);
 
+        row1[1] = "results";
+        row2[1] = "results";
+        row3[1] = "goals";
+        row4[1] = "goals";
+        row5[1] = "results";
+
+        combinedSortedData = ReportMgr.combineAndSortStages(mixedData);
+
+        assert combinedSortedData.size() == 2;
+        assert combinedSortedData.get(0)[1].equals("results");
+        assert combinedSortedData.get(0)[0].equals(45);
         assert combinedSortedData.get(1)[1].equals("goals");
         assert combinedSortedData.get(1)[0].equals(35);
+    }
+
+    public void shouldNotLimitIfDataIsEqualOrLessThanMaxDataPoints() {
+        List<Object[]> mixedData = new ArrayList<Object[]>();
+        List<Object[]> combinedSortedData = new ArrayList<Object[]>();
+
+        Object[] row1 = {45, "goals"};
+        Object[] row2 = {40, "results"};
+        Object[] row3 = {35, "review"};
+        Object[] row4 = {30, "appraisal"};
+        Object[] row5 = {20, "release"};
+
+        mixedData.add(row1);
+        mixedData.add(row2);
+        mixedData.add(row3);
+        mixedData.add(row4);
+        mixedData.add(row5);
+
+        combinedSortedData = ReportMgr.limitDataPoints(mixedData, 5);
+        assert combinedSortedData.size() == 5;
+
+        combinedSortedData = ReportMgr.limitDataPoints(mixedData, 0);
+        assert combinedSortedData.size() == 5;
+
+        combinedSortedData = ReportMgr.limitDataPoints(mixedData, -1);
+        assert combinedSortedData.size() == 5;
+
+        combinedSortedData = ReportMgr.limitDataPoints(mixedData, 4);
+        assert combinedSortedData.size() == 4;
+        assert combinedSortedData.get(0)[0].equals(45);
+        assert combinedSortedData.get(0)[1].equals("goals");
+        assert combinedSortedData.get(1)[0].equals(40);
+        assert combinedSortedData.get(1)[1].equals("results");
+        assert combinedSortedData.get(2)[0].equals(35);
+        assert combinedSortedData.get(2)[1].equals("review");
+        assert combinedSortedData.get(3)[0].equals(50);
+        assert combinedSortedData.get(3)[1].equals("other");
+
     }
 
     public void shouldProduceCorrectListHQLForRootLevel() {

@@ -57,6 +57,7 @@ public class ReportsAction implements ActionInterface {
 
     private List<Appraisal> listAppraisals;
     private List<Object[]> chartData;
+    private List<Object[]> trimmedChartData;
     private List<Object[]> drillDownData;
 
     /**
@@ -102,6 +103,7 @@ public class ReportsAction implements ActionInterface {
 
     private void setupDataForJSP(PortletRequest request) throws Exception {
         actionHelper.addToRequestMap("chartData", chartData);
+        actionHelper.addToRequestMap("trimmedChartData", trimmedChartData);
         actionHelper.addToRequestMap("drillDownData", drillDownData);
         actionHelper.addToRequestMap("listAppraisals", listAppraisals);
 
@@ -141,7 +143,18 @@ public class ReportsAction implements ActionInterface {
     }
 
     private String activeReport(List<Breadcrumb> crumbs) {
+        Map<String, Configuration> configurationMap =
+                (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
+        Configuration config = configurationMap.get("reportMaxDataForCharts");
+        int maxDataPoints = Integer.parseInt(config.getValue());
+
         chartData = ReportMgr.getChartData(paramMap, crumbs, true);
+        trimmedChartData = new ArrayList<Object[]>();
+        trimmedChartData.addAll(chartData);
+        if (!trimmedChartData.isEmpty()) {
+            trimmedChartData = ReportMgr.limitDataPoints(trimmedChartData, maxDataPoints);
+        }
+
         drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false);
         if (shouldListAppraisals()) {
             listAppraisals = ReportMgr.getListData(paramMap, crumbs);

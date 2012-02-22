@@ -130,12 +130,14 @@ public class ReportMgr {
     /**
      * Returns the data needed to generate the google charts and nothing more.
      *
+     *
      * @param paramMap
      * @param crumbs
      * @param sortByCount       Whether the data should be sorted by the count first
      * @return
      */
-    public static List<Object[]> getChartData(HashMap paramMap, List<Breadcrumb> crumbs, boolean sortByCount) {
+    public static List<Object[]> getChartData(HashMap paramMap, List<Breadcrumb> crumbs,
+                                              boolean sortByCount) {
         Session session = HibernateUtil.getCurrentSession();
 
         List results;
@@ -189,25 +191,70 @@ public class ReportMgr {
      * @return
      */
     public static List<Object[]> combineAndSortStages(List<Object[]> results) {
-        TreeMap<String, Integer> sortedMap = new TreeMap<String, Integer>();
+        TreeMap<Integer, List<String>> sortedMap = new TreeMap<Integer, List<String>>();
         ArrayList<Object[]> sortedResults = new ArrayList<Object[]>();
+        HashMap<String, Integer> combinedData = new HashMap<String, Integer>();
 
+        // Convert the sql data into an array list so that we can combine the total counts
         for (Object[] row : (List<Object[]>) results) {
             String status = (String) row[1];
             int count = Integer.parseInt(row[0].toString());
 
-            if (sortedMap.containsKey(status)) {
-                count += sortedMap.get(status);
+            if (combinedData.containsKey(status)) {
+                 count = count + combinedData.get(status);
             }
-            sortedMap.put(status, count);
+            combinedData.put(status, count);
         }
 
-        for (String key : sortedMap.descendingKeySet()) {
-            Object[] row = {sortedMap.get(key), key};
-            sortedResults.add(row);
+        // Now the data has been combined, place it in a Tree of String lists to sort it
+        for (String status : combinedData.keySet()) {
+            int count = (Integer) combinedData.get(status);
+            List<String> bar = new ArrayList<String>();
+            if (sortedMap.containsKey(count)) {
+                bar = sortedMap.get(count);
+            }
+            bar.add(status);
+            sortedMap.put(count, bar);
+        }
+
+        // Iterate over the sortedMap and generate the sorted results
+        for (Integer count : sortedMap.descendingKeySet()) {
+            List<String> values = sortedMap.get(count);
+            for (String singleValue : values) {
+                Object[] row = {count, singleValue};
+                sortedResults.add(row);
+            }
         }
 
         return sortedResults;
+    }
+
+    /**
+     * Parses the sorted results and limits the data based on the maxDataPoints. All
+     * the lower section of data that has a sort order >= maxDataPoints gets summed up
+     * and grouped together in a section called "other".
+     *
+     * @param results
+     * @param maxDataPoints
+     * @return
+     */
+    public static List<Object[]> limitDataPoints(List<Object[]> results, int maxDataPoints) {
+        if (results.size() <= maxDataPoints || maxDataPoints < 1) {
+            return results;
+        }
+
+        List<Object[]> trimmedData = results.subList(0,maxDataPoints-1);
+        List<Object[]> otherData = results.subList(maxDataPoints-1, results.size());
+        int otherCount = 0;
+        for (Object[] row : otherData) {
+            otherCount += Integer.parseInt(row[0].toString());
+        }
+        if (otherCount > 0) {
+            Object[] groupedRow = {otherCount, "other"};
+            trimmedData.add(groupedRow);
+        }
+
+        return trimmedData;
     }
 
     /**
