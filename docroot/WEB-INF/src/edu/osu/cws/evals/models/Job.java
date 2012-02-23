@@ -373,11 +373,19 @@ public class Job extends Evals implements Serializable {
      */
     public Calendar getNewAnnualStartDate()
     {
-        Date myDate = getInitialEvalStartDate(); //starting point
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         Calendar cal = Calendar.getInstance();
+        Date myDate = getInitialEvalStartDate(); //starting point
+
         cal.setTime(myDate);
-        int year = Calendar.getInstance().get(Calendar.YEAR);
-        cal.set(Calendar.YEAR, year);
+
+        // Verify that this is not the first annual appraisal and that annualInd is 18
+        if (currentYear != cal.get(Calendar.YEAR) && annualInd == 18) {
+            int month = 6 + cal.get(Calendar.MONTH);
+            cal.set(Calendar.MONTH, month);
+        }
+
+         cal.set(Calendar.YEAR, currentYear);
         return cal;
     }
 
