@@ -322,6 +322,24 @@ tr.ui-state-highlight {
 .osu-cws div.chart-content {
     padding: 0 1.5em 1.5em 1em;
 }
+tr.google-header-row {
+    background-color: #767676;
+    font-weight: bold;
+}
+tr.google-header-row td {
+    color: #fff;
+}
+.google-hover-table-row {
+    background-color: #C6C6C6;
+    color: #000;
+}
+tr.google-table-row td {
+    color: #000;
+}
+tr.google-odd-table-row td {
+    background-color: #F2F2F2;
+    color: #000;
+}
 /** Breadcrumbs **/
 .osu-cws-breadcrumbs {
     margin: 1em 0 0 0;

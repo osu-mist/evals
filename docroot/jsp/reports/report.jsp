@@ -172,7 +172,15 @@
       chart.draw(trimmedChartData, options);
 
       var table = new google.visualization.Table(document.getElementById('<portlet:namespace/>chart-data-div'));
-      table.draw(chartData, {});
+      var tableOptions = {
+        cssClassNames: {
+            headerRow: 'google-header-row',
+            hoverTableRow: 'google-hover-table-row',
+            oddTableRow: 'google-odd-table-row',
+            tableRow: 'google-table-row'
+        }
+      }
+      table.draw(chartData, tableOptions);
 
       // When the table is selected, update the orgchart.
       google.visualization.events.addListener(chart, 'select', function() {
