@@ -113,19 +113,46 @@ public class JobsTest {
     }
 
     public void shouldReturnCorrectNewAnnualStartDateIfFirstLasted18Months() {
-        Job job = new Job();
         Calendar cal = Calendar.getInstance();
+        Job job = new Job();
+        job.setAnnualInd(18);
 
-        cal.set(Calendar.YEAR, 2010);
+        cal.set(Calendar.YEAR, 2011);
         cal.set(Calendar.MONTH, Calendar.JUNE);
         cal.set(Calendar.DAY_OF_MONTH, 1);
 
-        job.setAnnualInd(18);
-        job.setBeginDate(cal.getTime());
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal);
 
+        cal.set(Calendar.YEAR, 2008);
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal);
+        cal.set(Calendar.YEAR, 2009);
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal);
+        cal.set(Calendar.YEAR, 2010);
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal);
+    }
+
+    private void assertCorrectNewAnnualStartDateForAnnualInd18(Job job, Calendar cal) {
+        job.setBeginDate(cal.getTime());
         Calendar newStartDate = job.getNewAnnualStartDate();
+
         assert newStartDate.get(Calendar.YEAR) == Calendar.getInstance().get(Calendar.YEAR);
         assert newStartDate.get(Calendar.MONTH) == Calendar.DECEMBER;
+        assert newStartDate.get(Calendar.DAY_OF_MONTH) == 1;
+    }
+
+    public void shouldReturnCorrectNewAnnualStartDateForFirstAnnualIfAnnualIndIs18() {
+        Calendar cal = Calendar.getInstance();
+        Job job = new Job();
+        job.setAnnualInd(18);
+
+        cal.set(Calendar.MONTH, Calendar.JUNE);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+
+        job.setBeginDate(cal.getTime());
+        Calendar newStartDate = job.getNewAnnualStartDate();
+
+        assert newStartDate.get(Calendar.YEAR) == Calendar.getInstance().get(Calendar.YEAR);
+        assert newStartDate.get(Calendar.MONTH) == Calendar.JUNE;
         assert newStartDate.get(Calendar.DAY_OF_MONTH) == 1;
     }
 }
