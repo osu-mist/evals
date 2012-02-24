@@ -332,12 +332,12 @@ public class ReportMgr {
 
     /**
      * Returns the hql needed to display the list of evaluation records in the reports.
+     * The data is sorted by lastName, firstName
      *
      * @param scope
      * @param reportType
      * @return
      */
-    //@todo: how do we sort this data?
     public static String getListHQL(String scope, String reportType) {
         String select = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
@@ -345,7 +345,7 @@ public class ReportMgr {
                 " from edu.osu.cws.evals.models.Appraisal ";
         String where = " where status not in ('completed', 'archived', 'closed') " +
                 " and job.appointmentType in :appointmentTypes ";
-        String order = " order by ";
+        String order = " order by job.employee.lastName, job.employee.firstName";
 
         if (scope.equals(ReportsAction.SCOPE_BC)) {
             where += " and job.businessCenterName = :bcName";
@@ -363,7 +363,7 @@ public class ReportMgr {
             where += " and overdue > 0";
         }
 
-        return select + where;
+        return select + where + order;
     }
 
     /**
