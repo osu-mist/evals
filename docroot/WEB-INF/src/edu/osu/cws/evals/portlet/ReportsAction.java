@@ -226,13 +226,25 @@ public class ReportsAction implements ActionInterface {
         boolean clickedCrumb = breadcrumbIndex != -1 && breadcrumbIndex < sessionBreadcrumbs.size() - 1;
         if (clickedCrumb) {
             crumbs = sessionBreadcrumbs.subList(0, breadcrumbIndex+1);
-        } else { // User is drilling down the chain
-            crumbs.addAll(sessionBreadcrumbs);
-
+        } else {
             // Figure out if the user selected a different report, within the same scope
-            String scopeOfLastCrumb = sessionBreadcrumbs.get(sessionBreadcrumbs.size() - 1).getScope();
+            Breadcrumb lastBreadcrumb = sessionBreadcrumbs.get(sessionBreadcrumbs.size() - 1);
+            String scopeOfLastCrumb = lastBreadcrumb.getScope();
             boolean sameScope = scope.equals(scopeOfLastCrumb);
-            if (!sameScope) {
+
+            // Figure out if user loaded url with previous scope
+            int currentScopeIndex = ArrayUtils.indexOf(DRILL_DOWN_INDEX, scope);
+            int lastCrumbScopeIndex = ArrayUtils.indexOf(DRILL_DOWN_INDEX, scopeOfLastCrumb);
+            boolean urlWithPreviousScope = currentScopeIndex <= lastCrumbScopeIndex;
+
+            //@todo: this is not as simple. The user could go back and the session breadcrumbs is osu, by they are drilling down on: osu > uabc > tex > 12345
+            if (urlWithPreviousScope) {
+                crumbs.addAll(sessionBreadcrumbs.subList(0, currentScopeIndex + 1));
+            } else {
+                crumbs.addAll(sessionBreadcrumbs);
+            }
+
+            if (!sameScope || urlWithPreviousScope) {
                 Breadcrumb crumb = new Breadcrumb(scopeValue, scope, scopeValue);
                 crumbs.add(crumb);
             }
