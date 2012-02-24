@@ -1,4 +1,5 @@
 <%@ page import="edu.osu.cws.evals.portlet.ReportsAction" %>
+<%@ page import="edu.osu.cws.evals.hibernate.ReportMgr" %>
 <%@ include file="/jsp/init.jsp"%>
 
 <h2><liferay-ui:message key="reports"/></h2>
@@ -194,7 +195,8 @@
   function chartDrillDown() {
     var chartSelection = chart.getSelection();
 
-    if (report == "<%= ReportsAction.REPORT_UNIT_BREAKDOWN%>") {
+    // drill down by clicking on the chart is allowed on all by unit reports
+    if (report.indexOf('<%= ReportMgr.UNIT %>') != -1) {
       var unitName = trimmedChartData.getValue(chartSelection[0].row, 0);
 
       var scope = '${scope}';
