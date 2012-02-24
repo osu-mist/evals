@@ -180,8 +180,19 @@
       chart.draw(trimmedChartData, options);
 
       var table = new google.visualization.Table(document.getElementById('<portlet:namespace/>chart-data-div'));
+      var drillDownUrl = '<a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                                    <portlet:param name="action" value="report"/>
+                                    <portlet:param name="controller" value="ReportsAction"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="unitName"/>
+                                    </portlet:actionURL>">{0}</a>';
+      drillDownUrl = drillDownUrl.replace("unitName", '{0}');
+      var formatter = new google.visualization.TablePatternFormat(drillDownUrl);
+      formatter.format(chartData, [0]); // Apply formatter and set the formatted value of the first column.
+
       var tableOptions = {
         sortColumn: 0,
+        allowHtml: true,
         cssClassNames: {
             headerRow: 'google-header-row',
             hoverTableRow: 'google-hover-table-row',
@@ -226,7 +237,7 @@
         <portlet:param name="action" value="report"/>
         <portlet:param name="controller" value="ReportsAction"/>
         <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
-        <portlet:param name="<%= ReportsAction.REPORT %>" value="<%= ReportsAction.REPORT_UNIT_BREAKDOWN%>"/>
+        <portlet:param name="<%= ReportsAction.REPORT %>" value="${report}"/>
         <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="unitName"/>
         <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
         </portlet:actionURL>';
