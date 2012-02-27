@@ -43,27 +43,27 @@ public class ReportsTest {
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL("root", "stageBreakdown", true);
-        expectedSQL = "SELECT count(*), status  FROM appraisals, PYVPASJ  WHERE " +
+        expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE " +
                 "in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm AND " +
                 "PYVPASJ_POSN = appraisals.position_number AND PYVPASJ_SUFF = appraisals.job_suffix " +
-                " GROUP BY  status ORDER BY count(*) DESC, status";
+                " GROUP BY status ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL("root", "stageOverdue", true);
-        expectedSQL = "SELECT count(*), status  FROM appraisals, PYVPASJ  WHERE " +
+        expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND " +
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
                 "AND PYVPASJ_POSN = appraisals.position_number AND PYVPASJ_SUFF = appraisals.job_suffix " +
-                " AND appraisals.overdue > 0 GROUP BY  status ORDER BY count(*) DESC, status";
+                " AND appraisals.overdue > 0 GROUP BY status ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL("root", "stageWayOverdue", true);
-        expectedSQL = "SELECT count(*), status  FROM appraisals, PYVPASJ  WHERE " +
+        expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND" +
                 " PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm AND" +
                 " PYVPASJ_POSN = appraisals.position_number AND PYVPASJ_SUFF = appraisals.job_suffix " +
-                " AND appraisals.overdue > 30 GROUP BY  status ORDER BY count(*) DESC, status";
+                " AND appraisals.overdue > 30 GROUP BY status ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
     }
 
@@ -97,27 +97,27 @@ public class ReportsTest {
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "stageBreakdown", true);
-        expectedSQL = "SELECT count(*), status  FROM appraisals, PYVPASJ  WHERE appraisals.status " +
+        expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE appraisals.status " +
                 "not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes " +
                 "AND PYVPASJ_PIDM = appraisals.job_pidm AND PYVPASJ_POSN = appraisals.position_number " +
-                "AND PYVPASJ_SUFF = appraisals.job_suffix  AND PYVPASJ_BCTR_TITLE = :bcName GROUP BY  status " +
+                "AND PYVPASJ_SUFF = appraisals.job_suffix  AND PYVPASJ_BCTR_TITLE = :bcName GROUP BY status " +
                 "ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "stageOverdue", true);
-        expectedSQL = "SELECT count(*), status  FROM appraisals, PYVPASJ  WHERE appraisals.status not " +
+        expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE appraisals.status not " +
                 "in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes " +
                 "AND PYVPASJ_PIDM = appraisals.job_pidm AND PYVPASJ_POSN = appraisals.position_number AND " +
                 "PYVPASJ_SUFF = appraisals.job_suffix  AND PYVPASJ_BCTR_TITLE = :bcName AND " +
-                "appraisals.overdue > 0 GROUP BY  status ORDER BY count(*) DESC, status";
+                "appraisals.overdue > 0 GROUP BY status ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "stageWayOverdue", true);
-        expectedSQL = "SELECT count(*), status  FROM appraisals, PYVPASJ  WHERE appraisals.status " +
+        expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE appraisals.status " +
                 "not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes " +
                 "AND PYVPASJ_PIDM = appraisals.job_pidm AND PYVPASJ_POSN = appraisals.position_number " +
                 "AND PYVPASJ_SUFF = appraisals.job_suffix  AND PYVPASJ_BCTR_TITLE = :bcName" +
-                " AND appraisals.overdue > 30 GROUP BY  status ORDER BY count(*) DESC, status";
+                " AND appraisals.overdue > 30 GROUP BY status ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
     }
 
@@ -151,30 +151,30 @@ public class ReportsTest {
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "stageBreakdown", true);
-        expectedSQL = "SELECT count(*), status  FROM appraisals, PYVPASJ  WHERE appraisals.status" +
+        expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE appraisals.status" +
                 " not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE" +
                 " in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm AND " +
                 "PYVPASJ_POSN = appraisals.position_number AND PYVPASJ_SUFF = appraisals.job_suffix " +
-                " AND PYVPASJ_BCTR_TITLE = :bcName AND PYVPASJ_ORGN_DESC LIKE :orgPrefix GROUP BY  status " +
+                " AND PYVPASJ_BCTR_TITLE = :bcName AND PYVPASJ_ORGN_DESC LIKE :orgPrefix GROUP BY status " +
                 "ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "stageOverdue", true);
-        expectedSQL = "SELECT count(*), status  FROM appraisals, PYVPASJ  WHERE " +
+        expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND " +
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
                 "AND PYVPASJ_POSN = appraisals.position_number AND PYVPASJ_SUFF = appraisals.job_suffix " +
                 " AND PYVPASJ_BCTR_TITLE = :bcName AND PYVPASJ_ORGN_DESC LIKE :orgPrefix AND" +
-                " appraisals.overdue > 0 GROUP BY  status ORDER BY count(*) DESC, status";
+                " appraisals.overdue > 0 GROUP BY status ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "stageWayOverdue", true);
-        expectedSQL = "SELECT count(*), status  FROM appraisals, PYVPASJ  WHERE appraisals.status " +
+        expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE appraisals.status " +
                 "not in ('completed', 'archived', 'closed') AND " +
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm" +
                 " AND PYVPASJ_POSN = appraisals.position_number AND PYVPASJ_SUFF = appraisals.job_suffix " +
                 " AND PYVPASJ_BCTR_TITLE = :bcName AND PYVPASJ_ORGN_DESC LIKE :orgPrefix AND " +
-                "appraisals.overdue > 30 GROUP BY  status ORDER BY count(*) DESC, status";
+                "appraisals.overdue > 30 GROUP BY status ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
     }
 
@@ -210,30 +210,30 @@ public class ReportsTest {
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "stageBreakdown", true);
-        expectedSQL = "SELECT count(*), status  FROM appraisals, PYVPASJ  WHERE " +
+        expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND" +
                 " PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm" +
                 " AND PYVPASJ_POSN = appraisals.position_number AND PYVPASJ_SUFF = appraisals.job_suffix  " +
-                "AND PYVPASJ_BCTR_TITLE = :bcName AND PYVPASJ_ORGN_CODE_TS = :tsOrgCode  GROUP BY  status " +
+                "AND PYVPASJ_BCTR_TITLE = :bcName AND PYVPASJ_ORGN_CODE_TS = :tsOrgCode  GROUP BY status " +
                 "ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "stageOverdue", true);
-        expectedSQL = "SELECT count(*), status  FROM appraisals, PYVPASJ  WHERE appraisals.status " +
+        expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE appraisals.status " +
                 "not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes " +
                 "AND PYVPASJ_PIDM = appraisals.job_pidm AND PYVPASJ_POSN = appraisals.position_number " +
                 "AND PYVPASJ_SUFF = appraisals.job_suffix  AND PYVPASJ_BCTR_TITLE = :bcName AND" +
                 " PYVPASJ_ORGN_CODE_TS = :tsOrgCode  AND appraisals.overdue > 0 " +
-                "GROUP BY  status ORDER BY count(*) DESC, status";
+                "GROUP BY status ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "stageWayOverdue", true);
-        expectedSQL = "SELECT count(*), status  FROM appraisals, PYVPASJ  WHERE" +
+        expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE" +
                 " appraisals.status not in ('completed', 'archived', 'closed') AND" +
                 " PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm" +
                 " AND PYVPASJ_POSN = appraisals.position_number AND PYVPASJ_SUFF = appraisals.job_suffix " +
                 " AND PYVPASJ_BCTR_TITLE = :bcName AND PYVPASJ_ORGN_CODE_TS = :tsOrgCode " +
-                " AND appraisals.overdue > 30 GROUP BY  status ORDER BY count(*) DESC, status";
+                " AND appraisals.overdue > 30 GROUP BY status ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
     }
 
@@ -288,12 +288,12 @@ public class ReportsTest {
         assert sql.equals(expectedSQL);
 
         sql = ReportMgr.getChartSQL(scope, "stageWayOverdue", false);
-        expectedSQL = "SELECT count(*), status  FROM appraisals, PYVPASJ  WHERE" +
+        expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE" +
                 " appraisals.status not in ('completed', 'archived', 'closed') AND" +
                 " PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm" +
                 " AND PYVPASJ_POSN = appraisals.position_number AND PYVPASJ_SUFF = appraisals.job_suffix " +
                 " AND PYVPASJ_BCTR_TITLE = :bcName AND PYVPASJ_ORGN_CODE_TS = :tsOrgCode " +
-                " AND appraisals.overdue > 30 GROUP BY  status ORDER BY status, count(*) DESC";
+                " AND appraisals.overdue > 30 GROUP BY status ORDER BY status, count(*) DESC";
         assert sql.equals(expectedSQL);
     }
 

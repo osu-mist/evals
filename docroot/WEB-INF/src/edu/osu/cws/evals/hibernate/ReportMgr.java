@@ -74,6 +74,7 @@ public class ReportMgr {
      * @return
      */
     public static String getChartSQL(String scope, String reportType, boolean sortByCount) {
+        String col1 = "";
         String select = "";
         String from = " FROM appraisals, PYVPASJ ";
         String where = " WHERE appraisals.status not in ('completed', 'archived', 'closed') " +
@@ -84,38 +85,32 @@ public class ReportMgr {
         String group = " GROUP BY ";
         String order = " ORDER BY ";
 
-        String col1 = "";
-        if (scope.equals(ReportsAction.DEFAULT_SCOPE)) {
-            col1 = "PYVPASJ_BCTR_TITLE";
-        } else if (scope.equals(ReportsAction.SCOPE_BC)) {
-            col1 = "SUBSTR(PYVPASJ_ORGN_DESC, 1, 3)";
+        if (!scope.equals(ReportsAction.DEFAULT_SCOPE)) {
             where += " AND PYVPASJ_BCTR_TITLE = :bcName";
-        } else if (scope.equals(ReportsAction.SCOPE_ORG_PREFIX)) {
-            col1 = "PYVPASJ_ORGN_CODE_TS";
-            where += " AND PYVPASJ_BCTR_TITLE = :bcName" +
-                    " AND PYVPASJ_ORGN_DESC LIKE :orgPrefix";
-        } else if (scope.equals(ReportsAction.SCOPE_ORG_CODE)) {
-            col1 = "PYVPASJ_SUPERVISOR_PIDM";
-            where += " AND PYVPASJ_BCTR_TITLE = :bcName" +
-                    " AND PYVPASJ_ORGN_CODE_TS = :tsOrgCode ";
+        }
+        if (reportType.contains(STAGE)) {
+            col1 = "status";
         }
 
-        if (reportType.contains(UNIT)) {
-            select = "SELECT count(*), " + col1 + from;
-            group += col1;
-            if (sortByCount) {
-                order += "count(*) DESC, " + col1;
-            } else {
-                order += col1 + ", count(*) DESC";
-            }
-        } else if (reportType.contains(STAGE)) {
-            select = "SELECT count(*), status " + from;
-            group += " status";
-            if (sortByCount) {
-                order += "count(*) DESC, status";
-            } else {
-                order += "status, count(*) DESC";
-            }
+        // assign a where clause depending on scope & the col1 if it is not empty
+        if (scope.equals(ReportsAction.DEFAULT_SCOPE)) {
+            col1 = col1.equals("")? "PYVPASJ_BCTR_TITLE" : col1;
+        } else if (scope.equals(ReportsAction.SCOPE_BC)) {
+            col1 = col1.equals("")? "SUBSTR(PYVPASJ_ORGN_DESC, 1, 3)" : col1;
+        } else if (scope.equals(ReportsAction.SCOPE_ORG_PREFIX)) {
+            col1 = col1.equals("")? "PYVPASJ_ORGN_CODE_TS" : col1;
+            where += " AND PYVPASJ_ORGN_DESC LIKE :orgPrefix";
+        } else if (scope.equals(ReportsAction.SCOPE_ORG_CODE)) {
+            col1 = col1.equals("")? "PYVPASJ_SUPERVISOR_PIDM" : col1;
+            where += " AND PYVPASJ_ORGN_CODE_TS = :tsOrgCode ";
+        }
+
+        select = "SELECT count(*), " + col1 + from;
+        group += col1;
+        if (sortByCount) {
+            order += "count(*) DESC, " + col1;
+        } else {
+            order += col1 + ", count(*) DESC";
         }
 
         if (reportType.contains("WayOverdue")) {
