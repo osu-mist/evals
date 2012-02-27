@@ -25,6 +25,7 @@
                                     <portlet:param name="controller" value="ReportsAction"/>
                                     <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
                                     <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${unit[1]}"/>
+                                    <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                                     </portlet:actionURL>">${unit[1]}</a>
                                 </li>
                             </c:if>
@@ -57,6 +58,7 @@
                             <portlet:param name="controller" value="ReportsAction"/>
                             <portlet:param name="scope" value="${scope}"/>
                             <portlet:param name="scopeValue" value="${scopeValue}"/>
+                            <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                             <portlet:param name="report" value="<%= ReportsAction.REPORT_DEFAULT%>"/>
                             </portlet:actionURL>"><liferay-ui:message key="report-title-unitBreakdown"/></a></li>
                     <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
@@ -64,6 +66,7 @@
                             <portlet:param name="controller" value="ReportsAction"/>
                             <portlet:param name="scope" value="${scope}"/>
                             <portlet:param name="scopeValue" value="${scopeValue}"/>
+                            <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                             <portlet:param name="report" value="<%= ReportsAction.REPORT_UNIT_OVERDUE%>"/>
                             </portlet:actionURL>"><liferay-ui:message key="report-title-unitOverdue"/></a></li>
                     <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
@@ -71,6 +74,7 @@
                             <portlet:param name="controller" value="ReportsAction"/>
                             <portlet:param name="scope" value="${scope}"/>
                             <portlet:param name="scopeValue" value="${scopeValue}"/>
+                            <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                             <portlet:param name="report" value="<%= ReportsAction.REPORT_UNIT_WAYOVERDUE%>"/>
                             </portlet:actionURL>"><liferay-ui:message key="report-title-unitWayOverdue"/></a></li>
                 </c:if>
@@ -79,6 +83,7 @@
                         <portlet:param name="controller" value="ReportsAction"/>
                         <portlet:param name="scope" value="${scope}"/>
                         <portlet:param name="scopeValue" value="${scopeValue}"/>
+                        <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                         <portlet:param name="report" value="<%= ReportsAction.REPORT_STAGE_BREAKDOWN%>"/>
                         </portlet:actionURL>"><liferay-ui:message key="report-title-stageBreakdown"/></a></li>
                 <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
@@ -86,6 +91,7 @@
                         <portlet:param name="controller" value="ReportsAction"/>
                         <portlet:param name="scope" value="${scope}"/>
                         <portlet:param name="scopeValue" value="${scopeValue}"/>
+                        <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                         <portlet:param name="report" value="<%= ReportsAction.REPORT_STAGE_OVERDUE%>"/>
                         </portlet:actionURL>"><liferay-ui:message key="report-title-stageOverdue"/></a></li>
                 <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
@@ -93,6 +99,7 @@
                         <portlet:param name="controller" value="ReportsAction"/>
                         <portlet:param name="scope" value="${scope}"/>
                         <portlet:param name="scopeValue" value="${scopeValue}"/>
+                        <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                         <portlet:param name="report" value="<%= ReportsAction.REPORT_STAGE_WAYOVERDUE%>"/>
                         </portlet:actionURL>"><liferay-ui:message key="report-title-stageWayOverdue"/></a></li>
             </ul>
@@ -221,6 +228,7 @@
         <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
         <portlet:param name="<%= ReportsAction.REPORT %>" value="<%= ReportsAction.REPORT_UNIT_BREAKDOWN%>"/>
         <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="unitName"/>
+        <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
         </portlet:actionURL>';
 
       drillDownURL = drillDownURL.replace("unitName", unitName);

@@ -11,6 +11,7 @@
         <portlet:param name="<%= ReportsAction.BREADCRUMB_INDEX %>" value="${loopStatus.index}"/>
         <portlet:param name="<%= ReportsAction.SCOPE %>" value="${breadcrumb.scope}"/>
         <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${breadcrumb.scopeValue}"/>
+        <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
         </portlet:actionURL>">${breadcrumb.anchorText}</a>
             &gt;
         </c:if>

@@ -6,6 +6,7 @@ import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.util.Breadcrumb;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.portlet.*;
 import java.util.*;
@@ -15,7 +16,7 @@ public class ReportsAction implements ActionInterface {
     public static final String SCOPE_VALUE = "scopeValue";
 
     public static final String DEFAULT_SCOPE = "root";
-    public static final String DEFAULT_SCOPE_VALUE = "osu";
+    public static final String DEFAULT_SCOPE_VALUE = "OSU";
     public static final String SCOPE_BC = "bc";
     public static final String SCOPE_ORG_PREFIX = "orgPrefix";
     public static final String SCOPE_ORG_CODE = "orgCode";
@@ -64,6 +65,7 @@ public class ReportsAction implements ActionInterface {
      * Value displayed when generating the drill down links in data table.
      */
     HashMap<String, Integer> units = new HashMap<String, Integer>();
+    public static final String BREADCRUMB_SESS_KEY = "breadcrumbList";
 
     /**
      * Main method used in this class. It responds to the user request when the user is viewing
@@ -78,9 +80,7 @@ public class ReportsAction implements ActionInterface {
         PortletSession session = request.getPortletSession();
         setParamMap(request);
 
-        String breadcrumbSessKey = "breadcrumbList";
-        List<Breadcrumb> sessionBreadcrumbs = (List<Breadcrumb>) session.getAttribute(breadcrumbSessKey);
-        breadcrumbList = getBreadcrumbs(sessionBreadcrumbs);
+        breadcrumbList = getBreadcrumbs(request);
 
         if (!canViewReport(request)) {
             if (response instanceof ActionResponse) {
@@ -95,7 +95,7 @@ public class ReportsAction implements ActionInterface {
         actionHelper.useMaximizedMenu(request);
 
         // Save session values only if we didn't throw an exception before we got here.
-        session.setAttribute(breadcrumbSessKey, breadcrumbList);
+        session.setAttribute(BREADCRUMB_SESS_KEY, breadcrumbList);
         session.setAttribute("paramMap", paramMap);
 
         return jspFile;
@@ -118,6 +118,7 @@ public class ReportsAction implements ActionInterface {
         String nextScope = nextScopeInDrillDown(scope);
         actionHelper.addToRequestMap("nextScope", nextScope);
         actionHelper.addToRequestMap("breadcrumbList", breadcrumbList);
+        actionHelper.addToRequestMap("requestBreadcrumbs", getRequestBreadcrumbs());
 
         boolean allowAllDrillDown = false;
         if (actionHelper.isLoggedInUserAdmin(request)) {
@@ -198,19 +199,49 @@ public class ReportsAction implements ActionInterface {
     }
 
     /**
-     * Handles looking at the breadcrumbs stored in session and by
+     * Checks the request for breadcrumbs, then the session. It uses one of these to
+     * calculate the current set of breadcrumbs.
+     *
+     * @param request
+     * @return
+     */
+    private List<Breadcrumb> getBreadcrumbs(PortletRequest request) {
+        PortletSession session = request.getPortletSession();
+        String requestBreadcrumbs = ParamUtil.getString(request, "requestBreadcrumbs");
+        List<Breadcrumb> reqCrumbsList = new ArrayList<Breadcrumb>();
+
+        String[] scopeValues = StringUtils.split(requestBreadcrumbs);
+        if (scopeValues != null) {
+            for (int i = 0; i < scopeValues.length; i++) {
+                String scopeValue = scopeValues[i];
+                String scope = DRILL_DOWN_INDEX[i];
+                Breadcrumb crumb = new Breadcrumb(scopeValue, scope, scopeValue);
+                reqCrumbsList.add(crumb);
+            }
+        }
+
+        if (!reqCrumbsList.isEmpty()) {
+            return getBreadcrumbs(reqCrumbsList);
+        }
+
+        return getBreadcrumbs((List<Breadcrumb>) session.getAttribute(BREADCRUMB_SESS_KEY));
+    }
+
+    /**
+     * Handles looking at the breadcrumbs currently stored and by
      * looking at the paramMap, it changes the breadcrumbs and returns
      * them as a list.
 	 * There are 3 possibilities:
      *    1. return just the initial one (osu)
-     *    2. return breadCrumbFromSession  (not changed)
-	 *    3. return breadCrumbFromSession.add(new Breadcumb(...))
+     *    2. return startCrumbs  (not changed)
+	 *    3. return startCrumbs.add(new Breadcumb(...))
      *    4. if somebody clicks on a previous scope of the breadcrumb, we need to remove
      *    the rest of the scopes down the chain.
-     * @param sessionBreadcrumbs
+     *
+     * @param startCrumbs
      * @return
      */
-    private List<Breadcrumb> getBreadcrumbs(List<Breadcrumb> sessionBreadcrumbs) {
+    private List<Breadcrumb> getBreadcrumbs(List<Breadcrumb> startCrumbs) {
         List<Breadcrumb> crumbs = new ArrayList<Breadcrumb>();
         Breadcrumb rootBreadcrumb = new Breadcrumb("OSU", DEFAULT_SCOPE, DEFAULT_SCOPE_VALUE);
 
@@ -223,34 +254,37 @@ public class ReportsAction implements ActionInterface {
         }
 
         int breadcrumbIndex = (Integer) paramMap.get("breadcrumbIndex");
-        boolean clickedCrumb = breadcrumbIndex != -1 && breadcrumbIndex < sessionBreadcrumbs.size() - 1;
+        boolean clickedCrumb = breadcrumbIndex != -1 && breadcrumbIndex < startCrumbs.size() - 1;
         if (clickedCrumb) {
-            crumbs = sessionBreadcrumbs.subList(0, breadcrumbIndex+1);
+            crumbs = startCrumbs.subList(0, breadcrumbIndex+1);
         } else {
             // Figure out if the user selected a different report, within the same scope
-            Breadcrumb lastBreadcrumb = sessionBreadcrumbs.get(sessionBreadcrumbs.size() - 1);
+            Breadcrumb lastBreadcrumb = startCrumbs.get(startCrumbs.size() - 1);
             String scopeOfLastCrumb = lastBreadcrumb.getScope();
             boolean sameScope = scope.equals(scopeOfLastCrumb);
+            crumbs.addAll(startCrumbs);
 
-            // Figure out if user loaded url with previous scope
-            int currentScopeIndex = ArrayUtils.indexOf(DRILL_DOWN_INDEX, scope);
-            int lastCrumbScopeIndex = ArrayUtils.indexOf(DRILL_DOWN_INDEX, scopeOfLastCrumb);
-            boolean urlWithPreviousScope = currentScopeIndex <= lastCrumbScopeIndex;
-
-            //@todo: this is not as simple. The user could go back and the session breadcrumbs is osu, by they are drilling down on: osu > uabc > tex > 12345
-            if (urlWithPreviousScope) {
-                crumbs.addAll(sessionBreadcrumbs.subList(0, currentScopeIndex + 1));
-            } else {
-                crumbs.addAll(sessionBreadcrumbs);
-            }
-
-            if (!sameScope || urlWithPreviousScope) {
+            if (!sameScope) {
                 Breadcrumb crumb = new Breadcrumb(scopeValue, scope, scopeValue);
                 crumbs.add(crumb);
             }
         }
 
         return crumbs;
+    }
+
+    /**
+     * Returns the scope value of the breadcrumbList separated by a space.
+     *
+     * @return
+     */
+    private String getRequestBreadcrumbs() {
+        ArrayList<String> scopeValues = new ArrayList<String>();
+        for (Breadcrumb crumb : breadcrumbList) {
+            scopeValues.add(crumb.getScopeValue());
+        }
+
+        return StringUtils.join(scopeValues, " ");
     }
 
     private String getScopeValue() {
