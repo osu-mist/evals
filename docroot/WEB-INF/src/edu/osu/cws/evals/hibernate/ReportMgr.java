@@ -347,14 +347,14 @@ public class ReportMgr {
                 " and job.appointmentType in :appointmentTypes ";
         String order = " order by job.employee.lastName, job.employee.firstName";
 
-        if (scope.equals(ReportsAction.SCOPE_BC)) {
+        if (!scope.equals(ReportsAction.DEFAULT_SCOPE)) {
             where += " and job.businessCenterName = :bcName";
-        } else if (scope.equals(ReportsAction.SCOPE_ORG_PREFIX)) {
-            where += " and job.businessCenterName = :bcName" +
-                    " and job.orgCodeDescription LIKE :orgPrefix";
+        }
+
+        if (scope.equals(ReportsAction.SCOPE_ORG_PREFIX)) {
+            where += " and job.orgCodeDescription LIKE :orgPrefix";
         } else if (scope.equals(ReportsAction.SCOPE_ORG_CODE)) {
-            where += " and job.businessCenterName = :bcName" +
-                    " and job.tsOrgCode = :tsOrgCode";
+            where += " and job.tsOrgCode = :tsOrgCode";
         }
 
         if (reportType.contains("WayOverdue")) {
