@@ -150,9 +150,8 @@ public class ReportsAction implements ActionInterface {
 
         chartData = ReportMgr.getChartData(paramMap, crumbs, true);
         trimmedChartData = new ArrayList<Object[]>();
-        trimmedChartData.addAll(chartData);
-        if (!trimmedChartData.isEmpty()) {
-            trimmedChartData = ReportMgr.limitDataPoints(trimmedChartData, maxDataPoints);
+        if (!chartData.isEmpty()) {
+            trimmedChartData = ReportMgr.trimDataPoints(chartData, maxDataPoints);
         }
 
         drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false);

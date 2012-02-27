@@ -238,7 +238,7 @@ public class ReportMgr {
      * @param maxDataPoints
      * @return
      */
-    public static List<Object[]> limitDataPoints(List<Object[]> results, int maxDataPoints) {
+    public static List<Object[]> trimDataPoints(List<Object[]> results, int maxDataPoints) {
         if (results.size() <= maxDataPoints || maxDataPoints < 1) {
             return results;
         }

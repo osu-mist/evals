@@ -3,7 +3,6 @@ package edu.osu.cws.evals.tests;
 import edu.osu.cws.evals.hibernate.ReportMgr;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.portlet.ReportsAction;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -353,16 +352,16 @@ public class ReportsTest {
         mixedData.add(row4);
         mixedData.add(row5);
 
-        combinedSortedData = ReportMgr.limitDataPoints(mixedData, 5);
+        combinedSortedData = ReportMgr.trimDataPoints(mixedData, 5);
         assert combinedSortedData.size() == 5;
 
-        combinedSortedData = ReportMgr.limitDataPoints(mixedData, 0);
+        combinedSortedData = ReportMgr.trimDataPoints(mixedData, 0);
         assert combinedSortedData.size() == 5;
 
-        combinedSortedData = ReportMgr.limitDataPoints(mixedData, -1);
+        combinedSortedData = ReportMgr.trimDataPoints(mixedData, -1);
         assert combinedSortedData.size() == 5;
 
-        combinedSortedData = ReportMgr.limitDataPoints(mixedData, 4);
+        combinedSortedData = ReportMgr.trimDataPoints(mixedData, 4);
         assert combinedSortedData.size() == 4;
         assert combinedSortedData.get(0)[0].equals(45);
         assert combinedSortedData.get(0)[1].equals("goals");
