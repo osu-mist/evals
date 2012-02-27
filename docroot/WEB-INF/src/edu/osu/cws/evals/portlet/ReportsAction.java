@@ -154,7 +154,14 @@ public class ReportsAction implements ActionInterface {
             trimmedChartData = ReportMgr.trimDataPoints(chartData, maxDataPoints);
         }
 
-        drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false);
+        // The drill down data is the same as the report by unit (overdue may not have all units)
+        String report = (String) paramMap.get(REPORT);
+        if (report.equals(REPORT_DEFAULT)) {
+            drillDownData = chartData;
+        } else {
+            drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false);
+        }
+
         if (shouldListAppraisals()) {
             listAppraisals = ReportMgr.getListData(paramMap, crumbs);
         }

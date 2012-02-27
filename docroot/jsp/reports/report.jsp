@@ -174,6 +174,7 @@
 
       var table = new google.visualization.Table(document.getElementById('<portlet:namespace/>chart-data-div'));
       var tableOptions = {
+        sortColumn: 0,
         cssClassNames: {
             headerRow: 'google-header-row',
             hoverTableRow: 'google-hover-table-row',
