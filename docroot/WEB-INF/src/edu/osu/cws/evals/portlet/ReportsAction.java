@@ -150,10 +150,7 @@ public class ReportsAction implements ActionInterface {
         int maxDataPoints = Integer.parseInt(config.getValue());
 
         chartData = ReportMgr.getChartData(paramMap, crumbs, true);
-        trimmedChartData = new ArrayList<Object[]>();
-        if (!chartData.isEmpty()) {
-            trimmedChartData = ReportMgr.trimDataPoints(chartData, maxDataPoints);
-        }
+        trimmedChartData = ReportMgr.trimDataPoints(chartData, maxDataPoints);
 
         // The drill down data is the same as the report by unit (overdue may not have all units)
         String report = (String) paramMap.get(REPORT);
@@ -341,7 +338,6 @@ public class ReportsAction implements ActionInterface {
         if (selectedScope.equals(SCOPE_ORG_CODE) && selectedReport.contains(ReportMgr.UNIT)) {
             paramMap.put(REPORT,  REPORT_STAGE_BREAKDOWN);
         }
-
 
         int breadcrumbIndex = ParamUtil.getInteger(request, BREADCRUMB_INDEX, -1);
         paramMap.put(BREADCRUMB_INDEX, breadcrumbIndex);

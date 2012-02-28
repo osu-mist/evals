@@ -234,12 +234,15 @@ public class ReportMgr {
      * @return
      */
     public static List<Object[]> trimDataPoints(List<Object[]> results, int maxDataPoints) {
-        if (results.size() <= maxDataPoints || maxDataPoints < 1) {
+        if (results.size() <= maxDataPoints || maxDataPoints < 1 || results.isEmpty()) {
             return results;
         }
 
-        List<Object[]> trimmedData = results.subList(0,maxDataPoints-1);
-        List<Object[]> otherData = results.subList(maxDataPoints-1, results.size());
+        List<Object[]> trimmedData = new ArrayList<Object[]>();
+        List<Object[]> otherData = new ArrayList<Object[]>();
+        trimmedData.addAll(results.subList(0,maxDataPoints-1));
+        otherData.addAll(results.subList(maxDataPoints-1, results.size()));
+
         int otherCount = 0;
         for (Object[] row : otherData) {
             otherCount += Integer.parseInt(row[0].toString());
