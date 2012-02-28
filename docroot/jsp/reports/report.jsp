@@ -135,10 +135,10 @@
     // Create the data table.
     chartData = new google.visualization.DataTable();
     chartData.addColumn('string', '<liferay-ui:message key="${reportHeader}"/>');
-    chartData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evals"/>');
+    chartData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evaluations"/>');
     chartData.addRows([
         <c:forEach var="row" items="${chartData}" varStatus="loopStatus">
-            ['${row[1]}', ${row[0]}]
+            ['<liferay-ui:message key="${row[1]}"/>', ${row[0]}]
             <c:if test="${!loopStatus.last}">
                 ,
             </c:if>
@@ -150,7 +150,7 @@
     trimmedChartData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evals"/>');
     trimmedChartData.addRows([
         <c:forEach var="row" items="${trimmedChartData}" varStatus="loopStatus">
-            ['${row[1]}', ${row[0]}]
+            ['<liferay-ui:message key="${row[1]}"/>', ${row[0]}]
             <c:if test="${!loopStatus.last}">
                 ,
             </c:if>
