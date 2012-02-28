@@ -32,6 +32,10 @@ public class ReportsAction implements ActionInterface {
     public static final String REPORT_STAGE_OVERDUE = "stageOverdue";
     public static final String REPORT_STAGE_WAYOVERDUE = "stageWayOverdue";
 
+    public static final String CHART_TYPE_DEFAULT = "pie";
+    public static final String CHART_TYPE_BAR = "bar";
+    public static final String CHART_TYPE_COLUMN = "column";
+
     public static String[] APPOINTMENT_TYPES = {"Classified"};
     public static String[] DRILL_DOWN_INDEX = {
             DEFAULT_SCOPE,
@@ -41,6 +45,7 @@ public class ReportsAction implements ActionInterface {
             SCOPE_SUPERVISOR
     };
     public static final String BREADCRUMB_INDEX = "breadcrumbIndex";
+    public static final String CHART_TYPE = "chartType";
 
     private List<Breadcrumb> breadcrumbList = new ArrayList<Breadcrumb>();
 
@@ -114,6 +119,7 @@ public class ReportsAction implements ActionInterface {
         actionHelper.addToRequestMap("report", paramMap.get(REPORT));
         actionHelper.addToRequestMap("reportTitle", ReportMgr.getReportTitle(paramMap));
         actionHelper.addToRequestMap("reportHeader", ReportMgr.getReportHeader(paramMap));
+        actionHelper.addToRequestMap("chartType", getChartType(request));
 
         String nextScope = nextScopeInDrillDown(scope);
         actionHelper.addToRequestMap("nextScope", nextScope);
@@ -292,6 +298,16 @@ public class ReportsAction implements ActionInterface {
         return (String) paramMap.get(SCOPE);
     }
 
+    private String getChartType(PortletRequest request) {
+        PortletSession session = request.getPortletSession();
+        String chartType = (String) session.getAttribute(CHART_TYPE);
+        if (chartType == null || chartType.equals("")) {
+            chartType = CHART_TYPE_DEFAULT;
+        }
+
+        return chartType;
+    }
+
     /**
      * Looks at the values passed in the request, the session values and the
      * default ones. First it tries to use the request, if the values are not
@@ -341,6 +357,35 @@ public class ReportsAction implements ActionInterface {
 
         int breadcrumbIndex = ParamUtil.getInteger(request, BREADCRUMB_INDEX, -1);
         paramMap.put(BREADCRUMB_INDEX, breadcrumbIndex);
+    }
+
+    /**
+     * Handles an ajax request made by the user to save the chart type when they change to
+     * a different chart type.
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    public String saveChartType(PortletRequest request, PortletResponse response) {
+        String chartType = ParamUtil.getString(request, "chartType", CHART_TYPE_DEFAULT);
+
+        boolean allowedChartType = chartType.equals(CHART_TYPE_BAR)
+                || chartType.equals(CHART_TYPE_COLUMN) || chartType.equals(CHART_TYPE_DEFAULT);
+
+        if (allowedChartType)   {
+            PortletSession session = request.getPortletSession();
+
+            try {
+                session.setAttribute(CHART_TYPE, chartType);
+            } catch (Exception e) {
+                return e.getMessage();
+            }
+        } else {
+            return "";
+        }
+
+        return "success";
     }
 
     public void setActionHelper(ActionHelper actionHelper) {

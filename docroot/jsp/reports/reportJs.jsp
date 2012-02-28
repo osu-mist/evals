@@ -9,7 +9,7 @@
   // Set a callback to run when the Google Visualization API is loaded.
   google.setOnLoadCallback(drawChart);
   var chart;
-  var chartType = "pie";
+  var chartType = "${chartType}";
   var chartData;
   var trimmedChartData;
   var report = "${report}";
@@ -125,27 +125,34 @@
 
 jQuery(document).ready(function() {
   jQuery("#<portlet:namespace/>changeToPieType").click(function(e) {
-    e.preventDefault();
-    chartType = "pie";
-    chart.clearChart();
-    drawChart();
-    return false;
+    return changeChartType("pie", e);
   });
 
   jQuery("#<portlet:namespace/>changeToColumnType").click(function(e) {
-    e.preventDefault();
-    chartType = "column";
-    chart.clearChart();
-    drawChart();
-    return false;
+    return changeChartType("column", e);
   });
 
   jQuery("#<portlet:namespace/>changeToBarType").click(function(e) {
-    e.preventDefault();
-    chartType = "bar";
-    chart.clearChart();
-    drawChart();
-    return false;
+    return changeChartType("bar", e);
   });
 });
+    
+<portlet:resourceURL var="updateChartType" id="saveChartType" escapeXml="false" />
+function saveChartType() {
+  var querystring = {'chartType': chartType, 'controller': "ReportsAction"};
+  jQuery.ajax({
+    type: "POST",
+    url: "<%=renderResponse.encodeURL(updateChartType.toString())%>",
+    data: querystring
+  });
+}
+
+function changeChartType(type, e) {
+  chartType = type;
+  e.preventDefault();
+  chart.clearChart();
+  drawChart();
+  saveChartType(chartType);
+  return false;
+}
 </script>
