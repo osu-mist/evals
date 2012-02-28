@@ -17,7 +17,7 @@
                         </portlet:renderURL>"><liferay-ui:message key="my-information"/></a></li>
             </ul>
         </li>
-        <li><a href="#"><liferay-ui:message key="reports"/></a>
+        <li class="reports"><a href="#"><liferay-ui:message key="reports"/></a>
             <ul>
                 <li><a href="<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                         <portlet:param name="action" value="report"/>
