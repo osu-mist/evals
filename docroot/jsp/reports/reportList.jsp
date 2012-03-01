@@ -1,11 +1,10 @@
 <c:if test="${!empty listAppraisals}">
-  <div class="osu-cws-report-left chart-content">
+  <div class="osu-cws-report-left report-list">
     <div id="<portlet:namespace/>accordionMenuReportList" class="accordion-menu">
         <div class="osu-accordion-header">
-            <liferay-ui:message key="report-types" />
+            <liferay-ui:message key="report-list-title" />
         </div>
-        <div class="osu-accordion-content">
-          <h3><liferay-ui:message key="report-list-title"/></h3>
+        <div class="accordion-content">
           <table class="taglib-search-iterator report-data">
               <thead>
                   <tr class="portlet-section-header results-header">
