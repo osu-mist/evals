@@ -293,6 +293,9 @@ public class AppraisalMgr {
 
         // set the overdue value before updating the status
         String beforeUpdateStatus = appraisal.getStatus();
+        // calculate overdue value & set the appraisal.overdue value
+        AppraisalMgr.updateOverdue(appraisal, configurationMap);
+        int oldOverdue = appraisal.getOverdue();
 
         // update appraisal & assessment fields based on permission rules
         setAppraisalFields(request, appraisal, permRule);
@@ -303,13 +306,10 @@ public class AppraisalMgr {
             String overdueMethod = StringUtils.capitalize(beforeUpdateStatus);
             overdueMethod = "set" + overdueMethod.replace("Due", "Overdue");
             try {
-                // calculate overdue value & set the appraisal.overdue value
-                AppraisalMgr.updateOverdue(appraisal, configurationMap);
-
                 // call setStageOverdue method
                 Method controllerMethod = appraisal.getClass().getDeclaredMethod(overdueMethod,
                         Integer.class);
-                controllerMethod.invoke(appraisal, appraisal.getOverdue());
+                controllerMethod.invoke(appraisal, oldOverdue);
             } catch (NoSuchMethodException e) {
                 // don't do anything since some methods might not exist.
             }
