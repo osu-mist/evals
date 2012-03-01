@@ -580,6 +580,6 @@ public class AppraisalsTest {
         tx.commit();
         appraisal.setStatus(Appraisal.STATUS_CLOSED);
         appraisal.setOriginalStatus(Appraisal.STATUS_GOALS_DUE);
-        AppraisalMgr.updateAppraisalStatus(appraisal, false);
+        AppraisalMgr.updateAppraisalStatus(appraisal);
     }
 }

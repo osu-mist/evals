@@ -111,7 +111,7 @@ public class HomeAction implements ActionInterface {
             appraisal.setStatus(status);
             appraisal.setOriginalStatus(status);
 
-            AppraisalMgr.updateAppraisalStatus(appraisal, false);
+            AppraisalMgr.updateAppraisalStatus(appraisal);
         } catch (Exception e) {
             _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
         }

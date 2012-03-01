@@ -534,7 +534,7 @@ public class AppraisalsAction implements ActionInterface {
         if (request instanceof ActionRequest && response instanceof ActionResponse) {
             appraisal.setOriginalStatus(appraisal.getStatus());
             appraisal.setStatus(Appraisal.STATUS_RESULTS_DUE);
-            AppraisalMgr.updateAppraisalStatus(appraisal, false);
+            AppraisalMgr.updateAppraisalStatus(appraisal);
             SessionMessages.add(request, "appraisal-set-status-success");
             return display(request, response);
         }

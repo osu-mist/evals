@@ -69,6 +69,8 @@ public class Appraisal extends Evals {
     public static final String STAGE_CLOSED = "closed";
     public static final String STAGE_ARCHIVED = "archived";
 
+    public static final String DUE = "Due";
+    public static final String OVERDUE = "Overdue";
 
     private int id;
 

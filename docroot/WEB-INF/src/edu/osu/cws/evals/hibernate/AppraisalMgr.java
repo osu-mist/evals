@@ -2,10 +2,10 @@ package edu.osu.cws.evals.hibernate;
 
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.ActionHelper;
-import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.type.StandardBasicTypes;
@@ -293,24 +293,39 @@ public class AppraisalMgr {
 
         // set the overdue value before updating the status
         String beforeUpdateStatus = appraisal.getStatus();
-        boolean activeOverdueStatus = AppraisalMgr.isActiveOverdueStatus(beforeUpdateStatus);
-        if (activeOverdueStatus) {
-            AppraisalMgr.updateOverdue(appraisal, configurationMap);
-        }
 
         // update appraisal & assessment fields based on permission rules
         setAppraisalFields(request, appraisal, permRule);
 
-        if (!appraisal.getStatus().equals(beforeUpdateStatus)&& activeOverdueStatus) {
+        boolean statusChanged = !appraisal.getStatus().equals(beforeUpdateStatus);
+        if (statusChanged) {
             // Using the old status value call setStatusOverdue()
-            String overdueMethod = beforeUpdateStatus.substring(0, 1).toUpperCase() + beforeUpdateStatus.substring(1);
+            String overdueMethod = StringUtils.capitalize(beforeUpdateStatus);
             overdueMethod = "set" + overdueMethod.replace("Due", "Overdue");
-            Method controllerMethod = appraisal.getClass().getDeclaredMethod(overdueMethod, Integer.class);
-            controllerMethod.invoke(appraisal, appraisal.getOverdue());
+            try {
+                // calculate overdue value & set the appraisal.overdue value
+                AppraisalMgr.updateOverdue(appraisal, configurationMap);
+
+                // call setStageOverdue method
+                Method controllerMethod = appraisal.getClass().getDeclaredMethod(overdueMethod,
+                        Integer.class);
+                controllerMethod.invoke(appraisal, appraisal.getOverdue());
+            } catch (NoSuchMethodException e) {
+                // don't do anything since some methods might not exist.
+            }
+
+            // Assign the new status based on configuration values
+            String status = appraisal.getStatus();
+            String newStatus = AppraisalMgr.getNewStatus(status, appraisal, configurationMap);
+            if (newStatus != null) {
+                appraisal.setStatus(newStatus);
+            }
 
             // If the new status is valid for overdue, refresh the overdue value
-            if (AppraisalMgr.isActiveOverdueStatus(appraisal.getStatus())) {
+            if (appraisal.getStatus().contains(Appraisal.OVERDUE)) {
                 AppraisalMgr.updateOverdue(appraisal, configurationMap);
+            } else {
+                appraisal.setOverdue(-999);
             }
         }
 
@@ -338,20 +353,6 @@ public class AppraisalMgr {
         if (emailType != null) {
             mailer.sendMail(appraisal, emailType);
         }
-    }
-
-    /**
-     * This method figures out if the status is an active status where we should
-     * update the appraisal overdue value
-     *
-     * @param status
-     * @return
-     */
-    public static boolean isActiveOverdueStatus(String status) {
-        return !status.equals(Appraisal.STATUS_COMPLETED) &&
-                !status.equals(Appraisal.STATUS_CLOSED) &&
-                !status.equals(Appraisal.STATUS_GOALS_APPROVED) &&
-                !status.equals(Appraisal.STATUS_GOALS_REACTIVATED);
     }
 
     /**
@@ -1047,29 +1048,18 @@ public class AppraisalMgr {
      * Updates the appraisal status and originalStatus using the id of the appraisal and hsql query.
      *
      * @param appraisal
-     * @param updateOverdue     Whether or not to update the overdue value
      * @throws Exception
      */
-    public static void updateAppraisalStatus(Appraisal appraisal, boolean updateOverdue) throws Exception {
+    public static void updateAppraisalStatus(Appraisal appraisal) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        String query = "update edu.osu.cws.evals.models.Appraisal appraisal set status = :status, " +
-                "originalStatus = :origStatus ";
+        String query = "update edu.osu.cws.evals.models.Appraisal appraisal " +
+                "set status = :status, originalStatus = :origStatus where id = :id";
 
-        if (updateOverdue) {
-            query += ", overdue = :overdue ";
-        }
-        query += "where id = :id";
-
-        Query hibQuery = session.createQuery(query);
-        hibQuery.setString("status", appraisal.getStatus());
-        hibQuery.setString("origStatus", appraisal.getOriginalStatus());
-        hibQuery.setInteger("id", appraisal.getId());
-
-        if (updateOverdue) {
-            hibQuery.setInteger("overdue", appraisal.getOverdue());
-        }
-
-        hibQuery.executeUpdate();
+        session.createQuery(query)
+                .setString("status", appraisal.getStatus())
+                .setString("origStatus", appraisal.getOriginalStatus())
+                .setInteger("id", appraisal.getId())
+                .executeUpdate();
     }
 
 
@@ -1167,5 +1157,66 @@ public class AppraisalMgr {
                 .setInteger("id", appraisal.getId())
                 .setInteger("overdue", appraisal.getOverdue())
                 .executeUpdate();
+    }
+
+    /**
+     * Calculates what should be the new status of a given appraisal. It looks at the
+     * configuration values to see whether the status is due or overdue.
+     * @todo: handle: STATUS_GOALS_REACTIVATED in next release
+     *
+     * @param status
+     * @param appraisal
+     * @param configMap
+     * @return
+     * @throws Exception
+     */
+    public static String getNewStatus(String status, Appraisal appraisal,
+                                      Map<String, Configuration> configMap) throws Exception {
+        String newStatus = null;
+        Configuration config = configMap.get(status); //config object of this status
+
+        if (status.contains(Appraisal.DUE) && EvalsUtil.isDue(appraisal, config) <= 0) {
+            newStatus = status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
+        } else if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)
+                &&  isGoalsReqModOverDue(appraisal, configMap)) {
+            //goalsRequiredModification is not overdue.
+            newStatus = Appraisal.STATUS_GOALS_OVERDUE;
+        } else if (status.equals(Appraisal.STATUS_GOALS_APPROVED)) {
+            //Need to check to see if it's time to change the status to results due
+            Configuration reminderConfig = configMap.get("firstResultDueReminder");
+            if (EvalsUtil.isDue(appraisal, reminderConfig) < 0) {
+                newStatus = Appraisal.STATUS_RESULTS_DUE;
+            }
+        }
+        return newStatus;
+    }
+
+    /**
+     * If goals are not due yet, then no
+     * If goals are due, check to see if goalsRequiredModification is overdue
+     * Goals modifications due date is a configuration parameter which
+     * defines how many days after requiredModification is submitted before they are due.
+     * If goals modification is over due, then yes.
+     * @param appraisal
+     * @param configMap
+     * @return true if both goals are overdue and goalsRequiredModification is overdue. Otherwise false.
+     * @throws Exception
+     */
+    private static boolean isGoalsReqModOverDue(Appraisal appraisal,
+                                                Map<String, Configuration> configMap) throws Exception
+    {
+        Configuration goalsDueConfig = configMap.get(Appraisal.STATUS_GOALS_DUE); //this config exists
+
+        if (EvalsUtil.isDue(appraisal, goalsDueConfig) <= 0) { //goals due or overdue
+            System.out.println(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION + ", goals overdue");
+            //goals is due or overdue.  Is goalsRequiredModification overdue?
+            Configuration modConfig = configMap.get("goalsRequiredModificationDue");
+
+            if (EvalsUtil.isDue(appraisal, modConfig) < 0) {  // requiredModification is over due.
+               return true;
+            }
+        }
+
+        return false;
     }
 }
