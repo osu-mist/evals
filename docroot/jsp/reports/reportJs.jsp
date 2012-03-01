@@ -105,7 +105,7 @@
       }
 
       // right now we don't support drilling down to the grouped "other"
-      if (unitName == "other") {
+      if (unitName == '<liferay-ui:message key="other"/>') {
           return;
       }
 
