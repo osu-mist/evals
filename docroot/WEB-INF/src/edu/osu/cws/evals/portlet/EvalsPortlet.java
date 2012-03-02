@@ -184,6 +184,11 @@ public class EvalsPortlet extends GenericPortlet {
             Transaction tx = hibSession.beginTransaction();
             actionHelper.setUpUserPermissionInSession(request, false);
 
+            if (actionHelper.isDemo()) {
+                actionHelper.setupDemoSwitch(request);
+            }
+            actionHelper.addToRequestMap("isDemo", actionHelper.isDemo());
+
             // The portlet action can be set by the action/renderURLs using "action" as the parameter
             // name
             action =  ParamUtil.getString(request, "action", "display");

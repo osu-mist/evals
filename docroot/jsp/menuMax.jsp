@@ -11,7 +11,7 @@
                 <c:forEach  var="appraisal" items="${pendingReviews}">
                 <li><a href="<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                         <portlet:param name="action" value="display"/>
-                        <portlet:param name="controller" value="AppraisalAction"/>
+                        <portlet:param name="controller" value="AppraisalsAction"/>
                         <portlet:param name="id" value="${appraisal.id}"/>
                         </portlet:renderURL>">${appraisal.job.employee.name}</a></li>
                 </c:forEach>
@@ -24,7 +24,7 @@
                 <c:forEach  var="appraisal" items="${myTeamsAppraisals}">
                 <li><a href="<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                         <portlet:param name="action" value="display"/>
-                        <portlet:param name="controller" value="AppraisalAction"/>
+                        <portlet:param name="controller" value="AppraisalsAction"/>
                         <portlet:param name="id" value="${appraisal.id}"/>
                         </portlet:renderURL>">${appraisal.job.employee.name}</a></li>
                 </c:forEach>

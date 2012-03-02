@@ -58,6 +58,19 @@ public class Appraisal extends Evals {
     public static final String STATUS_SIGNATURE_OVERDUE = "signatureOverdue";
     public static final String STATUS_IN_REVIEW = "inReview";
 
+    public static final String STAGE_GOALS = "goals";
+    public static final String STAGE_RESULTS = "results";
+    public static final String STAGE_APPRAISAL = "appraisal";
+    public static final String STAGE_EVALUATION = "evaluation";
+    public static final String STAGE_RELEASE = "release";
+    public static final String STAGE_SIGNATURE = "signature";
+    public static final String STAGE_COMPLETED = "completed";
+    public static final String STAGE_REBUTTAL = "rebuttal";
+    public static final String STAGE_CLOSED = "closed";
+    public static final String STAGE_ARCHIVED = "archived";
+
+    public static final String DUE = "Due";
+    public static final String OVERDUE = "Overdue";
 
     private int id;
 
@@ -163,7 +176,25 @@ public class Appraisal extends Evals {
 
     private String originalStatus;
 
+    private Integer overdue;
+
     private Set<Assessment> assessments = new HashSet<Assessment>();
+
+    private Integer goalsOverdue;
+
+    private Integer goalsApprovalOverdue;
+
+    private Integer resultsOverdue;
+
+    private Integer appraisalOverdue;
+
+    private Integer reviewOverdue;
+
+    private Integer releaseOverdue;
+
+    private Integer signatureOverdue;
+
+    private Integer rebuttalReadOverdue;
 
     /**
      * Read only propety not stored in the db. It is the role of the logged in user with
@@ -270,6 +301,42 @@ public class Appraisal extends Evals {
         this.evaluationSubmitDate = evaluationSubmitDate;
         this.status = status;
         this.job = tempJob;
+    }
+
+    /**
+     * Constructor used by ReportMgr.getListHQL. It only fetches the data that it needs. The
+     * employee.id and job's pidm, posno and suffix are dummy data since they are only needed
+     * to construct the object.
+     *
+     * @param id
+     * @param firstName
+     * @param lastName
+     * @param startDate
+     * @param endDate
+     * @param status
+     * @param overdue
+     * @param employeeId
+     * @param positionNumber
+     * @param suffix
+     */
+    public Appraisal(int id, String firstName, String lastName, Date startDate, Date endDate,
+                     String status, int overdue, int employeeId, String positionNumber, String suffix) {
+        Employee employee = new Employee();
+        employee.setId(employeeId);
+        employee.setLastName(lastName);
+        employee.setFirstName(firstName);
+
+        Job tempJob = new Job();
+        tempJob.setPositionNumber(positionNumber);
+        tempJob.setSuffix(suffix);
+        tempJob.setEmployee(employee);
+
+        this.id = id;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = status;
+        this.job = tempJob;
+        this.overdue = overdue;
     }
 
     public boolean validateJob() {
@@ -393,6 +460,42 @@ public class Appraisal extends Evals {
         return !status.equals(STATUS_CLOSED) && !viewStatus.equals(STATUS_COMPLETED)
                 && !status.equals(STATUS_ARCHIVED) && !status.equals(STATUS_SIGNATURE_DUE)
                 && !status.equals(STATUS_SIGNATURE_OVERDUE);
+    }
+
+
+    /**
+     * Given a status, it returns the respective stage.
+     *
+     * @param status
+     * @return
+     */
+    public static String getStage(String status) {
+        String stage;
+        if (status.equals(Appraisal.STATUS_GOALS_APPROVED) ) {
+            stage = Appraisal.STAGE_RESULTS;
+        } else if (status.contains("goals")) {
+            stage = Appraisal.STAGE_GOALS;
+        } else {
+            stage = status.replace("Due", "").replace("Overdue", "");
+        }
+
+        if (stage.equals("rebuttalRead")) {
+            stage = Appraisal.STAGE_REBUTTAL;
+        }
+
+        return stage;
+    }
+
+    /**
+     * Used by the report list data. If the object is not overdue, we display - .
+     *
+     * @return
+     */
+    public String getViewOverdue() {
+        if (overdue < 1) {
+            return "-";
+        }
+        return overdue.toString();
     }
 
     public int getId() {
@@ -662,6 +765,78 @@ public class Appraisal extends Evals {
 
     public void setOriginalStatus(String originalStatus) {
         this.originalStatus = originalStatus;
+    }
+
+    public Integer getOverdue() {
+        return overdue;
+    }
+
+    public void setOverdue(Integer overdue) {
+        this.overdue = overdue;
+    }
+
+    public Integer getGoalsOverdue() {
+        return goalsOverdue;
+    }
+
+    public void setGoalsOverdue(Integer goalsOverdue) {
+        this.goalsOverdue = goalsOverdue;
+    }
+
+    public Integer getGoalsApprovalOverdue() {
+        return goalsApprovalOverdue;
+    }
+
+    public void setGoalsApprovalOverdue(Integer goalsApprovalOverdue) {
+        this.goalsApprovalOverdue = goalsApprovalOverdue;
+    }
+
+    public Integer getResultsOverdue() {
+        return resultsOverdue;
+    }
+
+    public void setResultsOverdue(Integer resultsOverdue) {
+        this.resultsOverdue = resultsOverdue;
+    }
+
+    public Integer getAppraisalOverdue() {
+        return appraisalOverdue;
+    }
+
+    public void setAppraisalOverdue(Integer appraisalOverdue) {
+        this.appraisalOverdue = appraisalOverdue;
+    }
+
+    public Integer getReviewOverdue() {
+        return reviewOverdue;
+    }
+
+    public void setReviewOverdue(Integer reviewOverdue) {
+        this.reviewOverdue = reviewOverdue;
+    }
+
+    public Integer getReleaseOverdue() {
+        return releaseOverdue;
+    }
+
+    public void setReleaseOverdue(Integer releaseOverdue) {
+        this.releaseOverdue = releaseOverdue;
+    }
+
+    public Integer getSignatureOverdue() {
+        return signatureOverdue;
+    }
+
+    public void setSignatureOverdue(Integer signatureOverdue) {
+        this.signatureOverdue = signatureOverdue;
+    }
+
+    public Integer getRebuttalReadOverdue() {
+        return rebuttalReadOverdue;
+    }
+
+    public void setRebuttalReadOverdue(Integer rebuttalReadOverdue) {
+        this.rebuttalReadOverdue = rebuttalReadOverdue;
     }
 
     /**

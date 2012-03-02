@@ -4,4 +4,7 @@
 <%@ include file="/jsp/home/myTeam.jsp" %>
 <%@ include file="/jsp/home/search.jsp" %>
 <%@ include file="/jsp/home/helpLinks.jsp" %>
+<c:if test="${isDemo}">
+    <%@ include file="/jsp/home/switchUser.jsp" %>
+</c:if>
 <%@ include file="/jsp/footer.jsp" %>
