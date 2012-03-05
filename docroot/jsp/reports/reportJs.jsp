@@ -21,7 +21,7 @@
     // Create the data table.
     chartData = new google.visualization.DataTable();
     chartData.addColumn('string', '<liferay-ui:message key="${reportHeader}"/>');
-    chartData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evaluations"/>');
+    chartData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evaluations"/> <liferay-ui:message key="${reportTitle}"/>');
     chartData.addRows([
         <c:forEach var="row" items="${chartData}" varStatus="loopStatus">
             ['<liferay-ui:message key="${row[1]}"/>', ${row[0]}]
