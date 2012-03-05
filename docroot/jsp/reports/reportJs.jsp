@@ -90,6 +90,10 @@
   function chartDrillDown() {
     var chartSelection = chart.getSelection();
 
+    if (typeof chartSelection == "undefined" || typeof chartSelection[0] == "undefined") {
+        return;
+    }
+
     // drill down by clicking on the chart is allowed on all by unit reports
     if (report.indexOf('<%= ReportMgr.UNIT %>') != -1) {
       var unitName = trimmedChartData.getValue(chartSelection[0].row, 0);
