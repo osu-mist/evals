@@ -138,6 +138,7 @@ public class ReportsAction implements ActionInterface {
             reviewerBCName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
         }
         actionHelper.addToRequestMap("reviewerBCName", reviewerBCName);
+        actionHelper.addToRequestMap("now", new Date());
     }
 
     private String nextScopeInDrillDown(String currentScope) {

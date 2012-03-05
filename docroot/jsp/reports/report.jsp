@@ -37,6 +37,9 @@
         </div>
         <div class="accordion-content chart-content" id="<portlet:namespace/>chartContent" style="display: block;">
             <%@ include file="breadcrumbs.jsp"%>
+
+            <strong><liferay-ui:message key="report-time-period"/></strong>
+            <liferay-ui:message key="report-time-period-active"/> <fmt:formatDate value="${now}" pattern="MM/dd/yy"/>
             <div id="<portlet:namespace/>chart-div" class="chart-div"></div>
             <div id="<portlet:namespace/>chart-data-div"></div>
         </div>
