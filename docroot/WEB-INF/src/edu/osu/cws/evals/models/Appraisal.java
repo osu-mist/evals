@@ -320,7 +320,7 @@ public class Appraisal extends Evals {
      * @param suffix
      */
     public Appraisal(int id, String firstName, String lastName, Date startDate, Date endDate,
-                     String status, int overdue, int employeeId, String positionNumber, String suffix) {
+                     String status, Integer overdue, int employeeId, String positionNumber, String suffix) {
         Employee employee = new Employee();
         employee.setId(employeeId);
         employee.setLastName(lastName);
@@ -336,7 +336,12 @@ public class Appraisal extends Evals {
         this.endDate = endDate;
         this.status = status;
         this.job = tempJob;
-        this.overdue = overdue;
+
+        if (overdue == null) {
+            this.overdue = -999;
+        } else {
+            this.overdue = overdue;
+        }
     }
 
     public boolean validateJob() {
