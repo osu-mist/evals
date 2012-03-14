@@ -1,9 +1,11 @@
 package edu.osu.cws.evals.portlet;
 
 import com.liferay.portal.kernel.util.ParamUtil;
+import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.ReportMgr;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Configuration;
+import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.util.Breadcrumb;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -72,6 +74,7 @@ public class ReportsAction implements ActionInterface {
     HashMap<String, Integer> units = new HashMap<String, Integer>();
     public static final String BREADCRUMB_SESS_KEY = "breadcrumbList";
 
+    private Job currentSupervisorJob;
     /**
      * Main method used in this class. It responds to the user request when the user is viewing
      * any kind of report.
@@ -219,7 +222,12 @@ public class ReportsAction implements ActionInterface {
             for (int i = 0; i < scopeValues.length; i++) {
                 String scopeValue = scopeValues[i];
                 String scope = DRILL_DOWN_INDEX[i];
-                Breadcrumb crumb = new Breadcrumb(scopeValue, scope, scopeValue);
+                String anchorText = scopeValue;
+                if (scope.equals(SCOPE_SUPERVISOR)) {
+                    //@todo: we are going to have to keep track of the supervisor name for anchor text
+                    anchorText = currentSupervisorJob.getEmployee().getName();
+                }
+                Breadcrumb crumb = new Breadcrumb(scopeValue, scope, anchorText);
                 reqCrumbsList.add(crumb);
             }
         }
@@ -269,7 +277,12 @@ public class ReportsAction implements ActionInterface {
             crumbs.addAll(startCrumbs);
 
             if (!sameScope) {
-                Breadcrumb crumb = new Breadcrumb(scopeValue, scope, scopeValue);
+                String anchorText = scopeValue;
+                if (scope.equals(SCOPE_SUPERVISOR)) {
+                    anchorText = currentSupervisorJob.getEmployee().getName();
+                }
+
+                Breadcrumb crumb = new Breadcrumb(scopeValue, scope, anchorText);
                 crumbs.add(crumb);
             }
         }
@@ -316,7 +329,7 @@ public class ReportsAction implements ActionInterface {
      *
      * @param request
      */
-    private void setParamMap(PortletRequest request) {
+    private void setParamMap(PortletRequest request) throws Exception {
         PortletSession session = request.getPortletSession();
         HashMap sessionParam = (HashMap) session.getAttribute("paramMap");
         if (sessionParam == null) {
@@ -348,7 +361,6 @@ public class ReportsAction implements ActionInterface {
             paramMap.put(REPORT, REPORT_DEFAULT);
         }
 
-
         // If the user is about to enter the org code scope and the chart is by Unit, use stage
         String selectedReport = (String) paramMap.get(REPORT);
         String selectedScope = (String) paramMap.get(SCOPE);
@@ -358,6 +370,13 @@ public class ReportsAction implements ActionInterface {
 
         int breadcrumbIndex = ParamUtil.getInteger(request, BREADCRUMB_INDEX, -1);
         paramMap.put(BREADCRUMB_INDEX, breadcrumbIndex);
+
+        if (getScope().equals(SCOPE_SUPERVISOR)) {
+            Job tempJob = Job.getJobFromString(getScopeValue());
+            //@todo: need to handle bad supervising data
+            currentSupervisorJob = JobMgr.getJob(tempJob.getEmployee().getId(),
+                    tempJob.getPositionNumber(), tempJob.getSuffix());
+        }
     }
 
     /**

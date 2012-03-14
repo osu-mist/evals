@@ -2,6 +2,8 @@ package edu.osu.cws.evals.tests;
 
 import edu.osu.cws.evals.hibernate.ReportMgr;
 import edu.osu.cws.evals.models.Appraisal;
+import edu.osu.cws.evals.models.Employee;
+import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.portlet.ReportsAction;
 import org.testng.annotations.Test;
 
@@ -557,5 +559,55 @@ public class ReportsTest {
         assert hql.equals(expectedHQL);
         hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
+    }
+
+    public void shouldProductionCorrectChartSQLForSupervisor() {
+        String scope = ReportsAction.SCOPE_SUPERVISOR;
+        String sql = "";
+        String expectedSQL;
+
+        Job job1 = new Job(new Employee(12345), "C12345", "00");
+        Job job2 = new Job(new Employee(12345), "C12345", "01");
+        ArrayList<Job> jobList = new ArrayList<Job>();
+        jobList.add(job1);
+        jobList.add(job2);
+
+        expectedSQL = "SELECT SUM(has_appraisal), root_supervisor_pidm from (SELECT " +
+                "(case when appraisals.id is not null then 1 else 0 end) as has_appraisal, "+
+                "CONNECT_BY_ROOT pyvpasj_pidm as root_supervisor_pidm FROM pyvpasj " +
+                "left join appraisals on (appraisals.job_pidm = pyvpasj_pidm AND " +
+                "appraisals.position_number = pyvpasj_posn AND " +
+                "appraisals.job_suffix = pyvpasj_suff) WHERE pyvpasj_status = 'A' AND " +
+                "pyvpasj_appointment_type in :appointmentTypes " +
+                "START WITH (pyvpasj_pidm = 12345 AND pyvpasj_posn = 'C12345' AND " +
+                "pyvpasj_suff = '00') OR (pyvpasj_pidm = 12345 AND pyvpasj_posn = 'C12345' " +
+                "AND pyvpasj_suff = '01')CONNECT BY "+
+                "pyvpasj_supervisor_pidm = prior pyvpasj_pidm AND "+
+                "pyvpasj_supervisor_posn = prior pyvpasj_posn AND "+
+                "pyvpasj_supervisor_suff = prior pyvpasj_suff ) GROUP BY root_supervisor_pidm"+
+                " ORDER BY sum(has_appraisal) DESC, root_supervisor_pidm";
+
+        sql = ReportMgr.getSupervisorChartSQL(scope, ReportsAction.REPORT_UNIT_BREAKDOWN,
+                true, jobList);
+        assert sql.equals(expectedSQL);
+
+        expectedSQL = "SELECT SUM(has_appraisal), status from (SELECT " +
+                "(case when appraisals.id is not null then 1 else 0 end) as has_appraisal, "+
+                "appraisals.status FROM pyvpasj " +
+                "left join appraisals on (appraisals.job_pidm = pyvpasj_pidm AND " +
+                "appraisals.position_number = pyvpasj_posn AND " +
+                "appraisals.job_suffix = pyvpasj_suff) WHERE pyvpasj_status = 'A' AND " +
+                "pyvpasj_appointment_type in :appointmentTypes " +
+                "START WITH (pyvpasj_pidm = 12345 AND pyvpasj_posn = 'C12345' AND " +
+                "pyvpasj_suff = '00') OR (pyvpasj_pidm = 12345 AND pyvpasj_posn = 'C12345' " +
+                "AND pyvpasj_suff = '01')CONNECT BY "+
+                "pyvpasj_supervisor_pidm = prior pyvpasj_pidm AND "+
+                "pyvpasj_supervisor_posn = prior pyvpasj_posn AND "+
+                "pyvpasj_supervisor_suff = prior pyvpasj_suff ) GROUP BY status"+
+                " ORDER BY sum(has_appraisal) DESC, status";
+
+        sql = ReportMgr.getSupervisorChartSQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN,
+                true, jobList);
+        assert sql.equals(expectedSQL);
     }
 }

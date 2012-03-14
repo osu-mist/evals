@@ -1,9 +1,11 @@
 package edu.osu.cws.evals.hibernate;
 
 import edu.osu.cws.evals.models.Appraisal;
+import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.util.Breadcrumb;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
 import java.util.*;
@@ -135,16 +137,33 @@ public class ReportMgr {
                                               boolean sortByCount) {
         Session session = HibernateUtil.getCurrentSession();
 
-        List results;
+        String sqlQuery = "";
+        List results = new ArrayList<Object[]>();
         String scope = (String) paramMap.get(ReportsAction.SCOPE);
         String scopeValue = (String) paramMap.get(ReportsAction.SCOPE_VALUE);
         String report = (String) paramMap.get(ReportsAction.REPORT);
         String bcName = "";
+        List<Job> directSupervisors;
         if (crumbs.size() > 1) {
             bcName = crumbs.get(1).getScopeValue();
         }
 
-        String sqlQuery = getChartSQL(scope, report, sortByCount);
+        // Fetch direct supervisors so we can get supervising data
+        if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
+            Job supervisorJob = Job.getJobFromString(scopeValue);
+            if (supervisorJob == null) {// If the supervisorJob was invalid stop
+                return results;
+            }
+
+            directSupervisors = JobMgr.getDirectSupervisorJobs(supervisorJob);
+            if (directSupervisors.isEmpty()) {// stop if it's low level supervisor
+                return results;
+            }
+            sqlQuery = getSupervisorChartSQL(scope, report, sortByCount, directSupervisors);
+        } else {
+            sqlQuery = getChartSQL(scope, report, sortByCount);
+        }
+
         if (scope.equals(ReportsAction.SCOPE_BC)) {
             results = session.createSQLQuery(sqlQuery)
                     .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
@@ -162,6 +181,10 @@ public class ReportMgr {
                     .setParameter("bcName", bcName)
                     .setParameter("tsOrgCode", scopeValue)
                     .list();
+        } else if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
+            results = session.createSQLQuery(sqlQuery)
+                    .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+                    .list();
         } else {
             results = session.createSQLQuery(sqlQuery)
                     .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
@@ -175,7 +198,70 @@ public class ReportMgr {
             }
         }
 
+        if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
+            results = addExtraSupervisingData(results, directSupervisors);
+        }
+
         return results;
+    }
+
+    /**
+     * Generates the sql needed to fetch the supervisors report.
+     *
+     * @param scope
+     * @param reportType
+     * @param sortByCount
+     * @param directSupervisors     List<Job> of direct supervisors
+     * @return
+     */
+    public static String getSupervisorChartSQL(String scope, String reportType, boolean sortByCount,
+                                        List<Job> directSupervisors) {
+        //@todo: need to handle case when directSupervisors is empty
+        String outerSelect = "SELECT SUM(has_appraisal), ";
+        String select = "SELECT " +
+                "(case when appraisals.id is not null then 1 else 0 end) as has_appraisal, ";
+        String from = "FROM pyvpasj left join appraisals on " +
+                "(appraisals.job_pidm = pyvpasj_pidm AND " +
+                "appraisals.position_number = pyvpasj_posn AND " +
+                "appraisals.job_suffix = pyvpasj_suff) ";
+        String where = "WHERE pyvpasj_status = 'A' AND pyvpasj_appointment_type " +
+                "in :appointmentTypes ";
+        String connectBy = "CONNECT BY " +
+                "pyvpasj_supervisor_pidm = prior pyvpasj_pidm AND " +
+                "pyvpasj_supervisor_posn = prior pyvpasj_posn AND " +
+                "pyvpasj_supervisor_suff = prior pyvpasj_suff ";
+        String orderBy = " ORDER BY ";
+        String col1 = "";
+
+        ArrayList<String> startWithClause = new ArrayList<String>();
+        for (Job directSupervisor : directSupervisors) {
+            String jobClause = "(pyvpasj_pidm = " + directSupervisor.getEmployee().getId() +
+                    " AND pyvpasj_posn = '" + directSupervisor.getPositionNumber() +
+                    "' AND pyvpasj_suff = '"+ directSupervisor.getSuffix() + "')";
+            startWithClause.add(jobClause);
+        }
+        String startWith = "START WITH ";
+        startWith += StringUtils.join(startWithClause, " OR ");
+
+        if (reportType.contains(STAGE)) {
+            col1 = "status";
+            select += "appraisals.status ";
+        } else {
+            col1 = "root_supervisor_pidm";
+            select += "CONNECT_BY_ROOT pyvpasj_pidm as root_supervisor_pidm ";
+        }
+
+        outerSelect += col1;
+        String groupBy = "GROUP BY " + col1;
+        if (sortByCount) {
+            orderBy += "sum(has_appraisal) DESC, " + col1;
+        } else {
+            orderBy += col1 + ", sum(has_appraisal) DESC";
+        }
+
+
+        return outerSelect + " from (" + select + from + where + startWith +
+                connectBy + ") " + groupBy + orderBy;
     }
 
     /**
@@ -222,6 +308,12 @@ public class ReportMgr {
         }
 
         return sortedResults;
+    }
+
+    //@todo: add supervisor name as the 3rd column
+    public static List<Object[]> addExtraSupervisingData(List<Object[]> results,
+                                                         List<Job> directSupervisors) {
+        return null;
     }
 
     /**

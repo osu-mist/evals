@@ -155,4 +155,16 @@ public class JobsTest {
         assert newStartDate.get(Calendar.MONTH) == Calendar.JUNE;
         assert newStartDate.get(Calendar.DAY_OF_MONTH) == 1;
     }
+
+    public void shouldParseJobFromString() {
+        assert null == Job.getJobFromString("");
+        assert null == Job.getJobFromString("1234");
+        assert null == Job.getJobFromString("1234_dfd");
+        assert null == Job.getJobFromString("1234_dfd_");
+
+        Job job = Job.getJobFromString("1234_C12345_00");
+        assert job.getId() == 1234;
+        assert job.getPositionNumber().equals("C12345");
+        assert job.getSuffix().equals("00");
+    }
 }

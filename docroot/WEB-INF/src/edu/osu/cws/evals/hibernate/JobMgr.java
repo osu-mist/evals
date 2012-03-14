@@ -189,4 +189,21 @@ public class JobMgr {
 
         return businessCenter;
     }
+
+    /**
+     * Returns a list of the direct supervisors under an mid-level or upper supervisor.
+     *
+     * @param supervisorJob
+     * @return
+     */
+    public static List<Job> getDirectSupervisorJobs(Job supervisorJob) {
+        Session session = HibernateUtil.getCurrentSession();
+        List<Job> results = (List<Job>) session.getNamedQuery("job.directSupervisors")
+                .setInteger("id", supervisorJob.getEmployee().getId())
+                .setString("posno", supervisorJob.getPositionNumber())
+                .setString("suffix", supervisorJob.getSuffix())
+                .list();
+
+        return results;
+    }
 }

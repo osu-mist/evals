@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import edu.osu.cws.util.CWSUtil;
+import org.apache.commons.lang.StringUtils;
 
 public class Job extends Evals implements Serializable {
     private int id;
@@ -458,6 +459,33 @@ public class Job extends Evals implements Serializable {
     {
         return "employee " + getEmployee().getId() + ", " +getEmployee().getName()
                  + ", position " + getPositionNumber();
+    }
+
+    /**
+     * Returns a job object with fields empty based on the string: pidm_posno_suff.
+     *
+     * @param jobString     Format is: pidm_posno_suff.
+     * @return Job
+     */
+    public static Job getJobFromString(String jobString) {
+        Job job = new Job();
+        jobString = StringUtils.trim(jobString);
+
+        if (StringUtils.isBlank(jobString)) {
+            return null;
+        }
+
+        String[] jobId = StringUtils.split(jobString, "_");
+        if (jobId.length != 3) {
+            return null;
+        }
+
+        int pidm = Integer.parseInt(jobId[0]);
+        job.setEmployee(new Employee(pidm));
+        job.setPositionNumber(jobId[1]);
+        job.setSuffix(jobId[2]);
+
+        return job;
     }
 }
 

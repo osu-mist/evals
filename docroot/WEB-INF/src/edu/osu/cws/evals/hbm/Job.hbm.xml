@@ -55,4 +55,11 @@
             PYVPASJ_APPOINTMENT_TYPE = 'Classified' AND
             PYVPASJ_STATUS != 'T'
     ]]></sql-query>
+    <query name="job.directSupervisors"><![CDATA[
+        from edu.osu.cws.evals.models.Job
+        where
+            supervisor.employee.id = :id and
+            supervisor.positionNumber = :posno and
+            supervisor.suffix = :suffix
+    ]]></query>
 </hibernate-mapping>
