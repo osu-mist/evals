@@ -41,4 +41,11 @@ public class Constants {
     public static final int DAYS_BEFORE_APPRAISAL_DUE_To_CREATE = 60;
 
     public static final String ROOT_DIR = "WEB-INF/src/";
+
+    // Used by several Hibernate classes when executing hierarchical queries
+    public static final String CONNECT_BY = "CONNECT BY " +
+            "pyvpasj_supervisor_pidm = prior pyvpasj_pidm AND " +
+            "pyvpasj_supervisor_posn = prior pyvpasj_posn AND " +
+            "pyvpasj_supervisor_suff = prior pyvpasj_suff ";
+
 }

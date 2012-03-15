@@ -14,7 +14,7 @@
                         <li><a href="#" id ="<portlet:namespace/>changeToBarType">Bar Chart</a></li>
                     </ul>
                 </li>
-                <c:if test="${scope != 'orgCode' && (allowAllDrillDown || reviewerBCName != '')}">
+                <c:if test="${showDrillDownMenu}">
                     <li><a href="#"><liferay-ui:message key="report-drilldown"/></a>
                         <ul>
                         <c:forEach var="unit" items="${drillDownData}" varStatus="loopStatus">
@@ -24,7 +24,7 @@
                                     <portlet:param name="action" value="report"/>
                                     <portlet:param name="controller" value="ReportsAction"/>
                                     <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
-                                    <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${unit[1]}"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${unit[2]}"/>
                                     <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                                     </portlet:actionURL>">${unit[1]}</a>
                                 </li>
@@ -55,7 +55,7 @@
         </div>
         <div class="accordion-content" id="<portlet:namespace/>ChooseReport" style="display: block;">
             <ul>
-                <c:if test="${scope != 'orgCode'}">
+                <c:if test="${enableByUnitReports}">
                     <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                             <portlet:param name="action" value="report"/>
                             <portlet:param name="controller" value="ReportsAction"/>

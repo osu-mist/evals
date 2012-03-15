@@ -1,5 +1,7 @@
 package edu.osu.cws.evals.portlet;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.ReportMgr;
@@ -8,9 +10,9 @@ import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.util.Breadcrumb;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 
 import javax.portlet.*;
+import java.lang.reflect.Type;
 import java.util.*;
 
 public class ReportsAction implements ActionInterface {
@@ -51,6 +53,8 @@ public class ReportsAction implements ActionInterface {
 
     private List<Breadcrumb> breadcrumbList = new ArrayList<Breadcrumb>();
 
+    private boolean enableByUnitReports = true;
+
     private ActionHelper actionHelper;
     private HomeAction homeAction;
 
@@ -75,6 +79,10 @@ public class ReportsAction implements ActionInterface {
     public static final String BREADCRUMB_SESS_KEY = "breadcrumbList";
 
     private Job currentSupervisorJob;
+    private boolean inLeafSupervisorReport = false;
+
+    Gson gson = new Gson();
+
     /**
      * Main method used in this class. It responds to the user request when the user is viewing
      * any kind of report.
@@ -123,6 +131,10 @@ public class ReportsAction implements ActionInterface {
         actionHelper.addToRequestMap("reportTitle", ReportMgr.getReportTitle(paramMap));
         actionHelper.addToRequestMap("reportHeader", ReportMgr.getReportHeader(paramMap));
         actionHelper.addToRequestMap("chartType", getChartType(request));
+        if (scope.equals(SCOPE_ORG_CODE)) {
+            enableByUnitReports = false;
+        }
+        actionHelper.addToRequestMap("enableByUnitReports", enableByUnitReports);
 
         String nextScope = nextScopeInDrillDown(scope);
         actionHelper.addToRequestMap("nextScope", nextScope);
@@ -142,6 +154,9 @@ public class ReportsAction implements ActionInterface {
         }
         actionHelper.addToRequestMap("reviewerBCName", reviewerBCName);
         actionHelper.addToRequestMap("now", new Date());
+
+        boolean showDrillDownMenu = showDrillDownMenu(allowAllDrillDown, reviewerBCName);
+        actionHelper.addToRequestMap("showDrillDownMenu", showDrillDownMenu);
     }
 
     private String nextScopeInDrillDown(String currentScope) {
@@ -154,12 +169,35 @@ public class ReportsAction implements ActionInterface {
     }
 
     private String activeReport(List<Breadcrumb> crumbs) {
+        List<Job> directSupervisors = null;
         Map<String, Configuration> configurationMap =
                 (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
         Configuration config = configurationMap.get("reportMaxDataForCharts");
         int maxDataPoints = Integer.parseInt(config.getValue());
 
-        chartData = ReportMgr.getChartData(paramMap, crumbs, true);
+        if (getScope().equals(ReportsAction.SCOPE_SUPERVISOR)) {
+            boolean allowUnitReport = true;
+            Job supervisorJob = Job.getJobFromString(getScopeValue());
+            if (supervisorJob != null) {
+                directSupervisors = JobMgr.getDirectSupervisorEmployees(supervisorJob);
+
+                if (JobMgr.isBottomLevelSupervisor(supervisorJob)) {
+                    allowUnitReport = false;
+                    inLeafSupervisorReport = true;
+                }
+            }
+
+            // If the supervisor is the bottom level supervisor, can't use by unit reports
+            if (!allowUnitReport) {
+                String report = (String) paramMap.get(REPORT);
+                if (report.contains(ReportMgr.UNIT)) {
+                    paramMap.put(REPORT, REPORT_STAGE_BREAKDOWN);
+                }
+                enableByUnitReports = false;
+            }
+        }
+
+        chartData = ReportMgr.getChartData(paramMap, crumbs, true, directSupervisors);
         trimmedChartData = ReportMgr.trimDataPoints(chartData, maxDataPoints);
 
         // The drill down data is the same as the report by unit (overdue may not have all units)
@@ -167,11 +205,11 @@ public class ReportsAction implements ActionInterface {
         if (report.equals(REPORT_DEFAULT)) {
             drillDownData = chartData;
         } else {
-            drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false);
+            drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false, directSupervisors);
         }
 
         if (shouldListAppraisals()) {
-            listAppraisals = ReportMgr.getListData(paramMap, crumbs);
+            listAppraisals = ReportMgr.getListData(paramMap, crumbs, directSupervisors);
         }
 
         return Constants.JSP_REPORT;
@@ -215,24 +253,12 @@ public class ReportsAction implements ActionInterface {
     private List<Breadcrumb> getBreadcrumbs(PortletRequest request) {
         PortletSession session = request.getPortletSession();
         String requestBreadcrumbs = ParamUtil.getString(request, "requestBreadcrumbs");
-        List<Breadcrumb> reqCrumbsList = new ArrayList<Breadcrumb>();
+        List<Breadcrumb> reqCrumbsList;
 
-        String[] scopeValues = StringUtils.split(requestBreadcrumbs);
-        if (scopeValues != null) {
-            for (int i = 0; i < scopeValues.length; i++) {
-                String scopeValue = scopeValues[i];
-                String scope = DRILL_DOWN_INDEX[i];
-                String anchorText = scopeValue;
-                if (scope.equals(SCOPE_SUPERVISOR)) {
-                    //@todo: we are going to have to keep track of the supervisor name for anchor text
-                    anchorText = currentSupervisorJob.getEmployee().getName();
-                }
-                Breadcrumb crumb = new Breadcrumb(scopeValue, scope, anchorText);
-                reqCrumbsList.add(crumb);
-            }
-        }
+        Type collectionType = new TypeToken<Collection<Breadcrumb>>(){}.getType();
+        reqCrumbsList = gson.fromJson(requestBreadcrumbs, collectionType);
 
-        if (!reqCrumbsList.isEmpty()) {
+        if (reqCrumbsList != null && !reqCrumbsList.isEmpty()) {
             return getBreadcrumbs(reqCrumbsList);
         }
 
@@ -270,19 +296,20 @@ public class ReportsAction implements ActionInterface {
         if (clickedCrumb) {
             crumbs = startCrumbs.subList(0, breadcrumbIndex+1);
         } else {
-            // Figure out if the user selected a different report, within the same scope
-            Breadcrumb lastBreadcrumb = startCrumbs.get(startCrumbs.size() - 1);
-            String scopeOfLastCrumb = lastBreadcrumb.getScope();
-            boolean sameScope = scope.equals(scopeOfLastCrumb);
             crumbs.addAll(startCrumbs);
 
-            if (!sameScope) {
+            // Figure out if the user selected a different report, within the same scope
+            Breadcrumb lastBreadcrumb = startCrumbs.get(startCrumbs.size() - 1);
+            String scopeValueOfLastCrumb = lastBreadcrumb.getScopeValue();
+            boolean sameScopeValue = scopeValue.equals(scopeValueOfLastCrumb);
+
+            if (!sameScopeValue) {
                 String anchorText = scopeValue;
                 if (scope.equals(SCOPE_SUPERVISOR)) {
                     anchorText = currentSupervisorJob.getEmployee().getName();
                 }
 
-                Breadcrumb crumb = new Breadcrumb(scopeValue, scope, anchorText);
+                Breadcrumb crumb = new Breadcrumb(anchorText, scope, scopeValue);
                 crumbs.add(crumb);
             }
         }
@@ -296,12 +323,7 @@ public class ReportsAction implements ActionInterface {
      * @return
      */
     private String getRequestBreadcrumbs() {
-        ArrayList<String> scopeValues = new ArrayList<String>();
-        for (Breadcrumb crumb : breadcrumbList) {
-            scopeValues.add(crumb.getScopeValue());
-        }
-
-        return StringUtils.join(scopeValues, " ");
+        return gson.toJson(breadcrumbList);
     }
 
     private String getScopeValue() {
@@ -443,6 +465,28 @@ public class ReportsAction implements ActionInterface {
                 }
             }
         }
+        return false;
+    }
+
+    /**
+     * Whether or not the drill down menu should be displayed in the charts.
+     *
+     * @param allowAllDrillDown
+     * @param reviewerBCName
+     * @return
+     */
+    private boolean showDrillDownMenu(boolean allowAllDrillDown, String reviewerBCName) {
+        // We don't allow drill down in lowest supervisor level
+        if (inLeafSupervisorReport) {
+            return false;
+        }
+
+        //scope != 'orgCode' && (allowAllDrillDown || reviewerBCName != '')
+        if (!getScope().equals(SCOPE_ORG_CODE) &&
+                (allowAllDrillDown || !reviewerBCName.equals(""))) {
+            return true;
+        }
+
         return false;
     }
 }

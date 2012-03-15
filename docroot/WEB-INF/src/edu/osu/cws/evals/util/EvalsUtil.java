@@ -14,12 +14,10 @@ import edu.osu.cws.util.CWSUtil;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import edu.osu.cws.evals.models.*;
+import org.apache.commons.lang.StringUtils;
 
 public class EvalsUtil {
     /**
@@ -210,5 +208,25 @@ public class EvalsUtil {
         }
 
         return 0;
+    }
+
+    /**
+     * Returns the start with clause so that we can get the oracle hierarchical data
+     * for the current supervisor level.
+     *
+     * @param directSupervisors
+     * @return
+     */
+    public static String getStartWithClause(List<Job> directSupervisors) {
+        ArrayList<String> startWithClause = new ArrayList<String>();
+        for (Job directSupervisor : directSupervisors) {
+            String jobClause = "(pyvpasj_pidm = " + directSupervisor.getEmployee().getId() +
+                    " AND pyvpasj_posn = '" + directSupervisor.getPositionNumber() +
+                    "' AND pyvpasj_suff = '"+ directSupervisor.getSuffix() + "')";
+            startWithClause.add(jobClause);
+        }
+        String startWith = "START WITH ";
+        startWith += StringUtils.join(startWithClause, " OR ");
+        return startWith;
     }
 }

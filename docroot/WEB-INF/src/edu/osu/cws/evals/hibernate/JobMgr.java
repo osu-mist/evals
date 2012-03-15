@@ -2,12 +2,14 @@ package edu.osu.cws.evals.hibernate;
 
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.models.ModelException;
+import edu.osu.cws.evals.portlet.Constants;
+import edu.osu.cws.evals.portlet.ReportsAction;
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.type.StandardBasicTypes;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -196,7 +198,7 @@ public class JobMgr {
      * @param supervisorJob
      * @return
      */
-    public static List<Job> getDirectSupervisorJobs(Job supervisorJob) {
+    public static List<Job> getDirectSupervisorEmployees(Job supervisorJob) {
         Session session = HibernateUtil.getCurrentSession();
         List<Job> results = (List<Job>) session.getNamedQuery("job.directSupervisors")
                 .setInteger("id", supervisorJob.getEmployee().getId())
@@ -205,5 +207,32 @@ public class JobMgr {
                 .list();
 
         return results;
+    }
+
+    /**
+     * Checks if the supervisor is the bottom level supervisor.
+     *
+     * @param supervisor
+     * @return
+     */
+    public static boolean isBottomLevelSupervisor(Job supervisor) {
+        Session session = HibernateUtil.getCurrentSession();
+        String select = "SELECT count(*) FROM pyvpasj ";
+        String where = "WHERE pyvpasj_status = 'A' " +
+                "AND PYVPASJ_APPOINTMENT_TYPE in (:appointmentTypes) AND " +
+                "level > 2 ";
+        List<Job> directSupervisors = new ArrayList<Job>();
+        directSupervisors.add(supervisor);
+
+        String startWith = EvalsUtil.getStartWithClause(directSupervisors);
+        String sql = select + where + startWith + Constants.CONNECT_BY;
+
+        // count the # of supervisors under the current supervisor
+        BigDecimal result = (BigDecimal) session.createSQLQuery(sql)
+                .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+                .uniqueResult();
+
+        int supervisorCount = Integer.parseInt(result.toString());
+       return supervisorCount < 1;
     }
 }

@@ -2,12 +2,15 @@ package edu.osu.cws.evals.hibernate;
 
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Job;
+import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.portlet.ReportsAction;
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.util.Breadcrumb;
-import org.apache.commons.lang.StringUtils;
+import org.hibernate.Query;
 import org.hibernate.Session;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class ReportMgr {
@@ -107,7 +110,7 @@ public class ReportMgr {
             where += " AND PYVPASJ_ORGN_CODE_TS = :tsOrgCode ";
         }
 
-        select = "SELECT count(*), " + col1 + from;
+        select = "SELECT count(*), " + col1 + ", " + col1 + " as col1_copy" + from;
         group += col1;
         if (sortByCount) {
             order += "count(*) DESC, " + col1;
@@ -126,15 +129,23 @@ public class ReportMgr {
 
     /**
      * Returns the data needed to generate the google charts and nothing more.
-     *
+     * The formatting of the data is:
+     * {
+     *     [number, 'bcName', 'bcName'],
+     *     [number, 'orgPrefix', 'orgPrefix'],
+     *     [number, 'orgCode', 'orgCode'],
+     *     [number, 'lastName, firstName', 'pidm_posno_suffix], // for supervisors
+     * }
      *
      * @param paramMap
-     * @param crumbs
+     * @param crumbs            Breadcrumbs
      * @param sortByCount       Whether the data should be sorted by the count first
+     * @param directSupervisors
+     *
      * @return
      */
     public static List<Object[]> getChartData(HashMap paramMap, List<Breadcrumb> crumbs,
-                                              boolean sortByCount) {
+                                              boolean sortByCount, List<Job> directSupervisors) {
         Session session = HibernateUtil.getCurrentSession();
 
         String sqlQuery = "";
@@ -143,51 +154,39 @@ public class ReportMgr {
         String scopeValue = (String) paramMap.get(ReportsAction.SCOPE_VALUE);
         String report = (String) paramMap.get(ReportsAction.REPORT);
         String bcName = "";
-        List<Job> directSupervisors;
         if (crumbs.size() > 1) {
             bcName = crumbs.get(1).getScopeValue();
         }
 
         // Fetch direct supervisors so we can get supervising data
         if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
-            Job supervisorJob = Job.getJobFromString(scopeValue);
-            if (supervisorJob == null) {// If the supervisorJob was invalid stop
-                return results;
-            }
-
-            directSupervisors = JobMgr.getDirectSupervisorJobs(supervisorJob);
-            if (directSupervisors.isEmpty()) {// stop if it's low level supervisor
-                return results;
-            }
             sqlQuery = getSupervisorChartSQL(scope, report, sortByCount, directSupervisors);
         } else {
             sqlQuery = getChartSQL(scope, report, sortByCount);
         }
 
+        Query chartQuery = session.createSQLQuery(sqlQuery)
+                .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES);
+
         if (scope.equals(ReportsAction.SCOPE_BC)) {
-            results = session.createSQLQuery(sqlQuery)
-                    .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+            results = chartQuery
                     .setParameter("bcName", scopeValue)
                     .list();
         } else if (scope.equals(ReportsAction.SCOPE_ORG_PREFIX)) {
-            results = session.createSQLQuery(sqlQuery)
-                    .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+            results = chartQuery
                     .setParameter("orgPrefix", scopeValue + "%")
                     .setParameter("bcName", bcName)
                     .list();
         } else if (scope.equals(ReportsAction.SCOPE_ORG_CODE)) {
-            results = session.createSQLQuery(sqlQuery)
-                    .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+            results = chartQuery
                     .setParameter("bcName", bcName)
                     .setParameter("tsOrgCode", scopeValue)
                     .list();
         } else if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
-            results = session.createSQLQuery(sqlQuery)
-                    .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+            results = chartQuery
                     .list();
         } else {
-            results = session.createSQLQuery(sqlQuery)
-                    .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+            results = chartQuery
                     .list();
         }
 
@@ -198,7 +197,8 @@ public class ReportMgr {
             }
         }
 
-        if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
+        // Add a third column to uniquely identify supervisors: pidm_posno_suffix
+        if (scope.equals(ReportsAction.SCOPE_SUPERVISOR) && report.contains(UNIT)) {
             results = addExtraSupervisingData(results, directSupervisors);
         }
 
@@ -226,22 +226,10 @@ public class ReportMgr {
                 "appraisals.job_suffix = pyvpasj_suff) ";
         String where = "WHERE pyvpasj_status = 'A' AND pyvpasj_appointment_type " +
                 "in :appointmentTypes ";
-        String connectBy = "CONNECT BY " +
-                "pyvpasj_supervisor_pidm = prior pyvpasj_pidm AND " +
-                "pyvpasj_supervisor_posn = prior pyvpasj_posn AND " +
-                "pyvpasj_supervisor_suff = prior pyvpasj_suff ";
         String orderBy = " ORDER BY ";
         String col1 = "";
 
-        ArrayList<String> startWithClause = new ArrayList<String>();
-        for (Job directSupervisor : directSupervisors) {
-            String jobClause = "(pyvpasj_pidm = " + directSupervisor.getEmployee().getId() +
-                    " AND pyvpasj_posn = '" + directSupervisor.getPositionNumber() +
-                    "' AND pyvpasj_suff = '"+ directSupervisor.getSuffix() + "')";
-            startWithClause.add(jobClause);
-        }
-        String startWith = "START WITH ";
-        startWith += StringUtils.join(startWithClause, " OR ");
+        String startWith = EvalsUtil.getStartWithClause(directSupervisors);
 
         if (reportType.contains(STAGE)) {
             col1 = "status";
@@ -259,9 +247,14 @@ public class ReportMgr {
             orderBy += col1 + ", sum(has_appraisal) DESC";
         }
 
+        if (reportType.contains("WayOverdue")) {
+            where += " AND appraisals.overdue > 30";
+        } else if (reportType.contains("Overdue")) {
+            where += " AND appraisals.overdue > 0";
+        }
 
         return outerSelect + " from (" + select + from + where + startWith +
-                connectBy + ") " + groupBy + orderBy;
+                Constants.CONNECT_BY + ") " + groupBy + orderBy;
     }
 
     /**
@@ -310,10 +303,50 @@ public class ReportMgr {
         return sortedResults;
     }
 
-    //@todo: add supervisor name as the 3rd column
+    /**
+     *
+     * Input:
+     * {
+     *     5, 12345, // # of evaluations, supervisor pidm
+     *     10, 54334
+     *     20, 56751
+     * }
+     * Output:
+     * {
+     * // # of evaluations, supervisor name, pidm_posno_suffix
+     *     5, 'Doe, Jane', '12345_C1111_00',
+     *     10, 'Smith, Joe', '54334_C1234_00',
+     *     20, 'Kent, Clark', '54334_C1234_00'
+     * }
+     *
+     * @param results
+     * @param directSupervisors
+     * @return
+     */
+    //@todo: we need to keep the sorting of evaluation count in place.
     public static List<Object[]> addExtraSupervisingData(List<Object[]> results,
                                                          List<Job> directSupervisors) {
-        return null;
+        List<Object[]> supervisorData = new ArrayList<Object[]>();
+        HashMap<String, Integer> pidmEvalCount = new HashMap<String, Integer>();
+        HashMap<Integer, Job> supervisorMap = new HashMap<Integer, Job>();
+
+        for (Job supervisor : directSupervisors) {
+            supervisorMap.put(supervisor.getEmployee().getId(), supervisor);
+        }
+
+        for (Object[] row : results) {
+            Integer pidm = Integer.parseInt(row[1].toString());
+            int evalCount = Integer.parseInt(row[0].toString());
+            Job supervisor = supervisorMap.get(pidm);
+            String supervisorName = supervisor.getEmployee().getName();
+            String key = pidm + "_" + supervisor.getPositionNumber() +
+                    "_" + supervisor.getSuffix();
+
+            Object[] newRow = {evalCount, supervisorName, key};
+            supervisorData.add(newRow);
+        }
+
+        return supervisorData;
     }
 
     /**
@@ -354,11 +387,13 @@ public class ReportMgr {
      * @param crumbs list of breadcrumbs
      * @return List of arrays of objects. The objects are strings
      */
-    public static List<Object[]> getDrillDownData(HashMap paramMap, List<Breadcrumb> crumbs, boolean sortByCount) {
+    public static List<Object[]> getDrillDownData(HashMap paramMap, List<Breadcrumb> crumbs,
+                                                  boolean sortByCount, List<Job> directSupervisors) {
         HashMap copyParamMap = new HashMap();
         copyParamMap.putAll(paramMap);
         copyParamMap.put(ReportsAction.REPORT, ReportsAction.REPORT_DEFAULT);
-        return getChartData(copyParamMap, crumbs, sortByCount);
+        //@todo: the drill down data shouldn't contain the current supervisor
+        return getChartData(copyParamMap, crumbs, sortByCount, directSupervisors);
     }
 
     /**
@@ -437,7 +472,9 @@ public class ReportMgr {
                 " and job.appointmentType in :appointmentTypes ";
         String order = " order by job.employee.lastName, job.employee.firstName";
 
-        if (!scope.equals(ReportsAction.DEFAULT_SCOPE)) {
+        //@todo: do we need to do bc filtering when the scope is supervisor?
+        if (!scope.equals(ReportsAction.DEFAULT_SCOPE) &&
+                !scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
             where += " and job.businessCenterName = :bcName";
         }
 
@@ -445,6 +482,8 @@ public class ReportMgr {
             where += " and job.orgCodeDescription LIKE :orgPrefix";
         } else if (scope.equals(ReportsAction.SCOPE_ORG_CODE)) {
             where += " and job.tsOrgCode = :tsOrgCode";
+        } else if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
+            where += " and id in (:appraisalIds)";
         }
 
         if (reportType.contains("WayOverdue")) {
@@ -463,7 +502,8 @@ public class ReportMgr {
      * @param crumbs
      * @return
      */
-    public static List<Appraisal> getListData(HashMap paramMap, List<Breadcrumb> crumbs) {
+    public static List<Appraisal> getListData(HashMap paramMap, List<Breadcrumb> crumbs,
+                                              List<Job> directSupervisors) {
         Session session = HibernateUtil.getCurrentSession();
 
         List<Appraisal> results;
@@ -476,29 +516,68 @@ public class ReportMgr {
         }
 
         String hqlQuery = getListHQL(scope, report);
+        Query listQuery = session.createQuery(hqlQuery)
+                .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES);
+
         if (scope.equals(ReportsAction.SCOPE_BC)) {
-            results = (ArrayList<Appraisal>) session.createQuery(hqlQuery)
-                    .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+            results = (ArrayList<Appraisal>) listQuery
                     .setParameter("bcName", scopeValue)
                     .list();
         } else if (scope.equals(ReportsAction.SCOPE_ORG_PREFIX)) {
-            results = (ArrayList<Appraisal>) session.createQuery(hqlQuery)
-                    .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+            results = (ArrayList<Appraisal>) listQuery
                     .setParameter("orgPrefix", scopeValue + "%")
                     .setParameter("bcName", bcName)
                     .list();
         } else if (scope.equals(ReportsAction.SCOPE_ORG_CODE)) {
-            results = (ArrayList<Appraisal>) session.createQuery(hqlQuery)
-                    .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+            results = (ArrayList<Appraisal>) listQuery
                     .setParameter("bcName", bcName)
                     .setParameter("tsOrgCode", scopeValue)
                     .list();
+        } else if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
+            List<Integer> appraisalIds = getAppraisalIdsForSupervisorReport(directSupervisors);
+            results = (ArrayList<Appraisal>) listQuery
+                    .setParameterList("appraisalIds", appraisalIds)
+                    .list();
         } else {
-            results = (ArrayList<Appraisal>) session.createQuery(hqlQuery)
-                    .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+            results = (ArrayList<Appraisal>) listQuery
                     .list();
         }
 
         return results;
+    }
+
+    /**
+     * Returns the list of all the appraisals that match the current supervising chain all the
+     * way down to the leaf.
+     *
+     * @param directSupervisors
+     * @return
+     */
+    public static List<Integer> getAppraisalIdsForSupervisorReport(List<Job> directSupervisors) {
+        if (directSupervisors == null) {
+            return null;
+        }
+
+        Session session = HibernateUtil.getCurrentSession();
+        List<Integer> ids = new ArrayList<Integer>();
+
+        String select = "SELECT appraisals.id FROM pyvpasj " +
+                "LEFT JOIN appraisals ON (appraisals.job_pidm = pyvpasj_pidm AND " +
+                "appraisals.position_number = pyvpasj_posn AND " +
+                "appraisals.job_suffix = pyvpasj_suff) ";
+        String where = "WHERE pyvpasj_status = 'A' " +
+                "AND PYVPASJ_APPOINTMENT_TYPE in (:appointmentTypes)";
+        String startWith = EvalsUtil.getStartWithClause(directSupervisors);
+
+        String sql = select + where + startWith + Constants.CONNECT_BY;
+        List<BigDecimal> result = session.createSQLQuery(sql)
+                .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
+                .list();
+
+        for (BigDecimal id : result) {
+            ids.add(Integer.parseInt(id.toString()));
+        }
+
+        return ids;
     }
 }

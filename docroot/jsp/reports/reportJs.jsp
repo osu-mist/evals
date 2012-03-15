@@ -12,6 +12,7 @@
   var chartType = "${chartType}";
   var chartData;
   var trimmedChartData;
+  var trimmedChartDataView;
   var report = "${report}";
 
   // Callback that creates and populates a data table,
@@ -34,9 +35,10 @@
     trimmedChartData = new google.visualization.DataTable();
     trimmedChartData.addColumn('string', '<liferay-ui:message key="${reportHeader}"/>');
     trimmedChartData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evals"/>');
+    trimmedChartData.addColumn('string', 'scopeValue');
     trimmedChartData.addRows([
         <c:forEach var="row" items="${trimmedChartData}" varStatus="loopStatus">
-            ['<liferay-ui:message key="${row[1]}"/>', ${row[0]}]
+            ['<liferay-ui:message key="${row[1]}"/>', ${row[0]}, '${row[2]}']
             <c:if test="${!loopStatus.last}">
                 ,
             </c:if>
@@ -63,7 +65,9 @@
       }
 
       // Instantiate and draw our chart, passing in some options.
-      chart.draw(trimmedChartData, options);
+      trimmedChartDataView = new google.visualization.DataView(trimmedChartData);
+      trimmedChartDataView.hideColumns(2);
+      chart.draw(trimmedChartDataView, options);
 
       var table = new google.visualization.Table(document.getElementById('<portlet:namespace/>chart-data-div'));
 
@@ -96,7 +100,7 @@
 
     // drill down by clicking on the chart is allowed on all by unit reports
     if (report.indexOf('<%= ReportMgr.UNIT %>') != -1) {
-      var unitName = trimmedChartData.getValue(chartSelection[0].row, 0);
+      var unitName = trimmedChartData.getValue(chartSelection[0].row, 2);
 
       var scope = '${scope}';
       var allowAllDrillDown = ${allowAllDrillDown};
