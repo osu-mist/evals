@@ -68,8 +68,21 @@ public class ReportsAction implements ActionInterface {
     private HashMap paramMap = new HashMap();
 
     private List<Appraisal> listAppraisals;
+    private List<Object[]> tableData;
+
+    /**
+     * Format:
+     * {
+     *     // # of evals, displayValue, scopeValue
+     *     5, 'UABC', 'UABC' // when scope is bc
+     *     5, 'CLA', 'CLA' // when scope is orgPrefix
+     *     5, '1234', '1234' // when scope is orgCode
+     *     5, 'Bond, James', 'pidm_posno_suffix' // when scope is supervisor
+     *
+     * }
+     */
     private List<Object[]> chartData;
-    private List<Object[]> trimmedChartData;
+
     private List<Object[]> drillDownData;
 
     /**
@@ -118,11 +131,13 @@ public class ReportsAction implements ActionInterface {
     }
 
     private void setupDataForJSP(PortletRequest request) throws Exception {
+        // chart related data
         actionHelper.addToRequestMap("chartData", chartData);
-        actionHelper.addToRequestMap("trimmedChartData", trimmedChartData);
+        actionHelper.addToRequestMap("tableData", tableData);
         actionHelper.addToRequestMap("drillDownData", drillDownData);
         actionHelper.addToRequestMap("listAppraisals", listAppraisals);
 
+        // parameter related data
         String scope = getScope();
         String scopeValue = getScopeValue();
         actionHelper.addToRequestMap("scope", scope);
@@ -136,6 +151,7 @@ public class ReportsAction implements ActionInterface {
         }
         actionHelper.addToRequestMap("enableByUnitReports", enableByUnitReports);
 
+        // breadcrumb and drill down data
         String nextScope = nextScopeInDrillDown(scope);
         actionHelper.addToRequestMap("nextScope", nextScope);
         actionHelper.addToRequestMap("breadcrumbList", breadcrumbList);
@@ -157,6 +173,8 @@ public class ReportsAction implements ActionInterface {
 
         boolean showDrillDownMenu = showDrillDownMenu(allowAllDrillDown, reviewerBCName);
         actionHelper.addToRequestMap("showDrillDownMenu", showDrillDownMenu);
+
+        actionHelper.addToRequestMap("chartDataScopeMap", chartDataScopeMap());
     }
 
     private String nextScopeInDrillDown(String currentScope) {
@@ -197,13 +215,13 @@ public class ReportsAction implements ActionInterface {
             }
         }
 
-        chartData = ReportMgr.getChartData(paramMap, crumbs, true, directSupervisors);
-        trimmedChartData = ReportMgr.trimDataPoints(chartData, maxDataPoints);
+        tableData = ReportMgr.getChartData(paramMap, crumbs, true, directSupervisors);
+        chartData = ReportMgr.trimDataPoints(tableData, maxDataPoints);
 
         // The drill down data is the same as the report by unit (overdue may not have all units)
         String report = (String) paramMap.get(REPORT);
         if (report.equals(REPORT_DEFAULT)) {
-            drillDownData = chartData;
+            drillDownData = tableData;
         } else {
             drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false, directSupervisors);
         }
@@ -236,7 +254,7 @@ public class ReportsAction implements ActionInterface {
         Configuration config = configurationMap.get("reportMaxDataForList");
         int maxDataForList = Integer.parseInt(config.getValue());
 
-        for (Object[] row : chartData ) {
+        for (Object[] row : tableData) {
             numberOfEvalRecords += Integer.parseInt(row[0].toString());
         }
 
@@ -488,5 +506,28 @@ public class ReportsAction implements ActionInterface {
         }
 
         return false;
+    }
+
+    /**
+     * Returns a string representation of a map that helps look up the scope value
+     * based on the display value of the chart data. This is needed for chart drill
+     * down.
+     *
+     * @return
+     */
+    private String chartDataScopeMap() {
+        String report = (String) paramMap.get(REPORT);
+        if (report.contains(ReportMgr.STAGE)) {
+            return "{}";
+        }
+
+        HashMap<String, String> dataScopeMap = new HashMap<String, String>();
+        for (Object[] row : chartData) {
+            String displayValue = row[1].toString();
+            String scopeValue = row[2].toString();
+            dataScopeMap.put(displayValue, scopeValue);
+        }
+
+        return gson.toJson(dataScopeMap);
     }
 }
