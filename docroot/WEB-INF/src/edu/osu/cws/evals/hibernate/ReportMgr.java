@@ -140,12 +140,15 @@ public class ReportMgr {
      * @param paramMap
      * @param crumbs            Breadcrumbs
      * @param sortByCount       Whether the data should be sorted by the count first
-     * @param directSupervisors
-     *
+     * @param directSupervisors A list of jobs of the direct supervisors of the current level
+     * @param myTeamAppraisals  A list of appraisals of the employees directly under current
+     *                          supervisor
      * @return
      */
     public static List<Object[]> getChartData(HashMap paramMap, List<Breadcrumb> crumbs,
-                                              boolean sortByCount, List<Job> directSupervisors) {
+                                              boolean sortByCount, List<Job> directSupervisors,
+                                              ArrayList<Appraisal> myTeamAppraisals,
+                                              Job currentSupervisorJob) {
         Session session = HibernateUtil.getCurrentSession();
 
         String sqlQuery = "";
@@ -185,21 +188,28 @@ public class ReportMgr {
         } else if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
             results = chartQuery
                     .list();
+
+            // Sometimes, we just want the drill down data and the current supervisor
+            // shouldn't be included
+            if (myTeamAppraisals != null && currentSupervisorJob != null) {
+                results = addMyTeamToReport(results, report, myTeamAppraisals,
+                        currentSupervisorJob);
+            }
         } else {
             results = chartQuery
                     .list();
         }
 
-        if (report.contains(STAGE)) {
-            if (!results.isEmpty()) {
+        if (!results.isEmpty()) {
+            if (report.contains(STAGE)) {
                 results = convertStatusToStage(results);
                 results = combineAndSortStages(results);
             }
-        }
 
-        // Add a third column to uniquely identify supervisors: pidm_posno_suffix
-        if (scope.equals(ReportsAction.SCOPE_SUPERVISOR) && report.contains(UNIT)) {
-            results = addExtraSupervisingData(results, directSupervisors);
+            // Add a third column to uniquely identify supervisors: pidm_posno_suffix
+            if (scope.equals(ReportsAction.SCOPE_SUPERVISOR) && report.contains(UNIT)) {
+                results = addSupervisorByUnitData(results, directSupervisors, currentSupervisorJob);
+            }
         }
 
         return results;
@@ -323,14 +333,22 @@ public class ReportMgr {
      * @param directSupervisors
      * @return
      */
-    //@todo: we need to keep the sorting of evaluation count in place.
-    public static List<Object[]> addExtraSupervisingData(List<Object[]> results,
-                                                         List<Job> directSupervisors) {
+    public static List<Object[]> addSupervisorByUnitData(List<Object[]> results,
+                                                         List<Job> directSupervisors,
+                                                         Job currentSupervisorJob) {
+        List<Job> supervisorsInReport = new ArrayList<Job>();
+        supervisorsInReport.addAll(directSupervisors);
+
+        // When we are getting the drill down data, we don't need the current supervisor
+        if (currentSupervisorJob != null) {
+            supervisorsInReport.add(currentSupervisorJob);
+        }
+
         List<Object[]> supervisorData = new ArrayList<Object[]>();
         HashMap<String, Integer> pidmEvalCount = new HashMap<String, Integer>();
         HashMap<Integer, Job> supervisorMap = new HashMap<Integer, Job>();
 
-        for (Job supervisor : directSupervisors) {
+        for (Job supervisor : supervisorsInReport) {
             supervisorMap.put(supervisor.getEmployee().getId(), supervisor);
         }
 
@@ -347,6 +365,49 @@ public class ReportMgr {
         }
 
         return supervisorData;
+    }
+
+    /**
+     * Adds raw information about the current supervisor by unit or by stage report data.
+     * In the case of the by unit we add:
+     *  ["# of evals", "pidm of direct employee"]
+     *
+     * In the case of by stage we add:
+     *  ["1", "status of evaluation of evaluation of direct employee1"],
+     *  ["1", "status of evaluation of evaluation of direct employee2"]
+     *
+     * The data will be combined and processed by other methods.
+     *
+     * @param results
+     * @param report
+     * @param myTeamAppraisals
+     * @return
+     */
+    public static List<Object[]> addMyTeamToReport(List<Object[]> results, String report,
+                                                   List<Appraisal> myTeamAppraisals,
+                                                   Job currentSupervisorJob) {
+        // add all the results to a new list because we cannot modify data that comes from
+        // Hibernate
+        List<Object[]> newResults = new ArrayList<Object[]>();
+        newResults.addAll(results);
+
+        //@todo: what happens if results is empty?
+        //@todo: what happens if myTeamAppraisals is empty?
+        //@todo: need to filter out data if report is overdue or wayOverdue
+        if (report.contains(UNIT)) {
+            Integer pidm = (Integer) currentSupervisorJob.getEmployee().getId();
+            Object[] currentSupervisorLevel = new Object[2];
+            currentSupervisorLevel[0] = (Object) myTeamAppraisals.size();
+            currentSupervisorLevel[1] = (Object) pidm;
+            newResults.add(0, currentSupervisorLevel);
+        } else {
+            for (Appraisal appraisal : myTeamAppraisals) {
+                Object[] newStatusRow = {1, appraisal.getStatus()};
+                newResults.add(newStatusRow);
+            }
+        }
+
+        return newResults;
     }
 
     /**
@@ -381,10 +442,12 @@ public class ReportMgr {
     }
 
     /**
-     * Returns the data used for the drill down table.
+     * Returns the data used for the drill down menu.
      *
      * @param paramMap search/request parameters
      * @param crumbs list of breadcrumbs
+     * @param sortByCount
+     * @param directSupervisors
      * @return List of arrays of objects. The objects are strings
      */
     public static List<Object[]> getDrillDownData(HashMap paramMap, List<Breadcrumb> crumbs,
@@ -392,8 +455,8 @@ public class ReportMgr {
         HashMap copyParamMap = new HashMap();
         copyParamMap.putAll(paramMap);
         copyParamMap.put(ReportsAction.REPORT, ReportsAction.REPORT_DEFAULT);
-        //@todo: the drill down data shouldn't contain the current supervisor
-        return getChartData(copyParamMap, crumbs, sortByCount, directSupervisors);
+        return getChartData(copyParamMap, crumbs, sortByCount, directSupervisors,
+                null, null);
     }
 
     /**

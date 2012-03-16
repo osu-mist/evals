@@ -659,9 +659,19 @@ public class AppraisalMgr {
      * @param onlyActive    Whether or not to include only the active appraisals
      * @return
      */
-    public List<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive) throws Exception {
+    public ArrayList<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return this.getMyTeamsAppraisals(pidm, onlyActive, session);
+        List<Appraisal> dbTeamAppraisals = this.getMyTeamsAppraisals(pidm, onlyActive, session);
+        ArrayList<Appraisal> myTeamAppraisals = new ArrayList<Appraisal>();
+
+        if (dbTeamAppraisals != null) {
+            for (Appraisal appraisal : dbTeamAppraisals) {
+                appraisal.setRole("supervisor");
+                myTeamAppraisals.add(appraisal);
+            }
+        }
+
+        return myTeamAppraisals;
     }
 
     /**

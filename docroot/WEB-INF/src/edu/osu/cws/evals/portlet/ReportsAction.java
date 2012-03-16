@@ -3,6 +3,7 @@ package edu.osu.cws.evals.portlet;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.liferay.portal.kernel.util.ParamUtil;
+import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.ReportMgr;
 import edu.osu.cws.evals.models.Appraisal;
@@ -91,7 +92,17 @@ public class ReportsAction implements ActionInterface {
     HashMap<String, Integer> units = new HashMap<String, Integer>();
     public static final String BREADCRUMB_SESS_KEY = "breadcrumbList";
 
+    /**
+     * Holds the job of the current supervisor level in the supervisor report.
+     * Set in setParamMap()
+     */
     private Job currentSupervisorJob;
+
+    /**
+     * Holds list of appraisals of direct employees of current supervisor
+     */
+    private ArrayList<Appraisal> supervisorTeamAppraisal;
+
     private boolean inLeafSupervisorReport = false;
 
     Gson gson = new Gson();
@@ -117,6 +128,12 @@ public class ReportsAction implements ActionInterface {
             }
             actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
             return homeAction.display(request, response);
+        }
+
+        if (getScope().equals(SCOPE_SUPERVISOR)) {
+            int supervisorLevelPidm = currentSupervisorJob.getEmployee().getId();
+            AppraisalMgr appraisalMgr = new AppraisalMgr();
+            supervisorTeamAppraisal = appraisalMgr.getMyTeamsAppraisals(supervisorLevelPidm, true);
         }
 
         String jspFile = activeReport(breadcrumbList);
@@ -215,9 +232,20 @@ public class ReportsAction implements ActionInterface {
             }
         }
 
-        tableData = ReportMgr.getChartData(paramMap, crumbs, true, directSupervisors);
+        tableData = ReportMgr.getChartData(paramMap, crumbs, true, directSupervisors,
+                supervisorTeamAppraisal, currentSupervisorJob);
         chartData = ReportMgr.trimDataPoints(tableData, maxDataPoints);
+        setDrillDownData(crumbs, directSupervisors);
 
+
+        if (shouldListAppraisals()) {
+            listAppraisals = ReportMgr.getListData(paramMap, crumbs, directSupervisors);
+        }
+
+        return Constants.JSP_REPORT;
+    }
+
+    private void setDrillDownData(List<Breadcrumb> crumbs, List<Job> directSupervisors) {
         // The drill down data is the same as the report by unit (overdue may not have all units)
         String report = (String) paramMap.get(REPORT);
         if (report.equals(REPORT_DEFAULT)) {
@@ -225,12 +253,6 @@ public class ReportsAction implements ActionInterface {
         } else {
             drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false, directSupervisors);
         }
-
-        if (shouldListAppraisals()) {
-            listAppraisals = ReportMgr.getListData(paramMap, crumbs, directSupervisors);
-        }
-
-        return Constants.JSP_REPORT;
     }
 
     /**

@@ -131,15 +131,7 @@ public class ActionHelper {
         myTeamAppraisals = (ArrayList<Appraisal>) session.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
         if (myTeamAppraisals == null) {
             AppraisalMgr appraisalMgr = new AppraisalMgr();
-            dbTeamAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true);
-            myTeamAppraisals = new ArrayList<Appraisal>();
-
-            if (dbTeamAppraisals != null) {
-                for (Appraisal appraisal : dbTeamAppraisals) {
-                    appraisal.setRole("supervisor");
-                    myTeamAppraisals.add(appraisal);
-                }
-            }
+            myTeamAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true);
             session.setAttribute(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals);
         }
         return myTeamAppraisals;
