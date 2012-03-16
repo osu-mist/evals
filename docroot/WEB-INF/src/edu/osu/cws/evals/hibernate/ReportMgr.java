@@ -19,6 +19,7 @@ public class ReportMgr {
     public static final String UNIT = "unit";
     public static final String ACTIVE_STATUS_SQL = "appraisals.status not in " +
             "('completed', 'archived', 'closed')";
+    public static final int WAY_OVERDUE_DAYS = 30;
 
     /**
      * Performs sql query to fetch appraisals and only the needed fields. In order to
@@ -120,9 +121,9 @@ public class ReportMgr {
             order += col1 + ", count(*) DESC";
         }
 
-        if (reportType.contains("WayOverdue")) {
+        if (isWayOverdueReport(reportType)) {
             where += " AND appraisals.overdue > 30";
-        } else if (reportType.contains("Overdue")) {
+        } else if (isOverdueReport(reportType)) {
             where += " AND appraisals.overdue > 0";
         }
 
@@ -259,9 +260,9 @@ public class ReportMgr {
             orderBy += col1 + ", sum(has_appraisal) DESC";
         }
 
-        if (reportType.contains("WayOverdue")) {
+        if (isWayOverdueReport(reportType)) {
             where += " AND appraisals.overdue > 30";
-        } else if (reportType.contains("Overdue")) {
+        } else if (isOverdueReport(reportType)) {
             where += " AND appraisals.overdue > 0";
         }
 
@@ -405,7 +406,21 @@ public class ReportMgr {
             if (!status.equals(Appraisal.STATUS_COMPLETED) &&
                     !status.equals(Appraisal.STATUS_CLOSED) &&
                     !status.equals(Appraisal.STATUS_ARCHIVED)) {
-                teamAppraisalTemp.add(appraisal);
+
+                boolean addAppraisal = true;
+
+                // Filter out of the appraisal if needed based on overdue or way overdue days.
+                Integer overdue = appraisal.getOverdue();
+                if (isOverdueReport(report) && overdue < 1) {
+                    addAppraisal = false;
+                } else if (isWayOverdueReport(report) && overdue <= WAY_OVERDUE_DAYS) {
+                    addAppraisal = false;
+                }
+
+                if (addAppraisal) {
+                    teamAppraisalTemp.add(appraisal);
+                }
+
             }
         }
 
@@ -565,13 +580,32 @@ public class ReportMgr {
             where += " and id in (:appraisalIds)";
         }
 
-        if (reportType.contains("WayOverdue")) {
+        if (isWayOverdueReport(reportType)) {
             where += " and overdue > 30";
-        } else if (reportType.contains("Overdue")) {
+        } else if (isOverdueReport(reportType)) {
             where += " and overdue > 0";
         }
 
         return select + where + order;
+    }
+
+    /**
+     * If the report is overdue by unit or stage
+     *
+     * @param reportType
+     * @return
+     */
+    private static boolean isOverdueReport(String reportType) {
+        return reportType.contains("Overdue");
+    }
+
+    /**
+     * If the report is way overdue by unit or stage
+     * @param reportType
+     * @return
+     */
+    private static boolean isWayOverdueReport(String reportType) {
+        return reportType.contains("WayOverdue");
     }
 
     /**

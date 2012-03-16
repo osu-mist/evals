@@ -241,10 +241,11 @@ public class Appraisal extends Evals {
      * @param goalsRequiredModificationDate
      * @param employeeSignedDate
      * @param employeeId
+     * @param overdue
      */
     public Appraisal(int id, String jobTitle, String lastName, String firstName, String appointmentType,
                      Date startDate, Date endDate, String status, Date goalsRequiredModificationDate,
-                     Date employeeSignedDate, int employeeId) {
+                     Date employeeSignedDate, int employeeId, Integer overdue) {
         Employee employee = new Employee();
         employee.setId(employeeId);
         employee.setLastName(lastName);
@@ -259,6 +260,13 @@ public class Appraisal extends Evals {
         this.job.setEmployee(employee);
         this.employeeSignedDate = employeeSignedDate;
         this.goalsRequiredModificationDate = goalsRequiredModificationDate;
+
+        if (overdue == null) {
+            this.overdue = -999;
+        } else {
+            this.overdue = overdue;
+        }
+
     }
 
     /**
