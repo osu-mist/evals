@@ -14,6 +14,8 @@
   var chartData;
   var chartDataScopeMap = eval('(' + '${chartDataScopeMap}' + ')');
   var report = "${report}";
+  var currentSupervisorName = "${currentSupervisorName}";
+  var nextScope = "${nextScope}";
 
   // Callback that creates and populates a data table,
   // instantiates the pie chart, passes in the data and
@@ -98,6 +100,11 @@
     if (report.indexOf('<%= ReportMgr.UNIT %>') != -1) {
       var displayValue = chartData.getValue(chartSelection[0].row, 0);
       var unitName = chartDataScopeMap[displayValue];
+
+      // if the drillDown level is supervisor, we don't allow drill down for currentSupervisor
+      if (nextScope == 'supervisor' && displayValue == '${currentSupervisorName}') {
+          return;
+      }
 
       var scope = '${scope}';
       var allowAllDrillDown = ${allowAllDrillDown};

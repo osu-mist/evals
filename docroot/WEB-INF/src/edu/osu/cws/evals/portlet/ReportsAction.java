@@ -192,6 +192,11 @@ public class ReportsAction implements ActionInterface {
         actionHelper.addToRequestMap("showDrillDownMenu", showDrillDownMenu);
 
         actionHelper.addToRequestMap("chartDataScopeMap", chartDataScopeMap());
+
+        if (currentSupervisorJob != null) {
+            String currentSupervisorName = currentSupervisorJob.getEmployee().getName();
+            actionHelper.addToRequestMap("currentSupervisorName", currentSupervisorName);
+        }
     }
 
     private String nextScopeInDrillDown(String currentScope) {
