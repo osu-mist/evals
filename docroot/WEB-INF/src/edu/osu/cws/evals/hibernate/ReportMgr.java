@@ -17,6 +17,8 @@ public class ReportMgr {
 
     public static final String STAGE = "stage";
     public static final String UNIT = "unit";
+    public static final String ACTIVE_STATUS_SQL = "appraisals.status not in " +
+            "('completed', 'archived', 'closed')";
 
     /**
      * Performs sql query to fetch appraisals and only the needed fields. In order to
@@ -82,7 +84,7 @@ public class ReportMgr {
         String col1 = "";
         String select = "";
         String from = " FROM appraisals, PYVPASJ ";
-        String where = " WHERE appraisals.status not in ('completed', 'archived', 'closed') " +
+        String where = " WHERE " + ACTIVE_STATUS_SQL + " " +
                 "AND PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes " +
                 "AND PYVPASJ_PIDM = appraisals.job_pidm " +
                 "AND PYVPASJ_POSN = appraisals.position_number " +
@@ -235,7 +237,7 @@ public class ReportMgr {
                 "appraisals.position_number = pyvpasj_posn AND " +
                 "appraisals.job_suffix = pyvpasj_suff) ";
         String where = "WHERE pyvpasj_status = 'A' AND pyvpasj_appointment_type " +
-                "in :appointmentTypes ";
+                "in :appointmentTypes AND " + ACTIVE_STATUS_SQL + " ";
         String orderBy = " ORDER BY ";
         String col1 = "";
 
@@ -389,10 +391,24 @@ public class ReportMgr {
         // add all the results to a new list because we cannot modify data that comes from
         // Hibernate
         List<Object[]> newResults = new ArrayList<Object[]>();
-        newResults.addAll(results);
 
-        //@todo: what happens if results is empty?
-        //@todo: what happens if myTeamAppraisals is empty?
+        if (myTeamAppraisals == null || results.isEmpty()) {
+            return newResults;
+        }
+
+        newResults.addAll(results);
+        List<Appraisal> teamAppraisalTemp = new ArrayList<Appraisal>();
+
+        // Only use the active evaluations
+        for (Appraisal appraisal : myTeamAppraisals) {
+            String status = appraisal.getStatus();
+            if (!status.equals(Appraisal.STATUS_COMPLETED) &&
+                    !status.equals(Appraisal.STATUS_CLOSED) &&
+                    !status.equals(Appraisal.STATUS_ARCHIVED)) {
+                teamAppraisalTemp.add(appraisal);
+            }
+        }
+
         //@todo: need to filter out data if report is overdue or wayOverdue
         if (report.contains(UNIT)) {
             Integer pidm = (Integer) currentSupervisorJob.getEmployee().getId();
