@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.hibernate;
 
+import edu.osu.cws.evals.models.AppointmentType;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.portlet.Constants;
@@ -417,6 +418,10 @@ public class ReportMgr {
                     addAppraisal = false;
                 }
 
+                if (!appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED)) {
+                    addAppraisal = false;
+                }
+
                 if (addAppraisal) {
                     teamAppraisalTemp.add(appraisal);
                 }
@@ -424,7 +429,6 @@ public class ReportMgr {
             }
         }
 
-        //@todo: need to filter out data if report is overdue or wayOverdue
         if (report.contains(UNIT)) {
             Integer pidm = (Integer) currentSupervisorJob.getEmployee().getId();
             Object[] currentSupervisorLevel = new Object[2];
