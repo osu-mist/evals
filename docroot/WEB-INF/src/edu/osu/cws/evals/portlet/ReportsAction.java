@@ -8,6 +8,7 @@ import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.ReportMgr;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Configuration;
+import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.util.Breadcrumb;
 import org.apache.commons.lang.ArrayUtils;
@@ -508,6 +509,20 @@ public class ReportsAction implements ActionInterface {
                 if (bcBreadcrumb.getScopeValue().equals(businessCenterName)) {
                     return true;
                 }
+            }
+        }
+
+        if (getScope().equals(SCOPE_SUPERVISOR)) {
+            Employee loggedInUser = actionHelper.getLoggedOnUser(request);
+            boolean isMyReport = currentSupervisorJob.getEmployee().getId() == loggedInUser.getId();
+            JobMgr jobMgr = new JobMgr();
+
+            if (isMyReport) {
+                return true;
+            }
+
+            if (jobMgr.isUpperSupervisor(currentSupervisorJob, loggedInUser.getId())) {
+                return true;
             }
         }
         return false;
