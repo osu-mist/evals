@@ -562,23 +562,32 @@ public class ReportsAction implements ActionInterface {
      * @throws Exception
      */
     private void showMyReportLink(PortletRequest request) throws Exception {
-        boolean loggedInUserSupervisor = actionHelper.isLoggedInUserSupervisor(request);
-        String supervisorJobTitle = "";
+        boolean showMyReportLink = false;
 
-        if (loggedInUserSupervisor) {
+        if (actionHelper.isLoggedInUserSupervisor(request)) {
             // We make the assumption that a person has only 1 supervising job
             Employee loggedInUser = actionHelper.getLoggedOnUser(request);
             Job supervisorJob = JobMgr.getSupervisingJob(loggedInUser.getId());
-            supervisorJobTitle = supervisorJob.getJobTitle();
+            String supervisorJobTitle = supervisorJob.getJobTitle();
             String myReportSupervisorKey = supervisorJob.getEmployee().getId() + "_" +
                     supervisorJob.getPositionNumber() + "_" + supervisorJob.getSuffix();
 
-
-            actionHelper.addToRequestMap("showMyReportLink", true);
+            showMyReportLink = true;
             actionHelper.addToRequestMap("supervisorJobTitle", supervisorJobTitle);
             actionHelper.addToRequestMap("myReportSupervisorKey", myReportSupervisorKey);
-            return;
         }
+
+        if (actionHelper.isLoggedInUserReviewer(request)) {
+            String myReportBcName = actionHelper.getBusinessCenterForLoggedInReviewer(request);
+            showMyReportLink = true;
+            actionHelper.addToRequestMap("myReportBcName", myReportBcName);
+        }
+
+        if (actionHelper.isLoggedInUserAdmin(request)) {
+            showMyReportLink = true;
+        }
+
+        actionHelper.addToRequestMap("showMyReportLink", showMyReportLink);
     }
 
     /**

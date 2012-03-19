@@ -303,8 +303,7 @@ public class ActionHelper {
             String businessCenterName = ParamUtil.getString(request, "businessCenterName");
 
             if (businessCenterName.equals("")) {
-                int employeeID = getLoggedOnUser(request).getId();
-                businessCenterName = getReviewer(employeeID).getBusinessCenterName();
+                businessCenterName = getBusinessCenterForLoggedInReviewer(request);
             }
             AppraisalMgr appraisalMgr = new AppraisalMgr();
             reviewList = appraisalMgr.getReviews(businessCenterName, -1);
@@ -322,6 +321,20 @@ public class ActionHelper {
         }
 
         return outList;
+    }
+
+    /**
+     * Returns the business center name for the currently logged in user that is a reviewer.
+     *
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    public String getBusinessCenterForLoggedInReviewer(PortletRequest request) throws Exception {
+        String businessCenterName;
+        int employeeID = getLoggedOnUser(request).getId();
+        businessCenterName = getReviewer(employeeID).getBusinessCenterName();
+        return businessCenterName;
     }
 
     /**

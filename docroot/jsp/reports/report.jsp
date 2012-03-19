@@ -36,15 +36,30 @@
                 <c:if test="${showMyReportLink}">
                     <li><a href="#"><liferay-ui:message key="report-my-report"/></a>
                         <ul>
-                            <c:if test="${supervisorJobTitle != ''}">
+                            <c:if test="${not empty supervisorJobTitle}">
                                 <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                                     <portlet:param name="action" value="report"/>
                                     <portlet:param name="controller" value="ReportsAction"/>
-                                    <portlet:param name="<%= ReportsAction.SCOPE %>" value="supervisor"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE %>" value="<%= ReportsAction.SCOPE_SUPERVISOR %>"/>
                                     <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${myReportSupervisorKey}"/>
                                     </portlet:actionURL>"><c:out value="${supervisorJobTitle}"/></a></li>
                             </c:if>
-
+                            <c:if test="${not empty myReportBcName}">
+                                <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                                    <portlet:param name="action" value="report"/>
+                                    <portlet:param name="controller" value="ReportsAction"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE %>" value="<%= ReportsAction.SCOPE_BC %>"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${myReportBcName}"/>
+                                    </portlet:actionURL>"><c:out value="${myReportBcName}"/></a></li>
+                            </c:if>
+                            <c:if test="${isAdmin == true}">
+                                <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                                    <portlet:param name="action" value="report"/>
+                                    <portlet:param name="controller" value="ReportsAction"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE %>" value="<%= ReportsAction.DEFAULT_SCOPE %>"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="osu"/>
+                                    </portlet:actionURL>">OSU</a></li>
+                            </c:if>
                         </ul>
                     </li>
                 </c:if>
