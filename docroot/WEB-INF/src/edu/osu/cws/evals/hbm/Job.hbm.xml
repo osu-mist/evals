@@ -62,4 +62,10 @@
             supervisor.positionNumber = :posno and
             supervisor.suffix = :suffix
     ]]></query>
+    <query name="job.firstSupervisorJob">
+        from edu.osu.cws.evals.models.Job
+        where
+            supervisor.employee.id = :id and
+            status = 'A'
+    </query>
 </hibernate-mapping>

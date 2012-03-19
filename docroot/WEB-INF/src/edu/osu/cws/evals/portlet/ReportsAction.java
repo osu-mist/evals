@@ -198,6 +198,9 @@ public class ReportsAction implements ActionInterface {
             String currentSupervisorName = currentSupervisorJob.getEmployee().getName();
             actionHelper.addToRequestMap("currentSupervisorName", currentSupervisorName);
         }
+
+        // My Report data
+        showMyReportLink(request);
     }
 
     private String nextScopeInDrillDown(String currentScope) {
@@ -548,6 +551,34 @@ public class ReportsAction implements ActionInterface {
         }
 
         return false;
+    }
+
+    /**
+     * Whether or not the my report link should be displayed. It also passes to the jsp
+     * the needed values to generate the my report links.
+     *
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    private void showMyReportLink(PortletRequest request) throws Exception {
+        boolean loggedInUserSupervisor = actionHelper.isLoggedInUserSupervisor(request);
+        String supervisorJobTitle = "";
+
+        if (loggedInUserSupervisor) {
+            // We make the assumption that a person has only 1 supervising job
+            Employee loggedInUser = actionHelper.getLoggedOnUser(request);
+            Job supervisorJob = JobMgr.getSupervisingJob(loggedInUser.getId());
+            supervisorJobTitle = supervisorJob.getJobTitle();
+            String myReportSupervisorKey = supervisorJob.getEmployee().getId() + "_" +
+                    supervisorJob.getPositionNumber() + "_" + supervisorJob.getSuffix();
+
+
+            actionHelper.addToRequestMap("showMyReportLink", true);
+            actionHelper.addToRequestMap("supervisorJobTitle", supervisorJobTitle);
+            actionHelper.addToRequestMap("myReportSupervisorKey", myReportSupervisorKey);
+            return;
+        }
     }
 
     /**

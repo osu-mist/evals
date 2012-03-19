@@ -167,4 +167,21 @@ public class JobsTest {
         assert job.getPositionNumber().equals("C12345");
         assert job.getSuffix().equals("00");
     }
+
+    public void shouldReturnNullWhenEmployeeHasNoSupervisorJob() {
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+        assert null == JobMgr.getSupervisingJob(0);
+        assert null == JobMgr.getSupervisingJob(-13435);
+
+        assert null == JobMgr.getSupervisingJob(787812);
+
+        Job supervisingJob = JobMgr.getSupervisingJob(12345);
+        assert null != supervisingJob;
+        assert supervisingJob.getEmployee().getId() == 12345;
+        assert supervisingJob.getPositionNumber().equals("1234");
+        assert supervisingJob.getSuffix().equals("00");
+
+        tx.commit();
+    }
 }

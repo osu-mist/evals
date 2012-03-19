@@ -15,6 +15,7 @@
               JOB_SUFFIX="00"
               CREATE_DATE="2011-05-01"
               TYPE="annual"
+              overdue="0"
   />
   <appraisals ID="2"
               START_DATE="2010-05-14"
@@ -25,6 +26,7 @@
               JOB_SUFFIX="00"
               CREATE_DATE="2010-05-01"
               TYPE="annual"
+              overdue="0"
   />
   <appraisals ID="3"
               START_DATE="2009-05-14"
@@ -36,6 +38,7 @@
               CREATE_DATE="2010-05-01"
               EVALUATION_SUBMIT_DATE="2011-03-01"
               TYPE="annual"
+              overdue="0"
   />
   <appraisals ID="4"
               START_DATE="2009-05-14"
@@ -47,6 +50,7 @@
               CREATE_DATE="2010-05-01"
               EVALUATION_SUBMIT_DATE="2011-03-01"
               TYPE="annual"
+              overdue="0"
   />
   <appraisals ID="5"
               START_DATE="2009-05-14"
@@ -57,6 +61,7 @@
               JOB_SUFFIX="00"
               CREATE_DATE="2010-05-01"
               TYPE="annual"
+              overdue="0"
   />
   <appraisals ID="6"
               START_DATE="2009-05-14"
@@ -67,6 +72,7 @@
               JOB_SUFFIX="00"
               CREATE_DATE="2010-05-01"
               TYPE="annual"
+              overdue="0"
   />
   <appraisals ID="7"
               START_DATE="2011-05-14"
@@ -77,6 +83,7 @@
               JOB_SUFFIX="00"
               CREATE_DATE="2010-05-01"
               TYPE="trial"
+              overdue="0"
   />
   <goals_logs/>
   <assessments ID="1" APPRAISAL_ID="1" CRITERION_DETAIL_ID="3" CREATE_DATE="2011-04-10 20:16:48.0" />

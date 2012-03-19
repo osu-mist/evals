@@ -235,4 +235,28 @@ public class JobMgr {
         int supervisorCount = Integer.parseInt(result.toString());
        return supervisorCount < 1;
     }
+
+    /**
+     * Returns the first superivsing job that the given Employee pidm holds.
+     *
+     * @param pidm
+     * @return
+     */
+    public static Job getSupervisingJob(int pidm) {
+        // Check for invalid pidm
+        if (pidm < 1) {
+            return null;
+        }
+
+        Session session = HibernateUtil.getCurrentSession();
+        List<Job> teamJobs = (List<Job>) session.getNamedQuery("job.firstSupervisorJob")
+                .setInteger("id", pidm)
+                .list();
+
+        if (teamJobs != null && !teamJobs.isEmpty()) {
+            return teamJobs.get(0).getSupervisor();
+        }
+
+        return null;
+    }
 }

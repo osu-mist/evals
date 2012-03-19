@@ -33,6 +33,21 @@
                         </ul>
                     </li>
                 </c:if>
+                <c:if test="${showMyReportLink}">
+                    <li><a href="#"><liferay-ui:message key="report-my-report"/></a>
+                        <ul>
+                            <c:if test="${supervisorJobTitle != ''}">
+                                <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                                    <portlet:param name="action" value="report"/>
+                                    <portlet:param name="controller" value="ReportsAction"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE %>" value="supervisor"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${myReportSupervisorKey}"/>
+                                    </portlet:actionURL>"><c:out value="${supervisorJobTitle}"/></a></li>
+                            </c:if>
+
+                        </ul>
+                    </li>
+                </c:if>
             </ul>
         </div>
         <div class="accordion-content chart-content" id="<portlet:namespace/>chartContent" style="display: block;">
