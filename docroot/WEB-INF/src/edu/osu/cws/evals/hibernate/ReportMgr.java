@@ -167,7 +167,7 @@ public class ReportMgr {
 
         // Fetch direct supervisors so we can get supervising data
         if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
-            sqlQuery = getSupervisorChartSQL(scope, report, sortByCount, directSupervisors);
+            sqlQuery = getSupervisorChartSQL(scope, report, sortByCount, directSupervisors.size());
         } else {
             sqlQuery = getChartSQL(scope, report, sortByCount);
         }
@@ -190,6 +190,7 @@ public class ReportMgr {
                     .setParameter("tsOrgCode", scopeValue)
                     .list();
         } else if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
+            EvalsUtil.setStartWithParameters(directSupervisors, chartQuery);
             results = chartQuery
                     .list();
 
@@ -225,11 +226,11 @@ public class ReportMgr {
      * @param scope
      * @param reportType
      * @param sortByCount
-     * @param directSupervisors     List<Job> of direct supervisors
+     * @param directSupervisorCount
      * @return
      */
     public static String getSupervisorChartSQL(String scope, String reportType, boolean sortByCount,
-                                        List<Job> directSupervisors) {
+                                        int directSupervisorCount) {
         //@todo: need to handle case when directSupervisors is empty
         String outerSelect = "SELECT SUM(has_appraisal), ";
         String select = "SELECT " +
@@ -243,7 +244,7 @@ public class ReportMgr {
         String orderBy = " ORDER BY ";
         String col1 = "";
 
-        String startWith = EvalsUtil.getStartWithClause(directSupervisors);
+        String startWith = EvalsUtil.getStartWithClause(directSupervisorCount);
 
         if (reportType.contains(STAGE)) {
             col1 = "status";
@@ -684,12 +685,14 @@ public class ReportMgr {
                 "appraisals.job_suffix = pyvpasj_suff) ";
         String where = "WHERE pyvpasj_status = 'A' " +
                 "AND PYVPASJ_APPOINTMENT_TYPE in (:appointmentTypes)";
-        String startWith = EvalsUtil.getStartWithClause(directSupervisors);
+        String startWith = EvalsUtil.getStartWithClause(directSupervisors.size());
 
         String sql = select + where + startWith + Constants.CONNECT_BY;
-        List<BigDecimal> result = session.createSQLQuery(sql)
-                .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
-                .list();
+
+        Query query = session.createSQLQuery(sql)
+                .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES);
+        EvalsUtil.setStartWithParameters(directSupervisors, query);
+        List<BigDecimal> result = query.list();
 
         for (BigDecimal id : result) {
             ids.add(Integer.parseInt(id.toString()));

@@ -588,7 +588,7 @@ public class ReportsTest {
                 " ORDER BY sum(has_appraisal) DESC, root_supervisor_pidm";
 
         sql = ReportMgr.getSupervisorChartSQL(scope, ReportsAction.REPORT_UNIT_BREAKDOWN,
-                true, jobList);
+                true, 2);
         assert sql.equals(expectedSQL);
 
         expectedSQL = "SELECT SUM(has_appraisal), status from (SELECT " +
@@ -607,7 +607,7 @@ public class ReportsTest {
                 " ORDER BY sum(has_appraisal) DESC, status";
 
         sql = ReportMgr.getSupervisorChartSQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN,
-                true, jobList);
+                true, 2);
         assert sql.equals(expectedSQL);
     }
 }

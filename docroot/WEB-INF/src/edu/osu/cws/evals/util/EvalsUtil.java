@@ -18,6 +18,7 @@ import java.util.*;
 
 import edu.osu.cws.evals.models.*;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Query;
 
 public class EvalsUtil {
     /**
@@ -214,19 +215,36 @@ public class EvalsUtil {
      * Returns the start with clause so that we can get the oracle hierarchical data
      * for the current supervisor level.
      *
-     * @param directSupervisors
      * @return
      */
-    public static String getStartWithClause(List<Job> directSupervisors) {
+    public static String getStartWithClause(int directSupervisorCount) {
         ArrayList<String> startWithClause = new ArrayList<String>();
-        for (Job directSupervisor : directSupervisors) {
-            String jobClause = "(pyvpasj_pidm = " + directSupervisor.getEmployee().getId() +
-                    " AND pyvpasj_posn = '" + directSupervisor.getPositionNumber() +
-                    "' AND pyvpasj_suff = '"+ directSupervisor.getSuffix() + "')";
+        for (int i = 0; i < directSupervisorCount; i++) {
+            String jobClause = "(pyvpasj_pidm = :startWithPidm" + i +
+                     " AND pyvpasj_posn = :startWithPosnNo" + i +
+                    " AND pyvpasj_suff = :startWithSuffix" + i + ") ";
             startWithClause.add(jobClause);
         }
         String startWith = "START WITH ";
         startWith += StringUtils.join(startWithClause, " OR ");
         return startWith;
     }
+
+    /**
+     * Sets the pidm, posno and suffix parameters used by the start with
+     * clause.
+     *
+     * @param directSupervisors
+     * @param query
+     */
+    public static void setStartWithParameters(List<Job> directSupervisors, Query query) {
+        int i = 0;
+        for (Job directSupervisor : directSupervisors) {
+            query.setInteger("startWithPidm"+i, directSupervisor.getEmployee().getId())
+                    .setString("startWithPosnNo"+i, directSupervisor.getPositionNumber())
+                    .setString("startWithSuffix"+i, directSupervisor.getSuffix());
+            i++;
+        }
+    }
+
 }

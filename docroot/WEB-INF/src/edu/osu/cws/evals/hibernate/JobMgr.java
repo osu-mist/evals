@@ -224,13 +224,14 @@ public class JobMgr {
         List<Job> directSupervisors = new ArrayList<Job>();
         directSupervisors.add(supervisor);
 
-        String startWith = EvalsUtil.getStartWithClause(directSupervisors);
+        String startWith = EvalsUtil.getStartWithClause(directSupervisors.size());
         String sql = select + where + startWith + Constants.CONNECT_BY;
 
         // count the # of supervisors under the current supervisor
-        BigDecimal result = (BigDecimal) session.createSQLQuery(sql)
-                .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES)
-                .uniqueResult();
+        Query query = session.createSQLQuery(sql)
+                .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES);
+        EvalsUtil.setStartWithParameters(directSupervisors, query);
+        BigDecimal result = (BigDecimal) query.uniqueResult();
 
         int supervisorCount = Integer.parseInt(result.toString());
        return supervisorCount < 1;
