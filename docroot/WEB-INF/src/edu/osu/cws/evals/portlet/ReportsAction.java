@@ -133,8 +133,11 @@ public class ReportsAction implements ActionInterface {
 
         if (getScope().equals(SCOPE_SUPERVISOR)) {
             int supervisorLevelPidm = currentSupervisorJob.getEmployee().getId();
+            String supervisorLevelPosno = currentSupervisorJob.getPositionNumber();
+            String supervisorLevelSuffix = currentSupervisorJob.getSuffix();
             AppraisalMgr appraisalMgr = new AppraisalMgr();
-            supervisorTeamAppraisal = appraisalMgr.getMyTeamsAppraisals(supervisorLevelPidm, true);
+            supervisorTeamAppraisal = appraisalMgr.getMyTeamsAppraisals(supervisorLevelPidm, true,
+                    supervisorLevelPosno, supervisorLevelSuffix);
         }
 
         String jspFile = activeReport(breadcrumbList);
@@ -212,8 +215,8 @@ public class ReportsAction implements ActionInterface {
         return (String) DRILL_DOWN_INDEX[nextDrillDownScope];
     }
 
-    private String activeReport(List<Breadcrumb> crumbs) {
-        List<Job> directSupervisors = null;
+    private String activeReport(List<Breadcrumb> crumbs) throws Exception {
+        List<Job> directEmployees = null;
         Map<String, Configuration> configurationMap =
                 (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
         Configuration config = configurationMap.get("reportMaxDataForCharts");
@@ -223,12 +226,14 @@ public class ReportsAction implements ActionInterface {
             boolean allowUnitReport = true;
             Job supervisorJob = Job.getJobFromString(getScopeValue());
             if (supervisorJob != null) {
-                directSupervisors = JobMgr.getDirectSupervisorEmployees(supervisorJob);
-
                 if (JobMgr.isBottomLevelSupervisor(supervisorJob)) {
                     allowUnitReport = false;
                     inLeafSupervisorReport = true;
                 }
+
+                boolean supervisorsOnly = !inLeafSupervisorReport;
+                directEmployees = JobMgr.getDirectEmployees(supervisorJob, supervisorsOnly);
+
             }
 
             // If the supervisor is the bottom level supervisor, can't use by unit reports
@@ -241,26 +246,29 @@ public class ReportsAction implements ActionInterface {
             }
         }
 
-        tableData = ReportMgr.getChartData(paramMap, crumbs, true, directSupervisors,
-                supervisorTeamAppraisal, currentSupervisorJob);
+        tableData = ReportMgr.getChartData(paramMap, crumbs, true, directEmployees,
+                supervisorTeamAppraisal, currentSupervisorJob, inLeafSupervisorReport);
         chartData = ReportMgr.trimDataPoints(tableData, maxDataPoints);
-        setDrillDownData(crumbs, directSupervisors);
+        setDrillDownData(crumbs, directEmployees, inLeafSupervisorReport);
 
 
         if (shouldListAppraisals()) {
-            listAppraisals = ReportMgr.getListData(paramMap, crumbs, directSupervisors);
+            listAppraisals = ReportMgr.getListData(paramMap, crumbs, directEmployees,
+                    inLeafSupervisorReport);
         }
 
         return Constants.JSP_REPORT;
     }
 
-    private void setDrillDownData(List<Breadcrumb> crumbs, List<Job> directSupervisors) {
+    private void setDrillDownData(List<Breadcrumb> crumbs, List<Job> directSupervisors,
+                                  boolean inLeafSupervisor) {
         // The drill down data is the same as the report by unit (overdue may not have all units)
         String report = (String) paramMap.get(REPORT);
         if (report.equals(REPORT_DEFAULT)) {
             drillDownData = tableData;
         } else {
-            drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false, directSupervisors);
+            drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false, directSupervisors,
+                    inLeafSupervisor);
         }
     }
 

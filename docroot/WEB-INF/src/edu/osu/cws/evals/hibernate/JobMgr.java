@@ -6,6 +6,7 @@ import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -41,19 +42,32 @@ public class JobMgr {
     }
 
     /**
-     * Determines whether a person has any job which is a supervising job.
+     * Determines whether a person or (job if posno is not empty) has any job
+     * which is a supervising job.
      *
      * @param pidm  pidm of employee to check
      * @return isSupervisor
      * @throws Exception
      */
-    public boolean isSupervisor(int pidm) throws Exception {
+    public static boolean isSupervisor(int pidm, String posno) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         int employeeCount;
         employeeCount = 0;
-        List<Object> results = session.getNamedQuery("job.isSupervisor")
-                .setInteger("pidm", pidm)
-                .list();
+
+        String sql = "SELECT count(*) AS countNum FROM PYVPASJ WHERE " +
+                "PYVPASJ_SUPERVISOR_PIDM = :pidm AND PYVPASJ_STATUS != 'T'";
+
+        // Use the posno if provided
+        if (!StringUtils.isEmpty(posno)) {
+            sql += " AND PYVPASJ_SUPERVISOR_POSN = :posno";
+        }
+
+        Query query = session.createSQLQuery(sql).setInteger("pidm", pidm);
+        if (!StringUtils.isEmpty(posno)) {
+            query.setString("posno", posno);
+        }
+        List<Object> results = query.list();
+
         if (!results.isEmpty()) {
             employeeCount = Integer.parseInt(results.get(0).toString());
         }
@@ -193,20 +207,37 @@ public class JobMgr {
     }
 
     /**
-     * Returns a list of the direct supervisors under an mid-level or upper supervisor.
+     * Returns a list of the direct employees under an mid-level or upper supervisor.
      *
      * @param supervisorJob
-     * @return
+     * @param supervisorsOnly       Whether or not we only want direct supervisors only
+     * @return  List<Job>
+     * @throws Exception
      */
-    public static List<Job> getDirectSupervisorEmployees(Job supervisorJob) {
+    public static List<Job> getDirectEmployees(Job supervisorJob, boolean supervisorsOnly)
+            throws Exception {
+        List<Job> directSupervisors = new ArrayList<Job>();
         Session session = HibernateUtil.getCurrentSession();
+
         List<Job> results = (List<Job>) session.getNamedQuery("job.directSupervisors")
                 .setInteger("id", supervisorJob.getEmployee().getId())
                 .setString("posno", supervisorJob.getPositionNumber())
                 .setString("suffix", supervisorJob.getSuffix())
                 .list();
 
-        return results;
+        if (!supervisorsOnly) {
+            return results;
+        }
+
+        for (Job directEmployeeJob : results) {
+            int pidm = directEmployeeJob.getEmployee().getId();
+            String posno = directEmployeeJob.getPositionNumber();
+            if (isSupervisor(pidm, posno)) {
+                directSupervisors.add(directEmployeeJob);
+            }
+        }
+
+        return directSupervisors;
     }
 
     /**

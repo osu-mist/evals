@@ -147,12 +147,14 @@ public class ReportMgr {
      * @param directSupervisors A list of jobs of the direct supervisors of the current level
      * @param myTeamAppraisals  A list of appraisals of the employees directly under current
      *                          supervisor
+     * @param currentSupervisorJob
+     * @param inLeafSupervisor  Whether or not the current supervisor report is lowest level
      * @return
      */
     public static List<Object[]> getChartData(HashMap paramMap, List<Breadcrumb> crumbs,
                                               boolean sortByCount, List<Job> directSupervisors,
                                               ArrayList<Appraisal> myTeamAppraisals,
-                                              Job currentSupervisorJob) {
+                                              Job currentSupervisorJob, boolean inLeafSupervisor) {
         Session session = HibernateUtil.getCurrentSession();
 
         String sqlQuery = "";
@@ -167,7 +169,8 @@ public class ReportMgr {
 
         // Fetch direct supervisors so we can get supervising data
         if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
-            sqlQuery = getSupervisorChartSQL(scope, report, sortByCount, directSupervisors.size());
+            sqlQuery = getSupervisorChartSQL(scope, report, sortByCount, directSupervisors.size(),
+                    inLeafSupervisor);
         } else {
             sqlQuery = getChartSQL(scope, report, sortByCount);
         }
@@ -191,18 +194,16 @@ public class ReportMgr {
                     .list();
         } else if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
             EvalsUtil.setStartWithParameters(directSupervisors, chartQuery);
-            results = chartQuery
-                    .list();
+            results = chartQuery.list();
 
-            // Sometimes, we just want the drill down data and the current supervisor
+            // Sometimes, we just want the drill down data and the current supervisor's team
             // shouldn't be included
-            if (myTeamAppraisals != null && currentSupervisorJob != null) {
+            if (myTeamAppraisals != null && currentSupervisorJob != null && !inLeafSupervisor) {
                 results = addMyTeamToReport(results, report, myTeamAppraisals,
                         currentSupervisorJob);
             }
         } else {
-            results = chartQuery
-                    .list();
+            results = chartQuery.list();
         }
 
         if (!results.isEmpty()) {
@@ -227,31 +228,45 @@ public class ReportMgr {
      * @param reportType
      * @param sortByCount
      * @param directSupervisorCount
+     * @param inLeafSupervisor
      * @return
      */
     public static String getSupervisorChartSQL(String scope, String reportType, boolean sortByCount,
-                                        int directSupervisorCount) {
+                                        int directSupervisorCount, boolean inLeafSupervisor) {
         //@todo: need to handle case when directSupervisors is empty
+        String startWith = EvalsUtil.getStartWithClause(directSupervisorCount);
+        String where = "WHERE pyvpasj_status = 'A' AND pyvpasj_appointment_type " +
+                "in :appointmentTypes ";
+        if (!inLeafSupervisor) {
+            where += "AND level > 1 ";
+        }
+        String where2 = " WHERE " + ACTIVE_STATUS_SQL;
         String outerSelect = "SELECT SUM(has_appraisal), ";
         String select = "SELECT " +
                 "(case when appraisals.id is not null then 1 else 0 end) as has_appraisal, ";
-        String from = "FROM pyvpasj left join appraisals on " +
+        String fromPart1 = "FROM (SELECT level, pyvpasj_pidm, pyvpasj_posn, pyvpasj_suff, " +
+                "CONNECT_BY_ROOT pyvpasj_pidm as root_supervisor_pidm " +
+                "FROM pyvpasj " + where;
+
+        String fromPart2 =
+                startWith +
+                Constants.CONNECT_BY +
+                ") LEFT JOIN appraisals on " +
                 "(appraisals.job_pidm = pyvpasj_pidm AND " +
-                "appraisals.position_number = pyvpasj_posn AND " +
-                "appraisals.job_suffix = pyvpasj_suff) ";
-        String where = "WHERE pyvpasj_status = 'A' AND pyvpasj_appointment_type " +
-                "in :appointmentTypes AND " + ACTIVE_STATUS_SQL + " ";
+                "appraisals.position_number = pyvpasj_posn " +
+                "AND appraisals.job_suffix = pyvpasj_suff)";
+
+        String from = fromPart1 + fromPart2;
+
         String orderBy = " ORDER BY ";
         String col1 = "";
-
-        String startWith = EvalsUtil.getStartWithClause(directSupervisorCount);
 
         if (reportType.contains(STAGE)) {
             col1 = "status";
             select += "appraisals.status ";
         } else {
             col1 = "root_supervisor_pidm";
-            select += "CONNECT_BY_ROOT pyvpasj_pidm as root_supervisor_pidm ";
+            select += "root_supervisor_pidm ";
         }
 
         outerSelect += col1;
@@ -263,13 +278,12 @@ public class ReportMgr {
         }
 
         if (isWayOverdueReport(reportType)) {
-            where += " AND appraisals.overdue > 30";
+            where2 += " AND appraisals.overdue > 30";
         } else if (isOverdueReport(reportType)) {
-            where += " AND appraisals.overdue > 0";
+            where2 += " AND appraisals.overdue > 0";
         }
 
-        return outerSelect + " from (" + select + from + where + startWith +
-                Constants.CONNECT_BY + ") " + groupBy + orderBy;
+        return outerSelect + " from (" + select + from + where2 + ") " + groupBy + orderBy;
     }
 
     /**
@@ -433,11 +447,11 @@ public class ReportMgr {
         if (report.contains(UNIT)) {
             Integer pidm = (Integer) currentSupervisorJob.getEmployee().getId();
             Object[] currentSupervisorLevel = new Object[2];
-            currentSupervisorLevel[0] = (Object) myTeamAppraisals.size();
+            currentSupervisorLevel[0] = (Object) teamAppraisalTemp.size();
             currentSupervisorLevel[1] = (Object) pidm;
             newResults.add(0, currentSupervisorLevel);
         } else {
-            for (Appraisal appraisal : myTeamAppraisals) {
+            for (Appraisal appraisal : teamAppraisalTemp) {
                 Object[] newStatusRow = {1, appraisal.getStatus()};
                 newResults.add(newStatusRow);
             }
@@ -487,12 +501,13 @@ public class ReportMgr {
      * @return List of arrays of objects. The objects are strings
      */
     public static List<Object[]> getDrillDownData(HashMap paramMap, List<Breadcrumb> crumbs,
-                                                  boolean sortByCount, List<Job> directSupervisors) {
+                                                  boolean sortByCount, List<Job> directSupervisors,
+                                                  boolean inLeafSupervisor) {
         HashMap copyParamMap = new HashMap();
         copyParamMap.putAll(paramMap);
         copyParamMap.put(ReportsAction.REPORT, ReportsAction.REPORT_DEFAULT);
         return getChartData(copyParamMap, crumbs, sortByCount, directSupervisors,
-                null, null);
+                null, null, inLeafSupervisor);
     }
 
     /**
@@ -621,10 +636,11 @@ public class ReportMgr {
      * @return
      */
     public static List<Appraisal> getListData(HashMap paramMap, List<Breadcrumb> crumbs,
-                                              List<Job> directSupervisors) {
+                                              List<Job> directSupervisors,
+                                              boolean inLeafSupervisor) {
         Session session = HibernateUtil.getCurrentSession();
 
-        List<Appraisal> results;
+        List<Appraisal> results = new ArrayList<Appraisal>();
         String scope = (String) paramMap.get(ReportsAction.SCOPE);
         String scopeValue = (String) paramMap.get(ReportsAction.SCOPE_VALUE);
         String report = (String) paramMap.get(ReportsAction.REPORT);
@@ -652,10 +668,14 @@ public class ReportMgr {
                     .setParameter("tsOrgCode", scopeValue)
                     .list();
         } else if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
-            List<Integer> appraisalIds = getAppraisalIdsForSupervisorReport(directSupervisors);
-            results = (ArrayList<Appraisal>) listQuery
-                    .setParameterList("appraisalIds", appraisalIds)
-                    .list();
+            List<Integer> appraisalIds = getAppraisalIdsForSupervisorReport(directSupervisors,
+                    inLeafSupervisor);
+
+            if (!appraisalIds.isEmpty()) {
+                results = (ArrayList<Appraisal>) listQuery
+                        .setParameterList("appraisalIds", appraisalIds)
+                        .list();
+            }
         } else {
             results = (ArrayList<Appraisal>) listQuery
                     .list();
@@ -671,7 +691,8 @@ public class ReportMgr {
      * @param directSupervisors
      * @return
      */
-    public static List<Integer> getAppraisalIdsForSupervisorReport(List<Job> directSupervisors) {
+    public static List<Integer> getAppraisalIdsForSupervisorReport(List<Job> directSupervisors,
+                                                                   boolean inLeafSupervisor) {
         if (directSupervisors == null) {
             return null;
         }
@@ -684,9 +705,13 @@ public class ReportMgr {
                 "appraisals.position_number = pyvpasj_posn AND " +
                 "appraisals.job_suffix = pyvpasj_suff) ";
         String where = "WHERE pyvpasj_status = 'A' " +
-                "AND PYVPASJ_APPOINTMENT_TYPE in (:appointmentTypes)";
+                "AND PYVPASJ_APPOINTMENT_TYPE in (:appointmentTypes) " +
+                "and appraisals.status not in ('completed', 'archived', 'closed')";
         String startWith = EvalsUtil.getStartWithClause(directSupervisors.size());
 
+        if (!inLeafSupervisor) {
+            where += " AND level > 1 ";
+        }
         String sql = select + where + startWith + Constants.CONNECT_BY;
 
         Query query = session.createSQLQuery(sql)

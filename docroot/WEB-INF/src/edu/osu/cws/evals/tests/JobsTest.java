@@ -46,8 +46,8 @@ public class JobsTest {
     }
 
     public void shouldCorrectlyDetectEmployeeSupervisor() throws Exception {
-        assert jobMgr.isSupervisor(990871) : "isSupervisor() should count employees correctly";
-        assert !jobMgr.isSupervisor(12345) : "isSupervisor() should not count inactive employees";
+        assert JobMgr.isSupervisor(990871, null) : "isSupervisor() should count employees correctly";
+        assert !JobMgr.isSupervisor(12345, null) : "isSupervisor() should not count inactive employees";
     }
 
 
