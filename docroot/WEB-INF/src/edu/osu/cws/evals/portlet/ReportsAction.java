@@ -265,7 +265,14 @@ public class ReportsAction implements ActionInterface {
         // The drill down data is the same as the report by unit (overdue may not have all units)
         String report = (String) paramMap.get(REPORT);
         if (report.equals(REPORT_DEFAULT)) {
-            drillDownData = tableData;
+            drillDownData = new ArrayList<Object[]>();
+            drillDownData.addAll(tableData);
+
+            // For the supervisor reports, the 1st slice of the tableData is the current level
+            // we can't drill down using the name of the current supervisor
+            if (getScope().equals(SCOPE_SUPERVISOR)) {
+                drillDownData.remove(0);
+            }
         } else {
             drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false, directSupervisors,
                     inLeafSupervisor);
@@ -512,27 +519,37 @@ public class ReportsAction implements ActionInterface {
             return true;
         }
 
+        int employeeID = actionHelper.getLoggedOnUser(request).getId();
+        boolean supervisorReport = getScope().equals(SCOPE_SUPERVISOR);
+
         if (actionHelper.isLoggedInUserReviewer(request)) {
-            int employeeID = actionHelper.getLoggedOnUser(request).getId();
-            String businessCenterName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
+            String bcName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
+
+            // the bc reviewer can drill down the report if supervisor is in his bc
+            if (supervisorReport && currentSupervisorJob.getBusinessCenterName().equals(bcName)) {
+                return true;
+            }
+
+            // the bc reviewer can drill down to orgPrefix or orgCode if they are in the same bc
             if (breadcrumbList.size() > 1) {
                 Breadcrumb bcBreadcrumb = breadcrumbList.get(1);
-                if (bcBreadcrumb.getScopeValue().equals(businessCenterName)) {
+                if (bcBreadcrumb.getScopeValue().equals(bcName)) {
                     return true;
                 }
             }
         }
 
-        if (getScope().equals(SCOPE_SUPERVISOR)) {
-            Employee loggedInUser = actionHelper.getLoggedOnUser(request);
-            boolean isMyReport = currentSupervisorJob.getEmployee().getId() == loggedInUser.getId();
+        // Check supervisor report to see if it's the current user's report or in her
+        // supervising chain
+        if (supervisorReport) {
+            boolean isMyReport = currentSupervisorJob.getEmployee().getId() == employeeID;
             JobMgr jobMgr = new JobMgr();
 
             if (isMyReport) {
                 return true;
             }
 
-            if (jobMgr.isUpperSupervisor(currentSupervisorJob, loggedInUser.getId())) {
+            if (jobMgr.isUpperSupervisor(currentSupervisorJob, employeeID)) {
                 return true;
             }
         }
@@ -555,6 +572,10 @@ public class ReportsAction implements ActionInterface {
         //scope != 'orgCode' && (allowAllDrillDown || reviewerBCName != '')
         if (!getScope().equals(SCOPE_ORG_CODE) &&
                 (allowAllDrillDown || !reviewerBCName.equals(""))) {
+            return true;
+        }
+
+        if (getScope().equals(SCOPE_SUPERVISOR)) {
             return true;
         }
 
