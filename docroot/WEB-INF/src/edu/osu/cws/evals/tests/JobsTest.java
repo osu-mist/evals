@@ -46,8 +46,8 @@ public class JobsTest {
     }
 
     public void shouldCorrectlyDetectEmployeeSupervisor() throws Exception {
-        assert jobMgr.isSupervisor(990871) : "isSupervisor() should count employees correctly";
-        assert !jobMgr.isSupervisor(12345) : "isSupervisor() should not count inactive employees";
+        assert JobMgr.isSupervisor(990871, null) : "isSupervisor() should count employees correctly";
+        assert !JobMgr.isSupervisor(12345, null) : "isSupervisor() should not count inactive employees";
     }
 
 
@@ -154,5 +154,34 @@ public class JobsTest {
         assert newStartDate.get(Calendar.YEAR) == Calendar.getInstance().get(Calendar.YEAR);
         assert newStartDate.get(Calendar.MONTH) == Calendar.JUNE;
         assert newStartDate.get(Calendar.DAY_OF_MONTH) == 1;
+    }
+
+    public void shouldParseJobFromString() {
+        assert null == Job.getJobFromString("");
+        assert null == Job.getJobFromString("1234");
+        assert null == Job.getJobFromString("1234_dfd");
+        assert null == Job.getJobFromString("1234_dfd_");
+
+        Job job = Job.getJobFromString("1234_C12345_00");
+        assert job.getId() == 1234;
+        assert job.getPositionNumber().equals("C12345");
+        assert job.getSuffix().equals("00");
+    }
+
+    public void shouldReturnNullWhenEmployeeHasNoSupervisorJob() {
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+        assert null == JobMgr.getSupervisingJob(0);
+        assert null == JobMgr.getSupervisingJob(-13435);
+
+        assert null == JobMgr.getSupervisingJob(787812);
+
+        Job supervisingJob = JobMgr.getSupervisingJob(12345);
+        assert null != supervisingJob;
+        assert supervisingJob.getEmployee().getId() == 12345;
+        assert supervisingJob.getPositionNumber().equals("1234");
+        assert supervisingJob.getSuffix().equals("00");
+
+        tx.commit();
     }
 }

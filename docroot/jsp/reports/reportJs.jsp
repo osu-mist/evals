@@ -10,20 +10,23 @@
   google.setOnLoadCallback(drawChart);
   var chart;
   var chartType = "${chartType}";
+  var tableData;
   var chartData;
-  var trimmedChartData;
+  var chartDataScopeMap = eval('(' + '${chartDataScopeMap}' + ')');
   var report = "${report}";
+  var currentSupervisorName = "${currentSupervisorName}";
+  var nextScope = "${nextScope}";
 
   // Callback that creates and populates a data table,
   // instantiates the pie chart, passes in the data and
   // draws it.
   function drawChart() {
     // Create the data table.
-    chartData = new google.visualization.DataTable();
-    chartData.addColumn('string', '<liferay-ui:message key="${reportHeader}"/>');
-    chartData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evaluations"/> <liferay-ui:message key="${reportTitle}"/>');
-    chartData.addRows([
-        <c:forEach var="row" items="${chartData}" varStatus="loopStatus">
+    tableData = new google.visualization.DataTable();
+    tableData.addColumn('string', '<liferay-ui:message key="${reportHeader}"/>');
+    tableData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evaluations"/> <liferay-ui:message key="${reportTitle}"/>');
+    tableData.addRows([
+        <c:forEach var="row" items="${tableData}" varStatus="loopStatus">
             ['<liferay-ui:message key="${row[1]}"/>', ${row[0]}]
             <c:if test="${!loopStatus.last}">
                 ,
@@ -31,11 +34,11 @@
         </c:forEach>
     ]);
 
-    trimmedChartData = new google.visualization.DataTable();
-    trimmedChartData.addColumn('string', '<liferay-ui:message key="${reportHeader}"/>');
-    trimmedChartData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evals"/>');
-    trimmedChartData.addRows([
-        <c:forEach var="row" items="${trimmedChartData}" varStatus="loopStatus">
+    chartData = new google.visualization.DataTable();
+    chartData.addColumn('string', '<liferay-ui:message key="${reportHeader}"/>');
+    chartData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evals"/>');
+    chartData.addRows([
+        <c:forEach var="row" items="${chartData}" varStatus="loopStatus">
             ['<liferay-ui:message key="${row[1]}"/>', ${row[0]}]
             <c:if test="${!loopStatus.last}">
                 ,
@@ -62,8 +65,7 @@
         break;
       }
 
-      // Instantiate and draw our chart, passing in some options.
-      chart.draw(trimmedChartData, options);
+      chart.draw(chartData, options);
 
       var table = new google.visualization.Table(document.getElementById('<portlet:namespace/>chart-data-div'));
 
@@ -76,7 +78,7 @@
             tableRow: 'google-table-row'
         }
       }
-      table.draw(chartData, tableOptions);
+      table.draw(tableData, tableOptions);
 
       // When the table is selected, update the orgchart.
       google.visualization.events.addListener(chart, 'select', function() {
@@ -96,7 +98,13 @@
 
     // drill down by clicking on the chart is allowed on all by unit reports
     if (report.indexOf('<%= ReportMgr.UNIT %>') != -1) {
-      var unitName = trimmedChartData.getValue(chartSelection[0].row, 0);
+      var displayValue = chartData.getValue(chartSelection[0].row, 0);
+      var unitName = chartDataScopeMap[displayValue];
+
+      // if the drillDown level is supervisor, we don't allow drill down for currentSupervisor
+      if (nextScope == 'supervisor' && displayValue == '${currentSupervisorName}') {
+          return;
+      }
 
       var scope = '${scope}';
       var allowAllDrillDown = ${allowAllDrillDown};

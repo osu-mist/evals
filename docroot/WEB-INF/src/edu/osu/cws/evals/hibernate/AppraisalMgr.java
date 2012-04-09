@@ -653,43 +653,68 @@ public class AppraisalMgr {
 
 
     /**
-     * Returns a List of team's active appraisals for the given supervisor's pidm.
+     * Returns a List of team's active appraisals for the given supervisor's pidm. If the
+     * posno and suffix are specific, the team appraisals are specific to that supervising job.
      *
      * @param pidm
      * @param onlyActive    Whether or not to include only the active appraisals
+     * @param posno
+     * @param suffix
      * @return
+     * @throws Exception
      */
-    public List<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive) throws Exception {
+    public ArrayList<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive,
+                                                     String posno, String suffix) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return this.getMyTeamsAppraisals(pidm, onlyActive, session);
+        List<Appraisal> dbTeamAppraisals = this.getMyTeamsAppraisals(pidm, onlyActive, session,
+                posno, suffix);
+        ArrayList<Appraisal> myTeamAppraisals = new ArrayList<Appraisal>();
+
+        if (dbTeamAppraisals != null) {
+            for (Appraisal appraisal : dbTeamAppraisals) {
+                appraisal.setRole("supervisor");
+                myTeamAppraisals.add(appraisal);
+            }
+        }
+
+        return myTeamAppraisals;
     }
 
     /**
      * Returns a list of appraisals with limited attributes set: id, job title, employee name,
      * job appointment type, start date, end date, status, goalsRequiredModification and
-     * employeSignedDate.
+     * employeSignedDate. If the posno and suffix are specific, the team appraisals are
+     * specific to that supervising job.
      *
-     * @param pidm      Supervisor's pidm.
+     * @param pidm          Supervisor's pidm.
      * @param onlyActive    Whether or not to include only the active appraisals
      * @param session
+     * @param posno         Supervisor's posno
+     * @param suffix        Supervisor's suffix
      * @return List of Hashmaps that contains the jobs this employee supervises.
      */
-    private List<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive, Session session) {
+    private List<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive, Session session,
+                                                 String posno, String suffix) {
         List<Appraisal> appraisals = new ArrayList<Appraisal>();
         List<Integer> pidms = new ArrayList<Integer>();
 
         String query = "select ap.ID, jobs.PYVPASJ_DESC, jobs.PYVPASJ_APPOINTMENT_TYPE, " +
                 "ap.START_DATE, ap.END_DATE, ap.STATUS, ap.GOALS_REQUIRED_MOD_DATE, " +
-                "ap.EMPLOYEE_SIGNED_DATE, jobs.PYVPASJ_PIDM " +
+                "ap.EMPLOYEE_SIGNED_DATE, jobs.PYVPASJ_PIDM, ap.OVERDUE " +
                 "FROM appraisals ap, PYVPASJ jobs " +
                 "WHERE ap.JOB_PIDM=jobs.PYVPASJ_PIDM AND ap.POSITION_NUMBER=jobs.PYVPASJ_POSN " +
                 "AND ap.JOB_SUFFIX=jobs.PYVPASJ_SUFF AND jobs.PYVPASJ_SUPERVISOR_PIDM=:pidm ";
+
+        if (!StringUtils.isEmpty(posno) && !StringUtils.isEmpty(suffix)) {
+            query += "AND jobs.PYVPASJ_SUPERVISOR_POSN=:posno " +
+                    "AND jobs.PYVPASJ_SUPERVISOR_SUFF = :suffix ";
+        }
 
         if (onlyActive) {
             query += "AND status NOT IN ('archived') ";
         }
 
-        List<Object[]> result =  session.createSQLQuery(query)
+        Query hibQuery = session.createSQLQuery(query)
                 .addScalar("ID", StandardBasicTypes.INTEGER)
                 .addScalar("PYVPASJ_DESC", StandardBasicTypes.STRING)
                 .addScalar("PYVPASJ_APPOINTMENT_TYPE", StandardBasicTypes.STRING)
@@ -699,7 +724,12 @@ public class AppraisalMgr {
                 .addScalar("GOALS_REQUIRED_MOD_DATE", StandardBasicTypes.DATE)
                 .addScalar("EMPLOYEE_SIGNED_DATE", StandardBasicTypes.DATE)
                 .addScalar("PYVPASJ_PIDM", StandardBasicTypes.INTEGER)
-                .setInteger("pidm", pidm).list();
+                .addScalar("OVERDUE", StandardBasicTypes.INTEGER)
+                .setInteger("pidm", pidm);
+        if (!StringUtils.isEmpty(posno) && !StringUtils.isEmpty(suffix)) {
+            hibQuery.setString("posno", posno).setString("suffix", suffix);
+        }
+        List<Object[]> result =  hibQuery.list();
 
         if (result.isEmpty()) {
             return appraisals;
@@ -716,9 +746,11 @@ public class AppraisalMgr {
             Date goalsReqModDate = (Date) aResult[6];
             Date employeeSignDate = (Date) aResult[7];
             Integer employeePidm = (Integer) aResult[8];
+            Integer overdue = (Integer) aResult[9];
 
             appraisal = new Appraisal(id, jobTitle, null, null, appointmentType,
-                    startDate, endDate, status, goalsReqModDate, employeeSignDate, employeePidm);
+                    startDate, endDate, status, goalsReqModDate, employeeSignDate, employeePidm,
+                    overdue);
             appraisals.add(appraisal);
             pidms.add(employeePidm);
         }

@@ -14,7 +14,7 @@
                         <li><a href="#" id ="<portlet:namespace/>changeToBarType">Bar Chart</a></li>
                     </ul>
                 </li>
-                <c:if test="${scope != 'orgCode' && (allowAllDrillDown || reviewerBCName != '')}">
+                <c:if test="${showDrillDownMenu}">
                     <li><a href="#"><liferay-ui:message key="report-drilldown"/></a>
                         <ul>
                         <c:forEach var="unit" items="${drillDownData}" varStatus="loopStatus">
@@ -24,12 +24,42 @@
                                     <portlet:param name="action" value="report"/>
                                     <portlet:param name="controller" value="ReportsAction"/>
                                     <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
-                                    <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${unit[1]}"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${unit[2]}"/>
                                     <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                                     </portlet:actionURL>">${unit[1]}</a>
                                 </li>
                             </c:if>
                         </c:forEach>
+                        </ul>
+                    </li>
+                </c:if>
+                <c:if test="${showMyReportLink}">
+                    <li><a href="#"><liferay-ui:message key="report-my-report"/></a>
+                        <ul>
+                            <c:if test="${not empty supervisorJobTitle}">
+                                <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                                    <portlet:param name="action" value="report"/>
+                                    <portlet:param name="controller" value="ReportsAction"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE %>" value="<%= ReportsAction.SCOPE_SUPERVISOR %>"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${myReportSupervisorKey}"/>
+                                    </portlet:actionURL>"><c:out value="${supervisorJobTitle}"/></a></li>
+                            </c:if>
+                            <c:if test="${not empty myReportBcName}">
+                                <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                                    <portlet:param name="action" value="report"/>
+                                    <portlet:param name="controller" value="ReportsAction"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE %>" value="<%= ReportsAction.SCOPE_BC %>"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${myReportBcName}"/>
+                                    </portlet:actionURL>"><c:out value="${myReportBcName}"/></a></li>
+                            </c:if>
+                            <c:if test="${isAdmin == true}">
+                                <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                                    <portlet:param name="action" value="report"/>
+                                    <portlet:param name="controller" value="ReportsAction"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE %>" value="<%= ReportsAction.DEFAULT_SCOPE %>"/>
+                                    <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="osu"/>
+                                    </portlet:actionURL>">OSU</a></li>
+                            </c:if>
                         </ul>
                     </li>
                 </c:if>
@@ -55,7 +85,7 @@
         </div>
         <div class="accordion-content" id="<portlet:namespace/>ChooseReport" style="display: block;">
             <ul>
-                <c:if test="${scope != 'orgCode'}">
+                <c:if test="${enableByUnitReports}">
                     <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                             <portlet:param name="action" value="report"/>
                             <portlet:param name="controller" value="ReportsAction"/>

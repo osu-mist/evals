@@ -1,14 +1,20 @@
 package edu.osu.cws.evals.portlet;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.liferay.portal.kernel.util.ParamUtil;
+import edu.osu.cws.evals.hibernate.AppraisalMgr;
+import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.ReportMgr;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Configuration;
+import edu.osu.cws.evals.models.Employee;
+import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.util.Breadcrumb;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 
 import javax.portlet.*;
+import java.lang.reflect.Type;
 import java.util.*;
 
 public class ReportsAction implements ActionInterface {
@@ -49,6 +55,8 @@ public class ReportsAction implements ActionInterface {
 
     private List<Breadcrumb> breadcrumbList = new ArrayList<Breadcrumb>();
 
+    private boolean enableByUnitReports = true;
+
     private ActionHelper actionHelper;
     private HomeAction homeAction;
 
@@ -62,8 +70,21 @@ public class ReportsAction implements ActionInterface {
     private HashMap paramMap = new HashMap();
 
     private List<Appraisal> listAppraisals;
+    private List<Object[]> tableData;
+
+    /**
+     * Format:
+     * {
+     *     // # of evals, displayValue, scopeValue
+     *     5, 'UABC', 'UABC' // when scope is bc
+     *     5, 'CLA', 'CLA' // when scope is orgPrefix
+     *     5, '1234', '1234' // when scope is orgCode
+     *     5, 'Bond, James', 'pidm_posno_suffix' // when scope is supervisor
+     *
+     * }
+     */
     private List<Object[]> chartData;
-    private List<Object[]> trimmedChartData;
+
     private List<Object[]> drillDownData;
 
     /**
@@ -71,6 +92,21 @@ public class ReportsAction implements ActionInterface {
      */
     HashMap<String, Integer> units = new HashMap<String, Integer>();
     public static final String BREADCRUMB_SESS_KEY = "breadcrumbList";
+
+    /**
+     * Holds the job of the current supervisor level in the supervisor report.
+     * Set in setParamMap()
+     */
+    private Job currentSupervisorJob;
+
+    /**
+     * Holds list of appraisals of direct employees of current supervisor
+     */
+    private ArrayList<Appraisal> supervisorTeamAppraisal;
+
+    private boolean inLeafSupervisorReport = false;
+
+    Gson gson = new Gson();
 
     /**
      * Main method used in this class. It responds to the user request when the user is viewing
@@ -95,6 +131,15 @@ public class ReportsAction implements ActionInterface {
             return homeAction.display(request, response);
         }
 
+        if (getScope().equals(SCOPE_SUPERVISOR)) {
+            int supervisorLevelPidm = currentSupervisorJob.getEmployee().getId();
+            String supervisorLevelPosno = currentSupervisorJob.getPositionNumber();
+            String supervisorLevelSuffix = currentSupervisorJob.getSuffix();
+            AppraisalMgr appraisalMgr = new AppraisalMgr();
+            supervisorTeamAppraisal = appraisalMgr.getMyTeamsAppraisals(supervisorLevelPidm, true,
+                    supervisorLevelPosno, supervisorLevelSuffix);
+        }
+
         String jspFile = activeReport(breadcrumbList);
         setupDataForJSP(request);
         actionHelper.useMaximizedMenu(request);
@@ -107,11 +152,13 @@ public class ReportsAction implements ActionInterface {
     }
 
     private void setupDataForJSP(PortletRequest request) throws Exception {
+        // chart related data
         actionHelper.addToRequestMap("chartData", chartData);
-        actionHelper.addToRequestMap("trimmedChartData", trimmedChartData);
+        actionHelper.addToRequestMap("tableData", tableData);
         actionHelper.addToRequestMap("drillDownData", drillDownData);
         actionHelper.addToRequestMap("listAppraisals", listAppraisals);
 
+        // parameter related data
         String scope = getScope();
         String scopeValue = getScopeValue();
         actionHelper.addToRequestMap("scope", scope);
@@ -120,7 +167,12 @@ public class ReportsAction implements ActionInterface {
         actionHelper.addToRequestMap("reportTitle", ReportMgr.getReportTitle(paramMap));
         actionHelper.addToRequestMap("reportHeader", ReportMgr.getReportHeader(paramMap));
         actionHelper.addToRequestMap("chartType", getChartType(request));
+        if (scope.equals(SCOPE_ORG_CODE)) {
+            enableByUnitReports = false;
+        }
+        actionHelper.addToRequestMap("enableByUnitReports", enableByUnitReports);
 
+        // breadcrumb and drill down data
         String nextScope = nextScopeInDrillDown(scope);
         actionHelper.addToRequestMap("nextScope", nextScope);
         actionHelper.addToRequestMap("breadcrumbList", breadcrumbList);
@@ -139,6 +191,19 @@ public class ReportsAction implements ActionInterface {
         }
         actionHelper.addToRequestMap("reviewerBCName", reviewerBCName);
         actionHelper.addToRequestMap("now", new Date());
+
+        boolean showDrillDownMenu = showDrillDownMenu(allowAllDrillDown, reviewerBCName);
+        actionHelper.addToRequestMap("showDrillDownMenu", showDrillDownMenu);
+
+        actionHelper.addToRequestMap("chartDataScopeMap", chartDataScopeMap());
+
+        if (currentSupervisorJob != null) {
+            String currentSupervisorName = currentSupervisorJob.getEmployee().getName();
+            actionHelper.addToRequestMap("currentSupervisorName", currentSupervisorName);
+        }
+
+        // My Report data
+        showMyReportLink(request);
     }
 
     private String nextScopeInDrillDown(String currentScope) {
@@ -150,28 +215,68 @@ public class ReportsAction implements ActionInterface {
         return (String) DRILL_DOWN_INDEX[nextDrillDownScope];
     }
 
-    private String activeReport(List<Breadcrumb> crumbs) {
+    private String activeReport(List<Breadcrumb> crumbs) throws Exception {
+        List<Job> directEmployees = null;
         Map<String, Configuration> configurationMap =
                 (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
         Configuration config = configurationMap.get("reportMaxDataForCharts");
         int maxDataPoints = Integer.parseInt(config.getValue());
 
-        chartData = ReportMgr.getChartData(paramMap, crumbs, true);
-        trimmedChartData = ReportMgr.trimDataPoints(chartData, maxDataPoints);
+        if (getScope().equals(ReportsAction.SCOPE_SUPERVISOR)) {
+            boolean allowUnitReport = true;
+            Job supervisorJob = Job.getJobFromString(getScopeValue());
+            if (supervisorJob != null) {
+                if (JobMgr.isBottomLevelSupervisor(supervisorJob)) {
+                    allowUnitReport = false;
+                    inLeafSupervisorReport = true;
+                }
 
-        // The drill down data is the same as the report by unit (overdue may not have all units)
-        String report = (String) paramMap.get(REPORT);
-        if (report.equals(REPORT_DEFAULT)) {
-            drillDownData = chartData;
-        } else {
-            drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false);
+                boolean supervisorsOnly = !inLeafSupervisorReport;
+                directEmployees = JobMgr.getDirectEmployees(supervisorJob, supervisorsOnly);
+
+            }
+
+            // If the supervisor is the bottom level supervisor, can't use by unit reports
+            if (!allowUnitReport) {
+                String report = (String) paramMap.get(REPORT);
+                if (report.contains(ReportMgr.UNIT)) {
+                    paramMap.put(REPORT, REPORT_STAGE_BREAKDOWN);
+                }
+                enableByUnitReports = false;
+            }
         }
 
+        tableData = ReportMgr.getChartData(paramMap, crumbs, true, directEmployees,
+                supervisorTeamAppraisal, currentSupervisorJob, inLeafSupervisorReport);
+        chartData = ReportMgr.trimDataPoints(tableData, maxDataPoints);
+        setDrillDownData(crumbs, directEmployees, inLeafSupervisorReport);
+
+
         if (shouldListAppraisals()) {
-            listAppraisals = ReportMgr.getListData(paramMap, crumbs);
+            listAppraisals = ReportMgr.getListData(paramMap, crumbs, directEmployees,
+                    inLeafSupervisorReport);
         }
 
         return Constants.JSP_REPORT;
+    }
+
+    private void setDrillDownData(List<Breadcrumb> crumbs, List<Job> directSupervisors,
+                                  boolean inLeafSupervisor) {
+        // The drill down data is the same as the report by unit (overdue may not have all units)
+        String report = (String) paramMap.get(REPORT);
+        if (report.equals(REPORT_DEFAULT)) {
+            drillDownData = new ArrayList<Object[]>();
+            drillDownData.addAll(tableData);
+
+            // For the supervisor reports, the 1st slice of the tableData is the current level
+            // we can't drill down using the name of the current supervisor
+            if (getScope().equals(SCOPE_SUPERVISOR)) {
+                drillDownData.remove(0);
+            }
+        } else {
+            drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false, directSupervisors,
+                    inLeafSupervisor);
+        }
     }
 
     /**
@@ -195,7 +300,7 @@ public class ReportsAction implements ActionInterface {
         Configuration config = configurationMap.get("reportMaxDataForList");
         int maxDataForList = Integer.parseInt(config.getValue());
 
-        for (Object[] row : chartData ) {
+        for (Object[] row : tableData) {
             numberOfEvalRecords += Integer.parseInt(row[0].toString());
         }
 
@@ -212,19 +317,12 @@ public class ReportsAction implements ActionInterface {
     private List<Breadcrumb> getBreadcrumbs(PortletRequest request) {
         PortletSession session = request.getPortletSession();
         String requestBreadcrumbs = ParamUtil.getString(request, "requestBreadcrumbs");
-        List<Breadcrumb> reqCrumbsList = new ArrayList<Breadcrumb>();
+        List<Breadcrumb> reqCrumbsList;
 
-        String[] scopeValues = StringUtils.split(requestBreadcrumbs);
-        if (scopeValues != null) {
-            for (int i = 0; i < scopeValues.length; i++) {
-                String scopeValue = scopeValues[i];
-                String scope = DRILL_DOWN_INDEX[i];
-                Breadcrumb crumb = new Breadcrumb(scopeValue, scope, scopeValue);
-                reqCrumbsList.add(crumb);
-            }
-        }
+        Type collectionType = new TypeToken<Collection<Breadcrumb>>(){}.getType();
+        reqCrumbsList = gson.fromJson(requestBreadcrumbs, collectionType);
 
-        if (!reqCrumbsList.isEmpty()) {
+        if (reqCrumbsList != null && !reqCrumbsList.isEmpty()) {
             return getBreadcrumbs(reqCrumbsList);
         }
 
@@ -262,14 +360,20 @@ public class ReportsAction implements ActionInterface {
         if (clickedCrumb) {
             crumbs = startCrumbs.subList(0, breadcrumbIndex+1);
         } else {
-            // Figure out if the user selected a different report, within the same scope
-            Breadcrumb lastBreadcrumb = startCrumbs.get(startCrumbs.size() - 1);
-            String scopeOfLastCrumb = lastBreadcrumb.getScope();
-            boolean sameScope = scope.equals(scopeOfLastCrumb);
             crumbs.addAll(startCrumbs);
 
-            if (!sameScope) {
-                Breadcrumb crumb = new Breadcrumb(scopeValue, scope, scopeValue);
+            // Figure out if the user selected a different report, within the same scope
+            Breadcrumb lastBreadcrumb = startCrumbs.get(startCrumbs.size() - 1);
+            String scopeValueOfLastCrumb = lastBreadcrumb.getScopeValue();
+            boolean sameScopeValue = scopeValue.equals(scopeValueOfLastCrumb);
+
+            if (!sameScopeValue) {
+                String anchorText = scopeValue;
+                if (scope.equals(SCOPE_SUPERVISOR)) {
+                    anchorText = currentSupervisorJob.getEmployee().getName();
+                }
+
+                Breadcrumb crumb = new Breadcrumb(anchorText, scope, scopeValue);
                 crumbs.add(crumb);
             }
         }
@@ -283,12 +387,7 @@ public class ReportsAction implements ActionInterface {
      * @return
      */
     private String getRequestBreadcrumbs() {
-        ArrayList<String> scopeValues = new ArrayList<String>();
-        for (Breadcrumb crumb : breadcrumbList) {
-            scopeValues.add(crumb.getScopeValue());
-        }
-
-        return StringUtils.join(scopeValues, " ");
+        return gson.toJson(breadcrumbList);
     }
 
     private String getScopeValue() {
@@ -316,7 +415,7 @@ public class ReportsAction implements ActionInterface {
      *
      * @param request
      */
-    private void setParamMap(PortletRequest request) {
+    private void setParamMap(PortletRequest request) throws Exception {
         PortletSession session = request.getPortletSession();
         HashMap sessionParam = (HashMap) session.getAttribute("paramMap");
         if (sessionParam == null) {
@@ -348,7 +447,6 @@ public class ReportsAction implements ActionInterface {
             paramMap.put(REPORT, REPORT_DEFAULT);
         }
 
-
         // If the user is about to enter the org code scope and the chart is by Unit, use stage
         String selectedReport = (String) paramMap.get(REPORT);
         String selectedScope = (String) paramMap.get(SCOPE);
@@ -358,6 +456,13 @@ public class ReportsAction implements ActionInterface {
 
         int breadcrumbIndex = ParamUtil.getInteger(request, BREADCRUMB_INDEX, -1);
         paramMap.put(BREADCRUMB_INDEX, breadcrumbIndex);
+
+        if (getScope().equals(SCOPE_SUPERVISOR)) {
+            Job tempJob = Job.getJobFromString(getScopeValue());
+            //@todo: need to handle bad supervising data
+            currentSupervisorJob = JobMgr.getJob(tempJob.getEmployee().getId(),
+                    tempJob.getPositionNumber(), tempJob.getSuffix());
+        }
     }
 
     /**
@@ -414,16 +519,126 @@ public class ReportsAction implements ActionInterface {
             return true;
         }
 
+        int employeeID = actionHelper.getLoggedOnUser(request).getId();
+        boolean supervisorReport = getScope().equals(SCOPE_SUPERVISOR);
+
         if (actionHelper.isLoggedInUserReviewer(request)) {
-            int employeeID = actionHelper.getLoggedOnUser(request).getId();
-            String businessCenterName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
+            String bcName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
+
+            // the bc reviewer can drill down the report if supervisor is in his bc
+            if (supervisorReport && currentSupervisorJob.getBusinessCenterName().equals(bcName)) {
+                return true;
+            }
+
+            // the bc reviewer can drill down to orgPrefix or orgCode if they are in the same bc
             if (breadcrumbList.size() > 1) {
                 Breadcrumb bcBreadcrumb = breadcrumbList.get(1);
-                if (bcBreadcrumb.getScopeValue().equals(businessCenterName)) {
+                if (bcBreadcrumb.getScopeValue().equals(bcName)) {
                     return true;
                 }
             }
         }
+
+        // Check supervisor report to see if it's the current user's report or in her
+        // supervising chain
+        if (supervisorReport) {
+            boolean isMyReport = currentSupervisorJob.getEmployee().getId() == employeeID;
+            JobMgr jobMgr = new JobMgr();
+
+            if (isMyReport) {
+                return true;
+            }
+
+            if (jobMgr.isUpperSupervisor(currentSupervisorJob, employeeID)) {
+                return true;
+            }
+        }
         return false;
+    }
+
+    /**
+     * Whether or not the drill down menu should be displayed in the charts.
+     *
+     * @param allowAllDrillDown
+     * @param reviewerBCName
+     * @return
+     */
+    private boolean showDrillDownMenu(boolean allowAllDrillDown, String reviewerBCName) {
+        // We don't allow drill down in lowest supervisor level
+        if (inLeafSupervisorReport) {
+            return false;
+        }
+
+        //scope != 'orgCode' && (allowAllDrillDown || reviewerBCName != '')
+        if (!getScope().equals(SCOPE_ORG_CODE) &&
+                (allowAllDrillDown || !reviewerBCName.equals(""))) {
+            return true;
+        }
+
+        if (getScope().equals(SCOPE_SUPERVISOR)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Whether or not the my report link should be displayed. It also passes to the jsp
+     * the needed values to generate the my report links.
+     *
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    private void showMyReportLink(PortletRequest request) throws Exception {
+        boolean showMyReportLink = false;
+
+        if (actionHelper.isLoggedInUserSupervisor(request)) {
+            // We make the assumption that a person has only 1 supervising job
+            Employee loggedInUser = actionHelper.getLoggedOnUser(request);
+            Job supervisorJob = JobMgr.getSupervisingJob(loggedInUser.getId());
+            String supervisorJobTitle = supervisorJob.getJobTitle();
+            String myReportSupervisorKey = supervisorJob.getEmployee().getId() + "_" +
+                    supervisorJob.getPositionNumber() + "_" + supervisorJob.getSuffix();
+
+            showMyReportLink = true;
+            actionHelper.addToRequestMap("supervisorJobTitle", supervisorJobTitle);
+            actionHelper.addToRequestMap("myReportSupervisorKey", myReportSupervisorKey);
+        }
+
+        if (actionHelper.isLoggedInUserReviewer(request)) {
+            String myReportBcName = actionHelper.getBusinessCenterForLoggedInReviewer(request);
+            showMyReportLink = true;
+            actionHelper.addToRequestMap("myReportBcName", myReportBcName);
+        }
+
+        if (actionHelper.isLoggedInUserAdmin(request)) {
+            showMyReportLink = true;
+        }
+
+        actionHelper.addToRequestMap("showMyReportLink", showMyReportLink);
+    }
+
+    /**
+     * Returns a string representation of a map that helps look up the scope value
+     * based on the display value of the chart data. This is needed for chart drill
+     * down.
+     *
+     * @return
+     */
+    private String chartDataScopeMap() {
+        String report = (String) paramMap.get(REPORT);
+        if (report.contains(ReportMgr.STAGE)) {
+            return "{}";
+        }
+
+        HashMap<String, String> dataScopeMap = new HashMap<String, String>();
+        for (Object[] row : chartData) {
+            String displayValue = row[1].toString();
+            String scopeValue = row[2].toString();
+            dataScopeMap.put(displayValue, scopeValue);
+        }
+
+        return gson.toJson(dataScopeMap);
     }
 }

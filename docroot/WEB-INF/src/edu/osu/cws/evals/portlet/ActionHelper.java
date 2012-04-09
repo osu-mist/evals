@@ -1,21 +1,13 @@
 package edu.osu.cws.evals.portlet;
 
-import com.liferay.portal.kernel.servlet.HttpHeaders;
-import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
-import edu.osu.cws.evals.util.EvalsPDF;
-import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.hibernate.Session;
 
 import javax.portlet.*;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -131,15 +123,7 @@ public class ActionHelper {
         myTeamAppraisals = (ArrayList<Appraisal>) session.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
         if (myTeamAppraisals == null) {
             AppraisalMgr appraisalMgr = new AppraisalMgr();
-            dbTeamAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true);
-            myTeamAppraisals = new ArrayList<Appraisal>();
-
-            if (dbTeamAppraisals != null) {
-                for (Appraisal appraisal : dbTeamAppraisals) {
-                    appraisal.setRole("supervisor");
-                    myTeamAppraisals.add(appraisal);
-                }
-            }
+            myTeamAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true, null, null);
             session.setAttribute(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals);
         }
         return myTeamAppraisals;
@@ -160,7 +144,7 @@ public class ActionHelper {
 
         Boolean isSupervisor = (Boolean) session.getAttribute("isSupervisor");
         if (refresh || isSupervisor == null) {
-            isSupervisor = jobMgr.isSupervisor(employeeId);
+            isSupervisor = JobMgr.isSupervisor(employeeId, null);
             session.setAttribute("isSupervisor", isSupervisor);
         }
         requestMap.put("isSupervisor", isSupervisor);
@@ -311,8 +295,7 @@ public class ActionHelper {
             String businessCenterName = ParamUtil.getString(request, "businessCenterName");
 
             if (businessCenterName.equals("")) {
-                int employeeID = getLoggedOnUser(request).getId();
-                businessCenterName = getReviewer(employeeID).getBusinessCenterName();
+                businessCenterName = getBusinessCenterForLoggedInReviewer(request);
             }
             AppraisalMgr appraisalMgr = new AppraisalMgr();
             reviewList = appraisalMgr.getReviews(businessCenterName, -1);
@@ -330,6 +313,20 @@ public class ActionHelper {
         }
 
         return outList;
+    }
+
+    /**
+     * Returns the business center name for the currently logged in user that is a reviewer.
+     *
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    public String getBusinessCenterForLoggedInReviewer(PortletRequest request) throws Exception {
+        String businessCenterName;
+        int employeeID = getLoggedOnUser(request).getId();
+        businessCenterName = getReviewer(employeeID).getBusinessCenterName();
+        return businessCenterName;
     }
 
     /**
