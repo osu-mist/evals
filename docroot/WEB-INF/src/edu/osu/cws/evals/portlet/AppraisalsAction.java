@@ -343,7 +343,7 @@ public class AppraisalsAction implements ActionInterface {
             ResourceResponse res = (ResourceResponse) response;
             res.setContentType("application/pdf");
             res.addProperty(HttpHeaders.CACHE_CONTROL, "max-age=3600, must-revalidate");
-            res.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+downloadFilename);
+            res.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""+downloadFilename+"\"");
 
             OutputStream out = res.getPortletOutputStream();
             RandomAccessFile in = new RandomAccessFile(filename, "r");
