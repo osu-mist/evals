@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.osu.cws.evals.hibernate.AppraisalMgr;
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
 
@@ -371,23 +373,71 @@ public class Job extends Evals implements Serializable {
      *
      * @return start date of appraisal period of the current year.
      * This day may be in the past of the future.
+     * @throws Exception
      */
-    public Calendar getNewAnnualStartDate()
-    {
+    public Calendar getNewAnnualStartDate() throws Exception {
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         Calendar cal = Calendar.getInstance();
-        Date myDate = getInitialEvalStartDate(); //starting point
+        Date initialStartDAte = getInitialEvalStartDate(); //starting point Jan 1st 2011
 
-        cal.setTime(myDate);
+        cal.setTime(initialStartDAte);
 
         // Verify that this is not the first annual appraisal and that annualInd is 18
-        if (currentYear != cal.get(Calendar.YEAR) && annualInd == 18) {
+        // if (isn't 1st evaluation && annualInd == 18) {
+        boolean firstAnnualStartDate = isFirstAnnualStartDate();
+        if (!firstAnnualStartDate && annualInd == 18) {
             int month = 6 + cal.get(Calendar.MONTH);
             cal.set(Calendar.MONTH, month);
         }
 
-         cal.set(Calendar.YEAR, currentYear);
+        // If this is the first annual evaluation and the indicator is 18, use initial date for year
+        if (firstAnnualStartDate && annualInd == 18) {
+            cal.setTime(initialStartDAte);
+        } else {
+            cal.set(Calendar.YEAR, currentYear);
+        }
+
         return cal;
+    }
+
+    /**
+     * Checks whether or not Date() - right now is within the first annual evaluation. This
+     * is used to figure out if when getNewAnnualStartDate is called and annual_ind = 18,
+     * whether we are in the first review period or the 2nd one.
+     *
+     * @return
+     * @throws Exception
+     */
+    private boolean isFirstAnnualStartDate() throws Exception {
+        // Calculate the end date of the 1st annual evaluation
+        Calendar initialEvalStartDate = Calendar.getInstance();
+        Date initialStartDate = getInitialEvalStartDate();
+        initialEvalStartDate.setTime(initialStartDate);
+        initialEvalStartDate.add(Calendar.MONTH, annualInd);
+        Date initialEvalStartCal = initialEvalStartDate.getTime();
+
+        long now = new Date().getTime();
+        long beginFirstEval = initialStartDate.getTime();
+        long endFirstEval = initialEvalStartCal.getTime();
+
+        // Check if we are within the evaluation period of the first annual evaluation
+        if (now >= beginFirstEval && now <= endFirstEval) {
+            // Check if the first annual evaluation has not been created
+            if (!AppraisalMgr.AnnualExists(this, initialStartDate)) {
+                // Check if the first annual evaluation should be created
+                if (now < initialStartDate.getTime()) {
+                    return false;
+                }
+                if (EvalsUtil.beforeEvalsTime(this, initialStartDate, Appraisal.TYPE_ANNUAL)) {
+                    return false;
+                }
+
+                return true;
+            }
+
+        }
+
+        return false;
     }
 
     public Date getAnnualStartDateBasedOnJobBeginDate(int year)

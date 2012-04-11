@@ -1077,6 +1077,31 @@ public class AppraisalMgr {
     }
 
     /**
+     * @param job
+     * @param appraisalStartDate
+     * @return
+     * @throws Exception
+     */
+    public static boolean AnnualExists(Job job, Date appraisalStartDate) throws Exception
+    {
+        if (AppraisalMgr.appraisalExists(job, appraisalStartDate, Appraisal.TYPE_ANNUAL))
+            return true;
+
+        //If we get here, there is no record for the job for appraisalStartDate
+        //It's possible that someone added a value for Pyvpasj_eval_date after we created
+        //the previous appraisal, so need to check that.
+        SimpleDateFormat simpleDateformat = new SimpleDateFormat("yyyy");
+        int thisYear = Integer.parseInt(simpleDateformat.format(appraisalStartDate));
+        Date startDateBasedOnJobBeginDate = job.getAnnualStartDateBasedOnJobBeginDate(thisYear);
+
+        if (startDateBasedOnJobBeginDate.equals(appraisalStartDate))
+            return false;
+        else
+            return AppraisalMgr.appraisalExists(job, startDateBasedOnJobBeginDate, Appraisal.TYPE_ANNUAL);
+    }
+
+
+    /**
      * Updates the appraisal status and originalStatus using the id of the appraisal and hsql query.
      *
      * @param appraisal

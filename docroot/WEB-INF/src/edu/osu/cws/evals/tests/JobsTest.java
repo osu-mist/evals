@@ -8,21 +8,31 @@ import edu.osu.cws.evals.models.ModelException;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 
 @Test
 public class JobsTest {
     Job job = new Job();
     JobMgr jobMgr = new JobMgr();
+    Transaction tx;
 
     @BeforeMethod
     public void setUp() throws Exception {
         DBUnit dbunit = new DBUnit();
         dbunit.seedDatabase();
+        Session session = HibernateUtil.getCurrentSession();
+        tx = session.beginTransaction();
+    }
+
+    @AfterMethod
+    public void tearDown() throws Exception {
+        tx.commit();
     }
 
     public void shouldFindUppserSupervisor() throws ModelException {
@@ -112,47 +122,60 @@ public class JobsTest {
         assert jobMgr.getBusinessCenter(56198).equals("UABC");
     }
 
-    public void shouldReturnCorrectNewAnnualStartDateIfFirstLasted18Months() {
+    public void shouldReturnCorrectNewAnnualStartDateIfFirstLasted18Months() throws Exception {
         Calendar cal = Calendar.getInstance();
         Job job = new Job();
         job.setAnnualInd(18);
+        job.setEmployee(new Employee(12345));
+        job.setPositionNumber("C1234");
+        job.setSuffix("00");
 
-        cal.set(Calendar.YEAR, 2011);
+        cal.set(Calendar.YEAR, cal.get(Calendar.YEAR)-1);
         cal.set(Calendar.MONTH, Calendar.JUNE);
         cal.set(Calendar.DAY_OF_MONTH, 1);
 
-        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal);
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, Calendar.JUNE,
+                Calendar.getInstance().get(Calendar.YEAR)-1);
 
-        cal.set(Calendar.YEAR, 2008);
-        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal);
-        cal.set(Calendar.YEAR, 2009);
-        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal);
-        cal.set(Calendar.YEAR, 2010);
-        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal);
+        cal.set(Calendar.YEAR, cal.get(Calendar.YEAR)-4);
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, Calendar.DECEMBER,
+                Calendar.getInstance().get(Calendar.YEAR));
+        cal.set(Calendar.YEAR, cal.get(Calendar.YEAR)-3);
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, Calendar.DECEMBER,
+                Calendar.getInstance().get(Calendar.YEAR));
+        cal.set(Calendar.YEAR, cal.get(Calendar.YEAR)-2);
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, Calendar.DECEMBER,
+                Calendar.getInstance().get(Calendar.YEAR));
     }
 
-    private void assertCorrectNewAnnualStartDateForAnnualInd18(Job job, Calendar cal) {
+    private void assertCorrectNewAnnualStartDateForAnnualInd18(Job job, Calendar cal, int month,
+                                                               int year) throws Exception {
         job.setBeginDate(cal.getTime());
         Calendar newStartDate = job.getNewAnnualStartDate();
 
-        assert newStartDate.get(Calendar.YEAR) == Calendar.getInstance().get(Calendar.YEAR);
-        assert newStartDate.get(Calendar.MONTH) == Calendar.DECEMBER;
+        assert newStartDate.get(Calendar.YEAR) == year;
+        assert newStartDate.get(Calendar.MONTH) == month;
         assert newStartDate.get(Calendar.DAY_OF_MONTH) == 1;
     }
 
-    public void shouldReturnCorrectNewAnnualStartDateForFirstAnnualIfAnnualIndIs18() {
+    public void shouldReturnCorrectNewAnnualStartDateForFirstAnnualIfAnnualIndIs18Case2()
+            throws Exception {
         Calendar cal = Calendar.getInstance();
         Job job = new Job();
         job.setAnnualInd(18);
+        job.setEmployee(new Employee(12345));
+        job.setPositionNumber("C1234");
+        job.setSuffix("00");
 
-        cal.set(Calendar.MONTH, Calendar.JUNE);
-        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.set(Calendar.MONTH, Calendar.DECEMBER);
+        cal.set(Calendar.DAY_OF_MONTH, 4);
+        cal.set(Calendar.YEAR, 2010);
 
         job.setBeginDate(cal.getTime());
         Calendar newStartDate = job.getNewAnnualStartDate();
 
-        assert newStartDate.get(Calendar.YEAR) == Calendar.getInstance().get(Calendar.YEAR);
-        assert newStartDate.get(Calendar.MONTH) == Calendar.JUNE;
+        assert newStartDate.get(Calendar.YEAR) == 2011;
+        assert newStartDate.get(Calendar.MONTH) == Calendar.JANUARY;
         assert newStartDate.get(Calendar.DAY_OF_MONTH) == 1;
     }
 

@@ -14,6 +14,8 @@ import edu.osu.cws.util.CWSUtil;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import edu.osu.cws.evals.models.*;
@@ -21,6 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 
 public class EvalsUtil {
+    private static Date evalsStartDate = null;
+
     /**
      *
      * @param appraisal
@@ -247,4 +251,42 @@ public class EvalsUtil {
         }
     }
 
+    /**
+     * Whether or not the current job and appraisal start date is before evals started
+     * processing evaluations.
+     *
+     * @param job
+     * @param startDate
+     * @param type
+     * @return
+     * @throws ParseException
+     */
+    public static boolean beforeEvalsTime(Job job, Date startDate, String type)
+            throws ParseException {
+        Date appraisalEndDate = job.getEndEvalDate(startDate, type);
+        System.out.print("appraisalEndDate = " + appraisalEndDate);
+        if (appraisalEndDate.before(getEvalsStartDate() )) {
+            System.out.println(", before evalsStartDate.");
+            return true;
+        }
+        System.out.println(".");
+        return false;
+    }
+
+    /**
+     * Parses the constant EVALS_START_DATE and stores a date object in evalsStartDate.
+     *
+     * @return
+     * @throws ParseException
+     */
+    public static Date getEvalsStartDate() throws ParseException {
+        if (evalsStartDate != null) {
+            return evalsStartDate;
+        } else {
+            SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
+            evalsStartDate = fmt.parse(Constants.EVALS_START_DATE);
+        }
+
+        return evalsStartDate;
+    }
 }

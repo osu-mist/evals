@@ -48,4 +48,7 @@ public class Constants {
             "pyvpasj_supervisor_posn = prior pyvpasj_posn AND " +
             "pyvpasj_supervisor_suff = prior pyvpasj_suff ";
 
+    //Appraisal ends on or after EVALS_START_DATE will be handled by this app.
+    public static final String EVALS_START_DATE = "10/31/2011";
+
 }
