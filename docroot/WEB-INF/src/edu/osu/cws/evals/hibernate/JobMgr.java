@@ -1,11 +1,13 @@
 package edu.osu.cws.evals.hibernate;
 
+import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.models.ModelException;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
+import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -15,6 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JobMgr {
+
+    // The search select, from and where clauses below are used by the find by name and id methods
+    public static final String SEARCH_JOB_SELECT = "select pyvpase_id, pyvpasj_pidm, " +
+            "pyvpasj_posn, pyvpasj_suff ";
+    public static final String SEARCH_JOB_FROM = "from pyvpasj, pyvpase ";
+    public static final String SEARCH_JOB_WHERE = "where pyvpase_pidm = pyvpasj_pidm and " +
+            "pyvpasj_status = 'A' ";
 
     /**
      * Traverses up the supervising chain of the given job and if the given pidm matches
@@ -173,7 +182,7 @@ public class JobMgr {
         Session session = HibernateUtil.getCurrentSession();
 
         String query = "from edu.osu.cws.evals.models.Job job " +
-                "where job.employee.id = :pidm";
+                "where job.employee.id = :pidm and job.status != 'T'";
 
         jobs = session.createQuery(query)
                 .setInteger("pidm", pidm)
@@ -290,5 +299,163 @@ public class JobMgr {
         }
 
         return null;
+    }
+
+
+    /**
+     * Returns the jobs with a matching osu id in the employees table. The jobs returned
+     * contain: employee osuid, pidm, posno, and suffix. It performs an exact search on the osuid.
+     *
+     * @param searchTerm      osuid of employee
+     * @param bcName
+     * @param supervisorPidm
+     * @return  Employee
+     * @throws Exception
+     */
+    public static List<Job> findByOsuid(String searchTerm, String bcName, int supervisorPidm)
+            throws Exception {
+        String sql = SEARCH_JOB_SELECT + SEARCH_JOB_FROM + SEARCH_JOB_WHERE +
+                "and pyvpase_id = :searchTerm ";
+
+        return findHelper(searchTerm, bcName, supervisorPidm, sql, null, true);
+    }
+
+    /**
+     * We only allow searching by first name or last name. Names with numbers in
+     * them are not considered valid. The jobs returned contain: employee osuid, pidm, posno
+     * and suffix. It does a like search with a wild card '%' at the end of the name.
+     *
+     * @param searchTerm            First/last name or first last names.
+     * @param bcName                If the logged in user is reviewer, their BC.
+     * @param supervisorPidm        If is not 0, the logged in user is a supervisor
+     * @return
+     * @throws Exception
+     */
+    public static List<Job> findByName(String searchTerm, String bcName, int supervisorPidm)
+            throws Exception {
+        ArrayList<String> conditions = new ArrayList<String>();
+        String where = SEARCH_JOB_WHERE;
+
+        searchTerm = StringUtils.trim(searchTerm);
+        searchTerm = StringUtils.remove(searchTerm, ",");
+
+        // if the user entered two words split them up and search by first, last and last, first
+        String[] tokens = StringUtils.split(searchTerm, " ");
+        if (tokens.length > 1) {
+            conditions.add("(pyvpase_first_name like :token0 and pyvpase_last_name like :token1)");
+            conditions.add("(pyvpase_first_name like :token1 and pyvpase_last_name like :token0)");
+        } else {
+            // we only search by name and first name if only 1 word was entered. otherwise, you get
+            // too many results
+            conditions.add("(pyvpase_first_name like :searchTerm or " +
+                "pyvpase_last_name like :searchTerm)");
+        }
+
+        where += "and (" + StringUtils.join(conditions, " or ") + ")";
+        String sql = SEARCH_JOB_SELECT + SEARCH_JOB_FROM + where;
+
+        return findHelper(searchTerm, bcName, supervisorPidm, sql, tokens, false);
+    }
+
+    /**
+     * Helper method that adds the where clause to filter by bcName, supervisor. This method is
+     * used by findByName and findByOsuid. It lso sets the parameter for searchTerm osuid or single
+     * name and multiple names.
+     *
+     * @param searchTerm
+     * @param bcName
+     * @param supervisorPidm
+     * @param sql
+     * @param tokens
+     * @param isNumeric
+     * @return
+     * @throws Exception
+     */
+    private static List<Job> findHelper(String searchTerm, String bcName, int supervisorPidm,
+                                        String sql, String[] tokens, boolean isNumeric)
+            throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        boolean addBC = !StringUtils.isEmpty(bcName);
+        boolean addSupervisor = supervisorPidm != 0;
+        List<Job> supervisorJobs = null;
+
+        if (addBC) {
+            sql += "and pyvpasj_bctr_title = :bcName ";
+        }
+
+        if (addSupervisor) {
+            supervisorJobs = getJobs(supervisorPidm);
+            if (supervisorJobs.isEmpty()) {
+                addSupervisor = false;
+            } else {
+                String startWith = EvalsUtil.getStartWithClause(supervisorJobs.size());
+                sql += startWith + Constants.CONNECT_BY;
+            }
+        }
+
+        Query query = session.createSQLQuery(sql);
+
+        if (tokens != null && tokens.length > 1) { // first last name search
+            query.setString("token0", tokens[0]+"%");
+            query.setString("token1", tokens[1]+"%");
+        } else { // either osuid or first/last name (only 1 word)
+            if (isNumeric) {
+                query.setInteger("searchTerm", Integer.parseInt(searchTerm));
+            } else {
+                query.setString("searchTerm", searchTerm + "%");
+            }
+        }
+
+        if (addBC) {
+            query.setString("bcName", bcName);
+        }
+        if (addSupervisor) {
+            EvalsUtil.setStartWithParameters(supervisorJobs, query);
+        }
+
+        return convertSearchArrayToJobList(query);
+    }
+
+    /**
+     * Helper method used by findHelper. It takes the hibernate query and executes it. Then
+     * it takes the sql results and converts them into a list of jobs.
+     *
+     * @param query
+     * @return
+     */
+    private static List<Job> convertSearchArrayToJobList(Query query) {
+        List<Object[]> result = query.list();
+        List<Job> jobs = new ArrayList<Job>();
+        // row[0] = osuid, row[1] = pidm, row[2] = posn, row[3] = suff
+        for (Object[] row : result) {
+            Employee employee = new Employee(Integer.parseInt(row[1].toString()));
+            employee.setOsuid(row[0].toString());
+            Job job = new Job(employee, row[2].toString(), row[3].toString());
+
+            jobs.add(job);
+        }
+        return jobs;
+    }
+
+    /**
+     * When searching by osuid, we require numeric 9 digits. When searching by name, we don't allow
+     * numbers along with it. This method relies on findByOsuid and findByName to do the work.
+     *
+     * @param searchTerm        The osuid or names to search for
+     * @param bcName            The bcName if the logged in user is a reviewer
+     * @param supervisorPidm    If is not 0, then the logged in user is a supervisor
+     * @return                  List of jobs that matched the search criteria.
+     * @throws Exception
+     */
+    public static List<Job> search(String searchTerm, String bcName, Integer supervisorPidm)
+            throws Exception {
+        List<Job> result = null;
+        if (CWSUtil.validateOsuid(searchTerm)) {
+            result = findByOsuid(searchTerm, bcName, supervisorPidm);
+        } else if (CWSUtil.validateNameSearch(searchTerm)) {
+            result = findByName(searchTerm, bcName, supervisorPidm);
+        }
+
+        return result;
     }
 }

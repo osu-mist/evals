@@ -14,7 +14,6 @@ import org.testng.annotations.Test;
 
 import java.util.Calendar;
 import java.util.List;
-import java.util.Set;
 
 @Test
 public class JobsTest {
@@ -206,5 +205,72 @@ public class JobsTest {
         assert supervisingJob.getSuffix().equals("00");
 
         tx.commit();
+    }
+
+    public void searchShouldAcceptOsuid() throws Exception {
+        List<Job> jobs = JobMgr.search("931421235", null, 0);
+        assert jobs.size() == 3;
+
+        jobs = JobMgr.search("931421234", null, 0);
+        assert jobs.size() == 1;
+
+        jobs = JobMgr.search("111111111", null, 0);
+        assert jobs.size() == 0;
+    }
+
+    public void searchByOsuidShouldCheckBCPermissions() throws Exception {
+        List<Job> jobs = JobMgr.findByOsuid("12345677", "AABC", 0);
+        assert jobs.size() == 2;
+
+        assert jobs.get(0).getEmployee().getId() == 56199;
+        assert jobs.get(0).getPositionNumber().equals("1234");
+
+        assert jobs.get(1).getEmployee().getId() == 56199;
+        assert jobs.get(1).getPositionNumber().equals("12341");
+    }
+
+    //@todo: the test below requires oracle :(
+    public void searchByOsuidShouldCheckSupervisorPermissions() throws Exception {}
+
+
+
+    public void searchByNameShouldAcceptFirstNameOnly() throws Exception {
+        List<Job> jobs = JobMgr.findByName("Joan", null, 0);
+        assert jobs.size() == 1;
+
+        jobs = JobMgr.findByName("Joannnnnn", null, 0);
+        assert jobs.size() == 0;
+
+        jobs = JobMgr.findByName("Jo", null, 0);
+        assert jobs.size() == 2;
+    }
+
+    public void searchByNameShouldAcceptLastNameOnly() throws Exception {
+        List<Job> jobs = JobMgr.findByName("Cedeno", null, 0);
+        assert jobs.size() == 1;
+
+        jobs = JobMgr.findByName("Bond", null, 0);
+        assert jobs.size() == 0;
+
+        jobs = JobMgr.findByName("Barlow", null, 0);
+        assert jobs.size() == 3;
+    }
+
+    public void searchByNameShouldAcceptFirstAndLastName() throws Exception {
+        List<Job> jobs = JobMgr.findByName("Joan Lu", null, 0);
+        assert jobs.size() == 1;
+
+        jobs = JobMgr.findByName("Lu Joan", null, 0);
+        assert jobs.size() == 1;
+    }
+
+    public void searchByNameShouldAcceptFirstAndLastNameWithCommaInBetween() throws Exception {
+        List<Job> jobs = JobMgr.findByName("Lu, Joan", null, 0);
+        assert jobs.size() == 1;
+    }
+
+    public void findOrgCodeShouldReturnValidResultList() throws Exception {
+        List<String> orgCodes = JobMgr.findOrgCodes("abcd");
+        assert orgCodes.isEmpty();
     }
 }

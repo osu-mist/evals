@@ -3,6 +3,7 @@
  */
 package edu.osu.cws.evals.models;
 
+import edu.osu.cws.util.CWSUtil;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,6 +49,10 @@ public class Employee extends Evals {
         }
 
         return nonTerminatedJobs;
+    }
+
+    public boolean validateOsuid() {
+        return CWSUtil.validateOsuid(osuid);
     }
 
     public Employee() { }

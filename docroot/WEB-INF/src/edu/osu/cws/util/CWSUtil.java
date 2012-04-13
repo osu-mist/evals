@@ -1,14 +1,7 @@
 package edu.osu.cws.util;
 
-/**
- * Created by IntelliJ IDEA.
- * User: luf
- * Date: 6/30/11
- * Time: 4:33 PM
- * To change this template use File | Settings | File Templates.
- */
-
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -229,4 +222,34 @@ public class CWSUtil
 
         return out;
     }
+
+    /**
+     * Accept as names: string separated by space, commas or dashes.
+     * Does not accept symbols other than - or numbers.
+     *
+     * @param name
+     * @return
+     */
+    public static boolean validateNameSearch(String name) {
+        name = StringUtils.lowerCase(name);
+        name = StringUtils.trim(name);
+
+        if (StringUtils.isEmpty(name)) {
+            return false;
+        }
+
+        String pattern = "([a-z,\\-\\s])+";
+        return name.matches(pattern);
+    }
+
+    /**
+     * We only accept numeric 9 digit string as a valid osu id.
+     *
+     * @param osuid
+     * @return
+     */
+    public static boolean validateOsuid(String osuid) {
+        return StringUtils.isNumeric(osuid) && osuid.length() == 9;
+    }
+
 }

@@ -9,8 +9,8 @@
             <portlet:param name="controller" value="AppraisalsAction" />
             </portlet:actionURL>" method="post">
 
-            <label for="<portlet:namespace/>osuid"><liferay-ui:message key="search-employee-osuid"/></label>
-            <input type="text" id="<portlet:namespace/>osuid" class="inline narrow" name="<portlet:namespace/>osuid" />
+            <label for="<portlet:namespace/>searchTerm"><liferay-ui:message key="search-employee-searchTerm"/></label>
+            <input type="text" id="<portlet:namespace/>searchTerm" class="inline narrow" name="<portlet:namespace/>searchTerm" />
             <input type="submit" value="<liferay-ui:message key="search"/>"/>
         </form>
     </div>
