@@ -1,5 +1,6 @@
 package edu.osu.cws.util;
 
+import edu.osu.cws.evals.portlet.Constants;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -252,4 +253,14 @@ public class CWSUtil
         return StringUtils.isNumeric(osuid) && osuid.length() == 9;
     }
 
+
+    /**
+     * A valid orgCode contains 6 digits and is numeric.
+     *
+     * @param orgCode
+     * @return
+     */
+    public static boolean validateOrgCode(String orgCode) {
+        return StringUtils.isNumeric(orgCode) && orgCode.length() == Constants.MAX_ORG_CODE_DIGITS;
+    }
 }

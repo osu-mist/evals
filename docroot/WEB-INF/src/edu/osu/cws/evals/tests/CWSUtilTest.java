@@ -19,4 +19,12 @@ public class CWSUtilTest {
         assert CWSUtil.validateNameSearch("James-Bond");
         assert CWSUtil.validateNameSearch("Bond, James");
     }
+
+    public void shouldValidateOrgCode() {
+        assert CWSUtil.validateOrgCode("") == false;
+        assert CWSUtil.validateOrgCode("abcde") == false;
+        assert CWSUtil.validateOrgCode("123a") == false;
+        assert CWSUtil.validateOrgCode("12345") == false;
+        assert CWSUtil.validateOrgCode("123456") == true;
+    }
 }

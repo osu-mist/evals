@@ -51,4 +51,5 @@ public class Constants {
     //Appraisal ends on or after EVALS_START_DATE will be handled by this app.
     public static final String EVALS_START_DATE = "10/31/2011";
 
+    public static final Integer MAX_ORG_CODE_DIGITS = 6;
 }

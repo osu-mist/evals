@@ -458,4 +458,44 @@ public class JobMgr {
 
         return result;
     }
+
+    /**
+     * Find the orgCode in the database. If the bcName is passed in, then we do a permission check
+     * to make sure it belongs to that BC.
+     *
+     * @param orgCode
+     * @param bcName
+     * @return
+     * @throws Exception
+     */
+    public static boolean findOrgCode(String orgCode, String bcName) throws Exception {
+        orgCode = StringUtils.trim(orgCode);
+        if (!CWSUtil.validateOrgCode(orgCode)) {
+            return false;
+        }
+
+        Session session = HibernateUtil.getCurrentSession();
+        String hql = "select count(*) from edu.osu.cws.evals.models.Job " +
+                "where tsOrgCode = :orgCode ";
+        boolean addBC = !StringUtils.isEmpty(bcName);
+
+        // Add bc name as a permission check
+        if (addBC) {
+            hql += "and businessCenterName = :bcName";
+        }
+
+        Query query = session.createQuery(hql).setString("orgCode", orgCode);
+        if (addBC) {
+            query.setString("bcName", bcName);
+        }
+
+        List<Object> results = query.list();
+        int orgCodeCount = 0;
+        if (!results.isEmpty()) {
+            orgCodeCount = Integer.parseInt(results.get(0).toString());
+        }
+
+        // If there were many jobs with this orgCode, then it is considered valid
+        return orgCodeCount > 0;
+    }
 }

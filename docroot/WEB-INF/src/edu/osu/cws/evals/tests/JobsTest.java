@@ -269,8 +269,13 @@ public class JobsTest {
         assert jobs.size() == 1;
     }
 
-    public void findOrgCodeShouldReturnValidResultList() throws Exception {
-        List<String> orgCodes = JobMgr.findOrgCodes("abcd");
-        assert orgCodes.isEmpty();
+    public void shouldFindOrgCodeAsAdmin() throws Exception {
+        assert JobMgr.findOrgCode("abcd", null) == false;
+        assert JobMgr.findOrgCode("123456", null) == true;
+    }
+
+    public void shouldFindOrgCodeAsBC() throws Exception {
+        assert JobMgr.findOrgCode("654321", "UABC") == true;
+        assert JobMgr.findOrgCode("654321", "AABC") == false;
     }
 }
