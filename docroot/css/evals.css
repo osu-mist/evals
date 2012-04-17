@@ -1,5 +1,5 @@
 .pass-hide {
-    display: none;
+    display: none !important;
 }
 
 /* Home View */

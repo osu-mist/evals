@@ -35,6 +35,7 @@
                 <th><liferay-ui:message key="job-title"/></th>
                 <th><liferay-ui:message key="position-no"/></th>
                 <th><liferay-ui:message key="orgn-code-desc"/></th>
+                <th><liferay-ui:message key="overdue"/></th>
                 <th><liferay-ui:message key="status"/></th>
             </tr>
         </thead>
@@ -47,6 +48,7 @@
             <td>${appraisal.job.jobTitle}</td>
             <td>${appraisal.job.positionNumber}</td>
             <td>${appraisal.job.orgCodeDescription}</td>
+            <td>${appraisal.viewOverdue}</td>
             <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
                                 <portlet:param name="id" value="${appraisal.id}"/>
                                 <portlet:param  name="action" value="display"/>

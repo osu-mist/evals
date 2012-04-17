@@ -1160,7 +1160,7 @@ public class AppraisalMgr {
             "id, job.jobTitle, job.positionNumber, startDate, endDate, type, " +
             "job.employee.id, job.employee.lastName, job.employee.firstName, " +
             "evaluationSubmitDate, status, job.businessCenterName, " +
-            "job.orgCodeDescription, job.suffix) from " +
+            "job.orgCodeDescription, job.suffix, overdue) from " +
             "edu.osu.cws.evals.models.Appraisal " +
             "where ";
 

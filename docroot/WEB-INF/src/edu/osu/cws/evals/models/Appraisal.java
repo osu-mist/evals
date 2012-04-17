@@ -288,7 +288,8 @@ public class Appraisal extends Evals {
      */
     public Appraisal(int id, String jobTitle, String positionNumber, Date startDate, Date endDate,
                      String type, int employeeId, String lastName, String firstName, Date evaluationSubmitDate,
-                     String status, String bcName, String orgCodeDescription, String suffix) {
+                     String status, String bcName, String orgCodeDescription, String suffix,
+                     Integer overdue) {
         Employee employee = new Employee();
         employee.setId(employeeId);
         employee.setLastName(lastName);
@@ -309,6 +310,12 @@ public class Appraisal extends Evals {
         this.evaluationSubmitDate = evaluationSubmitDate;
         this.status = status;
         this.job = tempJob;
+
+        if (overdue == null) {
+            this.overdue = -999;
+        } else {
+            this.overdue = overdue;
+        }
     }
 
     /**

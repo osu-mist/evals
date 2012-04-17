@@ -20,7 +20,7 @@ public class ReportsTest {
 //    }
 
     public void shouldProduceCorrectSQLForOSULevel() {
-        String sql = ReportMgr.getChartSQL("root", "unitBreakdown", true);
+        String sql = ReportMgr.getChartSQL("root", "unitBreakdown", true, true);
         String expectedSQL = "SELECT count(*), PYVPASJ_BCTR_TITLE FROM appraisals, PYVPASJ  WHERE" +
                 " appraisals.status not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE " +
                 "in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm AND " +
@@ -28,7 +28,7 @@ public class ReportsTest {
                 " GROUP BY PYVPASJ_BCTR_TITLE ORDER BY count(*) DESC, PYVPASJ_BCTR_TITLE";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL("root", "unitOverdue", true);
+        sql = ReportMgr.getChartSQL("root", "unitOverdue", true, true);
         expectedSQL = "SELECT count(*), PYVPASJ_BCTR_TITLE FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE " +
                 "in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm AND " +
@@ -36,7 +36,7 @@ public class ReportsTest {
                 " AND appraisals.overdue > 0 GROUP BY PYVPASJ_BCTR_TITLE ORDER BY count(*) DESC, PYVPASJ_BCTR_TITLE";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL("root", "unitWayOverdue", true);
+        sql = ReportMgr.getChartSQL("root", "unitWayOverdue", true, true);
         expectedSQL = "SELECT count(*), PYVPASJ_BCTR_TITLE FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE " +
                 "in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm AND " +
@@ -44,7 +44,7 @@ public class ReportsTest {
                 "AND appraisals.overdue > 30 GROUP BY PYVPASJ_BCTR_TITLE ORDER BY count(*) DESC, PYVPASJ_BCTR_TITLE";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL("root", "stageBreakdown", true);
+        sql = ReportMgr.getChartSQL("root", "stageBreakdown", true, true);
         expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE " +
                 "in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm AND " +
@@ -52,7 +52,7 @@ public class ReportsTest {
                 " GROUP BY status ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL("root", "stageOverdue", true);
+        sql = ReportMgr.getChartSQL("root", "stageOverdue", true, true);
         expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND " +
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
@@ -60,7 +60,7 @@ public class ReportsTest {
                 " AND appraisals.overdue > 0 GROUP BY status ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL("root", "stageWayOverdue", true);
+        sql = ReportMgr.getChartSQL("root", "stageWayOverdue", true, true);
         expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND" +
                 " PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm AND" +
@@ -71,7 +71,7 @@ public class ReportsTest {
 
     public void shouldProduceCorrectSQLForBCLevel() {
         String scope = ReportsAction.SCOPE_BC;
-        String sql = ReportMgr.getChartSQL(scope, "unitBreakdown", true);
+        String sql = ReportMgr.getChartSQL(scope, "unitBreakdown", true, true);
         String expectedSQL = "SELECT count(*), SUBSTR(PYVPASJ_ORGN_DESC, 1, 3) FROM appraisals, PYVPASJ " +
                 " WHERE appraisals.status not in ('completed', 'archived', 'closed') AND " +
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
@@ -80,7 +80,7 @@ public class ReportsTest {
                 "ORDER BY count(*) DESC, SUBSTR(PYVPASJ_ORGN_DESC, 1, 3)";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "unitOverdue", true);
+        sql = ReportMgr.getChartSQL(scope, "unitOverdue", true, true);
         expectedSQL = "SELECT count(*), SUBSTR(PYVPASJ_ORGN_DESC, 1, 3) FROM appraisals, PYVPASJ " +
                 " WHERE appraisals.status not in ('completed', 'archived', 'closed') AND " +
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
@@ -89,7 +89,7 @@ public class ReportsTest {
                 "GROUP BY SUBSTR(PYVPASJ_ORGN_DESC, 1, 3) ORDER BY count(*) DESC, SUBSTR(PYVPASJ_ORGN_DESC, 1, 3)";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "unitWayOverdue", true);
+        sql = ReportMgr.getChartSQL(scope, "unitWayOverdue", true, true);
         expectedSQL = "SELECT count(*), SUBSTR(PYVPASJ_ORGN_DESC, 1, 3) FROM appraisals, PYVPASJ  " +
                 "WHERE appraisals.status not in ('completed', 'archived', 'closed') AND " +
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
@@ -98,7 +98,7 @@ public class ReportsTest {
                 "GROUP BY SUBSTR(PYVPASJ_ORGN_DESC, 1, 3) ORDER BY count(*) DESC, SUBSTR(PYVPASJ_ORGN_DESC, 1, 3)";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "stageBreakdown", true);
+        sql = ReportMgr.getChartSQL(scope, "stageBreakdown", true, true);
         expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE appraisals.status " +
                 "not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes " +
                 "AND PYVPASJ_PIDM = appraisals.job_pidm AND PYVPASJ_POSN = appraisals.position_number " +
@@ -106,7 +106,7 @@ public class ReportsTest {
                 "ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "stageOverdue", true);
+        sql = ReportMgr.getChartSQL(scope, "stageOverdue", true, true);
         expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE appraisals.status not " +
                 "in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes " +
                 "AND PYVPASJ_PIDM = appraisals.job_pidm AND PYVPASJ_POSN = appraisals.position_number AND " +
@@ -114,7 +114,7 @@ public class ReportsTest {
                 "appraisals.overdue > 0 GROUP BY status ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "stageWayOverdue", true);
+        sql = ReportMgr.getChartSQL(scope, "stageWayOverdue", true, true);
         expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE appraisals.status " +
                 "not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes " +
                 "AND PYVPASJ_PIDM = appraisals.job_pidm AND PYVPASJ_POSN = appraisals.position_number " +
@@ -125,7 +125,7 @@ public class ReportsTest {
 
     public void shouldProduceCorrectSQLForOrgPrefixLevel() {
         String scope = ReportsAction.SCOPE_ORG_PREFIX;
-        String sql = ReportMgr.getChartSQL(scope, "unitBreakdown", true);
+        String sql = ReportMgr.getChartSQL(scope, "unitBreakdown", true, true);
         String expectedSQL = "SELECT count(*), PYVPASJ_ORGN_CODE_TS FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE " +
                 "in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm AND" +
@@ -134,7 +134,7 @@ public class ReportsTest {
                 "GROUP BY PYVPASJ_ORGN_CODE_TS ORDER BY count(*) DESC, PYVPASJ_ORGN_CODE_TS";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "unitOverdue", true);
+        sql = ReportMgr.getChartSQL(scope, "unitOverdue", true, true);
         expectedSQL = "SELECT count(*), PYVPASJ_ORGN_CODE_TS FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND " +
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
@@ -143,7 +143,7 @@ public class ReportsTest {
                 "appraisals.overdue > 0 GROUP BY PYVPASJ_ORGN_CODE_TS ORDER BY count(*) DESC, PYVPASJ_ORGN_CODE_TS";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "unitWayOverdue", true);
+        sql = ReportMgr.getChartSQL(scope, "unitWayOverdue", true, true);
         expectedSQL = "SELECT count(*), PYVPASJ_ORGN_CODE_TS FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND " +
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
@@ -152,7 +152,7 @@ public class ReportsTest {
                 "AND appraisals.overdue > 30 GROUP BY PYVPASJ_ORGN_CODE_TS ORDER BY count(*) DESC, PYVPASJ_ORGN_CODE_TS";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "stageBreakdown", true);
+        sql = ReportMgr.getChartSQL(scope, "stageBreakdown", true, true);
         expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE appraisals.status" +
                 " not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE" +
                 " in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm AND " +
@@ -161,7 +161,7 @@ public class ReportsTest {
                 "ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "stageOverdue", true);
+        sql = ReportMgr.getChartSQL(scope, "stageOverdue", true, true);
         expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND " +
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
@@ -170,7 +170,7 @@ public class ReportsTest {
                 " appraisals.overdue > 0 GROUP BY status ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "stageWayOverdue", true);
+        sql = ReportMgr.getChartSQL(scope, "stageWayOverdue", true, true);
         expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE appraisals.status " +
                 "not in ('completed', 'archived', 'closed') AND " +
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm" +
@@ -182,7 +182,7 @@ public class ReportsTest {
 
     public void shouldProduceCorrectSQLForOrgCodeLevel() {
         String scope = ReportsAction.SCOPE_ORG_CODE;
-        String sql = ReportMgr.getChartSQL(scope, "unitBreakdown", true);
+        String sql = ReportMgr.getChartSQL(scope, "unitBreakdown", true, true);
         String expectedSQL = "SELECT count(*), PYVPASJ_SUPERVISOR_PIDM FROM appraisals, PYVPASJ  " +
                 "WHERE appraisals.status not in ('completed', 'archived', 'closed') AND " +
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm" +
@@ -191,7 +191,7 @@ public class ReportsTest {
                 "GROUP BY PYVPASJ_SUPERVISOR_PIDM ORDER BY count(*) DESC, PYVPASJ_SUPERVISOR_PIDM";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "unitOverdue", true);
+        sql = ReportMgr.getChartSQL(scope, "unitOverdue", true, true);
         expectedSQL = "SELECT count(*), PYVPASJ_SUPERVISOR_PIDM FROM appraisals, PYVPASJ  WHERE" +
                 " appraisals.status not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE " +
                 "in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
@@ -201,7 +201,7 @@ public class ReportsTest {
                 "PYVPASJ_SUPERVISOR_PIDM";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "unitWayOverdue", true);
+        sql = ReportMgr.getChartSQL(scope, "unitWayOverdue", true, true);
         expectedSQL = "SELECT count(*), PYVPASJ_SUPERVISOR_PIDM FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND" +
                 " PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm " +
@@ -211,7 +211,7 @@ public class ReportsTest {
                 "PYVPASJ_SUPERVISOR_PIDM";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "stageBreakdown", true);
+        sql = ReportMgr.getChartSQL(scope, "stageBreakdown", true, true);
         expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE " +
                 "appraisals.status not in ('completed', 'archived', 'closed') AND" +
                 " PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm" +
@@ -220,7 +220,7 @@ public class ReportsTest {
                 "ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "stageOverdue", true);
+        sql = ReportMgr.getChartSQL(scope, "stageOverdue", true, true);
         expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE appraisals.status " +
                 "not in ('completed', 'archived', 'closed') AND PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes " +
                 "AND PYVPASJ_PIDM = appraisals.job_pidm AND PYVPASJ_POSN = appraisals.position_number " +
@@ -229,7 +229,7 @@ public class ReportsTest {
                 "GROUP BY status ORDER BY count(*) DESC, status";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "stageWayOverdue", true);
+        sql = ReportMgr.getChartSQL(scope, "stageWayOverdue", true, true);
         expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE" +
                 " appraisals.status not in ('completed', 'archived', 'closed') AND" +
                 " PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm" +
@@ -280,7 +280,7 @@ public class ReportsTest {
     public void shouldProduceSQLForSortedUnitOrStatus() {
         String scope = ReportsAction.SCOPE_ORG_CODE;
 
-        String sql = ReportMgr.getChartSQL(scope, "unitBreakdown", false);
+        String sql = ReportMgr.getChartSQL(scope, "unitBreakdown", false, true);
         String expectedSQL = "SELECT count(*), PYVPASJ_SUPERVISOR_PIDM FROM appraisals, PYVPASJ  " +
                 "WHERE appraisals.status not in ('completed', 'archived', 'closed') AND " +
                 "PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm" +
@@ -289,7 +289,7 @@ public class ReportsTest {
                 "GROUP BY PYVPASJ_SUPERVISOR_PIDM ORDER BY PYVPASJ_SUPERVISOR_PIDM, count(*) DESC";
         assert sql.equals(expectedSQL);
 
-        sql = ReportMgr.getChartSQL(scope, "stageWayOverdue", false);
+        sql = ReportMgr.getChartSQL(scope, "stageWayOverdue", false, true);
         expectedSQL = "SELECT count(*), status FROM appraisals, PYVPASJ  WHERE" +
                 " appraisals.status not in ('completed', 'archived', 'closed') AND" +
                 " PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes AND PYVPASJ_PIDM = appraisals.job_pidm" +
@@ -382,7 +382,7 @@ public class ReportsTest {
         String expectedHQL;
         scope = ReportsAction.DEFAULT_SCOPE;
 
-        hql = ReportMgr.getListHQL(scope, "unitBreakdown");
+        hql = ReportMgr.getListHQL(scope, "unitBreakdown", true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -391,10 +391,10 @@ public class ReportsTest {
                 " and job.appointmentType in :appointmentTypes " +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -403,10 +403,10 @@ public class ReportsTest {
                 " and job.appointmentType in :appointmentTypes  and overdue > 0" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -415,7 +415,7 @@ public class ReportsTest {
                 " and job.appointmentType in :appointmentTypes  and overdue > 30" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
     }
 
@@ -425,7 +425,7 @@ public class ReportsTest {
         String expectedHQL;
         scope = ReportsAction.SCOPE_BC;
 
-        hql = ReportMgr.getListHQL(scope, "unitBreakdown");
+        hql = ReportMgr.getListHQL(scope, "unitBreakdown", true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -435,10 +435,10 @@ public class ReportsTest {
                 " and job.businessCenterName = :bcName" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -448,10 +448,10 @@ public class ReportsTest {
                 " and job.businessCenterName = :bcName and overdue > 0" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -461,7 +461,7 @@ public class ReportsTest {
                 " and job.businessCenterName = :bcName and overdue > 30" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
     }
 
@@ -471,7 +471,7 @@ public class ReportsTest {
         String expectedHQL;
 
 
-        hql = ReportMgr.getListHQL(scope, "unitBreakdown");
+        hql = ReportMgr.getListHQL(scope, "unitBreakdown", true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -481,10 +481,10 @@ public class ReportsTest {
                 " and job.businessCenterName = :bcName and job.orgCodeDescription LIKE :orgPrefix" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -495,10 +495,10 @@ public class ReportsTest {
                 " and overdue > 0" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -509,7 +509,7 @@ public class ReportsTest {
                 " and overdue > 30" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
     }
 
@@ -519,7 +519,7 @@ public class ReportsTest {
         String expectedHQL;
 
 
-        hql = ReportMgr.getListHQL(scope, "unitBreakdown");
+        hql = ReportMgr.getListHQL(scope, "unitBreakdown", true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -529,10 +529,10 @@ public class ReportsTest {
                 " and job.businessCenterName = :bcName and job.tsOrgCode = :tsOrgCode" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -543,10 +543,10 @@ public class ReportsTest {
                 " and overdue > 0" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -557,7 +557,7 @@ public class ReportsTest {
                 " and overdue > 30" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE);
+        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
     }
 

@@ -20,10 +20,11 @@ public class JobMgr {
 
     // The search select, from and where clauses below are used by the find by name and id methods
     public static final String SEARCH_JOB_SELECT = "select pyvpase_id, pyvpasj_pidm, " +
-            "pyvpasj_posn, pyvpasj_suff ";
+            "pyvpasj_posn, pyvpasj_suff, pyvpase_first_name, " +
+            "pyvpase_last_name, pyvpasj_desc ";
     public static final String SEARCH_JOB_FROM = "from pyvpasj, pyvpase ";
-    public static final String SEARCH_JOB_WHERE = "where pyvpase_pidm = pyvpasj_pidm and " +
-            "pyvpasj_status = 'A' ";
+    public static final String SEARCH_JOB_WHERE = "where pyvpase_pidm = pyvpasj_pidm " +
+            "and pyvpasj_status != 'T' ";
 
     /**
      * Traverses up the supervising chain of the given job and if the given pidm matches
@@ -336,19 +337,21 @@ public class JobMgr {
         ArrayList<String> conditions = new ArrayList<String>();
         String where = SEARCH_JOB_WHERE;
 
-        searchTerm = StringUtils.trim(searchTerm);
+        searchTerm = StringUtils.trim(searchTerm).toLowerCase();
         searchTerm = StringUtils.remove(searchTerm, ",");
 
         // if the user entered two words split them up and search by first, last and last, first
         String[] tokens = StringUtils.split(searchTerm, " ");
         if (tokens.length > 1) {
-            conditions.add("(pyvpase_first_name like :token0 and pyvpase_last_name like :token1)");
-            conditions.add("(pyvpase_first_name like :token1 and pyvpase_last_name like :token0)");
+            conditions.add("(lower(pyvpase_first_name) like :token0 " +
+                    "and lower(pyvpase_last_name) like :token1)");
+            conditions.add("(lower(pyvpase_first_name) like :token1 " +
+                    "and lower(pyvpase_last_name) like :token0)");
         } else {
             // we only search by name and first name if only 1 word was entered. otherwise, you get
             // too many results
-            conditions.add("(pyvpase_first_name like :searchTerm or " +
-                "pyvpase_last_name like :searchTerm)");
+            conditions.add("(lower(pyvpase_first_name) like :searchTerm or " +
+                "lower(pyvpase_last_name) like :searchTerm)");
         }
 
         where += "and (" + StringUtils.join(conditions, " or ") + ")";
@@ -418,23 +421,58 @@ public class JobMgr {
 
     /**
      * Helper method used by findHelper. It takes the hibernate query and executes it. Then
-     * it takes the sql results and converts them into a list of jobs.
+     * it takes the sql results and converts them into a list of jobs. Column mappings:
+     *
+     *  row[0] = osuid, row[1] = pidm, row[2] = posn, row[3] = suff, row[4] = first name,
+     *  row[5] = last name, row[6] = job title
      *
      * @param query
      * @return
+     * @throws Exception
      */
-    private static List<Job> convertSearchArrayToJobList(Query query) {
+    private static List<Job> convertSearchArrayToJobList(Query query) throws Exception {
         List<Object[]> result = query.list();
         List<Job> jobs = new ArrayList<Job>();
-        // row[0] = osuid, row[1] = pidm, row[2] = posn, row[3] = suff
+
         for (Object[] row : result) {
             Employee employee = new Employee(Integer.parseInt(row[1].toString()));
             employee.setOsuid(row[0].toString());
-            Job job = new Job(employee, row[2].toString(), row[3].toString());
+            employee.setFirstName(row[4].toString());
+            employee.setLastName(row[5].toString());
 
+            Job job = new Job(employee, row[2].toString(), row[3].toString());
+            job.setJobTitle(row[6].toString());
             jobs.add(job);
         }
+        jobs = addSupervisorToJobs(jobs);
         return jobs;
+    }
+
+    /**
+     * Add supervisors to the jobs from the convertSearchArrayToJobList method. The original
+     * query doesn't add the supervisor information due to performance concerns.
+     *
+     * @param jobs
+     * @return
+     * @throws Exception
+     */
+    private static List<Job> addSupervisorToJobs(List<Job> jobs) throws Exception {
+        List<Job> jobsWithSupervisors = new ArrayList<Job>();
+
+        for (int i = 0; i < jobs.size(); i++) {
+            Job job = jobs.get(i);
+            int pidm = job.getEmployee().getId();
+            Job dbJob = getJob(pidm, job.getPositionNumber(), job.getSuffix());
+            job.setSupervisor(dbJob.getSupervisor());
+
+            // initialize property needed
+            if (job.getSupervisor() != null && job.getSupervisor().getEmployee() != null) {
+                job.getSupervisor().getEmployee().getName();
+            }
+            jobsWithSupervisors.add(job);
+        }
+
+        return jobsWithSupervisors;
     }
 
     /**

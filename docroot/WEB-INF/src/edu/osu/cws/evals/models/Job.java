@@ -537,5 +537,9 @@ public class Job extends Evals implements Serializable {
 
         return job;
     }
+
+    public String getIdKey() {
+        return getEmployee().getId() + "_" + positionNumber + "_" + suffix;
+    }
 }
 

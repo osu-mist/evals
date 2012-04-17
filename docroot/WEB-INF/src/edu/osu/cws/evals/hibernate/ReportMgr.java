@@ -8,6 +8,7 @@ import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.util.Breadcrumb;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -80,9 +81,11 @@ public class ReportMgr {
      * @param scope         The drill down scope: root, bc, orgPrefix, orgCode
      * @param reportType    The type of report to fetch data for
      * @param sortByCount   Whether the data should be sorted by the count first
+     * @param addBC         Whether the bc should be added to where clause
      * @return
      */
-    public static String getChartSQL(String scope, String reportType, boolean sortByCount) {
+    public static String getChartSQL(String scope, String reportType, boolean sortByCount,
+                                     boolean addBC) {
         String col1 = "";
         String select = "";
         String from = " FROM appraisals, PYVPASJ ";
@@ -94,7 +97,7 @@ public class ReportMgr {
         String group = " GROUP BY ";
         String order = " ORDER BY ";
 
-        if (!scope.equals(ReportsAction.DEFAULT_SCOPE)) {
+        if (!scope.equals(ReportsAction.DEFAULT_SCOPE) && addBC) {
             where += " AND PYVPASJ_BCTR_TITLE = :bcName";
         }
         if (reportType.contains(STAGE)) {
@@ -142,7 +145,6 @@ public class ReportMgr {
      * }
      *
      * @param paramMap
-     * @param crumbs            Breadcrumbs
      * @param sortByCount       Whether the data should be sorted by the count first
      * @param directSupervisors A list of jobs of the direct supervisors of the current level
      * @param myTeamAppraisals  A list of appraisals of the employees directly under current
@@ -151,28 +153,26 @@ public class ReportMgr {
      * @param inLeafSupervisor  Whether or not the current supervisor report is lowest level
      * @return
      */
-    public static List<Object[]> getChartData(HashMap paramMap, List<Breadcrumb> crumbs,
+    public static List<Object[]> getChartData(HashMap paramMap,
                                               boolean sortByCount, List<Job> directSupervisors,
                                               ArrayList<Appraisal> myTeamAppraisals,
                                               Job currentSupervisorJob, boolean inLeafSupervisor) {
         Session session = HibernateUtil.getCurrentSession();
 
         String sqlQuery = "";
-        List results = new ArrayList<Object[]>();
+        List results;
         String scope = (String) paramMap.get(ReportsAction.SCOPE);
         String scopeValue = (String) paramMap.get(ReportsAction.SCOPE_VALUE);
         String report = (String) paramMap.get(ReportsAction.REPORT);
-        String bcName = "";
-        if (crumbs.size() > 1) {
-            bcName = crumbs.get(1).getScopeValue();
-        }
+        String bcName = (String) paramMap.get(Constants.BC_NAME);
+        boolean addBC = !StringUtils.isEmpty(bcName);
 
         // Fetch direct supervisors so we can get supervising data
         if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
             sqlQuery = getSupervisorChartSQL(scope, report, sortByCount, directSupervisors.size(),
                     inLeafSupervisor);
         } else {
-            sqlQuery = getChartSQL(scope, report, sortByCount);
+            sqlQuery = getChartSQL(scope, report, sortByCount, addBC);
         }
 
         Query chartQuery = session.createSQLQuery(sqlQuery)
@@ -188,10 +188,13 @@ public class ReportMgr {
                     .setParameter("bcName", bcName)
                     .list();
         } else if (scope.equals(ReportsAction.SCOPE_ORG_CODE)) {
-            results = chartQuery
-                    .setParameter("bcName", bcName)
-                    .setParameter("tsOrgCode", scopeValue)
-                    .list();
+            chartQuery.setParameter("tsOrgCode", scopeValue);
+
+            // only set the bcName if it's not empty. if an admin searches, the bcName is empty
+            if (addBC) {
+                 chartQuery.setParameter("bcName", bcName);
+            }
+            results = chartQuery.list();
         } else if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
             EvalsUtil.setStartWithParameters(directSupervisors, chartQuery);
             results = chartQuery.list();
@@ -495,18 +498,17 @@ public class ReportMgr {
      * Returns the data used for the drill down menu.
      *
      * @param paramMap search/request parameters
-     * @param crumbs list of breadcrumbs
      * @param sortByCount
      * @param directSupervisors
      * @return List of arrays of objects. The objects are strings
      */
-    public static List<Object[]> getDrillDownData(HashMap paramMap, List<Breadcrumb> crumbs,
-                                                  boolean sortByCount, List<Job> directSupervisors,
+    public static List<Object[]> getDrillDownData(HashMap paramMap, boolean sortByCount,
+                                                  List<Job> directSupervisors,
                                                   boolean inLeafSupervisor) {
         HashMap copyParamMap = new HashMap();
         copyParamMap.putAll(paramMap);
         copyParamMap.put(ReportsAction.REPORT, ReportsAction.REPORT_DEFAULT);
-        return getChartData(copyParamMap, crumbs, sortByCount, directSupervisors,
+        return getChartData(copyParamMap, sortByCount, directSupervisors,
                 null, null, inLeafSupervisor);
     }
 
@@ -575,9 +577,10 @@ public class ReportMgr {
      *
      * @param scope
      * @param reportType
+     * @param addBC         Whether the BC should be added to the where clause
      * @return
      */
-    public static String getListHQL(String scope, String reportType) {
+    public static String getListHQL(String scope, String reportType, boolean addBC) {
         String select = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -588,7 +591,7 @@ public class ReportMgr {
 
         //@todo: do we need to do bc filtering when the scope is supervisor?
         if (!scope.equals(ReportsAction.DEFAULT_SCOPE) &&
-                !scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
+                !scope.equals(ReportsAction.SCOPE_SUPERVISOR) && addBC) {
             where += " and job.businessCenterName = :bcName";
         }
 
@@ -632,11 +635,9 @@ public class ReportMgr {
      * Returns the data needed to generate the google charts and nothing more.
      *
      * @param paramMap
-     * @param crumbs
      * @return
      */
-    public static List<Appraisal> getListData(HashMap paramMap, List<Breadcrumb> crumbs,
-                                              List<Job> directSupervisors,
+    public static List<Appraisal> getListData(HashMap paramMap, List<Job> directSupervisors,
                                               boolean inLeafSupervisor) {
         Session session = HibernateUtil.getCurrentSession();
 
@@ -644,12 +645,10 @@ public class ReportMgr {
         String scope = (String) paramMap.get(ReportsAction.SCOPE);
         String scopeValue = (String) paramMap.get(ReportsAction.SCOPE_VALUE);
         String report = (String) paramMap.get(ReportsAction.REPORT);
-        String bcName = "";
-        if (crumbs.size() > 1) {
-            bcName = crumbs.get(1).getScopeValue();
-        }
+        String bcName = (String) paramMap.get(Constants.BC_NAME);
+        boolean addBC = !StringUtils.isEmpty(bcName);
 
-        String hqlQuery = getListHQL(scope, report);
+        String hqlQuery = getListHQL(scope, report, addBC);
         Query listQuery = session.createQuery(hqlQuery)
                 .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES);
 
@@ -663,10 +662,14 @@ public class ReportMgr {
                     .setParameter("bcName", bcName)
                     .list();
         } else if (scope.equals(ReportsAction.SCOPE_ORG_CODE)) {
-            results = (ArrayList<Appraisal>) listQuery
-                    .setParameter("bcName", bcName)
-                    .setParameter("tsOrgCode", scopeValue)
-                    .list();
+            listQuery.setParameter("tsOrgCode", scopeValue);
+
+            // only set the bcName if it's not empty. if an admin searches, the bcName is empty
+            if (addBC) {
+                listQuery.setParameter("bcName", bcName);
+            }
+
+            results = (ArrayList<Appraisal>) listQuery.list();
         } else if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
             List<Integer> appraisalIds = getAppraisalIdsForSupervisorReport(directSupervisors,
                     inLeafSupervisor);
