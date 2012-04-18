@@ -136,7 +136,7 @@ public class ReportsAction implements ActionInterface {
         String searchTerm = getSearchTerm();
 
         if (!searchTerm.equals("")) {
-            displaySearchResults= search(searchTerm, request);
+            displaySearchResults = search(searchTerm, request);
         }
 
         setIsMyReport(request);
@@ -223,7 +223,6 @@ public class ReportsAction implements ActionInterface {
             // breadcrumb and drill down data
             String nextScope = nextScopeInDrillDown(scope);
             actionHelper.addToRequestMap("nextScope", nextScope);
-            actionHelper.addToRequestMap("requestBreadcrumbs", getRequestBreadcrumbs());
 
             boolean allowAllDrillDown = false;
             if (actionHelper.isLoggedInUserAdmin(request)) {
@@ -254,6 +253,8 @@ public class ReportsAction implements ActionInterface {
         }
 
         actionHelper.addToRequestMap("breadcrumbList", breadcrumbList);
+        actionHelper.addToRequestMap("requestBreadcrumbs", getRequestBreadcrumbs());
+
         actionHelper.addToRequestMap("showDrillDownMenu", showDrillDownMenu);
         actionHelper.addToRequestMap("searchView", displaySearchResultsPage);
 
@@ -487,7 +488,8 @@ public class ReportsAction implements ActionInterface {
      */
     private boolean isSearch() {
         String searchTerm = getSearchTerm();
-        return !StringUtils.isEmpty(searchTerm);
+        return !StringUtils.isEmpty(searchTerm) && searchResults != null
+                && !searchResults.isEmpty();
     }
 
     private String getChartType(PortletRequest request) {

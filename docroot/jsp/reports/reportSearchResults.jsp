@@ -16,6 +16,7 @@
             <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
                     <portlet:param name="action" value="report"/>
                     <portlet:param name="controller" value="ReportsAction"/>
+                    <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}" />
                     <portlet:param name="<%= ReportsAction.SCOPE %>" value="<%= ReportsAction.SCOPE_SUPERVISOR %>"/>
                     <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${job.idKey}"/>
                     </portlet:actionURL>">${job.employee.name}</a></td>
