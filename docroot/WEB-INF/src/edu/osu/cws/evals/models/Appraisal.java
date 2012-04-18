@@ -319,7 +319,7 @@ public class Appraisal extends Evals {
     }
 
     /**
-     * Constructor used by ReportMgr.getListHQL. It only fetches the data that it needs. The
+     * Constructor used by ReportMgr.getReportListHQL. It only fetches the data that it needs. The
      * employee.id and job's pidm, posno and suffix are dummy data since they are only needed
      * to construct the object.
      *

@@ -572,53 +572,12 @@ public class ReportMgr {
     }
 
     /**
-     * Returns the hql needed to display the list of evaluation records in the reports.
-     * The data is sorted by lastName, firstName
-     *
-     * @param scope
-     * @param reportType
-     * @param addBC         Whether the BC should be added to the where clause
-     * @return
-     */
-    public static String getListHQL(String scope, String reportType, boolean addBC) {
-        String select = "select new edu.osu.cws.evals.models.Appraisal (" +
-                "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
-                " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
-                " from edu.osu.cws.evals.models.Appraisal ";
-        String where = " where status not in ('completed', 'archived', 'closed') " +
-                " and job.appointmentType in :appointmentTypes ";
-        String order = " order by job.employee.lastName, job.employee.firstName";
-
-        //@todo: do we need to do bc filtering when the scope is supervisor?
-        if (!scope.equals(ReportsAction.DEFAULT_SCOPE) &&
-                !scope.equals(ReportsAction.SCOPE_SUPERVISOR) && addBC) {
-            where += " and job.businessCenterName = :bcName";
-        }
-
-        if (scope.equals(ReportsAction.SCOPE_ORG_PREFIX)) {
-            where += " and job.orgCodeDescription LIKE :orgPrefix";
-        } else if (scope.equals(ReportsAction.SCOPE_ORG_CODE)) {
-            where += " and job.tsOrgCode = :tsOrgCode";
-        } else if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
-            where += " and id in (:appraisalIds)";
-        }
-
-        if (isWayOverdueReport(reportType)) {
-            where += " and overdue > 30";
-        } else if (isOverdueReport(reportType)) {
-            where += " and overdue > 0";
-        }
-
-        return select + where + order;
-    }
-
-    /**
      * If the report is overdue by unit or stage
      *
      * @param reportType
      * @return
      */
-    private static boolean isOverdueReport(String reportType) {
+    public static boolean isOverdueReport(String reportType) {
         return reportType.contains("Overdue");
     }
 
@@ -627,105 +586,7 @@ public class ReportMgr {
      * @param reportType
      * @return
      */
-    private static boolean isWayOverdueReport(String reportType) {
+    public static boolean isWayOverdueReport(String reportType) {
         return reportType.contains("WayOverdue");
-    }
-
-    /**
-     * Returns the data needed to generate the google charts and nothing more.
-     *
-     * @param paramMap
-     * @return
-     */
-    public static List<Appraisal> getListData(HashMap paramMap, List<Job> directSupervisors,
-                                              boolean inLeafSupervisor) {
-        Session session = HibernateUtil.getCurrentSession();
-
-        List<Appraisal> results = new ArrayList<Appraisal>();
-        String scope = (String) paramMap.get(ReportsAction.SCOPE);
-        String scopeValue = (String) paramMap.get(ReportsAction.SCOPE_VALUE);
-        String report = (String) paramMap.get(ReportsAction.REPORT);
-        String bcName = (String) paramMap.get(Constants.BC_NAME);
-        boolean addBC = !StringUtils.isEmpty(bcName);
-
-        String hqlQuery = getListHQL(scope, report, addBC);
-        Query listQuery = session.createQuery(hqlQuery)
-                .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES);
-
-        if (scope.equals(ReportsAction.SCOPE_BC)) {
-            results = (ArrayList<Appraisal>) listQuery
-                    .setParameter("bcName", scopeValue)
-                    .list();
-        } else if (scope.equals(ReportsAction.SCOPE_ORG_PREFIX)) {
-            results = (ArrayList<Appraisal>) listQuery
-                    .setParameter("orgPrefix", scopeValue + "%")
-                    .setParameter("bcName", bcName)
-                    .list();
-        } else if (scope.equals(ReportsAction.SCOPE_ORG_CODE)) {
-            listQuery.setParameter("tsOrgCode", scopeValue);
-
-            // only set the bcName if it's not empty. if an admin searches, the bcName is empty
-            if (addBC) {
-                listQuery.setParameter("bcName", bcName);
-            }
-
-            results = (ArrayList<Appraisal>) listQuery.list();
-        } else if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
-            List<Integer> appraisalIds = getAppraisalIdsForSupervisorReport(directSupervisors,
-                    inLeafSupervisor);
-
-            if (!appraisalIds.isEmpty()) {
-                results = (ArrayList<Appraisal>) listQuery
-                        .setParameterList("appraisalIds", appraisalIds)
-                        .list();
-            }
-        } else {
-            results = (ArrayList<Appraisal>) listQuery
-                    .list();
-        }
-
-        return results;
-    }
-
-    /**
-     * Returns the list of all the appraisals that match the current supervising chain all the
-     * way down to the leaf.
-     *
-     * @param directSupervisors
-     * @return
-     */
-    public static List<Integer> getAppraisalIdsForSupervisorReport(List<Job> directSupervisors,
-                                                                   boolean inLeafSupervisor) {
-        if (directSupervisors == null) {
-            return null;
-        }
-
-        Session session = HibernateUtil.getCurrentSession();
-        List<Integer> ids = new ArrayList<Integer>();
-
-        String select = "SELECT appraisals.id FROM pyvpasj " +
-                "LEFT JOIN appraisals ON (appraisals.job_pidm = pyvpasj_pidm AND " +
-                "appraisals.position_number = pyvpasj_posn AND " +
-                "appraisals.job_suffix = pyvpasj_suff) ";
-        String where = "WHERE pyvpasj_status = 'A' " +
-                "AND PYVPASJ_APPOINTMENT_TYPE in (:appointmentTypes) " +
-                "and appraisals.status not in ('completed', 'archived', 'closed')";
-        String startWith = EvalsUtil.getStartWithClause(directSupervisors.size());
-
-        if (!inLeafSupervisor) {
-            where += " AND level > 1 ";
-        }
-        String sql = select + where + startWith + Constants.CONNECT_BY;
-
-        Query query = session.createSQLQuery(sql)
-                .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES);
-        EvalsUtil.setStartWithParameters(directSupervisors, query);
-        List<BigDecimal> result = query.list();
-
-        for (BigDecimal id : result) {
-            ids.add(Integer.parseInt(id.toString()));
-        }
-
-        return ids;
     }
 }

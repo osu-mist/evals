@@ -117,6 +117,12 @@ public class ReportsAction implements ActionInterface {
      */
     private boolean isMyReport = false;
 
+    /**
+     * Whether or not the current page we're viewing is the appraisal search. Meaning
+     * listing the appraisals for a single employee.
+     */
+    private boolean isAppraisalSearch = false;
+
     Gson gson = new Gson();
 
     /**
@@ -166,22 +172,19 @@ public class ReportsAction implements ActionInterface {
             }
 
 
-            // Check if we are viewing a supervisor report of a mere employee - display appraisal list
+            // Check if we are viewing a supervisor report of a mere employee
+            boolean displayAppraisalSearchList = false;
             if (getScope().equals(SCOPE_SUPERVISOR)) {
                 String posno = currentSupervisorJob.getPositionNumber();
                 int pidm = currentSupervisorJob.getEmployee().getId();
-                if (!JobMgr.isSupervisor(pidm, posno)) {
-                    AppraisalsAction appraisalsAction = new AppraisalsAction();
-                    appraisalsAction.setActionHelper(actionHelper);
-                    appraisalsAction.setHomeAction(homeAction);
-
-                    return appraisalsAction.search(request, response);
-                }
+                displayAppraisalSearchList = !JobMgr.isSupervisor(pidm, posno);
             }
 
-
-
-            jspFile = activeReport();
+            if (displayAppraisalSearchList) { // display appraisal list of single employee
+                jspFile = activeAppraisalList();
+            } else {
+                jspFile = activeReport();
+            }
         }
         setupDataForJSP(request);
         actionHelper.useMaximizedMenu(request);
@@ -199,7 +202,10 @@ public class ReportsAction implements ActionInterface {
         String searchTerm = getSearchTerm();
         boolean displaySearchResultsPage = displaySearchResultsPage();
 
-        if (!displaySearchResultsPage) {
+        if (isAppraisalSearch) { // display search result of employee appraisals
+            actionHelper.addToRequestMap("listAppraisals", listAppraisals);
+            actionHelper.addToRequestMap("isAppraisalSearch", isAppraisalSearch);
+        } else if (!displaySearchResultsPage) { // regular active report
             // chart related data
             actionHelper.addToRequestMap("chartData", chartData);
             actionHelper.addToRequestMap("tableData", tableData);
@@ -236,7 +242,6 @@ public class ReportsAction implements ActionInterface {
                 reviewerBCName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
             }
             actionHelper.addToRequestMap("reviewerBCName", reviewerBCName);
-            actionHelper.addToRequestMap("now", new Date());
 
             showDrillDownMenu = showDrillDownMenu(allowAllDrillDown, reviewerBCName);
 
@@ -246,12 +251,12 @@ public class ReportsAction implements ActionInterface {
                 String currentSupervisorName = currentSupervisorJob.getEmployee().getName();
                 actionHelper.addToRequestMap("currentSupervisorName", currentSupervisorName);
             }
-        } else {
+        } else { // displaying search results - multiple jobs
             actionHelper.addToRequestMap("searchTerm", searchTerm);
             actionHelper.addToRequestMap("searchResults", searchResults);
-            actionHelper.addToRequestMap("jobs", searchResults);
         }
 
+        actionHelper.addToRequestMap("now", new Date());
         actionHelper.addToRequestMap("breadcrumbList", breadcrumbList);
         actionHelper.addToRequestMap("requestBreadcrumbs", getRequestBreadcrumbs());
 
@@ -316,9 +321,23 @@ public class ReportsAction implements ActionInterface {
 
 
         if (shouldListAppraisals()) {
-            listAppraisals = ReportMgr.getListData(paramMap, directEmployees,
+            listAppraisals = AppraisalMgr.getReportListData(paramMap, directEmployees,
                     inLeafSupervisorReport);
         }
+
+        return Constants.JSP_REPORT;
+    }
+
+    /**
+     * Displays just the list of appraisals for a single employee. This is used when the user
+     * searches for a single non-supervisor employee and we display the appraisals of the
+     * search result employee.
+     *
+     * @return
+     */
+    private String activeAppraisalList() {
+        listAppraisals = AppraisalMgr.getEmployeeAppraisalList(searchResults);
+        isAppraisalSearch = true;
 
         return Constants.JSP_REPORT;
     }
@@ -768,6 +787,15 @@ public class ReportsAction implements ActionInterface {
         return gson.toJson(dataScopeMap);
     }
 
+    /**
+     * Returns true, if we have 2 or more search results to display. Otherwise it returns
+     * false.
+     *
+     * @param searchTerm
+     * @param request
+     * @return
+     * @throws Exception
+     */
     private boolean search(String searchTerm, PortletRequest request) throws Exception {
         ResourceBundle resource = (ResourceBundle) actionHelper
                 .getPortletContextAttribute("resourceBundle");

@@ -70,14 +70,19 @@
         <div class="accordion-content chart-content" id="<portlet:namespace/>chartContent" style="display: block;">
             <%@ include file="breadcrumbs.jsp"%>
 
-            <c:if test="${!searchView}">
-                <strong><liferay-ui:message key="report-time-period"/></strong>
-                <liferay-ui:message key="report-time-period-active"/> <fmt:formatDate value="${now}" pattern="MM/dd/yy"/>
+            <strong><liferay-ui:message key="report-time-period"/></strong>
+            <liferay-ui:message key="report-time-period-active"/> <fmt:formatDate value="${now}" pattern="MM/dd/yy"/>
+
+            <c:if test="${!searchView and !isAppraisalSearch}">
                 <div id="<portlet:namespace/>chart-div" class="chart-div"></div>
                 <div id="<portlet:namespace/>chart-data-div"></div>
             </c:if>
             <c:if test="${searchView}">
                 <%@ include file="/jsp/reports/reportSearchResults.jsp"%>
+            </c:if>
+
+            <c:if test="${!empty listAppraisals}">
+                <%@ include file="/jsp/reports/reportList.jsp"%>
             </c:if>
         </div>
     </div>
@@ -154,9 +159,7 @@
 
 <div class="osu-cws-clear-both"></div>
 
-<c:if test="${!searchView}">
-    <%@ include file="/jsp/reports/reportList.jsp"%>
-
+<c:if test="${!searchView and !isAppraisalSearch}">
     <%@ include file="/jsp/reports/reportJs.jsp"%>
 </c:if>
 

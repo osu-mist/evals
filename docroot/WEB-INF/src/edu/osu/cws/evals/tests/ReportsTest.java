@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.tests;
 
+import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.ReportMgr;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Employee;
@@ -382,7 +383,7 @@ public class ReportsTest {
         String expectedHQL;
         scope = ReportsAction.DEFAULT_SCOPE;
 
-        hql = ReportMgr.getListHQL(scope, "unitBreakdown", true);
+        hql = AppraisalMgr.getReportListHQL(scope, "unitBreakdown", true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -391,10 +392,10 @@ public class ReportsTest {
                 " and job.appointmentType in :appointmentTypes " +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -403,10 +404,10 @@ public class ReportsTest {
                 " and job.appointmentType in :appointmentTypes  and overdue > 0" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -415,7 +416,7 @@ public class ReportsTest {
                 " and job.appointmentType in :appointmentTypes  and overdue > 30" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
     }
 
@@ -425,7 +426,7 @@ public class ReportsTest {
         String expectedHQL;
         scope = ReportsAction.SCOPE_BC;
 
-        hql = ReportMgr.getListHQL(scope, "unitBreakdown", true);
+        hql = AppraisalMgr.getReportListHQL(scope, "unitBreakdown", true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -435,10 +436,10 @@ public class ReportsTest {
                 " and job.businessCenterName = :bcName" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -448,10 +449,10 @@ public class ReportsTest {
                 " and job.businessCenterName = :bcName and overdue > 0" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -461,7 +462,7 @@ public class ReportsTest {
                 " and job.businessCenterName = :bcName and overdue > 30" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
     }
 
@@ -471,7 +472,7 @@ public class ReportsTest {
         String expectedHQL;
 
 
-        hql = ReportMgr.getListHQL(scope, "unitBreakdown", true);
+        hql = AppraisalMgr.getReportListHQL(scope, "unitBreakdown", true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -481,10 +482,10 @@ public class ReportsTest {
                 " and job.businessCenterName = :bcName and job.orgCodeDescription LIKE :orgPrefix" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -495,10 +496,10 @@ public class ReportsTest {
                 " and overdue > 0" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -509,7 +510,7 @@ public class ReportsTest {
                 " and overdue > 30" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
     }
 
@@ -519,7 +520,7 @@ public class ReportsTest {
         String expectedHQL;
 
 
-        hql = ReportMgr.getListHQL(scope, "unitBreakdown", true);
+        hql = AppraisalMgr.getReportListHQL(scope, "unitBreakdown", true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -529,10 +530,10 @@ public class ReportsTest {
                 " and job.businessCenterName = :bcName and job.tsOrgCode = :tsOrgCode" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_UNIT_OVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -543,10 +544,10 @@ public class ReportsTest {
                 " and overdue > 0" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_STAGE_OVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
 
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_UNIT_WAYOVERDUE, true);
         expectedHQL = "select new edu.osu.cws.evals.models.Appraisal (" +
                 "id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
                 " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
@@ -557,7 +558,7 @@ public class ReportsTest {
                 " and overdue > 30" +
                 " order by job.employee.lastName, job.employee.firstName";
         assert hql.equals(expectedHQL);
-        hql = ReportMgr.getListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE, true);
+        hql = AppraisalMgr.getReportListHQL(scope, ReportsAction.REPORT_STAGE_WAYOVERDUE, true);
         assert hql.equals(expectedHQL) : "The hql should be the same for report & stage";
     }
 
