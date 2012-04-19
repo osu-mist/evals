@@ -96,7 +96,7 @@
 
     <%@ include file="/jsp/reports/search.jsp"%>
 
-    <c:if test="${!searchView}">
+    <c:if test="${!searchView and !isAppraisalSearch}">
         <div id="<portlet:namespace/>accordionMenuChooseReport" class="accordion-menu">
             <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>ChooseReport');">
                 <img id="<portlet:namespace/>ChooseReportImageToggle" src="/cps/images/accordion/accordion_arrow_up.png"/>
