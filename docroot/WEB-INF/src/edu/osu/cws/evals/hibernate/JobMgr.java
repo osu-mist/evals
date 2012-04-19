@@ -474,15 +474,21 @@ public class JobMgr {
      * @param job
      * @throws Exception
      */
-    public static void addSupervisorToJob(Job job) throws Exception {
-        int pidm = job.getEmployee().getId();
-        Job dbJob = getJob(pidm, job.getPositionNumber(), job.getSuffix());
-        job.setSupervisor(dbJob.getSupervisor());
+    public static Job addSupervisorToJob(Job job) throws Exception {
+        try {
+            int pidm = job.getEmployee().getId();
+            Job dbJob = getJob(pidm, job.getPositionNumber(), job.getSuffix());
+            job.setSupervisor(dbJob.getSupervisor());
 
-        // initialize property needed
-        if (job.getSupervisor() != null && job.getSupervisor().getEmployee() != null) {
-            job.getSupervisor().getEmployee().getName();
+            // initialize property needed
+            if (job.getSupervisor() != null && job.getSupervisor().getEmployee() != null) {
+                job.getSupervisor().getEmployee().getName();
+            }
+        } catch (org.hibernate.ObjectNotFoundException e) { // handle missing job/supervisor
+            job.setSupervisor(null);
         }
+
+        return job;
     }
 
     /**

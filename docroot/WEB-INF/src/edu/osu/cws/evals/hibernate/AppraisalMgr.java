@@ -1217,18 +1217,35 @@ public class AppraisalMgr {
         }
 
         List<Appraisal> temp =  (ArrayList<Appraisal>) query.list();
-
-        // Add supervisor pojo to the appraisal list
-        for (Appraisal appraisal : temp) {
-            Job job = appraisal.getJob();
-            JobMgr.addSupervisorToJob(job);
-            appraisal.setJob(job);
-
-            appraisals.add(appraisal);
-        }
-
+        appraisals = addSupervisorToAppraisals(temp);
 
         return appraisals;
+    }
+
+    /**
+     * Add the supervisor to the list of appraisal pojo. This is so that the jsp is able
+     * to handle with job's not having supervisors.
+     *
+     * @param source
+     * @return
+     * @throws Exception
+     */
+    private static List<Appraisal> addSupervisorToAppraisals(List<Appraisal> source)
+            throws Exception {
+        List<Appraisal> destination = new ArrayList<Appraisal>();
+
+        // Add supervisor pojo to the appraisal list
+        for (Appraisal appraisal : source) {
+            Job job = appraisal.getJob();
+            Job tempJob = JobMgr.addSupervisorToJob(job);
+            appraisal.setJob(tempJob);
+
+            // Copy the appraisal pojo and fields to handle missing employee/job
+            Appraisal nonDbAppraisal = new Appraisal(appraisal);
+            destination.add(nonDbAppraisal);
+        }
+
+        return destination;
     }
 
 
@@ -1255,7 +1272,7 @@ public class AppraisalMgr {
      * @return
      */
     public static List<Appraisal> getReportListData(HashMap paramMap, List<Job> directSupervisors,
-                                                    boolean inLeafSupervisor) {
+                                                    boolean inLeafSupervisor) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
 
         List<Appraisal> results = new ArrayList<Appraisal>();
@@ -1301,7 +1318,7 @@ public class AppraisalMgr {
                     .list();
         }
 
-        return results;
+        return AppraisalMgr.addSupervisorToAppraisals(results);
     }
 
     /**

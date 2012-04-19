@@ -359,6 +359,42 @@ public class Appraisal extends Evals {
         }
     }
 
+    /**
+     * Used to copy an appraisal object. This is used by appraisal search or report list appraisal.
+     * This is done so that the jsp files don't complain about missing employee or job records in
+     * the db.
+     *
+     * @param appraisal
+     */
+    public Appraisal(Appraisal appraisal) {
+        this.id = appraisal.getId();
+        if (appraisal.getStartDate() != null) {
+            setStartDate(appraisal.getStartDate());
+        }
+        if (appraisal.getEndDate() != null) {
+            setEndDate(appraisal.getEndDate());
+        }
+        if (appraisal.getType() != null) {
+            setType(appraisal.getType());
+        }
+        if (appraisal.getEvaluationSubmitDate() != null) {
+            setEvaluationSubmitDate(appraisal.getEvaluationSubmitDate());
+        }
+        if (appraisal.getStatus() != null) {
+            setStatus(appraisal.getStatus());
+        }
+        if (appraisal.getOverdue() != null) {
+            setOverdue(appraisal.getOverdue());
+        }
+        if (appraisal.getStatus() != null) {
+            setStatus(appraisal.getStatus());
+        }
+        if (appraisal.getStatus() != null) {
+            setStatus(appraisal.getStatus());
+        }
+        setJob(appraisal.getJob());
+    }
+
     public boolean validateJob() {
         ArrayList<String> jobErrors = new ArrayList<String>();
 
