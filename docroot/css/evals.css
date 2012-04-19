@@ -346,6 +346,7 @@ tr.ui-state-highlight {
 }
 
 .osu-cws .report-list {
+  margin-top: 1.5em;
   width: 620px;
 }
 
