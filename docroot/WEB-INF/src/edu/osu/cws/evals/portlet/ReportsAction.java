@@ -508,8 +508,11 @@ public class ReportsAction implements ActionInterface {
      */
     private boolean isSearch() {
         String searchTerm = getSearchTerm();
-        return !StringUtils.isEmpty(searchTerm) && searchResults != null
+        boolean isBcSearch = !StringUtils.isEmpty(searchTerm) && getScope().equals(SCOPE_ORG_CODE);
+        boolean isNameSearch = !StringUtils.isEmpty(searchTerm) && searchResults != null
                 && !searchResults.isEmpty();
+
+        return isBcSearch || isNameSearch;
     }
 
     private String getChartType(PortletRequest request) {

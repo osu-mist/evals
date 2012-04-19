@@ -1186,7 +1186,7 @@ public class AppraisalMgr {
             throws Exception {
         // The list of jobs contains the pidm, posno and suff that match the search criteria and
         // the permission level of the logged in user.
-        if (jobs.isEmpty()) {
+        if (jobs == null || jobs.isEmpty()) {
             return new ArrayList<Appraisal>();
         }
 
