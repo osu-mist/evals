@@ -252,11 +252,11 @@ public class ReportsAction implements ActionInterface {
                 actionHelper.addToRequestMap("currentSupervisorName", currentSupervisorName);
             }
         } else { // displaying search results - multiple jobs
-            actionHelper.addToRequestMap("searchTerm", searchTerm);
             actionHelper.addToRequestMap("searchResults", searchResults);
         }
 
         actionHelper.addToRequestMap("now", new Date());
+        actionHelper.addToRequestMap("searchTerm", searchTerm);
         actionHelper.addToRequestMap("breadcrumbList", breadcrumbList);
         actionHelper.addToRequestMap("requestBreadcrumbs", getRequestBreadcrumbs());
 
@@ -334,8 +334,9 @@ public class ReportsAction implements ActionInterface {
      * search result employee.
      *
      * @return
+     * @throws Exception
      */
-    private String activeAppraisalList() {
+    private String activeAppraisalList() throws Exception {
         listAppraisals = AppraisalMgr.getEmployeeAppraisalList(searchResults);
         isAppraisalSearch = true;
 

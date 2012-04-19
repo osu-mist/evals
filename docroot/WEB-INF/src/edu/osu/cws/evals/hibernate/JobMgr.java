@@ -459,20 +459,30 @@ public class JobMgr {
     private static List<Job> addSupervisorToJobs(List<Job> jobs) throws Exception {
         List<Job> jobsWithSupervisors = new ArrayList<Job>();
 
-        for (int i = 0; i < jobs.size(); i++) {
-            Job job = jobs.get(i);
-            int pidm = job.getEmployee().getId();
-            Job dbJob = getJob(pidm, job.getPositionNumber(), job.getSuffix());
-            job.setSupervisor(dbJob.getSupervisor());
-
-            // initialize property needed
-            if (job.getSupervisor() != null && job.getSupervisor().getEmployee() != null) {
-                job.getSupervisor().getEmployee().getName();
-            }
+        for (Job job : jobs) {
+            addSupervisorToJob(job);
             jobsWithSupervisors.add(job);
         }
 
         return jobsWithSupervisors;
+    }
+
+    /**
+     * Loads the supervisor pojo for the given job. This helps when we have queries that
+     * don't include the supervisor due to performance issues.
+     *
+     * @param job
+     * @throws Exception
+     */
+    public static void addSupervisorToJob(Job job) throws Exception {
+        int pidm = job.getEmployee().getId();
+        Job dbJob = getJob(pidm, job.getPositionNumber(), job.getSuffix());
+        job.setSupervisor(dbJob.getSupervisor());
+
+        // initialize property needed
+        if (job.getSupervisor() != null && job.getSupervisor().getEmployee() != null) {
+            job.getSupervisor().getEmployee().getName();
+        }
     }
 
     /**

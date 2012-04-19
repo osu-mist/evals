@@ -1180,8 +1180,10 @@ public class AppraisalMgr {
      * @param jobs
      * @param hql
      * @return
+     * @throws Exception
      */
-    private static List<Appraisal> getAppraisalsByJobs(List<Job> jobs, String hql) {
+    private static List<Appraisal> getAppraisalsByJobs(List<Job> jobs, String hql)
+            throws Exception {
         // The list of jobs contains the pidm, posno and suff that match the search criteria and
         // the permission level of the logged in user.
         if (jobs.isEmpty()) {
@@ -1190,7 +1192,8 @@ public class AppraisalMgr {
 
         Session session = HibernateUtil.getCurrentSession();
 
-        List<Appraisal> appraisals;ArrayList<String> conditions = new ArrayList<String>();
+        List<Appraisal> appraisals = new ArrayList<Appraisal>();
+        ArrayList<String> conditions = new ArrayList<String>();
         for (int i = 0; i < jobs.size(); i++) {
             String cond = "(job.employee.id = :pidm" + i + " and job.positionNumber = :posno" + i +
                     " and job.suffix = :suff"+i+")";
@@ -1213,7 +1216,18 @@ public class AppraisalMgr {
             i++;
         }
 
-        appraisals =  (ArrayList<Appraisal>) query.list();
+        List<Appraisal> temp =  (ArrayList<Appraisal>) query.list();
+
+        // Add supervisor pojo to the appraisal list
+        for (Appraisal appraisal : temp) {
+            Job job = appraisal.getJob();
+            JobMgr.addSupervisorToJob(job);
+            appraisal.setJob(job);
+
+            appraisals.add(appraisal);
+        }
+
+
         return appraisals;
     }
 
@@ -1225,7 +1239,7 @@ public class AppraisalMgr {
      * @param jobs
      * @return
      */
-    public static List<Appraisal> getEmployeeAppraisalList(List<Job> jobs) {
+    public static List<Appraisal> getEmployeeAppraisalList(List<Job> jobs) throws Exception {
         String hql = REPORT_LIST_SELECT + REPORT_LIST_WHERE;
 
         return getAppraisalsByJobs(jobs, hql);

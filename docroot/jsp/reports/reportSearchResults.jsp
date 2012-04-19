@@ -1,5 +1,4 @@
 <c:if test="${!empty searchResults}">
-    <h3><liferay-ui:message key="report-search-results-title"/> <c:out value="${searchTerm}"/></h3>
     <table class="taglib-search-iterator">
         <thead>
             <tr class="portlet-section-header results-header">

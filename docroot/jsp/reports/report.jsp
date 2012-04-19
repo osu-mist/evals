@@ -77,6 +77,10 @@
                 <div id="<portlet:namespace/>chart-div" class="chart-div"></div>
                 <div id="<portlet:namespace/>chart-data-div"></div>
             </c:if>
+
+            <c:if test="${searchView or isAppraisalSearch}">
+                <h3><liferay-ui:message key="report-search-results-title"/> <c:out value="${searchTerm}"/></h3>
+            </c:if>
             <c:if test="${searchView}">
                 <%@ include file="/jsp/reports/reportSearchResults.jsp"%>
             </c:if>

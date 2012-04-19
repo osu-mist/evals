@@ -10,6 +10,7 @@
                   <tr class="portlet-section-header results-header">
                       <th><liferay-ui:message key="employee"/></th>
                       <th><liferay-ui:message key="reviewPeriod"/></th>
+                      <th><liferay-ui:message key="supervisor"/></th>
                       <th><liferay-ui:message key="overdue"/></th>
                       <th><liferay-ui:message key="status"/></th>
                   </tr>
@@ -20,6 +21,7 @@
                           'portlet-section-alternate results-row alt'}">
                       <td><c:out value="${appraisal.job.employee.name}"/></td>
                       <td><c:out value="${appraisal.reviewPeriod}"/></td>
+                      <td><c:out value="${appraisal.job.supervisor.employee.name}"/></td>
                       <td><c:out value="${appraisal.viewOverdue}"/></td>
                       <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
                                       <portlet:param name="id" value="${appraisal.id}"/>
