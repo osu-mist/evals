@@ -181,7 +181,7 @@ public class ReportsAction implements ActionInterface {
             }
 
             if (displayAppraisalSearchList) { // display appraisal list of single employee
-                jspFile = activeAppraisalList();
+                jspFile = activeAppraisalList(request);
             } else {
                 jspFile = activeReport();
             }
@@ -331,13 +331,23 @@ public class ReportsAction implements ActionInterface {
     /**
      * Displays just the list of appraisals for a single employee. This is used when the user
      * searches for a single non-supervisor employee and we display the appraisals of the
-     * search result employee.
+     * search result employee. If the employee doesn't have any appraisals, we show an error
+     * message to the user telling them about this.
      *
      * @return
      * @throws Exception
      */
-    private String activeAppraisalList() throws Exception {
+    private String activeAppraisalList(PortletRequest request) throws Exception {
         listAppraisals = AppraisalMgr.getEmployeeAppraisalList(searchResults);
+
+        // Check if the user had no evaluation records
+        if (listAppraisals == null || listAppraisals.isEmpty()) {
+            ResourceBundle resource = (ResourceBundle) actionHelper
+                    .getPortletContextAttribute("resourceBundle");
+
+            String errorMsg = resource.getString("report-search-no-results-no-evals");
+            actionHelper.addErrorsToRequest(request, errorMsg);
+        }
         isAppraisalSearch = true;
 
         return Constants.JSP_REPORT;
