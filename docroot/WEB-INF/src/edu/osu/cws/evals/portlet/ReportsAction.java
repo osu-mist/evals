@@ -338,6 +338,7 @@ public class ReportsAction implements ActionInterface {
      * @throws Exception
      */
     private String activeAppraisalList(PortletRequest request) throws Exception {
+        isAppraisalSearch = true;
         listAppraisals = AppraisalMgr.getEmployeeAppraisalList(searchResults);
 
         // Check if the user had no evaluation records
@@ -348,7 +349,12 @@ public class ReportsAction implements ActionInterface {
             String errorMsg = resource.getString("report-search-no-results-no-evals");
             actionHelper.addErrorsToRequest(request, errorMsg);
         }
-        isAppraisalSearch = true;
+
+        // when showing the evaluation list after clicking on a search result, set the searchTerm
+        if (getSearchTerm().equals("")) {
+            Breadcrumb lastBreadcrumb = breadcrumbList.get(breadcrumbList.size() - 1);
+            paramMap.put(SEARCH_TERM, lastBreadcrumb.getAnchorText());
+        }
 
         return Constants.JSP_REPORT;
     }
