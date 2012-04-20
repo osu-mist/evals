@@ -25,6 +25,8 @@ public class JobMgr {
     public static final String SEARCH_JOB_FROM = "from pyvpasj, pyvpase ";
     public static final String SEARCH_JOB_WHERE = "where pyvpase_pidm = pyvpasj_pidm " +
             "and pyvpasj_status != 'T' ";
+    public static final String SEARCH_JOB_ORDER_BY = " order by pyvpase_last_name, " +
+            "pyvpase_first_name ";
     public static final String SEARCH_TOO_MANY_RESULTS = "Your search returned too many results. " +
             "Pleae refine your search.";
 
@@ -357,7 +359,7 @@ public class JobMgr {
         }
 
         where += "and (" + StringUtils.join(conditions, " or ") + ")";
-        String sql = SEARCH_JOB_SELECT + SEARCH_JOB_FROM + where;
+        String sql = SEARCH_JOB_SELECT + SEARCH_JOB_FROM + where + SEARCH_JOB_ORDER_BY;
 
         return findHelper(searchTerm, bcName, supervisorPidm, sql, tokens, false);
     }
