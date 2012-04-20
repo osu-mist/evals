@@ -55,4 +55,6 @@ public class Constants {
     public static final Integer MAX_ORG_CODE_DIGITS = 6;
 
     public static final String BC_NAME = "bcName";
+
+    public static final Integer SEARCH_MAX_RESULTS = 20;
 }

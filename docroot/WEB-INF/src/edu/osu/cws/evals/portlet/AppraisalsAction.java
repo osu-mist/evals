@@ -83,16 +83,21 @@ public class AppraisalsAction implements ActionInterface {
                 bcName = actionHelper.getReviewer(pidm).getBusinessCenterName();
             }
             AppraisalMgr appraisalMgr = new AppraisalMgr();
-            appraisals = appraisalMgr.search(searchTerm, pidm, isAdmin, isSupervisor, bcName);
 
-            if (appraisals.isEmpty()) {
-                if (isAdmin) {
-                    actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-no-results-admin"));
-                } else if (isReviewer) {
-                    actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-no-results-reviewer"));
-                } else {
-                    actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-no-results-supervisor"));
+            try {
+                appraisals = appraisalMgr.search(searchTerm, pidm, isAdmin, isSupervisor, bcName);
+
+                if (appraisals.isEmpty()) {
+                    if (isAdmin) {
+                        actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-no-results-admin"));
+                    } else if (isReviewer) {
+                        actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-no-results-reviewer"));
+                    } else {
+                        actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-no-results-supervisor"));
+                    }
                 }
+            } catch (ModelException e) {
+                actionHelper.addErrorsToRequest(request, e.getMessage());
             }
         }
 

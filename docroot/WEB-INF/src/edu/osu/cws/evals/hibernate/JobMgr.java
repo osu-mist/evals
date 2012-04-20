@@ -25,6 +25,8 @@ public class JobMgr {
     public static final String SEARCH_JOB_FROM = "from pyvpasj, pyvpase ";
     public static final String SEARCH_JOB_WHERE = "where pyvpase_pidm = pyvpasj_pidm " +
             "and pyvpasj_status != 'T' ";
+    public static final String SEARCH_TOO_MANY_RESULTS = "Your search returned too many results. " +
+            "Pleae refine your search.";
 
     /**
      * Traverses up the supervising chain of the given job and if the given pidm matches
@@ -432,6 +434,12 @@ public class JobMgr {
      */
     private static List<Job> convertSearchArrayToJobList(Query query) throws Exception {
         List<Object[]> result = query.list();
+
+        // If the search is too brad, stop and let the user refine it
+        if (result.size() > Constants.SEARCH_MAX_RESULTS) {
+            throw new ModelException(SEARCH_TOO_MANY_RESULTS);
+        }
+
         List<Job> jobs = new ArrayList<Job>();
 
         for (Object[] row : result) {

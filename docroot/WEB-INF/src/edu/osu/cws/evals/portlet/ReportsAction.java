@@ -6,10 +6,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.ReportMgr;
-import edu.osu.cws.evals.models.Appraisal;
-import edu.osu.cws.evals.models.Configuration;
-import edu.osu.cws.evals.models.Employee;
-import edu.osu.cws.evals.models.Job;
+import edu.osu.cws.evals.models.*;
 import edu.osu.cws.util.Breadcrumb;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.ArrayUtils;
@@ -830,7 +827,9 @@ public class ReportsAction implements ActionInterface {
         String searchType = "";
         String bcName = "";
         String userType = "admin"; // used for no results msg
-        boolean noSearchResults = false;
+        boolean noSearchResults = false; // the user query didn't match any jobs/employee
+        String noSearchResultMsg = ""; // msg to display the user when there were no results
+        boolean tooManyResults = false;
 
         if (actionHelper.isLoggedInUserReviewer(request)) {
             bcName = actionHelper.getBusinessCenterForLoggedInReviewer(request);
@@ -861,32 +860,45 @@ public class ReportsAction implements ActionInterface {
                 supervisorPidm = loggedInUser.getId();
                 userType = "supervisor";
             }
-            searchResults = JobMgr.search(searchTerm, bcName, supervisorPidm);
+
+            try {
+                // search by name/osuid - also does permission checking
+                searchResults = JobMgr.search(searchTerm, bcName, supervisorPidm);
+                int numberOfResults = (searchResults == null)? 0 : searchResults.size();
+
+                // display report, list of results or error msg
+                switch (numberOfResults) {
+                    case 0: // no search results found
+                        noSearchResults = true;
+                        break;
+                    case 1:
+                        int pidm = searchResults.get(0).getEmployee().getId();
+                        String positionNumber = searchResults.get(0).getPositionNumber();
+                        String suffix = searchResults.get(0).getSuffix();
+                        currentSupervisorJob = JobMgr.getJob(pidm, positionNumber, suffix);
+                        String scopeValue = currentSupervisorJob.getIdKey();
+
+                        paramMap.put(SCOPE, SCOPE_SUPERVISOR);
+                        paramMap.put(SCOPE_VALUE, scopeValue.toString());
+                        return false;
+                    default:
+                        return true;
+                }
 
 
-            int numberOfResults = (searchResults == null)? 0 : searchResults.size();
-            switch (numberOfResults) {
-                case 0: // no search results found
-                    noSearchResults = true;
-                    break;
-                case 1:
-                    int pidm = searchResults.get(0).getEmployee().getId();
-                    String positionNumber = searchResults.get(0).getPositionNumber();
-                    String suffix = searchResults.get(0).getSuffix();
-                    currentSupervisorJob = JobMgr.getJob(pidm, positionNumber, suffix);
-                    String scopeValue = currentSupervisorJob.getIdKey();
-
-                    paramMap.put(SCOPE, SCOPE_SUPERVISOR);
-                    paramMap.put(SCOPE_VALUE, scopeValue.toString());
-                    return false;
-                default:
-                    return true;
+                if (noSearchResults) {
+                    noSearchResult += searchType + "-" + userType;
+                    noSearchResultMsg = resource.getString(noSearchResult);
+                }
+            } catch (ModelException e) {
+                tooManyResults = true;
+                noSearchResultMsg = e.getMessage();
             }
         }
 
-        if (noSearchResults) {
-            noSearchResult += searchType + "-" + userType;
-            actionHelper.addErrorsToRequest(request, resource.getString(noSearchResult));
+        // Set a message if there were no results or too many
+        if (noSearchResults || tooManyResults) {
+            actionHelper.addErrorsToRequest(request, noSearchResultMsg);
         }
 
         return false;
