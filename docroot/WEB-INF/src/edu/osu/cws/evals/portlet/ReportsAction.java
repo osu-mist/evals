@@ -76,7 +76,7 @@ public class ReportsAction implements ActionInterface {
 
     private List<Appraisal> listAppraisals;
     private List<Object[]> tableData;
-    private List<Job> searchResults;
+    private List<Job> searchResults = new ArrayList<Job>();
 
     /**
      * Format:
@@ -181,6 +181,7 @@ public class ReportsAction implements ActionInterface {
             }
 
             if (displayAppraisalSearchList) { // display appraisal list of single employee
+                searchResults.add(currentSupervisorJob); // add single employee as the result
                 jspFile = activeAppraisalList(request);
             } else {
                 jspFile = activeReport();
@@ -334,6 +335,7 @@ public class ReportsAction implements ActionInterface {
      * search result employee. If the employee doesn't have any appraisals, we show an error
      * message to the user telling them about this.
      *
+     * @param request
      * @return
      * @throws Exception
      */

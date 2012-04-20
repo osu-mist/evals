@@ -1167,10 +1167,9 @@ public class AppraisalMgr {
             "job.employee.id, job.employee.lastName, job.employee.firstName, " +
             "evaluationSubmitDate, status, job.businessCenterName, " +
             "job.orgCodeDescription, job.suffix, overdue) from " +
-            "edu.osu.cws.evals.models.Appraisal " +
-            "where ";
+            "edu.osu.cws.evals.models.Appraisal ";
 
-        return getAppraisalsByJobs(jobs, hql);
+        return getAppraisalsByJobs(jobs, hql, null);
     }
 
     /**
@@ -1179,10 +1178,12 @@ public class AppraisalMgr {
      *
      * @param jobs
      * @param hql
+     * @param conditions
      * @return
      * @throws Exception
      */
-    private static List<Appraisal> getAppraisalsByJobs(List<Job> jobs, String hql)
+    private static List<Appraisal> getAppraisalsByJobs(List<Job> jobs, String hql,
+                                                       List<String> conditions)
             throws Exception {
         // The list of jobs contains the pidm, posno and suff that match the search criteria and
         // the permission level of the logged in user.
@@ -1191,34 +1192,41 @@ public class AppraisalMgr {
         }
 
         Session session = HibernateUtil.getCurrentSession();
-
         List<Appraisal> appraisals = new ArrayList<Appraisal>();
-        ArrayList<String> conditions = new ArrayList<String>();
+        if (conditions == null) {
+            conditions = new ArrayList<String>();
+        }
+
+        List<String> jobConditions = new ArrayList<String>();
         for (int i = 0; i < jobs.size(); i++) {
             String cond = "(job.employee.id = :pidm" + i + " and job.positionNumber = :posno" + i +
                     " and job.suffix = :suff"+i+")";
-            conditions.add(cond);
-            i++;
+            jobConditions.add(cond);
         }
 
         // add the job pidm, posno and suffix to the hql query to only get the appraisals we need.
+        if (!jobConditions.isEmpty()) {
+            String jobJoinClause = StringUtils.join(jobConditions, " or ");
+            conditions.add(jobJoinClause);
+        }
+
         if (!conditions.isEmpty()) {
-            hql += "and " + StringUtils.join(conditions, " or ") + " ";
+            hql += " where " + StringUtils.join(conditions, " and ") + " ";
         }
 
         hql += LIST_ORDER;
         Query query = session.createQuery(hql);
-        int i = 0;
-        for (Job job : jobs) {
+
+        for (int i = 0; i < jobs.size(); i++) {
+            Job job = jobs.get(i);
             query.setInteger("pidm"+i, job.getEmployee().getId())
                     .setString("posno"+i, job.getPositionNumber())
                     .setString("suff"+i, job.getSuffix());
-            i++;
         }
 
         List<Appraisal> temp =  (ArrayList<Appraisal>) query.list();
-        appraisals = addSupervisorToAppraisals(temp);
 
+        appraisals = addSupervisorToAppraisals(temp);
         return appraisals;
     }
 
@@ -1257,9 +1265,11 @@ public class AppraisalMgr {
      * @return
      */
     public static List<Appraisal> getEmployeeAppraisalList(List<Job> jobs) throws Exception {
-        String hql = REPORT_LIST_SELECT + REPORT_LIST_WHERE;
+        ArrayList<String> conditions = new ArrayList<String>();
+        String hql = REPORT_LIST_SELECT;
+        conditions.add("status not in ('completed', 'archived', 'closed')");
 
-        return getAppraisalsByJobs(jobs, hql);
+        return getAppraisalsByJobs(jobs, hql, conditions);
     }
 
 

@@ -483,6 +483,7 @@ public class JobMgr {
             // initialize property needed
             if (job.getSupervisor() != null && job.getSupervisor().getEmployee() != null) {
                 job.getSupervisor().getEmployee().getName();
+                job.getSupervisor().getIdKey();
             }
         } catch (org.hibernate.ObjectNotFoundException e) { // handle missing job/supervisor
             job.setSupervisor(null);

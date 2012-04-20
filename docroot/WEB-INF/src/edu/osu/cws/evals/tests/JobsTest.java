@@ -1,10 +1,8 @@
 package edu.osu.cws.evals.tests;
 
+import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
-import edu.osu.cws.evals.models.AppointmentType;
-import edu.osu.cws.evals.models.Employee;
-import edu.osu.cws.evals.models.Job;
-import edu.osu.cws.evals.models.ModelException;
+import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -12,6 +10,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
