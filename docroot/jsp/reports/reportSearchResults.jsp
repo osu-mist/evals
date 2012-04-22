@@ -18,6 +18,7 @@
                     <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}" />
                     <portlet:param name="<%= ReportsAction.SCOPE %>" value="<%= ReportsAction.SCOPE_SUPERVISOR %>"/>
                     <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${job.idKey}"/>
+                    <portlet:param name="requestBreadcrumbs" value="${breadcrumbsWithRootOnly}" />
                     </portlet:actionURL>">${job.employee.name}</a></td>
             <td>${job.jobTitle}</td>
             <td>${job.supervisor.employee.name}</td>

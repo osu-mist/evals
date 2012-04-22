@@ -122,6 +122,8 @@ public class ReportsAction implements ActionInterface {
 
     Gson gson = new Gson();
 
+    private Breadcrumb rootBreadcrumb = new Breadcrumb("OSU", DEFAULT_SCOPE, DEFAULT_SCOPE_VALUE);
+
     /**
      * Main method used in this class. It responds to the user request when the user is viewing
      * any kind of report.
@@ -271,6 +273,12 @@ public class ReportsAction implements ActionInterface {
 
         // My Report data
         showMyReportLink(request);
+
+        // list of breadcrumbs used when the request only needs OSU as the breadcrumbs
+        List<Breadcrumb> crumbListWithRootOnly = new ArrayList<Breadcrumb>();
+        crumbListWithRootOnly.add(rootBreadcrumb);
+        String breadcrumbsWithRootOnly = gson.toJson(crumbListWithRootOnly);
+        actionHelper.addToRequestMap("breadcrumbsWithRootOnly", breadcrumbsWithRootOnly);
     }
 
     private String nextScopeInDrillDown(String currentScope) {
@@ -416,14 +424,12 @@ public class ReportsAction implements ActionInterface {
         String requestBreadcrumbs = ParamUtil.getString(request, "requestBreadcrumbs");
         List<Breadcrumb> reqCrumbsList;
 
-        // We use the breadcrumbs from request only if we're not searching or in my report
-        if (!isSearch(request) && !isMyReport) {
-            Type collectionType = new TypeToken<Collection<Breadcrumb>>(){}.getType();
-            reqCrumbsList = gson.fromJson(requestBreadcrumbs, collectionType);
 
-            if (reqCrumbsList != null && !reqCrumbsList.isEmpty()) {
-                return getBreadcrumbs(reqCrumbsList, request);
-            }
+        Type collectionType = new TypeToken<Collection<Breadcrumb>>(){}.getType();
+        reqCrumbsList = gson.fromJson(requestBreadcrumbs, collectionType);
+
+        if (reqCrumbsList != null && !reqCrumbsList.isEmpty()) {
+            return getBreadcrumbs(reqCrumbsList, request);
         }
 
         return getBreadcrumbs((List<Breadcrumb>) session.getAttribute(BREADCRUMB_SESS_KEY), request);
@@ -446,7 +452,6 @@ public class ReportsAction implements ActionInterface {
      */
     private List<Breadcrumb> getBreadcrumbs(List<Breadcrumb> startCrumbs, PortletRequest request) {
         List<Breadcrumb> crumbs = new ArrayList<Breadcrumb>();
-        Breadcrumb rootBreadcrumb = new Breadcrumb("OSU", DEFAULT_SCOPE, DEFAULT_SCOPE_VALUE);
 
         // Initial user click to reports
         String scope = getScope();
@@ -463,20 +468,12 @@ public class ReportsAction implements ActionInterface {
         if (clickedCrumb) {
             crumbs = startCrumbs.subList(0, breadcrumbIndex+1);
         } else {
-            boolean sameScopeValue = false;
-            boolean isSearch =  isSearch(request);
+            crumbs.addAll(startCrumbs);
 
-            // if we are not coming from search or in my report, we'll use the previous breadcrumbs
-            if (!isSearch && !isMyReport) {
-                crumbs.addAll(startCrumbs);
-
-                // Figure out if the user selected a different report, within the same scope
-                Breadcrumb lastBreadcrumb = startCrumbs.get(startCrumbs.size() - 1);
-                String scopeValueOfLastCrumb = lastBreadcrumb.getScopeValue();
-                sameScopeValue = scopeValue.equals(scopeValueOfLastCrumb);
-            } else {
-                crumbs.add(rootBreadcrumb);
-            }
+            // Figure out if the user selected a different report, within the same scope
+            Breadcrumb lastBreadcrumb = startCrumbs.get(startCrumbs.size() - 1);
+            String scopeValueOfLastCrumb = lastBreadcrumb.getScopeValue();
+            boolean sameScopeValue = scopeValue.equals(scopeValueOfLastCrumb);
 
             if (!sameScopeValue) {
                 String anchorText = scopeValue;
@@ -515,24 +512,6 @@ public class ReportsAction implements ActionInterface {
 
     private String getSearchTerm() {
         return (String) paramMap.get(SEARCH_TERM);
-    }
-
-    /**
-     * Whether or not the current view comes from a search.
-     *
-     * @param request
-     * @return
-     */
-    private boolean isSearch(PortletRequest request) {
-        String searchTerm = getSearchTerm();
-        boolean isBcSearch = !StringUtils.isEmpty(searchTerm) && getScope().equals(SCOPE_ORG_CODE);
-        boolean isNameSearch = !StringUtils.isEmpty(searchTerm) && searchResults != null
-                && !searchResults.isEmpty();
-
-        // If we are doing a search from the report list
-        boolean isReportListSearch = ParamUtil.getBoolean(request, "isReportListSearch", false);
-
-        return isBcSearch || isNameSearch || isReportListSearch;
     }
 
     private String getChartType(PortletRequest request) {

@@ -359,7 +359,7 @@ public class JobMgr {
         }
 
         where += "and (" + StringUtils.join(conditions, " or ") + ")";
-        String sql = SEARCH_JOB_SELECT + SEARCH_JOB_FROM + where + SEARCH_JOB_ORDER_BY;
+        String sql = SEARCH_JOB_SELECT + SEARCH_JOB_FROM + where ;
 
         return findHelper(searchTerm, bcName, supervisorPidm, sql, tokens, false);
     }
@@ -400,6 +400,7 @@ public class JobMgr {
             }
         }
 
+        sql += SEARCH_JOB_ORDER_BY;
         Query query = session.createSQLQuery(sql);
 
         if (tokens != null && tokens.length > 1) { // first last name search

@@ -28,6 +28,7 @@
                                 <portlet:param name="controller" value="ReportsAction"/>
                                 <portlet:param name="<%= ReportsAction.SCOPE %>" value="<%= ReportsAction.SCOPE_SUPERVISOR %>"/>
                                 <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${appraisal.job.supervisor.idKey}"/>
+                                <portlet:param name="requestBreadcrumbs" value="${breadcrumbsWithRootOnly}" />
                                 <portlet:param name="isReportListSearch" value="true"/>
                                 </portlet:actionURL>">
                                 <c:out value="${appraisal.job.supervisor.employee.name}"/></a>

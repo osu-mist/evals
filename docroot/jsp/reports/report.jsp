@@ -44,6 +44,7 @@
                                     <portlet:param name="controller" value="ReportsAction"/>
                                     <portlet:param name="<%= ReportsAction.SCOPE %>" value="<%= ReportsAction.SCOPE_SUPERVISOR %>"/>
                                     <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${myReportSupervisorKey}"/>
+                                    <portlet:param name="requestBreadcrumbs" value="${breadcrumbsWithRootOnly}" />
                                     </portlet:actionURL>"><c:out value="${supervisorJobTitle}"/></a></li>
                             </c:if>
                             <c:if test="${not empty myReportBcName}">
@@ -52,6 +53,7 @@
                                     <portlet:param name="controller" value="ReportsAction"/>
                                     <portlet:param name="<%= ReportsAction.SCOPE %>" value="<%= ReportsAction.SCOPE_BC %>"/>
                                     <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${myReportBcName}"/>
+                                    <portlet:param name="requestBreadcrumbs" value="${breadcrumbsWithRootOnly}" />
                                     </portlet:actionURL>"><c:out value="${myReportBcName}"/></a></li>
                             </c:if>
                             <c:if test="${isAdmin == true}">

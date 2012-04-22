@@ -1,6 +1,7 @@
 <form id="<portlet:namespace/>searchForm" action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
     <portlet:param name="action" value="report" />
     <portlet:param name="controller" value="ReportsAction" />
+    <portlet:param name="requestBreadcrumbs" value="${breadcrumbsWithRootOnly}" />
     </portlet:actionURL>" method="post">
 
     <c:set var="searchTip" value="report-search-tip-default"/>
