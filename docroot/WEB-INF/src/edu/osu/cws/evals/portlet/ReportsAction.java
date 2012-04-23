@@ -159,6 +159,7 @@ public class ReportsAction implements ActionInterface {
 
         if (!canViewReport(request)) {
             accessDeniedReset(request);
+            displaySearchResults = false;
         }
 
         if (!displaySearchResults) {
@@ -207,6 +208,7 @@ public class ReportsAction implements ActionInterface {
         breadcrumbList.add(rootBreadcrumb);
         paramMap.put(SEARCH_TERM, "");
         paramMap.put(REPORT, REPORT_DEFAULT);
+        searchResults.clear();
 
         actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
     }
@@ -673,7 +675,7 @@ public class ReportsAction implements ActionInterface {
             return true;
         }
 
-        if (getScope().equals(DEFAULT_SCOPE)) {
+        if (getScope().equals(DEFAULT_SCOPE) && !displaySearchResultsPage()) {
             return true;
         }
 
@@ -689,7 +691,7 @@ public class ReportsAction implements ActionInterface {
             // bc reviewer and admin are the only ones that can search by org code
             if (searchingOrgCode && isReviewer) {
                 return true;
-            } else if (!searchingOrgCode && (isReviewer || !isSupervisor)) {
+            } else if (!searchingOrgCode && (isReviewer || isSupervisor)) {
                 // bc reviewer, admin or supervisor can search by name or osu id
                 return true;
             }

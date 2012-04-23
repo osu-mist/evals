@@ -96,7 +96,9 @@
 
 <div class="osu-cws-report-right">
 
-    <%@ include file="/jsp/reports/search.jsp"%>
+    <c:if test="${isReviewer || isAdmin || isSupervisor}">
+        <%@ include file="/jsp/reports/search.jsp"%>
+    </c:if>
 
     <c:if test="${!searchView and !isAppraisalSearch}">
         <div id="<portlet:namespace/>accordionMenuChooseReport" class="accordion-menu">
