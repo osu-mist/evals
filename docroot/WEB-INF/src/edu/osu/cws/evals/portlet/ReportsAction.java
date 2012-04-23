@@ -20,6 +20,7 @@ public class ReportsAction implements ActionInterface {
     public static final String SCOPE = "scope";
     public static final String SCOPE_VALUE = "scopeValue";
     public static final String SEARCH_TERM = "searchTerm";
+    public static final String BREADCRUMB_LIST = "breadcrumbList";
 
     public static final String DEFAULT_SCOPE = "root";
     public static final String DEFAULT_SCOPE_VALUE = "OSU";
@@ -68,6 +69,7 @@ public class ReportsAction implements ActionInterface {
      * breadCrumbIndex: numeric index of the breadcrumb clicked
      * searchTerm: the searchTerm the user entered, either osuid, name or orgCode
      * bcName:  the name of the bcName the report should filter on
+     * breadcrumbList: The breadcrumbs that should be used: request, session, or default osu
      */
     private HashMap paramMap = new HashMap();
 
@@ -89,12 +91,6 @@ public class ReportsAction implements ActionInterface {
     private List<Object[]> chartData;
 
     private List<Object[]> drillDownData;
-
-    /**
-     * Value displayed when generating the drill down links in data table.
-     */
-    HashMap<String, Integer> units = new HashMap<String, Integer>();
-    public static final String BREADCRUMB_SESS_KEY = "breadcrumbList";
 
     /**
      * Holds the job of the current supervisor level in the supervisor report.
@@ -137,15 +133,18 @@ public class ReportsAction implements ActionInterface {
         String jspFile = Constants.JSP_REPORT;
         boolean displaySearchResults = false;
         PortletSession session = request.getPortletSession();
-        setParamMap(request);
-        String searchTerm = getSearchTerm();
 
+        // parse the various parameters from request and session
+        setParamMap(request);
+
+        // if the user searched handle it
+        String searchTerm = getSearchTerm();
         if (!searchTerm.equals("")) {
             displaySearchResults = search(searchTerm, request);
         }
 
         setIsMyReport(request);
-        breadcrumbList = getBreadcrumbs(request);
+        breadcrumbList = getBreadcrumbs();
         if (!displaySearchResults) {
             if (paramMap.get(Constants.BC_NAME) == null) {
                 setBcName();
@@ -190,8 +189,7 @@ public class ReportsAction implements ActionInterface {
         actionHelper.useMaximizedMenu(request);
 
         // Save session values only if we didn't throw an exception before we got here.
-        session.setAttribute(BREADCRUMB_SESS_KEY, breadcrumbList);
-
+        session.setAttribute(BREADCRUMB_LIST, breadcrumbList);
         session.setAttribute("paramMap", paramMap);
 
         return jspFile;
@@ -446,19 +444,17 @@ public class ReportsAction implements ActionInterface {
      *    4. if somebody clicks on a previous scope of the breadcrumb, we need to remove
      *    the rest of the scopes down the chain.
      *
-     * @param startCrumbs
-     * @param request
      * @return
      */
-    private List<Breadcrumb> getBreadcrumbs(List<Breadcrumb> startCrumbs, PortletRequest request) {
+    private List<Breadcrumb> getBreadcrumbs() {
+        List<Breadcrumb> startCrumbs = (List<Breadcrumb>) paramMap.get(BREADCRUMB_LIST);
         List<Breadcrumb> crumbs = new ArrayList<Breadcrumb>();
 
         // Initial user click to reports
         String scope = getScope();
         String scopeValue = getScopeValue();
-        boolean displayResultsPage = displaySearchResultsPage();
 
-        if (paramMap.isEmpty() || scope.equals(DEFAULT_SCOPE) || displayResultsPage) {
+        if (paramMap.isEmpty() || scope.equals(DEFAULT_SCOPE) || !searchResults.isEmpty()) {
             crumbs.add(rootBreadcrumb);
             return crumbs;
         }
@@ -569,8 +565,25 @@ public class ReportsAction implements ActionInterface {
 
         setOrgCodeReportType();
 
+        // The inex of the breadcrumb the user clicked on
         int breadcrumbIndex = ParamUtil.getInteger(request, BREADCRUMB_INDEX, -1);
         paramMap.put(BREADCRUMB_INDEX, breadcrumbIndex);
+
+        // The list of breadcrumbs
+        String requestBreadcrumbs = ParamUtil.getString(request, "requestBreadcrumbs");
+        Type collectionType = new TypeToken<Collection<Breadcrumb>>(){}.getType();
+        List<Breadcrumb> reqCrumbsList = gson.fromJson(requestBreadcrumbs, collectionType);
+        List<Breadcrumb> sessCrumbs = (List<Breadcrumb>) sessionParam.get(BREADCRUMB_LIST);
+
+        if (reqCrumbsList != null && !reqCrumbsList.isEmpty()) {
+            paramMap.put(BREADCRUMB_LIST, reqCrumbsList);
+        } else if (sessCrumbs != null && !sessCrumbs.isEmpty()) {
+            paramMap.put(BREADCRUMB_LIST, sessCrumbs);
+        } else {
+            List<Breadcrumb> defaultCrumbs = new ArrayList<Breadcrumb>();
+            defaultCrumbs.add(rootBreadcrumb);
+            paramMap.put(BREADCRUMB_LIST, defaultCrumbs);
+        }
 
         if (getScope().equals(SCOPE_SUPERVISOR)) {
             Job tempJob = Job.getJobFromString(getScopeValue());
@@ -880,7 +893,20 @@ public class ReportsAction implements ActionInterface {
             actionHelper.addErrorsToRequest(request, noSearchResultMsg);
         }
 
+        switchRequestBreadcrumbsWithSession(request);
         return false;
+    }
+
+    /**
+     * Stores the breadcrumb list from session into paramMap.
+     *
+     * @param request
+     */
+    private void switchRequestBreadcrumbsWithSession(PortletRequest request) {
+        PortletSession session = request.getPortletSession();
+        List<Breadcrumb> sessCrumbs = (List<Breadcrumb>) session.getAttribute(BREADCRUMB_LIST);
+        paramMap.put(BREADCRUMB_LIST, sessCrumbs);
+
     }
 
     private void setBcName() {
