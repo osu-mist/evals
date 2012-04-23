@@ -1,6 +1,6 @@
 <div class="osu-cws-breadcrumbs">
     <c:forEach var="breadcrumb" items="${breadcrumbList}" varStatus="loopStatus">
-        <c:if test="${(loopStatus.last && !searchView) || (searView && !loopStatus.first)}">
+        <c:if test="${(loopStatus.last && !searchView) || (searchView && !loopStatus.first)}">
             ${breadcrumb.anchorText}
         </c:if>
 

@@ -145,6 +145,7 @@ public class ReportsAction implements ActionInterface {
 
         setIsMyReport(request);
         breadcrumbList = getBreadcrumbs();
+        // set the bc name using the scope value of the 2nd breadcrumb if applicable
         if (!displaySearchResults) {
             if (paramMap.get(Constants.BC_NAME) == null) {
                 setBcName();
@@ -152,11 +153,7 @@ public class ReportsAction implements ActionInterface {
         }
 
         if (!canViewReport(request)) {
-            if (response instanceof ActionResponse) {
-                ((ActionResponse) response ).setWindowState(WindowState.NORMAL);
-            }
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
-            return homeAction.display(request, response);
+            accessDeniedReset(request);
         }
 
         if (!displaySearchResults) {
@@ -169,7 +166,6 @@ public class ReportsAction implements ActionInterface {
                         supervisorLevelPosno, supervisorLevelSuffix);
             }
 
-
             // Check if we are viewing a supervisor report of a mere employee
             boolean displayAppraisalSearchList = false;
             if (getScope().equals(SCOPE_SUPERVISOR)) {
@@ -179,6 +175,9 @@ public class ReportsAction implements ActionInterface {
             }
 
             if (displayAppraisalSearchList) { // display appraisal list of single employee
+                if (searchResults == null) {
+                    searchResults = new ArrayList<Job>();
+                }
                 searchResults.add(currentSupervisorJob); // add single employee as the result
                 jspFile = activeAppraisalList(request);
             } else {
@@ -193,6 +192,23 @@ public class ReportsAction implements ActionInterface {
         session.setAttribute("paramMap", paramMap);
 
         return jspFile;
+    }
+
+    /**
+     * Resets the paramMap values to the default report and sets the message of
+     * access denied to the user.
+     *
+     * @param request
+     */
+    private void accessDeniedReset(PortletRequest request) {
+        paramMap.put(SCOPE, DEFAULT_SCOPE);
+        paramMap.put(SCOPE_VALUE, DEFAULT_SCOPE_VALUE);
+        breadcrumbList = new ArrayList<Breadcrumb>();
+        breadcrumbList.add(rootBreadcrumb);
+        paramMap.put(SEARCH_TERM, "");
+        paramMap.put(REPORT, REPORT_DEFAULT);
+
+        actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
     }
 
     private void setupDataForJSP(PortletRequest request) throws Exception {
@@ -411,29 +427,6 @@ public class ReportsAction implements ActionInterface {
     }
 
     /**
-     * Checks the request for breadcrumbs, then the session. It uses one of these to
-     * calculate the current set of breadcrumbs.
-     *
-     * @param request
-     * @return
-     */
-    private List<Breadcrumb> getBreadcrumbs(PortletRequest request) {
-        PortletSession session = request.getPortletSession();
-        String requestBreadcrumbs = ParamUtil.getString(request, "requestBreadcrumbs");
-        List<Breadcrumb> reqCrumbsList;
-
-
-        Type collectionType = new TypeToken<Collection<Breadcrumb>>(){}.getType();
-        reqCrumbsList = gson.fromJson(requestBreadcrumbs, collectionType);
-
-        if (reqCrumbsList != null && !reqCrumbsList.isEmpty()) {
-            return getBreadcrumbs(reqCrumbsList, request);
-        }
-
-        return getBreadcrumbs((List<Breadcrumb>) session.getAttribute(BREADCRUMB_SESS_KEY), request);
-    }
-
-    /**
      * Handles looking at the breadcrumbs currently stored and by
      * looking at the paramMap, it changes the breadcrumbs and returns
      * them as a list.
@@ -454,7 +447,11 @@ public class ReportsAction implements ActionInterface {
         String scope = getScope();
         String scopeValue = getScopeValue();
 
-        if (paramMap.isEmpty() || scope.equals(DEFAULT_SCOPE) || !searchResults.isEmpty()) {
+        boolean hasMultipleSearchResults = false;
+        if (searchResults != null && searchResults.size() > 1) {
+            hasMultipleSearchResults = true;
+        }
+        if (paramMap.isEmpty() || scope.equals(DEFAULT_SCOPE) || hasMultipleSearchResults) {
             crumbs.add(rootBreadcrumb);
             return crumbs;
         }
@@ -823,7 +820,8 @@ public class ReportsAction implements ActionInterface {
         String noSearchResultMsg = ""; // msg to display the user when there were no results
         boolean tooManyResults = false;
 
-        if (actionHelper.isLoggedInUserReviewer(request)) {
+        if (actionHelper.isLoggedInUserReviewer(request) &&
+                !actionHelper.isLoggedInUserAdmin(request)) {
             bcName = actionHelper.getBusinessCenterForLoggedInReviewer(request);
             userType = "reviewer";
         }

@@ -49,7 +49,8 @@ function validateSearch() {
   </c:choose>
   errorString = "<li>"+ errorString + "</li>";
 
-  if (searchTerm == "") {
+  if (searchTerm == "" || searchTerm == "<liferay-ui:message key="${searchTip}"/>" ||
+          (!/^[a-z,\- ]+$/i.test(searchTerm) && !/^[0-9]{6,9}$/.test(searchTerm))) {
     errors = errorString;
   } else {
     var isNumber = false;
