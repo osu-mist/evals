@@ -28,7 +28,4 @@
         SELECT new edu.osu.cws.evals.models.Employee(id, firstName, lastName)
         FROM edu.osu.cws.evals.models.Employee where id in (:ids)
     </query>
-    <query name="employee.byOsuid"><![CDATA[
-        FROM edu.osu.cws.evals.models.Employee where osuid = :osuid
-    ]]></query>
 </hibernate-mapping>

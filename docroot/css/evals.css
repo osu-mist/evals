@@ -1,5 +1,5 @@
 .pass-hide {
-    display: none;
+    display: none !important;
 }
 
 /* Home View */
@@ -346,7 +346,8 @@ tr.ui-state-highlight {
 }
 
 .osu-cws .report-list {
-  width: 660px;
+  margin-top: 1.5em;
+  width: 620px;
 }
 
 .osu-cws div.chart-content {
