@@ -159,6 +159,14 @@
                 </ul>
             </div>
         </div>
+
+        <c:if test="${scope == 'supervisor'}">
+            <c:if test="${!isMyReport}">
+                <%@ include file="/jsp/home/myStatus.jsp"%>
+            </c:if>
+
+            <%@ include file="/jsp/home/myTeam.jsp"%>
+        </c:if>
     </c:if>
 
 </div>

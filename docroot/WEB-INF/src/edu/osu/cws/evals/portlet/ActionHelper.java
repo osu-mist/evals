@@ -84,8 +84,7 @@ public class ActionHelper {
 
         allMyActiveAppraisals = (ArrayList<Appraisal>) session.getAttribute(ALL_MY_ACTIVE_APPRAISALS);
         if (allMyActiveAppraisals == null) {
-            AppraisalMgr appraisalMgr = new AppraisalMgr();
-            allMyActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(employeeId);
+            allMyActiveAppraisals = AppraisalMgr.getAllMyActiveAppraisals(employeeId, null, null);
             session.setAttribute(ALL_MY_ACTIVE_APPRAISALS, allMyActiveAppraisals);
         }
         return allMyActiveAppraisals;
@@ -122,8 +121,7 @@ public class ActionHelper {
         List<Appraisal> dbTeamAppraisals;
         myTeamAppraisals = (ArrayList<Appraisal>) session.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
         if (myTeamAppraisals == null) {
-            AppraisalMgr appraisalMgr = new AppraisalMgr();
-            myTeamAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true, null, null);
+            myTeamAppraisals = AppraisalMgr.getMyTeamsAppraisals(employeeId, true, null, null);
             session.setAttribute(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals);
         }
         return myTeamAppraisals;

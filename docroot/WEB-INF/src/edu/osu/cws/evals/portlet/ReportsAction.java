@@ -103,6 +103,11 @@ public class ReportsAction implements ActionInterface {
      */
     private ArrayList<Appraisal> supervisorTeamAppraisal;
 
+    /**
+     * Holds list of appraisals of current supervisor
+     */
+    private ArrayList<Appraisal> supervisorAppraisals;
+
     private boolean inLeafSupervisorReport = false;
 
     /**
@@ -158,12 +163,7 @@ public class ReportsAction implements ActionInterface {
 
         if (!displaySearchResults) {
             if (getScope().equals(SCOPE_SUPERVISOR)) {
-                int supervisorLevelPidm = currentSupervisorJob.getEmployee().getId();
-                String supervisorLevelPosno = currentSupervisorJob.getPositionNumber();
-                String supervisorLevelSuffix = currentSupervisorJob.getSuffix();
-                AppraisalMgr appraisalMgr = new AppraisalMgr();
-                supervisorTeamAppraisal = appraisalMgr.getMyTeamsAppraisals(supervisorLevelPidm, true,
-                        supervisorLevelPosno, supervisorLevelSuffix);
+                rightPaneData(request);
             }
 
             // Check if we are viewing a supervisor report of a mere employee
@@ -239,6 +239,13 @@ public class ReportsAction implements ActionInterface {
                 enableByUnitReports = false;
             }
             actionHelper.addToRequestMap("enableByUnitReports", enableByUnitReports);
+
+            if (scope.equals(SCOPE_SUPERVISOR)) {
+                // right pane data: supervisor appraisals and supervisor team
+                actionHelper.addToRequestMap("myActiveAppraisals", supervisorAppraisals);
+                actionHelper.addToRequestMap("myTeamsActiveAppraisals", supervisorTeamAppraisal);
+                actionHelper.addToRequestMap("isMyReport", isMyReport);
+            }
 
             // breadcrumb and drill down data
             String nextScope = nextScopeInDrillDown(scope);
@@ -346,6 +353,23 @@ public class ReportsAction implements ActionInterface {
         }
 
         return Constants.JSP_REPORT;
+    }
+
+    /**
+     * Fetches from the db the data needed for the right pane for supervisors:
+     * my evaluations and myTeam evaluations.
+     *
+     * @param request
+     * @throws Exception
+     */
+    private void rightPaneData(PortletRequest request) throws Exception {
+        int supervisorLevelPidm = currentSupervisorJob.getEmployee().getId();
+        String supervisorLevelPosno = currentSupervisorJob.getPositionNumber();
+        String supervisorLevelSuffix = currentSupervisorJob.getSuffix();
+        supervisorTeamAppraisal = AppraisalMgr.getMyTeamsAppraisals(supervisorLevelPidm,
+                true, supervisorLevelPosno, supervisorLevelSuffix);
+        supervisorAppraisals = AppraisalMgr.getAllMyActiveAppraisals(supervisorLevelPidm,
+                supervisorLevelPosno, supervisorLevelSuffix);
     }
 
     /**

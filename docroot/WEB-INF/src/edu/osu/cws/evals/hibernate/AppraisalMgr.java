@@ -628,72 +628,45 @@ public class AppraisalMgr {
     }
 
     /**
-     * Returns a list of active appraisals for all the jobs that the current pidm holds.
+     * Returns a list of active appraisals for all the jobs that the current pidm holds. If the
+     * posno and suffix are provided, the evaluations are specific to the job.
      * The fields that are returned in the appraisal are:
      *      id
      *      Job.jobTitle
      *      startDate
      *      endDate
-     *      status;
+     *      status
+     *      overdue
      *
-     * @param pidm
      * @return
-     * @throws Exception
+     * @param pidm
+     * @param posno
+     * @param suffix
      */
-    public ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm) throws Exception {
+    public static ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm, String posno,
+                                                                String suffix) {
         Session session = HibernateUtil.getCurrentSession();
-        return this.getAllMyActiveAppraisals(pidm, session);
-    }
-
-    /**
-     * Returns a HashMap
-     * @param pidm
-     * @param session
-     * @return
-     */
-    private ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm, Session session) {
-        //@todo: the query below should have a where clause => job.employee.id = pidm
-        String query = "select new edu.osu.cws.evals.models.Appraisal(id, job.jobTitle, startDate, endDate, status)" +
+        String query = "select new edu.osu.cws.evals.models.Appraisal(id, job.jobTitle, startDate, " +
+                "endDate, status, overdue)" +
                 " from edu.osu.cws.evals.models.Appraisal where " +
                 " job.employee.id = :pidm and status not in ('archived')";
-        ArrayList<Appraisal> result = (ArrayList<Appraisal>) session.createQuery(query)
-                .setInteger("pidm", pidm)
-                .list();
+
+        if (posno != null && suffix != null) {
+            query += " and job.positionNumber = :posno and job.suffix = :suffix";
+        }
+
+        Query hibQuery = session.createQuery(query).setInteger("pidm", pidm);
+        if (posno != null && suffix != null) {
+            hibQuery.setString("posno", posno).setString("suffix", suffix);
+        }
+
+        ArrayList<Appraisal> result = (ArrayList<Appraisal>) hibQuery.list();
 
         // Check the status of the appraisal and check to see if it needs to be replaced
         for(Appraisal appraisal : result) {
             appraisal.setRole("employee");
         }
         return result;
-    }
-
-
-    /**
-     * Returns a List of team's active appraisals for the given supervisor's pidm. If the
-     * posno and suffix are specific, the team appraisals are specific to that supervising job.
-     *
-     * @param pidm
-     * @param onlyActive    Whether or not to include only the active appraisals
-     * @param posno
-     * @param suffix
-     * @return
-     * @throws Exception
-     */
-    public ArrayList<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive,
-                                                     String posno, String suffix) throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        List<Appraisal> dbTeamAppraisals = this.getMyTeamsAppraisals(pidm, onlyActive, session,
-                posno, suffix);
-        ArrayList<Appraisal> myTeamAppraisals = new ArrayList<Appraisal>();
-
-        if (dbTeamAppraisals != null) {
-            for (Appraisal appraisal : dbTeamAppraisals) {
-                appraisal.setRole("supervisor");
-                myTeamAppraisals.add(appraisal);
-            }
-        }
-
-        return myTeamAppraisals;
     }
 
     /**
@@ -704,15 +677,15 @@ public class AppraisalMgr {
      *
      * @param pidm          Supervisor's pidm.
      * @param onlyActive    Whether or not to include only the active appraisals
-     * @param session
      * @param posno         Supervisor's posno
      * @param suffix        Supervisor's suffix
-     * @return List of Hashmaps that contains the jobs this employee supervises.
+     * @return List of Appraisal that contains the jobs this employee supervises.
      */
-    private List<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive, Session session,
+    public static ArrayList<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive,
                                                  String posno, String suffix) {
-        List<Appraisal> appraisals = new ArrayList<Appraisal>();
+        ArrayList<Appraisal> appraisals = new ArrayList<Appraisal>();
         List<Integer> pidms = new ArrayList<Integer>();
+        Session session = HibernateUtil.getCurrentSession();
 
         String query = "select ap.ID, jobs.PYVPASJ_DESC, jobs.PYVPASJ_APPOINTMENT_TYPE, " +
                 "ap.START_DATE, ap.END_DATE, ap.STATUS, ap.GOALS_REQUIRED_MOD_DATE, " +
@@ -753,6 +726,7 @@ public class AppraisalMgr {
 
         // Build list of appraisals from sql results
         for (Object[] aResult : result) {
+           Appraisal appraisal;
             Integer id = (Integer) aResult[0];
             String jobTitle = (String) aResult[1];
             String appointmentType = (String) aResult[2];
@@ -783,7 +757,16 @@ public class AppraisalMgr {
             Employee employee = employeeHashMap.get(employeePidm);
             ap.getJob().setEmployee(employee);
         }
-        return appraisals;
+
+        ArrayList<Appraisal> myTeamAppraisals = new ArrayList<Appraisal>();
+        if (appraisals != null) {
+            for (Appraisal appraisal : appraisals) {
+                appraisal.setRole("supervisor");
+                myTeamAppraisals.add(appraisal);
+            }
+        }
+
+        return myTeamAppraisals;
     }
 
     /**

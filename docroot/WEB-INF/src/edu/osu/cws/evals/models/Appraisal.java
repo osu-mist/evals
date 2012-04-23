@@ -208,7 +208,8 @@ public class Appraisal extends Evals {
 
     /**
      * Constructor used by AppraisalMgr to fetch only a limited set of attributes. Used to
-     * display information in my status section.
+     * display information in my status section and supervisor report (evaluations of current
+     * supervisor).
      *
      * @param id
      * @param jobTitle
@@ -216,13 +217,20 @@ public class Appraisal extends Evals {
      * @param endDate
      * @param status
      */
-    public Appraisal(int id, String jobTitle, Date startDate, Date endDate, String status) {
+    public Appraisal(int id, String jobTitle, Date startDate, Date endDate, String status,
+                     Integer overdue) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
         this.job = new Job();
         this.job.setJobTitle(jobTitle);
+
+        if (overdue == null) {
+            this.overdue = -999;
+        } else {
+            this.overdue = overdue;
+        }
     }
 
     /**
@@ -266,7 +274,6 @@ public class Appraisal extends Evals {
         } else {
             this.overdue = overdue;
         }
-
     }
 
     /**

@@ -5,7 +5,7 @@
     </portlet:actionURL>" method="post">
 
     <c:set var="searchTip" value="report-search-tip-default"/>
-    <c:if test="${isSupervisor}">
+    <c:if test="${isSupervisor && !isAdmin && !isReviewer}">
         <c:set var="searchTip" value="report-search-tip-supervisor"/>
     </c:if>
     <label class="pass-hide" for="<portlet:namespace/>searchTerm"><liferay-ui:message key="search-employee-searchTerm"/></label>
