@@ -135,13 +135,32 @@ public class ReportsAction implements ActionInterface {
      * @throws Exception
      */
     public String report(PortletRequest request, PortletResponse response) throws Exception {
-        String jspFile = Constants.JSP_REPORT;
-        boolean displaySearchResults = false;
         PortletSession session = request.getPortletSession();
 
         // parse the various parameters from request and session
         setParamMap(request);
 
+        processReport(request, response);
+        setupDataForJSP(request);
+        actionHelper.useMaximizedMenu(request);
+
+        // Save session values only if we didn't throw an exception before we got here.
+        session.setAttribute(BREADCRUMB_LIST, breadcrumbList);
+        session.setAttribute("paramMap", paramMap);
+
+        return Constants.JSP_REPORT;
+    }
+
+    /**
+     * Main process method that handles calling the search, active report, permission checks and
+     * breadcrumbs.
+     *
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    private void processReport(PortletRequest request, PortletResponse response) throws Exception {
+        boolean displaySearchResults = false;
         // if the user searched handle it
         String searchTerm = getSearchTerm();
         if (!searchTerm.equals("")) {
@@ -151,10 +170,8 @@ public class ReportsAction implements ActionInterface {
         setIsMyReport(request);
         breadcrumbList = getBreadcrumbs();
         // set the bc name using the scope value of the 2nd breadcrumb if applicable
-        if (!displaySearchResults) {
-            if (paramMap.get(Constants.BC_NAME) == null) {
+        if (!displaySearchResults && paramMap.get(Constants.BC_NAME) == null) {
                 setBcName();
-            }
         }
 
         if (!canViewReport(request)) {
@@ -176,23 +193,29 @@ public class ReportsAction implements ActionInterface {
             }
 
             if (displayAppraisalSearchList) { // display appraisal list of single employee
-                if (searchResults == null) {
-                    searchResults = new ArrayList<Job>();
-                }
+                searchResults = new ArrayList<Job>();
                 searchResults.add(currentSupervisorJob); // add single employee as the result
-                jspFile = activeAppraisalList(request);
+                isAppraisalSearch = activeAppraisalList(request, response);
+                if (!isAppraisalSearch) { //employee had no evaluations
+                    String prevSearchTerm = ParamUtil.getString(request, "prevSearchTerm");
+                    if (!StringUtils.isEmpty(prevSearchTerm)) { // go back to previous search
+                        paramMap.put(SEARCH_TERM, prevSearchTerm);
+                    } else {
+                        // remove the search term so that we can load the previous report
+                        paramMap.put(SEARCH_TERM, "");
+                        paramMap.put(SCOPE, ParamUtil.getString(request, SCOPE));
+                        paramMap.put(SCOPE_VALUE, ParamUtil.getString(request, SCOPE_VALUE));
+                        paramMap.put(REPORT, ParamUtil.getString(request, REPORT));
+                        List<Breadcrumb> prevCrumbs = jsonToBreadcrumbList(request, "prevCrumbs");
+                        paramMap.put(BREADCRUMB_LIST, prevCrumbs);
+                        setCurrentSupervisor();
+                    }
+                    processReport(request, response);
+                }
             } else {
-                jspFile = activeReport();
+                activeReport();
             }
         }
-        setupDataForJSP(request);
-        actionHelper.useMaximizedMenu(request);
-
-        // Save session values only if we didn't throw an exception before we got here.
-        session.setAttribute(BREADCRUMB_LIST, breadcrumbList);
-        session.setAttribute("paramMap", paramMap);
-
-        return jspFile;
     }
 
     /**
@@ -313,7 +336,7 @@ public class ReportsAction implements ActionInterface {
         return (String) DRILL_DOWN_INDEX[nextDrillDownScope];
     }
 
-    private String activeReport() throws Exception {
+    private boolean activeReport() throws Exception {
         List<Job> directEmployees = null;
         Map<String, Configuration> configurationMap =
                 (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
@@ -354,7 +377,7 @@ public class ReportsAction implements ActionInterface {
                     inLeafSupervisorReport);
         }
 
-        return Constants.JSP_REPORT;
+        return true;
     }
 
     /**
@@ -381,11 +404,12 @@ public class ReportsAction implements ActionInterface {
      * message to the user telling them about this.
      *
      * @param request
+     * @param response
      * @return
      * @throws Exception
      */
-    private String activeAppraisalList(PortletRequest request) throws Exception {
-        isAppraisalSearch = true;
+    private boolean activeAppraisalList(PortletRequest request, PortletResponse response)
+            throws Exception {
         listAppraisals = AppraisalMgr.getEmployeeAppraisalList(searchResults);
 
         // Check if the user had no evaluation records
@@ -395,6 +419,7 @@ public class ReportsAction implements ActionInterface {
 
             String errorMsg = resource.getString("report-search-no-results-no-evals");
             actionHelper.addErrorsToRequest(request, errorMsg);
+            return false;
         }
 
         // when showing the evaluation list after clicking on a search result, set the searchTerm
@@ -403,7 +428,7 @@ public class ReportsAction implements ActionInterface {
             paramMap.put(SEARCH_TERM, lastBreadcrumb.getAnchorText());
         }
 
-        return Constants.JSP_REPORT;
+        return true;
     }
 
     private void setDrillDownData(List<Job> directSupervisors, boolean inLeafSupervisor) {
@@ -593,9 +618,7 @@ public class ReportsAction implements ActionInterface {
         paramMap.put(BREADCRUMB_INDEX, breadcrumbIndex);
 
         // The list of breadcrumbs
-        String requestBreadcrumbs = ParamUtil.getString(request, "requestBreadcrumbs");
-        Type collectionType = new TypeToken<Collection<Breadcrumb>>(){}.getType();
-        List<Breadcrumb> reqCrumbsList = gson.fromJson(requestBreadcrumbs, collectionType);
+        List<Breadcrumb> reqCrumbsList = jsonToBreadcrumbList(request, "requestBreadcrumbs");
         List<Breadcrumb> sessCrumbs = (List<Breadcrumb>) sessionParam.get(BREADCRUMB_LIST);
 
         if (reqCrumbsList != null && !reqCrumbsList.isEmpty()) {
@@ -608,6 +631,28 @@ public class ReportsAction implements ActionInterface {
             paramMap.put(BREADCRUMB_LIST, defaultCrumbs);
         }
 
+        setCurrentSupervisor();
+    }
+
+    /**
+     * Converts a string in the request from json to a list of breadcrumbs.
+     *
+     * @param request       PortletRequest
+     * @param fieldName     Name of the parameter in the request that holds the json string
+     * @return
+     */
+    private List<Breadcrumb> jsonToBreadcrumbList(PortletRequest request, String fieldName) {
+        String jsonBreadcrumbs = ParamUtil.getString(request, fieldName);
+        Type collectionType = new TypeToken<Collection<Breadcrumb>>(){}.getType();
+        return gson.fromJson(jsonBreadcrumbs, collectionType);
+    }
+
+    /**
+     * Sets current supervisor from the scopeValue.
+     *
+     * @throws Exception
+     */
+    private void setCurrentSupervisor() throws Exception {
         if (getScope().equals(SCOPE_SUPERVISOR)) {
             Job tempJob = Job.getJobFromString(getScopeValue());
             //@todo: need to handle bad supervising data

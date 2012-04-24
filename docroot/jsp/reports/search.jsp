@@ -2,6 +2,11 @@
     <portlet:param name="action" value="report" />
     <portlet:param name="controller" value="ReportsAction" />
     <portlet:param name="requestBreadcrumbs" value="${breadcrumbsWithRootOnly}" />
+    <portlet:param name="<%= ReportsAction.SCOPE %>" value="${scope}"/>
+    <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${scopeValue}"/>
+    <portlet:param name="<%= ReportsAction.REPORT %>" value="${report}"/>
+    <portlet:param name="prevSearchTerm" value="${searchTerm}" />
+    <portlet:param name="prevCrumbs" value="${requestBreadcrumbs}" />
     </portlet:actionURL>" method="post">
 
     <c:set var="searchTip" value="report-search-tip-default"/>
