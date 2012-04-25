@@ -2,6 +2,11 @@
 <%@ page import="edu.osu.cws.evals.hibernate.ReportMgr" %>
 <%@ include file="/jsp/init.jsp"%>
 
+<c:set var="drilldownClass" value=""/>
+    <c:if test="${scope == 'supervisor'}">
+    <c:set var="drilldownClass" value="supervisor-report"/>
+</c:if>
+
 <h2><liferay-ui:message key="reports"/></h2>
 <div class="osu-cws-report-left">
     <div id="<portlet:namespace/>chartMenu" class="accordion-menu pass-notification chart-area">
@@ -18,7 +23,7 @@
                 </c:if>
                 <c:if test="${showDrillDownMenu}">
                     <li><a href="#"><liferay-ui:message key="report-drilldown"/></a>
-                        <ul>
+                        <ul class="${drilldownClass}">
                         <c:forEach var="unit" items="${drillDownData}" varStatus="loopStatus">
                             <c:if test="${(scope == 'root' && reviewerBCName == unit[1])
                             || allowAllDrillDown || scope != 'root'}">
@@ -36,7 +41,7 @@
                     </li>
                 </c:if>
                 <c:if test="${showMyReportLink}">
-                    <li><a href="#"><liferay-ui:message key="report-my-report"/></a>
+                    <li class="float-left first"><a href="#"><liferay-ui:message key="report-my-report"/></a>
                         <ul>
                             <c:if test="${not empty supervisorJobTitle}">
                                 <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
@@ -81,7 +86,7 @@
             </c:if>
 
             <c:if test="${searchView or isAppraisalSearch}">
-                <h3><liferay-ui:message key="report-search-results-title"/> <c:out value="${searchTerm}"/></h3>
+                <h3 class="clean"><liferay-ui:message key="report-search-results-title"/> <c:out value="${searchTerm}"/></h3>
             </c:if>
             <c:if test="${searchView}">
                 <%@ include file="/jsp/reports/reportSearchResults.jsp"%>
