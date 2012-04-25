@@ -253,26 +253,6 @@ public class ActionHelper {
     }
 
     /**
-     * Returns the reviews for the logged on User. It is a wrapper for
-     * getReviewsForLoggedInUser(request, maxResults). It basically looks up in session what is
-     * the number of maxResults and calls the getReviewsForLoggedInUser method.
-     *
-     * @param request       PortletRequest object
-     * @return              ArrayList<Appraisal>
-     * @throws Exception
-     */
-    private ArrayList<Appraisal> getReviewsForLoggedInUser(PortletRequest request) throws Exception {
-        int defaultMaxResults = -1;
-        PortletSession session = request.getPortletSession(true);
-        Integer maxResults = (Integer) session.getAttribute(REVIEW_LIST_MAX_RESULTS);
-        if (maxResults == null) {
-            maxResults = defaultMaxResults;
-        }
-
-        return getReviewsForLoggedInUser(request, maxResults);
-    }
-
-    /**
      * Retrieves the pending reviews for the logged in user.
      *
      * @param request
@@ -361,7 +341,7 @@ public class ActionHelper {
      * @throws Exception
      */
     public void removeReviewAppraisalInSession(PortletRequest request, Appraisal appraisal) throws Exception {
-        List<Appraisal> reviewList = getReviewsForLoggedInUser(request);
+        List<Appraisal> reviewList = getReviewsForLoggedInUser(request, -1);
         List<Appraisal> tempList = new ArrayList<Appraisal>();
         tempList.addAll(reviewList);
         for (Appraisal appraisalInSession: tempList) {
@@ -722,13 +702,14 @@ public class ActionHelper {
      *
      * @param businessCenterName
      * @param resource
+     * @param request
      * @return
      * @throws Exception
      */
     private RequiredAction getReviewerAction(String businessCenterName, ResourceBundle resource,
                                              PortletRequest request) throws Exception {
         int reviewCount;
-        List<Appraisal> reviewList = getReviewsForLoggedInUser(request);
+        List<Appraisal> reviewList = getReviewsForLoggedInUser(request, -1);
         if (reviewList != null) {
             reviewCount = reviewList.size();
         } else {

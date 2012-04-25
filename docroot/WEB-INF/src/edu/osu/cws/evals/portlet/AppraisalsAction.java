@@ -11,6 +11,7 @@ import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsPDF;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
@@ -264,7 +265,9 @@ public class AppraisalsAction implements ActionInterface {
 
 
         String status = appraisal.getStatus();
-        if ((status.equals(Appraisal.STATUS_RELEASE_DUE) || status.equals(Appraisal.STATUS_CLOSED))
+        String[] afterReviewStatus = {Appraisal.STATUS_RELEASE_DUE, Appraisal.STATUS_RELEASE_OVERDUE,
+                Appraisal.STATUS_CLOSED};
+        if (ArrayUtils.contains(afterReviewStatus, status)
                 && actionHelper.isLoggedInUserReviewer(request)) {
             actionHelper.removeReviewAppraisalInSession(request, appraisal);
         } else {
