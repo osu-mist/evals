@@ -116,8 +116,8 @@
         }
       }
 
-      // right now we don't support drilling down to the grouped "other"
-      if (unitName == '<liferay-ui:message key="other"/>') {
+      // right now we don't support drilling down to the grouped "other".
+      if (typeof unitName == "undefined") {
           return;
       }
 
