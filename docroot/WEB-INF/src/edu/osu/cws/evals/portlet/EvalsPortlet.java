@@ -386,12 +386,8 @@ public class EvalsPortlet extends GenericPortlet {
 
             if (logger != null) {
                 Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
-                if (loggedOnUser != null) {
-                    employee = loggedOnUser.toString();
-                }
-                grayLogFields.put("logged-in-user", employee);
-                String onidUsername = actionHelper.getLoggedOnUsername(request);
-                grayLogFields.put("onid-username", onidUsername);
+                String loggedOnUserId = ((Integer) loggedOnUser.getId()).toString();
+                grayLogFields.put("logged-in-user", loggedOnUserId);
                 logger.log(level, shortMessage, e, grayLogFields);
             }
         } catch (Exception exception) {

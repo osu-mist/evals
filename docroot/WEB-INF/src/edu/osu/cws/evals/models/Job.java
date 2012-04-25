@@ -507,8 +507,8 @@ public class Job extends Evals implements Serializable {
 
     public String getSignature()
     {
-        return "employee " + getEmployee().getId() + ", " +getEmployee().getName()
-                 + ", position " + getPositionNumber();
+        return "pidm: " + getEmployee().getId() +  ", position: " + getPositionNumber() +
+                ", suffix: " + getSuffix();
     }
 
     /**
