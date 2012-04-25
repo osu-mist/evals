@@ -367,7 +367,6 @@ public class ReportMgr {
         }
 
         List<Object[]> supervisorData = new ArrayList<Object[]>();
-        HashMap<String, Integer> pidmEvalCount = new HashMap<String, Integer>();
         HashMap<Integer, Job> supervisorMap = new HashMap<Integer, Job>();
 
         for (Job supervisor : supervisorsInReport) {
@@ -447,16 +446,20 @@ public class ReportMgr {
             }
         }
 
-        if (report.contains(UNIT)) {
-            Integer pidm = (Integer) currentSupervisorJob.getEmployee().getId();
-            Object[] currentSupervisorLevel = new Object[2];
-            currentSupervisorLevel[0] = (Object) teamAppraisalTemp.size();
-            currentSupervisorLevel[1] = (Object) pidm;
-            newResults.add(0, currentSupervisorLevel);
-        } else {
-            for (Appraisal appraisal : teamAppraisalTemp) {
-                Object[] newStatusRow = {1, appraisal.getStatus()};
-                newResults.add(newStatusRow);
+        // don't act the direct employees of the current supervisor if none of them had
+        // evaluations.
+        if (!teamAppraisalTemp.isEmpty()) {
+            if (report.contains(UNIT)) {
+                Integer pidm = (Integer) currentSupervisorJob.getEmployee().getId();
+                Object[] currentSupervisorLevel = new Object[2];
+                currentSupervisorLevel[0] = (Object) teamAppraisalTemp.size();
+                currentSupervisorLevel[1] = (Object) pidm;
+                newResults.add(0, currentSupervisorLevel);
+            } else {
+                for (Appraisal appraisal : teamAppraisalTemp) {
+                    Object[] newStatusRow = {1, appraisal.getStatus()};
+                    newResults.add(newStatusRow);
+                }
             }
         }
 
