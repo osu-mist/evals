@@ -113,56 +113,72 @@
             </div>
             <div class="accordion-content" id="<portlet:namespace/>ChooseReport" style="display: block;">
                 <ul>
-                    <c:if test="${enableByUnitReports}">
-                        <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                    <li><liferay-ui:message key="report-choose-active-overview"/>
+                        (
+                        <c:if test="${enableByUnitReports}">
+                            <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                                 <portlet:param name="action" value="report"/>
                                 <portlet:param name="controller" value="ReportsAction"/>
                                 <portlet:param name="scope" value="${scope}"/>
                                 <portlet:param name="scopeValue" value="${scopeValue}"/>
                                 <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                                 <portlet:param name="report" value="<%= ReportsAction.REPORT_DEFAULT%>"/>
-                                </portlet:actionURL>"><liferay-ui:message key="report-title-unitBreakdown"/></a></li>
-                        <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-                                <portlet:param name="action" value="report"/>
-                                <portlet:param name="controller" value="ReportsAction"/>
-                                <portlet:param name="scope" value="${scope}"/>
-                                <portlet:param name="scopeValue" value="${scopeValue}"/>
-                                <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
-                                <portlet:param name="report" value="<%= ReportsAction.REPORT_UNIT_OVERDUE%>"/>
-                                </portlet:actionURL>"><liferay-ui:message key="report-title-unitOverdue"/></a></li>
-                        <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-                                <portlet:param name="action" value="report"/>
-                                <portlet:param name="controller" value="ReportsAction"/>
-                                <portlet:param name="scope" value="${scope}"/>
-                                <portlet:param name="scopeValue" value="${scopeValue}"/>
-                                <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
-                                <portlet:param name="report" value="<%= ReportsAction.REPORT_UNIT_WAYOVERDUE%>"/>
-                                </portlet:actionURL>"><liferay-ui:message key="report-title-unitWayOverdue"/></a></li>
-                    </c:if>
-                    <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                                </portlet:actionURL>"><liferay-ui:message key="report-choose-by-unit"/></a> |
+                        </c:if>
+                        <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                             <portlet:param name="action" value="report"/>
                             <portlet:param name="controller" value="ReportsAction"/>
                             <portlet:param name="scope" value="${scope}"/>
                             <portlet:param name="scopeValue" value="${scopeValue}"/>
                             <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                             <portlet:param name="report" value="<%= ReportsAction.REPORT_STAGE_BREAKDOWN%>"/>
-                            </portlet:actionURL>"><liferay-ui:message key="report-title-stageBreakdown"/></a></li>
-                    <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                            </portlet:actionURL>"><liferay-ui:message key="report-choose-by-stage"/></a>
+                        )
+                    </li>
+                    <li><liferay-ui:message key="report-choose-active-overdue"/>
+                        (
+                        <c:if test="${enableByUnitReports}">
+                            <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                                <portlet:param name="action" value="report"/>
+                                <portlet:param name="controller" value="ReportsAction"/>
+                                <portlet:param name="scope" value="${scope}"/>
+                                <portlet:param name="scopeValue" value="${scopeValue}"/>
+                                <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
+                                <portlet:param name="report" value="<%= ReportsAction.REPORT_UNIT_OVERDUE%>"/>
+                                </portlet:actionURL>"><liferay-ui:message key="report-choose-by-unit"/></a> |
+                        </c:if>
+                        <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                             <portlet:param name="action" value="report"/>
                             <portlet:param name="controller" value="ReportsAction"/>
                             <portlet:param name="scope" value="${scope}"/>
                             <portlet:param name="scopeValue" value="${scopeValue}"/>
                             <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                             <portlet:param name="report" value="<%= ReportsAction.REPORT_STAGE_OVERDUE%>"/>
-                            </portlet:actionURL>"><liferay-ui:message key="report-title-stageOverdue"/></a></li>
-                    <li><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                            </portlet:actionURL>"><liferay-ui:message key="report-choose-by-stage"/></a>
+                        )
+                    </li>
+                    <li><liferay-ui:message key="report-choose-active-wayOerdue"/>
+                        (
+                        <c:if test="${enableByUnitReports}">
+                            <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                                <portlet:param name="action" value="report"/>
+                                <portlet:param name="controller" value="ReportsAction"/>
+                                <portlet:param name="scope" value="${scope}"/>
+                                <portlet:param name="scopeValue" value="${scopeValue}"/>
+                                <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
+                                <portlet:param name="report" value="<%= ReportsAction.REPORT_UNIT_WAYOVERDUE%>"/>
+                                </portlet:actionURL>"><liferay-ui:message key="report-choose-by-unit"/></a> |
+                        </c:if>
+                        <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                             <portlet:param name="action" value="report"/>
                             <portlet:param name="controller" value="ReportsAction"/>
                             <portlet:param name="scope" value="${scope}"/>
                             <portlet:param name="scopeValue" value="${scopeValue}"/>
                             <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                             <portlet:param name="report" value="<%= ReportsAction.REPORT_STAGE_WAYOVERDUE%>"/>
-                            </portlet:actionURL>"><liferay-ui:message key="report-title-stageWayOverdue"/></a></li>
+                            </portlet:actionURL>"><liferay-ui:message key="report-choose-by-stage"/></a>
+                        )
+                    </li>
                 </ul>
             </div>
         </div>
