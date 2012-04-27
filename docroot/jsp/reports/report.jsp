@@ -188,7 +188,9 @@
                 <%@ include file="/jsp/home/myStatus.jsp"%>
             </c:if>
 
-            <%@ include file="/jsp/home/myTeam.jsp"%>
+            <c:if test="${enableByUnitReports}">
+                <%@ include file="/jsp/home/myTeam.jsp"%>
+            </c:if>
         </c:if>
     </c:if>
 
