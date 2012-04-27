@@ -18,6 +18,7 @@ public class CWSUtilTest {
         assert CWSUtil.validateNameSearch("James Bond");
         assert CWSUtil.validateNameSearch("James-Bond");
         assert CWSUtil.validateNameSearch("Bond, James");
+        assert CWSUtil.validateNameSearch("O'Brien");
     }
 
     public void shouldValidateOrgCode() {
