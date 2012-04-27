@@ -27,7 +27,7 @@
     tableData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evaluations"/> <liferay-ui:message key="${reportTitle}"/>');
     tableData.addRows([
         <c:forEach var="row" items="${tableData}" varStatus="loopStatus">
-            ['<liferay-ui:message key="${row[1]}"/>', ${row[0]}]
+            [getGoogleTableUnitText('${row[2]}', '<liferay-ui:message key="${row[1]}"/>'), ${row[0]}]
             <c:if test="${!loopStatus.last}">
                 ,
             </c:if>
@@ -71,6 +71,7 @@
 
       var tableOptions = {
         sortColumn: 0,
+        allowHtml: true,
         cssClassNames: {
             headerRow: 'google-header-row',
             hoverTableRow: 'google-hover-table-row',
@@ -121,18 +122,49 @@
           return;
       }
 
-      var drillDownURL= '<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-        <portlet:param name="action" value="report"/>
-        <portlet:param name="controller" value="ReportsAction"/>
-        <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
-        <portlet:param name="<%= ReportsAction.REPORT %>" value="${report}"/>
-        <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="unitName"/>
-        <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
-        </portlet:actionURL>';
-
-      drillDownURL = drillDownURL.replace("unitName", unitName);
+      var drillDownURL= getDrillDownUrl(unitName);
       window.location = drillDownURL;
     }
+  }
+
+  function getDrillDownUrl(unitName) {
+    var drillDownURL = '<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+      <portlet:param name="action" value="report"/>
+      <portlet:param name="controller" value="ReportsAction"/>
+      <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
+      <portlet:param name="<%= ReportsAction.REPORT %>" value="${report}"/>
+      <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="unitName"/>
+      <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
+      </portlet:actionURL>';
+    drillDownURL = drillDownURL.replace("unitName", unitName);
+
+    return drillDownURL;
+  }
+
+  function getGoogleTableUnitText(unitName, displayName) {
+    var text = '<a href="' + getDrillDownUrl(unitName) + '">' + displayName + '</a>';
+
+    <c:if test="${scope == 'root' || scope == 'supervisor' || scope == 'orgCode'}">
+      var allowedDrillDown = {
+      <c:forEach var="unit" items="${drillDownData}" varStatus="loopStatus">
+          <c:choose>
+            <c:when test="${(scope == 'root' && reviewerBCName == unit[1])
+                            || allowAllDrillDown || scope != 'root'}">
+            '${unit[2]}' : ''
+            </c:when>
+            <c:otherwise>
+                '_fail${unit[2]}' : ''
+            </c:otherwise>
+          </c:choose>
+          <c:if test="${!loopStatus.last}">, </c:if>
+      </c:forEach>
+      };
+
+      if (!(unitName in allowedDrillDown)) {
+        text = displayName;
+      }
+    </c:if>
+    return text;
   }
 
 jQuery(document).ready(function() {
