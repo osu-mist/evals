@@ -7,7 +7,9 @@
             <liferay-ui:message key="myStatus" />
         </c:if>
         <c:if test="${!empty report}">
-            <liferay-ui:message key="report-supervisor-evals" /> ${currentSupervisorName}
+            <c:if test="${!isMyReport}">
+                <liferay-ui:message key="report-supervisor-evals" /> ${currentSupervisorName}
+            </c:if>
         </c:if>
     </div>
     <div class="accordion-content" id="<portlet:namespace/>MyStatus" style="display: block;">
@@ -46,7 +48,15 @@
             </table>
         </c:if>
         <c:if test="${empty myActiveAppraisals}">
-            <p><liferay-ui:message key="noActiveAppraisals" /></p>
+            <c:choose>
+                <c:when test="${empty report}">
+                    <p><liferay-ui:message key="noActiveAppraisals" /></p>
+                </c:when>
+                <c:otherwise>
+                    <p><liferay-ui:message key="report-supervisors-no-evals" /></p>
+                </c:otherwise>
+            </c:choose>
+
         </c:if>
     </div>
 </div>

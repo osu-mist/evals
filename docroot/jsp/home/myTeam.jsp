@@ -7,14 +7,12 @@
             <liferay-ui:message key="myTeam" />
          </c:if>
         <c:if test="${!empty report}">
-            <liferay-ui:message key="report-supervisor-evals" />
             <c:if test="${isMyReport}">
-                My
+                <liferay-ui:message key="report-supervisor-my-team-evals" />
             </c:if>
             <c:if test="${!isMyReport}">
-                ${currentSupervisorName}
+                <liferay-ui:message key="report-supervisor-team-evals" /> ${currentSupervisorName}
             </c:if>
-            <liferay-ui:message key="report-supervisor-tem-evals" />
         </c:if>
     </div>
     <div class="accordion-content" id="<portlet:namespace/>MyTeam" style="display: block;">
@@ -57,7 +55,15 @@
             </table>
         </c:if>
         <c:if test="${empty myTeamsActiveAppraisals}">
-            <p><em><liferay-ui:message key="noTeamActiveAppraisals" /></em></p>
+            <c:choose>
+                <c:when test="${empty report}">
+                    <p><liferay-ui:message key="noTeamActiveAppraisals" /></p>
+
+                </c:when>
+                <c:otherwise>
+                    <p><liferay-ui:message key="report-supervisors-team-no-evals" /></p>
+                </c:otherwise>
+            </c:choose>
         </c:if>
     </div>
 </div>

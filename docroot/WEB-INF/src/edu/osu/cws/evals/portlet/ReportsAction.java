@@ -946,15 +946,15 @@ public class ReportsAction implements ActionInterface {
                         return true;
                 }
 
-
-                if (noSearchResults) {
-                    noSearchResult += searchType + "-" + userType;
-                    noSearchResultMsg = resource.getString(noSearchResult);
-                }
             } catch (ModelException e) {
                 tooManyResults = true;
                 noSearchResultMsg = e.getMessage();
             }
+        }
+
+        if (noSearchResults && noSearchResultMsg.equals("")) {
+            noSearchResult += searchType + "-" + userType;
+            noSearchResultMsg = resource.getString(noSearchResult);
         }
 
         // Set a message if there were no results or too many
