@@ -516,7 +516,8 @@ public class ReportsAction implements ActionInterface {
         if (searchResults != null && searchResults.size() > 1) {
             hasMultipleSearchResults = true;
         }
-        if (paramMap.isEmpty() || scope.equals(DEFAULT_SCOPE) || hasMultipleSearchResults) {
+        if (paramMap.isEmpty() || scope.equals(DEFAULT_SCOPE) || hasMultipleSearchResults ||
+                startCrumbs == null || startCrumbs.isEmpty()) {
             crumbs.add(rootBreadcrumb);
             return crumbs;
         }
