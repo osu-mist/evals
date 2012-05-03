@@ -767,8 +767,15 @@ public class ReportsAction implements ActionInterface {
             // the bc reviewer can drill down to orgPrefix or orgCode if they are in the same bc
             if (breadcrumbList.size() > 1) {
                 Breadcrumb bcBreadcrumb = breadcrumbList.get(1);
-                if (bcBreadcrumb.getScopeValue().equals(bcName)) {
+                if (bcBreadcrumb.getScope().equals(SCOPE_BC) &&
+                        bcBreadcrumb.getScopeValue().equals(bcName)) {
                     return true;
+                } else {
+                    // check if the user loaded an org code direcly into the url
+                    boolean allowedOrgCode = JobMgr.findOrgCode(getScopeValue(), bcName);
+                    if (allowedOrgCode) {
+                        return true;
+                    }
                 }
             }
         }
