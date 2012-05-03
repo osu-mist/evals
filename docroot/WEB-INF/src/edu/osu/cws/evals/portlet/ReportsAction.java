@@ -975,7 +975,18 @@ public class ReportsAction implements ActionInterface {
         }
 
         if (noSearchResults && noSearchResultMsg.equals("")) {
-            noSearchResult += searchType + "-" + userType;
+            if (searchType.equals("orgCode")) {
+                noSearchResult += searchType + "-" + userType;
+            } else {
+                if (actionHelper.isLoggedInUserAdmin(request)) {
+                    noSearchResult = "appraisal-search-no-results-admin";
+                } else if (actionHelper.isLoggedInUserReviewer(request)) {
+                    noSearchResult = "appraisal-search-no-results-reviewer";
+                } else {
+                    noSearchResult = "appraisal-search-no-results-supervisor";
+                }
+            }
+
             noSearchResultMsg = resource.getString(noSearchResult);
         }
 
