@@ -431,6 +431,14 @@ public class ReportsAction implements ActionInterface {
         return true;
     }
 
+    /**
+     *  Set up the drill down array of data. If the user is viewing the default unit report, we
+     *  just copy the data and remove the current supervisor since he can't drill into himself. If
+     *  we are in another type of report, we do a db query to get the drill down list.
+     *
+     * @param directSupervisors
+     * @param inLeafSupervisor
+     */
     private void setDrillDownData(List<Job> directSupervisors, boolean inLeafSupervisor) {
         // The drill down data is the same as the report by unit (overdue may not have all units)
         String report = (String) paramMap.get(REPORT);
@@ -438,10 +446,16 @@ public class ReportsAction implements ActionInterface {
             drillDownData = new ArrayList<Object[]>();
             drillDownData.addAll(tableData);
 
-            // For the supervisor reports, the 1st slice of the tableData is the current level
-            // we can't drill down using the name of the current supervisor
+            // For the supervisor reports, if the 1st slice is the current supervisor, we remove it
+            // from the drill down.
             if (getScope().equals(SCOPE_SUPERVISOR)) {
-                drillDownData.remove(0);
+                Object[] firstRow = drillDownData.get(0);
+                if (firstRow.length > 1) {
+                    String scopeValue = firstRow[2].toString();
+                    if (currentSupervisorJob.getIdKey().equals(scopeValue)) {
+                        drillDownData.remove(0);
+                    }
+                }
             }
         } else {
             drillDownData = ReportMgr.getDrillDownData(paramMap, false, directSupervisors,
