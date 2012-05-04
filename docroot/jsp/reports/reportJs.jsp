@@ -122,7 +122,9 @@
 
       if (scope == "<%= ReportsAction.DEFAULT_SCOPE%>") {
         if (!allowAllDrillDown && reviewerBCName != unitName) {
-          alert("<liferay-ui:message key="report-js-no-drilldown-bc-other-bc"/>");
+            <c:if test="${isReviewer == 'true'}">
+              alert("<liferay-ui:message key="report-js-no-drilldown-bc-other-bc"/>");
+            </c:if>
           return;
         }
       }
