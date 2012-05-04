@@ -123,7 +123,16 @@
                                 <portlet:param name="scopeValue" value="${scopeValue}"/>
                                 <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                                 <portlet:param name="report" value="<%= ReportsAction.REPORT_DEFAULT%>"/>
-                                </portlet:actionURL>"><liferay-ui:message key="report-choose-by-unit"/></a> |
+                                </portlet:actionURL>">
+                                <c:choose>
+                                    <c:when test="${scope == 'supervisor'}">
+                                        <liferay-ui:message key="report-choose-by-supervisor"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <liferay-ui:message key="report-choose-by-unit"/>
+                                    </c:otherwise>
+                                </c:choose>
+                            </a> |
                         </c:if>
                         <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                             <portlet:param name="action" value="report"/>
@@ -145,7 +154,16 @@
                                 <portlet:param name="scopeValue" value="${scopeValue}"/>
                                 <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                                 <portlet:param name="report" value="<%= ReportsAction.REPORT_UNIT_OVERDUE%>"/>
-                                </portlet:actionURL>"><liferay-ui:message key="report-choose-by-unit"/></a> |
+                                </portlet:actionURL>">
+                                <c:choose>
+                                    <c:when test="${scope == 'supervisor'}">
+                                        <liferay-ui:message key="report-choose-by-supervisor"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <liferay-ui:message key="report-choose-by-unit"/>
+                                    </c:otherwise>
+                                </c:choose>
+                            </a> |
                         </c:if>
                         <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                             <portlet:param name="action" value="report"/>
@@ -167,7 +185,16 @@
                                 <portlet:param name="scopeValue" value="${scopeValue}"/>
                                 <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
                                 <portlet:param name="report" value="<%= ReportsAction.REPORT_UNIT_WAYOVERDUE%>"/>
-                                </portlet:actionURL>"><liferay-ui:message key="report-choose-by-unit"/></a> |
+                                </portlet:actionURL>">
+                                <c:choose>
+                                    <c:when test="${scope == 'supervisor'}">
+                                        <liferay-ui:message key="report-choose-by-supervisor"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <liferay-ui:message key="report-choose-by-unit"/>
+                                    </c:otherwise>
+                                </c:choose>
+                            </a> |
                         </c:if>
                         <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                             <portlet:param name="action" value="report"/>
