@@ -112,6 +112,7 @@
 
       // if the drillDown level is supervisor, we don't allow drill down for currentSupervisor
       if (nextScope == 'supervisor' && displayValue == "${currentSupervisorName}") {
+          alert("<liferay-ui:message key="report-js-no-drilldown-same-supervisor"/>");
           return;
       }
 
@@ -121,12 +122,14 @@
 
       if (scope == "<%= ReportsAction.DEFAULT_SCOPE%>") {
         if (!allowAllDrillDown && reviewerBCName != unitName) {
+          alert("<liferay-ui:message key="report-js-no-drilldown-bc-other-bc"/>");
           return;
         }
       }
 
       // right now we don't support drilling down to the grouped "other".
       if (typeof unitName == "undefined") {
+          alert("<liferay-ui:message key="report-js-no-drilldown-to-group-other"/>");
           return;
       }
 
