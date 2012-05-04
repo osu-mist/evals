@@ -61,7 +61,7 @@
 
                 </c:when>
                 <c:otherwise>
-                    <p><liferay-ui:message key="report-supervisors-team-no-evals" /></p>
+                    <p><liferay-ui:message key="report-supervisors-team-no-evals" /> ${currentSupervisorName}</p>
                 </c:otherwise>
             </c:choose>
         </c:if>
