@@ -85,6 +85,14 @@
       google.visualization.events.addListener(chart, 'select', function() {
           chartDrillDown();
       });
+      // When you hover on the chart, change the cursor to a hand
+      google.visualization.events.addListener(chart, 'onmouseover', function() {
+          chartMouseOver();
+      });
+      // When you leaving the chart, change the cursor to an arrow
+      google.visualization.events.addListener(chart, 'onmouseout', function() {
+          chartMouseOut();
+      });
   }
 
   /**
@@ -125,6 +133,14 @@
       var drillDownURL= getDrillDownUrl(unitName);
       window.location = drillDownURL;
     }
+  }
+
+  function chartMouseOver() {
+      jQuery(".chart-div iframe").contents().find("body").css("cursor", "pointer");
+  }
+
+  function chartMouseOut() {
+      jQuery(".chart-div iframe").contents().find("body").css("cursor", "auto");
   }
 
   function getDrillDownUrl(unitName) {
