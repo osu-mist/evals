@@ -27,7 +27,7 @@
     tableData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evaluations"/> <liferay-ui:message key="${reportTitle}"/>');
     tableData.addRows([
         <c:forEach var="row" items="${tableData}" varStatus="loopStatus">
-            [getGoogleTableUnitText('${row[2]}', '<liferay-ui:message key="${row[1]}"/>'), ${row[0]}]
+            [getGoogleTableUnitText('${row[2]}', "<liferay-ui:message key="${row[1]}"/>"), ${row[0]}]
             <c:if test="${!loopStatus.last}">
                 ,
             </c:if>
@@ -39,7 +39,7 @@
     chartData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evals"/>');
     chartData.addRows([
         <c:forEach var="row" items="${chartData}" varStatus="loopStatus">
-            ['<liferay-ui:message key="${row[1]}"/>', ${row[0]}]
+            ["<liferay-ui:message key="${row[1]}"/>", ${row[0]}]
             <c:if test="${!loopStatus.last}">
                 ,
             </c:if>
@@ -103,7 +103,7 @@
       var unitName = chartDataScopeMap[displayValue];
 
       // if the drillDown level is supervisor, we don't allow drill down for currentSupervisor
-      if (nextScope == 'supervisor' && displayValue == '${currentSupervisorName}') {
+      if (nextScope == 'supervisor' && displayValue == "${currentSupervisorName}") {
           return;
       }
 
@@ -142,6 +142,10 @@
   }
 
   function getGoogleTableUnitText(unitName, displayName) {
+    if (unitName == "") {
+        return displayName;
+    }
+
     var text = '<a href="' + getDrillDownUrl(unitName) + '">' + displayName + '</a>';
 
     <c:if test="${scope == 'root' || scope == 'supervisor' || scope == 'orgCode'}">
