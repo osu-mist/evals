@@ -264,8 +264,7 @@ tr.ui-state-highlight {
 }
 
 .osu-cws table.google-visualization-table-table {
-  width: 95% !important;
-  margin: auto 15px auto 12px !important;
+  margin: auto;
 }
 
 .osu-cws table.google-visualization-table-table td {
@@ -288,12 +287,12 @@ tr.ui-state-highlight {
     max-width: 50%;
 }
 
-.osu-cws-report-right a {
-    font-size: 1.18em;
+.osu-cws-report-right .accordion-content {
+    font-size: 12px;
 }
 
 .chart-div {
-    height: 42em;
+    height: 38em;
 }
 
 .osu-cws .chart-menu { /* removes unecessasry padidng */
@@ -364,7 +363,7 @@ tr.ui-state-highlight {
 }
 
 .chart-menu li a {
-    border-bottom: 3px solid transparent;
+    border-bottom: 2px solid transparent;
     color: #686868;
     display: block;
     min-height: 16px;
@@ -404,25 +403,29 @@ tr.ui-state-highlight {
   padding: 10px;
 }
 
-tr.google-header-row {
+.osu-cws table.report-data {
+  margin-top: 20px;
+}
+
+.osu-cws tr.google-header-row {
     background-color: #767676;
     font-weight: bold;
 }
 
-tr.google-header-row td {
+.osu-cws tr.google-header-row td {
     color: #fff;
 }
 
-.google-hover-table-row {
+.osu-cws .google-hover-table-row {
     background-color: #C6C6C6;
     color: #000;
 }
 
-tr.google-table-row td {
+.osu-cws tr.google-table-row td {
     color: #000;
 }
 
-tr.google-odd-table-row td {
+.osu-cws tr.google-odd-table-row td {
     background-color: #F2F2F2;
     color: #000;
 }
@@ -441,6 +444,13 @@ tr.google-odd-table-row td {
 
 .osu-cws .google-visualization-table-th {
   border: none;
+}
+.osu-cws .google-visualization-table-td {
+  border: none;
+}
+
+.osu-cws .google-visualization-table-td + td {
+  border-left: 1px solid #ddd;
 }
 
 /** Breadcrumbs **/
