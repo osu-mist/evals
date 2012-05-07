@@ -53,7 +53,7 @@
                     <p><liferay-ui:message key="noActiveAppraisals" /></p>
                 </c:when>
                 <c:otherwise>
-                    <p><liferay-ui:message key="report-supervisors-no-evals" /></p>
+                    <p>${currentSupervisorName} <liferay-ui:message key="report-supervisors-no-evals" /></p>
                 </c:otherwise>
             </c:choose>
 
