@@ -14,14 +14,17 @@ import edu.osu.cws.util.CWSUtil;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import edu.osu.cws.evals.models.*;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Query;
 
 public class EvalsUtil {
+    private static Date evalsStartDate = null;
+
     /**
      *
      * @param appraisal
@@ -210,5 +213,80 @@ public class EvalsUtil {
         }
 
         return 0;
+    }
+
+    /**
+     * Returns the start with clause so that we can get the oracle hierarchical data
+     * for the current supervisor level.
+     *
+     * @return
+     */
+    public static String getStartWithClause(int directSupervisorCount) {
+        ArrayList<String> startWithClause = new ArrayList<String>();
+        for (int i = 0; i < directSupervisorCount; i++) {
+            String jobClause = "(pyvpasj_pidm = :startWithPidm" + i +
+                     " AND pyvpasj_posn = :startWithPosnNo" + i +
+                    " AND pyvpasj_suff = :startWithSuffix" + i + ") ";
+            startWithClause.add(jobClause);
+        }
+        String startWith = "START WITH ";
+        startWith += StringUtils.join(startWithClause, " OR ");
+        return startWith;
+    }
+
+    /**
+     * Sets the pidm, posno and suffix parameters used by the start with
+     * clause.
+     *
+     * @param directSupervisors
+     * @param query
+     */
+    public static void setStartWithParameters(List<Job> directSupervisors, Query query) {
+        int i = 0;
+        for (Job directSupervisor : directSupervisors) {
+            query.setInteger("startWithPidm"+i, directSupervisor.getEmployee().getId())
+                    .setString("startWithPosnNo"+i, directSupervisor.getPositionNumber())
+                    .setString("startWithSuffix"+i, directSupervisor.getSuffix());
+            i++;
+        }
+    }
+
+    /**
+     * Whether or not the current job and appraisal start date is before evals started
+     * processing evaluations.
+     *
+     * @param job
+     * @param startDate
+     * @param type
+     * @return
+     * @throws ParseException
+     */
+    public static boolean beforeEvalsTime(Job job, Date startDate, String type)
+            throws ParseException {
+        Date appraisalEndDate = job.getEndEvalDate(startDate, type);
+        System.out.print("appraisalEndDate = " + appraisalEndDate);
+        if (appraisalEndDate.before(getEvalsStartDate() )) {
+            System.out.println(", before evalsStartDate.");
+            return true;
+        }
+        System.out.println(".");
+        return false;
+    }
+
+    /**
+     * Parses the constant EVALS_START_DATE and stores a date object in evalsStartDate.
+     *
+     * @return
+     * @throws ParseException
+     */
+    public static Date getEvalsStartDate() throws ParseException {
+        if (evalsStartDate != null) {
+            return evalsStartDate;
+        } else {
+            SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
+            evalsStartDate = fmt.parse(Constants.EVALS_START_DATE);
+        }
+
+        return evalsStartDate;
     }
 }

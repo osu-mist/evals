@@ -1,5 +1,5 @@
 .pass-hide {
-    display: none;
+    display: none !important;
 }
 
 /* Home View */
@@ -30,6 +30,13 @@
     margin: 0 1em 0 0.5em;
     padding: 0.3em 0 0 0.5em;
 }
+
+.pass-notification h3.clean {
+  padding: 0;
+  margin: 0;
+  border-bottom: none;
+}
+
 .pass-notification p {
     margin:0.5em 1em;
 }
@@ -256,7 +263,18 @@ tr.ui-state-highlight {
     display: none;
 }
 
+.osu-cws table.google-visualization-table-table {
+  margin: auto;
+}
 
+.osu-cws table.google-visualization-table-table td {
+  border-color: #ddd !important;
+}
+
+.osu-cws table.google-visualization-table-table tr.google-hover-table-row td,
+.osu-cws table.google-visualization-table-table tr.google-hover-table-row {
+  background: inherit !important;
+}
 /******************************************************************* Reports **/
 .osu-cws-report-left {
     float: left;
@@ -264,15 +282,17 @@ tr.ui-state-highlight {
 
 .osu-cws-report-right {
     margin-left: 58em;
-    width: 30em;
+    min-width: 38em;
+    width: auto;
+    max-width: 50%;
 }
 
-.osu-cws-report-right a {
-    font-size: 1.18em;
+.osu-cws-report-right .accordion-content {
+    font-size: 12px;
 }
 
 .chart-div {
-    height: 42em;
+    height: 38em;
 }
 
 .osu-cws .chart-menu { /* removes unecessasry padidng */
@@ -298,6 +318,14 @@ tr.ui-state-highlight {
     box-shadow: 0 2px 3px #ccc;
 }
 
+.osu-cws-report-left .chart-menu ul ul {
+  min-width: 8em;
+}
+
+.osu-cws-report-left .chart-menu ul ul.supervisor-report {
+  min-width: 14em;
+}
+
 .chart-menu ul li:hover ul {
     left: 0;
     border: 1px solid #ccc;
@@ -311,8 +339,21 @@ tr.ui-state-highlight {
     position: relative;
 }
 
+.chart-menu > ul > li.float-left {
+    float: left;    
+}
+
+.chart-menu > ul > li.float-left.first {
+    margin-left: -12px;
+}
+
+.chart-menu > ul > li.float-left > a {
+    border-left: none;
+    border-right: 1px solid #ccc;
+}
+
 .chart-menu > ul > li > a {
-  border-left: 1px solid #ccc;
+    border-left: 1px solid #ccc;
 }
 
 .chart-menu li ul li {
@@ -322,16 +363,20 @@ tr.ui-state-highlight {
 }
 
 .chart-menu li a {
-    border-bottom: 3px solid transparent;
+    border-bottom: 2px solid transparent;
     color: #686868;
     display: block;
-    height: 16px;
+    min-height: 16px;
     padding: 3px 0 0 8px;
     text-decoration: none;
 }
 
+.chart-menu > ul > li.float-left > a {
+   padding-right: 8px;
+}
+
 .ie7 .chart-menu li a {
-  min-width: 7.8em;
+    min-width: 7.8em;
 }
 
 .chart-menu li a:hover, 
@@ -346,7 +391,8 @@ tr.ui-state-highlight {
 }
 
 .osu-cws .report-list {
-  width: 660px;
+  margin-top: 1.5em;
+  width: 620px;
 }
 
 .osu-cws div.chart-content {
@@ -357,25 +403,29 @@ tr.ui-state-highlight {
   padding: 10px;
 }
 
-tr.google-header-row {
+.osu-cws table.report-data {
+  margin-top: 20px;
+}
+
+.osu-cws tr.google-header-row {
     background-color: #767676;
     font-weight: bold;
 }
 
-tr.google-header-row td {
+.osu-cws tr.google-header-row td {
     color: #fff;
 }
 
-.google-hover-table-row {
+.osu-cws .google-hover-table-row {
     background-color: #C6C6C6;
     color: #000;
 }
 
-tr.google-table-row td {
+.osu-cws tr.google-table-row td {
     color: #000;
 }
 
-tr.google-odd-table-row td {
+.osu-cws tr.google-odd-table-row td {
     background-color: #F2F2F2;
     color: #000;
 }
@@ -394,6 +444,13 @@ tr.google-odd-table-row td {
 
 .osu-cws .google-visualization-table-th {
   border: none;
+}
+.osu-cws .google-visualization-table-td {
+  border: none;
+}
+
+.osu-cws .google-visualization-table-td + td {
+  border-left: 1px solid #ddd;
 }
 
 /** Breadcrumbs **/

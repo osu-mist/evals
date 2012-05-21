@@ -148,18 +148,16 @@ public class Mailer {
             String recipientString = InternetAddress.toString(msg.getAllRecipients());
 
             logShortMessage = emailType.getType() + " email sent for appraisal " + appraisal.getId();
-            logLongMessage = "email of type " + emailType.getType() + " addressed to " + addressee
-                                + " sent to " + mailTo + " (" + recipientString + ")"
+            logLongMessage = "email of type " + emailType.getType() + " sent "
                                 + " regarding appraisal " + appraisal.getId()
-                                + " for " + getJobTitle(appraisal) + " " + getEmployeeName(appraisal);
+                                + " for " + getJobSignature(appraisal);
             logger.log(Logger.INFORMATIONAL, logShortMessage, logLongMessage, logFields);
         } catch (Exception e) {
             try {
                 logShortMessage = "Email not sent";
                 Employee employee = appraisal.getJob().getEmployee();
-                logLongMessage = "Error encountered when sending mail to employee " + employee.getName() +
-                        " with OSU ID = " + employee.getOsuid() +", PIDM = " + employee.getId() +
-                        ", job = " + appraisal.getJob().getPositionNumber() + ", appraisal = " +
+                logLongMessage = "Error encountered when sending mail to job: " +
+                        appraisal.getJob().getSignature() + ", appraisal = " +
                         appraisal.getId() + "\n" + CWSUtil.stackTraceString(e);
                 logger.log(Logger.ERROR,logShortMessage,logLongMessage);
             } catch (Exception logError) { }
@@ -272,9 +270,8 @@ public class Mailer {
     private void logNullEmail(Employee employee) throws Exception {
         String logShortMessage;
         String logLongMessage;
-        logShortMessage = employee.getName() + " has a blank or null email address";
-        logLongMessage = employee.getName() + " OSU ID = " + employee.getOsuid() + " PIDM = " + employee.getId() +
-                " does not have a valid email address";
+        logShortMessage = employee.getId() + " has a blank or null email address";
+        logLongMessage = " PIDM = " + employee.getId() +" does not have a valid email address";
         logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
     }
 
@@ -328,8 +325,8 @@ public class Mailer {
             if (bcName == null) //supervisor has no job, Error
             {
                 String shortMsg = "From sendSupervisorMail: supervisor has no active job";
-                String longMsg = "Supervisor " + supervisor.getName() + ", " +
-                        supervisor.getId() + ", has no active job.";
+                String longMsg = "Supervisor PIDM: " + supervisor.getId() +
+                        ", has no active job.";
                 logger.log(Logger.ERROR, shortMsg, longMsg);
                 return;
             }
@@ -367,7 +364,8 @@ public class Mailer {
                 email.getEmailType();
                 String logStatus = Logger.INFORMATIONAL;
                 String logShortMessage = emailType + " email sent to for appraisal " + appraisalId;
-                String logLongMessage = emailType + " mail sent to " + emailAddress + " for appraisal " + appraisalId;
+                String logLongMessage = emailType + " mail sent to supervisor with PIDM: " +
+                        supervisor.getId() + " for appraisal " + appraisalId;
 
                 logger.log(logStatus, logShortMessage, logLongMessage);
             }
@@ -375,9 +373,8 @@ public class Mailer {
             String logLongMessage = "";
             String shortMessage = "Error in sendSupervisorMail";
             try {
-                logLongMessage = "Error encountered when sending mail to supervisor " +
-                        supervisor.getName() + " with OSU ID = " + supervisor.getOsuid() +
-                        ", PIDM = " + supervisor.getId() + "\n" + CWSUtil.stackTraceString(e);
+                logLongMessage = "Error encountered when sending mail to supervisor with PIDM: " +
+                        supervisor.getId() + "\n" + CWSUtil.stackTraceString(e);
                 logger.log(Logger.ERROR, shortMessage, logLongMessage);
             } catch (Exception logError) { }
         }
@@ -411,14 +408,14 @@ public class Mailer {
             msg.setContent(body, mimeType);
             msg.setSubject(reviewerSubject);
             Transport.send(msg);
-            String longMsg = "Emails sent to: " + Arrays.toString(emailAddresses);
-            logger.log(Logger.INFORMATIONAL, "Reviewer emails sent to", longMsg);
+            String longMsg = "Emails sent to: various reviewers";
+            logger.log(Logger.INFORMATIONAL, "Reviewer emails sent", longMsg);
         } catch (Exception e) {
             String logLongMessage = "";
             String shortMessage = "Error in sendReviewerMail";
             try {
-                logLongMessage = "Error encountered when sending mail to reviewers =  " +
-                        emailAddresses.toString() + "\n" + CWSUtil.stackTraceString(e);
+                logLongMessage = "Error encountered when sending mail to reviewers" +
+                        "\n" + CWSUtil.stackTraceString(e);
                 logger.log(Logger.ERROR, shortMessage, logLongMessage);
             } catch (Exception logError) { }
         }
@@ -713,6 +710,15 @@ public class Mailer {
     }
 
     /**
+     * Fetch the signature of the job for a specific appraisal
+     * @param appraisal
+     * @return
+     */
+    private String getJobSignature(Appraisal appraisal) {
+        return (appraisal.getJob().getSignature());
+    }
+
+    /**
      * Fetch the full name of the employee for a particular appraisal
      * @param appraisal
      * @return
@@ -721,6 +727,17 @@ public class Mailer {
         Job job = appraisal.getJob();
         Employee employee = job.getEmployee();
         return employee.getConventionName();
+    }
+
+    /**
+     * Fetch the id/pidm of the employee for a particular appraisal
+     * @param appraisal
+     * @return
+     */
+    private String getEmployeeId(Appraisal appraisal) {
+        Job job = appraisal.getJob();
+        Integer id = job.getEmployee().getId();
+        return id.toString();
     }
 
     /**

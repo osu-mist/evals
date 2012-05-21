@@ -1,21 +1,13 @@
 package edu.osu.cws.evals.portlet;
 
-import com.liferay.portal.kernel.servlet.HttpHeaders;
-import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
-import edu.osu.cws.evals.util.EvalsPDF;
-import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.hibernate.Session;
 
 import javax.portlet.*;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -92,8 +84,7 @@ public class ActionHelper {
 
         allMyActiveAppraisals = (ArrayList<Appraisal>) session.getAttribute(ALL_MY_ACTIVE_APPRAISALS);
         if (allMyActiveAppraisals == null) {
-            AppraisalMgr appraisalMgr = new AppraisalMgr();
-            allMyActiveAppraisals = appraisalMgr.getAllMyActiveAppraisals(employeeId);
+            allMyActiveAppraisals = AppraisalMgr.getAllMyActiveAppraisals(employeeId, null, null);
             session.setAttribute(ALL_MY_ACTIVE_APPRAISALS, allMyActiveAppraisals);
         }
         return allMyActiveAppraisals;
@@ -130,16 +121,7 @@ public class ActionHelper {
         List<Appraisal> dbTeamAppraisals;
         myTeamAppraisals = (ArrayList<Appraisal>) session.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
         if (myTeamAppraisals == null) {
-            AppraisalMgr appraisalMgr = new AppraisalMgr();
-            dbTeamAppraisals = appraisalMgr.getMyTeamsAppraisals(employeeId, true);
-            myTeamAppraisals = new ArrayList<Appraisal>();
-
-            if (dbTeamAppraisals != null) {
-                for (Appraisal appraisal : dbTeamAppraisals) {
-                    appraisal.setRole("supervisor");
-                    myTeamAppraisals.add(appraisal);
-                }
-            }
+            myTeamAppraisals = AppraisalMgr.getMyTeamsAppraisals(employeeId, true, null, null);
             session.setAttribute(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals);
         }
         return myTeamAppraisals;
@@ -160,7 +142,7 @@ public class ActionHelper {
 
         Boolean isSupervisor = (Boolean) session.getAttribute("isSupervisor");
         if (refresh || isSupervisor == null) {
-            isSupervisor = jobMgr.isSupervisor(employeeId);
+            isSupervisor = JobMgr.isSupervisor(employeeId, null);
             session.setAttribute("isSupervisor", isSupervisor);
         }
         requestMap.put("isSupervisor", isSupervisor);
@@ -271,26 +253,6 @@ public class ActionHelper {
     }
 
     /**
-     * Returns the reviews for the logged on User. It is a wrapper for
-     * getReviewsForLoggedInUser(request, maxResults). It basically looks up in session what is
-     * the number of maxResults and calls the getReviewsForLoggedInUser method.
-     *
-     * @param request       PortletRequest object
-     * @return              ArrayList<Appraisal>
-     * @throws Exception
-     */
-    private ArrayList<Appraisal> getReviewsForLoggedInUser(PortletRequest request) throws Exception {
-        int defaultMaxResults = -1;
-        PortletSession session = request.getPortletSession(true);
-        Integer maxResults = (Integer) session.getAttribute(REVIEW_LIST_MAX_RESULTS);
-        if (maxResults == null) {
-            maxResults = defaultMaxResults;
-        }
-
-        return getReviewsForLoggedInUser(request, maxResults);
-    }
-
-    /**
      * Retrieves the pending reviews for the logged in user.
      *
      * @param request
@@ -311,8 +273,7 @@ public class ActionHelper {
             String businessCenterName = ParamUtil.getString(request, "businessCenterName");
 
             if (businessCenterName.equals("")) {
-                int employeeID = getLoggedOnUser(request).getId();
-                businessCenterName = getReviewer(employeeID).getBusinessCenterName();
+                businessCenterName = getBusinessCenterForLoggedInReviewer(request);
             }
             AppraisalMgr appraisalMgr = new AppraisalMgr();
             reviewList = appraisalMgr.getReviews(businessCenterName, -1);
@@ -330,6 +291,20 @@ public class ActionHelper {
         }
 
         return outList;
+    }
+
+    /**
+     * Returns the business center name for the currently logged in user that is a reviewer.
+     *
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    public String getBusinessCenterForLoggedInReviewer(PortletRequest request) throws Exception {
+        String businessCenterName;
+        int employeeID = getLoggedOnUser(request).getId();
+        businessCenterName = getReviewer(employeeID).getBusinessCenterName();
+        return businessCenterName;
     }
 
     /**
@@ -366,7 +341,7 @@ public class ActionHelper {
      * @throws Exception
      */
     public void removeReviewAppraisalInSession(PortletRequest request, Appraisal appraisal) throws Exception {
-        List<Appraisal> reviewList = getReviewsForLoggedInUser(request);
+        List<Appraisal> reviewList = getReviewsForLoggedInUser(request, -1);
         List<Appraisal> tempList = new ArrayList<Appraisal>();
         tempList.addAll(reviewList);
         for (Appraisal appraisalInSession: tempList) {
@@ -727,13 +702,14 @@ public class ActionHelper {
      *
      * @param businessCenterName
      * @param resource
+     * @param request
      * @return
      * @throws Exception
      */
     private RequiredAction getReviewerAction(String businessCenterName, ResourceBundle resource,
                                              PortletRequest request) throws Exception {
         int reviewCount;
-        List<Appraisal> reviewList = getReviewsForLoggedInUser(request);
+        List<Appraisal> reviewList = getReviewsForLoggedInUser(request, -1);
         if (reviewList != null) {
             reviewCount = reviewList.size();
         } else {

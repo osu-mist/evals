@@ -1,19 +1,26 @@
 package edu.osu.cws.evals.portlet;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.liferay.portal.kernel.util.ParamUtil;
+import edu.osu.cws.evals.hibernate.AppraisalMgr;
+import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.ReportMgr;
-import edu.osu.cws.evals.models.Appraisal;
-import edu.osu.cws.evals.models.Configuration;
+import edu.osu.cws.evals.models.*;
 import edu.osu.cws.util.Breadcrumb;
+import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.portlet.*;
+import java.lang.reflect.Type;
 import java.util.*;
 
 public class ReportsAction implements ActionInterface {
     public static final String SCOPE = "scope";
     public static final String SCOPE_VALUE = "scopeValue";
+    public static final String SEARCH_TERM = "searchTerm";
+    public static final String BREADCRUMB_LIST = "breadcrumbList";
 
     public static final String DEFAULT_SCOPE = "root";
     public static final String DEFAULT_SCOPE_VALUE = "OSU";
@@ -49,6 +56,8 @@ public class ReportsAction implements ActionInterface {
 
     private List<Breadcrumb> breadcrumbList = new ArrayList<Breadcrumb>();
 
+    private boolean enableByUnitReports = true;
+
     private ActionHelper actionHelper;
     private HomeAction homeAction;
 
@@ -58,19 +67,63 @@ public class ReportsAction implements ActionInterface {
      * *scope: root (default), bc, orgPrefix, orgCode, employee
      * scopeValue: related to scope: osu, uabc, mum, 123456, 943232
      * breadCrumbIndex: numeric index of the breadcrumb clicked
+     * searchTerm: the searchTerm the user entered, either osuid, name or orgCode
+     * bcName:  the name of the bcName the report should filter on
+     * breadcrumbList: The breadcrumbs that should be used: request, session, or default osu
      */
     private HashMap paramMap = new HashMap();
 
     private List<Appraisal> listAppraisals;
+    private List<Object[]> tableData;
+    private List<Job> searchResults = new ArrayList<Job>();
+
+    /**
+     * Format:
+     * {
+     *     // # of evals, displayValue, scopeValue
+     *     5, 'UABC', 'UABC' // when scope is bc
+     *     5, 'CLA', 'CLA' // when scope is orgPrefix
+     *     5, '1234', '1234' // when scope is orgCode
+     *     5, 'Bond, James', 'pidm_posno_suffix' // when scope is supervisor
+     *
+     * }
+     */
     private List<Object[]> chartData;
-    private List<Object[]> trimmedChartData;
+
     private List<Object[]> drillDownData;
 
     /**
-     * Value displayed when generating the drill down links in data table.
+     * Holds the job of the current supervisor level in the supervisor report.
+     * Set in setParamMap()
      */
-    HashMap<String, Integer> units = new HashMap<String, Integer>();
-    public static final String BREADCRUMB_SESS_KEY = "breadcrumbList";
+    private Job currentSupervisorJob;
+
+    /**
+     * Holds list of appraisals of direct employees of current supervisor
+     */
+    private ArrayList<Appraisal> supervisorTeamAppraisal;
+
+    /**
+     * Holds list of appraisals of current supervisor
+     */
+    private ArrayList<Appraisal> supervisorAppraisals;
+
+    private boolean inLeafSupervisorReport = false;
+
+    /**
+     * Specifies if the current supervisor report is the report of the logged in user
+     */
+    private boolean isMyReport = false;
+
+    /**
+     * Whether or not the current page we're viewing is the appraisal search. Meaning
+     * listing the appraisals for a single employee.
+     */
+    private boolean isAppraisalSearch = false;
+
+    Gson gson = new Gson();
+
+    private Breadcrumb rootBreadcrumb = new Breadcrumb("OSU", DEFAULT_SCOPE, DEFAULT_SCOPE_VALUE);
 
     /**
      * Main method used in this class. It responds to the user request when the user is viewing
@@ -83,62 +136,195 @@ public class ReportsAction implements ActionInterface {
      */
     public String report(PortletRequest request, PortletResponse response) throws Exception {
         PortletSession session = request.getPortletSession();
+
+        // parse the various parameters from request and session
         setParamMap(request);
 
-        breadcrumbList = getBreadcrumbs(request);
-
-        if (!canViewReport(request)) {
-            if (response instanceof ActionResponse) {
-                ((ActionResponse) response ).setWindowState(WindowState.NORMAL);
-            }
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
-            return homeAction.display(request, response);
-        }
-
-        String jspFile = activeReport(breadcrumbList);
+        processReport(request, response);
         setupDataForJSP(request);
         actionHelper.useMaximizedMenu(request);
 
         // Save session values only if we didn't throw an exception before we got here.
-        session.setAttribute(BREADCRUMB_SESS_KEY, breadcrumbList);
+        session.setAttribute(BREADCRUMB_LIST, breadcrumbList);
         session.setAttribute("paramMap", paramMap);
 
-        return jspFile;
+        return Constants.JSP_REPORT;
+    }
+
+    /**
+     * Main process method that handles calling the search, active report, permission checks and
+     * breadcrumbs.
+     *
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    private void processReport(PortletRequest request, PortletResponse response) throws Exception {
+        boolean displaySearchResults = false;
+        // if the user searched handle it
+        String searchTerm = getSearchTerm();
+        if (!searchTerm.equals("")) {
+            displaySearchResults = search(searchTerm, request);
+        }
+
+        setIsMyReport(request);
+        breadcrumbList = getBreadcrumbs();
+        // set the bc name using the scope value of the 2nd breadcrumb if applicable
+        if (!displaySearchResults && paramMap.get(Constants.BC_NAME) == null) {
+                setBcName();
+        }
+
+        if (!canViewReport(request)) {
+            accessDeniedReset(request);
+            displaySearchResults = false;
+        }
+
+        if (!displaySearchResults) {
+            if (getScope().equals(SCOPE_SUPERVISOR)) {
+                rightPaneData(request);
+            }
+
+            // Check if we are viewing a supervisor report of a mere employee
+            boolean displayAppraisalSearchList = false;
+            if (getScope().equals(SCOPE_SUPERVISOR)) {
+                String posno = currentSupervisorJob.getPositionNumber();
+                int pidm = currentSupervisorJob.getEmployee().getId();
+                displayAppraisalSearchList = !JobMgr.isSupervisor(pidm, posno);
+            }
+
+            if (displayAppraisalSearchList) { // display appraisal list of single employee
+                searchResults = new ArrayList<Job>();
+                searchResults.add(currentSupervisorJob); // add single employee as the result
+                isAppraisalSearch = activeAppraisalList(request, response);
+                if (!isAppraisalSearch) { //employee had no evaluations
+                    String prevSearchTerm = ParamUtil.getString(request, "prevSearchTerm");
+                    if (!StringUtils.isEmpty(prevSearchTerm)) { // go back to previous search
+                        paramMap.put(SEARCH_TERM, prevSearchTerm);
+                    } else {
+                        // remove the search term so that we can load the previous report
+                        paramMap.put(SEARCH_TERM, "");
+                        paramMap.put(SCOPE, ParamUtil.getString(request, SCOPE));
+                        paramMap.put(SCOPE_VALUE, ParamUtil.getString(request, SCOPE_VALUE));
+                        paramMap.put(REPORT, ParamUtil.getString(request, REPORT));
+                        List<Breadcrumb> prevCrumbs = jsonToBreadcrumbList(request, "prevCrumbs");
+                        paramMap.put(BREADCRUMB_LIST, prevCrumbs);
+                        setCurrentSupervisor();
+                    }
+                    processReport(request, response);
+                }
+            } else {
+                activeReport();
+            }
+        }
+    }
+
+    /**
+     * Resets the paramMap values to the default report and sets the message of
+     * access denied to the user.
+     *
+     * @param request
+     */
+    private void accessDeniedReset(PortletRequest request) {
+        paramMap.put(SCOPE, DEFAULT_SCOPE);
+        paramMap.put(SCOPE_VALUE, DEFAULT_SCOPE_VALUE);
+        breadcrumbList = new ArrayList<Breadcrumb>();
+        breadcrumbList.add(rootBreadcrumb);
+        paramMap.put(SEARCH_TERM, "");
+        paramMap.put(REPORT, REPORT_DEFAULT);
+        searchResults.clear();
+
+        actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
     }
 
     private void setupDataForJSP(PortletRequest request) throws Exception {
-        actionHelper.addToRequestMap("chartData", chartData);
-        actionHelper.addToRequestMap("trimmedChartData", trimmedChartData);
-        actionHelper.addToRequestMap("drillDownData", drillDownData);
-        actionHelper.addToRequestMap("listAppraisals", listAppraisals);
+        boolean showDrillDownMenu = false;
+        String searchTerm = getSearchTerm();
+        boolean displaySearchResultsPage = displaySearchResultsPage();
 
-        String scope = getScope();
-        String scopeValue = getScopeValue();
-        actionHelper.addToRequestMap("scope", scope);
-        actionHelper.addToRequestMap("scopeValue", scopeValue);
-        actionHelper.addToRequestMap("report", paramMap.get(REPORT));
-        actionHelper.addToRequestMap("reportTitle", ReportMgr.getReportTitle(paramMap));
-        actionHelper.addToRequestMap("reportHeader", ReportMgr.getReportHeader(paramMap));
-        actionHelper.addToRequestMap("chartType", getChartType(request));
+        if (isAppraisalSearch) { // display search result of employee appraisals
+            actionHelper.addToRequestMap("listAppraisals", listAppraisals);
+            actionHelper.addToRequestMap("isAppraisalSearch", isAppraisalSearch);
+        } else if (!displaySearchResultsPage) { // regular active report
+            // chart related data
+            actionHelper.addToRequestMap("chartData", chartData);
+            actionHelper.addToRequestMap("tableData", tableData);
+            actionHelper.addToRequestMap("drillDownData", drillDownData);
+            actionHelper.addToRequestMap("listAppraisals", listAppraisals);
 
-        String nextScope = nextScopeInDrillDown(scope);
-        actionHelper.addToRequestMap("nextScope", nextScope);
+            // parameter related data
+            String scope = getScope();
+            String scopeValue = getScopeValue();
+            actionHelper.addToRequestMap("scope", scope);
+            actionHelper.addToRequestMap("scopeValue", scopeValue);
+            actionHelper.addToRequestMap("report", paramMap.get(REPORT));
+            actionHelper.addToRequestMap("reportTitle", ReportMgr.getReportTitle(paramMap));
+            actionHelper.addToRequestMap("reportHeader", ReportMgr.getReportHeader(paramMap));
+            actionHelper.addToRequestMap("chartType", getChartType(request));
+            if (scope.equals(SCOPE_ORG_CODE)) {
+                enableByUnitReports = false;
+            }
+            actionHelper.addToRequestMap("enableByUnitReports", enableByUnitReports);
+
+            if (scope.equals(SCOPE_SUPERVISOR)) {
+                // right pane data: supervisor appraisals and supervisor team
+                actionHelper.addToRequestMap("myActiveAppraisals", supervisorAppraisals);
+                actionHelper.addToRequestMap("myTeamsActiveAppraisals", supervisorTeamAppraisal);
+                actionHelper.addToRequestMap("isMyReport", isMyReport);
+            }
+
+            // breadcrumb and drill down data
+            String nextScope = nextScopeInDrillDown(scope);
+            actionHelper.addToRequestMap("nextScope", nextScope);
+
+            boolean allowAllDrillDown = false;
+            if (actionHelper.isLoggedInUserAdmin(request)) {
+                allowAllDrillDown = true;
+            }
+            actionHelper.addToRequestMap("allowAllDrillDown", allowAllDrillDown);
+
+            String reviewerBCName = "";
+            if (actionHelper.isLoggedInUserReviewer(request)) {
+                int employeeID = actionHelper.getLoggedOnUser(request).getId();
+                reviewerBCName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
+            }
+            actionHelper.addToRequestMap("reviewerBCName", reviewerBCName);
+
+            showDrillDownMenu = showDrillDownMenu(allowAllDrillDown, reviewerBCName);
+
+            actionHelper.addToRequestMap("chartDataScopeMap", chartDataScopeMap());
+
+            if (currentSupervisorJob != null) {
+                String currentSupervisorName = currentSupervisorJob.getEmployee().getName();
+                actionHelper.addToRequestMap("currentSupervisorName", currentSupervisorName);
+            }
+        } else { // displaying search results - multiple jobs
+            actionHelper.addToRequestMap("searchResults", searchResults);
+        }
+
+        actionHelper.addToRequestMap("now", new Date());
+        actionHelper.addToRequestMap("searchTerm", searchTerm);
         actionHelper.addToRequestMap("breadcrumbList", breadcrumbList);
         actionHelper.addToRequestMap("requestBreadcrumbs", getRequestBreadcrumbs());
 
-        boolean allowAllDrillDown = false;
-        if (actionHelper.isLoggedInUserAdmin(request)) {
-            allowAllDrillDown = true;
-        }
-        actionHelper.addToRequestMap("allowAllDrillDown", allowAllDrillDown);
+        actionHelper.addToRequestMap("showDrillDownMenu", showDrillDownMenu);
+        actionHelper.addToRequestMap("searchView", displaySearchResultsPage);
 
-        String reviewerBCName = "";
-        if (actionHelper.isLoggedInUserReviewer(request)) {
-            int employeeID = actionHelper.getLoggedOnUser(request).getId();
-            reviewerBCName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
-        }
-        actionHelper.addToRequestMap("reviewerBCName", reviewerBCName);
-        actionHelper.addToRequestMap("now", new Date());
+        // Error String messages used by search js
+        ResourceBundle resource = (ResourceBundle) actionHelper
+                .getPortletContextAttribute("resourceBundle");
+        actionHelper.addToRequestMap("searchJsErrorDefault",
+                resource.getString("report-search-js-validation-default"));
+        actionHelper.addToRequestMap("searchJsErrorSupervisor",
+                resource.getString("report-search-js-validation-supervisor"));
+
+        // My Report data
+        showMyReportLink(request);
+
+        // list of breadcrumbs used when the request only needs OSU as the breadcrumbs
+        List<Breadcrumb> crumbListWithRootOnly = new ArrayList<Breadcrumb>();
+        crumbListWithRootOnly.add(rootBreadcrumb);
+        String breadcrumbsWithRootOnly = gson.toJson(crumbListWithRootOnly);
+        actionHelper.addToRequestMap("breadcrumbsWithRootOnly", breadcrumbsWithRootOnly);
     }
 
     private String nextScopeInDrillDown(String currentScope) {
@@ -150,28 +336,131 @@ public class ReportsAction implements ActionInterface {
         return (String) DRILL_DOWN_INDEX[nextDrillDownScope];
     }
 
-    private String activeReport(List<Breadcrumb> crumbs) {
+    private boolean activeReport() throws Exception {
+        List<Job> directEmployees = null;
         Map<String, Configuration> configurationMap =
                 (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
         Configuration config = configurationMap.get("reportMaxDataForCharts");
         int maxDataPoints = Integer.parseInt(config.getValue());
 
-        chartData = ReportMgr.getChartData(paramMap, crumbs, true);
-        trimmedChartData = ReportMgr.trimDataPoints(chartData, maxDataPoints);
+        if (getScope().equals(ReportsAction.SCOPE_SUPERVISOR)) {
+            boolean allowUnitReport = true;
+            Job supervisorJob = Job.getJobFromString(getScopeValue());
+            if (supervisorJob != null) {
+                if (JobMgr.isBottomLevelSupervisor(supervisorJob)) {
+                    allowUnitReport = false;
+                    inLeafSupervisorReport = true;
+                }
 
+                boolean supervisorsOnly = !inLeafSupervisorReport;
+                directEmployees = JobMgr.getDirectEmployees(supervisorJob, supervisorsOnly);
+            }
+
+            // If the supervisor is the bottom level supervisor, can't use by unit reports
+            if (!allowUnitReport) {
+                String report = (String) paramMap.get(REPORT);
+                if (report.contains(ReportMgr.UNIT)) {
+                    paramMap.put(REPORT, REPORT_STAGE_BREAKDOWN);
+                }
+                enableByUnitReports = false;
+            }
+        }
+
+        tableData = ReportMgr.getChartData(paramMap, true, directEmployees,
+                supervisorTeamAppraisal, currentSupervisorJob, inLeafSupervisorReport);
+        chartData = ReportMgr.trimDataPoints(tableData, maxDataPoints);
+        setDrillDownData(directEmployees, inLeafSupervisorReport);
+
+
+        if (shouldListAppraisals()) {
+            listAppraisals = AppraisalMgr.getReportListData(paramMap, directEmployees,
+                    inLeafSupervisorReport);
+        }
+
+        return true;
+    }
+
+    /**
+     * Fetches from the db the data needed for the right pane for supervisors:
+     * my evaluations and myTeam evaluations.
+     *
+     * @param request
+     * @throws Exception
+     */
+    private void rightPaneData(PortletRequest request) throws Exception {
+        int supervisorLevelPidm = currentSupervisorJob.getEmployee().getId();
+        String supervisorLevelPosno = currentSupervisorJob.getPositionNumber();
+        String supervisorLevelSuffix = currentSupervisorJob.getSuffix();
+        supervisorTeamAppraisal = AppraisalMgr.getMyTeamsAppraisals(supervisorLevelPidm,
+                true, supervisorLevelPosno, supervisorLevelSuffix);
+        supervisorAppraisals = AppraisalMgr.getAllMyActiveAppraisals(supervisorLevelPidm,
+                supervisorLevelPosno, supervisorLevelSuffix);
+    }
+
+    /**
+     * Displays just the list of appraisals for a single employee. This is used when the user
+     * searches for a single non-supervisor employee and we display the appraisals of the
+     * search result employee. If the employee doesn't have any appraisals, we show an error
+     * message to the user telling them about this.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    private boolean activeAppraisalList(PortletRequest request, PortletResponse response)
+            throws Exception {
+        listAppraisals = AppraisalMgr.getEmployeeAppraisalList(searchResults);
+
+        // Check if the user had no evaluation records
+        if (listAppraisals == null || listAppraisals.isEmpty()) {
+            ResourceBundle resource = (ResourceBundle) actionHelper
+                    .getPortletContextAttribute("resourceBundle");
+
+            String errorMsg = resource.getString("report-search-no-results-no-evals");
+            actionHelper.addErrorsToRequest(request, errorMsg);
+            return false;
+        }
+
+        // when showing the evaluation list after clicking on a search result, set the searchTerm
+        if (getSearchTerm().equals("")) {
+            Breadcrumb lastBreadcrumb = breadcrumbList.get(breadcrumbList.size() - 1);
+            paramMap.put(SEARCH_TERM, lastBreadcrumb.getAnchorText());
+        }
+
+        return true;
+    }
+
+    /**
+     *  Set up the drill down array of data. If the user is viewing the default unit report, we
+     *  just copy the data and remove the current supervisor since he can't drill into himself. If
+     *  we are in another type of report, we do a db query to get the drill down list.
+     *
+     * @param directSupervisors
+     * @param inLeafSupervisor
+     */
+    private void setDrillDownData(List<Job> directSupervisors, boolean inLeafSupervisor) {
         // The drill down data is the same as the report by unit (overdue may not have all units)
         String report = (String) paramMap.get(REPORT);
         if (report.equals(REPORT_DEFAULT)) {
-            drillDownData = chartData;
+            drillDownData = new ArrayList<Object[]>();
+            drillDownData.addAll(tableData);
+
+            // For the supervisor reports, if the 1st slice is the current supervisor, we remove it
+            // from the drill down.
+            if (getScope().equals(SCOPE_SUPERVISOR)) {
+                Object[] firstRow = drillDownData.get(0);
+                if (firstRow.length > 1) {
+                    String scopeValue = firstRow[2].toString();
+                    if (currentSupervisorJob.getIdKey().equals(scopeValue)) {
+                        drillDownData.remove(0);
+                    }
+                }
+            }
         } else {
-            drillDownData = ReportMgr.getDrillDownData(paramMap, crumbs, false);
+            drillDownData = ReportMgr.getDrillDownData(paramMap, false, directSupervisors,
+                    inLeafSupervisor);
         }
-
-        if (shouldListAppraisals()) {
-            listAppraisals = ReportMgr.getListData(paramMap, crumbs);
-        }
-
-        return Constants.JSP_REPORT;
     }
 
     /**
@@ -195,40 +484,11 @@ public class ReportsAction implements ActionInterface {
         Configuration config = configurationMap.get("reportMaxDataForList");
         int maxDataForList = Integer.parseInt(config.getValue());
 
-        for (Object[] row : chartData ) {
+        for (Object[] row : tableData) {
             numberOfEvalRecords += Integer.parseInt(row[0].toString());
         }
 
         return numberOfEvalRecords <= maxDataForList;
-    }
-
-    /**
-     * Checks the request for breadcrumbs, then the session. It uses one of these to
-     * calculate the current set of breadcrumbs.
-     *
-     * @param request
-     * @return
-     */
-    private List<Breadcrumb> getBreadcrumbs(PortletRequest request) {
-        PortletSession session = request.getPortletSession();
-        String requestBreadcrumbs = ParamUtil.getString(request, "requestBreadcrumbs");
-        List<Breadcrumb> reqCrumbsList = new ArrayList<Breadcrumb>();
-
-        String[] scopeValues = StringUtils.split(requestBreadcrumbs);
-        if (scopeValues != null) {
-            for (int i = 0; i < scopeValues.length; i++) {
-                String scopeValue = scopeValues[i];
-                String scope = DRILL_DOWN_INDEX[i];
-                Breadcrumb crumb = new Breadcrumb(scopeValue, scope, scopeValue);
-                reqCrumbsList.add(crumb);
-            }
-        }
-
-        if (!reqCrumbsList.isEmpty()) {
-            return getBreadcrumbs(reqCrumbsList);
-        }
-
-        return getBreadcrumbs((List<Breadcrumb>) session.getAttribute(BREADCRUMB_SESS_KEY));
     }
 
     /**
@@ -242,17 +502,22 @@ public class ReportsAction implements ActionInterface {
      *    4. if somebody clicks on a previous scope of the breadcrumb, we need to remove
      *    the rest of the scopes down the chain.
      *
-     * @param startCrumbs
      * @return
      */
-    private List<Breadcrumb> getBreadcrumbs(List<Breadcrumb> startCrumbs) {
+    private List<Breadcrumb> getBreadcrumbs() {
+        List<Breadcrumb> startCrumbs = (List<Breadcrumb>) paramMap.get(BREADCRUMB_LIST);
         List<Breadcrumb> crumbs = new ArrayList<Breadcrumb>();
-        Breadcrumb rootBreadcrumb = new Breadcrumb("OSU", DEFAULT_SCOPE, DEFAULT_SCOPE_VALUE);
 
         // Initial user click to reports
         String scope = getScope();
         String scopeValue = getScopeValue();
-        if (paramMap.isEmpty() || scope.equals(DEFAULT_SCOPE)) {
+
+        boolean hasMultipleSearchResults = false;
+        if (searchResults != null && searchResults.size() > 1) {
+            hasMultipleSearchResults = true;
+        }
+        if (paramMap.isEmpty() || scope.equals(DEFAULT_SCOPE) || hasMultipleSearchResults ||
+                startCrumbs == null || startCrumbs.isEmpty()) {
             crumbs.add(rootBreadcrumb);
             return crumbs;
         }
@@ -262,19 +527,29 @@ public class ReportsAction implements ActionInterface {
         if (clickedCrumb) {
             crumbs = startCrumbs.subList(0, breadcrumbIndex+1);
         } else {
-            // Figure out if the user selected a different report, within the same scope
-            Breadcrumb lastBreadcrumb = startCrumbs.get(startCrumbs.size() - 1);
-            String scopeOfLastCrumb = lastBreadcrumb.getScope();
-            boolean sameScope = scope.equals(scopeOfLastCrumb);
             crumbs.addAll(startCrumbs);
 
-            if (!sameScope) {
-                Breadcrumb crumb = new Breadcrumb(scopeValue, scope, scopeValue);
+            // Figure out if the user selected a different report, within the same scope
+            Breadcrumb lastBreadcrumb = startCrumbs.get(startCrumbs.size() - 1);
+            String scopeValueOfLastCrumb = lastBreadcrumb.getScopeValue();
+            boolean sameScopeValue = scopeValue.equals(scopeValueOfLastCrumb);
+
+            if (!sameScopeValue) {
+                String anchorText = scopeValue;
+                if (scope.equals(SCOPE_SUPERVISOR)) {
+                    anchorText = currentSupervisorJob.getEmployee().getName();
+                }
+
+                Breadcrumb crumb = new Breadcrumb(anchorText, scope, scopeValue);
                 crumbs.add(crumb);
             }
         }
 
         return crumbs;
+    }
+
+    private boolean displaySearchResultsPage() {
+        return searchResults != null && searchResults.size() > 1;
     }
 
     /**
@@ -283,12 +558,7 @@ public class ReportsAction implements ActionInterface {
      * @return
      */
     private String getRequestBreadcrumbs() {
-        ArrayList<String> scopeValues = new ArrayList<String>();
-        for (Breadcrumb crumb : breadcrumbList) {
-            scopeValues.add(crumb.getScopeValue());
-        }
-
-        return StringUtils.join(scopeValues, " ");
+        return gson.toJson(breadcrumbList);
     }
 
     private String getScopeValue() {
@@ -297,6 +567,10 @@ public class ReportsAction implements ActionInterface {
 
     private String getScope() {
         return (String) paramMap.get(SCOPE);
+    }
+
+    private String getSearchTerm() {
+        return (String) paramMap.get(SEARCH_TERM);
     }
 
     private String getChartType(PortletRequest request) {
@@ -316,7 +590,7 @@ public class ReportsAction implements ActionInterface {
      *
      * @param request
      */
-    private void setParamMap(PortletRequest request) {
+    private void setParamMap(PortletRequest request) throws Exception {
         PortletSession session = request.getPortletSession();
         HashMap sessionParam = (HashMap) session.getAttribute("paramMap");
         if (sessionParam == null) {
@@ -348,16 +622,67 @@ public class ReportsAction implements ActionInterface {
             paramMap.put(REPORT, REPORT_DEFAULT);
         }
 
+        String searchTerm = ParamUtil.getString(request, "searchTerm");
+        searchTerm = StringUtils.trim(searchTerm);
+        paramMap.put(SEARCH_TERM, searchTerm);
 
+        setOrgCodeReportType();
+
+        // The inex of the breadcrumb the user clicked on
+        int breadcrumbIndex = ParamUtil.getInteger(request, BREADCRUMB_INDEX, -1);
+        paramMap.put(BREADCRUMB_INDEX, breadcrumbIndex);
+
+        // The list of breadcrumbs
+        List<Breadcrumb> reqCrumbsList = jsonToBreadcrumbList(request, "requestBreadcrumbs");
+        List<Breadcrumb> sessCrumbs = (List<Breadcrumb>) sessionParam.get(BREADCRUMB_LIST);
+
+        if (reqCrumbsList != null && !reqCrumbsList.isEmpty()) {
+            paramMap.put(BREADCRUMB_LIST, reqCrumbsList);
+        } else if (sessCrumbs != null && !sessCrumbs.isEmpty()) {
+            paramMap.put(BREADCRUMB_LIST, sessCrumbs);
+        } else {
+            List<Breadcrumb> defaultCrumbs = new ArrayList<Breadcrumb>();
+            defaultCrumbs.add(rootBreadcrumb);
+            paramMap.put(BREADCRUMB_LIST, defaultCrumbs);
+        }
+
+        setCurrentSupervisor();
+    }
+
+    /**
+     * Converts a string in the request from json to a list of breadcrumbs.
+     *
+     * @param request       PortletRequest
+     * @param fieldName     Name of the parameter in the request that holds the json string
+     * @return
+     */
+    private List<Breadcrumb> jsonToBreadcrumbList(PortletRequest request, String fieldName) {
+        String jsonBreadcrumbs = ParamUtil.getString(request, fieldName);
+        Type collectionType = new TypeToken<Collection<Breadcrumb>>(){}.getType();
+        return gson.fromJson(jsonBreadcrumbs, collectionType);
+    }
+
+    /**
+     * Sets current supervisor from the scopeValue.
+     *
+     * @throws Exception
+     */
+    private void setCurrentSupervisor() throws Exception {
+        if (getScope().equals(SCOPE_SUPERVISOR)) {
+            Job tempJob = Job.getJobFromString(getScopeValue());
+            //@todo: need to handle bad supervising data
+            currentSupervisorJob = JobMgr.getJob(tempJob.getEmployee().getId(),
+                    tempJob.getPositionNumber(), tempJob.getSuffix());
+        }
+    }
+
+    private void setOrgCodeReportType() {
         // If the user is about to enter the org code scope and the chart is by Unit, use stage
         String selectedReport = (String) paramMap.get(REPORT);
         String selectedScope = (String) paramMap.get(SCOPE);
         if (selectedScope.equals(SCOPE_ORG_CODE) && selectedReport.contains(ReportMgr.UNIT)) {
             paramMap.put(REPORT,  REPORT_STAGE_BREAKDOWN);
         }
-
-        int breadcrumbIndex = ParamUtil.getInteger(request, BREADCRUMB_INDEX, -1);
-        paramMap.put(BREADCRUMB_INDEX, breadcrumbIndex);
     }
 
     /**
@@ -410,20 +735,288 @@ public class ReportsAction implements ActionInterface {
             return true;
         }
 
-        if (getScope().equals(DEFAULT_SCOPE)) {
+        if (getScope().equals(DEFAULT_SCOPE) && !displaySearchResultsPage()) {
             return true;
         }
 
-        if (actionHelper.isLoggedInUserReviewer(request)) {
-            int employeeID = actionHelper.getLoggedOnUser(request).getId();
-            String businessCenterName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
+        int employeeID = actionHelper.getLoggedOnUser(request).getId();
+        boolean supervisorReport = getScope().equals(SCOPE_SUPERVISOR);
+        boolean isReviewer = actionHelper.isLoggedInUserReviewer(request);
+        boolean isSupervisor = actionHelper.isLoggedInUserSupervisor(request);
+        String searchTerm = getSearchTerm();
+
+        // Search permission checks
+        boolean searchingOrgCode = CWSUtil.validateOrgCode(searchTerm);
+        if (!searchTerm.equals("")) {
+            // bc reviewer and admin are the only ones that can search by org code
+            if (searchingOrgCode && isReviewer) {
+                return true;
+            } else if (!searchingOrgCode && (isReviewer || isSupervisor)) {
+                // bc reviewer, admin or supervisor can search by name or osu id
+                return true;
+            }
+        }
+
+        if (isReviewer) {
+            String bcName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
+
+            // the bc reviewer can drill down the report if supervisor is in his bc
+            if (supervisorReport && currentSupervisorJob.getBusinessCenterName().equals(bcName)) {
+                return true;
+            }
+
+            // the bc reviewer can drill down to orgPrefix or orgCode if they are in the same bc
             if (breadcrumbList.size() > 1) {
                 Breadcrumb bcBreadcrumb = breadcrumbList.get(1);
-                if (bcBreadcrumb.getScopeValue().equals(businessCenterName)) {
+                if (bcBreadcrumb.getScope().equals(SCOPE_BC) &&
+                        bcBreadcrumb.getScopeValue().equals(bcName)) {
                     return true;
+                } else {
+                    // check if the user loaded an org code direcly into the url
+                    boolean allowedOrgCode = JobMgr.findOrgCode(getScopeValue(), bcName);
+                    if (allowedOrgCode) {
+                        return true;
+                    }
                 }
             }
         }
+
+        // Check supervisor report to see if it's the current user's report or in her
+        // supervising chain
+        if (supervisorReport) {
+            JobMgr jobMgr = new JobMgr();
+
+            if (isMyReport) {
+                return true;
+            }
+
+            if (jobMgr.isUpperSupervisor(currentSupervisorJob, employeeID)) {
+                return true;
+            }
+        }
         return false;
+    }
+
+    private void setIsMyReport(PortletRequest request) throws Exception {
+        if (getScope().equals(SCOPE_SUPERVISOR)) {
+            int employeeID = actionHelper.getLoggedOnUser(request).getId();
+            isMyReport = currentSupervisorJob.getEmployee().getId() == employeeID;
+        }
+    }
+
+    /**
+     * Whether or not the drill down menu should be displayed in the charts.
+     *
+     * @param allowAllDrillDown
+     * @param reviewerBCName
+     * @return
+     */
+    private boolean showDrillDownMenu(boolean allowAllDrillDown, String reviewerBCName) {
+        // We don't allow drill down in lowest supervisor level
+        if (inLeafSupervisorReport) {
+            return false;
+        }
+
+        //scope != 'orgCode' && (allowAllDrillDown || reviewerBCName != '')
+        if (!getScope().equals(SCOPE_ORG_CODE) &&
+                (allowAllDrillDown || !reviewerBCName.equals(""))) {
+            return true;
+        }
+
+        if (getScope().equals(SCOPE_SUPERVISOR)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Whether or not the my report link should be displayed. It also passes to the jsp
+     * the needed values to generate the my report links.
+     *
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    private void showMyReportLink(PortletRequest request) throws Exception {
+        boolean showMyReportLink = false;
+
+        if (actionHelper.isLoggedInUserSupervisor(request)) {
+            // We make the assumption that a person has only 1 supervising job
+            Employee loggedInUser = actionHelper.getLoggedOnUser(request);
+            Job supervisorJob = JobMgr.getSupervisingJob(loggedInUser.getId());
+            String supervisorJobTitle = supervisorJob.getJobTitle();
+            String myReportSupervisorKey = supervisorJob.getEmployee().getId() + "_" +
+                    supervisorJob.getPositionNumber() + "_" + supervisorJob.getSuffix();
+
+            showMyReportLink = true;
+            actionHelper.addToRequestMap("supervisorJobTitle", supervisorJobTitle);
+            actionHelper.addToRequestMap("myReportSupervisorKey", myReportSupervisorKey);
+        }
+
+        if (actionHelper.isLoggedInUserReviewer(request)) {
+            String myReportBcName = actionHelper.getBusinessCenterForLoggedInReviewer(request);
+            showMyReportLink = true;
+            actionHelper.addToRequestMap("myReportBcName", myReportBcName);
+        }
+
+        if (actionHelper.isLoggedInUserAdmin(request)) {
+            showMyReportLink = true;
+        }
+
+        actionHelper.addToRequestMap("showMyReportLink", showMyReportLink);
+    }
+
+    /**
+     * Returns a string representation of a map that helps look up the scope value
+     * based on the display value of the chart data. This is needed for chart drill
+     * down.
+     *
+     * @return
+     */
+    private String chartDataScopeMap() {
+        String report = (String) paramMap.get(REPORT);
+        if (report.contains(ReportMgr.STAGE)) {
+            return "{}";
+        }
+
+        HashMap<String, String> dataScopeMap = new HashMap<String, String>();
+        for (Object[] row : chartData) {
+            String displayValue = row[1].toString();
+            String scopeValue = row[1].toString();
+            if (row.length == 3) {
+                scopeValue = row[2].toString();
+            }
+            dataScopeMap.put(displayValue, scopeValue);
+        }
+
+        return gson.toJson(dataScopeMap);
+    }
+
+    /**
+     * Returns true, if we have 2 or more search results to display. Otherwise it returns
+     * false.
+     *
+     * @param searchTerm
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    private boolean search(String searchTerm, PortletRequest request) throws Exception {
+        ResourceBundle resource = (ResourceBundle) actionHelper
+                .getPortletContextAttribute("resourceBundle");
+        String noSearchResult = "report-search-no-results-";
+        String searchType = "";
+        String bcName = "";
+        String userType = "admin"; // used for no results msg
+        boolean noSearchResults = false; // the user query didn't match any jobs/employee
+        String noSearchResultMsg = ""; // msg to display the user when there were no results
+        boolean tooManyResults = false;
+
+        if (actionHelper.isLoggedInUserReviewer(request) &&
+                !actionHelper.isLoggedInUserAdmin(request)) {
+            bcName = actionHelper.getBusinessCenterForLoggedInReviewer(request);
+            userType = "reviewer";
+        }
+        if (CWSUtil.validateOrgCode(searchTerm)) {
+            searchType = "orgCode";
+            boolean validOrgCode = JobMgr.findOrgCode(searchTerm, bcName);
+            if (validOrgCode) {
+                paramMap.put(Constants.BC_NAME, bcName);
+                paramMap.put(SCOPE, SCOPE_ORG_CODE);
+                paramMap.put(SCOPE_VALUE, searchTerm);
+                setOrgCodeReportType();
+                return false;
+            } else { // no search results found
+                noSearchResults = true;
+            }
+        } else {
+            // Define the type of search used for error msg
+            searchType = "name";
+            if (CWSUtil.validateOsuid(searchTerm)) {
+                searchType = "osuid";
+            }
+
+            int supervisorPidm = 0;
+            if (actionHelper.isLoggedInUserSupervisor(request)) {
+                Employee loggedInUser = actionHelper.getLoggedOnUser(request);
+                supervisorPidm = loggedInUser.getId();
+                userType = "supervisor";
+            }
+
+            try {
+                // search by name/osuid - also does permission checking
+                searchResults = JobMgr.search(searchTerm, bcName, supervisorPidm);
+                int numberOfResults = (searchResults == null)? 0 : searchResults.size();
+
+                // display report, list of results or error msg
+                switch (numberOfResults) {
+                    case 0: // no search results found
+                        noSearchResults = true;
+                        break;
+                    case 1:
+                        int pidm = searchResults.get(0).getEmployee().getId();
+                        String positionNumber = searchResults.get(0).getPositionNumber();
+                        String suffix = searchResults.get(0).getSuffix();
+                        currentSupervisorJob = JobMgr.getJob(pidm, positionNumber, suffix);
+                        String scopeValue = currentSupervisorJob.getIdKey();
+
+                        paramMap.put(SCOPE, SCOPE_SUPERVISOR);
+                        paramMap.put(SCOPE_VALUE, scopeValue.toString());
+                        return false;
+                    default:
+                        return true;
+                }
+
+            } catch (ModelException e) {
+                tooManyResults = true;
+                noSearchResultMsg = e.getMessage();
+            }
+        }
+
+        if (noSearchResults && noSearchResultMsg.equals("")) {
+            if (searchType.equals("orgCode")) {
+                noSearchResult += searchType + "-" + userType;
+            } else {
+                if (actionHelper.isLoggedInUserAdmin(request)) {
+                    noSearchResult = "appraisal-search-no-results-admin";
+                } else if (actionHelper.isLoggedInUserReviewer(request)) {
+                    noSearchResult = "appraisal-search-no-results-reviewer";
+                } else {
+                    noSearchResult = "appraisal-search-no-results-supervisor";
+                }
+            }
+
+            noSearchResultMsg = resource.getString(noSearchResult);
+        }
+
+        // Set a message if there were no results or too many
+        if (noSearchResults || tooManyResults) {
+            actionHelper.addErrorsToRequest(request, noSearchResultMsg);
+        }
+
+        switchRequestBreadcrumbsWithSession(request);
+        return false;
+    }
+
+    /**
+     * Stores the breadcrumb list from session into paramMap.
+     *
+     * @param request
+     */
+    private void switchRequestBreadcrumbsWithSession(PortletRequest request) {
+        PortletSession session = request.getPortletSession();
+        List<Breadcrumb> sessCrumbs = (List<Breadcrumb>) session.getAttribute(BREADCRUMB_LIST);
+        paramMap.put(BREADCRUMB_LIST, sessCrumbs);
+
+    }
+
+    private void setBcName() {
+        if (breadcrumbList.size() > 1) {
+            Breadcrumb secondBreadcrumb = breadcrumbList.get(1);
+            if (secondBreadcrumb.getScope().equals(SCOPE_BC)) {
+                paramMap.put(Constants.BC_NAME, secondBreadcrumb.getScopeValue());
+            }
+        }
     }
 }

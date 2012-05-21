@@ -208,7 +208,8 @@ public class Appraisal extends Evals {
 
     /**
      * Constructor used by AppraisalMgr to fetch only a limited set of attributes. Used to
-     * display information in my status section.
+     * display information in my status section and supervisor report (evaluations of current
+     * supervisor).
      *
      * @param id
      * @param jobTitle
@@ -216,13 +217,20 @@ public class Appraisal extends Evals {
      * @param endDate
      * @param status
      */
-    public Appraisal(int id, String jobTitle, Date startDate, Date endDate, String status) {
+    public Appraisal(int id, String jobTitle, Date startDate, Date endDate, String status,
+                     Integer overdue) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
         this.job = new Job();
         this.job.setJobTitle(jobTitle);
+
+        if (overdue == null) {
+            this.overdue = -999;
+        } else {
+            this.overdue = overdue;
+        }
     }
 
     /**
@@ -241,10 +249,11 @@ public class Appraisal extends Evals {
      * @param goalsRequiredModificationDate
      * @param employeeSignedDate
      * @param employeeId
+     * @param overdue
      */
     public Appraisal(int id, String jobTitle, String lastName, String firstName, String appointmentType,
                      Date startDate, Date endDate, String status, Date goalsRequiredModificationDate,
-                     Date employeeSignedDate, int employeeId) {
+                     Date employeeSignedDate, int employeeId, Integer overdue) {
         Employee employee = new Employee();
         employee.setId(employeeId);
         employee.setLastName(lastName);
@@ -259,6 +268,12 @@ public class Appraisal extends Evals {
         this.job.setEmployee(employee);
         this.employeeSignedDate = employeeSignedDate;
         this.goalsRequiredModificationDate = goalsRequiredModificationDate;
+
+        if (overdue == null) {
+            this.overdue = -999;
+        } else {
+            this.overdue = overdue;
+        }
     }
 
     /**
@@ -280,7 +295,8 @@ public class Appraisal extends Evals {
      */
     public Appraisal(int id, String jobTitle, String positionNumber, Date startDate, Date endDate,
                      String type, int employeeId, String lastName, String firstName, Date evaluationSubmitDate,
-                     String status, String bcName, String orgCodeDescription, String suffix) {
+                     String status, String bcName, String orgCodeDescription, String suffix,
+                     Integer overdue) {
         Employee employee = new Employee();
         employee.setId(employeeId);
         employee.setLastName(lastName);
@@ -301,10 +317,16 @@ public class Appraisal extends Evals {
         this.evaluationSubmitDate = evaluationSubmitDate;
         this.status = status;
         this.job = tempJob;
+
+        if (overdue == null) {
+            this.overdue = -999;
+        } else {
+            this.overdue = overdue;
+        }
     }
 
     /**
-     * Constructor used by ReportMgr.getListHQL. It only fetches the data that it needs. The
+     * Constructor used by ReportMgr.getReportListHQL. It only fetches the data that it needs. The
      * employee.id and job's pidm, posno and suffix are dummy data since they are only needed
      * to construct the object.
      *
@@ -342,6 +364,42 @@ public class Appraisal extends Evals {
         } else {
             this.overdue = overdue;
         }
+    }
+
+    /**
+     * Used to copy an appraisal object. This is used by appraisal search or report list appraisal.
+     * This is done so that the jsp files don't complain about missing employee or job records in
+     * the db.
+     *
+     * @param appraisal
+     */
+    public Appraisal(Appraisal appraisal) {
+        this.id = appraisal.getId();
+        if (appraisal.getStartDate() != null) {
+            setStartDate(appraisal.getStartDate());
+        }
+        if (appraisal.getEndDate() != null) {
+            setEndDate(appraisal.getEndDate());
+        }
+        if (appraisal.getType() != null) {
+            setType(appraisal.getType());
+        }
+        if (appraisal.getEvaluationSubmitDate() != null) {
+            setEvaluationSubmitDate(appraisal.getEvaluationSubmitDate());
+        }
+        if (appraisal.getStatus() != null) {
+            setStatus(appraisal.getStatus());
+        }
+        if (appraisal.getOverdue() != null) {
+            setOverdue(appraisal.getOverdue());
+        }
+        if (appraisal.getStatus() != null) {
+            setStatus(appraisal.getStatus());
+        }
+        if (appraisal.getStatus() != null) {
+            setStatus(appraisal.getStatus());
+        }
+        setJob(appraisal.getJob());
     }
 
     public boolean validateJob() {

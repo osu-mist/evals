@@ -45,14 +45,17 @@
         </set>
     </class>
 
-    <sql-query name="job.isSupervisor"><![CDATA[
-        SELECT
-            count(*) AS countNum
-        FROM
-            PYVPASJ
-        WHERE
-            PYVPASJ_SUPERVISOR_PIDM = :pidm AND
-            PYVPASJ_APPOINTMENT_TYPE = 'Classified' AND
-            PYVPASJ_STATUS != 'T'
-    ]]></sql-query>
+    <query name="job.directSupervisors"><![CDATA[
+        from edu.osu.cws.evals.models.Job
+        where
+            supervisor.employee.id = :id and
+            supervisor.positionNumber = :posno and
+            supervisor.suffix = :suffix
+    ]]></query>
+    <query name="job.firstSupervisorJob">
+        from edu.osu.cws.evals.models.Job
+        where
+            supervisor.employee.id = :id and
+            status = 'A'
+    </query>
 </hibernate-mapping>

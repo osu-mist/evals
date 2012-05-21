@@ -1,16 +1,16 @@
 package edu.osu.cws.evals.tests;
 
+import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
-import edu.osu.cws.evals.models.AppointmentType;
-import edu.osu.cws.evals.models.Employee;
-import edu.osu.cws.evals.models.Job;
-import edu.osu.cws.evals.models.ModelException;
+import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -18,11 +18,19 @@ import java.util.List;
 public class JobsTest {
     Job job = new Job();
     JobMgr jobMgr = new JobMgr();
+    Transaction tx;
 
     @BeforeMethod
     public void setUp() throws Exception {
         DBUnit dbunit = new DBUnit();
         dbunit.seedDatabase();
+        Session session = HibernateUtil.getCurrentSession();
+        tx = session.beginTransaction();
+    }
+
+    @AfterMethod
+    public void tearDown() throws Exception {
+        tx.commit();
     }
 
     public void shouldFindUppserSupervisor() throws ModelException {
@@ -46,8 +54,8 @@ public class JobsTest {
     }
 
     public void shouldCorrectlyDetectEmployeeSupervisor() throws Exception {
-        assert jobMgr.isSupervisor(990871) : "isSupervisor() should count employees correctly";
-        assert !jobMgr.isSupervisor(12345) : "isSupervisor() should not count inactive employees";
+        assert JobMgr.isSupervisor(990871, null) : "isSupervisor() should count employees correctly";
+        assert !JobMgr.isSupervisor(12345, null) : "isSupervisor() should not count inactive employees";
     }
 
 
@@ -112,47 +120,161 @@ public class JobsTest {
         assert jobMgr.getBusinessCenter(56198).equals("UABC");
     }
 
-    public void shouldReturnCorrectNewAnnualStartDateIfFirstLasted18Months() {
+    public void shouldReturnCorrectNewAnnualStartDateIfFirstLasted18Months() throws Exception {
         Calendar cal = Calendar.getInstance();
         Job job = new Job();
         job.setAnnualInd(18);
+        job.setEmployee(new Employee(12345));
+        job.setPositionNumber("C1234");
+        job.setSuffix("00");
 
-        cal.set(Calendar.YEAR, 2011);
+        cal.set(Calendar.YEAR, cal.get(Calendar.YEAR)-1);
         cal.set(Calendar.MONTH, Calendar.JUNE);
         cal.set(Calendar.DAY_OF_MONTH, 1);
 
-        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal);
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, Calendar.JUNE,
+                Calendar.getInstance().get(Calendar.YEAR)-1);
 
-        cal.set(Calendar.YEAR, 2008);
-        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal);
-        cal.set(Calendar.YEAR, 2009);
-        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal);
+        cal.set(Calendar.YEAR, cal.get(Calendar.YEAR)-4);
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, Calendar.DECEMBER,
+                Calendar.getInstance().get(Calendar.YEAR));
+        cal.set(Calendar.YEAR, cal.get(Calendar.YEAR)-3);
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, Calendar.DECEMBER,
+                Calendar.getInstance().get(Calendar.YEAR));
+        cal.set(Calendar.YEAR, cal.get(Calendar.YEAR)-2);
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, Calendar.DECEMBER,
+                Calendar.getInstance().get(Calendar.YEAR));
+    }
+
+    private void assertCorrectNewAnnualStartDateForAnnualInd18(Job job, Calendar cal, int month,
+                                                               int year) throws Exception {
+        job.setBeginDate(cal.getTime());
+        Calendar newStartDate = job.getNewAnnualStartDate();
+
+        assert newStartDate.get(Calendar.YEAR) == year;
+        assert newStartDate.get(Calendar.MONTH) == month;
+        assert newStartDate.get(Calendar.DAY_OF_MONTH) == 1;
+    }
+
+    public void shouldReturnCorrectNewAnnualStartDateForFirstAnnualIfAnnualIndIs18Case2()
+            throws Exception {
+        Calendar cal = Calendar.getInstance();
+        Job job = new Job();
+        job.setAnnualInd(18);
+        job.setEmployee(new Employee(12345));
+        job.setPositionNumber("C1234");
+        job.setSuffix("00");
+
+        cal.set(Calendar.MONTH, Calendar.DECEMBER);
+        cal.set(Calendar.DAY_OF_MONTH, 4);
         cal.set(Calendar.YEAR, 2010);
-        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal);
-    }
-
-    private void assertCorrectNewAnnualStartDateForAnnualInd18(Job job, Calendar cal) {
-        job.setBeginDate(cal.getTime());
-        Calendar newStartDate = job.getNewAnnualStartDate();
-
-        assert newStartDate.get(Calendar.YEAR) == Calendar.getInstance().get(Calendar.YEAR);
-        assert newStartDate.get(Calendar.MONTH) == Calendar.DECEMBER;
-        assert newStartDate.get(Calendar.DAY_OF_MONTH) == 1;
-    }
-
-    public void shouldReturnCorrectNewAnnualStartDateForFirstAnnualIfAnnualIndIs18() {
-        Calendar cal = Calendar.getInstance();
-        Job job = new Job();
-        job.setAnnualInd(18);
-
-        cal.set(Calendar.MONTH, Calendar.JUNE);
-        cal.set(Calendar.DAY_OF_MONTH, 1);
 
         job.setBeginDate(cal.getTime());
         Calendar newStartDate = job.getNewAnnualStartDate();
 
-        assert newStartDate.get(Calendar.YEAR) == Calendar.getInstance().get(Calendar.YEAR);
-        assert newStartDate.get(Calendar.MONTH) == Calendar.JUNE;
+        assert newStartDate.get(Calendar.YEAR) == 2011;
+        assert newStartDate.get(Calendar.MONTH) == Calendar.JANUARY;
         assert newStartDate.get(Calendar.DAY_OF_MONTH) == 1;
+    }
+
+    public void shouldParseJobFromString() {
+        assert null == Job.getJobFromString("");
+        assert null == Job.getJobFromString("1234");
+        assert null == Job.getJobFromString("1234_dfd");
+        assert null == Job.getJobFromString("1234_dfd_");
+
+        Job job = Job.getJobFromString("1234_C12345_00");
+        assert job.getId() == 1234;
+        assert job.getPositionNumber().equals("C12345");
+        assert job.getSuffix().equals("00");
+    }
+
+    public void shouldReturnNullWhenEmployeeHasNoSupervisorJob() {
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+        assert null == JobMgr.getSupervisingJob(0);
+        assert null == JobMgr.getSupervisingJob(-13435);
+
+        assert null == JobMgr.getSupervisingJob(787812);
+
+        Job supervisingJob = JobMgr.getSupervisingJob(12345);
+        assert null != supervisingJob;
+        assert supervisingJob.getEmployee().getId() == 12345;
+        assert supervisingJob.getPositionNumber().equals("1234");
+        assert supervisingJob.getSuffix().equals("00");
+
+        tx.commit();
+    }
+
+    public void searchShouldAcceptOsuid() throws Exception {
+        List<Job> jobs = JobMgr.search("931421235", null, 0);
+        assert jobs.size() == 3;
+
+        jobs = JobMgr.search("931421234", null, 0);
+        assert jobs.size() == 1;
+
+        jobs = JobMgr.search("111111111", null, 0);
+        assert jobs.size() == 0;
+    }
+
+    public void searchByOsuidShouldCheckBCPermissions() throws Exception {
+        List<Job> jobs = JobMgr.findByOsuid("12345677", "AABC", 0);
+        assert jobs.size() == 2;
+
+        assert jobs.get(0).getEmployee().getId() == 56199;
+        assert jobs.get(0).getPositionNumber().equals("1234");
+
+        assert jobs.get(1).getEmployee().getId() == 56199;
+        assert jobs.get(1).getPositionNumber().equals("12341");
+    }
+
+    //@todo: the test below requires oracle :(
+    public void searchByOsuidShouldCheckSupervisorPermissions() throws Exception {}
+
+
+
+    public void searchByNameShouldAcceptFirstNameOnly() throws Exception {
+        List<Job> jobs = JobMgr.findByName("Joan", null, 0);
+        assert jobs.size() == 1;
+
+        jobs = JobMgr.findByName("Joannnnnn", null, 0);
+        assert jobs.size() == 0;
+
+        jobs = JobMgr.findByName("Jo", null, 0);
+        assert jobs.size() == 2;
+    }
+
+    public void searchByNameShouldAcceptLastNameOnly() throws Exception {
+        List<Job> jobs = JobMgr.findByName("Cedeno", null, 0);
+        assert jobs.size() == 1;
+
+        jobs = JobMgr.findByName("Bond", null, 0);
+        assert jobs.size() == 0;
+
+        jobs = JobMgr.findByName("Barlow", null, 0);
+        assert jobs.size() == 3;
+    }
+
+    public void searchByNameShouldAcceptFirstAndLastName() throws Exception {
+        List<Job> jobs = JobMgr.findByName("Joan Lu", null, 0);
+        assert jobs.size() == 1;
+
+        jobs = JobMgr.findByName("Lu Joan", null, 0);
+        assert jobs.size() == 1;
+    }
+
+    public void searchByNameShouldAcceptFirstAndLastNameWithCommaInBetween() throws Exception {
+        List<Job> jobs = JobMgr.findByName("Lu, Joan", null, 0);
+        assert jobs.size() == 1;
+    }
+
+    public void shouldFindOrgCodeAsAdmin() throws Exception {
+        assert JobMgr.findOrgCode("abcd", null) == false;
+        assert JobMgr.findOrgCode("123456", null) == true;
+    }
+
+    public void shouldFindOrgCodeAsBC() throws Exception {
+        assert JobMgr.findOrgCode("654321", "UABC") == true;
+        assert JobMgr.findOrgCode("654321", "AABC") == false;
     }
 }

@@ -10,33 +10,36 @@
   google.setOnLoadCallback(drawChart);
   var chart;
   var chartType = "${chartType}";
+  var tableData;
   var chartData;
-  var trimmedChartData;
+  var chartDataScopeMap = eval('(' + '${chartDataScopeMap}' + ')');
   var report = "${report}";
+  var currentSupervisorName = "${currentSupervisorName}";
+  var nextScope = "${nextScope}";
 
   // Callback that creates and populates a data table,
   // instantiates the pie chart, passes in the data and
   // draws it.
   function drawChart() {
     // Create the data table.
-    chartData = new google.visualization.DataTable();
-    chartData.addColumn('string', '<liferay-ui:message key="${reportHeader}"/>');
-    chartData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evaluations"/> <liferay-ui:message key="${reportTitle}"/>');
-    chartData.addRows([
-        <c:forEach var="row" items="${chartData}" varStatus="loopStatus">
-            ['<liferay-ui:message key="${row[1]}"/>', ${row[0]}]
+    tableData = new google.visualization.DataTable();
+    tableData.addColumn('string', '<liferay-ui:message key="${reportHeader}"/>');
+    tableData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evaluations"/> <liferay-ui:message key="${reportTitle}"/>');
+    tableData.addRows([
+        <c:forEach var="row" items="${tableData}" varStatus="loopStatus">
+            [getGoogleTableUnitText('${row[2]}', "<liferay-ui:message key="${row[1]}"/>"), ${row[0]}]
             <c:if test="${!loopStatus.last}">
                 ,
             </c:if>
         </c:forEach>
     ]);
 
-    trimmedChartData = new google.visualization.DataTable();
-    trimmedChartData.addColumn('string', '<liferay-ui:message key="${reportHeader}"/>');
-    trimmedChartData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evals"/>');
-    trimmedChartData.addRows([
-        <c:forEach var="row" items="${trimmedChartData}" varStatus="loopStatus">
-            ['<liferay-ui:message key="${row[1]}"/>', ${row[0]}]
+    chartData = new google.visualization.DataTable();
+    chartData.addColumn('string', '<liferay-ui:message key="${reportHeader}"/>');
+    chartData.addColumn('number', '<liferay-ui:message key="report-drilldown-num-evals"/>');
+    chartData.addRows([
+        <c:forEach var="row" items="${chartData}" varStatus="loopStatus">
+            ["<liferay-ui:message key="${row[1]}"/>", ${row[0]}]
             <c:if test="${!loopStatus.last}">
                 ,
             </c:if>
@@ -62,13 +65,13 @@
         break;
       }
 
-      // Instantiate and draw our chart, passing in some options.
-      chart.draw(trimmedChartData, options);
+      chart.draw(chartData, options);
 
       var table = new google.visualization.Table(document.getElementById('<portlet:namespace/>chart-data-div'));
 
       var tableOptions = {
         sortColumn: 0,
+        allowHtml: true,
         cssClassNames: {
             headerRow: 'google-header-row',
             hoverTableRow: 'google-hover-table-row',
@@ -76,11 +79,19 @@
             tableRow: 'google-table-row'
         }
       }
-      table.draw(chartData, tableOptions);
+      table.draw(tableData, tableOptions);
 
       // When the table is selected, update the orgchart.
       google.visualization.events.addListener(chart, 'select', function() {
           chartDrillDown();
+      });
+      // When you hover on the chart, change the cursor to a hand
+      google.visualization.events.addListener(chart, 'onmouseover', function() {
+          chartMouseOver();
+      });
+      // When you leaving the chart, change the cursor to an arrow
+      google.visualization.events.addListener(chart, 'onmouseout', function() {
+          chartMouseOut();
       });
   }
 
@@ -96,7 +107,14 @@
 
     // drill down by clicking on the chart is allowed on all by unit reports
     if (report.indexOf('<%= ReportMgr.UNIT %>') != -1) {
-      var unitName = trimmedChartData.getValue(chartSelection[0].row, 0);
+      var displayValue = chartData.getValue(chartSelection[0].row, 0);
+      var unitName = chartDataScopeMap[displayValue];
+
+      // if the drillDown level is supervisor, we don't allow drill down for currentSupervisor
+      if (nextScope == 'supervisor' && displayValue == "${currentSupervisorName}") {
+          alert("<liferay-ui:message key="report-js-no-drilldown-same-supervisor"/>");
+          return;
+      }
 
       var scope = '${scope}';
       var allowAllDrillDown = ${allowAllDrillDown};
@@ -104,27 +122,74 @@
 
       if (scope == "<%= ReportsAction.DEFAULT_SCOPE%>") {
         if (!allowAllDrillDown && reviewerBCName != unitName) {
+            <c:if test="${isReviewer == 'true'}">
+              alert("<liferay-ui:message key="report-js-no-drilldown-bc-other-bc"/>");
+            </c:if>
           return;
         }
       }
 
-      // right now we don't support drilling down to the grouped "other"
-      if (unitName == '<liferay-ui:message key="other"/>') {
+      // right now we don't support drilling down to the grouped "other".
+      if (typeof unitName == "undefined") {
+          alert("<liferay-ui:message key="report-js-no-drilldown-to-group-other"/>");
           return;
       }
 
-      var drillDownURL= '<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-        <portlet:param name="action" value="report"/>
-        <portlet:param name="controller" value="ReportsAction"/>
-        <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
-        <portlet:param name="<%= ReportsAction.REPORT %>" value="${report}"/>
-        <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="unitName"/>
-        <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
-        </portlet:actionURL>';
-
-      drillDownURL = drillDownURL.replace("unitName", unitName);
+      var drillDownURL= getDrillDownUrl(unitName);
       window.location = drillDownURL;
     }
+  }
+
+  function chartMouseOver() {
+      jQuery(".chart-div iframe").contents().find("body").css("cursor", "pointer");
+  }
+
+  function chartMouseOut() {
+      jQuery(".chart-div iframe").contents().find("body").css("cursor", "auto");
+  }
+
+  function getDrillDownUrl(unitName) {
+    var drillDownURL = '<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+      <portlet:param name="action" value="report"/>
+      <portlet:param name="controller" value="ReportsAction"/>
+      <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
+      <portlet:param name="<%= ReportsAction.REPORT %>" value="${report}"/>
+      <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="unitName"/>
+      <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
+      </portlet:actionURL>';
+    drillDownURL = drillDownURL.replace("unitName", unitName);
+
+    return drillDownURL;
+  }
+
+  function getGoogleTableUnitText(unitName, displayName) {
+    if (unitName == "") {
+        return displayName;
+    }
+
+    var text = '<a href="' + getDrillDownUrl(unitName) + '">' + displayName + '</a>';
+
+    <c:if test="${scope == 'root' || scope == 'supervisor' || scope == 'orgCode'}">
+      var allowedDrillDown = {
+      <c:forEach var="unit" items="${drillDownData}" varStatus="loopStatus">
+          <c:choose>
+            <c:when test="${(scope == 'root' && reviewerBCName == unit[1])
+                            || allowAllDrillDown || scope != 'root'}">
+            '${unit[2]}' : ''
+            </c:when>
+            <c:otherwise>
+                '_fail${unit[2]}' : ''
+            </c:otherwise>
+          </c:choose>
+          <c:if test="${!loopStatus.last}">, </c:if>
+      </c:forEach>
+      };
+
+      if (!(unitName in allowedDrillDown)) {
+        text = displayName;
+      }
+    </c:if>
+    return text;
   }
 
 jQuery(document).ready(function() {

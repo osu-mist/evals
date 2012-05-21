@@ -18,8 +18,8 @@
     </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" class="search" method="post">
     <fieldset id="pass-user-add">
         <legend><liferay-ui:message key="search"/></legend>
-        <label for="<portlet:namespace/>osuid"><liferay-ui:message key="osuid"/></label>
-        <input type="text" id="<portlet:namespace/>osuid" class="narrow" name="<portlet:namespace/>osuid" />
+        <label for="<portlet:namespace/>searchTerm"><liferay-ui:message key="searchTerm-osuid-or-name"/></label>
+        <input type="text" id="<portlet:namespace/>searchTerm" class="narrow" name="<portlet:namespace/>searchTerm" />
         <input type="submit" value="<liferay-ui:message key="search" />" />
         <input type="submit" class="cancel" value="<liferay-ui:message key="cancel" />" id="<portlet:namespace/>cancel" />
     </fieldset>    
@@ -35,6 +35,7 @@
                 <th><liferay-ui:message key="job-title"/></th>
                 <th><liferay-ui:message key="position-no"/></th>
                 <th><liferay-ui:message key="orgn-code-desc"/></th>
+                <th><liferay-ui:message key="overdue"/></th>
                 <th><liferay-ui:message key="status"/></th>
             </tr>
         </thead>
@@ -47,6 +48,7 @@
             <td>${appraisal.job.jobTitle}</td>
             <td>${appraisal.job.positionNumber}</td>
             <td>${appraisal.job.orgCodeDescription}</td>
+            <td>${appraisal.viewOverdue}</td>
             <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
                                 <portlet:param name="id" value="${appraisal.id}"/>
                                 <portlet:param  name="action" value="display"/>
@@ -81,7 +83,7 @@ jQuery(document).ready(function() {
   // Validate form submission
   jQuery("#<portlet:namespace />fm").submit(function() {
     var errors = "";
-    if (jQuery("#<portlet:namespace />osuid").val() == "") {
+    if (jQuery("#<portlet:namespace />searchTerm").val() == "") {
       errors = "<li>Please enter the employee's OSU ID</li>";
     }
     if (errors != "") {

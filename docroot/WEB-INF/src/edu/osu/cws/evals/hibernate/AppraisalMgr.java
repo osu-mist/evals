@@ -2,6 +2,8 @@ package edu.osu.cws.evals.hibernate;
 
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.ActionHelper;
+import edu.osu.cws.evals.portlet.Constants;
+import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
@@ -11,16 +13,30 @@ import org.hibernate.Session;
 import org.hibernate.type.StandardBasicTypes;
 
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 public class AppraisalMgr {
     //Need to change this back to 11/01/2011 after testing.
     private static final String FULL_GOALS_DATE = "11/01/2011";
+
+
+    // used to sort the list of evaluations displayed during searches
+    private static final String LIST_ORDER = " order by job.employee.lastName, " +
+            "job.employee.firstName, startDate";
+
+    // Constants that specify appraisal list for report
+    private static final String REPORT_LIST_SELECT = "select new edu.osu.cws.evals.models.Appraisal " +
+            "(id, job.employee.firstName, job.employee.lastName, startDate, endDate," +
+            " status, overdue, job.employee.id, job.positionNumber, job.suffix)" +
+            " from edu.osu.cws.evals.models.Appraisal ";
+    private static final String REPORT_LIST_WHERE = " where status not in ('completed', 'archived', " +
+            "'closed') ";
+
+
     private static Date fullGoalsDate;
     private Employee loggedInUser;
 
@@ -612,37 +628,39 @@ public class AppraisalMgr {
     }
 
     /**
-     * Returns a list of active appraisals for all the jobs that the current pidm holds.
+     * Returns a list of active appraisals for all the jobs that the current pidm holds. If the
+     * posno and suffix are provided, the evaluations are specific to the job.
      * The fields that are returned in the appraisal are:
      *      id
      *      Job.jobTitle
      *      startDate
      *      endDate
-     *      status;
+     *      status
+     *      overdue
      *
-     * @param pidm
      * @return
-     * @throws Exception
+     * @param pidm
+     * @param posno
+     * @param suffix
      */
-    public ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm) throws Exception {
+    public static ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm, String posno,
+                                                                String suffix) {
         Session session = HibernateUtil.getCurrentSession();
-        return this.getAllMyActiveAppraisals(pidm, session);
-    }
-
-    /**
-     * Returns a HashMap
-     * @param pidm
-     * @param session
-     * @return
-     */
-    private ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm, Session session) {
-        //@todo: the query below should have a where clause => job.employee.id = pidm
-        String query = "select new edu.osu.cws.evals.models.Appraisal(id, job.jobTitle, startDate, endDate, status)" +
+        String query = "select new edu.osu.cws.evals.models.Appraisal(id, job.jobTitle, startDate, " +
+                "endDate, status, overdue)" +
                 " from edu.osu.cws.evals.models.Appraisal where " +
                 " job.employee.id = :pidm and status not in ('archived')";
-        ArrayList<Appraisal> result = (ArrayList<Appraisal>) session.createQuery(query)
-                .setInteger("pidm", pidm)
-                .list();
+
+        if (posno != null && suffix != null) {
+            query += " and job.positionNumber = :posno and job.suffix = :suffix";
+        }
+
+        Query hibQuery = session.createQuery(query).setInteger("pidm", pidm);
+        if (posno != null && suffix != null) {
+            hibQuery.setString("posno", posno).setString("suffix", suffix);
+        }
+
+        ArrayList<Appraisal> result = (ArrayList<Appraisal>) hibQuery.list();
 
         // Check the status of the appraisal and check to see if it needs to be replaced
         for(Appraisal appraisal : result) {
@@ -651,45 +669,41 @@ public class AppraisalMgr {
         return result;
     }
 
-
-    /**
-     * Returns a List of team's active appraisals for the given supervisor's pidm.
-     *
-     * @param pidm
-     * @param onlyActive    Whether or not to include only the active appraisals
-     * @return
-     */
-    public List<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive) throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        return this.getMyTeamsAppraisals(pidm, onlyActive, session);
-    }
-
     /**
      * Returns a list of appraisals with limited attributes set: id, job title, employee name,
      * job appointment type, start date, end date, status, goalsRequiredModification and
-     * employeSignedDate.
+     * employeSignedDate. If the posno and suffix are specific, the team appraisals are
+     * specific to that supervising job.
      *
-     * @param pidm      Supervisor's pidm.
+     * @param pidm          Supervisor's pidm.
      * @param onlyActive    Whether or not to include only the active appraisals
-     * @param session
-     * @return List of Hashmaps that contains the jobs this employee supervises.
+     * @param posno         Supervisor's posno
+     * @param suffix        Supervisor's suffix
+     * @return List of Appraisal that contains the jobs this employee supervises.
      */
-    private List<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive, Session session) {
-        List<Appraisal> appraisals = new ArrayList<Appraisal>();
+    public static ArrayList<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive,
+                                                 String posno, String suffix) {
+        ArrayList<Appraisal> appraisals = new ArrayList<Appraisal>();
         List<Integer> pidms = new ArrayList<Integer>();
+        Session session = HibernateUtil.getCurrentSession();
 
         String query = "select ap.ID, jobs.PYVPASJ_DESC, jobs.PYVPASJ_APPOINTMENT_TYPE, " +
                 "ap.START_DATE, ap.END_DATE, ap.STATUS, ap.GOALS_REQUIRED_MOD_DATE, " +
-                "ap.EMPLOYEE_SIGNED_DATE, jobs.PYVPASJ_PIDM " +
+                "ap.EMPLOYEE_SIGNED_DATE, jobs.PYVPASJ_PIDM, ap.OVERDUE " +
                 "FROM appraisals ap, PYVPASJ jobs " +
                 "WHERE ap.JOB_PIDM=jobs.PYVPASJ_PIDM AND ap.POSITION_NUMBER=jobs.PYVPASJ_POSN " +
                 "AND ap.JOB_SUFFIX=jobs.PYVPASJ_SUFF AND jobs.PYVPASJ_SUPERVISOR_PIDM=:pidm ";
+
+        if (!StringUtils.isEmpty(posno) && !StringUtils.isEmpty(suffix)) {
+            query += "AND jobs.PYVPASJ_SUPERVISOR_POSN=:posno " +
+                    "AND jobs.PYVPASJ_SUPERVISOR_SUFF = :suffix ";
+        }
 
         if (onlyActive) {
             query += "AND status NOT IN ('archived') ";
         }
 
-        List<Object[]> result =  session.createSQLQuery(query)
+        Query hibQuery = session.createSQLQuery(query)
                 .addScalar("ID", StandardBasicTypes.INTEGER)
                 .addScalar("PYVPASJ_DESC", StandardBasicTypes.STRING)
                 .addScalar("PYVPASJ_APPOINTMENT_TYPE", StandardBasicTypes.STRING)
@@ -699,7 +713,12 @@ public class AppraisalMgr {
                 .addScalar("GOALS_REQUIRED_MOD_DATE", StandardBasicTypes.DATE)
                 .addScalar("EMPLOYEE_SIGNED_DATE", StandardBasicTypes.DATE)
                 .addScalar("PYVPASJ_PIDM", StandardBasicTypes.INTEGER)
-                .setInteger("pidm", pidm).list();
+                .addScalar("OVERDUE", StandardBasicTypes.INTEGER)
+                .setInteger("pidm", pidm);
+        if (!StringUtils.isEmpty(posno) && !StringUtils.isEmpty(suffix)) {
+            hibQuery.setString("posno", posno).setString("suffix", suffix);
+        }
+        List<Object[]> result =  hibQuery.list();
 
         if (result.isEmpty()) {
             return appraisals;
@@ -707,6 +726,7 @@ public class AppraisalMgr {
 
         // Build list of appraisals from sql results
         for (Object[] aResult : result) {
+           Appraisal appraisal;
             Integer id = (Integer) aResult[0];
             String jobTitle = (String) aResult[1];
             String appointmentType = (String) aResult[2];
@@ -716,9 +736,11 @@ public class AppraisalMgr {
             Date goalsReqModDate = (Date) aResult[6];
             Date employeeSignDate = (Date) aResult[7];
             Integer employeePidm = (Integer) aResult[8];
+            Integer overdue = (Integer) aResult[9];
 
             appraisal = new Appraisal(id, jobTitle, null, null, appointmentType,
-                    startDate, endDate, status, goalsReqModDate, employeeSignDate, employeePidm);
+                    startDate, endDate, status, goalsReqModDate, employeeSignDate, employeePidm,
+                    overdue);
             appraisals.add(appraisal);
             pidms.add(employeePidm);
         }
@@ -735,7 +757,16 @@ public class AppraisalMgr {
             Employee employee = employeeHashMap.get(employeePidm);
             ap.getJob().setEmployee(employee);
         }
-        return appraisals;
+
+        ArrayList<Appraisal> myTeamAppraisals = new ArrayList<Appraisal>();
+        if (appraisals != null) {
+            for (Appraisal appraisal : appraisals) {
+                appraisal.setRole("supervisor");
+                myTeamAppraisals.add(appraisal);
+            }
+        }
+
+        return myTeamAppraisals;
     }
 
     /**
@@ -1045,6 +1076,31 @@ public class AppraisalMgr {
     }
 
     /**
+     * @param job
+     * @param appraisalStartDate
+     * @return
+     * @throws Exception
+     */
+    public static boolean AnnualExists(Job job, Date appraisalStartDate) throws Exception
+    {
+        if (AppraisalMgr.appraisalExists(job, appraisalStartDate, Appraisal.TYPE_ANNUAL))
+            return true;
+
+        //If we get here, there is no record for the job for appraisalStartDate
+        //It's possible that someone added a value for Pyvpasj_eval_date after we created
+        //the previous appraisal, so need to check that.
+        SimpleDateFormat simpleDateformat = new SimpleDateFormat("yyyy");
+        int thisYear = Integer.parseInt(simpleDateformat.format(appraisalStartDate));
+        Date startDateBasedOnJobBeginDate = job.getAnnualStartDateBasedOnJobBeginDate(thisYear);
+
+        if (startDateBasedOnJobBeginDate.equals(appraisalStartDate))
+            return false;
+        else
+            return AppraisalMgr.appraisalExists(job, startDateBasedOnJobBeginDate, Appraisal.TYPE_ANNUAL);
+    }
+
+
+    /**
      * Updates the appraisal status and originalStatus using the id of the appraisal and hsql query.
      *
      * @param appraisal
@@ -1064,73 +1120,278 @@ public class AppraisalMgr {
 
 
     /**
-     * Get all the appraisals first using job-pidm, and then filter through to remove
-     * extra appraisals for reviewer and supervisor.
-     * @param osuid     osu id of the employee's appraisals we are searching
-     * @param pidm      pidm of the logged in user
+     * First get the jobs that match the search criteria. Then we get the list of appraisals
+     * using the jobs in the where clause.
+     *
+     * @param searchTerm    osu id of or name the employee's appraisals we are searching
+     * @param pidm          pidm of the logged in user
      * @param isAdmin
      * @param isSupervisor
      * @param bcName
      * @return
      * @throws Exception
      */
-    public List<Appraisal> search(int osuid, int pidm, boolean isAdmin, boolean isSupervisor, String bcName)
+    public List<Appraisal> search(String searchTerm, int pidm, boolean isAdmin,
+                                  boolean isSupervisor, String bcName) throws Exception {
+        List<Job> jobs;
+
+        if (!isAdmin) {
+            int supervisorPidm = 0;
+            if (isSupervisor) {
+                supervisorPidm = pidm;
+            }
+            jobs = JobMgr.search(searchTerm, bcName, supervisorPidm);
+        } else {
+            jobs = JobMgr.search(searchTerm, "", 0);
+        }
+
+        String hql = "select new edu.osu.cws.evals.models.Appraisal ( " +
+            "id, job.jobTitle, job.positionNumber, startDate, endDate, type, " +
+            "job.employee.id, job.employee.lastName, job.employee.firstName, " +
+            "evaluationSubmitDate, status, job.businessCenterName, " +
+            "job.orgCodeDescription, job.suffix, overdue) from " +
+            "edu.osu.cws.evals.models.Appraisal ";
+
+        return getAppraisalsByJobs(jobs, hql, null);
+    }
+
+    /**
+     * Returns a list of appraisals that are retrieved based on the jobs. These are used by
+     * by appraisal.search and report search of employee appraisals.
+     *
+     * @param jobs
+     * @param hql
+     * @param conditions
+     * @return
+     * @throws Exception
+     */
+    private static List<Appraisal> getAppraisalsByJobs(List<Job> jobs, String hql,
+                                                       List<String> conditions)
             throws Exception {
+        // The list of jobs contains the pidm, posno and suff that match the search criteria and
+        // the permission level of the logged in user.
+        if (jobs == null || jobs.isEmpty()) {
+            return new ArrayList<Appraisal>();
+        }
+
         Session session = HibernateUtil.getCurrentSession();
         List<Appraisal> appraisals = new ArrayList<Appraisal>();
-        Set<Job> notBelongJobs = new HashSet<Job>();//jobs the logged in user has no access
-        Set<Job> belongJobs = new HashSet<Job>(); //jobs the logged in user has access
-
-        Employee employee = employeeMgr.findByOsuid(osuid);
-        if (employee == null) {
-            return appraisals;
+        if (conditions == null) {
+            conditions = new ArrayList<String>();
         }
 
-        int searchUserID = employee.getId(); //pidm of the employee we are searching for.
-        Query hibernateQuery = session.getNamedQuery("appraisal.search")
-                .setInteger("pidm", searchUserID);
-
-        List<Appraisal> appraisalsTemp =  (ArrayList<Appraisal>) hibernateQuery.list();
-
-        if (isAdmin) //Admin gets to see all, so no filtering needed
-            return appraisalsTemp;
-
-        for (Appraisal appraisal : appraisalsTemp) {
-            Job appJob = appraisal.getJob();
-            if (belongJobs.contains(appJob) || notBelongJobs.contains(appJob)) {
-                if (belongJobs.contains(appJob)) {
-                    appraisals.add(appraisal);
-                }
-                continue;
-            }
-
-            //If we get here, we haven't checked this job yet.
-            if (bcName != null && !bcName.equals("")) { //reviewer
-               if (appJob.getBusinessCenterName().equals(bcName)) {
-                  appraisals.add(appraisal);
-                  belongJobs.add(appJob);
-               }
-               else {
-                  notBelongJobs.add(appJob);
-               }
-            } else if (isSupervisor) {
-                // Fetch the appraisal job from the db because the isSupervisor method needs to
-                // traverse up the supervising chain.
-                //Employee employee1 = new Employee(appJob.getEmployee().getId());
-                //Job dbJob = new Job(employee, appJob.getPositionNumber(), appJob.getSuffix());
-                Job job = (Job) session.load(Job.class, appJob);
-                if (jobMgr.isUpperSupervisor(job, pidm)) {
-                    appraisals.add(appraisal);
-                    belongJobs.add(appJob);
-                } else {
-                    notBelongJobs.add(appJob);
-                }
-            }
+        List<String> jobConditions = new ArrayList<String>();
+        for (int i = 0; i < jobs.size(); i++) {
+            String cond = "(job.employee.id = :pidm" + i + " and job.positionNumber = :posno" + i +
+                    " and job.suffix = :suff"+i+")";
+            jobConditions.add(cond);
         }
 
+        // add the job pidm, posno and suffix to the hql query to only get the appraisals we need.
+        if (!jobConditions.isEmpty()) {
+            String jobJoinClause = StringUtils.join(jobConditions, " or ");
+            conditions.add(jobJoinClause);
+        }
+
+        if (!conditions.isEmpty()) {
+            hql += " where " + StringUtils.join(conditions, " and ") + " ";
+        }
+
+        hql += LIST_ORDER;
+        Query query = session.createQuery(hql);
+
+        for (int i = 0; i < jobs.size(); i++) {
+            Job job = jobs.get(i);
+            query.setInteger("pidm"+i, job.getEmployee().getId())
+                    .setString("posno"+i, job.getPositionNumber())
+                    .setString("suff"+i, job.getSuffix());
+        }
+
+        List<Appraisal> temp =  (ArrayList<Appraisal>) query.list();
+
+        appraisals = addSupervisorToAppraisals(temp);
         return appraisals;
-
     }
+
+    /**
+     * Add the supervisor to the list of appraisal pojo. This is so that the jsp is able
+     * to handle with job's not having supervisors.
+     *
+     * @param source
+     * @return
+     * @throws Exception
+     */
+    private static List<Appraisal> addSupervisorToAppraisals(List<Appraisal> source)
+            throws Exception {
+        List<Appraisal> destination = new ArrayList<Appraisal>();
+
+        // Add supervisor pojo to the appraisal list
+        for (Appraisal appraisal : source) {
+            Job job = appraisal.getJob();
+            Job tempJob = JobMgr.addSupervisorToJob(job);
+            appraisal.setJob(tempJob);
+
+            // Copy the appraisal pojo and fields to handle missing employee/job
+            Appraisal nonDbAppraisal = new Appraisal(appraisal);
+            destination.add(nonDbAppraisal);
+        }
+
+        return destination;
+    }
+
+
+    /**
+     * This method is used by ReportsAction to display the list of evaluations for a given set of
+     * jobs.
+     *
+     * @param jobs
+     * @return
+     */
+    public static List<Appraisal> getEmployeeAppraisalList(List<Job> jobs) throws Exception {
+        ArrayList<String> conditions = new ArrayList<String>();
+        String hql = REPORT_LIST_SELECT;
+        conditions.add("status not in ('completed', 'archived', 'closed')");
+
+        return getAppraisalsByJobs(jobs, hql, conditions);
+    }
+
+
+    /**
+     * Returns the data needed to generate the google charts and nothing more.
+     *
+     * @param paramMap
+     * @param directSupervisors
+     * @param inLeafSupervisor
+     * @return
+     */
+    public static List<Appraisal> getReportListData(HashMap paramMap, List<Job> directSupervisors,
+                                                    boolean inLeafSupervisor) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+
+        List<Appraisal> results = new ArrayList<Appraisal>();
+        String scope = (String) paramMap.get(ReportsAction.SCOPE);
+        String scopeValue = (String) paramMap.get(ReportsAction.SCOPE_VALUE);
+        String report = (String) paramMap.get(ReportsAction.REPORT);
+        String bcName = (String) paramMap.get(Constants.BC_NAME);
+        boolean addBC = !StringUtils.isEmpty(bcName);
+
+        String hqlQuery = getReportListHQL(scope, report, addBC);
+        Query listQuery = session.createQuery(hqlQuery)
+                .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES);
+
+        if (scope.equals(ReportsAction.SCOPE_BC)) {
+            results = (ArrayList<Appraisal>) listQuery
+                    .setParameter("bcName", scopeValue)
+                    .list();
+        } else if (scope.equals(ReportsAction.SCOPE_ORG_PREFIX)) {
+            results = (ArrayList<Appraisal>) listQuery
+                    .setParameter("orgPrefix", scopeValue + "%")
+                    .setParameter("bcName", bcName)
+                    .list();
+        } else if (scope.equals(ReportsAction.SCOPE_ORG_CODE)) {
+            listQuery.setParameter("tsOrgCode", scopeValue);
+
+            // only set the bcName if it's not empty. if an admin searches, the bcName is empty
+            if (addBC) {
+                listQuery.setParameter("bcName", bcName);
+            }
+
+            results = (ArrayList<Appraisal>) listQuery.list();
+        } else if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
+            List<Integer> appraisalIds = getAppraisalIdsForSupervisorReport(directSupervisors,
+                    inLeafSupervisor);
+
+            if (!appraisalIds.isEmpty()) {
+                results = (ArrayList<Appraisal>) listQuery
+                        .setParameterList("appraisalIds", appraisalIds)
+                        .list();
+            }
+        } else {
+            results = (ArrayList<Appraisal>) listQuery
+                    .list();
+        }
+
+        return AppraisalMgr.addSupervisorToAppraisals(results);
+    }
+
+    /**
+     * Returns the hql needed to display the list of evaluation records in the reports.
+     * The data is sorted by lastName, firstName
+     *
+     * @param scope
+     * @param reportType
+     * @param addBC         Whether the BC should be added to the where clause
+     * @return
+     */
+    public static String getReportListHQL(String scope, String reportType, boolean addBC) {
+        String where = REPORT_LIST_WHERE + " and job.appointmentType in :appointmentTypes ";
+
+        //@todo: do we need to do bc filtering when the scope is supervisor?
+        if (!scope.equals(ReportsAction.DEFAULT_SCOPE) &&
+                !scope.equals(ReportsAction.SCOPE_SUPERVISOR) && addBC) {
+            where += " and job.businessCenterName = :bcName";
+        }
+
+        if (scope.equals(ReportsAction.SCOPE_ORG_PREFIX)) {
+            where += " and job.orgCodeDescription LIKE :orgPrefix";
+        } else if (scope.equals(ReportsAction.SCOPE_ORG_CODE)) {
+            where += " and job.tsOrgCode = :tsOrgCode";
+        } else if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
+            where += " and id in (:appraisalIds)";
+        }
+
+        if (ReportMgr.isWayOverdueReport(reportType)) {
+            where += " and overdue > 30";
+        } else if (ReportMgr.isOverdueReport(reportType)) {
+            where += " and overdue > 0";
+        }
+
+        return REPORT_LIST_SELECT + where + LIST_ORDER;
+    }
+
+    /**
+     * Returns the list of all the appraisals that match the current supervising chain all the
+     * way down to the leaf.
+     *
+     * @param directSupervisors
+     * @param inLeafSupervisor
+     * @return
+     */
+    public static List<Integer> getAppraisalIdsForSupervisorReport(List<Job> directSupervisors,
+                                                                   boolean inLeafSupervisor) {
+        if (directSupervisors == null) {
+            return null;
+        }
+
+        Session session = HibernateUtil.getCurrentSession();
+        List<Integer> ids = new ArrayList<Integer>();
+
+        String select = "SELECT appraisals.id FROM pyvpasj " +
+                "LEFT JOIN appraisals ON (appraisals.job_pidm = pyvpasj_pidm AND " +
+                "appraisals.position_number = pyvpasj_posn AND " +
+                "appraisals.job_suffix = pyvpasj_suff) ";
+        String where = "WHERE pyvpasj_status = 'A' " +
+                "AND PYVPASJ_APPOINTMENT_TYPE in (:appointmentTypes) " +
+                "and appraisals.status not in ('completed', 'archived', 'closed')";
+        String startWith = EvalsUtil.getStartWithClause(directSupervisors.size());
+
+        if (!inLeafSupervisor) {
+            where += " AND level > 1 ";
+        }
+        String sql = select + where + startWith + Constants.CONNECT_BY;
+
+        Query query = session.createSQLQuery(sql)
+                .setParameterList("appointmentTypes", ReportsAction.APPOINTMENT_TYPES);
+        EvalsUtil.setStartWithParameters(directSupervisors, query);
+        List<BigDecimal> result = query.list();
+
+        for (BigDecimal id : result) {
+            ids.add(Integer.parseInt(id.toString()));
+        }
+
+        return ids;
+    }
+
 
     /**
      * Calculates the overdue value for the appraisal object and updates the value in the object.

@@ -152,13 +152,13 @@
                         <br />
                         <input type="submit" id="<portlet:namespace />show-rebuttal"
                             value="<liferay-ui:message key="appraisal-want-rebuttal" />" />
-                        <div class="pass-hide pass-appraisal-rebuttal">
+                        <div class="pass-appraisal-rebuttal">
                     </c:if>
                     <label for="<portlet:namespace />appraisal.rebuttal"><liferay-ui:message key="appraisal-employee-response" /></label>
                     <liferay-ui:input-textarea param="appraisal.rebuttal"
                         defaultValue="${appraisal.rebuttal}" />
                     <c:if test="${empty appraisal.rebuttal}">
-                        </div><!-- end pass-hide-->
+                        </div><!-- end pass-appraisal-rebuttal-->
                     </c:if>
                 </c:when>
                 <c:when test="${permissionRule.employeeResponse == 'v' && not empty appraisal.rebuttal}">

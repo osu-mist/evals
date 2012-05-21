@@ -11,6 +11,8 @@ import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsPDF;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
 import javax.portlet.*;
@@ -73,8 +75,8 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         int pidm = actionHelper.getLoggedOnUser(request).getId();
-        int osuid = ParamUtil.getInteger(request, "osuid");
-        if (osuid == 0) {
+        String searchTerm = ParamUtil.getString(request, "searchTerm");
+        if (StringUtils.isEmpty(searchTerm)) {
             actionHelper.addErrorsToRequest(request, "Please enter an employee's OSU ID");
         } else {
             String bcName = "";
@@ -82,16 +84,21 @@ public class AppraisalsAction implements ActionInterface {
                 bcName = actionHelper.getReviewer(pidm).getBusinessCenterName();
             }
             AppraisalMgr appraisalMgr = new AppraisalMgr();
-            appraisals = appraisalMgr.search(osuid, pidm, isAdmin, isSupervisor, bcName);
 
-            if (appraisals.isEmpty()) {
-                if (isAdmin) {
-                    actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-no-results-admin"));
-                } else if (isReviewer) {
-                    actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-no-results-reviewer"));
-                } else {
-                    actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-no-results-supervisor"));
+            try {
+                appraisals = appraisalMgr.search(searchTerm, pidm, isAdmin, isSupervisor, bcName);
+
+                if (appraisals.isEmpty()) {
+                    if (isAdmin) {
+                        actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-no-results-admin"));
+                    } else if (isReviewer) {
+                        actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-no-results-reviewer"));
+                    } else {
+                        actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-no-results-supervisor"));
+                    }
                 }
+            } catch (ModelException e) {
+                actionHelper.addErrorsToRequest(request, e.getMessage());
             }
         }
 
@@ -258,7 +265,9 @@ public class AppraisalsAction implements ActionInterface {
 
 
         String status = appraisal.getStatus();
-        if ((status.equals(Appraisal.STATUS_RELEASE_DUE) || status.equals(Appraisal.STATUS_CLOSED))
+        String[] afterReviewStatus = {Appraisal.STATUS_RELEASE_DUE, Appraisal.STATUS_RELEASE_OVERDUE,
+                Appraisal.STATUS_CLOSED};
+        if (ArrayUtils.contains(afterReviewStatus, status)
                 && actionHelper.isLoggedInUserReviewer(request)) {
             actionHelper.removeReviewAppraisalInSession(request, appraisal);
         } else {
@@ -343,7 +352,7 @@ public class AppraisalsAction implements ActionInterface {
             ResourceResponse res = (ResourceResponse) response;
             res.setContentType("application/pdf");
             res.addProperty(HttpHeaders.CACHE_CONTROL, "max-age=3600, must-revalidate");
-            res.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+downloadFilename);
+            res.addProperty(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""+downloadFilename+"\"");
 
             OutputStream out = res.getPortletOutputStream();
             RandomAccessFile in = new RandomAccessFile(filename, "r");

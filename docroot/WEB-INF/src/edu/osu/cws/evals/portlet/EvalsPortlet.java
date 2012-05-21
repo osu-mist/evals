@@ -9,6 +9,7 @@ package edu.osu.cws.evals.portlet;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.util.PortalUtil;
 import edu.osu.cws.evals.hibernate.AppraisalStepMgr;
 import edu.osu.cws.evals.hibernate.PermissionRuleMgr;
 import edu.osu.cws.evals.models.Configuration;
@@ -108,7 +109,6 @@ public class EvalsPortlet extends GenericPortlet {
     public void processAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws IOException, PortletException {
-
         delegate(actionRequest, actionResponse);
 	}
 
@@ -386,12 +386,11 @@ public class EvalsPortlet extends GenericPortlet {
 
             if (logger != null) {
                 Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
-                if (loggedOnUser != null) {
-                    employee = loggedOnUser.toString();
-                }
-                grayLogFields.put("logged-in-user", employee);
-                String onidUsername = actionHelper.getLoggedOnUsername(request);
-                grayLogFields.put("onid-username", onidUsername);
+                String loggedOnUserId = ((Integer) loggedOnUser.getId()).toString();
+                String currentURL = PortalUtil.getCurrentURL(request);
+
+                grayLogFields.put("logged-in-user", loggedOnUserId);
+                grayLogFields.put("currentURL", currentURL);
                 logger.log(level, shortMessage, e, grayLogFields);
             }
         } catch (Exception exception) {

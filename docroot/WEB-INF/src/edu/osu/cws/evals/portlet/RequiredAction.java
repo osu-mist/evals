@@ -5,6 +5,7 @@ import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
+import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.Date;
@@ -64,6 +65,7 @@ public class RequiredAction {
                 key.contains("results-due") || key.contains("results-overdue") ||
                 key.contains("signature-due") || key.contains("signature-overdue")
                 ) {
+            pattern = changeKeyIfDueToday(key, numDays, resource);
             if (isTeamAction) {
                 anchorText = MessageFormat.format(pattern, name, reviewPeriod, numDays);
             } else {
@@ -89,7 +91,7 @@ public class RequiredAction {
                 key.equals("action-required-2nd-release-overdue") ||
                 key.contains("action-required-rebuttal-read")
             ) {
-            pattern = resource.getString(key);
+            pattern = changeKeyIfDueToday(key, numDays, resource);
             anchorText = MessageFormat.format(pattern, name, numDays);
         }
 
@@ -98,6 +100,26 @@ public class RequiredAction {
         if (anchorText.equals("")) {
             anchorText = resource.getString(key);
         }
+    }
+
+    /**
+     * If the number of days when something is due/overdue is 0, we change it to Today.
+     *
+     * @param key
+     * @param numDays
+     * @return
+     */
+    private String changeKeyIfDueToday(String key, int numDays, ResourceBundle resource) {
+        // change overdue by 0 days into due today
+        if (numDays == 0) {
+            if (key.contains("overdue")) {
+                key = key.replace("-overdue", "-due-today");
+            } else {
+                key += "-today";
+            }
+        }
+
+        return resource.getString(key);
     }
 
     /**

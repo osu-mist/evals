@@ -35,10 +35,26 @@ public class Constants {
     public static final String JSP_APPRAISAL_CLOSEOUT = "/jsp/appraisals/closeout.jsp";
 
     public static final String JSP_REPORT = "/jsp/reports/report.jsp";
+    public static final String JSP_REPORT_SEARCH_RESULTS = "/jsp/reports/reportSearchResults.jsp";
 
     //if appraisalStartDate is before FUL__GOALS_DUE date, create the appraisal these many
     //days before appraialsDue.
     public static final int DAYS_BEFORE_APPRAISAL_DUE_To_CREATE = 60;
 
     public static final String ROOT_DIR = "WEB-INF/src/";
+
+    // Used by several Hibernate classes when executing hierarchical queries
+    public static final String CONNECT_BY = "CONNECT BY " +
+            "pyvpasj_supervisor_pidm = prior pyvpasj_pidm AND " +
+            "pyvpasj_supervisor_posn = prior pyvpasj_posn AND " +
+            "pyvpasj_supervisor_suff = prior pyvpasj_suff ";
+
+    //Appraisal ends on or after EVALS_START_DATE will be handled by this app.
+    public static final String EVALS_START_DATE = "10/31/2011";
+
+    public static final Integer MAX_ORG_CODE_DIGITS = 6;
+
+    public static final String BC_NAME = "bcName";
+
+    public static final Integer SEARCH_MAX_RESULTS = 20;
 }
