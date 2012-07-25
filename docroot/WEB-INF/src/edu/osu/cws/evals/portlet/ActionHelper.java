@@ -1,5 +1,7 @@
 package edu.osu.cws.evals.portlet;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
@@ -40,6 +42,7 @@ public class ActionHelper {
     private PortletContext portletContext;
 
     public static final String ACCESS_DENIED = "You do not have access to perform this action.";
+    private static Log _log = LogFactoryUtil.getLog(EvalsPortlet.class);
 
     private HashMap<String, Object> requestMap = new HashMap<String, Object>();
 
@@ -66,6 +69,8 @@ public class ActionHelper {
     public void setupMyActiveAppraisals(PortletRequest request, int employeeId)
             throws Exception {
         List<Appraisal> allMyActiveAppraisals = getMyActiveAppraisals(request, employeeId);
+        _log.error("start setup!");
+        _log.error(allMyActiveAppraisals.get(0).getStatus());
         requestMap.put("myActiveAppraisals", allMyActiveAppraisals);
     }
 
@@ -139,12 +144,14 @@ public class ActionHelper {
         PortletSession session = request.getPortletSession(true);
         Employee employee = getLoggedOnUser(request);
         int employeeId = employee.getId();
-
+        _log.error("ID"+employeeId);
         Boolean isSupervisor = (Boolean) session.getAttribute("isSupervisor");
+
         if (refresh || isSupervisor == null) {
             isSupervisor = JobMgr.isSupervisor(employeeId, null);
             session.setAttribute("isSupervisor", isSupervisor);
         }
+
         requestMap.put("isSupervisor", isSupervisor);
 
         Boolean isReviewer = (Boolean) session.getAttribute("isReviewer");
@@ -395,14 +402,38 @@ public class ActionHelper {
     /**
      * Returns an Employee object of the currently logged on user. First it looks in
      * the PortletSession if it's not there it fetches the Employee object and stores
-     * it there.
+     * it there. No include the joined job objects.
      *
      * @param request   PortletRequest
      * @return
      * @throws Exception
      */
-    public Employee getLoggedOnUser(PortletRequest request) throws Exception {
+    public Employee getLoggedOnUser (PortletRequest request) throws Exception {
         PortletSession session = request.getPortletSession(true);
+        Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
+        if (loggedOnUser == null) {
+            _log.error("getlog start!");
+            String loggedOnUsername = getLoggedOnUsername(request);
+            _log.error(loggedOnUsername);
+            loggedOnUser = employeeMgr.findByOnid(loggedOnUsername, "employee-with-jobs");
+            loggedOnUser.setEmployeeJobFlag(false);
+            session.setAttribute("loggedOnUser", loggedOnUser);
+            refreshContextCache();
+        }
+
+        return  loggedOnUser;
+    }
+
+  /*  public void UpdateLoggedOnUser (PortletRequest request, Employee employee) throws Exception{
+        PortletSession session = request.getPortletSession(true);
+        session.setAttribute("loggedOnUser", employee);
+        refreshContextCache();
+    }
+   */
+
+  /*  public Employee getLoggedOnUser(PortletRequest request) throws Exception {
+
+         PortletSession session = request.getPortletSession(true);
         Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
         if (loggedOnUser == null) {
             String loggedOnUsername = getLoggedOnUsername(request);
@@ -421,11 +452,12 @@ public class ActionHelper {
                 }
             }
             session.setAttribute("loggedOnUser", loggedOnUser);
+
             refreshContextCache();
         }
 
         return loggedOnUser;
-    }
+    }  */
 
     /**
      * Returns a map with information on the currently logged on user.

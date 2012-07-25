@@ -97,6 +97,7 @@ public class EvalsPortlet extends GenericPortlet {
         // If processAction's delegate method was called, it set the viewJSP property to some
         // jsp value, if viewJSP is null, it means processAction was not called and we need to
         // call delegate
+        _log.error("Do View!");
         if (viewJSP == null) {
             delegate(renderRequest, renderResponse);
         }
@@ -176,14 +177,16 @@ public class EvalsPortlet extends GenericPortlet {
     public void delegate(PortletRequest request, PortletResponse response) {
         String action = "delegate";
         Session hibSession = null;
+        _log.error("Delegate start!");
 
         try {
             actionHelper.setPortletContext(getPortletContext());
             portletSetup(request);
             hibSession = HibernateUtil.getCurrentSession();
             Transaction tx = hibSession.beginTransaction();
+            _log.error("Action start!");
             actionHelper.setUpUserPermissionInSession(request, false);
-
+            _log.error("Action comp!");
             if (actionHelper.isDemo()) {
                 actionHelper.setupDemoSwitch(request);
             }
@@ -191,21 +194,29 @@ public class EvalsPortlet extends GenericPortlet {
 
             // The portlet action can be set by the action/renderURLs using "action" as the parameter
             // name
+            // get the action name from request, the default name is "display"
             action =  ParamUtil.getString(request, "action", "display");
+            // the the controller class from request, the default name is "HomeAction"
+            // Which means in default we execute "display" method in "HomeAction" class
             String controllerClass =  ParamUtil.getString(request, "controller", "HomeAction");
+            // define controller's class
             if (controllerClass != null && !action.equals("")) {
                 controllerClass = "edu.osu.cws.evals.portlet." + controllerClass;
-
+            // set a new instance of the controller
                 ActionInterface controller = (ActionInterface) Class.forName(controllerClass).newInstance();
+            // set the actionhelp of the new instance
                 controller.setActionHelper(actionHelper);
                 HomeAction homeAction = new HomeAction();
                 homeAction.setActionHelper(actionHelper);
+            // set the homeaction of the new instance
                 controller.setHomeAction(homeAction);
-
+            // execute the method (or action) of the instance
                 Method controllerMethod = controller.getClass().getDeclaredMethod(
                         action, PortletRequest.class, PortletResponse.class);
+            // the return value is a string indicate the jsp page the system should go
                 viewJSP = (String) controllerMethod.invoke(controller, request, response);
             }
+            _log.error(viewJSP+ "Delegate finished");
             tx.commit();
         } catch (Exception e) {
             if (hibSession != null && hibSession.isOpen()) {
@@ -229,8 +240,8 @@ public class EvalsPortlet extends GenericPortlet {
      * Takes care of initializing portlet variables and storing them in the portletContext.
      * Some of these variables are: permissionRuleMgr, appraisalStepMgr, reviewers, admins and
      * environment properties. It also creates a EvalsLogger and Mailer instances and stores them
-     * in portletContext. This method is called everytime a doView, processAction or
-     * serveResource are called, but the code inside only executes the first time.
+     * in portletContext. This method is called everytime a doView is called,
+     * but the code inside only executes the first time.
      *
      * @param request
      * @throws Exception

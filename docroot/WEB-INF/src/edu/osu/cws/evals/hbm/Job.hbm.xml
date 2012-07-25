@@ -35,14 +35,14 @@
             <column name="PYVPASJ_SUPERVISOR_SUFF"/>
         </many-to-one>
 
-        <set name="appraisals" inverse="true">
-            <key>
-                <column name="JOB_PIDM"/>
-                <column name="POSITION_NUMBER"/>
-                <column name="JOB_SUFFIX"/>
-            </key>
-            <one-to-many class="edu.osu.cws.evals.models.Appraisal"/>
-        </set>
+        <!--<set name="appraisals" inverse="true">-->
+            <!--<key>-->
+                <!--<column name="JOB_PIDM"/>-->
+                <!--<column name="POSITION_NUMBER"/>-->
+                <!--<column name="JOB_SUFFIX"/>-->
+            <!--</key>-->
+            <!--<one-to-many class="edu.osu.cws.evals.models.Appraisal"/>-->
+        <!--</set>-->
     </class>
 
     <query name="job.directSupervisors"><![CDATA[

@@ -11,6 +11,8 @@ package edu.osu.cws.evals.util;
  * All PASS logging should be done by this class, not the native Logger class.
  */
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import edu.osu.cws.util.Logger;
 import java.util.HashMap;
 import java.util.Map;

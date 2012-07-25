@@ -12,7 +12,8 @@ public class HibernateUtil {
      * Config value - name of hibernate test xml config file.
      */
 
-    public static final String TEST_CONFIG = "hibernate-test.cfg.xml";
+    //public static final String TEST_CONFIG = "hibernate-test.cfg.xml";
+    public static final String TEST_CONFIG = "hibernate-annie.cfg.xml";
 
     /**
      * Config value - path to hibernate xml config files from the root of the
