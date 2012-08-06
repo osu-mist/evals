@@ -66,7 +66,8 @@ public class AppraisalsAction implements ActionInterface {
 
         boolean isAdmin = actionHelper.isLoggedInUserAdmin(request);
         boolean isReviewer = actionHelper.isLoggedInUserReviewer(request);
-        boolean isSupervisor = actionHelper.isLoggedInUserSupervisor(request);
+        // reviewer permissions are higher than supervisor
+        boolean isSupervisor = !isReviewer && actionHelper.isLoggedInUserSupervisor(request);
 
         if (!isAdmin && !isReviewer && !isSupervisor)  {
             actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
