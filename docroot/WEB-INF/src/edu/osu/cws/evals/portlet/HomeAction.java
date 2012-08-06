@@ -7,17 +7,13 @@ import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Employee;
-import edu.osu.cws.evals.models.Job;
-import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletSession;
-import java.util.*;
+import java.util.ArrayList;
 
 public class HomeAction implements ActionInterface {
     private ActionHelper actionHelper = new ActionHelper();
@@ -35,14 +31,7 @@ public class HomeAction implements ActionInterface {
      * @throws Exception
      */
     public String display(PortletRequest request, PortletResponse response) throws Exception {
-        _log.error("Display Start!");
         Employee employee = actionHelper.getLoggedOnUser(request);
-        if (employee==null){
-            _log.error("No employee!");
-        }
-        else {
-            _log.error("Have employee!");
-        }
         int employeeId = employee.getId();
         String homeJSP = getHomeJSP(request);
         CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
@@ -54,15 +43,12 @@ public class HomeAction implements ActionInterface {
         helpLinks(request);
         actionHelper.addToRequestMap("alertMsg", config.getBoolean("alert.display"));
         actionHelper.addToRequestMap("isHome", true);
-        _log.error("Finish!");
+
         actionHelper.setupMyActiveAppraisals(request, employeeId);
         actionHelper.setupMyTeamActiveAppraisals(request, employeeId);
         ArrayList<Appraisal> myActiveAppraisals = (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myActiveAppraisals");
         ArrayList<Appraisal> myTeamsActiveAppraisals  =
                 (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myTeamsActiveAppraisals");
-        if(myActiveAppraisals==null){
-            _log.error("haha");
-        }
 
         boolean hasAppraisals = (myActiveAppraisals != null && !myActiveAppraisals.isEmpty()) ||
                 (myTeamsActiveAppraisals != null && !myTeamsActiveAppraisals.isEmpty());
@@ -82,14 +68,8 @@ public class HomeAction implements ActionInterface {
 
     public String displayMyInformation(PortletRequest request, PortletResponse response) throws Exception {
         actionHelper.useNormalMenu(request);
-        Employee employee = actionHelper.getLoggedOnUser(request);
-        if(!employee.getEmployeeJobFlag()){
-            //EmployeeMgr.findJobs(employee.getNonTerminatedJobs());
-            employee.setJobs(EmployeeMgr.findJobs(employee.getId()));
-            employee.setEmployeeJobFlag(true);
-        }
+        actionHelper.addToRequestMap("employee", actionHelper.getLoggedOnUser(request));
 
-        actionHelper.addToRequestMap("employee", employee);
         return Constants.JSP_MY_INFO;
     }
 

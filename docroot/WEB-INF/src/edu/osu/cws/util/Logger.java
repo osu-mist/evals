@@ -1,7 +1,5 @@
 package edu.osu.cws.util;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import org.graylog2.GelfMessage;
 import org.graylog2.GelfSender;
 import java.util.Date;
@@ -15,8 +13,6 @@ import java.util.Set;
  * @copyright Copyright 2011, Central Web Services, Oregon State University
  */
 public class Logger {
-    //private static Log _log = LogFactoryUtil.getLog(Logger.class);
-
     public static final String EMERGENCY = "0";
     public static final String ALERT = "1";
     public static final String CRITICAL = "2";
@@ -48,10 +44,9 @@ public class Logger {
         message.setHost(clientHost);
         message.setFacility(facilityName);
         message.addField("environment", environment);
-//        if (message.isValid()) {
-//            gelfSender.sendMessage(message);
-//        }
-       // _log.error(message.getShortMessage()+message.getFullMessage());
+        if (message.isValid()) {
+            gelfSender.sendMessage(message);
+        }
     }
 
     /**
@@ -77,11 +72,10 @@ public class Logger {
     public void log(String level, String shortMessage, String longMessage, Map<String,String> fields) throws Exception {
         GelfMessage message = new GelfMessage(shortMessage, longMessage, new Date(), level);
         Set<String> keys = fields.keySet();
-//        for (String key : keys) {
-//            message.addField(key, fields.get(key));
-//        }
-//        log(message);
-
+        for (String key : keys) {
+            message.addField(key, fields.get(key));
+        }
+        log(message);
     }
 
     /**
