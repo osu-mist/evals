@@ -26,6 +26,7 @@ public class ActionHelper {
     private static final String REVIEW_LIST_MAX_RESULTS = "reviewListMaxResults";
     public static final String APPRAISAL_NOT_FOUND = "We couldn't find your appraisal. If you believe this is an " +
             "error, please contact your supervisor.";
+    public static final String REQUEST_MAP = "requestMap";
 
     private EmployeeMgr employeeMgr = new EmployeeMgr();
 
@@ -41,7 +42,6 @@ public class ActionHelper {
 
     public static final String ACCESS_DENIED = "You do not have access to perform this action.";
 
-    private HashMap<String, Object> requestMap = new HashMap<String, Object>();
 
     /**
      * Specifies whether or not the request is an AJAX request by checking whether or not
@@ -66,7 +66,7 @@ public class ActionHelper {
     public void setupMyActiveAppraisals(PortletRequest request, int employeeId)
             throws Exception {
         List<Appraisal> allMyActiveAppraisals = getMyActiveAppraisals(request, employeeId);
-        requestMap.put("myActiveAppraisals", allMyActiveAppraisals);
+        addToRequestMap("myActiveAppraisals", allMyActiveAppraisals,request);
     }
 
     /**
@@ -101,7 +101,7 @@ public class ActionHelper {
     public void setupMyTeamActiveAppraisals(PortletRequest request, int employeeId) throws Exception {
         if (isLoggedInUserSupervisor(request)) {
             ArrayList<Appraisal> myTeamAppraisals = getMyTeamActiveAppraisals(request, employeeId);
-            requestMap.put(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals);
+            addToRequestMap(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals,request);
         }
     }
 
@@ -145,14 +145,14 @@ public class ActionHelper {
             isSupervisor = JobMgr.isSupervisor(employeeId, null);
             session.setAttribute("isSupervisor", isSupervisor);
         }
-        requestMap.put("isSupervisor", isSupervisor);
+        addToRequestMap("isSupervisor", isSupervisor,request);
 
         Boolean isReviewer = (Boolean) session.getAttribute("isReviewer");
         if (refresh || isReviewer == null) {
             isReviewer = getReviewer(employeeId) != null;
             session.setAttribute("isReviewer", isReviewer);
         }
-        requestMap.put("isReviewer", isReviewer);
+        addToRequestMap("isReviewer", isReviewer,request);
 
         Boolean isMasterAdmin = (Boolean) session.getAttribute("isSuperAdmin");
         if (refresh || isMasterAdmin == null) {
@@ -163,16 +163,16 @@ public class ActionHelper {
             }
             session.setAttribute("isMasterAdmin", isMasterAdmin);
         }
-        requestMap.put("isMasterAdmin", isMasterAdmin);
+        addToRequestMap("isMasterAdmin", isMasterAdmin,request);
 
         Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
         if (refresh || isAdmin == null) {
             isAdmin = getAdmin(employeeId) != null;
             session.setAttribute("isAdmin", isAdmin);
         }
-        requestMap.put("isAdmin", isAdmin);
+        addToRequestMap("isAdmin", isAdmin,request);
 
-        requestMap.put("employee", getLoggedOnUser(request));
+        addToRequestMap("employee", getLoggedOnUser(request),request);
     }
 
     /**
@@ -240,7 +240,7 @@ public class ActionHelper {
      * @param request
      */
     public void useNormalMenu(PortletRequest request) {
-        requestMap.put("menuHome", true);
+        addToRequestMap("menuHome", true,request);
     }
 
     /**
@@ -249,7 +249,7 @@ public class ActionHelper {
      * @param request
      */
     public void useMaximizedMenu(PortletRequest request) {
-        addToRequestMap("menuMax", true);
+        addToRequestMap("menuMax", true,request);
     }
 
     /**
@@ -389,7 +389,7 @@ public class ActionHelper {
      * @param errorMsg
      */
     public void addErrorsToRequest(PortletRequest request, String errorMsg) {
-        addToRequestMap("errorMsg", errorMsg);
+        addToRequestMap("errorMsg", errorMsg,request);
     }
 
     /**
@@ -601,13 +601,13 @@ public class ActionHelper {
         ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
 
 
-        myActiveAppraisals = (ArrayList<Appraisal>) requestMap.get("myActiveAppraisals");
+        myActiveAppraisals = (ArrayList<Appraisal>) getFromRequestMap("myActiveAppraisals",request);
         employeeRequiredActions = getAppraisalActions(myActiveAppraisals, "employee", resource);
-        requestMap.put("employeeActions", employeeRequiredActions);
+        addToRequestMap("employeeActions", employeeRequiredActions,request);
 
         // add supervisor required actions, if user has team's active appraisals
-        if (requestMap.get("myTeamsActiveAppraisals") != null) {
-            supervisorActions = (ArrayList<Appraisal>) requestMap.get("myTeamsActiveAppraisals");
+        if(getFromRequestMap("myTeamsActiveAppraisals",request) != null){
+            supervisorActions = (ArrayList<Appraisal>) getFromRequestMap("myTeamsActiveAppraisals",request);
             administrativeActions = getAppraisalActions(supervisorActions, "supervisor", resource);
         }
 
@@ -619,7 +619,7 @@ public class ActionHelper {
                 administrativeActions.add(reviewerAction);
             }
         }
-        requestMap.put("administrativeActions", administrativeActions);
+        addToRequestMap("administrativeActions", administrativeActions,request);
     }
 
     /**
@@ -727,6 +727,7 @@ public class ActionHelper {
      */
     public void setRequestAttributes(RenderRequest request) {
         String currentRole = getCurrentRole(request);
+        HashMap<String,Object> requestMap = new HashMap<String,Object>();
         requestMap.put("currentRole", currentRole);
 
         for (Map.Entry<String, Object> entry : requestMap.entrySet()) {
@@ -736,12 +737,32 @@ public class ActionHelper {
 
     }
 
-    public void addToRequestMap(String key, Object object) {
-        requestMap.put(key, object);
+    public void addToRequestMap(String key, Object object, PortletRequest request) {
+        PortletSession session = request.getPortletSession(true);
+        HashMap<String,Object> requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
+        if  (requestMap == null)
+        {
+            requestMap = new HashMap<String, Object>();
+            requestMap.put(key, object);
+            session.setAttribute(REQUEST_MAP,requestMap);
+        }
+        else {
+            requestMap.put(key, object);
+        }
+
     }
 
-    public Object getFromRequestMap(String key) {
+    public Object getFromRequestMap(String key,PortletRequest request) {
+        PortletSession session = request.getPortletSession(true);
+        HashMap<String,Object> requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
+        if (requestMap == null)
+            return null;
         return requestMap.get(key);
+    }
+
+    public void removeRequestMap(PortletRequest request){
+        PortletSession session = request.getPortletSession(true);
+        session.removeAttribute(REQUEST_MAP);
     }
 
     /**
@@ -796,8 +817,8 @@ public class ActionHelper {
         }
 
         // set Employee  and employees object(s)
-        addToRequestMap("employees", EmployeeMgr.list());
-        addToRequestMap("employee", getLoggedOnUser(request));
+        addToRequestMap("employees", EmployeeMgr.list(),request);
+        addToRequestMap("employee", getLoggedOnUser(request),request);
     }
 
 }

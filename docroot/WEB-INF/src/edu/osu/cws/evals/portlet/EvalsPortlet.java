@@ -187,7 +187,7 @@ public class EvalsPortlet extends GenericPortlet {
             if (actionHelper.isDemo()) {
                 actionHelper.setupDemoSwitch(request);
             }
-            actionHelper.addToRequestMap("isDemo", actionHelper.isDemo());
+            actionHelper.addToRequestMap("isDemo", actionHelper.isDemo(),request);
 
             // The portlet action can be set by the action/renderURLs using "action" as the parameter
             // name
@@ -207,6 +207,8 @@ public class EvalsPortlet extends GenericPortlet {
                 viewJSP = (String) controllerMethod.invoke(controller, request, response);
             }
             tx.commit();
+            actionHelper.removeRequestMap(request);
+
         } catch (Exception e) {
             if (hibSession != null && hibSession.isOpen()) {
                 hibSession.close();

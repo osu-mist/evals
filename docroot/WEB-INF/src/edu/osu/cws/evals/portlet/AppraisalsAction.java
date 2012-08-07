@@ -44,8 +44,8 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         ArrayList<Appraisal> appraisals = actionHelper.getReviewsForLoggedInUser(request, -1);
-        actionHelper.addToRequestMap("appraisals", appraisals);
-        actionHelper.addToRequestMap("pageTitle", "pending-reviews");
+        actionHelper.addToRequestMap("appraisals", appraisals,request);
+        actionHelper.addToRequestMap("pageTitle", "pending-reviews",request);
         actionHelper.useMaximizedMenu(request);
 
         return Constants.JSP_REVIEW_LIST;
@@ -61,7 +61,7 @@ public class AppraisalsAction implements ActionInterface {
      */
     public String search(PortletRequest request, PortletResponse response) throws Exception {
         List<Appraisal> appraisals = new ArrayList<Appraisal>();
-        actionHelper.addToRequestMap("pageTitle", "search-results");
+        actionHelper.addToRequestMap("pageTitle", "search-results",request);
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
 
         boolean isAdmin = actionHelper.isLoggedInUserAdmin(request);
@@ -103,7 +103,7 @@ public class AppraisalsAction implements ActionInterface {
             }
         }
 
-        actionHelper.addToRequestMap("appraisals", appraisals);
+        actionHelper.addToRequestMap("appraisals", appraisals,request);
         actionHelper.useMaximizedMenu(request);
 
         return Constants.JSP_REVIEW_LIST;
@@ -149,21 +149,21 @@ public class AppraisalsAction implements ActionInterface {
         actionHelper.setupMyTeamActiveAppraisals(request, userId);
         if (actionHelper.isLoggedInUserReviewer(request)) {
             ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(request, -1);
-            actionHelper.addToRequestMap("pendingReviews", reviews);
+            actionHelper.addToRequestMap("pendingReviews", reviews,request);
         }
 
         if (actionHelper.isLoggedInUserReviewer(request) && appraisal.getEmployeeSignedDate() != null &&
                 !appraisal.getRole().equals("employee")) {
-            actionHelper.addToRequestMap("displayResendNolij", true);
+            actionHelper.addToRequestMap("displayResendNolij", true,request);
         }
         if ((actionHelper.isLoggedInUserReviewer(request) || actionHelper.isLoggedInUserAdmin(request)) && appraisal.isOpen()
                 && !userRole.equals("employee")) {
-            actionHelper.addToRequestMap("displayCloseOutAppraisal", true);
+            actionHelper.addToRequestMap("displayCloseOutAppraisal", true,request);
         }
         String status = appraisal.getStatus();
         if ((actionHelper.isLoggedInUserAdmin(request) || actionHelper.isLoggedInUserReviewer(request)) &&
                 status.equals(Appraisal.STATUS_GOALS_APPROVED) && !userRole.equals("employee")) {
-            actionHelper.addToRequestMap("displaySetAppraisalStatus", true);
+            actionHelper.addToRequestMap("displaySetAppraisalStatus", true,request);
         }
 
         // Initialze lazy appraisal associations
@@ -185,8 +185,8 @@ public class AppraisalsAction implements ActionInterface {
         }
         // End of initialize lazy appraisal associations
 
-        actionHelper.addToRequestMap("appraisal", appraisal);
-        actionHelper.addToRequestMap("permissionRule", permRule);
+        actionHelper.addToRequestMap("appraisal", appraisal,request);
+        actionHelper.addToRequestMap("permissionRule", permRule,request);
         actionHelper.useMaximizedMenu(request);
 
         return Constants.JSP_APPRAISAL;
@@ -446,7 +446,7 @@ public class AppraisalsAction implements ActionInterface {
         String userRole = appraisalMgr.getRole(appraisal, userId);
         appraisal.setRole(userRole);
 
-        actionHelper.addToRequestMap("id", appraisal.getId());
+        actionHelper.addToRequestMap("id", appraisal.getId(),request);
         if (!actionHelper.isLoggedInUserReviewer(request)) {
             String errorMsg = resource.getString("appraisal-resend-permission-denied");
             actionHelper.addErrorsToRequest(request, errorMsg);
@@ -503,8 +503,8 @@ public class AppraisalsAction implements ActionInterface {
         List<CloseOutReason> reasonList = CloseOutReasonMgr.list(false);
         appraisal.getJob().getEmployee().toString();
 
-        actionHelper.addToRequestMap("reasonsList", reasonList);
-        actionHelper.addToRequestMap("appraisal", appraisal);
+        actionHelper.addToRequestMap("reasonsList", reasonList,request);
+        actionHelper.addToRequestMap("appraisal", appraisal,request);
         actionHelper.useMaximizedMenu(request);
 
         return Constants.JSP_APPRAISAL_CLOSEOUT;
