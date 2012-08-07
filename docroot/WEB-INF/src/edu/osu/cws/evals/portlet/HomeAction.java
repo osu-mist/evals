@@ -41,27 +41,27 @@ public class HomeAction implements ActionInterface {
         // specify menu type, help links and yellow box to display in home view
         actionHelper.useNormalMenu(request);
         helpLinks(request);
-        actionHelper.addToRequestMap("alertMsg", config.getBoolean("alert.display"));
-        actionHelper.addToRequestMap("isHome", true);
+        actionHelper.addToRequestMap("alertMsg", config.getBoolean("alert.display"),request);
+        actionHelper.addToRequestMap("isHome", true,request);
 
         actionHelper.setupMyActiveAppraisals(request, employeeId);
         actionHelper.setupMyTeamActiveAppraisals(request, employeeId);
-        ArrayList<Appraisal> myActiveAppraisals = (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myActiveAppraisals");
+        ArrayList<Appraisal> myActiveAppraisals = (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myActiveAppraisals",request);
         ArrayList<Appraisal> myTeamsActiveAppraisals  =
-                (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myTeamsActiveAppraisals");
+                (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myTeamsActiveAppraisals",request);
 
         boolean hasAppraisals = (myActiveAppraisals != null && !myActiveAppraisals.isEmpty()) ||
                 (myTeamsActiveAppraisals != null && !myTeamsActiveAppraisals.isEmpty());
 
         if (!isAdmin && !isReviewer && !hasAppraisals) {
-            actionHelper.addToRequestMap("hasNoEvalsAccess", true);
+            actionHelper.addToRequestMap("hasNoEvalsAccess", true,request);
         }
 
         actionHelper.setRequiredActions(request);
         if (homeJSP.equals(Constants.JSP_HOME_REVIEWER)) {
             int maxResults = config.getInt("reviewer.home.pending.max");
             ArrayList<Appraisal> appraisals = actionHelper.getReviewsForLoggedInUser(request, maxResults);
-            actionHelper.addToRequestMap("appraisals", appraisals);
+            actionHelper.addToRequestMap("appraisals", appraisals,request);
         }
         return homeJSP;
     }
@@ -82,7 +82,7 @@ public class HomeAction implements ActionInterface {
             employee.setEmployeeJobFlag(true);
         }
 
-        actionHelper.addToRequestMap("employee", employee);
+        actionHelper.addToRequestMap("employee", employee,request);
         return Constants.JSP_MY_INFO;
     }
 
@@ -93,7 +93,7 @@ public class HomeAction implements ActionInterface {
      */
     private void helpLinks(PortletRequest request) {
         CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
-        actionHelper.addToRequestMap("helpLinks", config.getStringArray("helpfulLinks"));
+        actionHelper.addToRequestMap("helpLinks", config.getStringArray("helpfulLinks"),request);
     }
 
     /**
