@@ -23,8 +23,8 @@ public class JobMgr {
             "pyvpasj_posn, pyvpasj_suff, pyvpase_first_name, " +
             "pyvpase_last_name, pyvpasj_desc ";
     public static final String SEARCH_JOB_FROM = "from pyvpasj, pyvpase ";
-    public static final String SEARCH_JOB_WHERE = "where pyvpase_pidm = pyvpasj_pidm " +
-            "and pyvpasj_status != 'T' ";
+    public static final String SEARCH_JOB_WHERE = "where pyvpase_pidm = pyvpasj_pidm "; //+
+            //"and pyvpasj_status != 'T' ";
     public static final String SEARCH_JOB_ORDER_BY = " order by pyvpase_last_name, " +
             "pyvpase_first_name ";
     public static final String SEARCH_TOO_MANY_RESULTS = "Your search returned too many results. " +
