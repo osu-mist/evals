@@ -57,4 +57,6 @@ public class Constants {
     public static final String BC_NAME = "bcName";
 
     public static final Integer SEARCH_MAX_RESULTS = 20;
+
+    public static final long DATE_CHANGE_SEQUENCE = 7 * 1000 * 60 * 60 * 24;
 }
