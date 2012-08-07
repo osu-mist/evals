@@ -407,24 +407,12 @@ public class ActionHelper {
         if (loggedOnUser == null) {
             String loggedOnUsername = getLoggedOnUsername(request);
             loggedOnUser = employeeMgr.findByOnid(loggedOnUsername, "employee-with-jobs");
-
-            // Initialize the jobs and supervisor of the jobs so that display employment
-            // information has the data it needs.
-            Set<Job> jobs = loggedOnUser.getNonTerminatedJobs();
-            if (jobs != null && !jobs.isEmpty()) {
-                for (Job job : jobs) {
-                    if (job.getSupervisor() != null && job.getSupervisor().getEmployee() != null) {
-                        job.getSupervisor();
-                        job.getSupervisor().getEmployee();
-                        job.getSupervisor().getEmployee().getName();
-                    }
-                }
-            }
+            loggedOnUser.setEmployeeJobFlag(false);
             session.setAttribute("loggedOnUser", loggedOnUser);
             refreshContextCache();
         }
 
-        return loggedOnUser;
+        return  loggedOnUser;
     }
 
     /**

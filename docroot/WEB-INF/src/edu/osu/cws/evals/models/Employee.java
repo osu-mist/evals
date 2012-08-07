@@ -22,6 +22,8 @@ public class Employee extends Evals {
 
     private String email;
 
+    private Boolean isEmployeeGetJob = false;
+
     /**
      * Possible values of status are:
      * A - active,
@@ -142,6 +144,15 @@ public class Employee extends Evals {
     public String getConventionName()
     {
         return (firstName + " " + lastName);
+    }
+
+
+    public Boolean getEmployeeJobFlag() {
+        return isEmployeeGetJob;
+    }
+
+    public void setEmployeeJobFlag(Boolean flag) {
+        isEmployeeGetJob = flag;
     }
 
     @Override
