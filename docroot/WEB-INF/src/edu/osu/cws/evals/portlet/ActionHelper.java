@@ -407,11 +407,10 @@ public class ActionHelper {
         if (loggedOnUser == null) {
             String loggedOnUsername = getLoggedOnUsername(request);
             loggedOnUser = employeeMgr.findByOnid(loggedOnUsername, "employee-with-jobs");
-            loggedOnUser.setEmployeeJobFlag(false);
+            loggedOnUser.setLoadJobs(false);
             session.setAttribute("loggedOnUser", loggedOnUser);
             refreshContextCache();
         }
-
         return  loggedOnUser;
     }
 

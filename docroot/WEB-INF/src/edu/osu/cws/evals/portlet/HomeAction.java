@@ -67,14 +67,15 @@ public class HomeAction implements ActionInterface {
     }
 
     public String displayMyInformation(PortletRequest request, PortletResponse response) throws Exception {
+        PortletSession session = request.getPortletSession(true);
         actionHelper.useNormalMenu(request);
         Employee employee = actionHelper.getLoggedOnUser(request);
         if(!employee.getLoadJobs()){
             employee.setJobs(EmployeeMgr.findJobs(employee.getId()));
             employee.setLoadJobs(true);
         }
-
         actionHelper.addToRequestMap("employee", employee,request);
+        session.setAttribute("loggedOnUser", employee);
         return Constants.JSP_MY_INFO;
     }
 
