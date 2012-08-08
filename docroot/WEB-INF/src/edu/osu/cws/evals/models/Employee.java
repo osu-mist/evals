@@ -22,7 +22,7 @@ public class Employee extends Evals {
 
     private String email;
 
-    private Boolean isEmployeeGetJob = false;
+    private Boolean loadJobs = false;
 
     /**
      * Possible values of status are:
@@ -146,13 +146,12 @@ public class Employee extends Evals {
         return (firstName + " " + lastName);
     }
 
-
-    public Boolean getEmployeeJobFlag() {
-        return isEmployeeGetJob;
+    public Boolean getLoadJobs() {
+        return loadJobs;
     }
 
-    public void setEmployeeJobFlag(Boolean flag) {
-        isEmployeeGetJob = flag;
+    public void setLoadJobs(Boolean loadJobs) {
+        this.loadJobs = loadJobs;
     }
 
     @Override
