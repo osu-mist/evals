@@ -246,7 +246,7 @@ public class EvalsPortlet extends GenericPortlet {
         if(contextLoadDate == null){
             reload = true;
         }
-        else if((new Date()).getTime() - contextLoadDate.getTime() >= Constants.DATE_CHANGE_SEQUENCE) {
+        else if((new Date()).getTime() - contextLoadDate.getTime() >= Constants.PORTLET_RELOAD_FREQENCY) {
             reload = true;
         }
 
