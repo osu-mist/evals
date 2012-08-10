@@ -106,6 +106,7 @@ public class EvalsPortlet extends GenericPortlet {
 
         include(viewJSP, renderRequest, renderResponse);
         viewJSP = null;
+        actionHelper.removeRequestMap(renderRequest);
 	}
 
     public void processAction(
@@ -209,7 +210,6 @@ public class EvalsPortlet extends GenericPortlet {
                 viewJSP = (String) controllerMethod.invoke(controller, request, response);
             }
             tx.commit();
-            actionHelper.removeRequestMap(request);
 
         } catch (Exception e) {
             if (hibSession != null && hibSession.isOpen()) {
@@ -240,13 +240,12 @@ public class EvalsPortlet extends GenericPortlet {
      * @throws Exception
      */
     private void portletSetup(PortletRequest request) throws Exception {
-
-        Date contextLoadDate = (Date) getPortletContext().getAttribute(CONTEXT_LOAD_DATE);
         Boolean reload = false;
-        if(contextLoadDate == null){
+        Date loadDate = (Date) getPortletContext().getAttribute(CONTEXT_LOAD_DATE);
+        if(loadDate == null){
             reload = true;
         }
-        else if((new Date()).getTime() - contextLoadDate.getTime() >= Constants.PORTLET_RELOAD_FREQENCY) {
+        else if((new Date()).getTime() - loadDate.getTime() > Constants.PORTLET_RELOAD_FREQENCY) {
             reload = true;
         }
 
