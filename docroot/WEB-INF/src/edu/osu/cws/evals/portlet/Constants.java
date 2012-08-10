@@ -58,5 +58,5 @@ public class Constants {
 
     public static final Integer SEARCH_MAX_RESULTS = 20;
 
-    public static final long DATE_CHANGE_SEQUENCE = 7 * 1000 * 60 * 60 * 24;
+    public static final long PORTLET_RELOAD_FREQENCY = 1000 * 60 * 60 * 24 * 7; //7 days in ms
 }

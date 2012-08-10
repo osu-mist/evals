@@ -66,23 +66,16 @@ public class HomeAction implements ActionInterface {
         return homeJSP;
     }
 
-   /* public String displayMyInformation(PortletRequest request, PortletResponse response) throws Exception {
-        actionHelper.useNormalMenu(request);
-        actionHelper.addToRequestMap("employee", actionHelper.getLoggedOnUser(request));
-
-        return Constants.JSP_MY_INFO;
-    }    */
-
     public String displayMyInformation(PortletRequest request, PortletResponse response) throws Exception {
+        PortletSession session = request.getPortletSession(true);
         actionHelper.useNormalMenu(request);
         Employee employee = actionHelper.getLoggedOnUser(request);
-        if(!employee.getEmployeeJobFlag()){
-            //EmployeeMgr.findJobs(employee.getNonTerminatedJobs());
+        if(!employee.getLoadJobs()){
             employee.setJobs(EmployeeMgr.findJobs(employee.getId()));
-            employee.setEmployeeJobFlag(true);
+            employee.setLoadJobs(true);
         }
-
         actionHelper.addToRequestMap("employee", employee,request);
+        session.setAttribute("loggedOnUser", employee);
         return Constants.JSP_MY_INFO;
     }
 

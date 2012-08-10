@@ -407,11 +407,10 @@ public class ActionHelper {
         if (loggedOnUser == null) {
             String loggedOnUsername = getLoggedOnUsername(request);
             loggedOnUser = employeeMgr.findByOnid(loggedOnUsername, "employee-with-jobs");
-            loggedOnUser.setEmployeeJobFlag(false);
+            loggedOnUser.setLoadJobs(false);
             session.setAttribute("loggedOnUser", loggedOnUser);
             refreshContextCache();
         }
-
         return  loggedOnUser;
     }
 
@@ -726,22 +725,29 @@ public class ActionHelper {
      * @param request
      */
     public void setRequestAttributes(RenderRequest request) {
+        PortletSession session = request.getPortletSession(true);
+        HashMap<String,Object> requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
         String currentRole = getCurrentRole(request);
-        HashMap<String,Object> requestMap = new HashMap<String,Object>();
         requestMap.put("currentRole", currentRole);
 
         for (Map.Entry<String, Object> entry : requestMap.entrySet()) {
             request.setAttribute(entry.getKey(), entry.getValue());
         }
         requestMap.clear();
-
     }
 
+    /**
+     * Add the data into requestMap and store the map into session.
+     *
+     * @param key
+     * @param object
+     * @param request
+     * @return
+     */
     public void addToRequestMap(String key, Object object, PortletRequest request) {
         PortletSession session = request.getPortletSession(true);
         HashMap<String,Object> requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
-        if  (requestMap == null)
-        {
+        if  (requestMap == null) {
             requestMap = new HashMap<String, Object>();
             requestMap.put(key, object);
             session.setAttribute(REQUEST_MAP,requestMap);
@@ -749,17 +755,32 @@ public class ActionHelper {
         else {
             requestMap.put(key, object);
         }
+        session.setAttribute(REQUEST_MAP, requestMap);
 
     }
 
+    /**
+     * remove the requestMap in session
+     *
+     * @param request
+     * @param key
+     * @return object from requestMap searching from key
+     */
     public Object getFromRequestMap(String key,PortletRequest request) {
         PortletSession session = request.getPortletSession(true);
         HashMap<String,Object> requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
-        if (requestMap == null)
+        if (requestMap == null){
             return null;
+        }
         return requestMap.get(key);
     }
 
+    /**
+     * remove the requestMap in session
+     *
+     * @param request
+     * @return
+     */
     public void removeRequestMap(PortletRequest request){
         PortletSession session = request.getPortletSession(true);
         session.removeAttribute(REQUEST_MAP);
