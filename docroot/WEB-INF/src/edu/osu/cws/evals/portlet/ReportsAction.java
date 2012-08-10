@@ -2,6 +2,8 @@ package edu.osu.cws.evals.portlet;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
@@ -17,6 +19,8 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public class ReportsAction implements ActionInterface {
+
+    private static Log _log = LogFactoryUtil.getLog(ReportsAction.class);
     public static final String SCOPE = "scope";
     public static final String SCOPE_VALUE = "scopeValue";
     public static final String SEARCH_TERM = "searchTerm";
@@ -876,20 +880,32 @@ public class ReportsAction implements ActionInterface {
      */
     private String chartDataScopeMap() {
         String report = (String) paramMap.get(REPORT);
+        String rowNumber = "1";
         if (report.contains(ReportMgr.STAGE)) {
             return "{}";
         }
 
         HashMap<String, String> dataScopeMap = new HashMap<String, String>();
+        int Size = chartData.size();
+        _log.error("The size of chartData is: " + Size);
+        int i = 0;
         for (Object[] row : chartData) {
+            _log.error("the length of the row is:" + row.length);
+            _log.error("we are in the " + i + " row of chartData!");
+            i++;
+            _log.error("display start");
             String displayValue = row[1].toString();
+            _log.error("display value is: " + displayValue);
             String scopeValue = row[1].toString();
+
             if (row.length == 3) {
                 scopeValue = row[2].toString();
+                rowNumber = "2";
             }
+            _log.error(" scope value is: " + scopeValue + "row number is: " + rowNumber);
             dataScopeMap.put(displayValue, scopeValue);
         }
-
+        _log.error("Job finish!");
         return gson.toJson(dataScopeMap);
     }
 
