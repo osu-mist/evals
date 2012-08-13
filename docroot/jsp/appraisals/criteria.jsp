@@ -19,6 +19,8 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
         </fieldset>
     </c:when>
 </c:choose>
+<p class="pass-hide">Role = '${appraisal.role}', permissionRule.goals = '${permissionRule.goals}',
+    permissionRule.results = '${permissionRule.results}'</p>
 
 <c:choose>
     <c:when test="${permissionRule.newGoals == 'e'}">
