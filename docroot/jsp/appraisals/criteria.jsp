@@ -18,11 +18,9 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
             <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAssessment.getGoal()) %></p>
         </fieldset>
     </c:when>
-    <c:otherwise>
-        <p class="pass-hide">Role = '${appraisal.role}', permissionRule.goals = '${permissionRule.goals}',
-            permissionRule.results = '${permissionRule.results}'</p>
-    </c:otherwise>
 </c:choose>
+<p class="pass-hide">Role = '${appraisal.role}', permissionRule.goals = '${permissionRule.goals}',
+    permissionRule.results = '${permissionRule.results}'</p>
 
 <c:choose>
     <c:when test="${permissionRule.newGoals == 'e'}">
