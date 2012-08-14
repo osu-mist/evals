@@ -369,7 +369,7 @@ public class ReportsAction implements ActionInterface {
                 enableByUnitReports = false;
             }
         }
-
+        _log.error("The maxDataPoints is " + maxDataPoints);
         tableData = ReportMgr.getChartData(paramMap, true, directEmployees,
                 supervisorTeamAppraisal, currentSupervisorJob, inLeafSupervisorReport);
         chartData = ReportMgr.trimDataPoints(tableData, maxDataPoints);
@@ -888,23 +888,31 @@ public class ReportsAction implements ActionInterface {
         HashMap<String, String> dataScopeMap = new HashMap<String, String>();
         int Size = chartData.size();
         _log.error("The size of chartData is: " + Size);
-        int i = 0;
+        int i=0;
         for (Object[] row : chartData) {
+            _log.error("we are in the " + (i+1) + " row of chartData!");
             _log.error("the length of the row is:" + row.length);
-            _log.error("we are in the " + i + " row of chartData!");
-            i++;
             _log.error("display start");
-            String displayValue = row[1].toString();
+            String displayValue = "No Business Center";
+            String scopeValue = "No Business Center";
+            if(row[1]!=null){
+                displayValue = row[1].toString();
+                scopeValue = row[1].toString();
+            }
             _log.error("display value is: " + displayValue);
-            String scopeValue = row[1].toString();
 
             if (row.length == 3) {
-                scopeValue = row[2].toString();
-                rowNumber = "2";
+                if(row[2] != null){
+                    scopeValue = row[2].toString();
+                    rowNumber = "2";
+                }
+                else scopeValue = "No Business Center";
+
             }
-            _log.error(" scope value is: " + scopeValue + "row number is: " + rowNumber);
+            _log.error("scope value is: " + scopeValue + " row number is: " + rowNumber);
             dataScopeMap.put(displayValue, scopeValue);
-        }
+            i++;
+            }
         _log.error("Job finish!");
         return gson.toJson(dataScopeMap);
     }
