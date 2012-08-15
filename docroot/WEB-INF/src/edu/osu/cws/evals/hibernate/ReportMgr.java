@@ -88,6 +88,7 @@ public class ReportMgr {
                                      boolean addBC) {
         String col1 = "";
         String select = "";
+        String notNull = "";
         String from = " FROM appraisals, PYVPASJ ";
         String where = " WHERE " + ACTIVE_STATUS_SQL + " " +
                 "AND PYVPASJ_APPOINTMENT_TYPE in :appointmentTypes " +
@@ -118,6 +119,7 @@ public class ReportMgr {
         }
 
         select = "SELECT count(*), " + col1 + ", " + col1 + " as col1_copy" + from;
+        notNull = " AND " + col1 + " IS NOT NULL";
         group += col1;
         if (sortByCount) {
             order += "count(*) DESC, " + col1;
@@ -131,7 +133,7 @@ public class ReportMgr {
             where += " AND appraisals.overdue > 0";
         }
 
-        return select + where + group + order;
+        return select + where + notNull + group + order;
     }
 
     /**

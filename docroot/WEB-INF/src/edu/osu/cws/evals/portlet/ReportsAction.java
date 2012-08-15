@@ -880,40 +880,25 @@ public class ReportsAction implements ActionInterface {
      */
     private String chartDataScopeMap() {
         String report = (String) paramMap.get(REPORT);
-        String rowNumber = "1";
         if (report.contains(ReportMgr.STAGE)) {
             return "{}";
         }
 
         HashMap<String, String> dataScopeMap = new HashMap<String, String>();
-        int Size = chartData.size();
-        _log.error("The size of chartData is: " + Size);
-        int i=0;
         for (Object[] row : chartData) {
-            _log.error("we are in the " + (i+1) + " row of chartData!");
-            _log.error("the length of the row is:" + row.length);
-            _log.error("display start");
-            String displayValue = "No Business Center";
-            String scopeValue = "No Business Center";
-            if(row[1]!=null){
+            String displayValue = "";
+            String scopeValue = "";
+            if(row[1]!= null){
                 displayValue = row[1].toString();
                 scopeValue = row[1].toString();
             }
-            _log.error("display value is: " + displayValue);
-
             if (row.length == 3) {
                 if(row[2] != null){
                     scopeValue = row[2].toString();
-                    rowNumber = "2";
                 }
-                else scopeValue = "No Business Center";
-
             }
-            _log.error("scope value is: " + scopeValue + " row number is: " + rowNumber);
             dataScopeMap.put(displayValue, scopeValue);
-            i++;
             }
-        _log.error("Job finish!");
         return gson.toJson(dataScopeMap);
     }
 
