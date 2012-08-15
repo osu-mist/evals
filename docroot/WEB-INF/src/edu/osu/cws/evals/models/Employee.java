@@ -22,6 +22,8 @@ public class Employee extends Evals {
 
     private String email;
 
+    private Boolean loadJobs = false;
+
     /**
      * Possible values of status are:
      * A - active,
@@ -142,6 +144,14 @@ public class Employee extends Evals {
     public String getConventionName()
     {
         return (firstName + " " + lastName);
+    }
+
+    public Boolean getLoadJobs() {
+        return loadJobs;
+    }
+
+    public void setLoadJobs(Boolean loadJobs) {
+        this.loadJobs = loadJobs;
     }
 
     @Override

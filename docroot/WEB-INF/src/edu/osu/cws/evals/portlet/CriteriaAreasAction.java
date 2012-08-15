@@ -45,7 +45,7 @@ public class CriteriaAreasAction implements ActionInterface {
             for (CriterionArea criteria : criterionList) {
                 criteria.getCurrentDetail().toString();
             }
-            actionHelper.addToRequestMap("criteria", criterionList);
+            actionHelper.addToRequestMap("criteria", criterionList,request);
         } catch (ModelException e) {
             actionHelper.addErrorsToRequest(request, e.getMessage());
         }
@@ -76,7 +76,7 @@ public class CriteriaAreasAction implements ActionInterface {
         Employee loggedOnUser = actionHelper.getLoggedOnUser(request);
 
         // Fetch list of appointment types to use in add form
-        actionHelper.addToRequestMap("appointmentTypes", new AppointmentTypeMgr().list());
+        actionHelper.addToRequestMap("appointmentTypes", new AppointmentTypeMgr().list(),request);
 
         // When the criterionAreaId == null means that the user clicks on the Add Criteria
         // link. Otherwise the form was submitted
@@ -100,8 +100,8 @@ public class CriteriaAreasAction implements ActionInterface {
             }
         }
 
-        actionHelper.addToRequestMap("criterionArea", criterionArea);
-        actionHelper.addToRequestMap("criterionDetail", criterionDetail);
+        actionHelper.addToRequestMap("criterionArea", criterionArea,request);
+        actionHelper.addToRequestMap("criterionDetail", criterionDetail,request);
         actionHelper.useMaximizedMenu(request);
 
         return Constants.JSP_CRITERIA_ADD;
@@ -143,8 +143,8 @@ public class CriteriaAreasAction implements ActionInterface {
             actionHelper.addErrorsToRequest(request, e.getMessage());
         }
 
-        actionHelper.addToRequestMap("criterionArea", criterionArea);
-        actionHelper.addToRequestMap("criterionDetail", criterionDetail);
+        actionHelper.addToRequestMap("criterionArea", criterionArea,request);
+        actionHelper.addToRequestMap("criterionDetail", criterionDetail,request);
         actionHelper.useMaximizedMenu(request);
 
         return Constants.JSP_CRITERIA_ADD;
@@ -176,7 +176,7 @@ public class CriteriaAreasAction implements ActionInterface {
             // If the user clicks on the delete link the first time, use confirm page
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
                 CriterionArea criterion = criteriaMgrArea.get(criteriaID);
-                actionHelper.addToRequestMap("criterion", criterion);
+                actionHelper.addToRequestMap("criterion", criterion,request);
                 return Constants.JSP_CRITERIA_DELETE;
             }
 

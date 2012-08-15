@@ -242,80 +242,80 @@ public class ReportsAction implements ActionInterface {
         boolean displaySearchResultsPage = displaySearchResultsPage();
 
         if (isAppraisalSearch) { // display search result of employee appraisals
-            actionHelper.addToRequestMap("listAppraisals", listAppraisals);
-            actionHelper.addToRequestMap("isAppraisalSearch", isAppraisalSearch);
+            actionHelper.addToRequestMap("listAppraisals", listAppraisals,request);
+            actionHelper.addToRequestMap("isAppraisalSearch", isAppraisalSearch,request);
         } else if (!displaySearchResultsPage) { // regular active report
             // chart related data
-            actionHelper.addToRequestMap("chartData", chartData);
-            actionHelper.addToRequestMap("tableData", tableData);
-            actionHelper.addToRequestMap("drillDownData", drillDownData);
-            actionHelper.addToRequestMap("listAppraisals", listAppraisals);
+            actionHelper.addToRequestMap("chartData", chartData,request);
+            actionHelper.addToRequestMap("tableData", tableData,request);
+            actionHelper.addToRequestMap("drillDownData", drillDownData,request);
+            actionHelper.addToRequestMap("listAppraisals", listAppraisals,request);
 
             // parameter related data
             String scope = getScope();
             String scopeValue = getScopeValue();
-            actionHelper.addToRequestMap("scope", scope);
-            actionHelper.addToRequestMap("scopeValue", scopeValue);
-            actionHelper.addToRequestMap("report", paramMap.get(REPORT));
-            actionHelper.addToRequestMap("reportTitle", ReportMgr.getReportTitle(paramMap));
-            actionHelper.addToRequestMap("reportHeader", ReportMgr.getReportHeader(paramMap));
-            actionHelper.addToRequestMap("chartType", getChartType(request));
+            actionHelper.addToRequestMap("scope", scope,request);
+            actionHelper.addToRequestMap("scopeValue", scopeValue,request);
+            actionHelper.addToRequestMap("report", paramMap.get(REPORT),request);
+            actionHelper.addToRequestMap("reportTitle", ReportMgr.getReportTitle(paramMap),request);
+            actionHelper.addToRequestMap("reportHeader", ReportMgr.getReportHeader(paramMap),request);
+            actionHelper.addToRequestMap("chartType", getChartType(request),request);
             if (scope.equals(SCOPE_ORG_CODE)) {
                 enableByUnitReports = false;
             }
-            actionHelper.addToRequestMap("enableByUnitReports", enableByUnitReports);
+            actionHelper.addToRequestMap("enableByUnitReports", enableByUnitReports,request);
 
             if (scope.equals(SCOPE_SUPERVISOR)) {
                 // right pane data: supervisor appraisals and supervisor team
-                actionHelper.addToRequestMap("myActiveAppraisals", supervisorAppraisals);
-                actionHelper.addToRequestMap("myTeamsActiveAppraisals", supervisorTeamAppraisal);
-                actionHelper.addToRequestMap("isMyReport", isMyReport);
+                actionHelper.addToRequestMap("myActiveAppraisals", supervisorAppraisals,request);
+                actionHelper.addToRequestMap("myTeamsActiveAppraisals", supervisorTeamAppraisal,request);
+                actionHelper.addToRequestMap("isMyReport", isMyReport,request);
             }
 
             // breadcrumb and drill down data
             String nextScope = nextScopeInDrillDown(scope);
-            actionHelper.addToRequestMap("nextScope", nextScope);
+            actionHelper.addToRequestMap("nextScope", nextScope,request);
 
             boolean allowAllDrillDown = false;
             if (actionHelper.isLoggedInUserAdmin(request)) {
                 allowAllDrillDown = true;
             }
-            actionHelper.addToRequestMap("allowAllDrillDown", allowAllDrillDown);
+            actionHelper.addToRequestMap("allowAllDrillDown", allowAllDrillDown,request);
 
             String reviewerBCName = "";
             if (actionHelper.isLoggedInUserReviewer(request)) {
                 int employeeID = actionHelper.getLoggedOnUser(request).getId();
                 reviewerBCName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
             }
-            actionHelper.addToRequestMap("reviewerBCName", reviewerBCName);
+            actionHelper.addToRequestMap("reviewerBCName", reviewerBCName,request);
 
             showDrillDownMenu = showDrillDownMenu(allowAllDrillDown, reviewerBCName);
 
-            actionHelper.addToRequestMap("chartDataScopeMap", chartDataScopeMap());
+            actionHelper.addToRequestMap("chartDataScopeMap", chartDataScopeMap(),request);
 
             if (currentSupervisorJob != null) {
                 String currentSupervisorName = currentSupervisorJob.getEmployee().getName();
-                actionHelper.addToRequestMap("currentSupervisorName", currentSupervisorName);
+                actionHelper.addToRequestMap("currentSupervisorName", currentSupervisorName,request);
             }
         } else { // displaying search results - multiple jobs
-            actionHelper.addToRequestMap("searchResults", searchResults);
+            actionHelper.addToRequestMap("searchResults", searchResults,request);
         }
 
-        actionHelper.addToRequestMap("now", new Date());
-        actionHelper.addToRequestMap("searchTerm", searchTerm);
-        actionHelper.addToRequestMap("breadcrumbList", breadcrumbList);
-        actionHelper.addToRequestMap("requestBreadcrumbs", getRequestBreadcrumbs());
+        actionHelper.addToRequestMap("now", new Date(),request);
+        actionHelper.addToRequestMap("searchTerm", searchTerm,request);
+        actionHelper.addToRequestMap("breadcrumbList", breadcrumbList,request);
+        actionHelper.addToRequestMap("requestBreadcrumbs", getRequestBreadcrumbs(),request);
 
-        actionHelper.addToRequestMap("showDrillDownMenu", showDrillDownMenu);
-        actionHelper.addToRequestMap("searchView", displaySearchResultsPage);
+        actionHelper.addToRequestMap("showDrillDownMenu", showDrillDownMenu,request);
+        actionHelper.addToRequestMap("searchView", displaySearchResultsPage,request);
 
         // Error String messages used by search js
         ResourceBundle resource = (ResourceBundle) actionHelper
                 .getPortletContextAttribute("resourceBundle");
         actionHelper.addToRequestMap("searchJsErrorDefault",
-                resource.getString("report-search-js-validation-default"));
+                resource.getString("report-search-js-validation-default"),request);
         actionHelper.addToRequestMap("searchJsErrorSupervisor",
-                resource.getString("report-search-js-validation-supervisor"));
+                resource.getString("report-search-js-validation-supervisor"),request);
 
         // My Report data
         showMyReportLink(request);
@@ -324,7 +324,7 @@ public class ReportsAction implements ActionInterface {
         List<Breadcrumb> crumbListWithRootOnly = new ArrayList<Breadcrumb>();
         crumbListWithRootOnly.add(rootBreadcrumb);
         String breadcrumbsWithRootOnly = gson.toJson(crumbListWithRootOnly);
-        actionHelper.addToRequestMap("breadcrumbsWithRootOnly", breadcrumbsWithRootOnly);
+        actionHelper.addToRequestMap("breadcrumbsWithRootOnly", breadcrumbsWithRootOnly,request);
     }
 
     private String nextScopeInDrillDown(String currentScope) {
@@ -850,21 +850,21 @@ public class ReportsAction implements ActionInterface {
                     supervisorJob.getPositionNumber() + "_" + supervisorJob.getSuffix();
 
             showMyReportLink = true;
-            actionHelper.addToRequestMap("supervisorJobTitle", supervisorJobTitle);
-            actionHelper.addToRequestMap("myReportSupervisorKey", myReportSupervisorKey);
+            actionHelper.addToRequestMap("supervisorJobTitle", supervisorJobTitle,request);
+            actionHelper.addToRequestMap("myReportSupervisorKey", myReportSupervisorKey,request);
         }
 
         if (actionHelper.isLoggedInUserReviewer(request)) {
             String myReportBcName = actionHelper.getBusinessCenterForLoggedInReviewer(request);
             showMyReportLink = true;
-            actionHelper.addToRequestMap("myReportBcName", myReportBcName);
+            actionHelper.addToRequestMap("myReportBcName", myReportBcName,request);
         }
 
         if (actionHelper.isLoggedInUserAdmin(request)) {
             showMyReportLink = true;
         }
 
-        actionHelper.addToRequestMap("showMyReportLink", showMyReportLink);
+        actionHelper.addToRequestMap("showMyReportLink", showMyReportLink,request);
     }
 
     /**

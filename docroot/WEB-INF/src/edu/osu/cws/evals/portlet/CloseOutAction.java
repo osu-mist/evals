@@ -33,7 +33,7 @@ public class CloseOutAction implements ActionInterface {
         }
 
         ArrayList<CloseOutReason> reasonsList = CloseOutReasonMgr.list(false);
-        actionHelper.addToRequestMap("reasonsList", reasonsList);
+        actionHelper.addToRequestMap("reasonsList", reasonsList,request);
         actionHelper.useMaximizedMenu(request);
 
         return Constants.JSP_CLOSEOUT_REASON_LIST;
@@ -88,7 +88,7 @@ public class CloseOutAction implements ActionInterface {
             // If the user clicks on the delete link the first time, use confirm page
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
                 CloseOutReason reason = CloseOutReasonMgr.get(id);
-                actionHelper.addToRequestMap("reason", reason);
+                actionHelper.addToRequestMap("reason", reason,request);
                 return Constants.JSP_CLOSEOUT_REASON_DELETE;
             }
 

@@ -42,9 +42,9 @@ public class ReviewersAction implements ActionInterface {
         BusinessCenterMgr businessCenterMgr = new BusinessCenterMgr();
         ArrayList<BusinessCenter> businessCenters = (ArrayList<BusinessCenter>) businessCenterMgr.list();
 
-        actionHelper.addToRequestMap("isMaster", actionHelper.isLoggedInUserMasterAdmin(request));
-        actionHelper.addToRequestMap("reviewersList", reviewersList);
-        actionHelper.addToRequestMap("businessCenters", businessCenters);
+        actionHelper.addToRequestMap("isMaster", actionHelper.isLoggedInUserMasterAdmin(request),request);
+        actionHelper.addToRequestMap("reviewersList", reviewersList,request);
+        actionHelper.addToRequestMap("businessCenters", businessCenters,request);
         actionHelper.useMaximizedMenu(request);
 
         return Constants.JSP_REVIEWER_LIST;
@@ -113,7 +113,7 @@ public class ReviewersAction implements ActionInterface {
                 if (reviewer.getEmployee() != null) {
                     reviewer.getEmployee().getName(); // initialize name due to lazy-loading
                 }
-                actionHelper.addToRequestMap("reviewer", reviewer);
+                actionHelper.addToRequestMap("reviewer", reviewer,request);
                 return Constants.JSP_REVIEWER_DELETE;
             }
 

@@ -37,8 +37,8 @@ public class AdminsAction implements ActionInterface {
 
         actionHelper.refreshContextCache();
         ArrayList<Admin> adminsList = (ArrayList<Admin>) actionHelper.getPortletContextAttribute("adminsList");
-        actionHelper.addToRequestMap("isMaster", actionHelper.isLoggedInUserMasterAdmin(request));
-        actionHelper.addToRequestMap("adminsList", adminsList);
+        actionHelper.addToRequestMap("isMaster", actionHelper.isLoggedInUserMasterAdmin(request),request);
+        actionHelper.addToRequestMap("adminsList", adminsList,request);
         actionHelper.useMaximizedMenu(request);
 
         return Constants.JSP_ADMIN_LIST;
@@ -101,7 +101,7 @@ public class AdminsAction implements ActionInterface {
                 if (admin.getEmployee() != null) { // initialize name due to lazy-loading
                     admin.getEmployee().getName();
                 }
-                actionHelper.addToRequestMap("admin", admin);
+                actionHelper.addToRequestMap("admin", admin,request);
                 return Constants.JSP_ADMIN_DELETE;
             }
 

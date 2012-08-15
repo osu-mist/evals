@@ -41,6 +41,8 @@ import javax.portlet.*;
 public class EvalsPortlet extends GenericPortlet {
 
     public static final String CONTEXT_CACHE_TIMESTAMP = "contextCacheTimestamp";
+
+    public static final String CONTEXT_LOAD_DATE = "contextLoadDate";
     /**
      * String used to store the view jsp used by the
      * doView method.
@@ -104,6 +106,7 @@ public class EvalsPortlet extends GenericPortlet {
 
         include(viewJSP, renderRequest, renderResponse);
         viewJSP = null;
+        actionHelper.removeRequestMap(renderRequest);
 	}
 
     public void processAction(
@@ -187,7 +190,7 @@ public class EvalsPortlet extends GenericPortlet {
             if (actionHelper.isDemo()) {
                 actionHelper.setupDemoSwitch(request);
             }
-            actionHelper.addToRequestMap("isDemo", actionHelper.isDemo());
+            actionHelper.addToRequestMap("isDemo", actionHelper.isDemo(), request);
 
             // The portlet action can be set by the action/renderURLs using "action" as the parameter
             // name
@@ -207,6 +210,7 @@ public class EvalsPortlet extends GenericPortlet {
                 viewJSP = (String) controllerMethod.invoke(controller, request, response);
             }
             tx.commit();
+
         } catch (Exception e) {
             if (hibSession != null && hibSession.isOpen()) {
                 hibSession.close();
@@ -236,7 +240,16 @@ public class EvalsPortlet extends GenericPortlet {
      * @throws Exception
      */
     private void portletSetup(PortletRequest request) throws Exception {
-        if (getPortletContext().getAttribute("environmentProp") == null) {
+        Boolean reload = false;
+        Date loadDate = (Date) getPortletContext().getAttribute(CONTEXT_LOAD_DATE);
+        if(loadDate == null){
+            reload = true;
+        }
+        else if((new Date()).getTime() - loadDate.getTime() > Constants.PORTLET_RELOAD_FREQENCY) {
+            reload = true;
+        }
+
+        if (reload) {
             Session hibSession = null;
             actionHelper.setPortletContext(getPortletContext());
             String message = loadEnvironmentProperties(request);
@@ -266,6 +279,7 @@ public class EvalsPortlet extends GenericPortlet {
                 if (logger != null) {
                     logger.log(Logger.INFORMATIONAL, "Portlet Setup Success", message);
                 }
+                getPortletContext().setAttribute(CONTEXT_LOAD_DATE, new Date());
             } catch (Exception e) {
                 if (hibSession != null && hibSession.isOpen()) {
                     hibSession.close();
