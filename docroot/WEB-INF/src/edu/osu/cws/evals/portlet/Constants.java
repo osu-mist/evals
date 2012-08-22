@@ -57,4 +57,6 @@ public class Constants {
     public static final String BC_NAME = "bcName";
 
     public static final Integer SEARCH_MAX_RESULTS = 20;
+
+    public static final long PORTLET_RELOAD_FREQENCY = 1000 * 60 * 60 * 24 * 7; //7 days in ms
 }

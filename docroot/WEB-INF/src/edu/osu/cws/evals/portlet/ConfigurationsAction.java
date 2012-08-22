@@ -30,7 +30,7 @@ public class ConfigurationsAction implements ActionInterface {
         actionHelper.refreshContextCache();
         ArrayList<Configuration> configurations = (ArrayList<Configuration>)
                 actionHelper.getPortletContextAttribute("configurationsList");
-        actionHelper.addToRequestMap("configurations", configurations);
+        actionHelper.addToRequestMap("configurations", configurations,request);
         actionHelper.useMaximizedMenu(request);
 
         return Constants.JSP_CONFIGURATION_LIST;
