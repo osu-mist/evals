@@ -1,5 +1,7 @@
 package edu.osu.cws.evals.hibernate;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import edu.osu.cws.evals.models.AppointmentType;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Job;

@@ -14,6 +14,7 @@ import org.hibernate.type.StandardBasicTypes;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.HashMap;
@@ -768,6 +769,71 @@ public class AppraisalMgr {
 
         return myTeamAppraisals;
     }
+
+
+    /**
+     * Returns a list of job with limited attributes set: id, job title, employee name,
+     * job appointment type, start date, end date, status, goalsRequiredModification and
+     * employeSignedDate. If the posno and suffix are specific, the team appraisals are
+     * specific to that supervising job.
+     *
+     * @param pidm          Supervisor's pidm.
+     * @return List of job that contains the jobs this employee supervises and the appointment is Classified IT.
+     */
+  public static ArrayList<String[]> getMyClassifiedITAppriasal(Integer pidm){
+
+        Session session = HibernateUtil.getCurrentSession();
+
+        String query = "select * from pyvpasj " +
+                "where pyvpasj_appointment_type like 'Classified IT'" +
+                "AND PYVPASJ_SUPERVISOR_PIDM=:pidm " +
+                "AND and pyvpasj_status= 'A'";
+        Query hibQuery = session.createSQLQuery(query).setInteger("pidm", pidm);
+        List<Object[]> result =  hibQuery.list();
+        ArrayList<String[]> myTeamJob = new ArrayList<String[]>();
+        String reviewPeriod = "";
+        if(result.isEmpty()){
+            return myTeamJob;
+        }
+        for (Object jResult : result) {
+            String strings[] = new String[2];
+            Job job = (Job)jResult;
+
+            job.setAnnualInd(Constants.ANNUAL_IND);
+            job.setTrialInd(Constants.TRIAL_IND);
+            Date startDate, endDate;
+            if(job.withinTrialPeriod()) {
+                startDate = job.getTrialStartDate();
+                endDate = job.getEndEvalDate(startDate,"trial");
+            }
+            else {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(job.getBeginDate());
+                startDate = job.getAnnualStartDateBasedOnJobBeginDate(calendar.get(Calendar.YEAR));
+                endDate = job.getEndEvalDate(startDate, "annual");
+            }
+
+            reviewPeriod = getReviewPeriod(startDate, endDate);
+            strings[0] = job.getEmployee().getName();
+            strings[1] = reviewPeriod;
+            myTeamJob.add(strings);
+        }
+      return myTeamJob;
+    }
+
+    public static String getReviewPeriod(Date startDate,Date endDate) {
+        if (startDate == null) {
+            startDate = new Date();
+        }
+        if (endDate == null) {
+            startDate = new Date();
+        }
+
+        return MessageFormat.format("{0,date,MM/dd/yy} - {1,date,MM/dd/yy}",
+                new Object[]{startDate, endDate});
+    }
+
+
 
     /**
      * Returns the role (employee, supervisor, immediate supervisor or reviewer) of the pidm

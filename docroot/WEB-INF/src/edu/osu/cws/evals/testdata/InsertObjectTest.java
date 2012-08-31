@@ -20,7 +20,7 @@ import java.util.*;
  */
 public class InsertObjectTest {
 
-    private static final int MAX_SIZE = 200;
+    private static final int MAX_SIZE = 10;
 
     private static int PId = 1 ;
     private static int OsuId = 900000000;
