@@ -399,9 +399,12 @@ public class EvalsPortlet extends GenericPortlet {
             EvalsLogger logger = getLog();
 
             if (logger != null) {
-                Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
-                String loggedOnUserId = ((Integer) loggedOnUser.getId()).toString();
                 String currentURL = PortalUtil.getCurrentURL(request);
+                Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
+                String loggedOnUserId = "";
+                if (loggedOnUser != null) {
+                    loggedOnUserId = ((Integer) loggedOnUser.getId()).toString();
+                }
 
                 grayLogFields.put("logged-in-user", loggedOnUserId);
                 grayLogFields.put("currentURL", currentURL);
