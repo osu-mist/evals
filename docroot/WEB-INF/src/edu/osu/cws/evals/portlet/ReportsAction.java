@@ -116,7 +116,7 @@ public class ReportsAction implements ActionInterface {
      * Holds list of appraisals of direct employees of current supervisor in classfied IT
      */
 
-    private ArrayList<String[]> supervisorClassifiedITAppraisal;
+    private ArrayList<ClassifiedITObject> supervisorClassifiedITAppraisal;
 
     private boolean inLeafSupervisorReport = false;
 
@@ -279,11 +279,14 @@ public class ReportsAction implements ActionInterface {
                 // right pane data: supervisor appraisals and supervisor team and supervisor classified IT
                 actionHelper.addToRequestMap("myActiveAppraisals", supervisorAppraisals, request);
                 actionHelper.addToRequestMap("myTeamsActiveAppraisals", supervisorTeamAppraisal, request);
-                actionHelper.addToRequestMap("myClassifiedITAppraisals", supervisorClassifiedITAppraisal, request);
-                for (String str[] : supervisorClassifiedITAppraisal){
-                     _log.error("user name: " + str[0]);
-                     _log.error("review: " + str[1]);
-                }
+                //if(!supervisorClassifiedITAppraisal.isEmpty())    {
+                   // for(ClassifiedITObject classifiedITObject : supervisorClassifiedITAppraisal){
+                     //   _log.error("name: " + classifiedITObject.getEmployeeName());
+                     //   _log.error("ReviewPeriod" + classifiedITObject.getReviewPeriod());
+                   // }
+               // }
+                //else _log.error("null");
+               // actionHelper.addToRequestMap("myClassifiedITAppraisals", supervisorClassifiedITAppraisal, request);
                 actionHelper.addToRequestMap("isMyReport", isMyReport, request);
             }
 
@@ -409,7 +412,18 @@ public class ReportsAction implements ActionInterface {
                 true, supervisorLevelPosno, supervisorLevelSuffix);
         supervisorAppraisals = AppraisalMgr.getAllMyActiveAppraisals(supervisorLevelPidm,
                 supervisorLevelPosno, supervisorLevelSuffix);
+        _log.error("begin!");
+        _log.error(supervisorLevelPidm);
         supervisorClassifiedITAppraisal = AppraisalMgr.getMyClassifiedITAppriasal(supervisorLevelPidm);
+        if (supervisorClassifiedITAppraisal.isEmpty())     {
+             _log.error("null");
+        }
+        else  {
+            for (ClassifiedITObject classifiedITObject : supervisorClassifiedITAppraisal) {
+                _log.error("name: " + classifiedITObject.getEmployeeName());
+                _log.error("ReviewPeriod" + classifiedITObject.getReviewPeriod());
+            }
+        }
     }
 
     /**
@@ -638,12 +652,7 @@ public class ReportsAction implements ActionInterface {
         }
 
         String searchTerm = ParamUtil.getString(request, "searchTerm");
-        if(searchTerm != null){
-            _log.error("the untrimed searchTerm is: " + searchTerm);
-        }
-        searchTerm = StringUtils.trim(searchTerm);{
-            _log.error("the trimed searchTerm is:" + searchTerm);
-        }
+        searchTerm = StringUtils.trim(searchTerm);
         paramMap.put(SEARCH_TERM, searchTerm);
 
         setOrgCodeReportType();

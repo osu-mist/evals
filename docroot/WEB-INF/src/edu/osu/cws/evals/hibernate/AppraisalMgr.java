@@ -1,5 +1,7 @@
 package edu.osu.cws.evals.hibernate;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.ActionHelper;
 import edu.osu.cws.evals.portlet.Constants;
@@ -8,8 +10,11 @@ import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.StandardBasicTypes;
 
 import java.lang.reflect.Method;
@@ -37,6 +42,7 @@ public class AppraisalMgr {
     private static final String REPORT_LIST_WHERE = " where status not in ('completed', 'archived', " +
             "'closed') ";
 
+    private static Log _log = LogFactoryUtil.getLog(AppraisalMgr.class);
 
     private static Date fullGoalsDate;
     private Employee loggedInUser;
@@ -780,23 +786,22 @@ public class AppraisalMgr {
      * @param pidm          Supervisor's pidm.
      * @return List of job that contains the jobs this employee supervises and the appointment is Classified IT.
      */
-  public static ArrayList<String[]> getMyClassifiedITAppriasal(Integer pidm){
+    public static ArrayList<ClassifiedITObject> getMyClassifiedITAppriasal(Integer pidm){
 
-        Session session = HibernateUtil.getCurrentSession();
-
-        String query = "select * from pyvpasj " +
-                "where pyvpasj_appointment_type like 'Classified IT'" +
-                "AND PYVPASJ_SUPERVISOR_PIDM=:pidm " +
-                "AND and pyvpasj_status= 'A'";
-        Query hibQuery = session.createSQLQuery(query).setInteger("pidm", pidm);
-        List<Object[]> result =  hibQuery.list();
-        ArrayList<String[]> myTeamJob = new ArrayList<String[]>();
+        Session hibSession = HibernateUtil.getCurrentSession();
+        Transaction tx = hibSession.beginTransaction();
+        Criteria criteria = hibSession.createCriteria(Job.class); //Create the criteria query
+        criteria.add(Restrictions.eq("supervisor.employee.id", pidm)).add(Restrictions.eq("status","A"));
+        List result = criteria.list();
+        ArrayList<ClassifiedITObject> myTeamClassifiedITObject = new ArrayList<ClassifiedITObject>();
         String reviewPeriod = "";
+        String name = "";
         if(result.isEmpty()){
-            return myTeamJob;
+            System.out.println("we don't fetch anything");
+            tx.commit();
+            return myTeamClassifiedITObject;
         }
         for (Object jResult : result) {
-            String strings[] = new String[2];
             Job job = (Job)jResult;
 
             job.setAnnualInd(Constants.ANNUAL_IND);
@@ -813,12 +818,17 @@ public class AppraisalMgr {
                 endDate = job.getEndEvalDate(startDate, "annual");
             }
 
+            name = job.getEmployee().getName();
             reviewPeriod = getReviewPeriod(startDate, endDate);
-            strings[0] = job.getEmployee().getName();
-            strings[1] = reviewPeriod;
-            myTeamJob.add(strings);
+            ClassifiedITObject classifiedITObject = new ClassifiedITObject(name, reviewPeriod);
+            System.out.println(name);
+            System.out.println(reviewPeriod);
+
+            myTeamClassifiedITObject.add(classifiedITObject);
+
         }
-      return myTeamJob;
+        tx.commit();
+        return myTeamClassifiedITObject;
     }
 
     public static String getReviewPeriod(Date startDate,Date endDate) {
@@ -832,6 +842,7 @@ public class AppraisalMgr {
         return MessageFormat.format("{0,date,MM/dd/yy} - {1,date,MM/dd/yy}",
                 new Object[]{startDate, endDate});
     }
+
 
 
 
