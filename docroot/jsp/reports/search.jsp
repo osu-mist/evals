@@ -44,7 +44,7 @@ function clearSearchBox() {
 function validateSearch() {
   var errors = "";
   var searchTerm = jQuery("#<portlet:namespace/>searchTerm").val();
-  serchTerm = serchTerm.replace(/^\s+|\s+$/g,"");
+  searchTerm = searchTerm.replace(/^\s+|\s+$/g,"");
   <c:choose>
     <c:when test="${isAdmin || isReviewer}">
       var errorString = "${searchJsErrorDefault}";
