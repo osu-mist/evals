@@ -776,29 +776,17 @@ public class AppraisalMgr {
         return myTeamAppraisals;
     }
 
-
-    /**
-     * Returns a list of job with limited attributes set: id, job title, employee name,
-     * job appointment type, start date, end date, status, goalsRequiredModification and
-     * employeSignedDate. If the posno and suffix are specific, the team appraisals are
-     * specific to that supervising job.
-     *
-     * @param pidm          Supervisor's pidm.
-     * @return List of job that contains the jobs this employee supervises and the appointment is Classified IT.
-     */
     public static ArrayList<ClassifiedITObject> getMyClassifiedITAppriasal(Integer pidm){
 
         Session hibSession = HibernateUtil.getCurrentSession();
-        Transaction tx = hibSession.beginTransaction();
         Criteria criteria = hibSession.createCriteria(Job.class); //Create the criteria query
-        criteria.add(Restrictions.eq("supervisor.employee.id", pidm)).add(Restrictions.eq("status","A"));
+        criteria.add(Restrictions.eq("supervisor.employee.id", pidm)).add(Restrictions.eq("status","A")).add(Restrictions.like("appointmentType","Classified IT"));
         List result = criteria.list();
         ArrayList<ClassifiedITObject> myTeamClassifiedITObject = new ArrayList<ClassifiedITObject>();
         String reviewPeriod = "";
         String name = "";
         if(result.isEmpty()){
             System.out.println("we don't fetch anything");
-            tx.commit();
             return myTeamClassifiedITObject;
         }
         for (Object jResult : result) {
@@ -827,7 +815,6 @@ public class AppraisalMgr {
             myTeamClassifiedITObject.add(classifiedITObject);
 
         }
-        tx.commit();
         return myTeamClassifiedITObject;
     }
 
@@ -842,8 +829,6 @@ public class AppraisalMgr {
         return MessageFormat.format("{0,date,MM/dd/yy} - {1,date,MM/dd/yy}",
                 new Object[]{startDate, endDate});
     }
-
-
 
 
     /**

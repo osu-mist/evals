@@ -112,11 +112,7 @@ public class ReportsAction implements ActionInterface {
      */
     private ArrayList<Appraisal> supervisorAppraisals;
 
-    /**
-     * Holds list of appraisals of direct employees of current supervisor in classfied IT
-     */
-
-    private ArrayList<ClassifiedITObject> supervisorClassifiedITAppraisal;
+    private ArrayList<ClassifiedITObject> supervisorClassfiedItAppraisals;
 
     private boolean inLeafSupervisorReport = false;
 
@@ -412,18 +408,16 @@ public class ReportsAction implements ActionInterface {
                 true, supervisorLevelPosno, supervisorLevelSuffix);
         supervisorAppraisals = AppraisalMgr.getAllMyActiveAppraisals(supervisorLevelPidm,
                 supervisorLevelPosno, supervisorLevelSuffix);
-        _log.error("begin!");
-        _log.error(supervisorLevelPidm);
-        supervisorClassifiedITAppraisal = AppraisalMgr.getMyClassifiedITAppriasal(supervisorLevelPidm);
-        if (supervisorClassifiedITAppraisal.isEmpty())     {
-             _log.error("null");
+        supervisorClassfiedItAppraisals = AppraisalMgr.getMyClassifiedITAppriasal(supervisorLevelPidm);
+       /* if(supervisorClassfiedItAppraisals.isEmpty()){
+            _log.error("null!");
         }
-        else  {
-            for (ClassifiedITObject classifiedITObject : supervisorClassifiedITAppraisal) {
-                _log.error("name: " + classifiedITObject.getEmployeeName());
-                _log.error("ReviewPeriod" + classifiedITObject.getReviewPeriod());
+        else {
+            for(ClassifiedITObject classifiedITObject: supervisorClassfiedItAppraisals){
+                _log.error(classifiedITObject.getEmployeeName());
+                _log.error(classifiedITObject.getReviewPeriod());
             }
-        }
+        }  */
     }
 
     /**
