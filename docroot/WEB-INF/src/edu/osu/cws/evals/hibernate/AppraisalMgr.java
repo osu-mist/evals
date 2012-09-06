@@ -1,7 +1,5 @@
 package edu.osu.cws.evals.hibernate;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.ActionHelper;
 import edu.osu.cws.evals.portlet.Constants;
@@ -42,7 +40,6 @@ public class AppraisalMgr {
     private static final String REPORT_LIST_WHERE = " where status not in ('completed', 'archived', " +
             "'closed') ";
 
-    private static Log _log = LogFactoryUtil.getLog(AppraisalMgr.class);
 
     private static Date fullGoalsDate;
     private Employee loggedInUser;
