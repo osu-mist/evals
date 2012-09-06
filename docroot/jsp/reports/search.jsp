@@ -43,6 +43,7 @@ function clearSearchBox() {
 
 function validateSearch() {
   var errors = "";
+  var isOthers = false;
   var searchTerm = jQuery("#<portlet:namespace/>searchTerm").val();
   searchTerm = searchTerm.replace(/^\s+|\s+$/g,"");
   <c:choose>
@@ -51,6 +52,7 @@ function validateSearch() {
     </c:when>
     <c:otherwise>
       var errorString = "${searchJsErrorSupervisor}";
+      isOthers = true;
     </c:otherwise>
   </c:choose>
   errorString = "<li>"+ errorString + "</li>";
@@ -68,6 +70,10 @@ function validateSearch() {
     if (isNumber && (searchTermLength != 9 && searchTermLength != 6)) {
         errors = errorString;
     }
+  }
+
+  if (isNumber && isOthers && (searchTermLength != 9)) {
+      errors = errorString;
   }
 
   if (errors != "") {
