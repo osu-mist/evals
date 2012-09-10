@@ -402,7 +402,7 @@ public class ReportsAction implements ActionInterface {
                 true, supervisorLevelPosno, supervisorLevelSuffix);
         supervisorAppraisals = AppraisalMgr.getAllMyActiveAppraisals(supervisorLevelPidm,
                 supervisorLevelPosno, supervisorLevelSuffix);
-        supervisorClassfiedItAppraisals = AppraisalMgr.getMyClassifiedITAppriasal(supervisorLevelPidm);
+        supervisorClassfiedItAppraisals = AppraisalMgr.getMyClassifiedITAppraisal(supervisorLevelPidm);
        /* if(supervisorClassfiedItAppraisals.isEmpty()){
             _log.error("null!");
         }

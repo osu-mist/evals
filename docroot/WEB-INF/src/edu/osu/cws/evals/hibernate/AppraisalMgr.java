@@ -773,7 +773,7 @@ public class AppraisalMgr {
         return myTeamAppraisals;
     }
 
-    public static ArrayList<ClassifiedITObject> getMyClassifiedITAppriasal(Integer pidm){
+    public static ArrayList<ClassifiedITObject> getMyClassifiedITAppraisal(Integer pidm) throws Exception{
 
         Session hibSession = HibernateUtil.getCurrentSession();
         Criteria criteria = hibSession.createCriteria(Job.class); //Create the criteria query
@@ -783,7 +783,6 @@ public class AppraisalMgr {
         String reviewPeriod = "";
         String name = "";
         if(result.isEmpty()){
-            System.out.println("we don't fetch anything");
             return myTeamClassifiedITObject;
         }
         for (Object jResult : result) {
@@ -797,18 +796,58 @@ public class AppraisalMgr {
                 endDate = job.getEndEvalDate(startDate,"trial");
             }
             else {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(job.getBeginDate());
-                startDate = job.getAnnualStartDateBasedOnJobBeginDate(calendar.get(Calendar.YEAR));
+                Calendar startCal = job.getNewAnnualStartDate();
+                startDate = startCal.getTime();
                 endDate = job.getEndEvalDate(startDate, "annual");
+                /*Calendar lastDayOfYear = Calendar.getInstance();
+                lastDayOfYear.set(Calendar.MONTH, Calendar.DECEMBER);
+                lastDayOfYear.set(Calendar.DAY_OF_MONTH, 31);
+                Date lastDateOfYear = lastDayOfYear.getTime();
+
+               if (createForDate.after(lastDateOfYear))
+                {
+                    //Also need to distinguish between initial annual and other annual,
+                    // as duration of initial can be different.
+                    if (startDate.equals(job.getInitialEvalStartDate()))  //initial appraisal
+                        startCal.add(Calendar.MONTH, job.getAnnualInd());
+                    else
+                        //Length of other appraisals is always 12 months.
+                        startCal.add(Calendar.MONTH, 12); //@todo: is this always true?
+                }
+
+                startDate = startCal.getTime();
+                System.out.println("at 2nd, startCat = " + startDate);
+
+                //If startCal is older than fullGoalsDate, then we should create it 2 months before appraisal due date.
+
+                if (startDate.after(createForDate)) //appraisal period start date is later than createForDate.
+                {
+                    // No need to create one for this year yet,
+                    // but do we need to create one for last year?
+                    if (startDate.equals(job.getInitialEvalStartDate()))  //initial appraisal
+                        startCal.add(Calendar.MONTH, -job.getAnnualInd());
+                    else
+                        //Length of other appraisals is always 12 months.
+                        startCal.add(Calendar.MONTH, -12);
+
+                    startDate = startCal.getTime();
+                    if (startDate.before(job.getInitialEvalStartDate()))
+                    {
+                        return null; //startDate before first annual start date, thus invalid
+                    }
+                }
+
+                if (EvalsUtil.beforeEvalsTime(job, startDate, Appraisal.TYPE_ANNUAL))
+                {
+                    System.out.println("Before evlasTime, returning null");
+                    return null;  //This appraisal happened before EvalS goes live.
+                } */
+
             }
 
             name = job.getEmployee().getName();
             reviewPeriod = getReviewPeriod(startDate, endDate);
             ClassifiedITObject classifiedITObject = new ClassifiedITObject(name, reviewPeriod);
-            System.out.println(name);
-            System.out.println(reviewPeriod);
-
             myTeamClassifiedITObject.add(classifiedITObject);
 
         }
