@@ -776,10 +776,11 @@ public class AppraisalMgr {
     public static ArrayList<ClassifiedITObject> getMyClassifiedITAppraisal(Integer pidm) throws Exception{
 
         Session hibSession = HibernateUtil.getCurrentSession();
-        Criteria criteria = hibSession.createCriteria(Job.class); //Create the criteria query
+        Criteria criteria = hibSession.createCriteria(Job.class);
         criteria.add(Restrictions.eq("supervisor.employee.id", pidm)).add(Restrictions.eq("status","A")).add(Restrictions.like("appointmentType","Classified IT"));
         List result = criteria.list();
         ArrayList<ClassifiedITObject> myTeamClassifiedITObject = new ArrayList<ClassifiedITObject>();
+        Date createForDate = getCreateForDate();
         String reviewPeriod = "";
         String name = "";
         if(result.isEmpty()){
@@ -799,49 +800,39 @@ public class AppraisalMgr {
                 Calendar startCal = job.getNewAnnualStartDate();
                 startDate = startCal.getTime();
                 endDate = job.getEndEvalDate(startDate, "annual");
-                /*Calendar lastDayOfYear = Calendar.getInstance();
+                Calendar lastDayOfYear = Calendar.getInstance();
                 lastDayOfYear.set(Calendar.MONTH, Calendar.DECEMBER);
                 lastDayOfYear.set(Calendar.DAY_OF_MONTH, 31);
                 Date lastDateOfYear = lastDayOfYear.getTime();
 
                if (createForDate.after(lastDateOfYear))
                 {
-                    //Also need to distinguish between initial annual and other annual,
-                    // as duration of initial can be different.
-                    if (startDate.equals(job.getInitialEvalStartDate()))  //initial appraisal
+                    if (startDate.equals(job.getInitialEvalStartDate()))
                         startCal.add(Calendar.MONTH, job.getAnnualInd());
                     else
-                        //Length of other appraisals is always 12 months.
-                        startCal.add(Calendar.MONTH, 12); //@todo: is this always true?
+                        startCal.add(Calendar.MONTH, 12);
                 }
 
                 startDate = startCal.getTime();
-                System.out.println("at 2nd, startCat = " + startDate);
 
-                //If startCal is older than fullGoalsDate, then we should create it 2 months before appraisal due date.
-
-                if (startDate.after(createForDate)) //appraisal period start date is later than createForDate.
+                if (startDate.after(createForDate))
                 {
-                    // No need to create one for this year yet,
-                    // but do we need to create one for last year?
-                    if (startDate.equals(job.getInitialEvalStartDate()))  //initial appraisal
+                    if (startDate.equals(job.getInitialEvalStartDate()))
                         startCal.add(Calendar.MONTH, -job.getAnnualInd());
                     else
-                        //Length of other appraisals is always 12 months.
                         startCal.add(Calendar.MONTH, -12);
 
                     startDate = startCal.getTime();
                     if (startDate.before(job.getInitialEvalStartDate()))
                     {
-                        return null; //startDate before first annual start date, thus invalid
+                        return null;
                     }
                 }
 
                 if (EvalsUtil.beforeEvalsTime(job, startDate, Appraisal.TYPE_ANNUAL))
                 {
-                    System.out.println("Before evlasTime, returning null");
-                    return null;  //This appraisal happened before EvalS goes live.
-                } */
+                    return null;
+                }
 
             }
 
@@ -852,6 +843,17 @@ public class AppraisalMgr {
 
         }
         return myTeamClassifiedITObject;
+    }
+
+    public static Date getCreateForDate() {
+        Session hibSession = HibernateUtil.getCurrentSession();
+        Configuration configuration = (Configuration) hibSession.createQuery(
+                "from edu.osu.cws.evals.models.Configuration as configration where configration.name like 'firstGoalDueReminder'").uniqueResult() ;
+        int intVal = configuration.getIntValue();
+        Calendar createCal = Calendar.getInstance();
+        createCal.add(Calendar.DAY_OF_MONTH, intVal);
+        Date createForDate = createCal.getTime();
+        return createForDate;
     }
 
     public static String getReviewPeriod(Date startDate,Date endDate) {
