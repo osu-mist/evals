@@ -1,15 +1,20 @@
 package edu.osu.cws.evals.testdata;
 
+import edu.osu.cws.evals.models.ClassifiedITObject;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.portlet.AmtObject;
 import edu.osu.cws.evals.models.Configuration;
+import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.*;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 
 
+import java.text.MessageFormat;
 import java.util.*;
 
 /**
@@ -254,6 +259,57 @@ public class InsertObjectTest {
 
     }
 
+    public static void fetchClassifiedIT(Integer pidm) throws Exception{
+        Session hibSession = HibernateUtil.getCurrentSession();
+        Transaction tx = hibSession.beginTransaction();
+        Criteria criteria = hibSession.createCriteria(Job.class);
+
+        criteria.add(Restrictions.eq("supervisor.employee.id", pidm)).add(Restrictions.eq("status", "A")).add(Restrictions.like("appointmentType", "Classified IT"));
+        List result = criteria.list();
+        ArrayList<ClassifiedITObject> myTeamClassifiedITObject = new ArrayList<ClassifiedITObject>();
+        String reviewPeriod = "";
+        String name = "";
+        if (result.isEmpty()) {
+            return;
+        }
+        for (Object jResult : result) {
+            Job job = (Job) jResult;
+
+            job.setAnnualInd(Constants.ANNUAL_IND);
+            Date startDate, endDate;
+            Calendar startCal = job.getNewAnnualStartDate();
+            startDate = startCal.getTime();
+            int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+            if (startDate.before(EvalsUtil.getEvalsStartDate())){
+                System.out.println("before");
+                startCal.set(Calendar.YEAR, currentYear);
+                startDate = startCal.getTime();
+            }
+            endDate = job.getEndEvalDate(startDate, "annual");
+
+
+            name = job.getEmployee().getName();
+            reviewPeriod = getReviewPeriod(startDate, endDate);
+            System.out.println(name);
+            System.out.println(reviewPeriod);
+            reviewPeriod = getReviewPeriod(EvalsUtil.getEvalsStartDate(), endDate);
+            System.out.println(reviewPeriod);
+
+        }
+        tx.commit();
+    }
+    public static String getReviewPeriod(Date startDate,Date endDate) {
+        if (startDate == null) {
+            startDate = new Date();
+        }
+        if (endDate == null) {
+            startDate = new Date();
+        }
+
+        return MessageFormat.format("{0,date,MM/dd/yy} - {1,date,MM/dd/yy}",
+                new Object[]{startDate, endDate});
+    }
+
     public static void fetchConfig() {
 
         Session hibSession = HibernateUtil.getCurrentSession();
@@ -264,13 +320,14 @@ public class InsertObjectTest {
         tx.commit();
     }
 
-    public static void main(String [] args)
+    public static void main(String [] args) throws Exception
     {
         HibernateUtil.setConfig("hibernate-annie.cfg.xml");
         //InitList();
         //Insert();
         //Display();
-        fetchConfig();
+        //fetchConfig();
+        fetchClassifiedIT(1318628);
       //  System.out.println(RandomStringUtils.random(6,false,true));
 
 

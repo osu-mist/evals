@@ -773,68 +773,33 @@ public class AppraisalMgr {
         return myTeamAppraisals;
     }
 
-    public static ArrayList<ClassifiedITObject> getMyClassifiedITAppraisal(Integer pidm) throws Exception{
+    public static ArrayList<ClassifiedITObject> getMyClassifiedITAppraisal(Integer pidm) throws Exception {
 
         Session hibSession = HibernateUtil.getCurrentSession();
         Criteria criteria = hibSession.createCriteria(Job.class);
-        criteria.add(Restrictions.eq("supervisor.employee.id", pidm)).add(Restrictions.eq("status","A")).add(Restrictions.like("appointmentType","Classified IT"));
+        criteria.add(Restrictions.eq("supervisor.employee.id", pidm)).add(Restrictions.eq("status", "A")).add(Restrictions.like("appointmentType", "Classified IT"));
         List result = criteria.list();
         ArrayList<ClassifiedITObject> myTeamClassifiedITObject = new ArrayList<ClassifiedITObject>();
-        Date createForDate = getCreateForDate();
+        //Date createForDate = getCreateForDate();
         String reviewPeriod = "";
         String name = "";
-        if(result.isEmpty()){
+        if (result.isEmpty()) {
             return myTeamClassifiedITObject;
         }
         for (Object jResult : result) {
-            Job job = (Job)jResult;
+            Job job = (Job) jResult;
 
             job.setAnnualInd(Constants.ANNUAL_IND);
-            job.setTrialInd(Constants.TRIAL_IND);
             Date startDate, endDate;
-            if(job.withinTrialPeriod()) {
-                startDate = job.getTrialStartDate();
-                endDate = job.getEndEvalDate(startDate,"trial");
-            }
-            else {
-                Calendar startCal = job.getNewAnnualStartDate();
+            Calendar startCal = job.getNewAnnualStartDate();
+            startDate = startCal.getTime();
+            int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+            if (startDate.before(EvalsUtil.getEvalsStartDate())){
+                startCal.set(Calendar.YEAR, currentYear);
                 startDate = startCal.getTime();
-                endDate = job.getEndEvalDate(startDate, "annual");
-                Calendar lastDayOfYear = Calendar.getInstance();
-                lastDayOfYear.set(Calendar.MONTH, Calendar.DECEMBER);
-                lastDayOfYear.set(Calendar.DAY_OF_MONTH, 31);
-                Date lastDateOfYear = lastDayOfYear.getTime();
-
-               if (createForDate.after(lastDateOfYear))
-                {
-                    if (startDate.equals(job.getInitialEvalStartDate()))
-                        startCal.add(Calendar.MONTH, job.getAnnualInd());
-                    else
-                        startCal.add(Calendar.MONTH, 12);
-                }
-
-                startDate = startCal.getTime();
-
-                if (startDate.after(createForDate))
-                {
-                    if (startDate.equals(job.getInitialEvalStartDate()))
-                        startCal.add(Calendar.MONTH, -job.getAnnualInd());
-                    else
-                        startCal.add(Calendar.MONTH, -12);
-
-                    startDate = startCal.getTime();
-                    if (startDate.before(job.getInitialEvalStartDate()))
-                    {
-                        return null;
-                    }
-                }
-
-                if (EvalsUtil.beforeEvalsTime(job, startDate, Appraisal.TYPE_ANNUAL))
-                {
-                    return null;
-                }
-
             }
+            endDate = job.getEndEvalDate(startDate, "annual");
+
 
             name = job.getEmployee().getName();
             reviewPeriod = getReviewPeriod(startDate, endDate);
