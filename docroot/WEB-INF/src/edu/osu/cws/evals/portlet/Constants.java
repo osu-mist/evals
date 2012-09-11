@@ -41,7 +41,7 @@ public class Constants {
     //days before appraialsDue.
     public static final int DAYS_BEFORE_APPRAISAL_DUE_To_CREATE = 60;
 
-    public static final String ROOT_DIR = "WEB-INF/src/";
+    public static final String ROOT_DIR = "docroot/WEB-INF/src/";
 
     // Used by several Hibernate classes when executing hierarchical queries
     public static final String CONNECT_BY = "CONNECT BY " +
