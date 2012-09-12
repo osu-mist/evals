@@ -7,9 +7,6 @@ import org.apache.commons.lang.StringUtils;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
-import java.text.DateFormat;
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.StringTokenizer;
@@ -65,17 +62,9 @@ public class CWSUtil
      * @return the number of days between the 2 date object.
      *          positive if d1 is after d2, negative number otherwise.
      */
-    public static int daysBetween(Date d1, Date d2) throws Exception
+    public static int daysBetween(Date d1, Date d2)
     {
-        DateFormat dformatter = new SimpleDateFormat("dd-MM-yy");
-        Format formatter = new SimpleDateFormat("dd-MM-yy");
-        String s1 = formatter.format(d1);
-        d1 = (Date)dformatter.parse(s1);
-        System.out.println(s1);
-        String s2 = formatter.format(d2);
-        d2 = (Date)dformatter.parse(s2);
-        return (int) ((d1.getTime() - d2.getTime()) / (1000 * 60 * 60 * 24));
-
+	    return (int) ((d1.getTime() - d2.getTime()) / (1000 * 60 * 60 * 24));
     }
 
     /**
@@ -151,7 +140,7 @@ public class CWSUtil
      * Positive indicates dueDate is in the future
      * Negative indicates dueDate is in the past (overdue)
      */
-   public static int getRemainDays(Date dueDate) throws Exception
+   public static int getRemainDays(Date dueDate)
    {
 	    return CWSUtil.daysBetween(dueDate, new Date());
    }

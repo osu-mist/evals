@@ -1,11 +1,13 @@
 package edu.osu.cws.evals.testdata;
 
-import edu.osu.cws.evals.models.*;
+import edu.osu.cws.evals.models.ClassifiedITObject;
+import edu.osu.cws.evals.models.Employee;
+import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.portlet.AmtObject;
+import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.*;
-import edu.osu.cws.util.CWSUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -13,9 +15,6 @@ import org.hibernate.criterion.Restrictions;
 
 
 import java.text.MessageFormat;
-import java.text.DateFormat;
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -321,18 +320,6 @@ public class InsertObjectTest {
         tx.commit();
     }
 
-    public static Date fetchAppraisal(){
-        Session hibSession = HibernateUtil.getCurrentSession();
-        Transaction tx = hibSession.beginTransaction();
-        Appraisal appraisal = (Appraisal) hibSession.createQuery(
-                "from edu.osu.cws.evals.models.Appraisal as appraisal where  appraisal.id=24998").uniqueResult() ;
-        Date endDate = appraisal.getEndDate();
-        System.out.println(endDate);
-        tx.commit();
-        return endDate;
-
-    }
-
     public static void main(String [] args) throws Exception
     {
         HibernateUtil.setConfig("hibernate-annie.cfg.xml");
@@ -340,40 +327,8 @@ public class InsertObjectTest {
         //Insert();
         //Display();
         //fetchConfig();
-       // fetchClassifiedIT(1318628);
+        fetchClassifiedIT(1318628);
       //  System.out.println(RandomStringUtils.random(6,false,true));
-        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
-        int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-        Calendar cal = Calendar.getInstance();
-        System.out.println(cal.getTime());
-        cal.set(Calendar.DAY_OF_MONTH,15);
-        cal.set(Calendar.MONTH, 9);
-        cal.set(Calendar.YEAR, currentYear);
-        cal.add(Calendar.DAY_OF_MONTH,-40);
-        Calendar cal2 = Calendar.getInstance();
-        cal2.set(Calendar.DAY_OF_MONTH, 4);
-        System.out.println(cal.getTime());
-        System.out.println(cal2.getTime());
-        int between = CWSUtil.daysBetween(cal.getTime(),cal2.getTime());
-       // System.out.println(between);
-       // DateFormat dformatter = new SimpleDateFormat("dd-MM-yy");
-        //Format formatter = new SimpleDateFormat("dd-MM-yy");
-        //String s1 = formatter.format(cal.getTime());
-        //Date d1 = (Date)dformatter.parse(s1);
-        //System.out.println(s1);
-        //String s2 = formatter.format(cal2.getTime());
-        //Date d2 = (Date)dformatter.parse(s2);
-       // System.out.println(s2);
-        //int between2 = CWSUtil.daysBetween(d1,d2);
-        //System.out.println(between2);
-        //Date endDate = fetchAppraisal() ;
-        //Calendar newCal = Calendar.getInstance();
-
-        //int between = CWSUtil.daysBetween(cal.getTime(), cal2.getTime());
-        //int between2 = CWSUtil.daysBetween(endDate, cal2.getTime());
-        System.out.println(between);
-        //System.out.println(between2);
 
 
 

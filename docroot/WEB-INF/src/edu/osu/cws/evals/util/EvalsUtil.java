@@ -93,7 +93,7 @@ public class EvalsUtil {
       * name of the config should be "goalsDue".
       * @return  true if need to send another email, false otherwise.
       */
-     public static boolean anotherEmail(Email lastEmail, Configuration config) throws Exception
+     public static boolean anotherEmail(Email lastEmail, Configuration config)
      {
          int frequency = config.getIntValue();
          int daysPassed = CWSUtil.daysBetween(new Date(), lastEmail.getSentDate());
@@ -162,7 +162,7 @@ public class EvalsUtil {
     }
 
     public static int daysBeforeAppraisalDue(Job job, Date appraisalStartDate, String appraisalType,
-                                             Map<String, Configuration> configMap) throws Exception {
+                                             Map<String, Configuration> configMap) {
         Configuration appraisalDueConfig = configMap.get(Appraisal.STATUS_APPRAISAL_DUE);
         int offset = appraisalDueConfig.getIntValue();    //number of days before end date of appraisal
 
