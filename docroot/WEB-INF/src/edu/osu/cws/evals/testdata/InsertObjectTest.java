@@ -328,9 +328,15 @@ public class InsertObjectTest {
         //Insert();
         //Display();
         //fetchConfig();
-        fetchClassifiedIT(1318628);
+        //fetchClassifiedIT(1318628);
       //  System.out.println(RandomStringUtils.random(6,false,true));
-
+        Calendar calendar = Calendar.getInstance();
+        Date d1 = calendar.getTime();
+        System.out.println(d1);
+        calendar.add(Calendar.DATE, 40);
+        Date d2 = calendar.getTime();
+        System.out.println(d2);
+        System.out.println(CWSUtil.daysBetween(d2,d1));
 
 
     }
