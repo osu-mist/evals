@@ -69,7 +69,7 @@ public class CWSUtil
         DateFormat dateFormat = new SimpleDateFormat("MM-dd-yy");
         String s1 = format.format(d1);
         d1 = (Date)dateFormat.parse(s1);
-        String s2 = format.format(d1);
+        String s2 = format.format(d2);
         d2 = (Date)dateFormat.parse(s2);
         return (int) ((d1.getTime() - d2.getTime()) / (1000 * 60 * 60 * 24));
     }

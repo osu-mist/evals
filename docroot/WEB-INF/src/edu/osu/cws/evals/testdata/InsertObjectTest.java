@@ -8,6 +8,7 @@ import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.*;
+import edu.osu.cws.util.CWSUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
