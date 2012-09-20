@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.io.FileInputStream;
+import java.util.Properties;
 
 import javax.mail.Address;
 import javax.mail.internet.InternetAddress;
@@ -62,6 +64,7 @@ public class EvalsPortlet extends GenericPortlet {
      * Helper Liferay object to store error messages into the server's log file
      */
 	private static Log _log = LogFactoryUtil.getLog(EvalsPortlet.class);
+    Properties prop = new Properties();
 
     /**
      * The actions class
@@ -122,6 +125,7 @@ public class EvalsPortlet extends GenericPortlet {
         String resourceID;
         Session hibSession = null;
         actionHelper.setPortletContext(getPortletContext());
+        prop.load(new FileInputStream(Constants.PROPERTIES_PATH));
 
         // The logic below is similar to delegate method, but instead we
         // need to return the value we get from ActionHelper method instead of
@@ -154,11 +158,11 @@ public class EvalsPortlet extends GenericPortlet {
                 if (hibSession != null && hibSession.isOpen()) {
                     hibSession.close();
                 }
-                handleEvalsException(e, "Error in serveResource", Logger.ERROR, request);
-                result="There was an error performing your request";
+                handleEvalsException(e, prop.getProperty("error-in-serveResource"), Logger.ERROR, request);
+                result=prop.getProperty("error-found");
             }
         } else {
-            result="There was an error performing your request";
+            result=prop.getProperty("error-found");
         }
 
         response.setContentType("text/html");
@@ -240,6 +244,7 @@ public class EvalsPortlet extends GenericPortlet {
      * @throws Exception
      */
     private void portletSetup(PortletRequest request) throws Exception {
+        prop.load(new FileInputStream(Constants.PROPERTIES_PATH));
         Boolean reload = false;
         Date loadDate = (Date) getPortletContext().getAttribute(CONTEXT_LOAD_DATE);
         if(loadDate == null){
@@ -277,7 +282,7 @@ public class EvalsPortlet extends GenericPortlet {
                 tx.commit();
                 EvalsLogger logger =  getLog();
                 if (logger != null) {
-                    logger.log(Logger.INFORMATIONAL, "Portlet Setup Success", message);
+                    logger.log(Logger.INFORMATIONAL, prop.getProperty("portlet-setup-success"), message);
                 }
                 getPortletContext().setAttribute(CONTEXT_LOAD_DATE, new Date());
             } catch (Exception e) {
@@ -286,7 +291,7 @@ public class EvalsPortlet extends GenericPortlet {
                 }
                 EvalsLogger logger =  getLog();
                 if (logger != null) {
-                    logger.log(Logger.ERROR, "Portlet Setup Failed", message);
+                    logger.log(Logger.ERROR, prop.getProperty("portlet-setup-failed"), message);
                 }
                 throw e;
             }
@@ -423,16 +428,17 @@ public class EvalsPortlet extends GenericPortlet {
 		PortletRequestDispatcher portletRequestDispatcher =
 			getPortletContext().getRequestDispatcher(path);
 
+        prop.load(new FileInputStream(Constants.PROPERTIES_PATH));
 		if (portletRequestDispatcher == null) {
             try {
-                getLog().log(Logger.ERROR, path + " is not a valid include", "");
+                getLog().log(Logger.ERROR, path + prop.getProperty("not-a-valid-include"), "");
                 //@todo: temporary fix for the null dispatcher issue.
                 // Will come back to revisit next release.
                 portletRequestDispatcher =
 			        getPortletContext().getRequestDispatcher(Constants.JSP_HOME);
                 portletRequestDispatcher.include(renderRequest, renderResponse);
             } catch (Exception e) {
-                _log.error(path + " is not a valid include");
+                _log.error(path + prop.getProperty("unexpected-exception"));
                 _log.error(CWSUtil.stackTraceString(e));
 
             }
