@@ -45,7 +45,7 @@ function validateSearch() {
   var errors = "";
   var isOthers = false;
   var searchTerm = jQuery("#<portlet:namespace/>searchTerm").val();
-  searchTerm = searchTerm.replace(/^\s+|\s+$/g,"");
+  searchTerm = jQuery.trim(searchTerm);
   <c:choose>
     <c:when test="${isAdmin || isReviewer}">
       var errorString = "${searchJsErrorDefault}";
