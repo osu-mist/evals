@@ -252,12 +252,8 @@ public class AppraisalsAction implements ActionInterface {
             SessionErrors.add(request, e.getMessage());
         }
 
-
-
-
         // If the user hit the save draft button, we stay in the same view
-        if (request.getParameter("save-draft") != null || request.getParameter("cancel") != null
-                ) {
+        if (request.getParameter("save-draft") != null || request.getParameter("cancel") != null) {
             if (request.getParameter("save-draft") != null) {
                 SessionMessages.add(request, "draft-saved");
             }
@@ -271,8 +267,7 @@ public class AppraisalsAction implements ActionInterface {
         String[] afterReviewStatus = {Appraisal.STATUS_RELEASE_DUE, Appraisal.STATUS_RELEASE_OVERDUE,
                 Appraisal.STATUS_CLOSED};
         if (ArrayUtils.contains(afterReviewStatus, status)
-                && actionHelper.isLoggedInUserReviewer(request)
-                && request.getParameter("close-appraisal") != null) {
+                && actionHelper.isLoggedInUserReviewer(request)) {
             actionHelper.removeReviewAppraisalInSession(request, appraisal);
         } else {
             updateAppraisalInSession(request, appraisal);
