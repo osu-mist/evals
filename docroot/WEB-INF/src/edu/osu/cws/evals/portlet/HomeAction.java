@@ -14,13 +14,10 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletSession;
 import java.util.ArrayList;
-import java.io.FileInputStream;
-import java.util.Properties;
 
 public class HomeAction implements ActionInterface {
     private ActionHelper actionHelper = new ActionHelper();
     private static Log _log = LogFactoryUtil.getLog(HomeAction.class);
-    Properties prop = new Properties();
 
 
     /**
@@ -102,9 +99,6 @@ public class HomeAction implements ActionInterface {
      * @throws Exception
      */
     public String demoResetAppraisal(PortletRequest request, PortletResponse response) throws Exception {
-
-        prop.load(new FileInputStream(Constants.PROPERTIES_PATH));
-
         if (!actionHelper.isDemo()) {
             actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
             return display(request, response);
@@ -114,7 +108,7 @@ public class HomeAction implements ActionInterface {
         String status = ParamUtil.getString(request, "status");
 
         if (id == 0 || status == null || status.equals("")) {
-            actionHelper.addErrorsToRequest(request, prop.getProperty("could-not-reset"));
+            actionHelper.addErrorsToRequest(request, "Could not reset the appraisal. Invalid ID or Status.");
         }
 
         try {
@@ -125,7 +119,7 @@ public class HomeAction implements ActionInterface {
 
             AppraisalMgr.updateAppraisalStatus(appraisal);
         } catch (Exception e) {
-            _log.error(prop.getProperty("not-a-valid-include") + CWSUtil.stackTraceString(e));
+            _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
         }
         AppraisalsAction appraisalsAction = new AppraisalsAction();
         appraisalsAction.setHomeAction(this);
@@ -145,9 +139,6 @@ public class HomeAction implements ActionInterface {
      * @return
      */
     public String demoSwitchUser(PortletRequest request, PortletResponse response) throws Exception {
-
-        prop.load(new FileInputStream(Constants.PROPERTIES_PATH));
-
         if (!actionHelper.isDemo()) {
             actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
             return display(request, response);
@@ -159,7 +150,7 @@ public class HomeAction implements ActionInterface {
         try {
             employee = EmployeeMgr.findById(employeeID, "employee-with-jobs");
         } catch (Exception e) {
-            _log.error(prop.getProperty("unexpected-exception") + CWSUtil.stackTraceString(e));
+            _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
         }
         session.setAttribute("loggedOnUser", employee);
         session.removeAttribute(ActionHelper.ALL_MY_ACTIVE_APPRAISALS);
