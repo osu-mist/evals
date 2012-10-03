@@ -3,6 +3,7 @@ package edu.osu.cws.util;
 import edu.osu.cws.evals.portlet.Constants;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -62,15 +63,13 @@ public class CWSUtil
      * @param d2
      * @return the number of days between the 2 date object.
      *          positive if d1 is after d2, negative number otherwise.
+     *          At the beginning we have to truncate the Date object to
+     *          exclude the times to get the correct betweenDays
      */
     public static int daysBetween(Date d1, Date d2)   throws Exception
     {
-        Format format = new SimpleDateFormat("MM-dd-yy");
-        DateFormat dateFormat = new SimpleDateFormat("MM-dd-yy");
-        String s1 = format.format(d1);
-        d1 = (Date)dateFormat.parse(s1);
-        String s2 = format.format(d2);
-        d2 = (Date)dateFormat.parse(s2);
+        d1 = DateUtils.truncate(d1,Calendar.DAY_OF_MONTH);
+        d2 = DateUtils.truncate(d2,Calendar.DAY_OF_MONTH);
         return (int) ((d1.getTime() - d2.getTime()) / (1000 * 60 * 60 * 24));
     }
 
