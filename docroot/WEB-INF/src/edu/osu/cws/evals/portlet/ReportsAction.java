@@ -112,7 +112,7 @@ public class ReportsAction implements ActionInterface {
      */
     private ArrayList<Appraisal> supervisorAppraisals;
 
-    private ArrayList<ClassifiedITObject> supervisorClassfiedItAppraisals;
+    private ArrayList<ClassifiedITObject> supervisorClassfiedITAppraisals;
 
     private boolean inLeafSupervisorReport = false;
 
@@ -275,7 +275,7 @@ public class ReportsAction implements ActionInterface {
                 // right pane data: supervisor appraisals and supervisor team
                 actionHelper.addToRequestMap("myActiveAppraisals", supervisorAppraisals,request);
                 actionHelper.addToRequestMap("myTeamsActiveAppraisals", supervisorTeamAppraisal,request);
-                actionHelper.addToRequestMap("myTeamsActiveClassifiedITAppraisals", supervisorClassfiedItAppraisals, request);
+                actionHelper.addToRequestMap("myTeamsActiveClassifiedITAppraisals", supervisorClassfiedITAppraisals, request);
                 actionHelper.addToRequestMap("isMyReport", isMyReport,request);
             }
 
@@ -402,16 +402,7 @@ public class ReportsAction implements ActionInterface {
                 true, supervisorLevelPosno, supervisorLevelSuffix);
         supervisorAppraisals = AppraisalMgr.getAllMyActiveAppraisals(supervisorLevelPidm,
                 supervisorLevelPosno, supervisorLevelSuffix);
-        supervisorClassfiedItAppraisals = AppraisalMgr.getMyClassifiedITAppraisal(supervisorLevelPidm);
-       /* if(supervisorClassfiedItAppraisals.isEmpty()){
-            _log.error("null!");
-        }
-        else {
-            for(ClassifiedITObject classifiedITObject: supervisorClassfiedItAppraisals){
-                _log.error(classifiedITObject.getEmployeeName());
-                _log.error(classifiedITObject.getReviewPeriod());
-            }
-        }  */
+        supervisorClassfiedITAppraisals = AppraisalMgr.getMyClassifiedITAppraisal(supervisorLevelPidm);
     }
 
     /**

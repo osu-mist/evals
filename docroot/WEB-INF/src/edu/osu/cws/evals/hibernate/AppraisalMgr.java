@@ -773,16 +773,23 @@ public class AppraisalMgr {
         return myTeamAppraisals;
     }
 
+    /**
+     * Returns a list of ClassifiedITObject contains limited attributes set: employee name, review Period
+     * job appointment type, start date, end date, status, goalsRequiredModification and
+     *
+     * @param pidm          Supervisor's pidm.
+     * @return List of Appraisal that contains the ClassifiedITObject this supervisor relate to.
+     */
     public static ArrayList<ClassifiedITObject> getMyClassifiedITAppraisal(Integer pidm) throws Exception {
-
         Session hibSession = HibernateUtil.getCurrentSession();
         Criteria criteria = hibSession.createCriteria(Job.class);
-        criteria.add(Restrictions.eq("supervisor.employee.id", pidm)).add(Restrictions.eq("status", "A")).add(Restrictions.like("appointmentType", "Classified IT"));
-        List result = criteria.list();
         ArrayList<ClassifiedITObject> myTeamClassifiedITObject = new ArrayList<ClassifiedITObject>();
-        //Date createForDate = getCreateForDate();
         String reviewPeriod = "";
         String name = "";
+
+        criteria.add(Restrictions.eq("supervisor.employee.id", pidm)).add(Restrictions.eq("status", "A")).
+                add(Restrictions.like("appointmentType", AppointmentType.CLASSIFIED_IT));
+        List result = criteria.list();
         if (result.isEmpty()) {
             return myTeamClassifiedITObject;
         }
@@ -799,8 +806,6 @@ public class AppraisalMgr {
                 startDate = startCal.getTime();
             }
             endDate = job.getEndEvalDate(startDate, "annual");
-
-
             name = job.getEmployee().getName();
             reviewPeriod = getReviewPeriod(startDate, endDate);
             ClassifiedITObject classifiedITObject = new ClassifiedITObject(name, reviewPeriod);

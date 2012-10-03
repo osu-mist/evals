@@ -69,9 +69,6 @@
     </div>
     <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>MyTeamClassified');">
         <img id="<portlet:namespace/>MyTeamClassifiedImageToggle" src="/cps/images/accordion/accordion_arrow_up.png"/>
-        <c:if test="${empty report}">
-            <liferay-ui:message key="myTeam" />
-        </c:if>
         <c:if test="${!empty report}">
             <c:if test="${isMyReport}">
                 <liferay-ui:message key="report-supervisor-my-team-classifiedIT-evals" />
