@@ -2,8 +2,6 @@ package edu.osu.cws.evals.portlet;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
@@ -20,7 +18,6 @@ import java.util.*;
 
 public class ReportsAction implements ActionInterface {
 
-    private static Log _log = LogFactoryUtil.getLog(ReportsAction.class);
     public static final String SCOPE = "scope";
     public static final String SCOPE_VALUE = "scopeValue";
     public static final String SEARCH_TERM = "searchTerm";
@@ -372,7 +369,6 @@ public class ReportsAction implements ActionInterface {
                 enableByUnitReports = false;
             }
         }
-        _log.error("The maxDataPoints is " + maxDataPoints);
         tableData = ReportMgr.getChartData(paramMap, true, directEmployees,
                 supervisorTeamAppraisal, currentSupervisorJob, inLeafSupervisorReport);
         chartData = ReportMgr.trimDataPoints(tableData, maxDataPoints);
