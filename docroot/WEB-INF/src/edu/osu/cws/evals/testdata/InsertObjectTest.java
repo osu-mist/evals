@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.testdata;
 
+import edu.osu.cws.evals.hibernate.ClassifiedITObjectMgr;
 import edu.osu.cws.evals.models.ClassifiedITObject;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Job;
