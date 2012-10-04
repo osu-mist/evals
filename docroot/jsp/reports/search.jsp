@@ -43,7 +43,7 @@ function clearSearchBox() {
 
 function validateSearch() {
   var errors = "";
-  var isOthers = false;
+  var isSupervisor = false;
   var searchTerm = jQuery("#<portlet:namespace/>searchTerm").val();
   searchTerm = jQuery.trim(searchTerm);
   <c:choose>
@@ -52,7 +52,7 @@ function validateSearch() {
     </c:when>
     <c:otherwise>
       var errorString = "${searchJsErrorSupervisor}";
-      isOthers = true;
+    isSupervisor = true;
     </c:otherwise>
   </c:choose>
   errorString = "<li>"+ errorString + "</li>";
