@@ -7,7 +7,15 @@ package edu.osu.cws.evals.models;
  * Time: 4:47 PM
  * To change this template use File | Settings | File Templates.
  */
-public class ClassifiedITObject {
+
+/**
+ * This is a special class to transport the data from a "fake" appraisal
+ * of Classified IT employees' job and display in a table of myReport
+ * portlet. This class is not mapping any database but just for the safety
+ * of data transportation.
+ * **/
+
+ public class ClassifiedITObject {
     private String employeeName;
 
     private String reviewPeriod;

@@ -780,7 +780,8 @@ public class AppraisalMgr {
      * @param pidm          Supervisor's pidm.
      * @return List of Appraisal that contains the ClassifiedITObject this supervisor relate to.
      */
-    public static ArrayList<ClassifiedITObject> getMyClassifiedITAppraisals (Integer pidm) throws Exception {
+    public static ArrayList<ClassifiedITObject> getMyClassifiedITAppraisals (Integer pidm)
+            throws Exception {
         Session hibSession = HibernateUtil.getCurrentSession();
         Criteria criteria = hibSession.createCriteria(Job.class);
         ArrayList<ClassifiedITObject> myTeamClassifiedITObject = new ArrayList<ClassifiedITObject>();
