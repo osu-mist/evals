@@ -398,7 +398,7 @@ public class ReportsAction implements ActionInterface {
                 true, supervisorLevelPosno, supervisorLevelSuffix);
         supervisorAppraisals = AppraisalMgr.getAllMyActiveAppraisals(supervisorLevelPidm,
                 supervisorLevelPosno, supervisorLevelSuffix);
-        supervisorClassfiedITAppraisals = AppraisalMgr.getMyClassifiedITAppraisal(supervisorLevelPidm);
+        supervisorClassfiedITAppraisals = AppraisalMgr.getMyClassifiedITAppraisals(supervisorLevelPidm);
     }
 
     /**
@@ -888,12 +888,12 @@ public class ReportsAction implements ActionInterface {
         for (Object[] row : chartData) {
             String displayValue = "";
             String scopeValue = "";
-            if(row[1]!= null){
+            if (row[1]!= null) {
                 displayValue = row[1].toString();
                 scopeValue = row[1].toString();
             }
             if (row.length == 3) {
-                if(row[2] != null){
+                if (row[2] != null) {
                     scopeValue = row[2].toString();
                 }
             }

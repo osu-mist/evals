@@ -780,7 +780,7 @@ public class AppraisalMgr {
      * @param pidm          Supervisor's pidm.
      * @return List of Appraisal that contains the ClassifiedITObject this supervisor relate to.
      */
-    public static ArrayList<ClassifiedITObject> getMyClassifiedITAppraisal(Integer pidm) throws Exception {
+    public static ArrayList<ClassifiedITObject> getMyClassifiedITAppraisals (Integer pidm) throws Exception {
         Session hibSession = HibernateUtil.getCurrentSession();
         Criteria criteria = hibSession.createCriteria(Job.class);
         ArrayList<ClassifiedITObject> myTeamClassifiedITObject = new ArrayList<ClassifiedITObject>();
@@ -801,7 +801,7 @@ public class AppraisalMgr {
             Calendar startCal = job.getNewAnnualStartDate();
             startDate = startCal.getTime();
             int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-            if (startDate.before(EvalsUtil.getEvalsStartDate())){
+            if (startDate.before(EvalsUtil.getEvalsStartDate())) {
                 startCal.set(Calendar.YEAR, currentYear);
                 startDate = startCal.getTime();
             }
@@ -818,7 +818,8 @@ public class AppraisalMgr {
     public static Date getCreateForDate() {
         Session hibSession = HibernateUtil.getCurrentSession();
         Configuration configuration = (Configuration) hibSession.createQuery(
-                "from edu.osu.cws.evals.models.Configuration as configration where configration.name like 'firstGoalDueReminder'").uniqueResult() ;
+                "from edu.osu.cws.evals.models.Configuration as configration " +
+                        "where configration.name like 'firstGoalDueReminder'").uniqueResult() ;
         int intVal = configuration.getIntValue();
         Calendar createCal = Calendar.getInstance();
         createCal.add(Calendar.DAY_OF_MONTH, intVal);

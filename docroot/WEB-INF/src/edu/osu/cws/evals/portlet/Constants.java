@@ -55,10 +55,7 @@ public class Constants {
     public static final Integer MAX_ORG_CODE_DIGITS = 6;
 
     public static final Integer ANNUAL_IND = 12;
-
     public static final Integer TRIAL_IND = 6;
-
-
 
     public static final String BC_NAME = "bcName";
 
