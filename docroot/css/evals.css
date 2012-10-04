@@ -1,5 +1,6 @@
 .pass-hide {
-    display: none !important;
+    position: absolute;
+    text-indent: -999em;
 }
 
 /* Home View */

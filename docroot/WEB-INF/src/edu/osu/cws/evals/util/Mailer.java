@@ -89,8 +89,7 @@ public class Mailer {
             if (!(appraisal.getJob().getStatus().equals("A"))) {
                 logShortMessage = "Email not sent";
                 logLongMessage = "Appraisal " + appraisal.getId() +
-                        " not available, job " + appraisal.getJob().getPositionNumber() +
-                        " is not active.";
+                        " not available, job is not active.";
                 logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                 return;
             }
@@ -148,17 +147,15 @@ public class Mailer {
             String recipientString = InternetAddress.toString(msg.getAllRecipients());
 
             logShortMessage = emailType.getType() + " email sent for appraisal " + appraisal.getId();
-            logLongMessage = "email of type " + emailType.getType() + " sent "
-                                + " regarding appraisal " + appraisal.getId()
-                                + " for " + getJobSignature(appraisal);
+            logLongMessage = "email of type " + emailType.getType() + " sent regarding appraisal " + appraisal.getId();
             logger.log(Logger.INFORMATIONAL, logShortMessage, logLongMessage, logFields);
         } catch (Exception e) {
             try {
                 logShortMessage = "Email not sent";
                 Employee employee = appraisal.getJob().getEmployee();
-                logLongMessage = "Error encountered when sending mail to job: " +
-                        appraisal.getJob().getSignature() + ", appraisal = " +
-                        appraisal.getId() + "\n" + CWSUtil.stackTraceString(e);
+                String stackTrace = replaceEmails(CWSUtil.stackTraceString(e), "email address removed");
+                logLongMessage = "Error encountered when sending mail for appraisal = " +
+                        appraisal.getId() + "\n" + stackTrace;
                 logger.log(Logger.ERROR,logShortMessage,logLongMessage);
             } catch (Exception logError) { }
         }
@@ -363,7 +360,7 @@ public class Mailer {
                 String emailType = email.getEmailType();
                 email.getEmailType();
                 String logStatus = Logger.INFORMATIONAL;
-                String logShortMessage = emailType + " email sent to for appraisal " + appraisalId;
+                String logShortMessage = emailType + " email sent for appraisal " + appraisalId;
                 String logLongMessage = emailType + " mail sent to supervisor with PIDM: " +
                         supervisor.getId() + " for appraisal " + appraisalId;
 
@@ -777,5 +774,16 @@ public class Mailer {
     {
         Date today = new Date();
         return today.before(emailStartDate);
+    }
+
+    /**
+     * Strips e-mail addresses from text and replaces with given replacement text
+     *
+     * @param originalText
+     * @return
+     */
+    private String replaceEmails(String originalText, String replacementStr) {
+        String EMAIL_PATTERN = "\\b[a-zA-Z0-9._%-+]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\\b";
+        return originalText.replaceAll(EMAIL_PATTERN, replacementStr); // Replace emails
     }
 }

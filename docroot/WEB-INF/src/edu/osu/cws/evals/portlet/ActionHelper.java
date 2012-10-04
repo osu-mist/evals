@@ -727,9 +727,9 @@ public class ActionHelper {
      */
     public void setRequestAttributes(RenderRequest request) {
         PortletSession session = request.getPortletSession(true);
+
+        addToRequestMap("currentRole", getCurrentRole(request), request);
         HashMap<String,Object> requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
-        String currentRole = getCurrentRole(request);
-        requestMap.put("currentRole", currentRole);
 
         for (Map.Entry<String, Object> entry : requestMap.entrySet()) {
             request.setAttribute(entry.getKey(), entry.getValue());
