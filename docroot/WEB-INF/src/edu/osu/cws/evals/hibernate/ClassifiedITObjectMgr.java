@@ -29,7 +29,6 @@ public class ClassifiedITObjectMgr {
 
     /**
      * Returns a list of ClassifiedITObject contains limited attributes set: employee name, review Period
-     * job appointment type, start date, end date, status, goalsRequiredModification and
      *
      * @param pidm          Supervisor's pidm.
      * @return List of Appraisal that contains the ClassifiedITObject this supervisor relate to.
