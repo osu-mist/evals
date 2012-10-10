@@ -433,7 +433,6 @@ public class ActionHelper {
      */
     public String getLoggedOnUsername(PortletRequest request) {
         PortletSession session = request.getPortletSession(true);
-        //return "";
         String usernameSessionKey = "onidUsername";
         String onidUsername = (String) session.getAttribute(usernameSessionKey);
         if (onidUsername == null || onidUsername.equals("")) {
