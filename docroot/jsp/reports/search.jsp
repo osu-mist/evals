@@ -72,7 +72,7 @@ function validateSearch() {
     }
   }
 
-  if (isNumber && isOthers && (searchTermLength != 9)) {
+  if (isNumber && isSupervisor && (searchTermLength != 9)) {
       errors = errorString;
   }
 
