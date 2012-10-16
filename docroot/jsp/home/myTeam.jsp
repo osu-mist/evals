@@ -67,5 +67,7 @@
             </c:choose>
         </c:if>
     </div>
-    <%@ include file="/jsp/home/myClassifiedIT.jsp" %>
+    <c:if test="${!empty myTeamsActiveClassifiedITAppraisals}">
+        <%@ include file="/jsp/home/myClassifiedIT.jsp" %>
+    </c:if>
 </div>
