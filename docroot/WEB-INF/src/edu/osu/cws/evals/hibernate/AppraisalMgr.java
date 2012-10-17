@@ -625,8 +625,11 @@ public class AppraisalMgr {
 
         PermissionRule permissionRule = (PermissionRule) permissionRules.get(permissionKey);
         if (permissionRule != null &&  appraisal.getStartDate().before(fullGoalsDate)) {
-            permissionRule.setGoals("j");
-            permissionRule.setResults("j");
+            String debug = "j-startDate=" + appraisal.getStartDate().toString() +
+                    "; fullGoalsDate=" + fullGoalsDate.toString() + "; FULL_GOALS_DATE=" +
+                    FULL_GOALS_DATE;
+            permissionRule.setGoals(debug);
+            permissionRule.setResults(debug);
         }
         return permissionRule;
     }
