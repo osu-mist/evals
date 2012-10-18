@@ -416,7 +416,6 @@ public class AppraisalsAction implements ActionInterface {
     public String resendAppraisalToNolij(PortletRequest request, PortletResponse response) throws Exception {
         AppraisalMgr appraisalMgr = new AppraisalMgr();
         Appraisal appraisal;
-        PermissionRule permRule;
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
 
         int appraisalID = ParamUtil.getInteger(request, "id");
@@ -429,16 +428,14 @@ public class AppraisalsAction implements ActionInterface {
 
         // 1) Get the appraisal and permission rule
         appraisal = appraisalMgr.getAppraisal(appraisalID);
-        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
+        appraisal.setRole(appraisalMgr.getRole(appraisal, currentlyLoggedOnUser.getId()));
 
         // Permission checks
-        if (permRule != null && actionHelper.isLoggedInUserReviewer(request)
-                && appraisal.getEmployeeSignedDate() != null && !appraisal.getRole().equals("employee")) {
-            permRule = null;
-        }
-
-        // Check to see if the logged in user has permission to access the appraisal
-        if (permRule == null) {
+        if (!actionHelper.isLoggedInUserReviewer(request)
+                || appraisal.getEmployeeSignedDate() == null
+                || appraisal.getRole().equals("employee")
+                || !appraisal.getStatus().equals("completed"))
+        {
             actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
             return homeAction.display(request, response);
         }
