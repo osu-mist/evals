@@ -11,7 +11,6 @@
     </c:if>
 </div>
 <div class="accordion-content" id="<portlet:namespace/>MyTeamClassified" style="display: block;">
-    <c:if test="${!empty myTeamsActiveClassifiedITAppraisals}">
         <table class="taglib-search-iterator narrow">
             <thead>
             <tr class="portlet-section-header results-header">
@@ -29,17 +28,5 @@
             </c:forEach>
             </tbody>
         </table>
-    </c:if>
-    <c:if test="${empty myTeamsActiveClassifiedITAppraisals}">
-        <c:choose>
-            <c:when test="${empty report}">
-                <p><liferay-ui:message key="noTeamClassifiedIT" /></p>
-
-            </c:when>
-            <c:otherwise>
-                <p><liferay-ui:message key="report-supervisors-team-no-evals" /> ${currentSupervisorName}</p>
-            </c:otherwise>
-        </c:choose>
-    </c:if>
 </div>
 
