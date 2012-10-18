@@ -1,6 +1,6 @@
 package edu.osu.cws.evals.models;
 
-public class PermissionRule extends Evals {
+public class PermissionRule extends Evals implements Cloneable {
     private int id;
 
     private String status;
@@ -32,6 +32,10 @@ public class PermissionRule extends Evals {
     private String submit;
 
     private String actionRequired;
+
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
     public PermissionRule() { }
 
