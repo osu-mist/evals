@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping auto-import="false" >
+
+    <class name="edu.osu.cws.evals.models.Notice" table="notice">
+        <id name="id" type="int" column="ID">
+            <generator class="native">
+                <param name="sequence">pass_seq</param>
+            </generator>
+        </id>
+        <property name="ancestorID" type="int" column="ANCESTOR_ID"/>
+        <property name="name" column="NAME"/>
+        <property name="text" column="TEXT"/>
+        <property name="createDate" type="timestamp" column="CREATE_DATE"/>
+        <many-to-one name="creator" class="edu.osu.cws.evals.models.Employee"
+                     column="CREATOR_PIDM"
+                     not-null="true"/>
+    </class>
+</hibernate-mapping>
