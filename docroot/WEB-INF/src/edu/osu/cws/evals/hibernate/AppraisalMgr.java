@@ -623,7 +623,8 @@ public class AppraisalMgr {
         String role = getRole(appraisal, loggedInUser.getId());
         permissionKey = appraisal.getStatus()+"-"+ role;
 
-        PermissionRule permissionRule = (PermissionRule) permissionRules.get(permissionKey);
+        PermissionRule originalPermRule = (PermissionRule) permissionRules.get(permissionKey);
+        PermissionRule permissionRule = (PermissionRule) originalPermRule.clone();
         if (permissionRule != null &&  appraisal.getStartDate().before(fullGoalsDate)) {
             String debug = "j-startDate=" + appraisal.getStartDate().toString() +
                     "; fullGoalsDate=" + fullGoalsDate.toString() + "; FULL_GOALS_DATE=" +
