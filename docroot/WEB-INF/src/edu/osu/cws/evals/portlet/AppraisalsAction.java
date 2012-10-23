@@ -152,21 +152,21 @@ public class AppraisalsAction implements ActionInterface {
         actionHelper.setupMyTeamActiveAppraisals(request, userId);
         if (actionHelper.isLoggedInUserReviewer(request)) {
             ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(request, -1);
-            actionHelper.addToRequestMap("pendingReviews", reviews,request);
+            actionHelper.addToRequestMap("pendingReviews", reviews, request);
         }
 
         if (actionHelper.isLoggedInUserReviewer(request) && appraisal.getEmployeeSignedDate() != null &&
-                !appraisal.getRole().equals("employee")) {
-            actionHelper.addToRequestMap("displayResendNolij", true,request);
+                !appraisal.getRole().equals("employee") && appraisal.getStatus().equals("completed")) {
+            actionHelper.addToRequestMap("displayResendNolij", true, request);
         }
         if ((actionHelper.isLoggedInUserReviewer(request) || actionHelper.isLoggedInUserAdmin(request)) && appraisal.isOpen()
                 && !userRole.equals("employee")) {
-            actionHelper.addToRequestMap("displayCloseOutAppraisal", true,request);
+            actionHelper.addToRequestMap("displayCloseOutAppraisal", true, request);
         }
         String status = appraisal.getStatus();
         if ((actionHelper.isLoggedInUserAdmin(request) || actionHelper.isLoggedInUserReviewer(request)) &&
                 status.equals(Appraisal.STATUS_GOALS_APPROVED) && !userRole.equals("employee")) {
-            actionHelper.addToRequestMap("displaySetAppraisalStatus", true,request);
+            actionHelper.addToRequestMap("displaySetAppraisalStatus", true, request);
         }
 
         // Initialze lazy appraisal associations

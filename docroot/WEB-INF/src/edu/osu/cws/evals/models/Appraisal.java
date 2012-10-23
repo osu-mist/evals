@@ -521,8 +521,7 @@ public class Appraisal extends Evals {
     public boolean isOpen() {
         String viewStatus = getViewStatus();
         return !status.equals(STATUS_CLOSED) && !viewStatus.equals(STATUS_COMPLETED)
-                && !status.equals(STATUS_ARCHIVED) && !status.equals(STATUS_SIGNATURE_DUE)
-                && !status.equals(STATUS_SIGNATURE_OVERDUE);
+                && !status.equals(STATUS_ARCHIVED);
     }
 
 
