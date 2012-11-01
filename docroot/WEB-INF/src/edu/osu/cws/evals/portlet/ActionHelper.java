@@ -842,4 +842,19 @@ public class ActionHelper {
         addToRequestMap("employee", getLoggedOnUser(request),request);
     }
 
+    /**
+     * fetch the latest notice from notice table and addToRequestMap as yellowBox message
+     *
+     * @param request
+     * @return Text of yellowBox message
+     * @throws Exception
+     */
+    public void getYellowBoxMsg(PortletRequest request) throws Exception {
+        Notice notice = NoticeMgr.getYellowBoxMsg();
+        addToRequestMap("yellowBoxMsg", notice, request);
+    }
 }
+
+
+
+

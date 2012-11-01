@@ -186,6 +186,7 @@ public class EvalsPortlet extends GenericPortlet {
             hibSession = HibernateUtil.getCurrentSession();
             Transaction tx = hibSession.beginTransaction();
             actionHelper.setUpUserPermissionInSession(request, false);
+            actionHelper.getYellowBoxMsg(request);
 
             if (actionHelper.isDemo()) {
                 actionHelper.setupDemoSwitch(request);
