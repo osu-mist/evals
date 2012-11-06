@@ -54,9 +54,12 @@ public class Constants {
 
     public static final Integer MAX_ORG_CODE_DIGITS = 6;
 
+    public static final Integer ANNUAL_IND = 12;
+    public static final Integer TRIAL_IND = 6;
+
     public static final String BC_NAME = "bcName";
 
     public static final Integer SEARCH_MAX_RESULTS = 20;
 
-    public static final long PORTLET_RELOAD_FREQENCY = 1000 * 60 * 60 * 24 * 7; //7 days in ms
+    public static final long PORTLET_RELOAD_FREQUENCY = 1000 * 60 * 60 * 24; //1 days in ms
 }

@@ -43,13 +43,16 @@ function clearSearchBox() {
 
 function validateSearch() {
   var errors = "";
+  var isSupervisor = false;
   var searchTerm = jQuery("#<portlet:namespace/>searchTerm").val();
+  searchTerm = jQuery.trim(searchTerm);
   <c:choose>
     <c:when test="${isAdmin || isReviewer}">
       var errorString = "${searchJsErrorDefault}";
     </c:when>
     <c:otherwise>
       var errorString = "${searchJsErrorSupervisor}";
+    isSupervisor = true;
     </c:otherwise>
   </c:choose>
   errorString = "<li>"+ errorString + "</li>";
@@ -67,6 +70,10 @@ function validateSearch() {
     if (isNumber && (searchTermLength != 9 && searchTermLength != 6)) {
         errors = errorString;
     }
+  }
+
+  if (isNumber && isSupervisor && (searchTermLength != 9)) {
+      errors = errorString;
   }
 
   if (errors != "") {

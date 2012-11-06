@@ -11,7 +11,7 @@ package edu.osu.cws.evals.models;
 public class AppointmentType extends Evals {
     public static final String CLASSIFIED = "Classified";
 
-    public static final String CLASSIFIED_IT = "classifiedIT";
+    public static final String CLASSIFIED_IT = "Classified IT";
 
     private String name;
 

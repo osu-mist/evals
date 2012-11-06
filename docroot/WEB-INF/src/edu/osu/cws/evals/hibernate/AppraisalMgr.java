@@ -8,12 +8,16 @@ import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.StandardBasicTypes;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.HashMap;
@@ -619,10 +623,14 @@ public class AppraisalMgr {
         String role = getRole(appraisal, loggedInUser.getId());
         permissionKey = appraisal.getStatus()+"-"+ role;
 
-        PermissionRule permissionRule = (PermissionRule) permissionRules.get(permissionKey);
+        PermissionRule originalPermRule = (PermissionRule) permissionRules.get(permissionKey);
+        PermissionRule permissionRule = (PermissionRule) originalPermRule.clone();
         if (permissionRule != null &&  appraisal.getStartDate().before(fullGoalsDate)) {
-            permissionRule.setGoals("j");
-            permissionRule.setResults("j");
+            String debug = "j-startDate=" + appraisal.getStartDate().toString() +
+                    "; fullGoalsDate=" + fullGoalsDate.toString() + "; FULL_GOALS_DATE=" +
+                    FULL_GOALS_DATE;
+            permissionRule.setGoals(debug);
+            permissionRule.setResults(debug);
         }
         return permissionRule;
     }

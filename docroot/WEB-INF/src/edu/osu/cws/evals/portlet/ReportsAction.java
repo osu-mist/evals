@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
+import edu.osu.cws.evals.hibernate.ClassifiedITObjectMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.ReportMgr;
 import edu.osu.cws.evals.models.*;
@@ -17,6 +18,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public class ReportsAction implements ActionInterface {
+
     public static final String SCOPE = "scope";
     public static final String SCOPE_VALUE = "scopeValue";
     public static final String SEARCH_TERM = "searchTerm";
@@ -107,6 +109,8 @@ public class ReportsAction implements ActionInterface {
      * Holds list of appraisals of current supervisor
      */
     private ArrayList<Appraisal> supervisorAppraisals;
+
+    private ArrayList<ClassifiedITObject> supervisorClassfiedITAppraisals;
 
     private boolean inLeafSupervisorReport = false;
 
@@ -269,6 +273,7 @@ public class ReportsAction implements ActionInterface {
                 // right pane data: supervisor appraisals and supervisor team
                 actionHelper.addToRequestMap("myActiveAppraisals", supervisorAppraisals,request);
                 actionHelper.addToRequestMap("myTeamsActiveAppraisals", supervisorTeamAppraisal,request);
+                actionHelper.addToRequestMap("myTeamsActiveClassifiedITAppraisals", supervisorClassfiedITAppraisals, request);
                 actionHelper.addToRequestMap("isMyReport", isMyReport,request);
             }
 
@@ -365,7 +370,6 @@ public class ReportsAction implements ActionInterface {
                 enableByUnitReports = false;
             }
         }
-
         tableData = ReportMgr.getChartData(paramMap, true, directEmployees,
                 supervisorTeamAppraisal, currentSupervisorJob, inLeafSupervisorReport);
         chartData = ReportMgr.trimDataPoints(tableData, maxDataPoints);
@@ -395,6 +399,7 @@ public class ReportsAction implements ActionInterface {
                 true, supervisorLevelPosno, supervisorLevelSuffix);
         supervisorAppraisals = AppraisalMgr.getAllMyActiveAppraisals(supervisorLevelPidm,
                 supervisorLevelPosno, supervisorLevelSuffix);
+        supervisorClassfiedITAppraisals = ClassifiedITObjectMgr.getMyClassifiedITAppraisals(supervisorLevelPidm);
     }
 
     /**
@@ -882,14 +887,19 @@ public class ReportsAction implements ActionInterface {
 
         HashMap<String, String> dataScopeMap = new HashMap<String, String>();
         for (Object[] row : chartData) {
-            String displayValue = row[1].toString();
-            String scopeValue = row[1].toString();
+            String displayValue = "";
+            String scopeValue = "";
+            if (row[1]!= null) {
+                displayValue = row[1].toString();
+                scopeValue = row[1].toString();
+            }
             if (row.length == 3) {
-                scopeValue = row[2].toString();
+                if (row[2] != null) {
+                    scopeValue = row[2].toString();
+                }
             }
             dataScopeMap.put(displayValue, scopeValue);
-        }
-
+            }
         return gson.toJson(dataScopeMap);
     }
 

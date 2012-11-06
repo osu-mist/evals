@@ -540,7 +540,7 @@ public class EvalsPDF {
 
         c = new Chunk(resource.getString("appraisal-status")+": ", INFO_FONT);
         p = new Paragraph(c);
-        c = new Chunk(resource.getString(appraisal.getStatus()), FONT_BOLD_11);
+        c = new Chunk(resource.getString(appraisal.getViewStatus()), FONT_BOLD_11);
         p.add(c);
         cell = new PdfPCell(p);
         cell.setPaddingLeft(4);

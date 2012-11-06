@@ -152,21 +152,21 @@ public class AppraisalsAction implements ActionInterface {
         actionHelper.setupMyTeamActiveAppraisals(request, userId);
         if (actionHelper.isLoggedInUserReviewer(request)) {
             ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(request, -1);
-            actionHelper.addToRequestMap("pendingReviews", reviews,request);
+            actionHelper.addToRequestMap("pendingReviews", reviews, request);
         }
 
         if (actionHelper.isLoggedInUserReviewer(request) && appraisal.getEmployeeSignedDate() != null &&
-                !appraisal.getRole().equals("employee")) {
-            actionHelper.addToRequestMap("displayResendNolij", true,request);
+                !appraisal.getRole().equals("employee") && appraisal.getStatus().equals("completed")) {
+            actionHelper.addToRequestMap("displayResendNolij", true, request);
         }
         if ((actionHelper.isLoggedInUserReviewer(request) || actionHelper.isLoggedInUserAdmin(request)) && appraisal.isOpen()
                 && !userRole.equals("employee")) {
-            actionHelper.addToRequestMap("displayCloseOutAppraisal", true,request);
+            actionHelper.addToRequestMap("displayCloseOutAppraisal", true, request);
         }
         String status = appraisal.getStatus();
         if ((actionHelper.isLoggedInUserAdmin(request) || actionHelper.isLoggedInUserReviewer(request)) &&
                 status.equals(Appraisal.STATUS_GOALS_APPROVED) && !userRole.equals("employee")) {
-            actionHelper.addToRequestMap("displaySetAppraisalStatus", true,request);
+            actionHelper.addToRequestMap("displaySetAppraisalStatus", true, request);
         }
 
         // Initialze lazy appraisal associations
@@ -256,8 +256,7 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         // If the user hit the save draft button, we stay in the same view
-        if (request.getParameter("save-draft") != null || request.getParameter("cancel") != null ||
-                request.getParameter("close-appraisal") != null) {
+        if (request.getParameter("save-draft") != null || request.getParameter("cancel") != null) {
             if (request.getParameter("save-draft") != null) {
                 SessionMessages.add(request, "draft-saved");
             }
@@ -266,7 +265,6 @@ public class AppraisalsAction implements ActionInterface {
             }
             return display(request, response);
         }
-
 
         String status = appraisal.getStatus();
         String[] afterReviewStatus = {Appraisal.STATUS_RELEASE_DUE, Appraisal.STATUS_RELEASE_OVERDUE,
@@ -418,7 +416,6 @@ public class AppraisalsAction implements ActionInterface {
     public String resendAppraisalToNolij(PortletRequest request, PortletResponse response) throws Exception {
         AppraisalMgr appraisalMgr = new AppraisalMgr();
         Appraisal appraisal;
-        PermissionRule permRule;
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
 
         int appraisalID = ParamUtil.getInteger(request, "id");
@@ -431,16 +428,14 @@ public class AppraisalsAction implements ActionInterface {
 
         // 1) Get the appraisal and permission rule
         appraisal = appraisalMgr.getAppraisal(appraisalID);
-        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
+        appraisal.setRole(appraisalMgr.getRole(appraisal, currentlyLoggedOnUser.getId()));
 
         // Permission checks
-        if (permRule != null && actionHelper.isLoggedInUserReviewer(request)
-                && appraisal.getEmployeeSignedDate() != null && !appraisal.getRole().equals("employee")) {
-            permRule = null;
-        }
-
-        // Check to see if the logged in user has permission to access the appraisal
-        if (permRule == null) {
+        if (!actionHelper.isLoggedInUserReviewer(request)
+                || appraisal.getEmployeeSignedDate() == null
+                || appraisal.getRole().equals("employee")
+                || !appraisal.getStatus().equals("completed"))
+        {
             actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
             return homeAction.display(request, response);
         }

@@ -10,7 +10,7 @@ package edu.osu.cws.evals.util;
 
 import edu.osu.cws.evals.hibernate.EmailMgr;
 import edu.osu.cws.evals.portlet.Constants;
-import edu.osu.cws.util.CWSUtil;
+import edu.osu.cws.util.*;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -93,8 +93,7 @@ public class EvalsUtil {
       * name of the config should be "goalsDue".
       * @return  true if need to send another email, false otherwise.
       */
-     public static boolean anotherEmail(Email lastEmail, Configuration config)
-     {
+     public static boolean anotherEmail(Email lastEmail, Configuration config) throws Exception {
          int frequency = config.getIntValue();
          int daysPassed = CWSUtil.daysBetween(new Date(), lastEmail.getSentDate());
          return (daysPassed > frequency);
@@ -162,7 +161,7 @@ public class EvalsUtil {
     }
 
     public static int daysBeforeAppraisalDue(Job job, Date appraisalStartDate, String appraisalType,
-                                             Map<String, Configuration> configMap) {
+                                             Map<String, Configuration> configMap) throws Exception{
         Configuration appraisalDueConfig = configMap.get(Appraisal.STATUS_APPRAISAL_DUE);
         int offset = appraisalDueConfig.getIntValue();    //number of days before end date of appraisal
 
