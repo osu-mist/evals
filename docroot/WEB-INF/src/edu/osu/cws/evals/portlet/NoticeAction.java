@@ -1,22 +1,25 @@
 package edu.osu.cws.evals.portlet;
 
-import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.NoticeMgr;
+import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Notice;
 import edu.osu.cws.evals.models.ModelException;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
+import javax.portlet.RenderRequest;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class NoticeAction implements ActionInterface {
+
     private ActionHelper actionHelper;
 
     private HomeAction homeAction;
-
     /**
-     * Handles listing the close out reasons.
+     * Handles listing the notice.
      *
      * @param request
      * @param response
@@ -34,67 +37,55 @@ public class NoticeAction implements ActionInterface {
         actionHelper.addToRequestMap("noticeList", noticeList, request);
         actionHelper.useMaximizedMenu(request);
 
-        return Constants.JSP_CLOSEOUT_REASON_LIST;
+        return Constants.JSP_NOTICE_LIST;
     }
 
+
     /**
-     * Handles adding a close out reason. If successful, it displays the list of close out reasons.
+     * put a new version of file in a single ancestorID.
      *
      * @param request
      * @param response
      * @return
      * @throws Exception
      */
-    public String add(PortletRequest request, PortletResponse response) throws Exception {
+   public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!actionHelper.isLoggedInUserAdmin(request)) {
             actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
             return homeAction.display(request, response);
         }
-
-        String name = ParamUtil.getString(request, "name");
-        String text = ParamUtil.getString(request, "text");
+        Notice notice = new Notice();
         try {
-            NoticeMgr.add(actionHelper.getLoggedOnUser(request), name, text);
-            SessionMessages.add(request, "notice-added");
-        } catch (ModelException e) {
-            actionHelper.addErrorsToRequest(request, e.getMessage());
-        } catch (Exception e) {
-            throw e;
-        }
+            int ancestorId = ParamUtil.getInteger(request, "ancestorID") ;
+            if (request instanceof RenderRequest) {
 
-        return list(request, response);
-    }
+                notice = NoticeMgr.get(ancestorId);
+            } else {
+                Employee loggedOnUser = actionHelper.getLoggedOnUser(request);
+                notice = new Notice();
+                notice.setAncestorID(ancestorId);
+                notice.setCreator(loggedOnUser);
+                Calendar calendar = Calendar.getInstance();
+                Date date = calendar.getTime();
+                notice.setCreateDate(date);
+                notice.setName(ParamUtil.getString(request, "name"));
+                notice.setText(ParamUtil.getString(request, "text"));
+                NoticeMgr.edit(notice);
+                return list(request, response);
+           }
+       } catch (ModelException e) {
+           actionHelper.addErrorsToRequest(request, e.getMessage());
+       }
 
-    /**
-     * Handles performing a soft delete of a single close out reason.
-     *
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
-     */
-    public String edit(PortletRequest request, PortletResponse response) throws Exception {
-        // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
-            return homeAction.display(request, response);
-        }
+        actionHelper.addToRequestMap("notice", notice, request);
+        actionHelper.useMaximizedMenu(request);
 
-        String editName = ParamUtil.getString(request, "name");
-        String editText = ParamUtil.getString(request, "text");
-        int ancestorId = ParamUtil.getInteger(request, "ancestorID")  ;
-        try {
-            NoticeMgr.edit(actionHelper.getLoggedOnUser(request), ancestorId, editName, editText);
-            SessionMessages.add(request, "notice-edited");
-        } catch (ModelException e) {
-            actionHelper.addErrorsToRequest(request, e.getMessage());
-        } catch (Exception e) {
-            throw e;
-        }
+       return Constants.JSP_NOTICE_EDIT;
+   }
 
-        return list(request, response);
-    }
+
+
 
     public void setActionHelper(ActionHelper actionHelper) {
         this.actionHelper = actionHelper;
