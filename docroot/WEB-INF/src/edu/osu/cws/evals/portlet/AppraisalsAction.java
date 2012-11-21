@@ -39,7 +39,8 @@ public class AppraisalsAction implements ActionInterface {
     public String reviewList(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!actionHelper.isLoggedInUserReviewer(request)) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
@@ -73,7 +74,7 @@ public class AppraisalsAction implements ActionInterface {
         boolean isSupervisor = !isReviewer && actionHelper.isLoggedInUserSupervisor(request);
 
         if (!isAdmin && !isReviewer && !isSupervisor)  {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             ((ActionResponse) response).setWindowState(WindowState.NORMAL);
             return homeAction.display(request, response);
         }
@@ -81,7 +82,7 @@ public class AppraisalsAction implements ActionInterface {
         int pidm = actionHelper.getLoggedOnUser(request).getId();
         String searchTerm = ParamUtil.getString(request, "searchTerm");
         if (StringUtils.isEmpty(searchTerm)) {
-            actionHelper.addErrorsToRequest(request, "Please enter an employee's OSU ID");
+            actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-enter-id"));
         } else {
             String bcName = "";
             if (isReviewer) {
@@ -125,11 +126,12 @@ public class AppraisalsAction implements ActionInterface {
         Appraisal appraisal;
         PermissionRule permRule;
         Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser(request);
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         int userId = currentlyLoggedOnUser.getId();
 
         int appraisalID = ParamUtil.getInteger(request, "id");
         if (appraisalID == 0) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
@@ -142,7 +144,7 @@ public class AppraisalsAction implements ActionInterface {
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
@@ -209,8 +211,9 @@ public class AppraisalsAction implements ActionInterface {
         AppraisalMgr appraisalMgr = new AppraisalMgr();
         CompositeConfiguration config;
         int id = ParamUtil.getInteger(request, "id", 0);
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (id == 0) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.APPRAISAL_NOT_FOUND);
+            actionHelper.addErrorsToRequest(request, resource.getString("appraisal-no-found"));
             return homeAction.display(request, response);
         }
 
@@ -313,8 +316,9 @@ public class AppraisalsAction implements ActionInterface {
         PermissionRule permRule;
 
         int appraisalID = ParamUtil.getInteger(request, "id");
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (appraisalID == 0) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
         Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser(request);
@@ -326,7 +330,7 @@ public class AppraisalsAction implements ActionInterface {
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
@@ -340,7 +344,6 @@ public class AppraisalsAction implements ActionInterface {
         String filename = EvalsPDF.getNolijFileName(appraisal, tmpDir, "dev2");
 
         // 3) Create PDF
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         String rootDir = actionHelper.getPortletContext().getRealPath("/");
         EvalsPDF.createPDF(appraisal, permRule, filename, resource, rootDir);
 
@@ -420,7 +423,7 @@ public class AppraisalsAction implements ActionInterface {
 
         int appraisalID = ParamUtil.getInteger(request, "id");
         if (appraisalID == 0) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
         Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser(request);
@@ -436,7 +439,7 @@ public class AppraisalsAction implements ActionInterface {
                 || appraisal.getRole().equals("employee")
                 || !appraisal.getStatus().equals("completed"))
         {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
@@ -478,9 +481,10 @@ public class AppraisalsAction implements ActionInterface {
         Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser(request);
         int userId = currentlyLoggedOnUser.getId();
 
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         int appraisalID = ParamUtil.getInteger(request, "id");
         if (appraisalID == 0) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
@@ -494,7 +498,7 @@ public class AppraisalsAction implements ActionInterface {
         // Check to see if the logged in user has permission to access the appraisal
         boolean isAdminOrReviewer = userRole.equals("admin") || userRole.equals("reviewer");
         if (permRule == null || !isAdminOrReviewer) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
@@ -522,9 +526,10 @@ public class AppraisalsAction implements ActionInterface {
         Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser(request);
         int userId = currentlyLoggedOnUser.getId();
 
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         int appraisalID = ParamUtil.getInteger(request, "id");
         if (appraisalID == 0) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
@@ -535,7 +540,7 @@ public class AppraisalsAction implements ActionInterface {
         String userRole = appraisalMgr.getRole(appraisal, userId);
         appraisal.setRole(userRole);
         if (!userRole.equals("admin") && !userRole.equals(ActionHelper.ROLE_REVIEWER)) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 

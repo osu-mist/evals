@@ -12,6 +12,7 @@ import javax.portlet.RenderRequest;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.ResourceBundle;
 
 public class NoticeAction implements ActionInterface {
 
@@ -28,8 +29,9 @@ public class NoticeAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
@@ -51,8 +53,9 @@ public class NoticeAction implements ActionInterface {
      */
    public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
+       ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
         Notice notice = new Notice();

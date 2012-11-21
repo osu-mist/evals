@@ -236,8 +236,8 @@ public class ReportsAction implements ActionInterface {
         paramMap.put(SEARCH_TERM, "");
         paramMap.put(REPORT, REPORT_DEFAULT);
         searchResults.clear();
-
-        actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
+        actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
     }
 
     private void setupDataForJSP(PortletRequest request) throws Exception {
