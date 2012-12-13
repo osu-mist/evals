@@ -11,10 +11,10 @@
     <portlet:param name="controller" value="NoticeAction"/>
     </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
     <fieldset>
-        <legend><liferay-ui:message key="Notices" /></legend>
+        <legend>Notice</legend>
         <input name="<portlet:namespace />ancestorID" type="hidden" value="${notice.ancestorID}" />
-        <label for="<portlet:namespace />name"><liferay-ui:message key="name" /></label>
-        <input type="text" id="<portlet:namespace />name" name="<portlet:namespace />name" value="${notice.name}" />
+        <input type="hidden" id="<portlet:namespace />name" name="<portlet:namespace />name"
+               value="${notice.name}" />
 
         <label for="<portlet:namespace />text"><liferay-ui:message key="text" /></label>
         <liferay-ui:input-textarea param="text" defaultValue="${notice.text}"/>

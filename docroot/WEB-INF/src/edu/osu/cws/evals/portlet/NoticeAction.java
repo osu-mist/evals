@@ -44,7 +44,7 @@ public class NoticeAction implements ActionInterface {
 
 
     /**
-     * put a new version of file in a single ancestorID.
+     * edit the notice of defined ancestorID, we will put a new score of value with the ancestorID in the notice table
      *
      * @param request
      * @param response
@@ -65,16 +65,25 @@ public class NoticeAction implements ActionInterface {
 
                 notice = NoticeMgr.get(ancestorId);
             } else {
+                String Text = ParamUtil.getString(request, "text");
+                //validation, if the text is blank, return to list
+                if(Text == null||Text.equals("")) {
+                     return list(request, response);
+                }
                 Employee loggedOnUser = actionHelper.getLoggedOnUser(request);
                 notice = new Notice();
                 notice.setAncestorID(ancestorId);
                 notice.setCreator(loggedOnUser);
-                Calendar calendar = Calendar.getInstance();
-                Date date = calendar.getTime();
+                Date date = new Date();
                 notice.setCreateDate(date);
                 notice.setName(ParamUtil.getString(request, "name"));
-                notice.setText(ParamUtil.getString(request, "text"));
-                NoticeMgr.edit(notice);
+                notice.setText(Text);
+                boolean noticeChange = NoticeMgr.edit(notice);
+                //if the current notice is a yellowBoxMessage (ancestorID = 1) and it is changed, update it into
+                //portletContext so the other loggedInUser can see it.
+                if(noticeChange && ancestorId == 1){
+                    actionHelper.setHomePageNotice(true);
+                }
                 return list(request, response);
            }
        } catch (ModelException e) {

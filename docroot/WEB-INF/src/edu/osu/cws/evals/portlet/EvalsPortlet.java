@@ -14,6 +14,7 @@ import edu.osu.cws.evals.hibernate.AppraisalStepMgr;
 import edu.osu.cws.evals.hibernate.PermissionRuleMgr;
 import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.models.Employee;
+import edu.osu.cws.evals.models.Notice;
 import edu.osu.cws.evals.util.*;
 import edu.osu.cws.util.CWSUtil;
 import edu.osu.cws.util.Logger;
@@ -43,6 +44,7 @@ public class EvalsPortlet extends GenericPortlet {
     public static final String CONTEXT_CACHE_TIMESTAMP = "contextCacheTimestamp";
 
     public static final String CONTEXT_LOAD_DATE = "contextLoadDate";
+
     /**
      * String used to store the view jsp used by the
      * doView method.
@@ -186,8 +188,6 @@ public class EvalsPortlet extends GenericPortlet {
             hibSession = HibernateUtil.getCurrentSession();
             Transaction tx = hibSession.beginTransaction();
             actionHelper.setUpUserPermissionInSession(request, false);
-            actionHelper.getYellowBoxMsg(request);
-
             if (actionHelper.isDemo()) {
                 actionHelper.setupDemoSwitch(request);
             }
@@ -269,12 +269,14 @@ public class EvalsPortlet extends GenericPortlet {
                 message += "Stored Appraisal Steps in portlet context\n";
                 loadResourceBundle();
                 message += "Stored resource bundle Language.properties in portlet context\n";
+                message += "Stored homePageNotice in portlet context\n";
                 Date currentTimestamp = new Date();
                 getPortletContext().setAttribute(CONTEXT_CACHE_TIMESTAMP, currentTimestamp);
                 message += "Stored contextCacheTimestamp of " + currentTimestamp.toString() + "\n";
-
                 actionHelper.setEvalsAdmins(false);
                 actionHelper.setEvalsReviewers(false);
+                actionHelper.setHomePageNotice(false);
+
                 tx.commit();
                 EvalsLogger logger =  getLog();
                 if (logger != null) {

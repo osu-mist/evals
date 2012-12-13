@@ -840,14 +840,16 @@ public class ActionHelper {
 
     /**
      * fetch the latest notice from notice table and addToRequestMap as yellowBox message
-     *
-     * @param request
+     * @param updateContextTimestamp    Whether or not to update the context timestamp in config_times
      * @return Text of yellowBox message
      * @throws Exception
      */
-    public void getYellowBoxMsg(PortletRequest request) throws Exception {
-        Notice notice = NoticeMgr.getYellowBoxMsg();
-        addToRequestMap("yellowBoxMsg", notice, request);
+    public void setHomePageNotice(boolean updateContextTimestamp) throws Exception {
+        Notice notice = NoticeMgr.getHomePageNotice();
+        getPortletContext().setAttribute("homePageNotice", notice);
+        if (updateContextTimestamp) {
+            updateContextTimestamp();
+        }
     }
 }
 

@@ -23,7 +23,6 @@
 
 <%@ page isELIgnored ="false" %>
 
-
 <portlet:defineObjects />
 
 <liferay-theme:defineObjects />
@@ -55,7 +54,7 @@ if (errorMsg != null && !errorMsg.equals("")) {
 
     <c:if test="${!empty alertMsg and alertMsg == 'true'}">
     <span class="portlet-msg-alert">
-    <c:out value = "${yellowBoxMsg.text}"/>
+    <c:out value = "${homePageNotice.text}"/>
     </span>
     </c:if>
 </div>

@@ -7,6 +7,7 @@ import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Employee;
+import edu.osu.cws.evals.models.Notice;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
 
@@ -32,6 +33,8 @@ public class HomeAction implements ActionInterface {
      * @throws Exception
      */
     public String display(PortletRequest request, PortletResponse response) throws Exception {
+        Notice homePageNotice = (Notice)actionHelper.getPortletContextAttribute("homePageNotice");
+        actionHelper.addToRequestMap("homePageNotice", homePageNotice, request);
         Employee employee = actionHelper.getLoggedOnUser(request);
         int employeeId = employee.getId();
         String homeJSP = getHomeJSP(request);
