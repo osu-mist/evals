@@ -14,7 +14,6 @@ import edu.osu.cws.evals.hibernate.AppraisalStepMgr;
 import edu.osu.cws.evals.hibernate.PermissionRuleMgr;
 import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.models.Employee;
-import edu.osu.cws.evals.models.Notice;
 import edu.osu.cws.evals.util.*;
 import edu.osu.cws.util.CWSUtil;
 import edu.osu.cws.util.Logger;
@@ -269,15 +268,15 @@ public class EvalsPortlet extends GenericPortlet {
                 message += "Stored Appraisal Steps in portlet context\n";
                 loadResourceBundle();
                 message += "Stored resource bundle Language.properties in portlet context\n";
-                message += "Stored homePageNotice in portlet context\n";
                 Date currentTimestamp = new Date();
                 getPortletContext().setAttribute(CONTEXT_CACHE_TIMESTAMP, currentTimestamp);
                 message += "Stored contextCacheTimestamp of " + currentTimestamp.toString() + "\n";
                 actionHelper.setEvalsAdmins(false);
                 actionHelper.setEvalsReviewers(false);
                 actionHelper.setHomePageNotice(false);
-
+                message += "Stored homePageNotice in portlet context\n";
                 tx.commit();
+
                 EvalsLogger logger =  getLog();
                 if (logger != null) {
                     logger.log(Logger.INFORMATIONAL, "Portlet Setup Success", message);

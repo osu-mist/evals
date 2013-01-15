@@ -45,8 +45,8 @@ public class HomeAction implements ActionInterface {
         // specify menu type, help links and yellow box to display in home view
         actionHelper.useNormalMenu(request);
         helpLinks(request);
-        actionHelper.addToRequestMap("alertMsg", config.getBoolean("alert.display"),request);
-        actionHelper.addToRequestMap("isHome", true,request);
+        actionHelper.addToRequestMap("alertMsg", true, request);
+        actionHelper.addToRequestMap("isHome", true, request);
 
         actionHelper.setupMyActiveAppraisals(request, employeeId);
         actionHelper.setupMyTeamActiveAppraisals(request, employeeId);

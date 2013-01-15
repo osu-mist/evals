@@ -37,7 +37,6 @@ public class ClassifiedITObjectMgr {
         ArrayList<ClassifiedITObject> myTeamClassifiedITObject = new ArrayList<ClassifiedITObject>();
         String reviewPeriod = "";
         String name = "";
-        Iterator count = hibSession.createQuery("select count(*)  from edu.osu.cws.evals.models.Reviewer rv ").iterate();
         criteria.add(Restrictions.eq("supervisor.employee.id", pidm)).add(Restrictions.eq("status", "A")).
                 add(Restrictions.like("appointmentType", AppointmentType.CLASSIFIED_IT));
         List result = criteria.list();
@@ -63,7 +62,6 @@ public class ClassifiedITObjectMgr {
             myTeamClassifiedITObject.add(classifiedITObject);
 
         }
-        count = hibSession.createQuery("select count(*)  from edu.osu.cws.evals.models.EmailType et").iterate();
         return myTeamClassifiedITObject;
     }
 

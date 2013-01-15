@@ -15,8 +15,7 @@ public class NoticeMgr {
      */
     public static Notice getHomePageNotice() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        Notice notice = (Notice)session.getNamedQuery("notice.homePageNotice").uniqueResult();
-        return notice;
+        return (Notice)session.getNamedQuery("notice.homePageNotice").uniqueResult();
     }
 
     /**
@@ -26,8 +25,7 @@ public class NoticeMgr {
      */
     public static Notice get(int ancestorID) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        Notice notice = (Notice)session.getNamedQuery("notice.singleNotice").setInteger("ancestorID", ancestorID).uniqueResult();
-        return notice;
+        return (Notice)session.getNamedQuery("notice.singleNotice").setInteger("ancestorID", ancestorID).uniqueResult();
     }
 
     public static ArrayList<Notice> list() throws Exception {
@@ -46,14 +44,10 @@ public class NoticeMgr {
     public static boolean edit(Notice upDatedNotice) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         String text = upDatedNotice.getText();
-        boolean textChanged = false;
         Notice notice = get(upDatedNotice.getAncestorID());
         int textHash = notice.getText().hashCode();
         int updateTextHash = text.hashCode();
-        if (textHash != updateTextHash) {
-            textChanged = true;
-        }
-        if (!textChanged) {
+        if (textHash == updateTextHash) {
             return false;
         }
         session.save(upDatedNotice);

@@ -11,17 +11,13 @@
     <portlet:param name="controller" value="NoticeAction"/>
     </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" method="post">
     <fieldset>
-        <legend>Notice</legend>
+        <legend><liferay-ui:message key="notices"/></legend>
         <input name="<portlet:namespace />ancestorID" type="hidden" value="${notice.ancestorID}" />
         <input type="hidden" id="<portlet:namespace />name" name="<portlet:namespace />name"
                value="${notice.name}" />
 
         <label for="<portlet:namespace />text"><liferay-ui:message key="text" /></label>
         <liferay-ui:input-textarea param="text" defaultValue="${notice.text}"/>
-        <c:if test="${action == 'edit'}">
-            <input type="checkbox" id="<portlet:namespace />propagateEdit"name="<portlet:namespace />propagateEdit"/>
-            <label for="<portlet:namespace />propagateEdit"><liferay-ui:message key="criteria-propagate-edit" /></label>
-        </c:if>
     </fieldset>
 
     <input type="submit" value="<liferay-ui:message key="save" />" />

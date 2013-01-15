@@ -44,14 +44,14 @@ public class NoticeAction implements ActionInterface {
 
 
     /**
-     * edit the notice of defined ancestorID, we will put a new score of value with the ancestorID in the notice table
+     * edit the notice of provided ancestorID, insert a new notice instead of edit the existed one
      *
      * @param request
      * @param response
      * @return
      * @throws Exception
      */
-   public String edit(PortletRequest request, PortletResponse response) throws Exception {
+    public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin(request)) {
@@ -65,19 +65,18 @@ public class NoticeAction implements ActionInterface {
 
                 notice = NoticeMgr.get(ancestorId);
             } else {
-                String Text = ParamUtil.getString(request, "text");
+                String text = ParamUtil.getString(request, "text");
                 //validation, if the text is blank, return to list
-                if(Text == null||Text.equals("")) {
+                if(text == null||text.equals("")) {
                      return list(request, response);
                 }
                 Employee loggedOnUser = actionHelper.getLoggedOnUser(request);
                 notice = new Notice();
                 notice.setAncestorID(ancestorId);
                 notice.setCreator(loggedOnUser);
-                Date date = new Date();
-                notice.setCreateDate(date);
+                notice.setCreateDate(new Date());
                 notice.setName(ParamUtil.getString(request, "name"));
-                notice.setText(Text);
+                notice.setText(text);
                 boolean noticeChange = NoticeMgr.edit(notice);
                 //if the current notice is a yellowBoxMessage (ancestorID = 1) and it is changed, update it into
                 //portletContext so the other loggedInUser can see it.
