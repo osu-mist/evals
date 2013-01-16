@@ -70,7 +70,7 @@ public class ClassifiedITObjectMgr {
             startDate = new Date();
         }
         if (endDate == null) {
-            startDate = new Date();
+            endDate = new Date();
         }
 
         return MessageFormat.format("{0,date,MM/dd/yy} - {1,date,MM/dd/yy}",
