@@ -5,3 +5,4 @@ docroot/WEB-INF/classes/
 *.properties
 *.iml
 .idea
+*.pyc
