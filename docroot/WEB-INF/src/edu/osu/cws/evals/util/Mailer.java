@@ -428,7 +428,7 @@ public class Mailer {
     private String goalsDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsDue_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDaysRemaining(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal), getDaysRemaining(appraisal));
     }
 
     /**
@@ -439,7 +439,7 @@ public class Mailer {
      */
     private String goalsOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsOverdue_body");
-        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(), getDueDate(appraisal));
     }
 
     /**
@@ -449,7 +449,8 @@ public class Mailer {
      * @throws Exception
      */
     private String goalsRequiredModificationBody(Appraisal appraisal) throws Exception {
-        return emailBundle.getString("email_goalsRequiredModification_body");
+        String bodyString = emailBundle.getString("email_goalsRequiredModification_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(), getDueDate(appraisal));
     }
 
     /**
@@ -461,7 +462,7 @@ public class Mailer {
     private String goalsApprovalDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsApprovalDue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod());
+                appraisal.getReviewPeriod(), getDueDate(appraisal));
     }
 
     /**
@@ -473,7 +474,7 @@ public class Mailer {
     private String goalsApprovalOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsApprovalOverdue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod());
+                appraisal.getReviewPeriod(), getDueDate(appraisal));
     }
 
     /**
@@ -484,7 +485,8 @@ public class Mailer {
      */
     private String goalsApprovedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsApproved_body");
-        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(),
+                getDueDate(appraisal));
     }
 
     /**
@@ -495,7 +497,7 @@ public class Mailer {
      */
     private String goalsReactivatedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsReactivated_body");
-        return MessageFormat.format(bodyString, appraisal.getReviewPeriod());
+        return MessageFormat.format(bodyString, appraisal.getReviewPeriod(), getDueDate(appraisal));
     }
 
     /**
@@ -507,7 +509,7 @@ public class Mailer {
     private String resultsDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_resultsDue_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDaysRemaining(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal), getDaysRemaining(appraisal));
     }
 
     /**
@@ -518,7 +520,8 @@ public class Mailer {
      */
     private String resultsOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_resultsOverdue_body");
-        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(),
+                getDueDate(appraisal));
     }
 
     /**
@@ -529,8 +532,8 @@ public class Mailer {
      */
     private String appraisalDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_appraisalDue_body");
-        return MessageFormat.format(bodyString, getEmployeeName(appraisal),
-                appraisal.getReviewPeriod(), getDaysRemaining(appraisal));
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
+                appraisal.getReviewPeriod(), getDueDate(appraisal), getDaysRemaining(appraisal));
     }
 
     /**
@@ -541,7 +544,8 @@ public class Mailer {
      */
     private String appraisalOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_appraisalOverdue_body");
-        return MessageFormat.format(bodyString, getEmployeeName(appraisal), appraisal.getReviewPeriod());
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
+                appraisal.getReviewPeriod(), getDueDate(appraisal));
     }
 
     /**
@@ -580,7 +584,7 @@ public class Mailer {
     private String releaseDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_releaseDue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod());
+                appraisal.getReviewPeriod(),getDueDate(appraisal));
     }
 
     /**
@@ -592,7 +596,7 @@ public class Mailer {
     private String releaseOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_releaseOverdue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod());
+                appraisal.getReviewPeriod(),getDueDate(appraisal));
     }
 
     /**
@@ -602,7 +606,9 @@ public class Mailer {
      * @throws Exception
      */
     private String signatureDueBody(Appraisal appraisal) throws Exception {
-         return emailBundle.getString("email_signatureDue_body");
+        String bodyString = emailBundle.getString("email_signatureDue_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal),appraisal.getReviewPeriod(),
+                getDueDate(appraisal));
     }
 
     /**
@@ -612,7 +618,9 @@ public class Mailer {
      * @throws Exception
      */
     private String signatureOverdueBody(Appraisal appraisal) throws Exception {
-        return emailBundle.getString("email_signatureOverdue_body");
+        String bodyString = emailBundle.getString("email_signatureOverdue_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal),appraisal.getReviewPeriod(),
+                getDueDate((appraisal)));
     }
 
     /**
@@ -623,7 +631,7 @@ public class Mailer {
      */
     private String rebuttalReadBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_rebuttalRead_body");
-        return MessageFormat.format(bodyString, appraisal.getReviewPeriod());
+        return MessageFormat.format(bodyString, appraisal.getReviewPeriod(), getDueDate(appraisal));
     }
 
     /**
@@ -637,7 +645,7 @@ public class Mailer {
         String osuid = appraisal.getJob().getEmployee().getOsuid();
 
         return MessageFormat.format(bodyString, getEmployeeName(appraisal),
-                osuid, getJobTitle(appraisal), appraisal.getReviewPeriod());
+                osuid, getJobTitle(appraisal), appraisal.getReviewPeriod(), getDueDate(appraisal));
     }
 
     /**
@@ -648,8 +656,9 @@ public class Mailer {
      */
     private String rebuttalReadOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_rebuttalReadOverdue_body");
-        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod());
+        String osuid = appraisal.getJob().getEmployee().getOsuid();
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), osuid, getJobTitle(appraisal),
+                appraisal.getReviewPeriod(), getDueDate(appraisal));
     }
 
     /**
@@ -660,7 +669,7 @@ public class Mailer {
      */
     private String completedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_completed_body");
-        return MessageFormat.format(bodyString, appraisal.getReviewPeriod());
+        return MessageFormat.format(bodyString, appraisal.getReviewPeriod(), appraisal.getEndDate());
     }
 
     /**
@@ -735,6 +744,23 @@ public class Mailer {
         Job job = appraisal.getJob();
         Integer id = job.getEmployee().getId();
         return id.toString();
+    }
+
+    /**
+     * Fetch the due day
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String getDueDate(Appraisal appraisal) throws Exception {
+        String status = appraisal.getStatus();
+        if(status.contains("Overdue")) {
+            status = status.replace("Overdue", "Due");
+        }
+        else System.out.println("It is due!");
+        Configuration config = configMap.get(status);
+        Date dueDay = EvalsUtil.getDueDate(appraisal, config);
+        return MessageFormat.format("{0,date,MM/dd/yy}", new Object[]{dueDay});
     }
 
     /**
