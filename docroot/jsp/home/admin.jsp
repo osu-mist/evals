@@ -24,6 +24,11 @@ PortletURL closeOutReasonListURL = renderResponse.createRenderURL();
 closeOutReasonListURL.setWindowState(WindowState.MAXIMIZED);
 closeOutReasonListURL.setParameter("action", "list");
 closeOutReasonListURL.setParameter("controller", "CloseOutAction");
+
+PortletURL noticeListURL = renderResponse.createRenderURL();
+noticeListURL.setWindowState(WindowState.MAXIMIZED);
+noticeListURL.setParameter("action", "list");
+noticeListURL.setParameter("controller", "NoticeAction");
 %>
 
 <c:if test="${isAdmin == 'true'}">
@@ -49,6 +54,10 @@ closeOutReasonListURL.setParameter("controller", "CloseOutAction");
                 <li>
                     <a href="<%= closeOutReasonListURL.toString() %>">
                         <liferay-ui:message key="closeout-reason-list-title"/></a>
+                </li>
+                <li>
+                    <a href="<%= noticeListURL.toString() %>">
+                        <liferay-ui:message key="notice-list-title"/></a>
                 </li>
             </ul>
         </div>

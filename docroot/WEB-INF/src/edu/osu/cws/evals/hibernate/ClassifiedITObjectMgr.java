@@ -12,10 +12,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -40,7 +37,6 @@ public class ClassifiedITObjectMgr {
         ArrayList<ClassifiedITObject> myTeamClassifiedITObject = new ArrayList<ClassifiedITObject>();
         String reviewPeriod = "";
         String name = "";
-
         criteria.add(Restrictions.eq("supervisor.employee.id", pidm)).add(Restrictions.eq("status", "A")).
                 add(Restrictions.like("appointmentType", AppointmentType.CLASSIFIED_IT));
         List result = criteria.list();
@@ -74,7 +70,7 @@ public class ClassifiedITObjectMgr {
             startDate = new Date();
         }
         if (endDate == null) {
-            startDate = new Date();
+            endDate = new Date();
         }
 
         return MessageFormat.format("{0,date,MM/dd/yy} - {1,date,MM/dd/yy}",

@@ -60,6 +60,7 @@ name of the hibernate configuration file.
         <mapping resource="edu/osu/cws/evals/hbm/EmailType.hbm.xml"/>
         <mapping resource="edu/osu/cws/evals/hbm/Email.hbm.xml"/>
         <mapping resource="edu/osu/cws/evals/hbm/NolijCopy.hbm.xml"/>
+        <mapping resource="edu/osu/cws/evals/hbm/Notice.hbm.xml"/>
         <mapping resource="edu/osu/cws/evals/hbm/AppraisalStep.hbm.xml"/>
         <mapping resource="edu/osu/cws/evals/hbm/PermissionRule.hbm.xml"/>
         <mapping resource="edu/osu/cws/evals/hbm/Reviewer.hbm.xml"/>
