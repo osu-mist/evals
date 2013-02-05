@@ -669,7 +669,7 @@ public class Mailer {
      */
     private String completedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_completed_body");
-        return MessageFormat.format(bodyString, appraisal.getReviewPeriod(), appraisal.getEndDate());
+        return MessageFormat.format(bodyString,getJobTitle(appraisal), appraisal.getReviewPeriod());
     }
 
     /**
@@ -757,7 +757,6 @@ public class Mailer {
         if(status.contains("Overdue")) {
             status = status.replace("Overdue", "Due");
         }
-        else System.out.println("It is due!");
         Configuration config = configMap.get(status);
         Date dueDay = EvalsUtil.getDueDate(appraisal, config);
         return MessageFormat.format("{0,date,MM/dd/yy}", new Object[]{dueDay});
