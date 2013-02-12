@@ -53,7 +53,7 @@ public class ReviewersAction implements ActionInterface {
     }
 
     /**
-     * Handles adding an admin user.
+     * Handles adding a reviewer user.
      *
      * @param request
      * @param response
@@ -61,7 +61,7 @@ public class ReviewersAction implements ActionInterface {
      * @throws Exception
      */
     public String add(PortletRequest request, PortletResponse response) throws Exception {
-        // Check that the logged in user is admin
+        // Check that the logged in user is an reviewer
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin(request)) {
             actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
@@ -71,7 +71,7 @@ public class ReviewersAction implements ActionInterface {
         String onid = ParamUtil.getString(request, "onid");
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
 
-        // Check whether or not the user is already an admin user
+        // Check whether or not the user is already a reviewer user
         EmployeeMgr employeeMgr = new EmployeeMgr();
         Employee onidUser = employeeMgr.findByOnid(onid, null);
         if (actionHelper.getReviewer(onidUser.getId()) != null) {
