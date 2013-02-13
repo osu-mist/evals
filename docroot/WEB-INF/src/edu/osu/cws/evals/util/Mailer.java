@@ -631,7 +631,7 @@ public class Mailer {
      */
     private String rebuttalReadBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_rebuttalRead_body");
-        return MessageFormat.format(bodyString, appraisal.getReviewPeriod(), getDueDate(appraisal));
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
     }
 
     /**
@@ -669,7 +669,7 @@ public class Mailer {
      */
     private String completedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_completed_body");
-        return MessageFormat.format(bodyString,getJobTitle(appraisal), appraisal.getReviewPeriod());
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
     }
 
     /**
