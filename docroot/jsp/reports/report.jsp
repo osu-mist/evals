@@ -215,9 +215,7 @@
                 <%@ include file="/jsp/home/myStatus.jsp"%>
             </c:if>
 
-            <c:if test="${enableByUnitReports}">
-                <%@ include file="/jsp/home/myTeam.jsp"%>
-            </c:if>
+            <%@ include file="/jsp/home/myTeam.jsp"%>
         </c:if>
     </c:if>
 
