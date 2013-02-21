@@ -844,9 +844,9 @@ public class ActionHelper {
      * @return Text of yellowBox message
      * @throws Exception
      */
-    public void setHomePageNotice(boolean updateContextTimestamp) throws Exception {
-        Notice notice = NoticeMgr.getHomePageNotice();
-        getPortletContext().setAttribute("homePageNotice", notice);
+    public void setNotices(boolean updateContextTimestamp) throws Exception {
+        Map notices = NoticeMgr.getNotices();
+        getPortletContext().setAttribute("Notices", notices);
         if (updateContextTimestamp) {
             updateContextTimestamp();
         }

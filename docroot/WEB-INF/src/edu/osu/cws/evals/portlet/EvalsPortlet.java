@@ -273,8 +273,8 @@ public class EvalsPortlet extends GenericPortlet {
                 message += "Stored contextCacheTimestamp of " + currentTimestamp.toString() + "\n";
                 actionHelper.setEvalsAdmins(false);
                 actionHelper.setEvalsReviewers(false);
-                actionHelper.setHomePageNotice(false);
-                message += "Stored homePageNotice in portlet context\n";
+                actionHelper.setNotices(false);
+                message += "Stored notices in portlet context\n";
                 tx.commit();
 
                 EvalsLogger logger =  getLog();

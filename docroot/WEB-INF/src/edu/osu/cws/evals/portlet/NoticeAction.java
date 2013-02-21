@@ -53,7 +53,7 @@ public class NoticeAction implements ActionInterface {
      */
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-       ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin(request)) {
             actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
@@ -62,38 +62,32 @@ public class NoticeAction implements ActionInterface {
         try {
             int ancestorId = ParamUtil.getInteger(request, "ancestorID") ;
             if (request instanceof RenderRequest) {
-
                 notice = NoticeMgr.get(ancestorId);
             } else {
                 String text = ParamUtil.getString(request, "text");
-                //validation, if the text is blank, return to list
-                if(text == null||text.equals("")) {
-                     return list(request, response);
-                }
                 Employee loggedOnUser = actionHelper.getLoggedOnUser(request);
-                notice = new Notice();
                 notice.setAncestorID(ancestorId);
                 notice.setCreator(loggedOnUser);
                 notice.setCreateDate(new Date());
                 notice.setName(ParamUtil.getString(request, "name"));
                 notice.setText(text);
-                boolean noticeChange = NoticeMgr.edit(notice);
-                //if the current notice is a yellowBoxMessage (ancestorID = 1) and it is changed, update it into
+                boolean noticeChange = NoticeMgr.compareNotices(notice);
+                //if the current notice is a yellowBoxMessage and it is changed, update it into
                 //portletContext so the other loggedInUser can see it.
-                if(noticeChange && ancestorId == 1){
-                    actionHelper.setHomePageNotice(true);
+                if(noticeChange){
+                    actionHelper.setNotices(true);
                 }
                 return list(request, response);
-           }
-       } catch (ModelException e) {
-           actionHelper.addErrorsToRequest(request, e.getMessage());
-       }
+            }
+        } catch (ModelException e) {
+            actionHelper.addErrorsToRequest(request, e.getMessage());
+        }
 
         actionHelper.addToRequestMap("notice", notice, request);
         actionHelper.useMaximizedMenu(request);
 
-       return Constants.JSP_NOTICE_EDIT;
-   }
+        return Constants.JSP_NOTICE_EDIT;
+    }
 
 
 

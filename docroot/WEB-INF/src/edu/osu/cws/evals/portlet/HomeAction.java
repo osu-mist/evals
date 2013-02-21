@@ -15,6 +15,7 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletSession;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class HomeAction implements ActionInterface {
@@ -33,8 +34,8 @@ public class HomeAction implements ActionInterface {
      * @throws Exception
      */
     public String display(PortletRequest request, PortletResponse response) throws Exception {
-        Notice homePageNotice = (Notice)actionHelper.getPortletContextAttribute("homePageNotice");
-        actionHelper.addToRequestMap("homePageNotice", homePageNotice, request);
+        Map Notices = (Map)actionHelper.getPortletContextAttribute("Notices");
+        actionHelper.addToRequestMap("homePageNotice", Notices.get("Homepage Notice"), request);
         Employee employee = actionHelper.getLoggedOnUser(request);
         int employeeId = employee.getId();
         String homeJSP = getHomeJSP(request);

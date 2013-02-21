@@ -9,25 +9,35 @@ import org.hibernate.Session;
 public class NoticeMgr {
 
     /**
-     * fetch the latest notice from notice table and addToRequestMap as yellowBox message
-     * @return Notice object of yellowBox message
-     * @throws Exception
-     */
-    public static Notice getHomePageNotice() throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        return (Notice)session.getNamedQuery("notice.homePageNotice").uniqueResult();
-    }
-
-    /**
      * fetch a notice from notice table in input ancestorID
      * @return Notice object
      * @throws Exception
      */
     public static Notice get(int ancestorID) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return (Notice)session.getNamedQuery("notice.singleNotice").setInteger("ancestorID", ancestorID).uniqueResult();
+        return (Notice)session.getNamedQuery("notice.singleNoticeByAncestorID").setInteger("ancestorID", ancestorID).uniqueResult();
     }
 
+    /**
+     * build a map from notice list
+     * @return Map of Notices
+     * @throws Exception
+     */
+    public static Map getNotices() throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        ArrayList<Notice> notices = list();
+        Map noticeMap = new HashMap();
+        for (int i = 0; i < notices.size(); i++) {
+            noticeMap.put(notices.get(i).getName(), notices.get(i));
+        }
+        return noticeMap;
+    }
+
+    /**
+     * get a list notices from notice table
+     * @return Arraylist of Notice
+     * @throws Exception
+     */
     public static ArrayList<Notice> list() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         ArrayList<Notice> noticeList = (ArrayList<Notice>)session.getNamedQuery("notice.noticeList").list();
@@ -41,12 +51,16 @@ public class NoticeMgr {
      * @return boolean object to tell if the database changed
      * @throws Exception
      */
-    public static boolean edit(Notice upDatedNotice) throws Exception {
+    public static boolean compareNotices(Notice upDatedNotice) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        String text = upDatedNotice.getText();
+        String textToUpdate = upDatedNotice.getText();
         Notice notice = get(upDatedNotice.getAncestorID());
-        int textHash = notice.getText().hashCode();
-        int updateTextHash = text.hashCode();
+        int textHash;
+        if(notice.getText() == null)
+            textHash = 0;
+        else
+            textHash = notice.getText().hashCode();
+        int updateTextHash = textToUpdate.hashCode();
         if (textHash == updateTextHash) {
             return false;
         }

@@ -171,6 +171,9 @@ public class AppraisalsAction implements ActionInterface {
             actionHelper.addToRequestMap("displaySetAppraisalStatus", true, request);
         }
 
+        Map Notices = (Map)actionHelper.getPortletContextAttribute("Notices");
+        actionHelper.addToRequestMap("appraisalNotice", Notices.get("Appraisal Notice"), request);
+
         // Initialze lazy appraisal associations
         Job job = appraisal.getJob();
         job.toString();
