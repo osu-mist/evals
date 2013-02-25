@@ -59,6 +59,7 @@ public class NoticeMgr {
             textHash = 0;
         } else {
             textHash = notice.getText().hashCode();
+        }
         int updateTextHash = textToUpdate.hashCode();
         if (textHash == updateTextHash) {
             return false;
