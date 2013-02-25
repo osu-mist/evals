@@ -24,7 +24,6 @@ public class NoticeMgr {
      * @throws Exception
      */
     public static Map getNotices() throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
         ArrayList<Notice> notices = list();
         Map noticeMap = new HashMap();
         for (int i = 0; i < notices.size(); i++) {
@@ -45,8 +44,8 @@ public class NoticeMgr {
     }
 
     /**
-     * edit Notice data score in the table, validate Notice transported from edit page to see if it is the same as the
-     * latest score in database, if not. save it as the new score
+     * get Notice data score in the table, validate Notice transported from edit page to see if it is the same as the
+     * latest score in database. if not, save it as the new score
      * @param upDatedNotice transported from edit page
      * @return boolean object to tell if the database changed
      * @throws Exception
@@ -56,9 +55,9 @@ public class NoticeMgr {
         String textToUpdate = upDatedNotice.getText();
         Notice notice = get(upDatedNotice.getAncestorID());
         int textHash;
-        if(notice.getText() == null)
+        if(notice.getText() == null) {
             textHash = 0;
-        else
+        } else {
             textHash = notice.getText().hashCode();
         int updateTextHash = textToUpdate.hashCode();
         if (textHash == updateTextHash) {
