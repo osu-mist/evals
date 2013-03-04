@@ -21,8 +21,6 @@ public class CriterionArea extends Evals {
 
     private CriterionArea originalID;
 
-    private int sequence;
-
     private Date createDate;
 
     private Employee creator;
@@ -76,29 +74,6 @@ public class CriterionArea extends Evals {
 
         if (nameErrors.size() > 0) {
             this.errors.put("name", nameErrors);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Method called by util Hibernate classes to validate the sequence.
-     *
-     * @return errors
-     */
-    public boolean validateSequence() {
-        ArrayList<String> sequenceErrors = new ArrayList<String>();
-
-        // If there were any previous validation errors remove them.
-        this.errors.remove("sequence");
-        if (this.sequence == 0) {
-            sequenceErrors.add(sequenceRequired);
-        } else if (this.sequence < 1) {
-            sequenceErrors.add(sequenceInvalid);
-        }
-
-        if (sequenceErrors.size() > 0) {
-            this.errors.put("sequence", sequenceErrors);
             return false;
         }
         return true;
@@ -168,14 +143,6 @@ public class CriterionArea extends Evals {
 
     public void setOriginalID(CriterionArea originalID) {
         this.originalID = originalID;
-    }
-
-    public int getSequence() {
-        return sequence;
-    }
-
-    public void setSequence(int sequence) {
-        this.sequence = sequence;
     }
 
     public Date getCreateDate() {

@@ -5,12 +5,8 @@
 
     <class name="edu.osu.cws.evals.models.CriterionArea" table="criteria_areas" batch-size="10">
         <id name="id" type="int" column="ID">
-            <generator class="native">
-                <param name="sequence">pass_seq</param>
-            </generator>
         </id>
         <property name="name" column="NAME"/>
-        <property name="sequence" column="SEQUENCE"/>
         <property name="createDate" type="timestamp" column="CREATE_DATE"/>
         <property name="deleteDate" type="timestamp" column="DELETE_DATE"/>
         <property name="appointmentType" length="45" column="APPOINTMENT_TYPE"/>

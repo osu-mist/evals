@@ -35,10 +35,8 @@ public class CriteriaMgr {
      */
     public boolean add(CriterionArea area, CriterionDetail details, Employee creator)
             throws Exception {
-        int sequence = getNextSequence(area.getAppointmentType());
 
         area.setCreator(creator);
-        area.setSequence(sequence);
         area.setCreateDate(new Date());
         details.setCreator(creator);
         details.setCreateDate(new Date());
@@ -205,7 +203,6 @@ public class CriteriaMgr {
      */
     private void copyCriterion(Employee loggedInUser, CriterionArea newCriterion, CriterionArea criterion) {
         newCriterion.setName(criterion.getName());
-        newCriterion.setSequence(criterion.getSequence());
         newCriterion.setCreator(loggedInUser);
         newCriterion.setAppointmentType(criterion.getAppointmentType());
         newCriterion.setCreateDate(new Date());
@@ -236,7 +233,7 @@ public class CriteriaMgr {
      */
     private List<CriterionArea> list(String appointmentType, Session session) throws Exception {
         List result = session.createQuery("from edu.osu.cws.evals.models.CriterionArea where " +
-                "appointmentType = :appointmentType AND deleteDate IS NULL ORDER BY sequence")
+                "appointmentType = :appointmentType AND deleteDate IS NULL ORDER BY name")
                 .setString("appointmentType", appointmentType)
                 .list();
         return result;
@@ -268,106 +265,6 @@ public class CriteriaMgr {
         session.update(criterion);
 
         return true;
-    }
-
-    /**
-     * Takes care of updating the sequence of the evaluation criteria.
-     *
-     * @param id
-     * @param newPosition
-     * @return
-     * @throws Exception
-     */
-    public boolean updateSequence(int id, int newPosition) throws Exception {
-        CriterionArea criterion = get(id);
-
-        if (criterion == null || criterion.getDeleteDate() != null) {
-            throw new ModelException("Can't update sequence. Invalid Evaluation Criteria");
-        }
-
-        int originalPosition = criterion.getSequence();
-        if (originalPosition == newPosition)  {
-            return true;
-        }
-
-        String appointmentType = criterion.getAppointmentType();
-        // whether or not we are moving the Criteria up visually
-        boolean moveCriteriaToSmallerSequence = true;
-
-        // Calculate the inclusive lower and upper bound of the objects whose sequence need to be updated
-        int lowerBound = newPosition;
-        int upperBound = originalPosition;
-        if (originalPosition < newPosition) {
-            lowerBound = originalPosition;
-            upperBound = newPosition;
-            moveCriteriaToSmallerSequence = false;
-        }
-
-        Session session = HibernateUtil.getCurrentSession();
-        updateSequence(newPosition, originalPosition, appointmentType, lowerBound, upperBound,
-                moveCriteriaToSmallerSequence, session);
-        return true;
-    }
-
-    /**
-     * Takes care of updating the sequence of all the affected evaluation criteria.
-     *
-     * @param newPosition
-     * @param originalPosition
-     * @param appointmentType
-     * @param lowerBound
-     * @param upperBound
-     * @param moveCriteriaToSmallerSequence
-     * @param session
-     */
-    private void updateSequence(int newPosition, int originalPosition, String appointmentType,
-                                int lowerBound, int upperBound,
-                                boolean moveCriteriaToSmallerSequence, Session session) {
-        String query = "from edu.osu.cws.evals.models.CriterionArea where deleteDate is null " +
-                "and appointmentType = :appointmentType and sequence >= :lowerBound and " +
-                "sequence <= :upperBound";
-
-        List<CriterionArea> results = (List<CriterionArea>) session.createQuery(query)
-                .setString("appointmentType", appointmentType)
-                .setInteger("lowerBound", lowerBound)
-                .setInteger("upperBound", upperBound)
-                .list();
-        for (CriterionArea criteria : results) {
-            if (criteria.getSequence() == originalPosition) {
-                criteria.setSequence(newPosition);
-            } else {
-                if (moveCriteriaToSmallerSequence) {
-                    criteria.setSequence(criteria.getSequence() + 1);
-                } else {
-                    criteria.setSequence(criteria.getSequence() - 1);
-                }
-            }
-            session.update(criteria);
-        }
-    }
-
-    /**
-     * Figures out the next available sequence for a CriterionArea of a specific appointment type.
-     * The next available sequence is usually is size of criteria list + 1.
-     * @param appointmentType
-     * @return
-     */
-    public int getNextSequence(String appointmentType) throws Exception {
-        int availableSequence = 0;
-        Session hsession = HibernateUtil.getCurrentSession();
-        Query countQry = hsession.createQuery("select count(*) from edu.osu.cws.evals.models.CriterionArea " +
-                "where appointmentType = :appointmentType AND deleteDate IS NULL");
-
-        countQry.setString("appointmentType", appointmentType);
-        countQry.setMaxResults(1);
-        Iterator results = countQry.list().iterator();
-
-        if (results.hasNext()) {
-            availableSequence =  Integer.parseInt(results.next().toString());
-        }
-
-        return ++availableSequence;
-
     }
 
     /**

@@ -205,36 +205,6 @@ public class CriteriaAreasAction implements ActionInterface {
         return list(request, response);
     }
 
-    /**
-     * This method is called via AJAX when the sequence of an evaluation criteria is updated.
-     *
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
-     */
-    public String updateSequence(PortletRequest request, PortletResponse response) throws Exception {
-        // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
-        }
-
-        int id = ParamUtil.getInteger(request, "id");
-        int sequence = ParamUtil.getInteger(request, "sequence");
-        CriteriaMgr criteriaMgrArea = new CriteriaMgr();
-
-        try {
-            Employee loggedOnUser = actionHelper.getLoggedOnUser(request);
-            criteriaMgrArea.updateSequence(id, sequence);
-        } catch (ModelException e) {
-            return e.getMessage();
-        }
-
-        return "success";
-    }
-
     public void setActionHelper(ActionHelper actionHelper) {
         this.actionHelper = actionHelper;
     }

@@ -139,16 +139,6 @@ public class Assessment extends Evals implements Comparable<Assessment> {
             return EQUAL;
         }
 
-        if (this.getCriterionDetail().getAreaID().getSequence() <
-                otherAssessment.getCriterionDetail().getAreaID().getSequence()) {
-            return BEFORE;
-        }
-
-        if (this.getCriterionDetail().getAreaID().getSequence() >
-                otherAssessment.getCriterionDetail().getAreaID().getSequence()) {
-            return AFTER;
-        }
-
         return EQUAL;
     }
 }
