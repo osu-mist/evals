@@ -49,12 +49,10 @@ public class ClassifiedITObjectMgr {
             job.setAnnualInd(Constants.ANNUAL_IND);
             Date startDate, endDate;
             Calendar startCal = job.getNewAnnualStartDate();
-            startDate = startCal.getTime();
-            int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-            if (startDate.before(EvalsUtil.getEvalsStartDate())) {
-                startCal.set(Calendar.YEAR, currentYear);
-                startDate = startCal.getTime();
+            if(startCal.after(Calendar.getInstance())) {
+                startCal.add(Calendar.MONTH, -12);
             }
+            startDate = startCal.getTime();
             endDate = job.getEndEvalDate(startDate, "annual");
             name = job.getEmployee().getName();
             reviewPeriod = getReviewPeriod(startDate, endDate);
