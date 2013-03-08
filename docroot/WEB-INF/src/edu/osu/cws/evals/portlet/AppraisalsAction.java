@@ -189,7 +189,8 @@ public class AppraisalsAction implements ActionInterface {
         }
         appraisal.getSortedAssessments().size();
         for (Assessment assessment : appraisal.getAssessments()) {
-            assessment.getCriterionDetail().getAreaID();
+            //@todo
+            //assessment.getCriterionDetail().getAreaID();
         }
         // End of initialize lazy appraisal associations
 

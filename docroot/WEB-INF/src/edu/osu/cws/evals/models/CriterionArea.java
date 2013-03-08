@@ -29,7 +29,7 @@ public class CriterionArea extends Evals {
 
     private Employee deleter;
 
-    private Set details = new HashSet();
+    private String description;
 
     /**
      * Validation error message for name is public because the add.jsp
@@ -39,16 +39,11 @@ public class CriterionArea extends Evals {
             "Please enter an area name for the evaluation criteria";
 
     /**
-     * Validation error message for Sequence
+     * descriptionRequired static variable is public because add.jsp needs to
+     * access it to provide js validation
      */
-    private static final String sequenceRequired =
-            "Please provide a sequence for the evaluation criteria";
-
-    /**
-     * Validation error message for Sequence
-     */
-    private static final String sequenceInvalid =
-            "Evaluation criteria sequence should be greater than 1";
+    public static final String descriptionRequired =
+            "Please enter an evaluation criteria description";
 
     /**
      * Validation error message for Sequence
@@ -103,15 +98,6 @@ public class CriterionArea extends Evals {
         return true;
     }
 
-    /**
-     * Returns the most recent criterion_detail. The sorting is done by the
-     * db using the createDate field.
-     *
-     * @return  The most recently created CriterionDetail for the CriterionArea
-     */
-    public CriterionDetail getCurrentDetail() {
-        return (CriterionDetail) details.toArray()[0];
-    }
 
     public int getId() {
         return id;
@@ -177,23 +163,34 @@ public class CriterionArea extends Evals {
         this.deleter = deleter;
     }
 
-    public Set getDetails() {
-        return details;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDetails(Set details) {
-        this.details = details;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**
-     * This method is not needed by hibernate, but it is a helper method used to add CriterionDetail
-     * to the details HashSet.
+     * Method called by Hibernate util classes to validate the description.
      *
-     * @param detail
+     * @return errors
      */
-    public void addDetails(CriterionDetail detail) {
-        detail.setAreaID(this);
-        this.details.add(detail);
+    public boolean validateDescription() {
+        ArrayList<String> descriptionErrors = new ArrayList<String>();
+
+        // If there were any previous validation errors remove them.
+        this.errors.remove("description");
+        if (this.description == null || this.description.equals("")) {
+            descriptionErrors.add(descriptionRequired);
+        }
+
+        if (descriptionErrors.size() > 0) {
+            this.errors.put("description", descriptionErrors);
+            return false;
+        }
+
+        return true;
     }
 
 }

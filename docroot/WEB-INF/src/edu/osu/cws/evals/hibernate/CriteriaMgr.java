@@ -28,34 +28,28 @@ public class CriteriaMgr {
      * and calls the respective hibernate method to save to db if passed validation.
      *
      * @param area      CriterionArea POJO
-     * @param details   CriterionDetail POJO
      * @param creator      Username of logged in user
      * @return errors   An array of error messages, but empty array on success.
      * @throws Exception
      */
-    public boolean add(CriterionArea area, CriterionDetail details, Employee creator)
+    public boolean add(CriterionArea area, Employee creator)
             throws Exception {
 
         area.setCreator(creator);
         area.setCreateDate(new Date());
-        details.setCreator(creator);
-        details.setCreateDate(new Date());
 
         // validate both objects individually and then check for errors
         area.validate();
-        details.validate();
+        area.validateDescription();
 
-        if (area.getErrors().size() > 0 || details.getErrors().size() > 0) {
+        if (area.getErrors().size() > 0) {
             return false;
         }
 
         Session session = HibernateUtil.getCurrentSession();
         session.save(area);
-        area.addDetails(details);
-        session.save(details);
 
         return true;
-
     }
 
     /**
@@ -70,7 +64,6 @@ public class CriteriaMgr {
     public boolean edit(Map<String, String[]> request, int id, Employee loggedInUser) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         CriterionArea newCriterion = new CriterionArea();
-        CriterionDetail newDetails = new CriterionDetail();
         CriterionArea criterion;
 
         String description = request.get("description")[0];
@@ -84,10 +77,9 @@ public class CriteriaMgr {
 
         boolean areaChanged = false;
         boolean descriptionChanged = false;
-        CriterionDetail currentDetail = criterion.getCurrentDetail();
-        String criterionDescription = currentDetail.getDescription();
-        int descHash = criterionDescription.hashCode();
 
+        String criterionDescription = criterion.getDescription();
+        int descHash = criterionDescription.hashCode();
         int updatedDescHash = description.hashCode();
 
         if (!criterion.getName().equals(name)) {
@@ -102,15 +94,16 @@ public class CriteriaMgr {
 
         if (areaChanged && !descriptionChanged) {
             // copy all the values from the old CriterionArea
-            copyCriterion(loggedInUser, newCriterion, criterion);
             newCriterion.setName(name);
-
-            // copy all the values form the old CriterionDetail
-            copyDetails(loggedInUser, newDetails, criterion, criterionDescription);
+            newCriterion.setCreator(loggedInUser);
+            newCriterion.setAppointmentType(criterion.getAppointmentType());
+            newCriterion.setCreateDate(new Date());
+            newCriterion.setOriginalID(criterion);
+            newCriterion.setDescription(criterion.getDescription());
 
             // validate both new area + description
             newCriterion.validate();
-            newDetails.validate();
+            newCriterion.validateDescription();
 
             // set old criteria as deleted
             setCriteriaDeleteProperties(loggedInUser, criterion);
@@ -118,29 +111,39 @@ public class CriteriaMgr {
             // save pojos
             session.save(newCriterion);
             session.update(criterion);
-            newCriterion.addDetails(newDetails);
-            session.save(newDetails);
+
         } else if (!areaChanged && descriptionChanged) {
-            // copy all the values form the old CriterionDetail
-            copyDetails(loggedInUser, newDetails, criterion, description);
+            // copy all the values from the old CriterionArea
+            newCriterion.setName(criterion.getName());
+            newCriterion.setCreator(loggedInUser);
+            newCriterion.setAppointmentType(criterion.getAppointmentType());
+            newCriterion.setCreateDate(new Date());
+            newCriterion.setOriginalID(criterion);
+            newCriterion.setDescription(description);
 
             // validate both new area + description
-            newDetails.validate();
+            newCriterion.validate();
+            newCriterion.validateDescription();
 
-            // save pojo
-            criterion.addDetails(newDetails);
-            session.save(newDetails);
+            // set old criteria as deleted
+            setCriteriaDeleteProperties(loggedInUser, criterion);
+
+            // save pojos
+            session.save(newCriterion);
+            session.update(criterion);
+
         } else if (areaChanged && descriptionChanged) {
             // copy all the values from the old CriterionArea
-            copyCriterion(loggedInUser, newCriterion, criterion);
             newCriterion.setName(name);
-
-            // copy all the values form the old CriterionDetail
-            copyDetails(loggedInUser, newDetails, criterion, description);
+            newCriterion.setCreator(loggedInUser);
+            newCriterion.setAppointmentType(criterion.getAppointmentType());
+            newCriterion.setCreateDate(new Date());
+            newCriterion.setOriginalID(criterion);
+            newCriterion.setDescription(description);
 
             // validate both new area + description
             newCriterion.validate();
-            newDetails.validate();
+            newCriterion.validateDescription();
 
             // set old criteria as deleted
             setCriteriaDeleteProperties(loggedInUser, criterion);
@@ -148,18 +151,9 @@ public class CriteriaMgr {
             // save pojos
             session.save(newCriterion);
             session.update(criterion);
-            newCriterion.addDetails(newDetails);
-            session.save(newDetails);
         }
         if (propagateEdit) {
-            String sqlUpdate = "UPDATE assessments a SET a.CRITERION_DETAIL_ID = :newDetail " +
-                    "WHERE a.CRITERION_DETAIL_ID = :oldDetail AND a.APPRAISAL_ID in ( " +
-                    "SELECT ID FROM appraisals WHERE STATUS not in ('completed', 'closed', 'archived')" +
-                    ")";
-            session.createSQLQuery(sqlUpdate)
-                    .setInteger("newDetail", newDetails.getId())
-                    .setInteger("oldDetail", currentDetail.getId())
-                    .executeUpdate();
+            //@todo: after AssessmentCriteria piece is done
         }
 
         //@todo: ajax
@@ -176,37 +170,6 @@ public class CriteriaMgr {
     private void setCriteriaDeleteProperties(Employee loggedInUser, CriterionArea criterion) {
         criterion.setDeleteDate(new Date());
         criterion.setDeleter(loggedInUser);
-    }
-
-    /**
-     * Sets up the various values in newDetails using the rest of the parameters to create a copy of the
-     * criteria details.
-     *
-     * @param loggedInUser
-     * @param newDetails
-     * @param criterion
-     * @param criterionDescription
-     */
-    private void copyDetails(Employee loggedInUser, CriterionDetail newDetails, CriterionArea criterion, String criterionDescription) {
-        newDetails.setDescription(criterionDescription);
-        newDetails.setAreaID(criterion);
-        newDetails.setCreateDate(new Date());
-        newDetails.setCreator(loggedInUser);
-    }
-
-    /**
-     * Copies the data from criterion into newCriterion.
-     *
-     * @param loggedInUser
-     * @param newCriterion
-     * @param criterion
-     */
-    private void copyCriterion(Employee loggedInUser, CriterionArea newCriterion, CriterionArea criterion) {
-        newCriterion.setName(criterion.getName());
-        newCriterion.setCreator(loggedInUser);
-        newCriterion.setAppointmentType(criterion.getAppointmentType());
-        newCriterion.setCreateDate(new Date());
-        newCriterion.setOriginalID(criterion);
     }
 
     /**
@@ -237,7 +200,6 @@ public class CriteriaMgr {
                 .setString("appointmentType", appointmentType)
                 .list();
         return result;
-
     }
 
     /**

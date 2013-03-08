@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping auto-import="false" >
+
+    <class name="edu.osu.cws.evals.models.AssessmentCriteria" table="assessments_criteria"
+           dynamic-insert="true"
+           dynamic-update="true">
+        <id name="id" type="int" column="ID">
+            <generator class="native">
+                <param name="sequence">pass_seq</param>
+            </generator>
+        </id>
+
+        <property name="assessmentID" type="int" column="ASSESSMENT_ID"/>
+        <property name="criteriaAreaID" type="int" column="CRITERIA_AREA_ID"/>
+        <property name="checked" type="boolean" column="CHECKED"/>
+
+    </class>
+
+</hibernate-mapping>

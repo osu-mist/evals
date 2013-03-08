@@ -5,7 +5,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppointmentTypeMgr;
 import edu.osu.cws.evals.hibernate.CriteriaMgr;
 import edu.osu.cws.evals.models.CriterionArea;
-import edu.osu.cws.evals.models.CriterionDetail;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.ModelException;
 
@@ -44,10 +43,7 @@ public class CriteriaAreasAction implements ActionInterface {
 
         try {
             List<CriterionArea> criterionList = new CriteriaMgr().list(appointmentType);
-            for (CriterionArea criteria : criterionList) {
-                criteria.getCurrentDetail().toString();
-            }
-            actionHelper.addToRequestMap("criteria", criterionList,request);
+            actionHelper.addToRequestMap("criteria", criterionList, request);
         } catch (ModelException e) {
             actionHelper.addErrorsToRequest(request, e.getMessage());
         }
@@ -75,7 +71,6 @@ public class CriteriaAreasAction implements ActionInterface {
 
         CriteriaMgr criteriaMgrArea = new CriteriaMgr();
         CriterionArea criterionArea = new CriterionArea();
-        CriterionDetail criterionDetail = new CriterionDetail();
         Employee loggedOnUser = actionHelper.getLoggedOnUser(request);
 
         // Fetch list of appointment types to use in add form
@@ -91,10 +86,10 @@ public class CriteriaAreasAction implements ActionInterface {
 
             criterionArea.setName(name);
             criterionArea.setAppointmentType(appointmentType);
-            criterionDetail.setDescription(description);
+            criterionArea.setDescription(description);
 
             try {
-                if (criteriaMgrArea.add(criterionArea, criterionDetail, loggedOnUser)) {
+                if (criteriaMgrArea.add(criterionArea, loggedOnUser)) {
                     SessionMessages.add(request, "criteria-saved");
                     return list(request, response);
                 }
@@ -104,7 +99,6 @@ public class CriteriaAreasAction implements ActionInterface {
         }
 
         actionHelper.addToRequestMap("criterionArea", criterionArea,request);
-        actionHelper.addToRequestMap("criterionDetail", criterionDetail,request);
         actionHelper.useMaximizedMenu(request);
 
         return Constants.JSP_CRITERIA_ADD;
@@ -130,14 +124,11 @@ public class CriteriaAreasAction implements ActionInterface {
 
         CriteriaMgr criteriaMgr = new CriteriaMgr();
         CriterionArea criterionArea = new CriterionArea();
-        CriterionDetail criterionDetail = new CriterionDetail();
+
         try {
             int criterionAreaId = ParamUtil.getInteger(request, "criterionAreaId");
             if (request instanceof RenderRequest) {
                 criterionArea = criteriaMgr.get(criterionAreaId);
-                if (criterionArea != null) {
-                    criterionDetail = criterionArea.getCurrentDetail();
-                }
             } else {
                 Employee loggedOnUser = actionHelper.getLoggedOnUser(request);
                 criteriaMgr.edit(request.getParameterMap(), criterionAreaId, loggedOnUser);
@@ -148,7 +139,6 @@ public class CriteriaAreasAction implements ActionInterface {
         }
 
         actionHelper.addToRequestMap("criterionArea", criterionArea,request);
-        actionHelper.addToRequestMap("criterionDetail", criterionDetail,request);
         actionHelper.useMaximizedMenu(request);
 
         return Constants.JSP_CRITERIA_ADD;

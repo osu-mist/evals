@@ -33,7 +33,7 @@ addURL.setParameter("controller", "CriteriaAreasAction");
 <c:forEach var="criterion" items="${criteria}">
     <tr id="<portlet:namespace/>criterion-${criterion.id}">
         <td>${criterion.name}</td>
-        <td>${criterion.currentDetail.description}</td>
+        <td>${criterion.description}</td>
         <td>
         <a class="<portlet:namespace/>criterion-edit"
             onclick="return <portlet:namespace/>edit(${criterion.id});" href="<portlet:renderURL
@@ -56,7 +56,7 @@ addURL.setParameter("controller", "CriteriaAreasAction");
 </table>
 
 <portlet:resourceURL var="deleteAJAXURL" id="delete" escapeXml="false" />
-<portlet:resourceURL var="updateSequenceAJAXURL" id="updateSequence" escapeXml="false" />
+
 <script type="text/javascript">
   // Delete Criteria JS
   function <portlet:namespace/>delete(id, name) {
@@ -86,11 +86,5 @@ addURL.setParameter("controller", "CriteriaAreasAction");
     return false;
   }
 
-  // Updates the colors in the criteria list table
-  function updateCriteriaColors() {
-    jQuery("#<portlet:namespace/>criteria-list tbody tr:odd").attr("class", "results-row portlet-section-body");
-    jQuery("#<portlet:namespace/>criteria-list tbody tr:even").attr("class",
-      "results-row portlet-section-alternate alt");
-  }
 </script>
 <%@ include file="/jsp/footer.jsp" %>

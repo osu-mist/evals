@@ -79,7 +79,8 @@ public class AppraisalMgr {
                                             Configuration goalsDueConfig) throws Exception {
         CriteriaMgr criteriaMgr = new CriteriaMgr();
         Appraisal appraisal = new Appraisal();
-        CriterionDetail detail;
+        //@todo
+        // CriterionDetail detail;
         Assessment assessment;
 
         if (!type.equals(Appraisal.TYPE_TRIAL) && !type.equals(Appraisal.TYPE_ANNUAL) &&
@@ -112,10 +113,12 @@ public class AppraisalMgr {
 
             // Create assessment and associate it to appraisal
             for (CriterionArea criterion : criteriaList) {
-                detail = criterion.getCurrentDetail();
+                //@todo
+                //detail = criterion.getCurrentDetail();
                 assessment = new Assessment();
-                assessment.setCriterionDetail(detail);
                 assessment.setAppraisal(appraisal);
+                //@todo
+                // assessment.setCriterionDetail(detail);
                 assessment.setCreateDate(new Date());
                 assessment.setModifiedDate(new Date());
                 session.save(assessment);
@@ -216,7 +219,8 @@ public class AppraisalMgr {
             Assessment newAssessment;
             for (Assessment origAssesment: trialAppraisal.getAssessments()) {
                 newAssessment = new Assessment();
-                newAssessment.setCriterionDetail(origAssesment.getCriterionDetail());
+                //@todo
+                //newAssessment.setCriterionDetail(origAssesment.getCriterionDetail());
                 newAssessment.setGoal(origAssesment.getGoal());
                 newAssessment.setAppraisal(appraisal);
                 newAssessment.setCreateDate(new Date());
@@ -277,9 +281,9 @@ public class AppraisalMgr {
 
 
             originalNewGoalText = assessment.getLastGoalLog(GoalLog.NEW_GOAL_TYPE).getContent();
-            updatedNewGoalText = assessment.getNewGoals();
+            //updatedNewGoalText = assessment.getNewGoals();
             //@todo: use a hash instead of comparing these two long text fields
-            if (!originalNewGoalText.equals(updatedNewGoalText) && updatedNewGoalText != null) {
+            /*if (!originalNewGoalText.equals("") && updatedNewGoalText != null) {
                 goalLog = new GoalLog();
                 goalLog.setCreateDate(new Date());
                 goalLog.setAuthor(loggedInUser);
@@ -290,7 +294,7 @@ public class AppraisalMgr {
                 goalLog.setType(GoalLog.NEW_GOAL_TYPE);
                 assessment.addAssessmentLog(goalLog);
                 session.save(goalLog);
-            }
+            }*/
         }
         return true;
     }
@@ -451,7 +455,7 @@ public class AppraisalMgr {
             for (Assessment assessment : appraisal.getAssessments()) {
                 String assessmentID = Integer.toString(assessment.getId());
                 parameterKey = "appraisal.newGoal." + assessmentID;
-                assessment.setNewGoals(request.get(parameterKey)[0]);
+                //assessment.setNewGoals(request.get(parameterKey)[0]);
             }
         }
         // Save goalComments

@@ -5,11 +5,15 @@
 
     <class name="edu.osu.cws.evals.models.CriterionArea" table="criteria_areas" batch-size="10">
         <id name="id" type="int" column="ID">
+            <generator class="native">
+                <param name="sequence">pass_seq</param>
+            </generator>
         </id>
         <property name="name" column="NAME"/>
         <property name="createDate" type="timestamp" column="CREATE_DATE"/>
         <property name="deleteDate" type="timestamp" column="DELETE_DATE"/>
         <property name="appointmentType" length="45" column="APPOINTMENT_TYPE"/>
+        <property name="description" column="DESCRIPTION"/>
 
         <many-to-one name="creator" class="edu.osu.cws.evals.models.Employee"
                      column="CREATOR_PIDM"
@@ -18,14 +22,9 @@
                      column="DELETER_PIDM"
                      not-null="false"/>
         <many-to-one name="originalID" class="edu.osu.cws.evals.models.CriterionArea"
-                     column="ORIGINAL_ID"
+                     column="ANCESTOR_ID"
                      not-null="false"
                      unique="true"/>
-        <set name="details" inverse="true" order-by="createDate DESC" batch-size="10">
-            <key column="AREA_ID"/>
-            <one-to-many class="edu.osu.cws.evals.models.CriterionDetail"/>
-
-        </set>
     </class>
 
 </hibernate-mapping>
