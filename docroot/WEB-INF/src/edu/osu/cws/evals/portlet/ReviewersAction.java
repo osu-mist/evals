@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class ReviewersAction implements ActionInterface {
-    private ActionHelper actionHelper = new ActionHelper();
+    private ActionHelper actionHelper;
 
     private HomeAction homeAction;
 
@@ -34,8 +34,8 @@ public class ReviewersAction implements ActionInterface {
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+        if (!actionHelper.isLoggedInUserAdmin()) {
+            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
@@ -44,10 +44,10 @@ public class ReviewersAction implements ActionInterface {
         BusinessCenterMgr businessCenterMgr = new BusinessCenterMgr();
         ArrayList<BusinessCenter> businessCenters = (ArrayList<BusinessCenter>) businessCenterMgr.list();
 
-        actionHelper.addToRequestMap("isMaster", actionHelper.isLoggedInUserMasterAdmin(request),request);
-        actionHelper.addToRequestMap("reviewersList", reviewersList,request);
-        actionHelper.addToRequestMap("businessCenters", businessCenters,request);
-        actionHelper.useMaximizedMenu(request);
+        actionHelper.addToRequestMap("isMaster", actionHelper.isLoggedInUserMasterAdmin());
+        actionHelper.addToRequestMap("reviewersList", reviewersList);
+        actionHelper.addToRequestMap("businessCenters", businessCenters);
+        actionHelper.useMaximizedMenu();
 
         return Constants.JSP_REVIEWER_LIST;
     }
@@ -63,8 +63,8 @@ public class ReviewersAction implements ActionInterface {
     public String add(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is an reviewer
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+        if (!actionHelper.isLoggedInUserAdmin()) {
+            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
@@ -75,7 +75,7 @@ public class ReviewersAction implements ActionInterface {
         EmployeeMgr employeeMgr = new EmployeeMgr();
         Employee onidUser = employeeMgr.findByOnid(onid, null);
         if (actionHelper.getReviewer(onidUser.getId()) != null) {
-            actionHelper.addErrorsToRequest(request, resource.getString("already-reviewer"));
+            actionHelper.addErrorsToRequest(resource.getString("already-reviewer"));
             return list(request, response);
         }
 
@@ -85,7 +85,7 @@ public class ReviewersAction implements ActionInterface {
             actionHelper.setEvalsReviewers(true);
             SessionMessages.add(request, "reviewer-added");
         } catch (Exception e) {
-            actionHelper.addErrorsToRequest(request, e.getMessage());
+            actionHelper.addErrorsToRequest(e.getMessage());
         }
 
         return list(request, response);
@@ -102,8 +102,8 @@ public class ReviewersAction implements ActionInterface {
     public String delete(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+        if (!actionHelper.isLoggedInUserAdmin()) {
+            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
@@ -117,7 +117,7 @@ public class ReviewersAction implements ActionInterface {
                 if (reviewer.getEmployee() != null) {
                     reviewer.getEmployee().getName(); // initialize name due to lazy-loading
                 }
-                actionHelper.addToRequestMap("reviewer", reviewer,request);
+                actionHelper.addToRequestMap("reviewer", reviewer);
                 return Constants.JSP_REVIEWER_DELETE;
             }
 
@@ -130,7 +130,7 @@ public class ReviewersAction implements ActionInterface {
             actionHelper.setEvalsReviewers(true);
             SessionMessages.add(request, "reviewer-deleted");
         } catch (ModelException e) {
-            actionHelper.addErrorsToRequest(request, e.getMessage());
+            actionHelper.addErrorsToRequest(e.getMessage());
         }
 
         return list(request, response);

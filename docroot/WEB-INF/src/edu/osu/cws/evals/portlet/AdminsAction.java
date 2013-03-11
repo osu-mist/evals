@@ -32,16 +32,16 @@ public class AdminsAction implements ActionInterface {
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+        if (!actionHelper.isLoggedInUserAdmin()) {
+            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
         actionHelper.refreshContextCache();
         ArrayList<Admin> adminsList = (ArrayList<Admin>) actionHelper.getPortletContextAttribute("adminsList");
-        actionHelper.addToRequestMap("isMaster", actionHelper.isLoggedInUserMasterAdmin(request),request);
-        actionHelper.addToRequestMap("adminsList", adminsList,request);
-        actionHelper.useMaximizedMenu(request);
+        actionHelper.addToRequestMap("isMaster", actionHelper.isLoggedInUserMasterAdmin());
+        actionHelper.addToRequestMap("adminsList", adminsList);
+        actionHelper.useMaximizedMenu();
 
         return Constants.JSP_ADMIN_LIST;
     }
@@ -57,8 +57,8 @@ public class AdminsAction implements ActionInterface {
     public String add(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserMasterAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+        if (!actionHelper.isLoggedInUserMasterAdmin()) {
+            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
@@ -67,11 +67,11 @@ public class AdminsAction implements ActionInterface {
         AdminMgr adminMgr = new AdminMgr();
 
         try {
-            adminMgr.add(onid,  isMaster, actionHelper.getLoggedOnUser(request));
+            adminMgr.add(onid,  isMaster, actionHelper.getLoggedOnUser());
             actionHelper.setEvalsAdmins(true);
             SessionMessages.add(request, "admin-added");
         } catch (ModelException e) {
-            actionHelper.addErrorsToRequest(request, e.getMessage());
+            actionHelper.addErrorsToRequest(e.getMessage());
         } catch (Exception e) {
             throw e;
         }
@@ -90,8 +90,8 @@ public class AdminsAction implements ActionInterface {
     public String delete(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserMasterAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+        if (!actionHelper.isLoggedInUserMasterAdmin()) {
+            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
@@ -105,7 +105,7 @@ public class AdminsAction implements ActionInterface {
                 if (admin.getEmployee() != null) { // initialize name due to lazy-loading
                     admin.getEmployee().getName();
                 }
-                actionHelper.addToRequestMap("admin", admin,request);
+                actionHelper.addToRequestMap("admin", admin);
                 return Constants.JSP_ADMIN_DELETE;
             }
 
@@ -118,7 +118,7 @@ public class AdminsAction implements ActionInterface {
             actionHelper.setEvalsAdmins(true);
             SessionMessages.add(request, "admin-deleted");
         } catch (ModelException e) {
-            actionHelper.addErrorsToRequest(request, e.getMessage());
+            actionHelper.addErrorsToRequest(e.getMessage());
         }
 
         return list(request, response);

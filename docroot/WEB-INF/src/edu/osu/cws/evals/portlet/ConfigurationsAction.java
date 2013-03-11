@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class ConfigurationsAction implements ActionInterface {
-    private ActionHelper actionHelper = new ActionHelper();
+    private ActionHelper actionHelper;
 
     private HomeAction homeAction;
     
@@ -24,16 +24,16 @@ public class ConfigurationsAction implements ActionInterface {
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+        if (!actionHelper.isLoggedInUserAdmin()) {
+            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
         actionHelper.refreshContextCache();
         ArrayList<Configuration> configurations = (ArrayList<Configuration>)
                 actionHelper.getPortletContextAttribute("configurationsList");
-        actionHelper.addToRequestMap("configurations", configurations,request);
-        actionHelper.useMaximizedMenu(request);
+        actionHelper.addToRequestMap("configurations", configurations);
+        actionHelper.useMaximizedMenu();
 
         return Constants.JSP_CONFIGURATION_LIST;
     }
@@ -49,8 +49,8 @@ public class ConfigurationsAction implements ActionInterface {
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+        if (!actionHelper.isLoggedInUserAdmin()) {
+            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
