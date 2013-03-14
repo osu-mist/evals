@@ -38,10 +38,14 @@ public class ActionHelper {
 
     private PortletRequest request;
     private PortletResponse response;
+    private Employee loggedOnUser;
 
-    public ActionHelper(PortletRequest request, PortletResponse response) {
+    public ActionHelper(PortletRequest request, PortletResponse response,
+                        PortletContext portletContext) throws Exception {
         this.request = request;
         this.response = response;
+        this.portletContext = portletContext;
+        setLoggedOnUser();
     }
 
     /**
@@ -58,30 +62,28 @@ public class ActionHelper {
      * Places in the request object the active appraisals of the user. This is used by the notification
      * piece.
      *
-     * @param employeeId    Id/Pidm of the currently logged in user
      * @throws Exception
      */
-    public void setupMyActiveAppraisals(int employeeId)
-            throws Exception {
-        List<Appraisal> allMyActiveAppraisals = getMyActiveAppraisals(employeeId);
+    public void setupMyActiveAppraisals() throws Exception {
+        List<Appraisal> allMyActiveAppraisals = getMyActiveAppraisals();
         addToRequestMap("myActiveAppraisals", allMyActiveAppraisals);
     }
 
     /**
-     * Tries to fetch the employee active appraisals from session and if they are null, it grabs them from
-     * the db.
+     * Tries to fetch the employee active appraisals from session and if they are null, it grabs
+     * them from the db.
      *
-     * @param employeeId
      * @return
      * @throws Exception
      */
-    public List<Appraisal> getMyActiveAppraisals(int employeeId) throws Exception {
+    public List<Appraisal> getMyActiveAppraisals() throws Exception {
         PortletSession session = request.getPortletSession(true);
         List<Appraisal> allMyActiveAppraisals;
 
         allMyActiveAppraisals = (ArrayList<Appraisal>) session.getAttribute(ALL_MY_ACTIVE_APPRAISALS);
         if (allMyActiveAppraisals == null) {
-            allMyActiveAppraisals = AppraisalMgr.getAllMyActiveAppraisals(employeeId, null, null);
+            allMyActiveAppraisals = AppraisalMgr.getAllMyActiveAppraisals(loggedOnUser.getId(),
+                    null, null);
             session.setAttribute(ALL_MY_ACTIVE_APPRAISALS, allMyActiveAppraisals);
         }
         return allMyActiveAppraisals;
@@ -91,12 +93,11 @@ public class ActionHelper {
      * Fetches the supervisor's team active appraisal and stores the list in session. Then it places the list
      * in the requestMap so that the view can access it.
      *
-     * @param employeeId    Id/Pidm of the currently logged in user
      * @throws Exception
      */
-    public void setupMyTeamActiveAppraisals(int employeeId) throws Exception {
+    public void setupMyTeamActiveAppraisals() throws Exception {
         if (isLoggedInUserSupervisor()) {
-            ArrayList<Appraisal> myTeamAppraisals = getMyTeamActiveAppraisals(employeeId);
+            ArrayList<Appraisal> myTeamAppraisals = getMyTeamActiveAppraisals();
             addToRequestMap(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals);
         }
     }
@@ -105,18 +106,17 @@ public class ActionHelper {
      * Tries to fetch the my teams active appraisals from session. If they list is null, it fetches them
      * from the db.
      *
-     * @param employeeId    Id of the logged in user
      * @return              ArrayList<Appraisal>
      * @throws Exception
      */
-    public ArrayList<Appraisal> getMyTeamActiveAppraisals(int employeeId) throws Exception {
+    public ArrayList<Appraisal> getMyTeamActiveAppraisals() throws Exception {
         PortletSession session = request.getPortletSession(true);
 
         ArrayList<Appraisal> myTeamAppraisals;
-        List<Appraisal> dbTeamAppraisals;
         myTeamAppraisals = (ArrayList<Appraisal>) session.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
         if (myTeamAppraisals == null) {
-            myTeamAppraisals = AppraisalMgr.getMyTeamsAppraisals(employeeId, true, null, null);
+            myTeamAppraisals = AppraisalMgr.getMyTeamsAppraisals(loggedOnUser.getId(),
+                    true, null, null);
             session.setAttribute(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals);
         }
         return myTeamAppraisals;
@@ -131,26 +131,25 @@ public class ActionHelper {
      */
     public void setUpUserPermissionInSession(boolean refresh) throws Exception {
         PortletSession session = request.getPortletSession(true);
-        Employee employee = getLoggedOnUser();
-        int employeeId = employee.getId();
 
         Boolean isSupervisor = (Boolean) session.getAttribute("isSupervisor");
         if (refresh || isSupervisor == null) {
-            isSupervisor = JobMgr.isSupervisor(employeeId, null);
+            isSupervisor = JobMgr.isSupervisor(loggedOnUser.getId(), null);
             session.setAttribute("isSupervisor", isSupervisor);
         }
         addToRequestMap("isSupervisor", isSupervisor);
 
         Boolean isReviewer = (Boolean) session.getAttribute("isReviewer");
         if (refresh || isReviewer == null) {
-            isReviewer = getReviewer(employeeId) != null;
+            isReviewer = getReviewer(loggedOnUser.getId()) != null;
             session.setAttribute("isReviewer", isReviewer);
         }
         addToRequestMap("isReviewer", isReviewer);
 
         Boolean isMasterAdmin = (Boolean) session.getAttribute("isSuperAdmin");
         if (refresh || isMasterAdmin == null) {
-            if (getAdmin(employeeId) != null && getAdmin(employeeId).getIsMaster()) {
+            if (getAdmin(loggedOnUser.getId()) != null &&
+                    getAdmin(loggedOnUser.getId()).getIsMaster()) {
                 isMasterAdmin = true;
             } else {
                 isMasterAdmin = false;
@@ -161,12 +160,12 @@ public class ActionHelper {
 
         Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
         if (refresh || isAdmin == null) {
-            isAdmin = getAdmin(employeeId) != null;
+            isAdmin = getAdmin(loggedOnUser.getId()) != null;
             session.setAttribute("isAdmin", isAdmin);
         }
         addToRequestMap("isAdmin", isAdmin);
 
-        addToRequestMap("employee", getLoggedOnUser());
+        addToRequestMap("employee", loggedOnUser);
     }
 
     /**
@@ -292,18 +291,16 @@ public class ActionHelper {
      */
     public String getBusinessCenterForLoggedInReviewer() throws Exception {
         String businessCenterName;
-        int employeeID = getLoggedOnUser().getId();
-        businessCenterName = getReviewer(employeeID).getBusinessCenterName();
+        businessCenterName = getReviewer(loggedOnUser.getId()).getBusinessCenterName();
         return businessCenterName;
     }
 
     /**
      * Setups up parameters from portletContext needed by AppraisalMgr class.
      *
-     * @param currentlyLoggedOnUser
      * @param appraisalMgr
      */
-    public void setAppraisalMgrParameters(Employee currentlyLoggedOnUser, AppraisalMgr appraisalMgr) {
+    public void setAppraisalMgrParameters(AppraisalMgr appraisalMgr) {
         HashMap permissionRules = (HashMap) portletContext.getAttribute("permissionRules");
         HashMap<Integer, Admin> admins = (HashMap<Integer, Admin>) portletContext.getAttribute("admins");
         HashMap<Integer, Reviewer> reviewers = (HashMap<Integer, Reviewer>) portletContext.getAttribute("reviewers");
@@ -313,7 +310,7 @@ public class ActionHelper {
                 (Map<String, Configuration>) portletContext.getAttribute("configurations");
 
         appraisalMgr.setPermissionRules(permissionRules);
-        appraisalMgr.setLoggedInUser(currentlyLoggedOnUser);
+        appraisalMgr.setLoggedInUser(loggedOnUser);
         appraisalMgr.setAdmins(admins);
         appraisalMgr.setReviewers(reviewers);
         appraisalMgr.setAppraisalSteps(appraisalSteps);
@@ -354,7 +351,7 @@ public class ActionHelper {
     public void refreshContextCache() throws Exception {
         Date contextCacheTimestamp = (Date) portletContext.getAttribute(EvalsPortlet.CONTEXT_CACHE_TIMESTAMP);
         Timestamp contextLastUpdate = ConfigurationMgr.getContextLastUpdate();
-        if (contextLastUpdate.after(contextCacheTimestamp)) {
+        if (contextCacheTimestamp != null && contextLastUpdate.after(contextCacheTimestamp)) {
             setEvalsAdmins(false);
             setEvalsReviewers(false);
             setEvalsConfiguration(false);
@@ -389,16 +386,28 @@ public class ActionHelper {
      * @throws Exception
      */
     public Employee getLoggedOnUser() throws Exception {
+        return  loggedOnUser;
+    }
+
+    /**
+     * Gets the ONID username of the employee and fetches the employee object from the db
+     * if not found in session. The loggedOnUser object is set as an instance variable.
+     * It is also stored in the portlet session.
+     *
+     * @throws Exception
+     */
+    private void setLoggedOnUser() throws Exception {
+        // try to set it from session
         PortletSession session = request.getPortletSession(true);
-        Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
+        loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
+
+        // if not in session, get it from db
         if (loggedOnUser == null) {
-            String loggedOnUsername = getLoggedOnUsername();
-            loggedOnUser = employeeMgr.findByOnid(loggedOnUsername, "employee-with-jobs");
+            loggedOnUser = employeeMgr.findByOnid(getLoggedOnUsername(), "employee-with-jobs");
             loggedOnUser.setLoadJobs(false);
             session.setAttribute("loggedOnUser", loggedOnUser);
             refreshContextCache();
         }
-        return  loggedOnUser;
     }
 
     /**
@@ -439,16 +448,6 @@ public class ActionHelper {
             session.setAttribute(usernameSessionKey, onidUsername);
         }
         return onidUsername;
-    }
-
-    /**
-     * Sets the porletContext field. This method is called by the delegate and portletSetup
-     * methods in EvalsPortlet.
-     *
-     * @param portletContext
-     */
-    public void setPortletContext(PortletContext portletContext) {
-        this.portletContext = portletContext;
     }
 
     public PortletContext getPortletContext() {
@@ -575,8 +574,6 @@ public class ActionHelper {
         ArrayList<Appraisal> supervisorActions;
         RequiredAction reviewerAction;
         Reviewer reviewer;
-        Employee loggedInEmployee = getLoggedOnUser();
-        int employeeID = loggedInEmployee.getId();
         ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
 
 
@@ -590,7 +587,7 @@ public class ActionHelper {
             administrativeActions = getAppraisalActions(supervisorActions, "supervisor", resource);
         }
 
-        reviewer = getReviewer(employeeID);
+        reviewer = getReviewer(loggedOnUser.getId());
         if (reviewer != null) {
             String businessCenterName = reviewer.getBusinessCenterName();
             reviewerAction = getReviewerAction(businessCenterName, resource);
@@ -813,7 +810,7 @@ public class ActionHelper {
 
         // set Employee  and employees object(s)
         addToRequestMap("employees", EmployeeMgr.list());
-        addToRequestMap("employee", getLoggedOnUser());
+        addToRequestMap("employee", loggedOnUser);
     }
 
     /**
@@ -824,7 +821,7 @@ public class ActionHelper {
      */
     public void setNotices(boolean updateContextTimestamp) throws Exception {
         Map notices = NoticeMgr.getNotices();
-        getPortletContext().setAttribute("Notices", notices);
+        portletContext.setAttribute("Notices", notices);
         if (updateContextTimestamp) {
             updateContextTimestamp();
         }

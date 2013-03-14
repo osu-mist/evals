@@ -121,8 +121,6 @@ public class EvalsPortlet extends GenericPortlet {
         String result = "";
         String resourceID;
         Session hibSession = null;
-        actionHelper = new ActionHelper(request, response);
-        actionHelper.setPortletContext(getPortletContext());
 
         // The logic below is similar to delegate method, but instead we
         // need to return the value we get from ActionHelper method instead of
@@ -131,6 +129,7 @@ public class EvalsPortlet extends GenericPortlet {
         String controllerClass =  ParamUtil.getString(request, "controller", "HomeAction");
         if (resourceID != null && controllerClass != null) {
             try {
+                actionHelper = new ActionHelper(request, response, getPortletContext());
                 controllerClass = "edu.osu.cws.evals.portlet." + controllerClass;
                 ActionInterface controller = (ActionInterface) Class.forName(controllerClass).newInstance();
                 controller.setActionHelper(actionHelper);
@@ -180,13 +179,12 @@ public class EvalsPortlet extends GenericPortlet {
     public void delegate(PortletRequest request, PortletResponse response) {
         String action = "delegate";
         Session hibSession = null;
-        actionHelper = new ActionHelper(request, response);
 
         try {
-            actionHelper.setPortletContext(getPortletContext());
             portletSetup(request);
             hibSession = HibernateUtil.getCurrentSession();
             Transaction tx = hibSession.beginTransaction();
+            actionHelper = new ActionHelper(request, response, getPortletContext());
             actionHelper.setUpUserPermissionInSession(false);
             if (actionHelper.isDemo()) {
                 actionHelper.setupDemoSwitch();
@@ -252,13 +250,17 @@ public class EvalsPortlet extends GenericPortlet {
 
         if (reload) {
             Session hibSession = null;
-            actionHelper.setPortletContext(getPortletContext());
-            String message = loadEnvironmentProperties(request);
-            createLogger();
+            String message = "";
 
             try {
+                message += loadEnvironmentProperties(request);
+                createLogger();
+                message += "Created logger object\n";
+
                 hibSession = HibernateUtil.getCurrentSession();
                 Transaction tx = hibSession.beginTransaction();
+
+                actionHelper = new ActionHelper(request, null, getPortletContext());
                 actionHelper.setEvalsConfiguration(false);
                 message += "Stored Configuration Map and List in portlet context\n";
                 createMailer();

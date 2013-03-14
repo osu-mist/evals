@@ -49,8 +49,8 @@ public class HomeAction implements ActionInterface {
         actionHelper.addToRequestMap("alertMsg", true);
         actionHelper.addToRequestMap("isHome", true);
 
-        actionHelper.setupMyActiveAppraisals(employeeId);
-        actionHelper.setupMyTeamActiveAppraisals(employeeId);
+        actionHelper.setupMyActiveAppraisals();
+        actionHelper.setupMyTeamActiveAppraisals();
         ArrayList<Appraisal> myActiveAppraisals = (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myActiveAppraisals");
         ArrayList<Appraisal> myTeamsActiveAppraisals  =
                 (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myTeamsActiveAppraisals");

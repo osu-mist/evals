@@ -136,7 +136,7 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         AppraisalMgr appraisalMgr = new AppraisalMgr();
-        actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
+        actionHelper.setAppraisalMgrParameters(appraisalMgr);
 
         // 1) Get the appraisal and permission rule
         appraisal = appraisalMgr.getAppraisal(appraisalID);
@@ -151,7 +151,7 @@ public class AppraisalsAction implements ActionInterface {
         String userRole = appraisalMgr.getRole(appraisal, userId);
         appraisal.setRole(userRole);
 
-        actionHelper.setupMyTeamActiveAppraisals(userId);
+        actionHelper.setupMyTeamActiveAppraisals();
         if (actionHelper.isLoggedInUserReviewer()) {
             ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(-1);
             actionHelper.addToRequestMap("pendingReviews", reviews);
@@ -221,7 +221,7 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser();
-        actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
+        actionHelper.setAppraisalMgrParameters(appraisalMgr);
         Appraisal appraisal = (Appraisal) session.get(Appraisal.class, id);
         PermissionRule permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
 
@@ -253,9 +253,9 @@ public class AppraisalsAction implements ActionInterface {
             }
 
             if (appraisal.getRole().equals("supervisor")) {
-                actionHelper.setupMyTeamActiveAppraisals(currentlyLoggedOnUser.getId());
+                actionHelper.setupMyTeamActiveAppraisals();
             } else if (appraisal.getRole().equals("employee")) {
-                actionHelper.setupMyActiveAppraisals(currentlyLoggedOnUser.getId());
+                actionHelper.setupMyActiveAppraisals();
             }
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
@@ -325,7 +325,7 @@ public class AppraisalsAction implements ActionInterface {
             return homeAction.display(request, response);
         }
         Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser();
-        actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
+        actionHelper.setAppraisalMgrParameters(appraisalMgr);
 
         // 1) Get the appraisal and permission rule
         appraisal = appraisalMgr.getAppraisal(appraisalID);
@@ -395,9 +395,9 @@ public class AppraisalsAction implements ActionInterface {
         Employee loggedOnUser = actionHelper.getLoggedOnUser();
         int employeeId = loggedOnUser.getId();
         if (appraisal.getRole().equals("employee")) {
-            appraisals = actionHelper.getMyActiveAppraisals(employeeId);
+            appraisals = actionHelper.getMyActiveAppraisals();
         } else if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR)) {
-            appraisals = actionHelper.getMyTeamActiveAppraisals(employeeId);
+            appraisals = actionHelper.getMyTeamActiveAppraisals();
         } else {
             return;
         }
@@ -430,7 +430,7 @@ public class AppraisalsAction implements ActionInterface {
             return homeAction.display(request, response);
         }
         Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser();
-        actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
+        actionHelper.setAppraisalMgrParameters(appraisalMgr);
 
         // 1) Get the appraisal and permission rule
         appraisal = appraisalMgr.getAppraisal(appraisalID);
@@ -491,7 +491,7 @@ public class AppraisalsAction implements ActionInterface {
             return homeAction.display(request, response);
         }
 
-        actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
+        actionHelper.setAppraisalMgrParameters(appraisalMgr);
 
         // 1) Get the appraisal, permission rule and userRole
         appraisal = appraisalMgr.getAppraisal(appraisalID);
@@ -536,7 +536,7 @@ public class AppraisalsAction implements ActionInterface {
             return homeAction.display(request, response);
         }
 
-        actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
+        actionHelper.setAppraisalMgrParameters(appraisalMgr);
 
         // 1) Get the appraisal and role
         appraisal = appraisalMgr.getAppraisal(appraisalID);
