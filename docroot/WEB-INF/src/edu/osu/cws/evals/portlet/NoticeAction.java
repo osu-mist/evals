@@ -30,14 +30,14 @@ public class NoticeAction implements ActionInterface {
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+        if (!actionHelper.isLoggedInUserAdmin()) {
+            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
         ArrayList<Notice> noticeList = NoticeMgr.list();
-        actionHelper.addToRequestMap("noticeList", noticeList, request);
-        actionHelper.useMaximizedMenu(request);
+        actionHelper.addToRequestMap("noticeList", noticeList);
+        actionHelper.useMaximizedMenu();
 
         return Constants.JSP_NOTICE_LIST;
     }
@@ -54,8 +54,8 @@ public class NoticeAction implements ActionInterface {
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+        if (!actionHelper.isLoggedInUserAdmin()) {
+            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
         Notice notice = new Notice();
@@ -65,7 +65,7 @@ public class NoticeAction implements ActionInterface {
                 notice = NoticeMgr.get(ancestorId);
             } else {
                 String text = ParamUtil.getString(request, "text");
-                Employee loggedOnUser = actionHelper.getLoggedOnUser(request);
+                Employee loggedOnUser = actionHelper.getLoggedOnUser();
                 notice.setAncestorID(ancestorId);
                 notice.setCreator(loggedOnUser);
                 notice.setCreateDate(new Date());
@@ -80,11 +80,11 @@ public class NoticeAction implements ActionInterface {
                 return list(request, response);
             }
         } catch (ModelException e) {
-            actionHelper.addErrorsToRequest(request, e.getMessage());
+            actionHelper.addErrorsToRequest(e.getMessage());
         }
 
-        actionHelper.addToRequestMap("notice", notice, request);
-        actionHelper.useMaximizedMenu(request);
+        actionHelper.addToRequestMap("notice", notice);
+        actionHelper.useMaximizedMenu();
 
         return Constants.JSP_NOTICE_EDIT;
     }

@@ -67,7 +67,7 @@ public class EvalsPortlet extends GenericPortlet {
     /**
      * The actions class
      */
-    private ActionHelper actionHelper = new ActionHelper();
+    private ActionHelper actionHelper;
 
     public void doDispatch(
 			RenderRequest renderRequest, RenderResponse renderResponse)
@@ -107,7 +107,7 @@ public class EvalsPortlet extends GenericPortlet {
 
         include(viewJSP, renderRequest, renderResponse);
         viewJSP = null;
-        actionHelper.removeRequestMap(renderRequest);
+        actionHelper.removeRequestMap();
 	}
 
     public void processAction(
@@ -119,10 +119,8 @@ public class EvalsPortlet extends GenericPortlet {
     public void serveResource(ResourceRequest request, ResourceResponse response)
             throws PortletException, IOException {
         String result = "";
-        Method actionMethod;
         String resourceID;
         Session hibSession = null;
-        actionHelper.setPortletContext(getPortletContext());
 
         // The logic below is similar to delegate method, but instead we
         // need to return the value we get from ActionHelper method instead of
@@ -131,6 +129,7 @@ public class EvalsPortlet extends GenericPortlet {
         String controllerClass =  ParamUtil.getString(request, "controller", "HomeAction");
         if (resourceID != null && controllerClass != null) {
             try {
+                actionHelper = new ActionHelper(request, response, getPortletContext());
                 controllerClass = "edu.osu.cws.evals.portlet." + controllerClass;
                 ActionInterface controller = (ActionInterface) Class.forName(controllerClass).newInstance();
                 controller.setActionHelper(actionHelper);
@@ -182,15 +181,15 @@ public class EvalsPortlet extends GenericPortlet {
         Session hibSession = null;
 
         try {
-            actionHelper.setPortletContext(getPortletContext());
             portletSetup(request);
             hibSession = HibernateUtil.getCurrentSession();
             Transaction tx = hibSession.beginTransaction();
-            actionHelper.setUpUserPermissionInSession(request, false);
+            actionHelper = new ActionHelper(request, response, getPortletContext());
+            actionHelper.setUpUserPermissionInSession(false);
             if (actionHelper.isDemo()) {
-                actionHelper.setupDemoSwitch(request);
+                actionHelper.setupDemoSwitch();
             }
-            actionHelper.addToRequestMap("isDemo", actionHelper.isDemo(), request);
+            actionHelper.addToRequestMap("isDemo", actionHelper.isDemo());
 
             // The portlet action can be set by the action/renderURLs using "action" as the parameter
             // name
@@ -251,13 +250,17 @@ public class EvalsPortlet extends GenericPortlet {
 
         if (reload) {
             Session hibSession = null;
-            actionHelper.setPortletContext(getPortletContext());
-            String message = loadEnvironmentProperties(request);
-            createLogger();
+            String message = "";
 
             try {
+                message += loadEnvironmentProperties(request);
+                createLogger();
+                message += "Created logger object\n";
+
                 hibSession = HibernateUtil.getCurrentSession();
                 Transaction tx = hibSession.beginTransaction();
+
+                actionHelper = new ActionHelper(request, null, getPortletContext());
                 actionHelper.setEvalsConfiguration(false);
                 message += "Stored Configuration Map and List in portlet context\n";
                 createMailer();
