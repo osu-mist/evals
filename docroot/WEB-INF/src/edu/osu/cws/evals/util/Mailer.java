@@ -23,9 +23,6 @@ import edu.osu.cws.util.*;
 import java.text.MessageFormat;
 
 public class Mailer {
-
-    private static final String EMAIL_START_DATE = "12/01/2011";
-    private Date emailStartDate;
     private ResourceBundle emailBundle;
 	private Mail email;
     private String linkURL;
@@ -61,15 +58,6 @@ public class Mailer {
         this.logger = logger;
         this.replyTo[0] = replyTo;
         //@todo make replyTo an address here, take a string in the constructor
-        SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
-        try {
-            emailStartDate = fmt.parse(EMAIL_START_DATE);
-        }catch(Exception e)
-        {
-            //should not get here.
-        }
-        logFields.put("sub-facility","Mailer");
-
     }
 
     /**
@@ -83,9 +71,6 @@ public class Mailer {
         String logLongMessage = "";
 
         try {
-            if (beforeEmailStartDate()) //don't send email before email start date
-                return;
-
             if (!(appraisal.getJob().getStatus().equals("A"))) {
                 logShortMessage = "Email not sent";
                 logLongMessage = "Appraisal " + appraisal.getId() +
@@ -793,12 +778,6 @@ public class Mailer {
             return "Reviewer";
         }
         return "";
-    }
-
-    private boolean beforeEmailStartDate()
-    {
-        Date today = new Date();
-        return today.before(emailStartDate);
     }
 
     /**
