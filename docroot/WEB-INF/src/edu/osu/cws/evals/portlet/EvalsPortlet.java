@@ -17,7 +17,6 @@ import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.util.*;
 import edu.osu.cws.util.CWSUtil;
 import edu.osu.cws.util.Logger;
-import edu.osu.cws.util.Mail;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.hibernate.Session;
@@ -28,8 +27,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import javax.mail.Address;
-import javax.mail.internet.InternetAddress;
 import javax.portlet.*;
 
 /**
@@ -309,15 +306,14 @@ public class EvalsPortlet extends GenericPortlet {
         ResourceBundle resources = ResourceBundle.getBundle("edu.osu.cws.evals.portlet.Email");
         CompositeConfiguration config = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
         String hostname = config.getString("mail.hostname");
-        Address from = new InternetAddress(config.getString("mail.fromAddress"));
-        Address replyTo = new InternetAddress(config.getString("mail.replyToAddress"));
+        String from = config.getString("mail.fromAddress");
+        String replyTo = config.getString("mail.replyToAddress");
         String linkUrl = config.getString("mail.linkUrl");
         String helpLinkUrl = config.getString("helpfulLinks.url");
-        String mimeType = config.getString("mail.mimeType");
         Map<String, Configuration> configurationMap = (Map<String, Configuration>)
                 getPortletContext().getAttribute("configurations");
-        Mail mail = new Mail(hostname, from);
-        Mailer mailer = new Mailer(resources, mail, linkUrl,  helpLinkUrl, mimeType, configurationMap, getLog(),replyTo);
+        Mailer mailer = new Mailer(resources, hostname, from, linkUrl,  helpLinkUrl,
+                configurationMap, getLog(), replyTo);
         getPortletContext().setAttribute("mailer", mailer);
     }
 
