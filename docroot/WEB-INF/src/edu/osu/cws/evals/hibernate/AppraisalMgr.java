@@ -1032,17 +1032,25 @@ public class AppraisalMgr {
     public static boolean appraisalExists(Job job, Date startDate, String type) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
 
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startDate);
+        cal.add(Calendar.MONTH, -6);
+        Date beginDate = cal.getTime();
+        cal.add(Calendar.MONTH, 12);
+        Date endDate = cal.getTime();
+
         String query = "select count(*) from edu.osu.cws.evals.models.Appraisal appraisal " +
                 "where appraisal.job.employee.id = :pidm and appraisal.job.positionNumber = :positionNumber " +
                 "and appraisal.job.suffix = :suffix and appraisal.type = :type " +
-                "and appraisal.startDate = :startDate";
+                "and appraisal.startDate >= :beginDate and appraisal.startDate <= :endDate";
 
         Iterator resultMapIter = session.createQuery(query)
                 .setInteger("pidm", job.getEmployee().getId())
                 .setString("positionNumber", job.getPositionNumber())
                 .setString("suffix", job.getSuffix())
                 .setString("type", type)
-                .setDate("startDate", startDate)
+                .setDate("beginDate", beginDate)
+                .setDate("endDate", endDate)
                 .setMaxResults(1)
                 .list().iterator();
 

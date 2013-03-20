@@ -29,7 +29,7 @@
 
 <c:if test="${showForm}">
     <span class="portlet-msg-alert">
-    <liferay-ui:message key="appraisal-info-msg"/>
+    <c:out value = "${appraisalNotice.text}"/>
     </span>
 </c:if>
 

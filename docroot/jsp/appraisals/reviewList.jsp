@@ -84,7 +84,7 @@ jQuery(document).ready(function() {
   jQuery("#<portlet:namespace />fm").submit(function() {
     var errors = "";
     if (jQuery("#<portlet:namespace />searchTerm").val() == "") {
-      errors = "<li>Please enter the employee's OSU ID</li>";
+      errors = "<li>Please enter the employee's name or OSU ID</li>";
     }
     if (errors != "") {
       jQuery("#<portlet:namespace />flash").html(

@@ -43,6 +43,7 @@ public class EvalsPortlet extends GenericPortlet {
     public static final String CONTEXT_CACHE_TIMESTAMP = "contextCacheTimestamp";
 
     public static final String CONTEXT_LOAD_DATE = "contextLoadDate";
+
     /**
      * String used to store the view jsp used by the
      * doView method.
@@ -186,7 +187,6 @@ public class EvalsPortlet extends GenericPortlet {
             hibSession = HibernateUtil.getCurrentSession();
             Transaction tx = hibSession.beginTransaction();
             actionHelper.setUpUserPermissionInSession(request, false);
-
             if (actionHelper.isDemo()) {
                 actionHelper.setupDemoSwitch(request);
             }
@@ -271,10 +271,12 @@ public class EvalsPortlet extends GenericPortlet {
                 Date currentTimestamp = new Date();
                 getPortletContext().setAttribute(CONTEXT_CACHE_TIMESTAMP, currentTimestamp);
                 message += "Stored contextCacheTimestamp of " + currentTimestamp.toString() + "\n";
-
                 actionHelper.setEvalsAdmins(false);
                 actionHelper.setEvalsReviewers(false);
+                actionHelper.setNotices(false);
+                message += "Stored notices in portlet context\n";
                 tx.commit();
+
                 EvalsLogger logger =  getLog();
                 if (logger != null) {
                     logger.log(Logger.INFORMATIONAL, "Portlet Setup Success", message);

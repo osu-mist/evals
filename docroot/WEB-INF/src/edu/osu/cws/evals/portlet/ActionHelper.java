@@ -24,8 +24,6 @@ public class ActionHelper {
     public static final String MY_TEAMS_ACTIVE_APPRAISALS = "myTeamsActiveAppraisals";
     private static final String REVIEW_LIST = "reviewList";
     private static final String REVIEW_LIST_MAX_RESULTS = "reviewListMaxResults";
-    public static final String APPRAISAL_NOT_FOUND = "We couldn't find your appraisal. If you believe this is an " +
-            "error, please contact your supervisor.";
     public static final String REQUEST_MAP = "requestMap";
 
     private EmployeeMgr employeeMgr = new EmployeeMgr();
@@ -39,8 +37,6 @@ public class ActionHelper {
     private ConfigurationMgr configurationMgr = new ConfigurationMgr();
 
     private PortletContext portletContext;
-
-    public static final String ACCESS_DENIED = "You do not have access to perform this action.";
 
 
     /**
@@ -842,4 +838,21 @@ public class ActionHelper {
         addToRequestMap("employee", getLoggedOnUser(request),request);
     }
 
+    /**
+     * fetch the latest notice from notice table and addToRequestMap as yellowBox message
+     * @param updateContextTimestamp    Whether or not to update the context timestamp in config_times
+     * @return Text of yellowBox message
+     * @throws Exception
+     */
+    public void setNotices(boolean updateContextTimestamp) throws Exception {
+        Map notices = NoticeMgr.getNotices();
+        getPortletContext().setAttribute("Notices", notices);
+        if (updateContextTimestamp) {
+            updateContextTimestamp();
+        }
+    }
 }
+
+
+
+

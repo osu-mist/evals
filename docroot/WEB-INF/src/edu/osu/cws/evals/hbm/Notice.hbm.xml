@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping auto-import="false" >
+
+    <class name="edu.osu.cws.evals.models.Notice" table="notices">
+        <id name="id" type="int" column="ID">
+            <generator class="native">
+                <param name="sequence">pass_seq</param>
+            </generator>
+        </id>
+        <property name="ancestorID" type="int" column="ANCESTOR_ID"/>
+        <property name="name" column="NAME"/>
+        <property name="text" column="TEXT"/>
+        <property name="createDate" type="timestamp" column="CREATE_DATE"/>
+        <many-to-one name="creator" class="edu.osu.cws.evals.models.Employee"
+                     column="CREATOR_PIDM"
+                     not-null="true"/>
+    </class>
+
+    <query name="notice.singleNoticeByAncestorID"><![CDATA[
+        from edu.osu.cws.evals.models.Notice as notice01
+        where
+            notice01.id = (
+            select max (id) from edu.osu.cws.evals.models.Notice as notice02
+                where
+                    notice02.ancestorID = :ancestorID
+            )
+    ]]></query>
+
+    <query name="notice.singleNoticeByName"><![CDATA[
+        from edu.osu.cws.evals.models.Notice as notice01
+        where
+            notice01.id = (
+            select max (id) from edu.osu.cws.evals.models.Notice as notice02
+                where
+                    notice02.name = :name
+            )
+    ]]></query>
+
+    <query name="notice.noticeList"><![CDATA[
+        from edu.osu.cws.evals.models.Notice as notice01
+        where
+            notice01.id = (
+            select max (id) from edu.osu.cws.evals.models.Notice as notice02
+                where
+                    notice01.ancestorID = notice02.ancestorID
+            )
+        order by ancestorID
+    ]]></query>
+</hibernate-mapping>

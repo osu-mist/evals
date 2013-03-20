@@ -15,6 +15,7 @@ import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 public class ReviewersAction implements ActionInterface {
     private ActionHelper actionHelper = new ActionHelper();
@@ -32,8 +33,9 @@ public class ReviewersAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
@@ -51,7 +53,7 @@ public class ReviewersAction implements ActionInterface {
     }
 
     /**
-     * Handles adding an admin user.
+     * Handles adding a reviewer user.
      *
      * @param request
      * @param response
@@ -59,20 +61,21 @@ public class ReviewersAction implements ActionInterface {
      * @throws Exception
      */
     public String add(PortletRequest request, PortletResponse response) throws Exception {
-        // Check that the logged in user is admin
+        // Check that the logged in user is an reviewer
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
         String onid = ParamUtil.getString(request, "onid");
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
 
-        // Check whether or not the user is already an admin user
+        // Check whether or not the user is already a reviewer user
         EmployeeMgr employeeMgr = new EmployeeMgr();
         Employee onidUser = employeeMgr.findByOnid(onid, null);
         if (actionHelper.getReviewer(onidUser.getId()) != null) {
-            actionHelper.addErrorsToRequest(request, "This user is already a reviewer.");
+            actionHelper.addErrorsToRequest(request, resource.getString("already-reviewer"));
             return list(request, response);
         }
 
@@ -98,8 +101,9 @@ public class ReviewersAction implements ActionInterface {
      */
     public String delete(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, ActionHelper.ACCESS_DENIED);
+            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
             return homeAction.display(request, response);
         }
 
