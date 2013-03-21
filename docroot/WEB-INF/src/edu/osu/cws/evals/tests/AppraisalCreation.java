@@ -5,6 +5,7 @@ import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.joda.time.DateTime;
 
 import java.util.*;
 
@@ -29,14 +30,12 @@ public class AppraisalCreation {
         tx.commit();
 
         for (Job job : results) {
-            Calendar startDay = job.getNewAnnualStartDate();
-            Calendar newDay = Calendar.getInstance();
+            DateTime startDate = job.getNewAnnualStartDate();
             //this create date is far in the future, let's create the one started last year.
-            newDay.add(Calendar.DAY_OF_MONTH, 30);
-            if (startDay.after(newDay)) {
-                startDay.add(Calendar.YEAR, -1); //last year
+            DateTime newDay = new DateTime().plusDays(30);
+            if (startDate.isAfter(newDay)) {
+                startDate = startDate.minusYears(1); //last year
             }
-            Date startDate = startDay.getTime();
             AppraisalMgr.createAppraisal(job, startDate, Appraisal.TYPE_ANNUAL, goalsDueConfig);
         }
     }

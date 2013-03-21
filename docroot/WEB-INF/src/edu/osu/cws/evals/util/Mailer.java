@@ -19,7 +19,11 @@ import edu.osu.cws.evals.hibernate.EmailMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.ReviewerMgr;
 import edu.osu.cws.evals.models.*;
+import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.util.*;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+
 import java.text.MessageFormat;
 
 public class Mailer {
@@ -758,8 +762,8 @@ public class Mailer {
             status = status.replace("Overdue", "Due");
         }
         Configuration config = configMap.get(status);
-        Date dueDay = EvalsUtil.getDueDate(appraisal, config);
-        return MessageFormat.format("{0,date,MM/dd/yy}", new Object[]{dueDay});
+        DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
+        return dueDay.toString(Constants.DATE_FORMAT);
     }
 
     /**
@@ -771,8 +775,8 @@ public class Mailer {
     private int getDaysRemaining(Appraisal appraisal) throws Exception {
         String status = appraisal.getStatus();
         Configuration config = configMap.get(status);
-        Date dueDay = EvalsUtil.getDueDate(appraisal, config);
-        return CWSUtil.getRemainDays(dueDay);
+        DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
+        return Days.daysBetween(new DateTime(), dueDay).getDays();
     }
 
     /**

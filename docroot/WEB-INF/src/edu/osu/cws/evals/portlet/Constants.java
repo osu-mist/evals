@@ -65,4 +65,7 @@ public class Constants {
     public static final Integer SEARCH_MAX_RESULTS = 20;
 
     public static final long PORTLET_RELOAD_FREQUENCY = 1000 * 60 * 60 * 24; //1 days in ms
+
+    public static final String DATE_FORMAT = "MM/dd/yy";
+    public static final String DATE_FORMAT_FULL = "MM/dd/yyyy";
 }

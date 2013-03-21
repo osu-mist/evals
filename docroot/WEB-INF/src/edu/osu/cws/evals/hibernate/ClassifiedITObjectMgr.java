@@ -10,6 +10,9 @@ import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -47,12 +50,11 @@ public class ClassifiedITObjectMgr {
             Job job = (Job) jResult;
 
             job.setAnnualInd(Constants.ANNUAL_IND);
-            Date startDate, endDate;
-            Calendar startCal = job.getNewAnnualStartDate();
-            if(startCal.after(Calendar.getInstance())) {
-                startCal.add(Calendar.MONTH, -12);
+            DateTime startDate, endDate;
+            startDate = job.getNewAnnualStartDate();
+            if(startDate.isAfterNow()) {
+                startDate = startDate.minusMonths(12);
             }
-            startDate = startCal.getTime();
             endDate = job.getEndEvalDate(startDate, "annual");
             name = job.getEmployee().getName();
             reviewPeriod = getReviewPeriod(startDate, endDate);
@@ -63,15 +65,15 @@ public class ClassifiedITObjectMgr {
         return myTeamClassifiedITObject;
     }
 
-    public static String getReviewPeriod(Date startDate,Date endDate) {
+    public static String getReviewPeriod(DateTime startDate, DateTime endDate) {
         if (startDate == null) {
-            startDate = new Date();
+            startDate = new DateTime();
         }
         if (endDate == null) {
-            endDate = new Date();
+            endDate = new DateTime();
         }
 
-        return MessageFormat.format("{0,date,MM/dd/yy} - {1,date,MM/dd/yy}",
-                new Object[]{startDate, endDate});
+        return startDate.toString(Constants.DATE_FORMAT) + " - " +
+                endDate.toString(Constants.DATE_FORMAT);
     }
 }

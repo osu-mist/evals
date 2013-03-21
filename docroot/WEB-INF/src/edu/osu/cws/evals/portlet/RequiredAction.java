@@ -6,6 +6,8 @@ import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 
 import java.text.MessageFormat;
 import java.util.Date;
@@ -49,14 +51,14 @@ public class RequiredAction {
 
         String pattern = resource.getString(key);
 
-        Date dueDate = EvalsUtil.getDueDate(appraisal, configuration);
-        String dueOn = EvalsUtil.formatDate(dueDate);
+        DateTime dueDate = EvalsUtil.getDueDate(appraisal, configuration);
+        String dueOn = dueDate.toString(Constants.DATE_FORMAT);
 
         String name = "";
         if (appraisal.getJob() != null && appraisal.getJob().getEmployee() != null) {
             name = appraisal.getJob().getEmployee().getName();
         }
-        int numDays = Math.abs(CWSUtil.getRemainDays(dueDate));
+        int numDays = Math.abs(Days.daysBetween(dueDate, new DateTime()).getDays());
         String jobTitle = appraisal.getJob().getJobTitle();
         String reviewPeriod = appraisal.getReviewPeriod();
         boolean isTeamAction = key.contains("action-team");
