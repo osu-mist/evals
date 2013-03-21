@@ -4,23 +4,21 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppointmentTypeMgr;
 import edu.osu.cws.evals.hibernate.CriteriaMgr;
-import edu.osu.cws.evals.models.CriterionArea;
-import edu.osu.cws.evals.models.CriterionDetail;
-import edu.osu.cws.evals.models.Employee;
-import edu.osu.cws.evals.models.ModelException;
+import edu.osu.cws.evals.models.*;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import java.util.List;
-import java.util.ResourceBundle;
 
 public class CriteriaAreasAction implements ActionInterface {
     
     private ActionHelper actionHelper;
 
     private HomeAction homeAction;
+
+    private ErrorHandler errorHandler;
 
     /**
      * Takes the request object and passes the employeeType to the hibernate util class.
@@ -32,11 +30,8 @@ public class CriteriaAreasAction implements ActionInterface {
      * @throws Exception
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
-        // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin()) {
-            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         String appointmentType = ParamUtil.getString(request, "appointmentType",
@@ -67,10 +62,8 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String add(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin()) {
-            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         CriteriaMgr criteriaMgrArea = new CriteriaMgr();
@@ -122,10 +115,8 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin()) {
-            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         CriteriaMgr criteriaMgr = new CriteriaMgr();
@@ -167,10 +158,8 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String delete(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin()) {
-            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         int criteriaID = ParamUtil.getInteger(request, "id");
@@ -215,10 +204,8 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String updateSequence(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin()) {
-            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         int id = ParamUtil.getInteger(request, "id");
@@ -241,5 +228,9 @@ public class CriteriaAreasAction implements ActionInterface {
 
     public void setHomeAction(HomeAction homeAction) {
         this.homeAction = homeAction;
+    }
+
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
     }
 }

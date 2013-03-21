@@ -825,6 +825,7 @@ public class ActionHelper {
         Map notices = NoticeMgr.getNotices();
         portletContext.setAttribute("Notices", notices);
     }
+
 }
 
 
