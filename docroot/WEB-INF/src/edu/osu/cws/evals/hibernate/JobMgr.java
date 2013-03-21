@@ -94,19 +94,7 @@ public class JobMgr {
     //@todo: Where do you use this method.  This is a very expensive operation.
     public List<Job> list() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return this.list(session);
-    }
-
-    /**
-     * Retrieves a list of Jobs from the database.
-     *
-     * @param session
-     * @return
-     * @throws Exception
-     */
-    private List<Job> list(Session session) throws Exception {
-        List<Job> result = session.createQuery("from edu.osu.cws.evals.models.Job").list();
-        return result;
+        return session.createQuery("from edu.osu.cws.evals.models.Job").list();
     }
 
     /**

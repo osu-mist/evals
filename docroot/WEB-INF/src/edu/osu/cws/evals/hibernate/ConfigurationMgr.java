@@ -21,9 +21,7 @@ public class ConfigurationMgr {
     public Map<String, Configuration> mapByName() throws Exception {
         HashMap<String, Configuration> configs = new HashMap<String, Configuration>();
         List<Configuration> configsList = new ArrayList<Configuration>();
-        Session session = HibernateUtil.getCurrentSession();
-
-        configsList = list(session);
+        configsList = list();
         for (Configuration configuration : configsList) {
             configs.put(configuration.getName(), configuration);
         }
@@ -31,24 +29,13 @@ public class ConfigurationMgr {
     }
 
     /**
-     * Uses list(session) method to grab a list of configurations.
+     * Grabs a list of configurations.
      *
      * @throws Exception
      * @return
      */
     public List<Configuration> list() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return list(session);
-    }
-
-    /**
-     * Retrieves a list of Admin from the database.
-     *
-     * @param session
-     * @return
-     * @throws Exception
-     */
-    private List<Configuration> list(Session session) throws Exception {
         List<Configuration> result = session.createQuery("from edu.osu.cws.evals.models.Configuration configuration " +
                 "order by configuration.section, configuration.sequence").list();
         return result;
@@ -56,17 +43,13 @@ public class ConfigurationMgr {
 
     public boolean edit(int id, String value) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        edit(id, value, session);
-        return true;
-    }
-
-    private void edit(int id, String value, Session session) throws Exception {
         Configuration configuration = (Configuration) session.get(Configuration.class, id);
         if (configuration == null) {
             throw new ModelException("Configuration Parameter not found");
         }
         configuration.setValue(value);
         session.update(configuration);
+        return true;
     }
 
     /**

@@ -833,30 +833,17 @@ public class AppraisalMgr {
     }
 
     /**
-     * This method is just a wrapper for session.get. It returns the appraisal that
-     * matches the id. It also adds the currentSupervisor to the appraisal object.
+     * It returns the appraisal that matches the id.
+     * It also adds the currentSupervisor to the appraisal object.
      *
      * @param id
-     * @return
+     * @return Appraisal
      * @throws Exception
      */
     public Appraisal getAppraisal(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        appraisal = getAppraisal(id, session);
-
-        return appraisal;
-    }
-
-    /**
-     * This method is just a wrapper for getAppraisal(int id). It performs the hibernate
-     * call to retrieve the appraisal.
-     *
-     * @param id
-     * @param session
-     * @return
-     */
-    private Appraisal getAppraisal(int id, Session session) {
         appraisal = (Appraisal) session.get(Appraisal.class, id);
+
         return appraisal;
     }
 
@@ -870,24 +857,9 @@ public class AppraisalMgr {
      * @return
      * @throws Exception
      */
+    //@todo: Joan: don't do anything with job.endDate, that's not reliable.
     public ArrayList<Appraisal> getReviews(String businessCenterName, int maxResults) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return getReviews(businessCenterName, session, maxResults);
-    }
-
-
-    /**
-     * Returns an ArrayList of Appraisal which contain data about appraisals pending
-     * review. This method is used to display a list of pending reviews in the displayReview
-     * actions method. If maxResults > 0, it will limit the number of results.
-     *
-     * @param businessCenterName
-     * @param session
-     * @param maxResults
-     * @return
-     */
-    //@todo: Joan: don't do anything with job.endDate, that's not reliable.
-    private ArrayList<Appraisal> getReviews(String businessCenterName, Session session, int maxResults) {
         Query hibernateQuery = session.getNamedQuery("appraisal.getReviews")
                 .setString("bc", businessCenterName);
         //@todo: Joan: can we set the maxResults before querying the database?
@@ -906,13 +878,8 @@ public class AppraisalMgr {
      * @throws Exception
      */
     public int getReviewCount(String businessCenterName) throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        return getReviewCount(businessCenterName, session);
-    }
-
-    private int getReviewCount(String businessCenterName, Session session) {
         int reviewCount = 0;
-
+        Session session = HibernateUtil.getCurrentSession();
         List results = session.getNamedQuery("appraisal.reviewCount")
                 .setString("bcName", businessCenterName)
                 .list();
