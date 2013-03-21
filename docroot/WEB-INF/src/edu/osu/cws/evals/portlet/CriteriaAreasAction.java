@@ -147,7 +147,7 @@ public class CriteriaAreasAction implements ActionInterface {
     /**
      * Handles deleting an evaluation criteria. If the request a regular http request, it
      * displays a confirm page. Once the user confirms the deletion, the criteria is deleted,
-     * the sequence is updated and the list of criteria is displayed again. If the request is
+     * and the list of criteria is displayed again. If the request is
      * AJAX, we remove the evaluation criteria.
      *
      * @param request

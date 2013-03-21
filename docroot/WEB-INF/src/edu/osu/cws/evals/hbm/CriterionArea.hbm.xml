@@ -21,7 +21,7 @@
         <many-to-one name="deleter" class="edu.osu.cws.evals.models.Employee"
                      column="DELETER_PIDM"
                      not-null="false"/>
-        <many-to-one name="originalID" class="edu.osu.cws.evals.models.CriterionArea"
+        <many-to-one name="ancestorID" class="edu.osu.cws.evals.models.CriterionArea"
                      column="ANCESTOR_ID"
                      not-null="false"
                      unique="true"/>

@@ -40,7 +40,6 @@ public class CriteriaMgr {
 
         // validate both objects individually and then check for errors
         area.validate();
-        area.validateDescription();
 
         if (area.getErrors().size() > 0) {
             return false;
@@ -91,54 +90,13 @@ public class CriteriaMgr {
         if (!areaChanged && !descriptionChanged) {
             return true;
         }
-
-        if (areaChanged && !descriptionChanged) {
+        if (areaChanged || descriptionChanged) {
             // copy all the values from the old CriterionArea
             newCriterion.setName(name);
             newCriterion.setCreator(loggedInUser);
             newCriterion.setAppointmentType(criterion.getAppointmentType());
             newCriterion.setCreateDate(new Date());
-            newCriterion.setOriginalID(criterion);
-            newCriterion.setDescription(criterion.getDescription());
-
-            // validate both new area + description
-            newCriterion.validate();
-            newCriterion.validateDescription();
-
-            // set old criteria as deleted
-            setCriteriaDeleteProperties(loggedInUser, criterion);
-
-            // save pojos
-            session.save(newCriterion);
-            session.update(criterion);
-
-        } else if (!areaChanged && descriptionChanged) {
-            // copy all the values from the old CriterionArea
-            newCriterion.setName(criterion.getName());
-            newCriterion.setCreator(loggedInUser);
-            newCriterion.setAppointmentType(criterion.getAppointmentType());
-            newCriterion.setCreateDate(new Date());
-            newCriterion.setOriginalID(criterion);
-            newCriterion.setDescription(description);
-
-            // validate both new area + description
-            newCriterion.validate();
-            newCriterion.validateDescription();
-
-            // set old criteria as deleted
-            setCriteriaDeleteProperties(loggedInUser, criterion);
-
-            // save pojos
-            session.save(newCriterion);
-            session.update(criterion);
-
-        } else if (areaChanged && descriptionChanged) {
-            // copy all the values from the old CriterionArea
-            newCriterion.setName(name);
-            newCriterion.setCreator(loggedInUser);
-            newCriterion.setAppointmentType(criterion.getAppointmentType());
-            newCriterion.setCreateDate(new Date());
-            newCriterion.setOriginalID(criterion);
+            newCriterion.setAncestorID(criterion);
             newCriterion.setDescription(description);
 
             // validate both new area + description
@@ -155,7 +113,6 @@ public class CriteriaMgr {
         if (propagateEdit) {
             //@todo: after AssessmentCriteria piece is done
         }
-
         //@todo: ajax
         return true;
     }

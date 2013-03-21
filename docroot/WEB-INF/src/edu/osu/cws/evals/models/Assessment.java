@@ -26,7 +26,7 @@ public class Assessment extends Evals implements Comparable<Assessment> {
 
     private int sequence;
 
-    private int deleterPidm;
+    private Integer deleterPidm;
 
     private Date deleteDate;
 
@@ -133,11 +133,11 @@ public class Assessment extends Evals implements Comparable<Assessment> {
         this.modifiedDate = modifiedDate;
     }
 
-    public int getDeleterPidm() {
+    public Integer getDeleterPidm() {
         return deleterPidm;
     }
 
-    public void setDeleterPidm(int deleterPidm) {
+    public void setDeleterPidm(Integer deleterPidm) {
         this.deleterPidm = deleterPidm;
     }
 

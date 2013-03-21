@@ -1,6 +1,6 @@
 /**
  * POJO to interact with criteria_areas table. It also contains a method to
- * validate the name and sequence fields.
+ * validate the name, appointmentType and description.
  */
 
 package edu.osu.cws.evals.models;
@@ -19,7 +19,7 @@ public class CriterionArea extends Evals {
 
     private String appointmentType;
 
-    private CriterionArea originalID;
+    private CriterionArea ancestorID;
 
     private Date createDate;
 
@@ -46,7 +46,7 @@ public class CriterionArea extends Evals {
             "Please enter an evaluation criteria description";
 
     /**
-     * Validation error message for Sequence
+     * Validation error message for appointmentType
      */
     private static final String appointmentTypeRequired =
             "Please select an appointment type";
@@ -123,12 +123,12 @@ public class CriterionArea extends Evals {
         this.appointmentType = appointmentType;
     }
 
-    public CriterionArea getOriginalID() {
-        return originalID;
+    public CriterionArea getAncestorID() {
+        return ancestorID;
     }
 
-    public void setOriginalID(CriterionArea originalID) {
-        this.originalID = originalID;
+    public void setAncestorID(CriterionArea ancestorID) {
+        this.ancestorID = ancestorID;
     }
 
     public Date getCreateDate() {
