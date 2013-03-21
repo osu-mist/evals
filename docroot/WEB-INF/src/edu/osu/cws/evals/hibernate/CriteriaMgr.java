@@ -82,7 +82,7 @@ public class CriteriaMgr {
             propagateEdit = request.get("propagateEdit")[0] != null;
         }
 
-        criterion = get(id, session);
+        criterion = get(id);
 
         boolean areaChanged = false;
         boolean descriptionChanged = false;
@@ -213,8 +213,7 @@ public class CriteriaMgr {
     }
 
     /**
-     * Takes an appointmentType, gets a Hibernate session object and calls a private method
-     * to call the private method that just uses Hibernate to fetch the list of criteria.
+     * Takes an appointmentType, gets a Hibernate session object fetch a list of criteria.
      *
      * @param appointmentType
      * @return criteria        List of CriterionAreas
@@ -222,25 +221,11 @@ public class CriteriaMgr {
      */
     public List<CriterionArea> list(String appointmentType) throws ModelException, Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return this.list(appointmentType, session);
-    }
-
-    /**
-     * Takes an appointmentType, a Hibernate session and uses Hibernate to fetch the list of
-     * CriterionArea that are not deleted.
-     *
-     * @param appointmentType
-     * @param session
-     * @return criteria     List of CriterionAreas
-     * @throws Exception
-     */
-    private List<CriterionArea> list(String appointmentType, Session session) throws Exception {
         List result = session.createQuery("from edu.osu.cws.evals.models.CriterionArea where " +
-                "appointmentType = :appointmentType AND deleteDate IS NULL ORDER BY sequence")
+                "appointmentType = :appointmentType AND deleteDate IS NULL ORDER BY name")
                 .setString("appointmentType", appointmentType)
                 .list();
         return result;
-
     }
 
     /**
@@ -255,7 +240,7 @@ public class CriteriaMgr {
     public boolean delete(int id, Employee deleter) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         CriterionArea criterion;
-        criterion = get(id, session);
+        criterion = get(id);
 
         // check that the criteria is valid
         if (criterion == null || criterion.getDeleteDate() != null) {
@@ -379,17 +364,6 @@ public class CriteriaMgr {
      */
     public CriterionArea get(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return get(id, session);
-    }
-
-    /**
-     * Retrieves a CriterionArea object from the db
-     *
-     * @param id
-     * @param session
-     * @return
-     */
-    private CriterionArea get(int id, Session session) {
         return (CriterionArea) session.get(CriterionArea.class, id);
     }
 }
