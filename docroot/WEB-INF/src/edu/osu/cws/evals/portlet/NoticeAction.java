@@ -3,6 +3,7 @@ package edu.osu.cws.evals.portlet;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.NoticeMgr;
 import edu.osu.cws.evals.models.Employee;
+import edu.osu.cws.evals.models.ErrorHandler;
 import edu.osu.cws.evals.models.Notice;
 import edu.osu.cws.evals.models.ModelException;
 
@@ -19,6 +20,9 @@ public class NoticeAction implements ActionInterface {
     private ActionHelper actionHelper;
 
     private HomeAction homeAction;
+
+    private ErrorHandler errorHandler = new ErrorHandler();
+
     /**
      * Handles listing the notice.
      *
@@ -29,10 +33,8 @@ public class NoticeAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         ArrayList<Notice> noticeList = NoticeMgr.list();
@@ -53,10 +55,8 @@ public class NoticeAction implements ActionInterface {
      */
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
         Notice notice = new Notice();
         try {

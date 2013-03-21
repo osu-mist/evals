@@ -7,6 +7,7 @@ import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Employee;
+import edu.osu.cws.evals.models.ErrorHandler;
 import edu.osu.cws.evals.models.Notice;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -21,7 +22,7 @@ import java.util.ResourceBundle;
 public class HomeAction implements ActionInterface {
     private ActionHelper actionHelper = new ActionHelper();
     private static Log _log = LogFactoryUtil.getLog(HomeAction.class);
-
+    private ErrorHandler errorHandler = new ErrorHandler();
 
     /**
      * Takes care of grabbing all the information needed to display the home view sections
@@ -106,8 +107,7 @@ public class HomeAction implements ActionInterface {
     public String demoResetAppraisal(PortletRequest request, PortletResponse response) throws Exception {
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isDemo()) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         int id = ParamUtil.getInteger(request, "id");
@@ -145,10 +145,8 @@ public class HomeAction implements ActionInterface {
      * @return
      */
     public String demoSwitchUser(PortletRequest request, PortletResponse response) throws Exception {
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isDemo()) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         PortletSession session = request.getPortletSession(true);

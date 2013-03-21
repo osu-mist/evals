@@ -3,6 +3,7 @@ package edu.osu.cws.evals.portlet;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.ConfigurationMgr;
 import edu.osu.cws.evals.models.Configuration;
+import edu.osu.cws.evals.models.ErrorHandler;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -13,6 +14,8 @@ public class ConfigurationsAction implements ActionInterface {
     private ActionHelper actionHelper = new ActionHelper();
 
     private HomeAction homeAction;
+
+    private ErrorHandler errorHandler = new ErrorHandler();
     
     /**
      * Handles listing the configuration parameters.
@@ -23,10 +26,8 @@ public class ConfigurationsAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         actionHelper.refreshContextCache();
@@ -48,10 +49,8 @@ public class ConfigurationsAction implements ActionInterface {
      */
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         int id = ParamUtil.getInteger(request, "id");
