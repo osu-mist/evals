@@ -150,16 +150,6 @@ public class EvalsUtil {
         return null;
     }
 
-    public static int daysBeforeAppraisalDue(Job job, DateTime appraisalStartDate, String appraisalType,
-                                             Map<String, Configuration> configMap) throws Exception{
-        Configuration appraisalDueConfig = configMap.get(Appraisal.STATUS_APPRAISAL_DUE);
-        int offset = appraisalDueConfig.getIntValue();    //number of days before end date of appraisal
-
-        //determine appraisal due date.
-        DateTime dueDate = job.getEndEvalDate(appraisalStartDate, appraisalType).minusDays(offset);
-        return Days.daysBetween(new DateTime(), dueDate).getDays();
-    }
-
     /**
      * This method calculates the # of days an evaluation record is overdue. The are three
      * possible types of values:
