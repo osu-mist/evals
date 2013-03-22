@@ -68,4 +68,8 @@ public class Constants {
 
     public static final String DATE_FORMAT = "MM/dd/yy";
     public static final String DATE_FORMAT_FULL = "MM/dd/yyyy";
+
+    public static final int MAX_ERROR_COUNT = 500;  //# of errors before aborting
+    public static final String DEFAULT_PROPERTIES_FILE = Constants.ROOT_DIR + "backend-config.properties";
+    public static final String EMAIL_BUNDLE_FILE = "edu.osu.cws.evals.portlet.Email";
 }

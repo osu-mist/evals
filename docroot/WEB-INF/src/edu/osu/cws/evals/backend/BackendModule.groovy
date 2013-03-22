@@ -20,7 +20,8 @@ import org.hibernate.Transaction;
 import javax.mail.Address;
 import javax.mail.internet.InternetAddress;
 import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.ResourceBundle
+import edu.osu.cws.evals.portlet.Constants;
 
 public class BackendModule extends AbstractModule {
 
@@ -53,7 +54,6 @@ public class BackendModule extends AbstractModule {
             System.out.println("mailHost: " + mailHost);
             String mailFrom = config.getString("mail.fromAddress");
             String replyTo = config.getString("mail.replyToAddress");
-            String mimeType = config.getString("mail.mimeType");
             String linkUrl = config.getString("mail.linkUrl");
             String helpLinkUrl = config.getString("helpfulLinks.url");
 
@@ -76,7 +76,7 @@ public class BackendModule extends AbstractModule {
         try {
             String specificPropFile = EvalsUtil.getSpecificConfigFile("backend", "");
             config.addConfiguration(new PropertiesConfiguration(specificPropFile));
-            config.addConfiguration(new PropertiesConfiguration(BackendMgr.DEFAULT_PROPERTIES_FILE));
+            config.addConfiguration(new PropertiesConfiguration(Constants.DEFAULT_PROPERTIES_FILE));
         } catch (Exception e) {
             // need to log exception
         }
