@@ -40,10 +40,6 @@ public class Constants {
     public static final String JSP_NOTICE_LIST = "/jsp/notices/list.jsp";
     public static final String JSP_NOTICE_EDIT = "/jsp/notices/edit.jsp";
 
-    //if appraisalStartDate is before FUL__GOALS_DUE date, create the appraisal these many
-    //days before appraialsDue.
-    public static final int DAYS_BEFORE_APPRAISAL_DUE_To_CREATE = 60;
-
     public static final String ROOT_DIR = "WEB-INF/src/";
 
     // Used by several Hibernate classes when executing hierarchical queries
