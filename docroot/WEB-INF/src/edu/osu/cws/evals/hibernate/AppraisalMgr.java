@@ -24,9 +24,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 public class AppraisalMgr {
-    //Need to change this back to 11/01/2011 after testing.
-    private static final String FULL_GOALS_DATE = "11/01/2011";
-
 
     // used to sort the list of evaluations displayed during searches
     private static final String LIST_ORDER = " order by job.employee.lastName, " +
@@ -40,8 +37,6 @@ public class AppraisalMgr {
     private static final String REPORT_LIST_WHERE = " where status not in ('completed', 'archived', " +
             "'closed') ";
 
-
-    private static Date fullGoalsDate;
     private Employee loggedInUser;
 
     private Appraisal appraisal = new Appraisal();
@@ -57,11 +52,6 @@ public class AppraisalMgr {
 
     public AppraisalMgr() {
         SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
-        try {
-            fullGoalsDate = fmt.parse(FULL_GOALS_DATE);
-        } catch (Exception e) {
-            //Should not get here
-        }
     }
 
     /**
@@ -136,9 +126,7 @@ public class AppraisalMgr {
      */
     private static void createAppraisalStatus(Date startDate, Configuration goalsDueConfig,
                                               Appraisal appraisal) throws Exception {
-        if (startDate.before(fullGoalsDate)) {
-            appraisal.setStatus(Appraisal.STATUS_APPRAISAL_DUE);
-        } else if (EvalsUtil.isDue(appraisal, goalsDueConfig) < 0) {
+        if (EvalsUtil.isDue(appraisal, goalsDueConfig) < 0) {
             appraisal.setStatus(Appraisal.STATUS_GOALS_OVERDUE);
         } else {
             appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
@@ -199,9 +187,7 @@ public class AppraisalMgr {
         appraisal.setEndDate(endDate);
 
         int resultsDue = EvalsUtil.isDue(appraisal, resultsDueConfig);
-        if (appraisal.getStartDate().before(fullGoalsDate)) {
-            appraisal.setStatus(Appraisal.STATUS_APPRAISAL_DUE);
-        } else if (resultsDue == 0) {
+        if (resultsDue == 0) {
             appraisal.setStatus(Appraisal.STATUS_RESULTS_DUE);
         } else if (resultsDue < 0) {
             appraisal.setStatus(Appraisal.STATUS_RESULTS_OVERDUE);
@@ -625,10 +611,8 @@ public class AppraisalMgr {
 
         PermissionRule originalPermRule = (PermissionRule) permissionRules.get(permissionKey);
         PermissionRule permissionRule = (PermissionRule) originalPermRule.clone();
-        if (permissionRule != null &&  appraisal.getStartDate().before(fullGoalsDate)) {
-            String debug = "j-startDate=" + appraisal.getStartDate().toString() +
-                    "; fullGoalsDate=" + fullGoalsDate.toString() + "; FULL_GOALS_DATE=" +
-                    FULL_GOALS_DATE;
+        if (permissionRule != null) {
+            String debug = "j-startDate=" + appraisal.getStartDate().toString();
             permissionRule.setGoals(debug);
             permissionRule.setResults(debug);
         }
