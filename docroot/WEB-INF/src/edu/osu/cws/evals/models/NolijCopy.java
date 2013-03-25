@@ -1,7 +1,10 @@
 package edu.osu.cws.evals.models;
 
+import edu.osu.cws.evals.portlet.ActionHelper;
+
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.ResourceBundle;
 
 public class NolijCopy extends Evals {
 
@@ -9,22 +12,20 @@ public class NolijCopy extends Evals {
     private int appraisalId;
     private Date submitDate;
     private String filename;
-
-    private static final String validAppraisalIdRequired = "Invalid appraisal Id";
-    private static final String validFilenameRequired = "A non-empty filename is required";
-    private static final String filenameTooLong = "The filename is longer than the allowed length";
+    private static ActionHelper actionHelper;
 
     /**
      * Validates to make sure that the appraisalId is present and non-zero.
      * @return
      */
     public boolean validateAppraisalId() {
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         ArrayList<String> appraisalErrors = new ArrayList<String>();
 
         // If there were any previous validation errors remove them.
         this.errors.remove("appraisalId");
         if (this.appraisalId == 0) {
-            appraisalErrors.add(validAppraisalIdRequired);
+            appraisalErrors.add(resource.getString("NolijCopy-validAppraisalIdRequired"));
         }
 
         if (appraisalErrors.size() > 0) {
@@ -40,16 +41,17 @@ public class NolijCopy extends Evals {
      * @return
      */
     public boolean validateFilename() {
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         ArrayList<String> filenameErrors = new ArrayList<String>();
 
         // If there were any previous validation errors remove them.
         this.errors.remove("filename");
         if (this.filename == null || this.filename.equals("")) {
-            filenameErrors.add(validFilenameRequired);
+            filenameErrors.add(resource.getString("NolijCopy-validFilenameRequired"));
         }
 
         if (this.filename.length() > 255) {
-            filenameErrors.add(filenameTooLong);
+            filenameErrors.add(resource.getString("NolijCopy-filenameTooLong"));
         }
 
         if (filenameErrors.size() > 0) {

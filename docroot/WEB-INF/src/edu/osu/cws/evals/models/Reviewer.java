@@ -1,6 +1,9 @@
 package edu.osu.cws.evals.models;
 
+import edu.osu.cws.evals.portlet.ActionHelper;
+
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 public class Reviewer extends Evals {
     private int id;
@@ -9,9 +12,7 @@ public class Reviewer extends Evals {
 
     private Employee employee;
 
-
-    public static final String validEmployeeRequired =
-            "The username you entered does not exist or is inactive. Please provide a valid employee username.";
+    private static ActionHelper actionHelper;
 
     public Reviewer() {
     }
@@ -22,12 +23,13 @@ public class Reviewer extends Evals {
      * @return
      */
     public boolean validateEmployee() {
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         ArrayList<String> employeeErrors = new ArrayList<String>();
 
         // If there were any previous validation errors remove them.
         this.errors.remove("employee");
         if (this.employee == null || !this.employee.getStatus().equals("A")) {
-            employeeErrors.add(validEmployeeRequired);
+            employeeErrors.add(resource.getString("reviewer-validEmployeeRequired"));
         }
 
         if (employeeErrors.size() > 0) {

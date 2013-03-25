@@ -5,10 +5,9 @@
 
 package edu.osu.cws.evals.models;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import edu.osu.cws.evals.portlet.ActionHelper;
+
+import java.util.*;
 
 public class CriterionArea extends Evals {
 
@@ -33,30 +32,7 @@ public class CriterionArea extends Evals {
 
     private Set details = new HashSet();
 
-    /**
-     * Validation error message for name is public because the add.jsp
-     * needs to access this static variable in order to do js validation
-     */
-    public static final String nameRequired =
-            "Please enter an area name for the evaluation criteria";
-
-    /**
-     * Validation error message for Sequence
-     */
-    private static final String sequenceRequired =
-            "Please provide a sequence for the evaluation criteria";
-
-    /**
-     * Validation error message for Sequence
-     */
-    private static final String sequenceInvalid =
-            "Evaluation criteria sequence should be greater than 1";
-
-    /**
-     * Validation error message for Sequence
-     */
-    private static final String appointmentTypeRequired =
-            "Please select an appointment type";
+    private static ActionHelper actionHelper;
 
     public CriterionArea() { }
 
@@ -66,12 +42,13 @@ public class CriterionArea extends Evals {
      * @return errors
      */
     public boolean validateName() {
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         ArrayList<String> nameErrors = new ArrayList<String>();
 
         // If there were any previous validation errors remove them.
         this.errors.remove("name");
         if (this.name == null || this.name.equals("")) {
-            nameErrors.add(nameRequired);
+            nameErrors.add(resource.getString("criteria-nameRequired"));
         }
 
         if (nameErrors.size() > 0) {
@@ -92,9 +69,9 @@ public class CriterionArea extends Evals {
         // If there were any previous validation errors remove them.
         this.errors.remove("sequence");
         if (this.sequence == 0) {
-            sequenceErrors.add(sequenceRequired);
+            sequenceErrors.add("");
         } else if (this.sequence < 1) {
-            sequenceErrors.add(sequenceInvalid);
+            sequenceErrors.add("");
         }
 
         if (sequenceErrors.size() > 0) {
@@ -111,14 +88,15 @@ public class CriterionArea extends Evals {
      * @return
      */
     public boolean validateAppointmentType() {
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         ArrayList<String> appointmentErrors = new ArrayList<String>();
 
         // If there were any previous validation errors remove them.
         this.errors.remove("appointmentType");
         if (this.appointmentType == null) {
-            appointmentErrors.add(appointmentTypeRequired);
+            appointmentErrors.add(resource.getString("criteria-appointmentTypeRequired"));
         } else if (this.appointmentType.equals("")) {
-            appointmentErrors.add(appointmentTypeRequired);
+            appointmentErrors.add(resource.getString("criteria-appointmentTypeRequired"));
         }
 
         if (appointmentErrors.size() > 0) {
@@ -127,6 +105,7 @@ public class CriterionArea extends Evals {
         }
         return true;
     }
+
 
     /**
      * Returns the most recent criterion_detail. The sorting is done by the

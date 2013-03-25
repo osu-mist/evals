@@ -1,8 +1,11 @@
 package edu.osu.cws.evals.models;
 
 
+import edu.osu.cws.evals.portlet.ActionHelper;
+
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.ResourceBundle;
 
 public class Admin extends Evals {
     private int id;
@@ -22,11 +25,7 @@ public class Admin extends Evals {
      */
     private String scope;
 
-    public static final String validEmployeeRequired =
-            "The username you entered does not exist or is inactive. Please provide a valid employee username.";
-
-    public static final String isMasterCannotBeEmpty =
-            "Please select the type of administrator.";
+    private static ActionHelper actionHelper;
 
     /**
      * Check that the employee we are adding as admin is active.
@@ -39,7 +38,7 @@ public class Admin extends Evals {
         // If there were any previous validation errors remove them.
         this.errors.remove("employee");
         if (this.employee == null || !this.employee.getStatus().equals("A")) {
-            employeeErrors.add(validEmployeeRequired);
+            employeeErrors.add(getMessage("admin-validEmployeeRequired"));
         }
 
         if (employeeErrors.size() > 0) {
@@ -105,5 +104,10 @@ public class Admin extends Evals {
 
     public void setScope(String scope) {
         this.scope = scope;
+    }
+
+    public static String getMessage(String type){
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
+        return resource.getString(type);
     }
 }

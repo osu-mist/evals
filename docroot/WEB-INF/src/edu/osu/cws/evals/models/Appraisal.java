@@ -1,31 +1,11 @@
 package edu.osu.cws.evals.models;
 
+import edu.osu.cws.evals.portlet.ActionHelper;
+
 import java.text.MessageFormat;
 import java.util.*;
 
 public class Appraisal extends Evals {
-    private static final String jobRequired =
-            "Please provide a valid job";
-
-    /**
-     * Validation error message for signature is public because the appraisal.jsp
-     * needs to access this static variable in order to do js validation
-     */
-    public static final String signatureRequired =
-            "Please click the box to acknowledge that you have read the appraisal";
-
-    public static final String rebuttalReadRequired =
-            "Please click the box to acknowledge that you have read the rebuttal";
-
-    /**
-     * Validation error message for rating is public because the appraisal.jsp
-     * needs to access this static variable in order to do js validation
-     */
-    public static final String ratingRequired =
-            "Please select a rating.";
-
-    public static final String invalidType =
-            "Appraisal type can only be: annual or trial. Please provide a valid type.";
 
     public static final String TYPE_ANNUAL = "annual";
 
@@ -203,6 +183,8 @@ public class Appraisal extends Evals {
     private String role;
 
     private ArrayList<String> statusHiddenFromEmployee = new ArrayList<String>();
+
+    private static ActionHelper actionHelper;
 
     public Appraisal() { }
 
@@ -403,13 +385,14 @@ public class Appraisal extends Evals {
     }
 
     public boolean validateJob() {
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         ArrayList<String> jobErrors = new ArrayList<String>();
 
         // If there were any previous validation errors remove them
         this.errors.remove("job");
 
         if (this.job == null || this.job.getEmployee() == null || this.job.getEmployee().getId() == 0) {
-            jobErrors.add(jobRequired);
+            jobErrors.add(getMessage("appraisal-jobRequired"));
         }
 
         if (jobErrors.size() > 0) {
@@ -426,7 +409,7 @@ public class Appraisal extends Evals {
         this.errors.remove("type");
 
         if (this.type == null || (!this.type.equals(TYPE_ANNUAL) && !this.type.equals(TYPE_TRIAL))) {
-            typeErrors.add(invalidType);
+            typeErrors.add(getMessage("appraisal-invalidType"));
         }
 
         if (typeErrors.size() > 0) {
@@ -916,5 +899,10 @@ public class Appraisal extends Evals {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public static String getMessage(String type){
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
+        return resource.getString(type);
     }
 }
