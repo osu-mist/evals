@@ -4,7 +4,6 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.CloseOutReasonMgr;
 import edu.osu.cws.evals.models.CloseOutReason;
-import edu.osu.cws.evals.models.ErrorHandler;
 import edu.osu.cws.evals.models.ModelException;
 
 import javax.portlet.PortletRequest;
@@ -12,14 +11,11 @@ import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import java.util.ArrayList;
-import java.util.ResourceBundle;
 
 public class CloseOutAction implements ActionInterface {
     private ActionHelper actionHelper;
 
     private HomeAction homeAction;
-
-    private ErrorHandler errorHandler = new ErrorHandler();
 
     /**
      * Handles listing the close out reasons.
@@ -32,7 +28,7 @@ public class CloseOutAction implements ActionInterface {
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!actionHelper.isLoggedInUserAdmin(request)) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         ArrayList<CloseOutReason> reasonsList = CloseOutReasonMgr.list(false);
@@ -53,7 +49,7 @@ public class CloseOutAction implements ActionInterface {
     public String add(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!actionHelper.isLoggedInUserAdmin(request)) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         String reason = ParamUtil.getString(request, "reason");
@@ -80,7 +76,7 @@ public class CloseOutAction implements ActionInterface {
     public String delete(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!actionHelper.isLoggedInUserAdmin(request)) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         int id = ParamUtil.getInteger(request, "id");

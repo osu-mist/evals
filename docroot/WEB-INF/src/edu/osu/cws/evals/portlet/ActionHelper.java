@@ -38,8 +38,6 @@ public class ActionHelper {
 
     private PortletContext portletContext;
 
-    private HomeAction homeAction;
-
     /**
      * Specifies whether or not the request is an AJAX request by checking whether or not
      * request and response are instances of ResourceRequest and ResourceResponse.

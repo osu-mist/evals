@@ -4,7 +4,6 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AdminMgr;
 import edu.osu.cws.evals.models.Admin;
-import edu.osu.cws.evals.models.ErrorHandler;
 import edu.osu.cws.evals.models.ModelException;
 
 import javax.portlet.PortletRequest;
@@ -20,8 +19,6 @@ public class AdminsAction implements ActionInterface {
     
     private HomeAction homeAction;
 
-    private ErrorHandler errorHandler = new ErrorHandler();
-
     /**
      * Handles listing the admin users. It only performs error checking. The list of
      * admins is already set by EvalsPortlet.portletSetup, so we don't need to do
@@ -35,7 +32,7 @@ public class AdminsAction implements ActionInterface {
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!actionHelper.isLoggedInUserAdmin(request)) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         actionHelper.refreshContextCache();
@@ -59,7 +56,7 @@ public class AdminsAction implements ActionInterface {
         // Check that the logged in user is admin
 
         if (!actionHelper.isLoggedInUserMasterAdmin(request)) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         String onid = ParamUtil.getString(request, "onid");
@@ -91,7 +88,7 @@ public class AdminsAction implements ActionInterface {
         // Check that the logged in user is admin
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserMasterAdmin(request)) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         int id = ParamUtil.getInteger(request, "id");

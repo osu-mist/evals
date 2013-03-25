@@ -28,8 +28,6 @@ public class AppraisalsAction implements ActionInterface {
 
     private HomeAction homeAction;
     
-    private ErrorHandler errorHandler = new ErrorHandler();
-    
     /**
      * Handles displaying a list of pending reviews for a given business center.
      *
@@ -41,7 +39,7 @@ public class AppraisalsAction implements ActionInterface {
     public String reviewList(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         if (!actionHelper.isLoggedInUserReviewer(request)) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         ArrayList<Appraisal> appraisals = actionHelper.getReviewsForLoggedInUser(request, -1);
@@ -75,7 +73,7 @@ public class AppraisalsAction implements ActionInterface {
 
         if (!isAdmin && !isReviewer && !isSupervisor)  {
             ((ActionResponse) response).setWindowState(WindowState.NORMAL);
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         int pidm = actionHelper.getLoggedOnUser(request).getId();
@@ -130,7 +128,7 @@ public class AppraisalsAction implements ActionInterface {
 
         int appraisalID = ParamUtil.getInteger(request, "id");
         if (appraisalID == 0) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         AppraisalMgr appraisalMgr = new AppraisalMgr();
@@ -142,7 +140,7 @@ public class AppraisalsAction implements ActionInterface {
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         String userRole = appraisalMgr.getRole(appraisal, userId);
@@ -224,7 +222,7 @@ public class AppraisalsAction implements ActionInterface {
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         try {
@@ -317,7 +315,7 @@ public class AppraisalsAction implements ActionInterface {
         int appraisalID = ParamUtil.getInteger(request, "id");
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (appraisalID == 0) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
         Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser(request);
         actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
@@ -328,7 +326,7 @@ public class AppraisalsAction implements ActionInterface {
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         int userId = currentlyLoggedOnUser.getId();
@@ -420,7 +418,7 @@ public class AppraisalsAction implements ActionInterface {
 
         int appraisalID = ParamUtil.getInteger(request, "id");
         if (appraisalID == 0) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
         Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser(request);
         actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
@@ -435,7 +433,7 @@ public class AppraisalsAction implements ActionInterface {
                 || appraisal.getRole().equals("employee")
                 || !appraisal.getStatus().equals("completed"))
         {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         int userId = currentlyLoggedOnUser.getId();
@@ -479,7 +477,7 @@ public class AppraisalsAction implements ActionInterface {
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         int appraisalID = ParamUtil.getInteger(request, "id");
         if (appraisalID == 0) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
@@ -492,7 +490,7 @@ public class AppraisalsAction implements ActionInterface {
         // Check to see if the logged in user has permission to access the appraisal
         boolean isAdminOrReviewer = userRole.equals("admin") || userRole.equals("reviewer");
         if (permRule == null || !isAdminOrReviewer) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         List<CloseOutReason> reasonList = CloseOutReasonMgr.list(false);
@@ -522,7 +520,7 @@ public class AppraisalsAction implements ActionInterface {
         //ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         int appraisalID = ParamUtil.getInteger(request, "id");
         if (appraisalID == 0) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
@@ -532,7 +530,7 @@ public class AppraisalsAction implements ActionInterface {
         String userRole = appraisalMgr.getRole(appraisal, userId);
         appraisal.setRole(userRole);
         if (!userRole.equals("admin") && !userRole.equals(ActionHelper.ROLE_REVIEWER)) {
-            return errorHandler.handleAccessDenied(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         if (request instanceof ActionRequest && response instanceof ActionResponse) {
