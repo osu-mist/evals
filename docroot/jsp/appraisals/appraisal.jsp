@@ -30,6 +30,7 @@
 <c:if test="${showForm}">
     <span class="portlet-msg-alert">
     <c:out value = "${appraisalNotice.text}"/>
+
     </span>
 </c:if>
 
@@ -221,12 +222,12 @@
         var errors = "";
         if (jQuery("#<portlet:namespace />acknowledge-read-appraisal").length > 0 &&
                 !jQuery("#<portlet:namespace />acknowledge-read-appraisal").is(':checked')) {
-          errors = "<li><%= actionHelper.getMessage("appraisal-signatureRequired")%></li>";
-          alert("<%= Appraisal.getMessage("appraisal-signatureRequired") %>");
+          errors = "<li><%= resource.getString("appraisal-signatureRequired")%></li>";
+          alert("<%= resource.getString("appraisal-signatureRequired") %>");
         }
         if (jQuery("#<portlet:namespace />appraisal-readRebuttal").length > 0 && !jQuery("#<portlet:namespace />appraisal-readRebuttal").is(':checked')) {
-          errors = "<li><%= Appraisal.getMessage("appraisal-rebuttalReadRequired") %></li>";
-          alert("<%= Appraisal.getMessage("appraisal-rebuttalReadRequired") %>");
+          errors = "<li><%= resource.getString("appraisal-rebuttalReadRequired") %></li>";
+          alert("<%= resource.getString("appraisal-rebuttalReadRequired") %>");
         }
         if (errors != "") {
           jQuery("#<portlet:namespace />flash").html(
@@ -244,8 +245,8 @@
         if (jQuery("input[name=submit-appraisal]").length > 0 &&
               jQuery("input[name=<portlet:namespace />appraisal.rating]:checked",
                 "#<portlet:namespace />fm").val() == undefined) {
-          errors = "<li><%= Appraisal.getMessage("appraisal-ratingRequired") %></li>";
-          alert("<%= Appraisal.getMessage("appraisal-ratingRequired") %>");
+          errors = "<li><%= resource.getString("appraisal-ratingRequired") %></li>";
+          alert("<%= resource.getString("appraisal-ratingRequired") %>");
         }
 
         if (errors != "") {
@@ -282,5 +283,6 @@
     <%@ include file="/jsp/appraisals/demoSettings.jsp"%>
 
 </c:if>
+
 </div><!-- end appraisal -->
 <%@ include file="/jsp/footer.jsp" %>

@@ -94,7 +94,7 @@ jQuery(document).ready(function() {
   jQuery("#<portlet:namespace />fm").submit(function() {
     var errors = "";
     if (jQuery("#<portlet:namespace />onid").val() == "") {
-      errors = "<li><%= Reviewer.validEmployeeRequired %></li>";
+      errors = "<li><%= resource.getString("reviewer-validEmployeeRequired") %></li>";
     }
     if (errors != "") {
       jQuery("#<portlet:namespace />flash").html(

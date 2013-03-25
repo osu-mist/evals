@@ -392,7 +392,7 @@ public class Appraisal extends Evals {
         this.errors.remove("job");
 
         if (this.job == null || this.job.getEmployee() == null || this.job.getEmployee().getId() == 0) {
-            jobErrors.add(getMessage("appraisal-jobRequired"));
+            jobErrors.add(resource.getString("appraisal-jobRequired"));
         }
 
         if (jobErrors.size() > 0) {
@@ -403,13 +403,14 @@ public class Appraisal extends Evals {
     }
 
     public boolean validateType() {
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         ArrayList<String> typeErrors = new ArrayList<String>();
 
         // If there were any previous validation errors remove them
         this.errors.remove("type");
 
         if (this.type == null || (!this.type.equals(TYPE_ANNUAL) && !this.type.equals(TYPE_TRIAL))) {
-            typeErrors.add(getMessage("appraisal-invalidType"));
+            typeErrors.add(resource.getString("appraisal-invalidType"));
         }
 
         if (typeErrors.size() > 0) {
@@ -899,10 +900,5 @@ public class Appraisal extends Evals {
 
     public void setRole(String role) {
         this.role = role;
-    }
-
-    public static String getMessage(String type){
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        return resource.getString(type);
     }
 }

@@ -33,12 +33,13 @@ public class Admin extends Evals {
      * @return
      */
     public boolean validateEmployee() {
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         ArrayList<String> employeeErrors = new ArrayList<String>();
 
         // If there were any previous validation errors remove them.
         this.errors.remove("employee");
         if (this.employee == null || !this.employee.getStatus().equals("A")) {
-            employeeErrors.add(getMessage("admin-validEmployeeRequired"));
+            employeeErrors.add(resource.getString("admin-validEmployeeRequired"));
         }
 
         if (employeeErrors.size() > 0) {
@@ -104,10 +105,5 @@ public class Admin extends Evals {
 
     public void setScope(String scope) {
         this.scope = scope;
-    }
-
-    public static String getMessage(String type){
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        return resource.getString(type);
     }
 }
