@@ -74,7 +74,7 @@ public class CriteriaMgr {
 
         criterion = get(id, session);
 
-        boolean areaChanged = false;
+        boolean nameChanged = false;
         boolean descriptionChanged = false;
 
         String criterionDescription = criterion.getDescription();
@@ -82,15 +82,14 @@ public class CriteriaMgr {
         int updatedDescHash = description.hashCode();
 
         if (!criterion.getName().equals(name)) {
-            areaChanged = true;
+            nameChanged = true;
         }
         if (descHash != updatedDescHash) {
             descriptionChanged = true;
         }
-        if (!areaChanged && !descriptionChanged) {
+        if (!nameChanged && !descriptionChanged) {
             return true;
-        }
-        if (areaChanged || descriptionChanged) {
+        } else {
             // copy all the values from the old CriterionArea
             newCriterion.setName(name);
             newCriterion.setCreator(loggedInUser);
@@ -101,7 +100,6 @@ public class CriteriaMgr {
 
             // validate both new area + description
             newCriterion.validate();
-            newCriterion.validateDescription();
 
             // set old criteria as deleted
             setCriteriaDeleteProperties(loggedInUser, criterion);
