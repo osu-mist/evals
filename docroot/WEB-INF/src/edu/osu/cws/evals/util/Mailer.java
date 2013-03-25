@@ -160,70 +160,59 @@ public class Mailer {
         String logShortMessage = "";
         String logLongMessage = "";
 
+        // Get the appraisal job and check that it's valid.
+        Job job = appraisal.getJob();
+        if (job == null) {
+            logShortMessage = "Email not sent";
+            logLongMessage = "Job for appraisal " + appraisal.getId() + " is null";
+            logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
+            return null;
+        }
+
         for (String recipient : mailToArray) {
-            Job job = appraisal.getJob();
             if (recipient.equals("employee")) {
-                if (job == null) {
-                    logShortMessage = "Employee email not sent";
-                    logLongMessage = "Job for appraisal " + appraisal.getId() + " is null";
-                    logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
+                String employeeEmail = job.getEmployee().getEmail();
+                if (employeeEmail == null || employeeEmail.equals("")) {
+                    logNullEmail(job.getEmployee());
                 } else {
-                    String employeeEmail = job.getEmployee().getEmail();
-                    if (employeeEmail == null || employeeEmail.equals("")) {
-                        logNullEmail(job.getEmployee());
-                    } else {
-                        recipients.add(employeeEmail);
-                    }
+                    recipients.add(employeeEmail);
                 }
             }
 
             if (recipient.equals("supervisor")) {
-                if (job == null) {
+                Job supervisorJob = job.getSupervisor();
+                if (supervisorJob == null) {
                     logShortMessage = "Supervisor email not sent";
-                    logLongMessage = "Job for appraisal " + appraisal.getId() + " is null";
+                    logLongMessage = "Supervisor for appraisal " + appraisal.getId() + " is null";
                     logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                 } else {
-                    Job supervisorJob = job.getSupervisor();
-                    if (supervisorJob == null) {
-                        logShortMessage = "Supervisor email not sent";
-                        logLongMessage = "Supervisor for appraisal " + appraisal.getId() + " is null";
-                        logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
+                    String supervisorEmail = supervisorJob.getEmployee().getEmail();
+                    if (supervisorEmail == null || supervisorEmail.equals("")) {
+                        logNullEmail(supervisorJob.getEmployee());
                     } else {
-                        String supervisorEmail = supervisorJob.getEmployee().getEmail();
-                        if (supervisorEmail == null || supervisorEmail.equals("")) {
-                            logNullEmail(supervisorJob.getEmployee());
-                        } else {
-                            recipients.add(supervisorEmail);
-                        }
+                        recipients.add(supervisorEmail);
                     }
                 }
             }
 
             if (recipient.equals("reviewer")) {
-                if (job == null) {
+                String bcName = job.getBusinessCenterName();
+                List<Reviewer> reviewers = ReviewerMgr.getReviewers(bcName);
+                if (reviewers == null) {
                     logShortMessage = "Reviewer email not sent";
-                    logLongMessage = "Job for appraisal " + appraisal.getId() + " is null";
+                    logLongMessage = "Reviewers for appraisal " + appraisal.getId() + " is null";
                     logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                 } else {
-                    String bcName = job.getBusinessCenterName();
-                    List<Reviewer> reviewers = ReviewerMgr.getReviewers(bcName);
-                    if (reviewers == null) {
-                        logShortMessage = "Reviewer email not sent";
-                        logLongMessage = "Reviewers for appraisal " + appraisal.getId() + " is null";
-                        logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
-                    } else {
-                        for (Reviewer reviewer : reviewers) {
-                            String reviewerEmail = reviewer.getEmployee().getEmail();
-                            if (reviewerEmail == null || reviewerEmail.equals("")) {
-                                logNullEmail(reviewer.getEmployee());
-                            } else {
-                                recipients.add(reviewerEmail);
-                            }
+                    for (Reviewer reviewer : reviewers) {
+                        String reviewerEmail = reviewer.getEmployee().getEmail();
+                        if (reviewerEmail == null || reviewerEmail.equals("")) {
+                            logNullEmail(reviewer.getEmployee());
+                        } else {
+                            recipients.add(reviewerEmail);
                         }
                     }
                 }
             }
-
         }
 
         if (recipients.size() == 0) {
