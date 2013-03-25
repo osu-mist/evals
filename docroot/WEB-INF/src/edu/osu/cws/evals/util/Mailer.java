@@ -666,15 +666,6 @@ public class Mailer {
     }
 
     /**
-     * Fetch the signature of the job for a specific appraisal
-     * @param appraisal
-     * @return
-     */
-    private String getJobSignature(Appraisal appraisal) {
-        return (appraisal.getJob().getSignature());
-    }
-
-    /**
      * Fetch the full name of the employee for a particular appraisal
      * @param appraisal
      * @return
@@ -683,17 +674,6 @@ public class Mailer {
         Job job = appraisal.getJob();
         Employee employee = job.getEmployee();
         return employee.getConventionName();
-    }
-
-    /**
-     * Fetch the id/pidm of the employee for a particular appraisal
-     * @param appraisal
-     * @return
-     */
-    private String getEmployeeId(Appraisal appraisal) {
-        Job job = appraisal.getJob();
-        Integer id = job.getEmployee().getId();
-        return id.toString();
     }
 
     /**
