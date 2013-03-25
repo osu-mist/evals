@@ -175,7 +175,7 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         if (actionHelper.isLoggedInUserReviewer() && appraisal.getEmployeeSignedDate() != null &&
-                !appraisal.getRole().equals("employee") && appraisal.getStatus().equals("completed")) {
+                !appraisal.getRole().equals("employee")) {
             actionHelper.addToRequestMap("displayResendNolij", true);
         }
         if ((actionHelper.isLoggedInUserReviewer() || actionHelper.isLoggedInUserAdmin()) && appraisal.isOpen()
