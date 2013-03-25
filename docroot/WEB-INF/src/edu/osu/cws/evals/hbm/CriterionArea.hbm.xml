@@ -10,10 +10,10 @@
             </generator>
         </id>
         <property name="name" column="NAME"/>
-        <property name="sequence" column="SEQUENCE"/>
         <property name="createDate" type="timestamp" column="CREATE_DATE"/>
         <property name="deleteDate" type="timestamp" column="DELETE_DATE"/>
         <property name="appointmentType" length="45" column="APPOINTMENT_TYPE"/>
+        <property name="description" column="DESCRIPTION"/>
 
         <many-to-one name="creator" class="edu.osu.cws.evals.models.Employee"
                      column="CREATOR_PIDM"
@@ -21,15 +21,10 @@
         <many-to-one name="deleter" class="edu.osu.cws.evals.models.Employee"
                      column="DELETER_PIDM"
                      not-null="false"/>
-        <many-to-one name="originalID" class="edu.osu.cws.evals.models.CriterionArea"
-                     column="ORIGINAL_ID"
+        <many-to-one name="ancestorID" class="edu.osu.cws.evals.models.CriterionArea"
+                     column="ANCESTOR_ID"
                      not-null="false"
                      unique="true"/>
-        <set name="details" inverse="true" order-by="createDate DESC" batch-size="10">
-            <key column="AREA_ID"/>
-            <one-to-many class="edu.osu.cws.evals.models.CriterionDetail"/>
-
-        </set>
     </class>
 
 </hibernate-mapping>

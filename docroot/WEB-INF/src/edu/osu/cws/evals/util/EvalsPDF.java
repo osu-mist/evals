@@ -621,8 +621,13 @@ public class EvalsPDF {
 
         for (Assessment assessment : (java.util.List<Assessment>) appraisal.getSortedAssessments()) {
             i++;
+            /* @todo
             String areaText = i + ". " + assessment.getCriterionDetail().getAreaID().getName().toUpperCase() + ":";
             String descriptionText = " (" + assessment.getCriterionDetail().getDescription() + ")";
+            */
+
+            String areaText = "";
+            String descriptionText = "";
 
             Chunk area = new Chunk(areaText, FONT_BOLD_12);
             area.setUnderline(1f, -2f);

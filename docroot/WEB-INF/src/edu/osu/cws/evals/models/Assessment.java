@@ -9,11 +9,10 @@ public class Assessment extends Evals implements Comparable<Assessment> {
 
     private Appraisal appraisal;
 
-    private CriterionDetail criterionDetail;
+    //@todo
+    //private CriterionDetail criterionDetail;
 
     private String goal;
-
-    private String newGoals;
 
     private String employeeResult;
 
@@ -22,6 +21,14 @@ public class Assessment extends Evals implements Comparable<Assessment> {
     private Date createDate;
 
     private Date modifiedDate;
+
+    private int goalVersionID;
+
+    private int sequence;
+
+    private Integer deleterPidm;
+
+    private Date deleteDate;
 
     private Set<GoalLog> goalLogs = new HashSet<GoalLog>();
 
@@ -53,6 +60,22 @@ public class Assessment extends Evals implements Comparable<Assessment> {
         this.id = id;
     }
 
+    public int getGoalVersionID() {
+        return goalVersionID;
+    }
+
+    public void setGoalVersionID(int goalVersionID) {
+        this.goalVersionID = goalVersionID;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
+    }
+
     public Appraisal getAppraisal() {
         return appraisal;
     }
@@ -61,13 +84,14 @@ public class Assessment extends Evals implements Comparable<Assessment> {
         this.appraisal = appraisal;
     }
 
-    public CriterionDetail getCriterionDetail() {
+    //@todo
+    /*public CriterionDetail getCriterionDetail() {
         return criterionDetail;
     }
 
     public void setCriterionDetail(CriterionDetail criterionDetail) {
         this.criterionDetail = criterionDetail;
-    }
+    }*/
 
     public String getGoal() {
         return goal;
@@ -75,14 +99,6 @@ public class Assessment extends Evals implements Comparable<Assessment> {
 
     public void setGoal(String goal) {
         this.goal = goal;
-    }
-
-    public String getNewGoals() {
-        return newGoals;
-    }
-
-    public void setNewGoals(String newGoals) {
-        this.newGoals = newGoals;
     }
 
     public String getEmployeeResult() {
@@ -117,6 +133,22 @@ public class Assessment extends Evals implements Comparable<Assessment> {
         this.modifiedDate = modifiedDate;
     }
 
+    public Integer getDeleterPidm() {
+        return deleterPidm;
+    }
+
+    public void setDeleterPidm(Integer deleterPidm) {
+        this.deleterPidm = deleterPidm;
+    }
+
+    public Date getDeleteDate() {
+        return deleteDate;
+    }
+
+    public void setDeleteDate(Date deleteDate) {
+        this.deleteDate = deleteDate;
+    }
+
     public Set<GoalLog> getGoalLogs() {
         return goalLogs;
     }
@@ -139,7 +171,8 @@ public class Assessment extends Evals implements Comparable<Assessment> {
             return EQUAL;
         }
 
-        if (this.getCriterionDetail().getAreaID().getSequence() <
+        //@todo
+        /*if (this.getCriterionDetail().getAreaID().getSequence() <
                 otherAssessment.getCriterionDetail().getAreaID().getSequence()) {
             return BEFORE;
         }
@@ -147,7 +180,7 @@ public class Assessment extends Evals implements Comparable<Assessment> {
         if (this.getCriterionDetail().getAreaID().getSequence() >
                 otherAssessment.getCriterionDetail().getAreaID().getSequence()) {
             return AFTER;
-        }
+        }*/
 
         return EQUAL;
     }

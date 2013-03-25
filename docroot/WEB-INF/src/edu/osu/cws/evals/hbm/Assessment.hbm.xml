@@ -13,18 +13,20 @@
         </id>
 
         <property name="goal" type="text" column="GOAL"/>
-        <property name="newGoals" type="text" column="NEW_GOALS"/>
         <property name="employeeResult" type="text" column="EMPLOYEE_RESULT"/>
         <property name="supervisorResult" type="text" column="SUPERVISOR_RESULT"/>
         <property name="createDate" type="timestamp" column="CREATE_DATE"/>
         <property name="modifiedDate" type="timestamp" column="MODIFIED_DATE"/>
+        <property name="goalVersionID" type="int" column="GOAL_VERSION_ID"/>
+        <property name="sequence" type="int" column="SEQUENCE" />
+        <property name="deleterPidm" type="int" column="DELETER_PIDM"/>
+        <property name="deleteDate" type="timestamp" column="DELETE_DATE"/>
+
 
         <many-to-one name="appraisal" class="edu.osu.cws.evals.models.Appraisal"
                      column="APPRAISAL_ID"
                      not-null="true"/>
-        <many-to-one name="criterionDetail" class="edu.osu.cws.evals.models.CriterionDetail"
-                     column="CRITERION_DETAIL_ID"
-                     not-null="true"/>
+
         <set name="goalLogs" inverse="true" order-by="createDate DESC" batch-size="30">
             <key column="ASSESSMENT_ID"/>
             <one-to-many class="edu.osu.cws.evals.models.GoalLog"/>

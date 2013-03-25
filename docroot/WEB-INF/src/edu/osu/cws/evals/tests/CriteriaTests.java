@@ -19,7 +19,8 @@ import java.util.*;
 public class CriteriaTests {
 
     CriterionArea criterionObject = new CriterionArea();
-    CriterionDetail criteriaDetailObject = new CriterionDetail();
+    //@todo
+    //CriterionDetail criteriaDetailObject = new CriterionDetail();
     CriteriaMgr criteriaMgrObject = new CriteriaMgr();
 
     /**
@@ -42,7 +43,8 @@ public class CriteriaTests {
     @BeforeMethod
     public void initializeObjects() throws Exception {
         criterionObject = new CriterionArea();
-        criteriaDetailObject = new CriterionDetail();
+        //@todo
+        //criteriaDetailObject = new CriterionDetail();
         criteriaMgrObject = new CriteriaMgr();
         setUp();
     }
@@ -62,14 +64,14 @@ public class CriteriaTests {
         tx.commit();
 
         criterionObject.setName("Some valid name");
-        criteriaDetailObject.setDescription("Some valid description");
-        criteriaDetailObject.setCreator(creator);
+        criterionObject.setDescription("Some valid description");
+        //was criteriaDetailObject.setDescription("Some valid description");
         criterionObject.setAppointmentType(type);
-        criterionObject.setSequence(1);
         criterionObject.setCreator(creator);
 
         return new Object[][] {
-                { criterionObject, criteriaDetailObject }
+                { criterionObject }
+                //was { criterionObject, criteriaDetailObject }
         };
     }
 
@@ -84,35 +86,43 @@ public class CriteriaTests {
         List activeCriteriaList = criteriaMgrObject.list(CriteriaMgr.DEFAULT_APPOINTMENT_TYPE);
         CriterionArea expectedCriteria = new CriterionArea();
         CriterionArea expectedCriteria2 = new CriterionArea();
-        CriterionDetail expectedDetails = new CriterionDetail();
-        CriterionDetail expectedDetails2 = new CriterionDetail();
+        //@todo
+        //CriterionDetail expectedDetails = new CriterionDetail();
+        //CriterionDetail expectedDetails2 = new CriterionDetail();
 
         CriterionArea fakeCriteria;
         CriterionArea dbCriteria;
-        CriterionDetail fakeDetails;
-        CriterionDetail dbDetails;
+        //@todo
+        //CriterionDetail fakeDetails;
+        //CriterionDetail dbDetails;
 
         String type = AppointmentType.CLASSIFIED;
 
         expectedCriteria.setId(1);
         expectedCriteria.setName("COMMUNICATION SKILLS");
         expectedCriteria.setAppointmentType(type);
-        expectedCriteria.setSequence(1);
         expectedCriteria.setCreator(new Employee());
+        expectedCriteria.setDescription("How will you improve your communication?");
+        /* @todo
+        was
         expectedCriteria.setDetails(new HashSet<CriterionDetail>());
         expectedDetails.setId(1);
         expectedDetails.setDescription("How will you improve your communication?");
         expectedCriteria.getDetails().add(expectedDetails);
+        */
 
         expectedCriteria2.setId(2);
         expectedCriteria2.setName("TECHNICAL SKILLS");
         expectedCriteria2.setAppointmentType(type);
-        expectedCriteria2.setSequence(2);
         expectedCriteria2.setCreator(new Employee());
+        expectedCriteria2.setDescription("What training will you obtain this year?");
+        /* @todo
+        was
         expectedCriteria2.setDetails(new HashSet<CriterionDetail>());
         expectedDetails2.setId(2);
         expectedDetails2.setDescription("What training will you obtain this year?");
         expectedCriteria2.getDetails().add(expectedDetails2);
+         */
 
         ArrayList expected = new ArrayList<CriterionArea>();
         expected.add(expectedCriteria);
@@ -124,9 +134,12 @@ public class CriteriaTests {
             dbCriteria = (CriterionArea) activeCriteriaList.get(i);
             Assert.assertEquals(fakeCriteria.getId(), dbCriteria.getId());
 
+            /* @todo
+            was
             fakeDetails = (CriterionDetail) fakeCriteria.getDetails().toArray()[0];
             dbDetails = (CriterionDetail) fakeCriteria.getDetails().toArray()[0];
             Assert.assertEquals(fakeDetails.getId(), dbDetails.getId());
+            */
         }
     }
 
@@ -142,9 +155,14 @@ public class CriteriaTests {
         CriterionArea result = (CriterionArea) hsession.load(CriterionArea.class, 1);
         tx.commit();
 
+        Assert.assertEquals(result.getDescription(),
+                "How will you increase your communication skills?");
+        /* @todo
+        was
         Assert.assertEquals(result.getDetails().size(), 2);
         Assert.assertEquals(result.getCurrentDetail().getDescription(),
                 "How will you increase your communication skills?");
+        */
     }
 
 
@@ -166,24 +184,6 @@ public class CriteriaTests {
         assert !criterionObject.getErrors().containsKey("name") : "No name error msg should be present";
     }
 
-    /**
-     * Tests that criteria sequence is required.
-     */
-    @Test(groups = {"unittest"})
-    public void shouldRequireASequence() {
-        criterionObject.setSequence(0);
-        assert !criterionObject.validateSequence() : "Sequence should be required";
-        assert criterionObject.getErrors().containsKey("sequence") : "Missing sequence error msg";
-
-        criterionObject.setSequence(-1);
-        assert !criterionObject.validateSequence(): "Sequence should be greater than 1";
-        assert criterionObject.getErrors().containsKey("sequence") : "Missing sequence error msg";
-
-
-        criterionObject.setSequence(1);
-        assert criterionObject.validateSequence(): "Sequence should validate";
-        assert !criterionObject.getErrors().containsKey("sequence") : "No sequence error msg should be present";
-    }
 
     /**
      * Tests that a valid appointment type is associated to the CriterionArea Object.
@@ -216,33 +216,42 @@ public class CriteriaTests {
      */
     @Test(groups = {"unitttest"})
     public void shouldRequireDescription() {
+        assert !criterionObject.validateDescription() :
+                "A valid description should be required";
+        assert criterionObject.getErrors().containsKey("description") :
+                "Missing description error msg";
+        /* @todo
+        was
         assert !criteriaDetailObject.validateDescription() :
                 "A valid description should be required";
         assert criteriaDetailObject.getErrors().containsKey("description") :
                 "Missing description error msg";
+         */
     }
 
     @Test(groups={"unittest"}, expectedExceptions = {ModelException.class}, dataProvider = "criteria")
-    public void shouldValidateAllAreaFields(CriterionArea area, CriterionDetail details)
+    public void shouldValidateAllAreaFields(CriterionArea area)
+    //@todo
+    // public void shouldValidateAllAreaFields(CriterionArea area, CriterionDetail details)
             throws ModelException {
 
         area.setName("");
-        area.setSequence(0);
         area.setAppointmentType(AppointmentType.CLASSIFIED);
         assert !area.validate() : "All fields in CriterionArea should check validation";
     }
 
     /**
      * @param area
-     * @param details
      * @throws ModelException
      */
     @Test(groups={"unittest"}, expectedExceptions = {ModelException.class}, dataProvider = "criteria")
-    public void shouldValidateAllCriteriaDetails(CriterionArea area, CriterionDetail details)
+    public void shouldValidateAllCriteriaDetails(CriterionArea area)
+    //@todo
+    // public void shouldValidateAllAreaFields(CriterionArea area, CriterionDetail details)
             throws ModelException {
 
-        details.setDescription("");
-        assert !details.validate() : "All fields in CriterionDetail should check validation";
+        area.setDescription("");
+        assert !area.validate() : "All fields in CriterionDetail should check validation";
 
     }
 
@@ -259,21 +268,17 @@ public class CriteriaTests {
         tx.commit();
 
         criterionObject.setName("Communication");
-        criteriaDetailObject.setDescription("How do you plan to improve your communication skills?");
+        //@todo
+        //criteriaDetailObject.setDescription("How do you plan to improve your communication skills?");
+        criterionObject.setDescription("How do you plan to improve your communication skills?");
         criterionObject.setAppointmentType(type);
-        criterionObject.setSequence(1);
 
-        assert criteriaMgrObject.add(criterionObject, criteriaDetailObject, createdBy) :
+        assert criteriaMgrObject.add(criterionObject, createdBy) :
+        //@todo
+        //assert criteriaMgrObject.add(criterionObject, criteriaDetailObject, createdBy) :
                     "Valid data should save";
     }
 
-    @Test (groups = {"unittest"})
-    public void shouldReturnNextAvailableSequence() throws Exception {
-        setUp();
-        assert criteriaMgrObject.getNextSequence(CriteriaMgr.DEFAULT_APPOINTMENT_TYPE) == 3 :
-                "Incorrect calculation of next sequence";
-
-    }
 
     /**
      * Tests that when only the criteria name is modified in the edit action,
@@ -295,8 +300,8 @@ public class CriteriaTests {
 
         // grab old ids and properties to compare
         int oldCriterionAreaID = criterionArea.getId();
-        int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
-        int oldSequence = criterionArea.getSequence();
+        //@todo
+        //int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
 
         criteriaMgrObject.edit(request, id, employee);
 
@@ -304,9 +309,6 @@ public class CriteriaTests {
         criterionArea =  criteriaMgrObject.get(id);
         assert criterionArea.getDeleteDate() != null : "Should have set deletedDate in old pojo";
         assert criterionArea.getDeleter() != null : "Should have set deleter in old pojo";
-
-        // Sequence should not change
-        assert criterionArea.getSequence() == oldSequence : "Sequence should not change";
 
         Session session = HibernateUtil.getCurrentSession();
         try {
@@ -323,9 +325,10 @@ public class CriteriaTests {
         // Checks that two new pojos were created
         assert oldCriterionAreaID != criterionArea.getId() :
                 "should have created a new criteria pojo";
+        /* @todo
         assert oldCriterionDetailID != criterionArea.getCurrentDetail().getId() :
                 "should have created a new criteria detail pojo";
-        assert oldSequence == criterionArea.getSequence() : "Sequence should not change";
+        */
     }
 
     /**
@@ -349,8 +352,8 @@ public class CriteriaTests {
 
         // grab old ids and properties to compare
         int oldCriterionAreaID = criterionArea.getId();
-        int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
-        int oldSequence = criterionArea.getSequence();
+        //@todo
+        //int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
 
         criteriaMgrObject.edit(request, id, employee);
 
@@ -358,9 +361,6 @@ public class CriteriaTests {
         criterionArea =  criteriaMgrObject.get(id);
         assert criterionArea.getDeleteDate() == null : "Should not have set deletedDate in old pojo";
         assert criterionArea.getDeleter() == null : "Should not have set deleter in old pojo";
-
-        // Sequence should not change
-        assert criterionArea.getSequence() == oldSequence : "Sequence should not change";
 
         Session session = HibernateUtil.getCurrentSession();
         try {
@@ -377,10 +377,12 @@ public class CriteriaTests {
         // Checks that two new pojos were created
         assert oldCriterionAreaID == criterionArea.getId() :
                 "should not have created a new criteria pojo";
+        /* @todo
         assert oldCriterionDetailID != criterionArea.getCurrentDetail().getId() :
                 "should have created a new criteria detail pojo";
-        assert oldSequence == criterionArea.getSequence() : "Sequence should not change";
-        assert criterionArea.getCurrentDetail().getDescription().equals(newCriteriaDetail);
+        */
+        assert criterionArea.getDescription().equals(newCriteriaDetail);
+        //was assert criterionArea.getCurrentDetail().getDescription().equals(newCriteriaDetail);
     }
 
     /**
@@ -404,8 +406,8 @@ public class CriteriaTests {
 
         // grab old ids and properties to compare
         int oldCriterionAreaID = criterionArea.getId();
-        int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
-        int oldSequence = criterionArea.getSequence();
+        //@todo
+        //int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
 
         criteriaMgrObject.edit(request, id, employee);
 
@@ -413,9 +415,6 @@ public class CriteriaTests {
         criterionArea =  criteriaMgrObject.get(id);
         assert criterionArea.getDeleteDate() != null : "Should have set deletedDate in old pojo";
         assert criterionArea.getDeleter() != null : "Should have set deleter in old pojo";
-
-        // Sequence should not change
-        assert criterionArea.getSequence() == oldSequence : "Sequence should not change";
 
         Session session = HibernateUtil.getCurrentSession();
         try {
@@ -432,12 +431,13 @@ public class CriteriaTests {
         // Checks that two new pojos were created
         assert oldCriterionAreaID != criterionArea.getId() :
                 "should have created a new criteria pojo";
+        /* @todo
         assert oldCriterionDetailID != criterionArea.getCurrentDetail().getId() :
                 "should have created a new criteria detail pojo";
-        assert oldSequence == criterionArea.getSequence() : "Sequence should not change";
+        */
         assert criterionArea.getName().equals(newCriterionName) : "Should have updated name";
-        assert criterionArea.getCurrentDetail().
-                getDescription().equals(newDetailDescription);
+        assert criterionArea.getDescription().equals(newDetailDescription);
+        // was assert criterionArea.getCurrentDetail().getDescription().equals(newDetailDescription);
     }
 
     /**
@@ -462,8 +462,8 @@ public class CriteriaTests {
 
         // grab old ids and properties to compare
         int oldCriterionAreaID = criterionArea.getId();
-        int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
-        int oldSequence = criterionArea.getSequence();
+        //@todo
+        //int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
 
         criteriaMgrObject.edit(request, id, employee);
 
@@ -471,9 +471,6 @@ public class CriteriaTests {
         criterionArea =  criteriaMgrObject.get(id);
         assert criterionArea.getDeleteDate() == null : "Should not have set deletedDate in old pojo";
         assert criterionArea.getDeleter() == null : "Should not have set deleter in old pojo";
-
-        // Sequence should not change
-        assert criterionArea.getSequence() == oldSequence : "Sequence should not change";
 
         Session session = HibernateUtil.getCurrentSession();
         try {
@@ -490,10 +487,12 @@ public class CriteriaTests {
         // Checks that two new pojos were created
         assert oldCriterionAreaID == criterionArea.getId() :
                 "should not have created a new criteria pojo";
+        /* @todo
         assert oldCriterionDetailID != criterionArea.getCurrentDetail().getId() :
                 "should have created a new criteria detail pojo";
-        assert oldSequence == criterionArea.getSequence() : "Sequence should not change";
-        assert criterionArea.getCurrentDetail().getDescription().equals(newCriteriaDetail);
+        */
+        assert criterionArea.getDescription().equals(newCriteriaDetail);
+        //was assert criterionArea.getCurrentDetail().getDescription().equals(newCriteriaDetail);
 
         session = HibernateUtil.getCurrentSession();
         try {
@@ -503,6 +502,7 @@ public class CriteriaTests {
                     .list();
             tx.commit();
 
+            /* @todo
             Assessment assessment = results.get(0);
             assert assessment.getCriterionDetail().getId() != 3 :
                     "Open Appraisals should have assessments' Criterion Detail ID modified";
@@ -518,6 +518,8 @@ public class CriteriaTests {
             assessment = results.get(3);
             assert assessment.getCriterionDetail().getId() == 3 :
                     "Completed Appraisals should not have assessments' Criterion Detail ID modified";
+            */
+
         } catch (Exception e) {
             session.close();
             throw e;
@@ -539,27 +541,4 @@ public class CriteriaTests {
         criteriaMgrObject.delete(3, new Employee(12345));
     }
 
-    public void shouldDeleteCriteriaAndUpdateSequence() throws Exception {
-        criteriaMgrObject.delete(1, new Employee(12345));
-        assert criteriaMgrObject.list(AppointmentType.CLASSIFIED).size() == 1;
-        assert criteriaMgrObject.getNextSequence(AppointmentType.CLASSIFIED) == 2 :
-                "Invalid criteria sequence";
-    }
-
-    public void shouldUpdateSequenceWhenMovingDown() throws Exception {
-        criteriaMgrObject.updateSequence(1, 2);
-        assert criteriaMgrObject.get(1).getSequence() == 2;
-        assert criteriaMgrObject.get(2).getSequence() == 1;
-    }
-
-    public void shouldUpdateSequenceWhenMovingUp() throws Exception {
-        criteriaMgrObject.updateSequence(2, 1);
-        assert criteriaMgrObject.get(1).getSequence() == 2;
-        assert criteriaMgrObject.get(2).getSequence() == 1;
-    }
-
-    @Test(expectedExceptions = {ModelException.class})
-    public void shouldNotUpdateSequenceOfDeletedCriteria() throws Exception {
-        criteriaMgrObject.updateSequence(3, 1);
-    }
 }

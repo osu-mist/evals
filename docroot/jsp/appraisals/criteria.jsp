@@ -2,9 +2,11 @@
 Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 %>
 <fieldset>
+<%-- @todo
 <h3 class="secret"><c:out value="${assessment.criterionDetail.areaID.name}"/></h3>
 <legend><c:out value="${assessment.criterionDetail.areaID.name}"/></legend>
 <p class="instructions"><c:out value="${assessment.criterionDetail.description}" /></p>
+--%>
 
 <c:choose>
     <c:when test="${permissionRule.goals == 'e'}">
@@ -31,7 +33,9 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
     <c:when test="${permissionRule.newGoals == 'v'}">
         <fieldset>
             <legend><liferay-ui:message key="appraisal-newGoals" /></legend>
+            <%-- @todo getNewGoals no longer exists
             <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAssessment.getNewGoals()) %></p>
+            --%>
         </fieldset>
     </c:when>
 </c:choose>

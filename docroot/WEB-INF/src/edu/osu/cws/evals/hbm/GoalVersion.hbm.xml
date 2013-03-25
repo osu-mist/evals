@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping auto-import="false" >
+
+    <class name="edu.osu.cws.evals.models.GoalVersion" table="goals_versions"
+           dynamic-insert="true"
+           dynamic-update="true">
+        <id name="id" type="int" column="ID">
+            <generator class="native">
+                <param name="sequence">pass_seq</param>
+            </generator>
+        </id>
+
+        <property name="appraisalID" type="int" column="APPRAISAL_ID"/>
+        <property name="approverPidm" type="date" column="APPROVER_PIDM"/>
+        <property name="createDate" type="date" column="CREATE_DATE"/>
+        <property name="approvedDate" type="date" column="APRROVED_DATE"/>
+
+    </class>
+
+</hibernate-mapping>

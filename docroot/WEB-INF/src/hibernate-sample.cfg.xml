@@ -50,7 +50,6 @@ name of the hibernate configuration file.
         <mapping resource="edu/osu/cws/evals/hbm/BusinessCenter.hbm.xml" />
         <mapping resource="edu/osu/cws/evals/hbm/CloseOutReason.hbm.xml" />
         <mapping resource="edu/osu/cws/evals/hbm/CriterionArea.hbm.xml" />
-        <mapping resource="edu/osu/cws/evals/hbm/CriterionDetail.hbm.xml" />
         <mapping resource="edu/osu/cws/evals/hbm/Configuration.hbm.xml" />
         <mapping resource="edu/osu/cws/evals/hbm/Employee.hbm.xml" />
         <mapping resource="edu/osu/cws/evals/hbm/Job.hbm.xml"/>
@@ -64,5 +63,8 @@ name of the hibernate configuration file.
         <mapping resource="edu/osu/cws/evals/hbm/AppraisalStep.hbm.xml"/>
         <mapping resource="edu/osu/cws/evals/hbm/PermissionRule.hbm.xml"/>
         <mapping resource="edu/osu/cws/evals/hbm/Reviewer.hbm.xml"/>
+        <mapping resource="edu/osu/cws/evals/hbm/GoalVersion.hbm.xml"/>
+        <mapping resource="edu/osu/cws/evals/hbm/AssessmentCriteria.hbm.xml"/>
+
     </session-factory>
 </hibernate-configuration>
