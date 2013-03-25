@@ -75,7 +75,7 @@ public class AppraisalMgr {
      * @param job   Job for this appraisal
      * @param type: trial, annual, initial
      * @param goalsDueConfig: Configuration object of goalsDue or resultsDue
-     * @param startDate: starting date of appraisal period.
+     * @param startDate: (DateTime) starting date of appraisal period.
      * @return appraisal.id
      * @throws Exception
      */
@@ -133,7 +133,7 @@ public class AppraisalMgr {
      * Sets the status of the appraisal. If the startDate of the appraisal is before Nov 1st, 2011, we set the
      * status to appraisalDue, else if
      *
-     * @param startDate
+     * @param startDate         DateTime object
      * @param goalsDueConfig
      * @param appraisal
      * @throws Exception
@@ -1030,7 +1030,7 @@ public class AppraisalMgr {
 
     /** select count(*) from appraisals where job.... and startDAte = startDate and type = type
      * @param job: job against which the appraisal was create
-     * @param startDate: start date of appraisal period
+     * @param startDate: (DateTime) start date of appraisal period
      * @param type: "trial" or "annual".
      * @return true if an appraisal exist for job and startDate and type, false otherwise
      */
@@ -1095,7 +1095,7 @@ public class AppraisalMgr {
 
     /**
      * @param job
-     * @param appraisalStartDate
+     * @param appraisalStartDate    DateTime object
      * @return
      * @throws Exception
      */

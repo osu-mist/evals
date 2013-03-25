@@ -346,7 +346,7 @@ public class Job extends Evals implements Serializable {
 
     /**
      * Trial start date doed not need to be the first date of the month.
-     * @return  start date of the trial appraisal period.
+     * @return  (DateTime) start date of the trial appraisal period.
      */
     public DateTime getTrialStartDate()
     {
@@ -374,13 +374,13 @@ public class Job extends Evals implements Serializable {
 
     /**
      *
-     * @return start date of appraisal period of the current year.
+     * @return (DateTime) start date of appraisal period of the current year.
      * This day may be in the past of the future.
      * @throws Exception
      */
     public DateTime getNewAnnualStartDate() throws Exception {
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        DateTime initialStartDate = getInitialEvalStartDate(); //starting point Jan 1st 2011
+        DateTime initialStartDate = getInitialEvalStartDate();
         DateTime newStartDate = initialStartDate;
 
         // Verify that this is not the first annual appraisal and that annualInd is 18
@@ -402,7 +402,7 @@ public class Job extends Evals implements Serializable {
     }
 
     /**
-     * Checks whether or not Date() - right now is within the first annual evaluation. This
+     * Checks whether or not DateTime() - right now is within the first annual evaluation. This
      * is used to figure out if when getNewAnnualStartDate is called and annual_ind = 18,
      * whether we are in the first review period or the 2nd one.
      *
@@ -442,7 +442,7 @@ public class Job extends Evals implements Serializable {
 
     /**
      *
-     * @return a Date object representing the start date of the initial annual appraisal period
+     * @return a DateTime object representing the start date of the initial annual appraisal period
      */
     public DateTime getInitialEvalStartDate()
     {
@@ -457,7 +457,7 @@ public class Job extends Evals implements Serializable {
 
     /**
      *
-     * @param startDate
+     * @param startDate     DateTime object
      * @param type: trial, or annual
      * @return
      */

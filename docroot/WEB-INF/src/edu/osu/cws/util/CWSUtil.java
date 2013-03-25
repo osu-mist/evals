@@ -24,9 +24,9 @@ public class CWSUtil {
 
     /**
      *
-     * @param start: start of the period
-     * @param end: end of the period
-     * @param target: The date in question
+     * @param start: (DateTime) start of the period
+     * @param end: (DateTime) end of the period
+     * @param target: (DateTime) The date in question
      * @return true is target is the same as start or end, or target is between start and end.  False otherwise.
      */
     public static boolean isWithinPeriod(DateTime start, DateTime end, DateTime target) {
@@ -38,8 +38,8 @@ public class CWSUtil {
 
     /**
      *
-     * @param start
-     * @param end
+     * @param start     DateTime object
+     * @param end       DateTime object
      * @return true is the current time is between start and end, false otherwise.
      */
     public static boolean isWithinPeriod(DateTime start, DateTime end) {
@@ -49,7 +49,7 @@ public class CWSUtil {
     /**
      *
      * @param dt: reference point
-     * @return if date is the first date of the month, return the input date
+     * @return (DateTime) if date is the first date of the month, return the input date
      * else return the first day of next month
      */
    public static DateTime getFirstDayOfMonth(DateTime dt) {
@@ -62,7 +62,7 @@ public class CWSUtil {
     /**
      * Null safe way to convert Joda Datetime to Date.
      *
-     * @param dt
+     * @param dt    DateTime object
      * @return
      */
     public static Date toDate(DateTime dt) {

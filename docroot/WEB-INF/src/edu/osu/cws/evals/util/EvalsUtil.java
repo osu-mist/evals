@@ -239,7 +239,7 @@ public class EvalsUtil {
      * processing evaluations.
      *
      * @param job
-     * @param startDate
+     * @param startDate     DateTime object
      * @param type
      * @return
      * @throws ParseException
@@ -259,7 +259,7 @@ public class EvalsUtil {
     /**
      * Parses the constant EVALS_START_DATE and stores a date object in evalsStartDate.
      *
-     * @return
+     * @return  DateTime object
      * @throws ParseException
      */
     public static DateTime getEvalsStartDate() throws ParseException {
