@@ -258,8 +258,6 @@ public class EvalsPortlet extends GenericPortlet {
                 Transaction tx = hibSession.beginTransaction();
 
                 actionHelper = new ActionHelper(request, null, getPortletContext());
-                actionHelper.setEvalsConfiguration(false);
-                message += "Stored Configuration Map and List in portlet context\n";
                 createMailer();
                 message += "Mailer setup successfully\n";
                 getPortletContext().setAttribute("permissionRules", permissionRuleMgr.list());
@@ -268,11 +266,7 @@ public class EvalsPortlet extends GenericPortlet {
                 message += "Stored Appraisal Steps in portlet context\n";
                 loadResourceBundle();
                 message += "Stored resource bundle Language.properties in portlet context\n";
-                Date currentTimestamp = new Date();
-                getPortletContext().setAttribute(CONTEXT_CACHE_TIMESTAMP, currentTimestamp);
-                message += "Stored contextCacheTimestamp of " + currentTimestamp.toString() + "\n";
-                actionHelper.setEvalsAdmins(false);
-                actionHelper.setEvalsReviewers(false);
+                actionHelper.setupAdminConfig();
                 actionHelper.setNotices(false);
                 message += "Stored notices in portlet context\n";
                 tx.commit();

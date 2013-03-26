@@ -352,11 +352,22 @@ public class ActionHelper {
         Date contextCacheTimestamp = (Date) portletContext.getAttribute(EvalsPortlet.CONTEXT_CACHE_TIMESTAMP);
         Timestamp contextLastUpdate = ConfigurationMgr.getContextLastUpdate();
         if (contextCacheTimestamp != null && contextLastUpdate.after(contextCacheTimestamp)) {
-            setEvalsAdmins(false);
-            setEvalsReviewers(false);
-            setEvalsConfiguration(false);
-            portletContext.setAttribute(EvalsPortlet.CONTEXT_CACHE_TIMESTAMP, new Date());
+            setupAdminConfig();
         }
+    }
+
+    /**
+     * Refreshes the context cache:
+     * admins, reviewers and configuration lists and maps. If the context cache is refreshed, it
+     * updates the context cache timestamp in the portlet context.
+     *
+     * @throws Exception
+     */
+    public void setupAdminConfig() throws Exception {
+        setEvalsAdmins(false);
+        setEvalsReviewers(false);
+        setEvalsConfiguration(false);
+        portletContext.setAttribute(EvalsPortlet.CONTEXT_CACHE_TIMESTAMP, new Date());
     }
 
     /**
