@@ -121,7 +121,7 @@ public class EvalsUtil {
         String hostname = CWSUtil.getLocalHostname();
         System.out.println("hostname is " + hostname);
 
-        String filenameHead = portletRoot + Constants.ROOT_DIR;
+        String filenameHead = portletRoot + Constants.getRootDir();
 
         if (env.equals("backend"))
             filenameHead = filenameHead + "backend_";
