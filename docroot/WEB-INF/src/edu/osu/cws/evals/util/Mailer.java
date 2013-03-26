@@ -172,11 +172,7 @@ public class Mailer {
         for (String recipient : mailToArray) {
             if (recipient.equals("employee")) {
                 String employeeEmail = job.getEmployee().getEmail();
-                if (employeeEmail == null || employeeEmail.equals("")) {
-                    logNullEmail(job.getEmployee());
-                } else {
-                    recipients.add(employeeEmail);
-                }
+                addEmailList(employeeEmail, job.getEmployee(), recipients);
             }
 
             if (recipient.equals("supervisor")) {
@@ -187,11 +183,7 @@ public class Mailer {
                     logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                 } else {
                     String supervisorEmail = supervisorJob.getEmployee().getEmail();
-                    if (supervisorEmail == null || supervisorEmail.equals("")) {
-                        logNullEmail(supervisorJob.getEmployee());
-                    } else {
-                        recipients.add(supervisorEmail);
-                    }
+                    addEmailList(supervisorEmail, supervisorJob.getEmployee(), recipients);
                 }
             }
 
@@ -205,21 +197,13 @@ public class Mailer {
                 } else {
                     for (Reviewer reviewer : reviewers) {
                         String reviewerEmail = reviewer.getEmployee().getEmail();
-                        if (reviewerEmail == null || reviewerEmail.equals("")) {
-                            logNullEmail(reviewer.getEmployee());
-                        } else {
-                            recipients.add(reviewerEmail);
-                        }
+                        addEmailList(reviewerEmail, reviewer.getEmployee(), recipients);
                     }
                 }
             }
         }
 
-        if (recipients.size() == 0) {
-            return null;
-        }
-
-        return recipients.toArray(new String[recipients.size()]);
+        return recipients.isEmpty()? null :  recipients.toArray(new String[recipients.size()]);
     }
 
     /**
@@ -234,6 +218,23 @@ public class Mailer {
         logShortMessage = employee.getId() + " has a blank or null email address";
         logLongMessage = " PIDM = " + employee.getId() +" does not have a valid email address";
         logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
+    }
+
+    /**
+     * Adds an email to an array list. If the email is null or empty string it logs the data error.
+     *
+     * @param email         Email address we're trying to send an email to
+     * @param employee      Employee/Reviewer/Supervisor that we're trying to email
+     * @param recipients    List of recipient email addresses
+     * @throws Exception
+     */
+    private void addEmailList(String email, Employee employee, List<String> recipients)
+            throws Exception {
+        if (email == null || email.equals("")) {
+            logNullEmail(employee);
+        } else {
+            recipients.add(email);
+        }
     }
 
     /**
