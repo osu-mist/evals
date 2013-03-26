@@ -43,7 +43,7 @@ public class AppraisalsTest {
      */
     @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
     public void shouldCreateAnAppraisal(Job job, Configuration configuration) throws Exception {
-        assert AppraisalMgr.createAppraisal(job, new DateTime(),  Appraisal.TYPE_ANNUAL, configuration).getId() != 0 :
+        assert AppraisalMgr.createAppraisal(job, new DateTime(),  Appraisal.TYPE_ANNUAL).getId() != 0 :
                 "AppraisalMgr.createAppraisal should return id of appraisal";
     }
 
@@ -51,7 +51,7 @@ public class AppraisalsTest {
     public void appraisalShouldRequireValidJob() throws Exception {
         Job invalidJob = new Job();
 
-        assert AppraisalMgr.createAppraisal(invalidJob, new DateTime(),  Appraisal.TYPE_ANNUAL, new Configuration()).getId() != 0 :
+        assert AppraisalMgr.createAppraisal(invalidJob, new DateTime(),  Appraisal.TYPE_ANNUAL).getId() != 0 :
                 "AppraisalMgr.createAppraisal should require valid Job";
     }
 
@@ -133,8 +133,8 @@ public class AppraisalsTest {
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         tx.commit();
 
-        int appraisalID =  AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL,
-                new Configuration()).getId();
+        int appraisalID =  AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL)
+                .getId();
         hsession = HibernateUtil.getCurrentSession();
         tx = hsession.beginTransaction();
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
@@ -184,8 +184,8 @@ public class AppraisalsTest {
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         tx.commit();
 
-        int appraisalID =  AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL,
-                new Configuration()).getId();
+        int appraisalID =  AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL)
+                .getId();
         hsession = HibernateUtil.getCurrentSession();
         tx = hsession.beginTransaction();
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
@@ -215,8 +215,8 @@ public class AppraisalsTest {
         Transaction tx = hsession.beginTransaction();
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         tx.commit();
-        int appraisalID =  AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL,
-                new Configuration()).getId();
+        int appraisalID =  AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL)
+                .getId();
 
         // Grab the freshly created appraisal from the db before we start
         // updating the properties.
@@ -403,7 +403,7 @@ public class AppraisalsTest {
     @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
     public void shouldSetTheStartDateWhenCreatingAppraisal(Job job, Configuration configuration) throws Exception {
         DateTime today = new DateTime();
-        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_ANNUAL, configuration);
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_ANNUAL);
         assert appraisal.getStartDate().equals(today);
     }
 
@@ -411,13 +411,13 @@ public class AppraisalsTest {
             expectedExceptions = {ModelException.class})
     public void shouldOnlyCreateTwoTypesOfAppraisals(Job job, Configuration configuration) throws Exception {
         DateTime today = new DateTime();
-        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_ANNUAL, configuration);
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_ANNUAL);
         assert appraisal != null;
 
-        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL, configuration);
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL);
         assert appraisal != null;
 
-        appraisal = AppraisalMgr.createAppraisal(job, today, "invalid type", configuration);
+        appraisal = AppraisalMgr.createAppraisal(job, today, "invalid type");
         assert appraisal == null;
 
     }
@@ -428,13 +428,13 @@ public class AppraisalsTest {
         DateTime today = new DateTime();
         DateTime endDate = job.getEndEvalDate(today, Appraisal.TYPE_TRIAL);
 
-        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL, configuration);
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL);
         assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
         assert appraisal.getEndDate().equals(endDate.toDate()) : "End date should have been today + 6 months.";
 
         job.setTrialInd(9);
         endDate = job.getEndEvalDate(today, Appraisal.TYPE_TRIAL);
-        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL, configuration);
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL);
         assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
         assert appraisal.getEndDate().equals(endDate.toDate()) : "End date should have been today + 9 months.";
     }
@@ -446,7 +446,7 @@ public class AppraisalsTest {
         job.setAnnualInd(12);
         DateTime endDate = job.getEndEvalDate(today, Appraisal.TYPE_INITIAL);
 
-        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL, goalsDueConfig);
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL);
         appraisal = AppraisalMgr.createInitialAppraisalAfterTrial(appraisal, resultsDueConfig);
         assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
         assert appraisal.getEndDate().equals(endDate.toDate()) : "End date should have been today + 12 months.";
@@ -454,7 +454,7 @@ public class AppraisalsTest {
         job.setAnnualInd(18);
         endDate = job.getEndEvalDate(today, Appraisal.TYPE_INITIAL);
 
-        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL, goalsDueConfig);
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL);
         appraisal = AppraisalMgr.createInitialAppraisalAfterTrial(appraisal, resultsDueConfig);
         assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
         assert appraisal.getEndDate().equals(endDate.toDate()) : "End date should have been today + 18 months.";
@@ -467,20 +467,20 @@ public class AppraisalsTest {
         job.setAnnualInd(100);
         DateTime endDate = job.getEndEvalDate(today, Appraisal.TYPE_ANNUAL);
 
-        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_ANNUAL, configuration);
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_ANNUAL);
         assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
         assert appraisal.getEndDate().equals(endDate.toDate()) :
                 "End date should have been today + 12 months for annual appraisals.";
     }
 
     @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
-    public void shouldSetStatusToAppraisalDueIfStartDateIsBeforeNov1st2011(Job job, Configuration configuration)
+    public void shouldSetStatusToAppraisalDueIfStartDateIsBeforeNov1st2011(Job job)
             throws Exception{
         String startPointString = "10/29/2011";
         DateTimeFormatter fmt = DateTimeFormat.forPattern(Constants.DATE_FORMAT_FULL);
         DateTime startPointDate = fmt.parseDateTime(startPointString);
 
-        appraisal = AppraisalMgr.createAppraisal(job, startPointDate, Appraisal.TYPE_ANNUAL, configuration);
+        appraisal = AppraisalMgr.createAppraisal(job, startPointDate, Appraisal.TYPE_ANNUAL);
         assert appraisal.getStartDate().equals(startPointDate) : "Start date should be set correctly.";
         assert appraisal.getStatus().equals(Appraisal.STATUS_APPRAISAL_DUE) :
                 "appraisal status should have been appraisalDue, instead got - " + appraisal.getStatus();
@@ -507,7 +507,7 @@ public class AppraisalsTest {
         DateTimeFormatter fmt = DateTimeFormat.forPattern(Constants.DATE_FORMAT_FULL);
         DateTime startPointDate = fmt.parseDateTime(startPointString);
 
-        appraisal = AppraisalMgr.createAppraisal(job, startPointDate, Appraisal.TYPE_ANNUAL, configuration);
+        appraisal = AppraisalMgr.createAppraisal(job, startPointDate, Appraisal.TYPE_ANNUAL);
         assert appraisal.getStartDate().equals(startPointDate) : "Start date should be set correctly.";
         assert appraisal.getStatus().equals(Appraisal.STATUS_GOALS_DUE) :
                 "appraisal status should have been goalsDue, instead got - " + appraisal.getStatus();
