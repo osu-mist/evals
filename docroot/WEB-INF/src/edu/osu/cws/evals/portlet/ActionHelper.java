@@ -172,10 +172,10 @@ public class ActionHelper {
      * Updates the admins List in the portletContext. This method is called by
      * EvalsPortlet.portletSetup and by AdminsAction.add methods.
      *
-     * @param updateContextTimestamp    Whether or not to update the context timestamp in config_times
+     * @param
      * @throws Exception
      */
-    public void setEvalsAdmins(boolean updateContextTimestamp) throws Exception {
+    private void setEvalsAdmins() throws Exception {
         portletContext.setAttribute("admins", adminMgr.mapByEmployeeId());
         List<Admin> admins = adminMgr.list();
         // Call getName on the admins object to initialize the employee name
@@ -185,19 +185,16 @@ public class ActionHelper {
             }
         }
         portletContext.setAttribute("adminsList", admins);
-        if (updateContextTimestamp) {
-            updateContextTimestamp();
-        }
     }
 
     /**
      * Updates the reviewers List in the portletContext. This method is called by
      * EvalsPortlet.portletSetup and by ReviewersAction.add methods.
      *
-     * @param updateContextTimestamp    Whether or not to update the context timestamp in config_times
+     * @param
      * @throws Exception
      */
-    public void setEvalsReviewers(boolean updateContextTimestamp) throws Exception {
+    private void setEvalsReviewers() throws Exception {
         portletContext.setAttribute("reviewers", reviewerMgr.mapByEmployeeId());
         List<Reviewer> reviewers = reviewerMgr.list();
         // Call getName on the reviewers object to initialize the employee name
@@ -207,24 +204,18 @@ public class ActionHelper {
             }
         }
         portletContext.setAttribute("reviewersList", reviewers);
-        if (updateContextTimestamp) {
-            updateContextTimestamp();
-        }
     }
 
     /**
      * Updates the configuration List in the portletContext. This method is called by
      * EvalsPortlet.portletSetup and by ConfigurationsAction.edit methods.
      *
-     * @param updateContextTimestamp    Whether or not to update the context timestamp in config_times
+     * @param
      * @throws Exception
      */
-    public void setEvalsConfiguration(boolean updateContextTimestamp) throws Exception {
+    private void setEvalsConfiguration() throws Exception {
         portletContext.setAttribute("configurations", configurationMgr.mapByName());
         portletContext.setAttribute("configurationsList", configurationMgr.list());
-        if (updateContextTimestamp) {
-            updateContextTimestamp();
-        }
     }
 
     /**
@@ -352,7 +343,7 @@ public class ActionHelper {
         Date contextCacheTimestamp = (Date) portletContext.getAttribute(EvalsPortlet.CONTEXT_CACHE_TIMESTAMP);
         Timestamp contextLastUpdate = ConfigurationMgr.getContextLastUpdate();
         if (contextCacheTimestamp != null && contextLastUpdate.after(contextCacheTimestamp)) {
-            setupAdminConfig();
+            setupAdminConfig(false);
         }
     }
 
@@ -361,13 +352,18 @@ public class ActionHelper {
      * admins, reviewers and configuration lists and maps. If the context cache is refreshed, it
      * updates the context cache timestamp in the portlet context.
      *
+     * @param updateContextTimestamp    Whether or not to update the context timestamp in config_times
      * @throws Exception
      */
-    public void setupAdminConfig() throws Exception {
-        setEvalsAdmins(false);
-        setEvalsReviewers(false);
-        setEvalsConfiguration(false);
+    public void setupAdminConfig(boolean updateContextTimestamp) throws Exception {
+        setEvalsAdmins();
+        setEvalsReviewers();
+        setEvalsConfiguration();
+        setNotices();
         portletContext.setAttribute(EvalsPortlet.CONTEXT_CACHE_TIMESTAMP, new Date());
+        if (updateContextTimestamp) {
+            updateContextTimestamp();
+        }
     }
 
     /**
@@ -826,16 +822,13 @@ public class ActionHelper {
 
     /**
      * fetch the latest notice from notice table and addToRequestMap as yellowBox message
-     * @param updateContextTimestamp    Whether or not to update the context timestamp in config_times
+     * @param
      * @return Text of yellowBox message
      * @throws Exception
      */
-    public void setNotices(boolean updateContextTimestamp) throws Exception {
+    private void setNotices() throws Exception {
         Map notices = NoticeMgr.getNotices();
         portletContext.setAttribute("Notices", notices);
-        if (updateContextTimestamp) {
-            updateContextTimestamp();
-        }
     }
 }
 
