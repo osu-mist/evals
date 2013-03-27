@@ -7,6 +7,7 @@ import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
+import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -14,6 +15,9 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.StandardBasicTypes;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -41,7 +45,7 @@ public class AppraisalMgr {
             "'closed') ";
 
 
-    private static Date fullGoalsDate;
+    private static DateTime fullGoalsDate;
     private Employee loggedInUser;
 
     private Appraisal appraisal = new Appraisal();
@@ -56,9 +60,9 @@ public class AppraisalMgr {
     Map<String, Configuration> configurationMap;
 
     public AppraisalMgr() {
-        SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
         try {
-            fullGoalsDate = fmt.parse(FULL_GOALS_DATE);
+            DateTimeFormatter fmt = DateTimeFormat.forPattern(Constants.DATE_FORMAT_FULL);
+            fullGoalsDate = fmt.parseDateTime(FULL_GOALS_DATE);
         } catch (Exception e) {
             //Should not get here
         }
@@ -71,11 +75,11 @@ public class AppraisalMgr {
      * @param job   Job for this appraisal
      * @param type: trial, annual, initial
      * @param goalsDueConfig: Configuration object of goalsDue or resultsDue
-     * @param startDate: starting date of appraisal period.
+     * @param startDate: (DateTime) starting date of appraisal period.
      * @return appraisal.id
      * @throws Exception
      */
-    public static Appraisal createAppraisal(Job job, Date startDate, String type,
+    public static Appraisal createAppraisal(Job job, DateTime startDate, String type,
                                             Configuration goalsDueConfig) throws Exception {
         CriteriaMgr criteriaMgr = new CriteriaMgr();
         Appraisal appraisal = new Appraisal();
@@ -88,7 +92,7 @@ public class AppraisalMgr {
         }
 
         appraisal.setJob(job);
-        appraisal.setStartDate(startDate);
+        appraisal.setStartDate(startDate.toDate());
         appraisal.setCreateDate(new Date());
         appraisal.setRating(0);
 
@@ -99,8 +103,8 @@ public class AppraisalMgr {
         }
         appraisal.setType(dbType);
 
-        Date endDate = job.getEndEvalDate(startDate, type);
-        appraisal.setEndDate(endDate);
+        DateTime endDate = job.getEndEvalDate(startDate, type);
+        appraisal.setEndDate(CWSUtil.toDate(endDate));
 
         createAppraisalStatus(startDate, goalsDueConfig, appraisal);
 
@@ -129,14 +133,14 @@ public class AppraisalMgr {
      * Sets the status of the appraisal. If the startDate of the appraisal is before Nov 1st, 2011, we set the
      * status to appraisalDue, else if
      *
-     * @param startDate
+     * @param startDate         DateTime object
      * @param goalsDueConfig
      * @param appraisal
      * @throws Exception
      */
-    private static void createAppraisalStatus(Date startDate, Configuration goalsDueConfig,
+    private static void createAppraisalStatus(DateTime startDate, Configuration goalsDueConfig,
                                               Appraisal appraisal) throws Exception {
-        if (startDate.before(fullGoalsDate)) {
+        if (startDate.isBefore(fullGoalsDate)) {
             appraisal.setStatus(Appraisal.STATUS_APPRAISAL_DUE);
         } else if (EvalsUtil.isDue(appraisal, goalsDueConfig) < 0) {
             appraisal.setStatus(Appraisal.STATUS_GOALS_OVERDUE);
@@ -188,18 +192,19 @@ public class AppraisalMgr {
         appraisal.setType(Appraisal.TYPE_ANNUAL);
         appraisal.setJob(trialAppraisal.getJob());
         appraisal.setCreateDate(new Date());
-        Date initialEvalStartDate = appraisal.getJob().getInitialEvalStartDate();
+        Date initialEvalStartDate = appraisal.getJob().getInitialEvalStartDate().toDate();
         appraisal.setStartDate(initialEvalStartDate);
         appraisal.setGoalsSubmitDate(trialAppraisal.getGoalsSubmitDate());
         appraisal.setGoalsApprover(trialAppraisal.getGoalsApprover());
         appraisal.setGoalApprovedDate(trialAppraisal.getGoalApprovedDate());
         appraisal.setRating(0);
 
-        Date endDate = appraisal.getJob().getEndEvalDate(appraisal.getStartDate(), Appraisal.TYPE_INITIAL);
-        appraisal.setEndDate(endDate);
+        DateTime startDate = new DateTime(appraisal.getStartDate());
+        DateTime endDate = appraisal.getJob().getEndEvalDate(startDate, Appraisal.TYPE_INITIAL);
+        appraisal.setEndDate(CWSUtil.toDate(endDate));
 
         int resultsDue = EvalsUtil.isDue(appraisal, resultsDueConfig);
-        if (appraisal.getStartDate().before(fullGoalsDate)) {
+        if (startDate.isBefore(fullGoalsDate)) {
             appraisal.setStatus(Appraisal.STATUS_APPRAISAL_DUE);
         } else if (resultsDue == 0) {
             appraisal.setStatus(Appraisal.STATUS_RESULTS_DUE);
@@ -381,12 +386,11 @@ public class AppraisalMgr {
      *  2) The job annual_indicator != 0
      *
      * @param trialAppraisal
-     * @param startDate
      * @param configurationMap
      * @throws Exception
      * @return appraisal    The first annual appraisal created, null otherwise
      */
-    public static Appraisal createFirstAnnualAppraisal(Appraisal trialAppraisal, Date startDate,
+    public static Appraisal createFirstAnnualAppraisal(Appraisal trialAppraisal,
                                                 Map<String, Configuration>  configurationMap)
             throws Exception {
         Job job = trialAppraisal.getJob();
@@ -625,7 +629,8 @@ public class AppraisalMgr {
 
         PermissionRule originalPermRule = (PermissionRule) permissionRules.get(permissionKey);
         PermissionRule permissionRule = (PermissionRule) originalPermRule.clone();
-        if (permissionRule != null &&  appraisal.getStartDate().before(fullGoalsDate)) {
+        DateTime startDate = new DateTime(appraisal.getStartDate());
+        if (permissionRule != null &&  startDate.isBefore(fullGoalsDate)) {
             String debug = "j-startDate=" + appraisal.getStartDate().toString() +
                     "; fullGoalsDate=" + fullGoalsDate.toString() + "; FULL_GOALS_DATE=" +
                     FULL_GOALS_DATE;
@@ -1019,25 +1024,22 @@ public class AppraisalMgr {
      * @return  true is a trial appraisal exist for the job, false otherwise
      */
     public static boolean trialAppraisalExists(Job job) throws Exception {
-        Date startDate = job.getTrialStartDate();
+        DateTime startDate = job.getTrialStartDate();
         return appraisalExists(job, startDate,  Appraisal.TYPE_TRIAL);
     }
 
     /** select count(*) from appraisals where job.... and startDAte = startDate and type = type
      * @param job: job against which the appraisal was create
-     * @param startDate: start date of appraisal period
+     * @param startDate: (DateTime) start date of appraisal period
      * @param type: "trial" or "annual".
      * @return true if an appraisal exist for job and startDate and type, false otherwise
      */
-    public static boolean appraisalExists(Job job, Date startDate, String type) throws Exception {
+    public static boolean appraisalExists(Job job, DateTime startDate, String type) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(startDate);
-        cal.add(Calendar.MONTH, -6);
-        Date beginDate = cal.getTime();
-        cal.add(Calendar.MONTH, 12);
-        Date endDate = cal.getTime();
+        startDate = startDate.minusMonths(6);
+        Date beginDate = startDate.toDate();
+        Date endDate = startDate.plusMonths(12).toDate();
 
         String query = "select count(*) from edu.osu.cws.evals.models.Appraisal appraisal " +
                 "where appraisal.job.employee.id = :pidm and appraisal.job.positionNumber = :positionNumber " +
@@ -1093,11 +1095,11 @@ public class AppraisalMgr {
 
     /**
      * @param job
-     * @param appraisalStartDate
+     * @param appraisalStartDate    DateTime object
      * @return
      * @throws Exception
      */
-    public static boolean AnnualExists(Job job, Date appraisalStartDate) throws Exception
+    public static boolean AnnualExists(Job job, DateTime appraisalStartDate) throws Exception
     {
         if (AppraisalMgr.appraisalExists(job, appraisalStartDate, Appraisal.TYPE_ANNUAL))
             return true;
@@ -1105,14 +1107,11 @@ public class AppraisalMgr {
         //If we get here, there is no record for the job for appraisalStartDate
         //It's possible that someone added a value for Pyvpasj_eval_date after we created
         //the previous appraisal, so need to check that.
-        SimpleDateFormat simpleDateformat = new SimpleDateFormat("yyyy");
-        int thisYear = Integer.parseInt(simpleDateformat.format(appraisalStartDate));
-        Date startDateBasedOnJobBeginDate = job.getAnnualStartDateBasedOnJobBeginDate(thisYear);
+        int thisYear = appraisalStartDate.getYear();
+        DateTime startDateBasedOnJobBeginDate = job.getAnnualStartDateBasedOnJobBeginDate(thisYear);
 
-        if (startDateBasedOnJobBeginDate.equals(appraisalStartDate))
-            return false;
-        else
-            return AppraisalMgr.appraisalExists(job, startDateBasedOnJobBeginDate, Appraisal.TYPE_ANNUAL);
+        return !startDateBasedOnJobBeginDate.equals(appraisalStartDate) &&
+                AppraisalMgr.appraisalExists(job, startDateBasedOnJobBeginDate, Appraisal.TYPE_ANNUAL);
     }
 
 
