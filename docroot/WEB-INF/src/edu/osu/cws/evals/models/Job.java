@@ -363,13 +363,12 @@ public class Job extends Evals implements Serializable {
      */
     public boolean withinTrialPeriod()
     {
-       	if (trialInd == 0)
-	        return false;
+        if (trialInd == 0)
+            return false;
 
         DateTime startDate = getTrialStartDate();
         DateTime trialEndDate = getEndEvalDate(startDate, "trial");
-        DateTime beginDate1 = new DateTime(beginDate);
-        return CWSUtil.isWithinPeriod(beginDate1, trialEndDate);
+        return CWSUtil.isWithinPeriod(startDate, trialEndDate);
     }
 
     /**
