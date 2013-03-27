@@ -82,7 +82,7 @@ public class ReviewersAction implements ActionInterface {
         try {
             ReviewerMgr reviewerMgr = new ReviewerMgr();
             reviewerMgr.add(onid, businessCenterName);
-            actionHelper.setEvalsReviewers(true);
+            actionHelper.setupAdminConfig(true);
             SessionMessages.add(request, "reviewer-added");
         } catch (Exception e) {
             actionHelper.addErrorsToRequest(e.getMessage());
@@ -127,7 +127,7 @@ public class ReviewersAction implements ActionInterface {
             }
 
             reviewerMgr.delete(id);
-            actionHelper.setEvalsReviewers(true);
+            actionHelper.setupAdminConfig(true);
             SessionMessages.add(request, "reviewer-deleted");
         } catch (ModelException e) {
             actionHelper.addErrorsToRequest(e.getMessage());
