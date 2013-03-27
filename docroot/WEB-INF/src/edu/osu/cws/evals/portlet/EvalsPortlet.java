@@ -266,7 +266,8 @@ public class EvalsPortlet extends GenericPortlet {
                 message += "Stored Appraisal Steps in portlet context\n";
                 loadResourceBundle();
                 message += "Stored resource bundle Language.properties in portlet context\n";
-                actionHelper.setupAdminConfig(false);
+                actionHelper.updateContextTimestamp();
+                actionHelper.setAdminPortletData();
                 tx.commit();
 
                 EvalsLogger logger =  getLog();

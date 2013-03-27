@@ -343,34 +343,29 @@ public class ActionHelper {
         Date contextCacheTimestamp = (Date) portletContext.getAttribute(EvalsPortlet.CONTEXT_CACHE_TIMESTAMP);
         Timestamp contextLastUpdate = ConfigurationMgr.getContextLastUpdate();
         if (contextCacheTimestamp != null && contextLastUpdate.after(contextCacheTimestamp)) {
-            setupAdminConfig(false);
+            setAdminPortletData();
+            portletContext.setAttribute(EvalsPortlet.CONTEXT_CACHE_TIMESTAMP, new Date());
         }
     }
 
     /**
      * Refreshes the context cache:
-     * admins, reviewers and configuration lists and maps. If the context cache is refreshed, it
-     * updates the context cache timestamp in the portlet context.
+     * admins, reviewers and configuration lists and maps.
      *
-     * @param updateContextTimestamp    Whether or not to update the context timestamp in config_times
      * @throws Exception
      */
-    public void setupAdminConfig(boolean updateContextTimestamp) throws Exception {
+    public void setAdminPortletData() throws Exception {
         setEvalsAdmins();
         setEvalsReviewers();
         setEvalsConfiguration();
         setNotices();
-        portletContext.setAttribute(EvalsPortlet.CONTEXT_CACHE_TIMESTAMP, new Date());
-        if (updateContextTimestamp) {
-            updateContextTimestamp();
-        }
     }
 
     /**
      * Updates the context timestamp in the db and also in the portletContext.
      * @throws Exception
      */
-    private void updateContextTimestamp() throws Exception {
+    public void updateContextTimestamp() throws Exception {
         Date currentTimestamp = ConfigurationMgr.updateContextTimestamp();
         portletContext.setAttribute(EvalsPortlet.CONTEXT_CACHE_TIMESTAMP, currentTimestamp);
     }
