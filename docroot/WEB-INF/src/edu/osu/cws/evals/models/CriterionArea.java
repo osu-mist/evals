@@ -5,12 +5,9 @@
 
 package edu.osu.cws.evals.models;
 
-import edu.osu.cws.evals.portlet.ActionHelper;
-
 import java.util.*;
 
 public class CriterionArea extends Evals {
-
 
     private int id = 0;
 
@@ -32,8 +29,6 @@ public class CriterionArea extends Evals {
 
     private Set details = new HashSet();
 
-    private static ActionHelper actionHelper;
-
     public CriterionArea() { }
 
     /**
@@ -42,13 +37,12 @@ public class CriterionArea extends Evals {
      * @return errors
      */
     public boolean validateName() {
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         ArrayList<String> nameErrors = new ArrayList<String>();
 
         // If there were any previous validation errors remove them.
         this.errors.remove("name");
         if (this.name == null || this.name.equals("")) {
-            nameErrors.add(resource.getString("criteria-nameRequired"));
+            nameErrors.add(super.resources.getString("criteria-nameRequired"));
         }
 
         if (nameErrors.size() > 0) {
@@ -88,15 +82,14 @@ public class CriterionArea extends Evals {
      * @return
      */
     public boolean validateAppointmentType() {
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         ArrayList<String> appointmentErrors = new ArrayList<String>();
 
         // If there were any previous validation errors remove them.
         this.errors.remove("appointmentType");
         if (this.appointmentType == null) {
-            appointmentErrors.add(resource.getString("criteria-appointmentTypeRequired"));
+            appointmentErrors.add(super.resources.getString("criteria-appointmentTypeRequired"));
         } else if (this.appointmentType.equals("")) {
-            appointmentErrors.add(resource.getString("criteria-appointmentTypeRequired"));
+            appointmentErrors.add(super.resources.getString("criteria-appointmentTypeRequired"));
         }
 
         if (appointmentErrors.size() > 0) {

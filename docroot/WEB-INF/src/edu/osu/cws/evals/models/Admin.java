@@ -1,11 +1,7 @@
 package edu.osu.cws.evals.models;
 
-
-import edu.osu.cws.evals.portlet.ActionHelper;
-
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.ResourceBundle;
+
 
 public class Admin extends Evals {
     private int id;
@@ -24,30 +20,6 @@ public class Admin extends Evals {
      * The value for scope will be: hr, uabac, etc.
      */
     private String scope;
-
-    private static ActionHelper actionHelper;
-
-    /**
-     * Check that the employee we are adding as admin is active.
-     *
-     * @return
-     */
-    public boolean validateEmployee() {
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        ArrayList<String> employeeErrors = new ArrayList<String>();
-
-        // If there were any previous validation errors remove them.
-        this.errors.remove("employee");
-        if (this.employee == null || !this.employee.getStatus().equals("A")) {
-            employeeErrors.add(resource.getString("admin-validEmployeeRequired"));
-        }
-
-        if (employeeErrors.size() > 0) {
-            this.errors.put("employee", employeeErrors);
-            return false;
-        }
-        return true;
-    }
 
     public Admin() { }
 

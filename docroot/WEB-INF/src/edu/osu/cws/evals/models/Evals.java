@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.ResourceBundle;
 
 
 import com.liferay.portal.kernel.log.Log;
@@ -76,4 +77,6 @@ public class Evals {
     }
 
     private static Log _log = LogFactoryUtil.getLog(CriterionArea.class);
+
+    public static ResourceBundle resources = ResourceBundle.getBundle("edu.osu.cws.evals.portlet.Language");
 }

@@ -1,7 +1,5 @@
 package edu.osu.cws.evals.models;
 
-import edu.osu.cws.evals.portlet.ActionHelper;
-
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -183,8 +181,6 @@ public class Appraisal extends Evals {
     private String role;
 
     private ArrayList<String> statusHiddenFromEmployee = new ArrayList<String>();
-
-    private static ActionHelper actionHelper;
 
     public Appraisal() { }
 
@@ -382,42 +378,6 @@ public class Appraisal extends Evals {
             setStatus(appraisal.getStatus());
         }
         setJob(appraisal.getJob());
-    }
-
-    public boolean validateJob() {
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        ArrayList<String> jobErrors = new ArrayList<String>();
-
-        // If there were any previous validation errors remove them
-        this.errors.remove("job");
-
-        if (this.job == null || this.job.getEmployee() == null || this.job.getEmployee().getId() == 0) {
-            jobErrors.add(resource.getString("appraisal-jobRequired"));
-        }
-
-        if (jobErrors.size() > 0) {
-            this.errors.put("job", jobErrors);
-            return false;
-        }
-        return true;
-    }
-
-    public boolean validateType() {
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        ArrayList<String> typeErrors = new ArrayList<String>();
-
-        // If there were any previous validation errors remove them
-        this.errors.remove("type");
-
-        if (this.type == null || (!this.type.equals(TYPE_ANNUAL) && !this.type.equals(TYPE_TRIAL))) {
-            typeErrors.add(resource.getString("appraisal-invalidType"));
-        }
-
-        if (typeErrors.size() > 0) {
-            this.errors.put("type", typeErrors);
-            return false;
-        }
-        return true;
     }
 
     /**
