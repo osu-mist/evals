@@ -171,8 +171,7 @@ public class Mailer {
 
         for (String recipient : mailToArray) {
             if (recipient.equals("employee")) {
-                String employeeEmail = job.getEmployee().getEmail();
-                addEmailList(employeeEmail, job.getEmployee(), recipients);
+                addToEmailList(job.getEmployee(), recipients);
             }
 
             if (recipient.equals("supervisor")) {
@@ -182,8 +181,7 @@ public class Mailer {
                     logLongMessage = "Supervisor for appraisal " + appraisal.getId() + " is null";
                     logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                 } else {
-                    String supervisorEmail = supervisorJob.getEmployee().getEmail();
-                    addEmailList(supervisorEmail, supervisorJob.getEmployee(), recipients);
+                    addToEmailList(supervisorJob.getEmployee(), recipients);
                 }
             }
 
@@ -192,12 +190,12 @@ public class Mailer {
                 List<Reviewer> reviewers = ReviewerMgr.getReviewers(bcName);
                 if (reviewers == null) {
                     logShortMessage = "Reviewer email not sent";
-                    logLongMessage = "Reviewers for appraisal " + appraisal.getId() + " is null";
+                    logLongMessage = "No reviewers were found for the business center " +
+                            bcName + " for which appraisal " + appraisal.getId() + " belongs to.";
                     logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                 } else {
                     for (Reviewer reviewer : reviewers) {
-                        String reviewerEmail = reviewer.getEmployee().getEmail();
-                        addEmailList(reviewerEmail, reviewer.getEmployee(), recipients);
+                        addToEmailList(reviewer.getEmployee(), recipients);
                     }
                 }
             }
@@ -221,15 +219,16 @@ public class Mailer {
     }
 
     /**
-     * Adds an email to an array list. If the email is null or empty string it logs the data error.
+     * Adds an employee's email to an array list. If the email is null or empty string it logs
+     * the data error.
      *
-     * @param email         Email address we're trying to send an email to
      * @param employee      Employee/Reviewer/Supervisor that we're trying to email
      * @param recipients    List of recipient email addresses
      * @throws Exception
      */
-    private void addEmailList(String email, Employee employee, List<String> recipients)
+    private void addToEmailList(Employee employee, List<String> recipients)
             throws Exception {
+        String email = employee.getEmail();
         if (email == null || email.equals("")) {
             logNullEmail(employee);
         } else {
