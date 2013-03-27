@@ -983,6 +983,9 @@ public class AppraisalMgr {
      */
     public static boolean trialAppraisalExists(Job job) throws Exception {
         DateTime startDate = job.getTrialStartDate();
+        if (startDate == null) {
+            return false;
+        }
         return appraisalExists(job, startDate,  Appraisal.TYPE_TRIAL);
     }
 

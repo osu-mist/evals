@@ -350,8 +350,13 @@ public class Job extends Evals implements Serializable {
      */
     public DateTime getTrialStartDate()
     {
+        if (trialInd == 0) {
+            return null; //No trial appraisal for this job
+        }
+
        if (evalDate != null)
            return new DateTime(evalDate);
+
         return new DateTime(beginDate);
     }
 
@@ -367,6 +372,10 @@ public class Job extends Evals implements Serializable {
             return false;
 
         DateTime startDate = getTrialStartDate();
+        if (startDate == null) { // check if doesn't require a trial eval.
+            return false;
+        }
+
         DateTime trialEndDate = getEndEvalDate(startDate, "trial");
         return CWSUtil.isWithinPeriod(startDate, trialEndDate);
     }
