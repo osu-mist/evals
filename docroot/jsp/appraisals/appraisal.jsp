@@ -222,12 +222,12 @@
         var errors = "";
         if (jQuery("#<portlet:namespace />acknowledge-read-appraisal").length > 0 &&
                 !jQuery("#<portlet:namespace />acknowledge-read-appraisal").is(':checked')) {
-          errors = "<li><%= resource.getString("appraisal-signatureRequired")%></li>";
-          alert("<%= resource.getString("appraisal-signatureRequired") %>");
+          errors = "<li><%= bundle.getString("appraisal-signatureRequired")%></li>";
+          alert("<%= bundle.getString("appraisal-signatureRequired") %>");
         }
         if (jQuery("#<portlet:namespace />appraisal-readRebuttal").length > 0 && !jQuery("#<portlet:namespace />appraisal-readRebuttal").is(':checked')) {
-          errors = "<li><%= resource.getString("appraisal-rebuttalReadRequired") %></li>";
-          alert("<%= resource.getString("appraisal-rebuttalReadRequired") %>");
+          errors = "<li><%= bundle.getString("appraisal-rebuttalReadRequired") %></li>";
+          alert("<%= bundle.getString("appraisal-rebuttalReadRequired") %>");
         }
         if (errors != "") {
           jQuery("#<portlet:namespace />flash").html(
@@ -245,8 +245,8 @@
         if (jQuery("input[name=submit-appraisal]").length > 0 &&
               jQuery("input[name=<portlet:namespace />appraisal.rating]:checked",
                 "#<portlet:namespace />fm").val() == undefined) {
-          errors = "<li><%= resource.getString("appraisal-ratingRequired") %></li>";
-          alert("<%= resource.getString("appraisal-ratingRequired") %>");
+          errors = "<li><%= bundle.getString("appraisal-ratingRequired") %></li>";
+          alert("<%= bundle.getString("appraisal-ratingRequired") %>");
         }
 
         if (errors != "") {

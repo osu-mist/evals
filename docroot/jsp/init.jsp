@@ -34,7 +34,7 @@ if (errorMsg != null && !errorMsg.equals("")) {
     errorMsg = "<ul><li>"+StringUtils.replace(errorMsg, "\n", "</li><li>")+"</ul>";
 }
 PortletContext ctx = portletConfig.getPortletContext();
-ResourceBundle resource = (ResourceBundle)ctx.getAttribute("resourceBundle");
+ResourceBundle bundle = (ResourceBundle)ctx.getAttribute("resourceBundle");
 %>
 
 <div class="osu-cws"> <!-- Full wrapper for portlet (closed in footer.jsp) -->

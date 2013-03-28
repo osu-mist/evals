@@ -42,7 +42,7 @@ public class CriterionArea extends Evals {
         // If there were any previous validation errors remove them.
         this.errors.remove("name");
         if (this.name == null || this.name.equals("")) {
-            nameErrors.add(super.resources.getString("criteria-nameRequired"));
+            nameErrors.add(bundle.getString("criteria-nameRequired"));
         }
 
         if (nameErrors.size() > 0) {
@@ -87,9 +87,9 @@ public class CriterionArea extends Evals {
         // If there were any previous validation errors remove them.
         this.errors.remove("appointmentType");
         if (this.appointmentType == null) {
-            appointmentErrors.add(super.resources.getString("criteria-appointmentTypeRequired"));
+            appointmentErrors.add(bundle.getString("criteria-appointmentTypeRequired"));
         } else if (this.appointmentType.equals("")) {
-            appointmentErrors.add(super.resources.getString("criteria-appointmentTypeRequired"));
+            appointmentErrors.add(bundle.getString("criteria-appointmentTypeRequired"));
         }
 
         if (appointmentErrors.size() > 0) {

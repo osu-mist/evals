@@ -26,6 +26,10 @@ public class Evals {
      */
     protected HashMap errors = new HashMap();
 
+    private static Log _log = LogFactoryUtil.getLog(CriterionArea.class);
+
+    protected static ResourceBundle bundle = ResourceBundle.getBundle("edu.osu.cws.evals.portlet.Language");
+
     public boolean validate() throws ModelException {
         String validateMethodName;
 
@@ -76,7 +80,4 @@ public class Evals {
         return aggregateErrors;
     }
 
-    private static Log _log = LogFactoryUtil.getLog(CriterionArea.class);
-
-    public static ResourceBundle resources = ResourceBundle.getBundle("edu.osu.cws.evals.portlet.Language");
 }

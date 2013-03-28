@@ -105,14 +105,14 @@
       jQuery("#<portlet:namespace />fm").submit(function() {
         var errors = "";
         if (jQuery("#<portlet:namespace />onid").val() == "") {
-          errors = "<li><%= resource.getString("admin-validEmployeeRequired") %></li>";
+          errors = "<li><%= bundle.getString("admin-validEmployeeRequired") %></li>";
         }
         var isRadioChecked = false;
         jQuery("#<portlet:namespace />fm input[type='radio']").each(function() {
           isRadioChecked = isRadioChecked || jQuery(this).is(':checked');
         });
         if (!isRadioChecked) {
-          errors += "<li><%= resource.getString("admin-isMasterCannotBeEmpty") %></li>"
+          errors += "<li><%= bundle.getString("admin-isMasterCannotBeEmpty") %></li>"
         }
         if (errors != "") {
           jQuery("#<portlet:namespace />flash").html(
