@@ -10,15 +10,15 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.ResourceBundle;
 
 public class NoticeAction implements ActionInterface {
 
     private ActionHelper actionHelper;
 
     private HomeAction homeAction;
+
+
     /**
      * Handles listing the notice.
      *
@@ -29,10 +29,8 @@ public class NoticeAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin()) {
-            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         ArrayList<Notice> noticeList = NoticeMgr.list();
@@ -53,10 +51,8 @@ public class NoticeAction implements ActionInterface {
      */
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin()) {
-            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
         Notice notice = new Notice();
         try {
@@ -88,9 +84,6 @@ public class NoticeAction implements ActionInterface {
 
         return Constants.JSP_NOTICE_EDIT;
     }
-
-
-
 
     public void setActionHelper(ActionHelper actionHelper) {
         this.actionHelper = actionHelper;

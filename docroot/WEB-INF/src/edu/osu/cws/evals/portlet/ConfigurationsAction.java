@@ -7,7 +7,6 @@ import edu.osu.cws.evals.models.Configuration;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import java.util.ArrayList;
-import java.util.ResourceBundle;
 
 public class ConfigurationsAction implements ActionInterface {
     private ActionHelper actionHelper;
@@ -23,10 +22,8 @@ public class ConfigurationsAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin()) {
-            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         actionHelper.refreshContextCache();
@@ -48,10 +45,8 @@ public class ConfigurationsAction implements ActionInterface {
      */
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin()) {
-            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         int id = ParamUtil.getInteger(request, "id");

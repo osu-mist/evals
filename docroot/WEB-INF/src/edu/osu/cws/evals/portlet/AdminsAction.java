@@ -31,10 +31,8 @@ public class AdminsAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin()) {
-            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         actionHelper.refreshContextCache();
@@ -56,10 +54,8 @@ public class AdminsAction implements ActionInterface {
      */
     public String add(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserMasterAdmin()) {
-            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         String onid = ParamUtil.getString(request, "onid");
@@ -90,9 +86,9 @@ public class AdminsAction implements ActionInterface {
     public String delete(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
+
         if (!actionHelper.isLoggedInUserMasterAdmin()) {
-            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return ErrorHandler.handleAccessDenied(request, response);
         }
 
         int id = ParamUtil.getInteger(request, "id");
