@@ -4,6 +4,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.CloseOutReasonMgr;
 import edu.osu.cws.evals.models.CloseOutReason;
+import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.ModelException;
 
 import javax.portlet.PortletRequest;
@@ -29,7 +30,8 @@ public class CloseOutAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -50,7 +52,8 @@ public class CloseOutAction implements ActionInterface {
      */
     public String add(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -77,7 +80,8 @@ public class CloseOutAction implements ActionInterface {
      */
     public String delete(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 

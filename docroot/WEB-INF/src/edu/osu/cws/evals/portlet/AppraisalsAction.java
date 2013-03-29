@@ -54,7 +54,8 @@ public class AppraisalsAction implements ActionInterface {
         initialize(request);
 
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserReviewer()) {
+        boolean isReviewer = actionHelper.getReviewer() != null;
+        if (isReviewer) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -110,8 +111,8 @@ public class AppraisalsAction implements ActionInterface {
         List<Appraisal> appraisals = new ArrayList<Appraisal>();
         actionHelper.addToRequestMap("pageTitle", "search-results");
 
-        boolean isAdmin = actionHelper.isLoggedInUserAdmin();
-        boolean isReviewer = actionHelper.isLoggedInUserReviewer();
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        boolean isReviewer = actionHelper.getReviewer() != null;
 
         // If a supervisor is also a reviewer, the people he/she supervises will be in the
         // business center he/she is a reviewer of. Because reviewer has broader permissions
@@ -130,7 +131,7 @@ public class AppraisalsAction implements ActionInterface {
         } else {
             String bcName = "";
             if (isReviewer) {
-                bcName = actionHelper.getReviewer(pidm).getBusinessCenterName();
+                bcName = actionHelper.getReviewer().getBusinessCenterName();
             }
             AppraisalMgr appraisalMgr = new AppraisalMgr();
 
@@ -175,21 +176,24 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         actionHelper.setupMyTeamActiveAppraisals();
-        if (actionHelper.isLoggedInUserReviewer()) {
+        boolean isReviewer = actionHelper.getReviewer() != null;
+        boolean isAdmin = actionHelper.getAdmin() != null;
+
+        if (isReviewer) {
             ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(-1);
             actionHelper.addToRequestMap("pendingReviews", reviews);
         }
 
-        if (actionHelper.isLoggedInUserReviewer() && appraisal.getEmployeeSignedDate() != null &&
+        if (isReviewer && appraisal.getEmployeeSignedDate() != null &&
                 !appraisal.getRole().equals("employee")) {
             actionHelper.addToRequestMap("displayResendNolij", true);
         }
-        if ((actionHelper.isLoggedInUserReviewer() || actionHelper.isLoggedInUserAdmin()) && appraisal.isOpen()
+        if (isReviewer || isAdmin && appraisal.isOpen()
                 && !userRole.equals("employee")) {
             actionHelper.addToRequestMap("displayCloseOutAppraisal", true);
         }
         String status = appraisal.getStatus();
-        if ((actionHelper.isLoggedInUserAdmin() || actionHelper.isLoggedInUserReviewer()) &&
+        if ((isAdmin || isReviewer) &&
                 status.equals(Appraisal.STATUS_GOALS_APPROVED) && !userRole.equals("employee")) {
             actionHelper.addToRequestMap("displaySetAppraisalStatus", true);
         }
@@ -234,6 +238,7 @@ public class AppraisalsAction implements ActionInterface {
      */
     public String update(PortletRequest request, PortletResponse response) throws Exception {
         initialize(request);
+        boolean isReviewer = actionHelper.getReviewer() != null;
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
@@ -287,8 +292,7 @@ public class AppraisalsAction implements ActionInterface {
         String status = appraisal.getStatus();
         String[] afterReviewStatus = {Appraisal.STATUS_RELEASE_DUE, Appraisal.STATUS_RELEASE_OVERDUE,
                 Appraisal.STATUS_CLOSED};
-        if (ArrayUtils.contains(afterReviewStatus, status)
-                && actionHelper.isLoggedInUserReviewer()) {
+        if (ArrayUtils.contains(afterReviewStatus, status) && isReviewer) {
             actionHelper.removeReviewAppraisalInSession(appraisal);
         } else {
             updateAppraisalInSession(request, appraisal);
@@ -380,7 +384,6 @@ public class AppraisalsAction implements ActionInterface {
     public void updateAppraisalInSession(PortletRequest request, Appraisal appraisal) throws Exception {
         initialize(request);
         List<Appraisal>  appraisals;
-        int employeeId = loggedInUser.getId();
         if (appraisal.getRole().equals("employee")) {
             appraisals = actionHelper.getMyActiveAppraisals();
         } else if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR)) {
@@ -409,8 +412,9 @@ public class AppraisalsAction implements ActionInterface {
     public String resendAppraisalToNolij(PortletRequest request, PortletResponse response) throws Exception {
         initialize(request);
 
+        boolean isReviewer = actionHelper.getReviewer() != null;
         // Permission checks
-        if (!actionHelper.isLoggedInUserReviewer()
+        if (!isReviewer
                 || appraisal.getEmployeeSignedDate() == null
                 || appraisal.getRole().equals("employee")
                 || !appraisal.getStatus().equals("completed"))
@@ -421,7 +425,7 @@ public class AppraisalsAction implements ActionInterface {
         AppraisalMgr appraisalMgr = new AppraisalMgr();
         actionHelper.addToRequestMap("id", appraisal.getId());
 
-        if (!actionHelper.isLoggedInUserReviewer()) {
+        if (!isReviewer) {
             String errorMsg = resource.getString("appraisal-resend-permission-denied");
             actionHelper.addErrorsToRequest(errorMsg);
             return display(request, response);

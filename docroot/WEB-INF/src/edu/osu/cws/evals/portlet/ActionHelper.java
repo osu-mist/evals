@@ -141,15 +141,15 @@ public class ActionHelper {
 
         Boolean isReviewer = (Boolean) session.getAttribute("isReviewer");
         if (refresh || isReviewer == null) {
-            isReviewer = getReviewer(loggedOnUser.getId()) != null;
+            isReviewer = getReviewer() != null;
             session.setAttribute("isReviewer", isReviewer);
         }
         addToRequestMap("isReviewer", isReviewer);
 
         Boolean isMasterAdmin = (Boolean) session.getAttribute("isSuperAdmin");
         if (refresh || isMasterAdmin == null) {
-            if (getAdmin(loggedOnUser.getId()) != null &&
-                    getAdmin(loggedOnUser.getId()).getIsMaster()) {
+            if (getAdmin() != null &&
+                    getAdmin().getIsMaster()) {
                 isMasterAdmin = true;
             } else {
                 isMasterAdmin = false;
@@ -160,7 +160,7 @@ public class ActionHelper {
 
         Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
         if (refresh || isAdmin == null) {
-            isAdmin = getAdmin(loggedOnUser.getId()) != null;
+            isAdmin = getAdmin() != null;
             session.setAttribute("isAdmin", isAdmin);
         }
         addToRequestMap("isAdmin", isAdmin);
@@ -254,7 +254,7 @@ public class ActionHelper {
             String businessCenterName = ParamUtil.getString(request, "businessCenterName");
 
             if (businessCenterName.equals("")) {
-                businessCenterName = getBusinessCenterForLoggedInReviewer();
+                businessCenterName = getReviewer().getBusinessCenterName();
             }
             AppraisalMgr appraisalMgr = new AppraisalMgr();
             reviewList = appraisalMgr.getReviews(businessCenterName, -1);
@@ -272,18 +272,6 @@ public class ActionHelper {
         }
 
         return outList;
-    }
-
-    /**
-     * Returns the business center name for the currently logged in user that is a reviewer.
-     *
-     * @return
-     * @throws Exception
-     */
-    public String getBusinessCenterForLoggedInReviewer() throws Exception {
-        String businessCenterName;
-        businessCenterName = getReviewer(loggedOnUser.getId()).getBusinessCenterName();
-        return businessCenterName;
     }
 
     /**
@@ -471,14 +459,13 @@ public class ActionHelper {
      * to figure out if the current logged in user is a reviewer. If yes, then we return the
      * Reviewer object if not, it returns null.
      *
-     * @param pidm  Pidm of currently logged in user
      * @return Reviewer
      */
-    public Reviewer getReviewer(int pidm) {
+    public Reviewer getReviewer() {
         HashMap<Integer, Reviewer> reviewerMap =
                 (HashMap<Integer, Reviewer>) portletContext.getAttribute("reviewers");
 
-        return reviewerMap.get(pidm);
+        return reviewerMap.get(loggedOnUser.getId());
     }
 
     /**
@@ -486,30 +473,13 @@ public class ActionHelper {
      * to figure out if the current logged in user is a reviewer. If yes, then we return the
      * Admin object if not, it returns false.
      *
-     * @param pidm
      * @return Admin
      */
-    private Admin getAdmin(int pidm) {
+    public Admin getAdmin() {
         HashMap<Integer, Admin> adminMap =
                 (HashMap<Integer, Admin>) portletContext.getAttribute("admins");
 
-        return adminMap.get(pidm);
-    }
-
-    /**
-     * Returns true if the logged in user is admin, false otherwise.
-     *
-     * @return boolean
-     * @throws Exception
-     */
-    public boolean isLoggedInUserAdmin() throws Exception {
-        PortletSession session = request.getPortletSession(true);
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        if (isAdmin == null) {
-            setUpUserPermissionInSession(false);
-            isAdmin = (Boolean) session.getAttribute("isAdmin");
-        }
-        return isAdmin;
+        return adminMap.get(loggedOnUser.getId());
     }
 
     /**
@@ -526,22 +496,6 @@ public class ActionHelper {
             isMasterAdmin = (Boolean) session.getAttribute("isMasterAdmin");
         }
         return isMasterAdmin;
-    }
-
-    /**
-     * Returns true if the logged in user is reviewer, false otherwise.
-     *
-     * @return boolean
-     * @throws Exception
-     */
-    public boolean isLoggedInUserReviewer() throws Exception {
-        PortletSession session = request.getPortletSession(true);
-        Boolean isReviewer = (Boolean) session.getAttribute("isReviewer");
-        if (isReviewer == null) {
-            setUpUserPermissionInSession(false);
-            isReviewer = (Boolean) session.getAttribute("isReviewer");
-        }
-        return isReviewer;
     }
 
     /**
@@ -589,7 +543,7 @@ public class ActionHelper {
             administrativeActions = getAppraisalActions(supervisorActions, "supervisor", resource);
         }
 
-        reviewer = getReviewer(loggedOnUser.getId());
+        reviewer = getReviewer();
         if (reviewer != null) {
             String businessCenterName = reviewer.getBusinessCenterName();
             reviewerAction = getReviewerAction(businessCenterName, resource);
@@ -724,16 +678,11 @@ public class ActionHelper {
     public void addToRequestMap(String key, Object object) {
         PortletSession session = request.getPortletSession(true);
         HashMap<String,Object> requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
-        if  (requestMap == null) {
+        if (requestMap == null) {
             requestMap = new HashMap<String, Object>();
-            requestMap.put(key, object);
-            session.setAttribute(REQUEST_MAP,requestMap);
+            session.setAttribute(REQUEST_MAP, requestMap);
         }
-        else {
-            requestMap.put(key, object);
-        }
-        session.setAttribute(REQUEST_MAP, requestMap);
-
+        requestMap.put(key, object);
     }
 
     /**
@@ -769,19 +718,17 @@ public class ActionHelper {
      */
     public String getCurrentRole() {
         PortletSession session = request.getPortletSession(true);
-        String currentRole = (String) session.getAttribute("currentRole");
+        String currentRole = ParamUtil.getString(request, "currentRole");
 
-        String roleFromRequest = ParamUtil.getString(request, "currentRole");
-        if (!roleFromRequest.equals("")) {
-            currentRole = roleFromRequest;
+        if (!currentRole.equals("")) {
+            session.setAttribute("currentRole", currentRole);
+        } else {
+            currentRole = (String) session.getAttribute("currentRole");
+            if (currentRole == null || currentRole.equals("")){
+                currentRole = ROLE_SELF;
+            }
             session.setAttribute("currentRole", currentRole);
         }
-
-        if (currentRole == null || currentRole.equals("")) {
-            currentRole = ROLE_SELF;
-            session.setAttribute("currentRole", currentRole);
-        }
-
         return currentRole;
     }
 

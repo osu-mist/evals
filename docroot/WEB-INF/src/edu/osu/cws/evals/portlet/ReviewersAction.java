@@ -32,7 +32,8 @@ public class ReviewersAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -60,7 +61,10 @@ public class ReviewersAction implements ActionInterface {
     public String add(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is an reviewer
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        boolean isReviewer = actionHelper.getReviewer() != null;
+
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -70,7 +74,7 @@ public class ReviewersAction implements ActionInterface {
         // Check whether or not the user is already a reviewer user
         EmployeeMgr employeeMgr = new EmployeeMgr();
         Employee onidUser = employeeMgr.findByOnid(onid, null);
-        if (actionHelper.getReviewer(onidUser.getId()) != null) {
+        if (isReviewer) {
             actionHelper.addErrorsToRequest(resource.getString("already-reviewer"));
             return list(request, response);
         }
@@ -98,7 +102,8 @@ public class ReviewersAction implements ActionInterface {
      */
     public String delete(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 

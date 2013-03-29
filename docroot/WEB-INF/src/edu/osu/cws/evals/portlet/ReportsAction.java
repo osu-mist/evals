@@ -245,6 +245,8 @@ public class ReportsAction implements ActionInterface {
         boolean showDrillDownMenu = false;
         String searchTerm = getSearchTerm();
         boolean displaySearchResultsPage = displaySearchResultsPage();
+        boolean isReviewer = actionHelper.getReviewer() != null;
+        boolean isAdmin = actionHelper.getAdmin() != null;
 
         if (isAppraisalSearch) { // display search result of employee appraisals
             actionHelper.addToRequestMap("listAppraisals", listAppraisals);
@@ -283,15 +285,14 @@ public class ReportsAction implements ActionInterface {
             actionHelper.addToRequestMap("nextScope", nextScope);
 
             boolean allowAllDrillDown = false;
-            if (actionHelper.isLoggedInUserAdmin()) {
+            if (isAdmin) {
                 allowAllDrillDown = true;
             }
             actionHelper.addToRequestMap("allowAllDrillDown", allowAllDrillDown);
 
             String reviewerBCName = "";
-            if (actionHelper.isLoggedInUserReviewer()) {
-                int employeeID = actionHelper.getLoggedOnUser().getId();
-                reviewerBCName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
+            if (isReviewer) {
+                reviewerBCName = actionHelper.getReviewer().getBusinessCenterName();
             }
             actionHelper.addToRequestMap("reviewerBCName", reviewerBCName);
 
@@ -741,7 +742,8 @@ public class ReportsAction implements ActionInterface {
      * @throws Exception
      */
     public boolean canViewReport(PortletRequest request) throws Exception {
-        if (actionHelper.isLoggedInUserAdmin()) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (isAdmin) {
             return true;
         }
 
@@ -751,7 +753,7 @@ public class ReportsAction implements ActionInterface {
 
         int employeeID = actionHelper.getLoggedOnUser().getId();
         boolean supervisorReport = getScope().equals(SCOPE_SUPERVISOR);
-        boolean isReviewer = actionHelper.isLoggedInUserReviewer();
+        boolean isReviewer = actionHelper.getReviewer() != null;
         boolean isSupervisor = actionHelper.isLoggedInUserSupervisor();
         String searchTerm = getSearchTerm();
 
@@ -768,7 +770,7 @@ public class ReportsAction implements ActionInterface {
         }
 
         if (isReviewer) {
-            String bcName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
+            String bcName = actionHelper.getReviewer().getBusinessCenterName();
 
             // the bc reviewer can drill down the report if supervisor is in his bc
             if (supervisorReport && currentSupervisorJob.getBusinessCenterName().equals(bcName)) {
@@ -850,10 +852,12 @@ public class ReportsAction implements ActionInterface {
      */
     private void showMyReportLink(PortletRequest request) throws Exception {
         boolean showMyReportLink = false;
+        Employee loggedInUser = actionHelper.getLoggedOnUser();
+        boolean isReviewer = actionHelper.getReviewer() != null;
+        boolean isAdmin = actionHelper.getAdmin() != null;
 
         if (actionHelper.isLoggedInUserSupervisor()) {
             // We make the assumption that a person has only 1 supervising job
-            Employee loggedInUser = actionHelper.getLoggedOnUser();
             Job supervisorJob = JobMgr.getSupervisingJob(loggedInUser.getId());
             String supervisorJobTitle = supervisorJob.getJobTitle();
             String myReportSupervisorKey = supervisorJob.getEmployee().getId() + "_" +
@@ -864,13 +868,13 @@ public class ReportsAction implements ActionInterface {
             actionHelper.addToRequestMap("myReportSupervisorKey", myReportSupervisorKey);
         }
 
-        if (actionHelper.isLoggedInUserReviewer()) {
-            String myReportBcName = actionHelper.getBusinessCenterForLoggedInReviewer();
+        if (isReviewer) {
+            String myReportBcName = actionHelper.getReviewer().getBusinessCenterName();
             showMyReportLink = true;
             actionHelper.addToRequestMap("myReportBcName", myReportBcName);
         }
 
-        if (actionHelper.isLoggedInUserAdmin()) {
+        if (isAdmin) {
             showMyReportLink = true;
         }
 
@@ -927,10 +931,12 @@ public class ReportsAction implements ActionInterface {
         boolean noSearchResults = false; // the user query didn't match any jobs/employee
         String noSearchResultMsg = ""; // msg to display the user when there were no results
         boolean tooManyResults = false;
+        Employee loggedInUser = actionHelper.getLoggedOnUser();
+        boolean isReviewer = actionHelper.getReviewer() != null;
+        boolean isAdmin = actionHelper.getAdmin() != null;
 
-        if (actionHelper.isLoggedInUserReviewer() &&
-                !actionHelper.isLoggedInUserAdmin()) {
-            bcName = actionHelper.getBusinessCenterForLoggedInReviewer();
+        if (isReviewer && !isAdmin) {
+            bcName = actionHelper.getReviewer().getBusinessCenterName();
             userType = "reviewer";
         }
         if (CWSUtil.validateOrgCode(searchTerm)) {
@@ -954,7 +960,6 @@ public class ReportsAction implements ActionInterface {
 
             int supervisorPidm = 0;
             if (actionHelper.isLoggedInUserSupervisor()) {
-                Employee loggedInUser = actionHelper.getLoggedOnUser();
                 supervisorPidm = loggedInUser.getId();
                 userType = "supervisor";
             }
@@ -993,9 +998,9 @@ public class ReportsAction implements ActionInterface {
             if (searchType.equals("orgCode")) {
                 noSearchResult += searchType + "-" + userType;
             } else {
-                if (actionHelper.isLoggedInUserAdmin()) {
+                if (isAdmin) {
                     noSearchResult = "appraisal-search-no-results-admin";
-                } else if (actionHelper.isLoggedInUserReviewer()) {
+                } else if (isReviewer) {
                     noSearchResult = "appraisal-search-no-results-reviewer";
                 } else {
                     noSearchResult = "appraisal-search-no-results-supervisor";
