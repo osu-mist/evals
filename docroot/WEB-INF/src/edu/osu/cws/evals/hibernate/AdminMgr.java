@@ -119,7 +119,6 @@ public class AdminMgr {
         admin.setCreator(loggedInUser);
         admin.setEmployee(employee);
         admin.setIsMaster(isMaster);
-        admin.setScope("test");
 
         Session session = HibernateUtil.getCurrentSession();
         add(admin, session);
