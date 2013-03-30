@@ -71,7 +71,8 @@ public class NoticeAction implements ActionInterface {
                 //if the current notice is a yellowBoxMessage and it is changed, update it into
                 //portletContext so the other loggedInUser can see it.
                 if(noticeChange){
-                    actionHelper.setNotices(true);
+                    actionHelper.updateContextTimestamp();
+                    actionHelper.setAdminPortletData();
                 }
                 return list(request, response);
             }

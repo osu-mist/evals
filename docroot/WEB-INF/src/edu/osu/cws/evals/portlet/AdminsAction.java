@@ -64,7 +64,8 @@ public class AdminsAction implements ActionInterface {
 
         try {
             adminMgr.add(onid,  isMaster, actionHelper.getLoggedOnUser());
-            actionHelper.setEvalsAdmins(true);
+            actionHelper.updateContextTimestamp();
+            actionHelper.setAdminPortletData();
             SessionMessages.add(request, "admin-added");
         } catch (ModelException e) {
             actionHelper.addErrorsToRequest(e.getMessage());
@@ -111,7 +112,8 @@ public class AdminsAction implements ActionInterface {
             }
 
             adminMgr.delete(id);
-            actionHelper.setEvalsAdmins(true);
+            actionHelper.updateContextTimestamp();
+            actionHelper.setAdminPortletData();
             SessionMessages.add(request, "admin-deleted");
         } catch (ModelException e) {
             actionHelper.addErrorsToRequest(e.getMessage());
