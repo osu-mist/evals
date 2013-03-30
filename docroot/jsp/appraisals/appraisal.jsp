@@ -30,6 +30,7 @@
 <c:if test="${showForm}">
     <span class="portlet-msg-alert">
     <c:out value = "${appraisalNotice.text}"/>
+
     </span>
 </c:if>
 
@@ -221,12 +222,12 @@
         var errors = "";
         if (jQuery("#<portlet:namespace />acknowledge-read-appraisal").length > 0 &&
                 !jQuery("#<portlet:namespace />acknowledge-read-appraisal").is(':checked')) {
-          errors = "<li><%= Appraisal.signatureRequired %></li>";
-          alert("<%= Appraisal.signatureRequired %>");
+          errors = "<li><%= bundle.getString("appraisal-signatureRequired")%></li>";
+          alert("<%= bundle.getString("appraisal-signatureRequired") %>");
         }
         if (jQuery("#<portlet:namespace />appraisal-readRebuttal").length > 0 && !jQuery("#<portlet:namespace />appraisal-readRebuttal").is(':checked')) {
-          errors = "<li><%= Appraisal.rebuttalReadRequired %></li>";
-          alert("<%= Appraisal.rebuttalReadRequired %>");
+          errors = "<li><%= bundle.getString("appraisal-rebuttalReadRequired") %></li>";
+          alert("<%= bundle.getString("appraisal-rebuttalReadRequired") %>");
         }
         if (errors != "") {
           jQuery("#<portlet:namespace />flash").html(
@@ -244,8 +245,8 @@
         if (jQuery("input[name=submit-appraisal]").length > 0 &&
               jQuery("input[name=<portlet:namespace />appraisal.rating]:checked",
                 "#<portlet:namespace />fm").val() == undefined) {
-          errors = "<li><%= Appraisal.ratingRequired %></li>";
-          alert("<%= Appraisal.ratingRequired %>");
+          errors = "<li><%= bundle.getString("appraisal-ratingRequired") %></li>";
+          alert("<%= bundle.getString("appraisal-ratingRequired") %>");
         }
 
         if (errors != "") {
@@ -282,5 +283,6 @@
     <%@ include file="/jsp/appraisals/demoSettings.jsp"%>
 
 </c:if>
+
 </div><!-- end appraisal -->
 <%@ include file="/jsp/footer.jsp" %>

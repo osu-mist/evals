@@ -4,28 +4,6 @@ import java.text.MessageFormat;
 import java.util.*;
 
 public class Appraisal extends Evals {
-    private static final String jobRequired =
-            "Please provide a valid job";
-
-    /**
-     * Validation error message for signature is public because the appraisal.jsp
-     * needs to access this static variable in order to do js validation
-     */
-    public static final String signatureRequired =
-            "Please click the box to acknowledge that you have read the appraisal";
-
-    public static final String rebuttalReadRequired =
-            "Please click the box to acknowledge that you have read the rebuttal";
-
-    /**
-     * Validation error message for rating is public because the appraisal.jsp
-     * needs to access this static variable in order to do js validation
-     */
-    public static final String ratingRequired =
-            "Please select a rating.";
-
-    public static final String invalidType =
-            "Appraisal type can only be: annual or trial. Please provide a valid type.";
 
     public static final String TYPE_ANNUAL = "annual";
 
@@ -400,40 +378,6 @@ public class Appraisal extends Evals {
             setStatus(appraisal.getStatus());
         }
         setJob(appraisal.getJob());
-    }
-
-    public boolean validateJob() {
-        ArrayList<String> jobErrors = new ArrayList<String>();
-
-        // If there were any previous validation errors remove them
-        this.errors.remove("job");
-
-        if (this.job == null || this.job.getEmployee() == null || this.job.getEmployee().getId() == 0) {
-            jobErrors.add(jobRequired);
-        }
-
-        if (jobErrors.size() > 0) {
-            this.errors.put("job", jobErrors);
-            return false;
-        }
-        return true;
-    }
-
-    public boolean validateType() {
-        ArrayList<String> typeErrors = new ArrayList<String>();
-
-        // If there were any previous validation errors remove them
-        this.errors.remove("type");
-
-        if (this.type == null || (!this.type.equals(TYPE_ANNUAL) && !this.type.equals(TYPE_TRIAL))) {
-            typeErrors.add(invalidType);
-        }
-
-        if (typeErrors.size() > 0) {
-            this.errors.put("type", typeErrors);
-            return false;
-        }
-        return true;
     }
 
     /**
