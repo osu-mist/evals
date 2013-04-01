@@ -225,28 +225,6 @@ public class EvalsUtil {
     }
 
     /**
-     * Whether or not the current job and appraisal start date is before evals started
-     * processing evaluations.
-     *
-     * @param job
-     * @param startDate     DateTime object
-     * @param type
-     * @return
-     * @throws ParseException
-     */
-    public static boolean beforeEvalsTime(Job job, DateTime startDate, String type)
-            throws ParseException {
-        DateTime appraisalEndDate = job.getEndEvalDate(startDate, type);
-        System.out.print("appraisalEndDate = " + appraisalEndDate);
-        if (appraisalEndDate.isBefore(getEvalsStartDate())) {
-            System.out.println(", before evalsStartDate.");
-            return true;
-        }
-        System.out.println(".");
-        return false;
-    }
-
-    /**
      * Parses the constant EVALS_START_DATE and stores a date object in evalsStartDate.
      *
      * @return  DateTime object

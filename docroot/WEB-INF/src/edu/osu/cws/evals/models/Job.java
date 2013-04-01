@@ -427,14 +427,7 @@ public class Job extends Evals implements Serializable {
             // Check if the first annual evaluation has not been created
             if (!AppraisalMgr.AnnualExists(this, initialStartDate)) {
                 // Check if the first annual evaluation should be created
-                if (initialStartDate.isAfterNow()) {
-                    return false;
-                }
-                if (EvalsUtil.beforeEvalsTime(this, initialStartDate, Appraisal.TYPE_ANNUAL)) {
-                    return false;
-                }
-
-                return true;
+                return !initialStartDate.isAfterNow();
             }
 
         }
