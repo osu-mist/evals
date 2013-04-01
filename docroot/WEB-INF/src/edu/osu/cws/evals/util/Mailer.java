@@ -69,17 +69,17 @@ public class Mailer {
      * @param emailType - an EmailType
      * @throws Exception
      */
-    public void sendMail(Appraisal appraisal, EmailType emailType) {
+    public boolean sendMail(Appraisal appraisal, EmailType emailType) {
         String logShortMessage = "";
         String logLongMessage = "";
 
         try {
-            if (!(appraisal.getJob().getStatus().equals("A"))) {
+            if (!appraisal.isEmployeeJobActive()) {
                 logShortMessage = "Email not sent";
                 logLongMessage = "Appraisal " + appraisal.getId() +
                         " not available, job is not active.";
                 logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
-                return;
+                return false;
             }
 
             HtmlEmail email = getHtmlEmail();
@@ -113,7 +113,7 @@ public class Mailer {
             }
 
             if (!hasRecipients) {
-                return;
+                return false;
             }
 
             String addressee = getAddressee(appraisal,mailTo);
@@ -138,7 +138,10 @@ public class Mailer {
                         appraisal.getId() + "\n" + stackTrace;
                 logger.log(Logger.ERROR,logShortMessage,logLongMessage);
             } catch (Exception logError) { }
+            return false;
         }
+
+        return true;
    }
 
     private HtmlEmail getHtmlEmail() throws EmailException {
