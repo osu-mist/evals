@@ -17,11 +17,6 @@ public class Admin extends Evals {
 
     private boolean isMaster;
 
-    /**
-     * The value for scope will be: hr, uabac, etc.
-     */
-    private String scope;
-
     public static final String validEmployeeRequired =
             "The username you entered does not exist or is inactive. Please provide a valid employee username.";
 
@@ -97,13 +92,5 @@ public class Admin extends Evals {
 
     public void setIsMaster(boolean master) {
         isMaster = master;
-    }
-
-    public String getScope() {
-        return scope;
-    }
-
-    public void setScope(String scope) {
-        this.scope = scope;
     }
 }
