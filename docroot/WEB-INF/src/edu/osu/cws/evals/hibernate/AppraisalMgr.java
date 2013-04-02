@@ -609,13 +609,8 @@ public class AppraisalMgr {
         String role = getRole(appraisal, loggedInUser.getId());
         permissionKey = appraisal.getStatus()+"-"+ role;
 
-        PermissionRule originalPermRule = (PermissionRule) permissionRules.get(permissionKey);
-        PermissionRule permissionRule = (PermissionRule) originalPermRule.clone();
-        if (permissionRule != null) {
-            String debug = "j-startDate=" + appraisal.getStartDate().toString();
-            permissionRule.setGoals(debug);
-            permissionRule.setResults(debug);
-        }
+        PermissionRule permissionRule = (PermissionRule) permissionRules.get(permissionKey);
+
         return permissionRule;
     }
 
