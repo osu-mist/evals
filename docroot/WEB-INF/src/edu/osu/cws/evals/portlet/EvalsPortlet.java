@@ -129,9 +129,12 @@ public class EvalsPortlet extends GenericPortlet {
                 actionHelper = new ActionHelper(request, response, getPortletContext());
                 controllerClass = "edu.osu.cws.evals.portlet." + controllerClass;
                 ActionInterface controller = (ActionInterface) Class.forName(controllerClass).newInstance();
+                ErrorHandler errorHandler = new ErrorHandler(actionHelper);
                 controller.setActionHelper(actionHelper);
+                controller.setErrorHandler(errorHandler);
                 HomeAction homeAction = new HomeAction();
                 homeAction.setActionHelper(actionHelper);
+                homeAction.setErrorHandler(errorHandler);
                 controller.setHomeAction(homeAction);
 
                 hibSession = HibernateUtil.getCurrentSession();
@@ -197,8 +200,11 @@ public class EvalsPortlet extends GenericPortlet {
 
                 ActionInterface controller = (ActionInterface) Class.forName(controllerClass).newInstance();
                 controller.setActionHelper(actionHelper);
+                ErrorHandler errorHandler = new ErrorHandler(actionHelper);
+                controller.setErrorHandler(errorHandler);
                 HomeAction homeAction = new HomeAction();
                 homeAction.setActionHelper(actionHelper);
+                homeAction.setErrorHandler(errorHandler);
                 controller.setHomeAction(homeAction);
 
                 Method controllerMethod = controller.getClass().getDeclaredMethod(
@@ -258,8 +264,6 @@ public class EvalsPortlet extends GenericPortlet {
                 Transaction tx = hibSession.beginTransaction();
 
                 actionHelper = new ActionHelper(request, null, getPortletContext());
-                actionHelper.setEvalsConfiguration(false);
-                message += "Stored Configuration Map and List in portlet context\n";
                 createMailer();
                 message += "Mailer setup successfully\n";
                 getPortletContext().setAttribute("permissionRules", permissionRuleMgr.list());
@@ -268,13 +272,8 @@ public class EvalsPortlet extends GenericPortlet {
                 message += "Stored Appraisal Steps in portlet context\n";
                 loadResourceBundle();
                 message += "Stored resource bundle Language.properties in portlet context\n";
-                Date currentTimestamp = new Date();
-                getPortletContext().setAttribute(CONTEXT_CACHE_TIMESTAMP, currentTimestamp);
-                message += "Stored contextCacheTimestamp of " + currentTimestamp.toString() + "\n";
-                actionHelper.setEvalsAdmins(false);
-                actionHelper.setEvalsReviewers(false);
-                actionHelper.setNotices(false);
-                message += "Stored notices in portlet context\n";
+                actionHelper.updateContextTimestamp();
+                actionHelper.setAdminPortletData();
                 tx.commit();
 
                 EvalsLogger logger =  getLog();

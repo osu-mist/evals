@@ -62,6 +62,7 @@ public class ReportsAction implements ActionInterface {
 
     private ActionHelper actionHelper;
     private HomeAction homeAction;
+    private ErrorHandler errorHandler;
 
     /**
      * Map used to store drilldown, and search options used to fetch
@@ -725,6 +726,10 @@ public class ReportsAction implements ActionInterface {
 
     public void setHomeAction(HomeAction homeAction) {
         this.homeAction = homeAction;
+    }
+
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
     }
 
     /**

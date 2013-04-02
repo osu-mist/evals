@@ -10,15 +10,16 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.ResourceBundle;
 
 public class NoticeAction implements ActionInterface {
 
     private ActionHelper actionHelper;
 
     private HomeAction homeAction;
+
+    private ErrorHandler errorHandler;
+
     /**
      * Handles listing the notice.
      *
@@ -29,10 +30,8 @@ public class NoticeAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin()) {
-            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         ArrayList<Notice> noticeList = NoticeMgr.list();
@@ -53,10 +52,8 @@ public class NoticeAction implements ActionInterface {
      */
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isLoggedInUserAdmin()) {
-            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
         Notice notice = new Notice();
         try {
@@ -75,7 +72,8 @@ public class NoticeAction implements ActionInterface {
                 //if the current notice is a yellowBoxMessage and it is changed, update it into
                 //portletContext so the other loggedInUser can see it.
                 if(noticeChange){
-                    actionHelper.setNotices(true);
+                    actionHelper.updateContextTimestamp();
+                    actionHelper.setAdminPortletData();
                 }
                 return list(request, response);
             }
@@ -100,5 +98,8 @@ public class NoticeAction implements ActionInterface {
         this.homeAction = homeAction;
     }
 
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
+    }
 }
 
