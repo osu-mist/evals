@@ -37,14 +37,20 @@ public class ActionHelper {
     private PortletContext portletContext;
 
     private PortletRequest request;
+
     private PortletResponse response;
+
     private Employee loggedOnUser;
+
+    private HashMap<String,Object> requestMap;
 
     public ActionHelper(PortletRequest request, PortletResponse response,
                         PortletContext portletContext) throws Exception {
+        PortletSession session = request.getPortletSession(true);
         this.request = request;
         this.response = response;
         this.portletContext = portletContext;
+        this.requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
         setLoggedOnUser();
     }
 
@@ -129,7 +135,7 @@ public class ActionHelper {
      * @param refresh   Update the user permissions, even if they have already been set
      * @throws Exception
      */
-    public void setUpUserPermissionInSession(boolean refresh) throws Exception {
+    /*public void setUpUserPermissionInSession(boolean refresh) throws Exception {
         PortletSession session = request.getPortletSession(true);
 
         Boolean isSupervisor = (Boolean) session.getAttribute("isSupervisor");
@@ -166,7 +172,7 @@ public class ActionHelper {
         addToRequestMap("isAdmin", isAdmin);
 
         addToRequestMap("employee", loggedOnUser);
-    }
+    } */
 
     /**
      * Updates the admins List in the portletContext. This method is called by
@@ -455,9 +461,9 @@ public class ActionHelper {
     }
 
     /**
-     * Takes in a pidm, and looks up in the reviewers HashMap stored in the portlet context
-     * to figure out if the current logged in user is a reviewer. If yes, then we return the
-     * Reviewer object if not, it returns null.
+     * Looks up in the reviewers HashMap stored in the portlet context
+     * to figure out if the current logged in user is a reviewer.
+     * If yes, then we return the Reviewer object if not, it returns null.
      *
      * @return Reviewer
      */
@@ -469,9 +475,9 @@ public class ActionHelper {
     }
 
     /**
-     * Takes in a pidm, and looks up in the admins HashMap stored in the portlet context
-     * to figure out if the current logged in user is a reviewer. If yes, then we return the
-     * Admin object if not, it returns false.
+     * Looks up in the admins HashMap stored in the portlet context
+     * to figure out if the current logged in user is a reviewer.
+     * If yes, then we return the Admin object if not, it returns false.
      *
      * @return Admin
      */
@@ -489,13 +495,10 @@ public class ActionHelper {
      * @throws Exception
      */
     public boolean isLoggedInUserMasterAdmin() throws Exception {
-        PortletSession session = request.getPortletSession(true);
-        Boolean isMasterAdmin = (Boolean) session.getAttribute("isMasterAdmin");
-        if (isMasterAdmin == null) {
-            setUpUserPermissionInSession(false);
-            isMasterAdmin = (Boolean) session.getAttribute("isMasterAdmin");
+        if (getAdmin() == null) {
+            return false;
         }
-        return isMasterAdmin;
+        return getAdmin().getIsMaster();
     }
 
     /**
@@ -508,7 +511,7 @@ public class ActionHelper {
         PortletSession session = request.getPortletSession(true);
         Boolean isSupervisor = (Boolean) session.getAttribute("isSupervisor");
         if (isSupervisor == null) {
-            setUpUserPermissionInSession(false);
+            //setUpUserPermissionInSession(false);
             isSupervisor = (Boolean) session.getAttribute("isSupervisor");
         }
         return isSupervisor;
@@ -531,7 +534,6 @@ public class ActionHelper {
         RequiredAction reviewerAction;
         Reviewer reviewer;
         ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
-
 
         myActiveAppraisals = (ArrayList<Appraisal>) getFromRequestMap("myActiveAppraisals");
         employeeRequiredActions = getAppraisalActions(myActiveAppraisals, "employee", resource);
@@ -657,10 +659,7 @@ public class ActionHelper {
      * @param request
      */
     public void setRequestAttributes(RenderRequest request) {
-        PortletSession session = request.getPortletSession(true);
-
         addToRequestMap("currentRole", getCurrentRole());
-        HashMap<String,Object> requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
 
         for (Map.Entry<String, Object> entry : requestMap.entrySet()) {
             request.setAttribute(entry.getKey(), entry.getValue());
@@ -677,7 +676,6 @@ public class ActionHelper {
      */
     public void addToRequestMap(String key, Object object) {
         PortletSession session = request.getPortletSession(true);
-        HashMap<String,Object> requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
         if (requestMap == null) {
             requestMap = new HashMap<String, Object>();
             session.setAttribute(REQUEST_MAP, requestMap);
@@ -692,8 +690,6 @@ public class ActionHelper {
      * @return object from requestMap searching from key
      */
     public Object getFromRequestMap(String key) {
-        PortletSession session = request.getPortletSession(true);
-        HashMap<String,Object> requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
         if (requestMap == null){
             return null;
         }
