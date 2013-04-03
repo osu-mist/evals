@@ -44,14 +44,26 @@ public class ActionHelper {
 
     private HashMap<String,Object> requestMap;
 
+    private ResourceBundle bundle;
+
     public ActionHelper(PortletRequest request, PortletResponse response,
                         PortletContext portletContext) throws Exception {
         PortletSession session = request.getPortletSession(true);
         this.request = request;
         this.response = response;
         this.portletContext = portletContext;
-        this.requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
+        this.bundle = (ResourceBundle) portletContext.getAttribute("resourceBundle");
+        setRequestMap();
         setLoggedOnUser();
+    }
+
+    private void setRequestMap() {
+        PortletSession session = request.getPortletSession(true);
+        requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
+        if (requestMap == null) {
+            requestMap = new HashMap<String, Object>();
+            session.setAttribute(REQUEST_MAP, requestMap);
+        }
     }
 
     /**
@@ -127,52 +139,6 @@ public class ActionHelper {
         }
         return myTeamAppraisals;
     }
-
-    /**
-     * Checks the user permission level and sets up some flags in the session object to store those
-     * permissions.
-     *
-     * @param refresh   Update the user permissions, even if they have already been set
-     * @throws Exception
-     */
-    /*public void setUpUserPermissionInSession(boolean refresh) throws Exception {
-        PortletSession session = request.getPortletSession(true);
-
-        Boolean isSupervisor = (Boolean) session.getAttribute("isSupervisor");
-        if (refresh || isSupervisor == null) {
-            isSupervisor = JobMgr.isSupervisor(loggedOnUser.getId(), null);
-            session.setAttribute("isSupervisor", isSupervisor);
-        }
-        addToRequestMap("isSupervisor", isSupervisor);
-
-        Boolean isReviewer = (Boolean) session.getAttribute("isReviewer");
-        if (refresh || isReviewer == null) {
-            isReviewer = getReviewer() != null;
-            session.setAttribute("isReviewer", isReviewer);
-        }
-        addToRequestMap("isReviewer", isReviewer);
-
-        Boolean isMasterAdmin = (Boolean) session.getAttribute("isSuperAdmin");
-        if (refresh || isMasterAdmin == null) {
-            if (getAdmin() != null &&
-                    getAdmin().getIsMaster()) {
-                isMasterAdmin = true;
-            } else {
-                isMasterAdmin = false;
-            }
-            session.setAttribute("isMasterAdmin", isMasterAdmin);
-        }
-        addToRequestMap("isMasterAdmin", isMasterAdmin);
-
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        if (refresh || isAdmin == null) {
-            isAdmin = getAdmin() != null;
-            session.setAttribute("isAdmin", isAdmin);
-        }
-        addToRequestMap("isAdmin", isAdmin);
-
-        addToRequestMap("employee", loggedOnUser);
-    } */
 
     /**
      * Updates the admins List in the portletContext. This method is called by
@@ -533,22 +499,21 @@ public class ActionHelper {
         ArrayList<Appraisal> supervisorActions;
         RequiredAction reviewerAction;
         Reviewer reviewer;
-        ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
 
         myActiveAppraisals = (ArrayList<Appraisal>) getFromRequestMap("myActiveAppraisals");
-        employeeRequiredActions = getAppraisalActions(myActiveAppraisals, "employee", resource);
+        employeeRequiredActions = getAppraisalActions(myActiveAppraisals, "employee", bundle);
         addToRequestMap("employeeActions", employeeRequiredActions);
 
         // add supervisor required actions, if user has team's active appraisals
         if(getFromRequestMap("myTeamsActiveAppraisals") != null){
             supervisorActions = (ArrayList<Appraisal>) getFromRequestMap("myTeamsActiveAppraisals");
-            administrativeActions = getAppraisalActions(supervisorActions, "supervisor", resource);
+            administrativeActions = getAppraisalActions(supervisorActions, "supervisor", bundle);
         }
 
         reviewer = getReviewer();
         if (reviewer != null) {
             String businessCenterName = reviewer.getBusinessCenterName();
-            reviewerAction = getReviewerAction(businessCenterName, resource);
+            reviewerAction = getReviewerAction(businessCenterName, bundle);
             if (reviewerAction != null) {
                 administrativeActions.add(reviewerAction);
             }
@@ -563,12 +528,12 @@ public class ActionHelper {
      *
      * @param appraisalList     List of appraisals to check for actions required
      * @param role              Role of the currently logged in user
-     * @param resource          Resource bundle to pass in to RequiredAction bean
+     * @param bundle          Resource bundle to pass in to RequiredAction bean
      * @return  outList
      * @throws edu.osu.cws.evals.models.ModelException
      */
     public ArrayList<RequiredAction> getAppraisalActions(List<Appraisal> appraisalList,
-                                                         String role, ResourceBundle resource) throws Exception {
+                                                         String role, ResourceBundle bundle) throws Exception {
         Configuration configuration;
         HashMap permissionRuleMap = (HashMap) portletContext.getAttribute("permissionRules");
         Map<String, Configuration> configurationMap =
@@ -612,7 +577,7 @@ public class ActionHelper {
 
                 actionReq = new RequiredAction();
                 actionReq.setParameters(anchorParams);
-                actionReq.setAnchorText(actionRequired, appraisal, resource, configuration);
+                actionReq.setAnchorText(actionRequired, appraisal, bundle, configuration);
                 outList.add(actionReq);
             }
         }
@@ -623,11 +588,11 @@ public class ActionHelper {
      * Returns the required action for the business center reviewer.
      *
      * @param businessCenterName
-     * @param resource
+     * @param bundle
      * @return
      * @throws Exception
      */
-    private RequiredAction getReviewerAction(String businessCenterName, ResourceBundle resource
+    private RequiredAction getReviewerAction(String businessCenterName, ResourceBundle bundle
                                              ) throws Exception {
         int reviewCount;
         List<Appraisal> reviewList = getReviewsForLoggedInUser(-1);
@@ -646,7 +611,7 @@ public class ActionHelper {
         HashMap<String, String> parameters = new HashMap<String, String>();
         parameters.put("action", "reviewList");
         parameters.put("controller", "AppraisalsAction");
-        requiredAction.setAnchorText("action-required-review", reviewCount, resource);
+        requiredAction.setAnchorText("action-required-review", reviewCount, bundle);
         requiredAction.setParameters(parameters);
 
         return requiredAction;
