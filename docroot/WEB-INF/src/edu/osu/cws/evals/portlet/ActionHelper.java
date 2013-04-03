@@ -48,7 +48,6 @@ public class ActionHelper {
 
     public ActionHelper(PortletRequest request, PortletResponse response,
                         PortletContext portletContext) throws Exception {
-        PortletSession session = request.getPortletSession(true);
         this.request = request;
         this.response = response;
         this.portletContext = portletContext;
@@ -501,19 +500,19 @@ public class ActionHelper {
         Reviewer reviewer;
 
         myActiveAppraisals = (ArrayList<Appraisal>) getFromRequestMap("myActiveAppraisals");
-        employeeRequiredActions = getAppraisalActions(myActiveAppraisals, "employee", bundle);
+        employeeRequiredActions = getAppraisalActions(myActiveAppraisals, "employee");
         addToRequestMap("employeeActions", employeeRequiredActions);
 
         // add supervisor required actions, if user has team's active appraisals
         if(getFromRequestMap("myTeamsActiveAppraisals") != null){
             supervisorActions = (ArrayList<Appraisal>) getFromRequestMap("myTeamsActiveAppraisals");
-            administrativeActions = getAppraisalActions(supervisorActions, "supervisor", bundle);
+            administrativeActions = getAppraisalActions(supervisorActions, "supervisor");
         }
 
         reviewer = getReviewer();
         if (reviewer != null) {
             String businessCenterName = reviewer.getBusinessCenterName();
-            reviewerAction = getReviewerAction(businessCenterName, bundle);
+            reviewerAction = getReviewerAction(businessCenterName);
             if (reviewerAction != null) {
                 administrativeActions.add(reviewerAction);
             }
@@ -528,12 +527,11 @@ public class ActionHelper {
      *
      * @param appraisalList     List of appraisals to check for actions required
      * @param role              Role of the currently logged in user
-     * @param bundle          Resource bundle to pass in to RequiredAction bean
      * @return  outList
      * @throws edu.osu.cws.evals.models.ModelException
      */
     public ArrayList<RequiredAction> getAppraisalActions(List<Appraisal> appraisalList,
-                                                         String role, ResourceBundle bundle) throws Exception {
+                                                         String role) throws Exception {
         Configuration configuration;
         HashMap permissionRuleMap = (HashMap) portletContext.getAttribute("permissionRules");
         Map<String, Configuration> configurationMap =
@@ -588,12 +586,11 @@ public class ActionHelper {
      * Returns the required action for the business center reviewer.
      *
      * @param businessCenterName
-     * @param bundle
      * @return
      * @throws Exception
      */
-    private RequiredAction getReviewerAction(String businessCenterName, ResourceBundle bundle
-                                             ) throws Exception {
+    private RequiredAction getReviewerAction(String businessCenterName)
+            throws Exception {
         int reviewCount;
         List<Appraisal> reviewList = getReviewsForLoggedInUser(-1);
         if (reviewList != null) {
@@ -640,11 +637,6 @@ public class ActionHelper {
      * @return
      */
     public void addToRequestMap(String key, Object object) {
-        PortletSession session = request.getPortletSession(true);
-        if (requestMap == null) {
-            requestMap = new HashMap<String, Object>();
-            session.setAttribute(REQUEST_MAP, requestMap);
-        }
         requestMap.put(key, object);
     }
 
@@ -655,9 +647,6 @@ public class ActionHelper {
      * @return object from requestMap searching from key
      */
     public Object getFromRequestMap(String key) {
-        if (requestMap == null){
-            return null;
-        }
         return requestMap.get(key);
     }
 
