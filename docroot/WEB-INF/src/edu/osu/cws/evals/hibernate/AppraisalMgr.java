@@ -60,13 +60,12 @@ public class AppraisalMgr {
      *
      * @param job   Job for this appraisal
      * @param type: trial, annual, initial
-     * @param goalsDueConfig: Configuration object of goalsDue or resultsDue
      * @param startDate: (DateTime) starting date of appraisal period.
      * @return appraisal.id
      * @throws Exception
      */
-    public static Appraisal createAppraisal(Job job, DateTime startDate, String type,
-                                            Configuration goalsDueConfig) throws Exception {
+    public static Appraisal createAppraisal(Job job, DateTime startDate, String type)
+            throws Exception {
         CriteriaMgr criteriaMgr = new CriteriaMgr();
         Appraisal appraisal = new Appraisal();
         CriterionDetail detail;
@@ -81,6 +80,7 @@ public class AppraisalMgr {
         appraisal.setStartDate(startDate.toDate());
         appraisal.setCreateDate(new Date());
         appraisal.setRating(0);
+        appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
 
         // In the db, we only store: annual or trial.
         String dbType = type;
@@ -91,8 +91,6 @@ public class AppraisalMgr {
 
         DateTime endDate = job.getEndEvalDate(startDate, type);
         appraisal.setEndDate(CWSUtil.toDate(endDate));
-
-        createAppraisalStatus(startDate, goalsDueConfig, appraisal);
 
         if (appraisal.validate()) {
             String appointmentType = job.getAppointmentType();
@@ -114,25 +112,6 @@ public class AppraisalMgr {
 
         return appraisal;
     }
-
-    /**
-     * Sets the status of the appraisal. If the startDate of the appraisal is before Nov 1st, 2011, we set the
-     * status to appraisalDue, else if
-     *
-     * @param startDate         DateTime object
-     * @param goalsDueConfig
-     * @param appraisal
-     * @throws Exception
-     */
-    private static void createAppraisalStatus(DateTime startDate, Configuration goalsDueConfig,
-                                              Appraisal appraisal) throws Exception {
-        if (EvalsUtil.isDue(appraisal, goalsDueConfig) < 0) {
-            appraisal.setStatus(Appraisal.STATUS_GOALS_OVERDUE);
-        } else {
-            appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
-        }
-    }
-
 
     public static List<Appraisal>  getActiveAppraisals(Job job)
     {
@@ -999,6 +978,9 @@ public class AppraisalMgr {
      */
     public static boolean trialAppraisalExists(Job job) throws Exception {
         DateTime startDate = job.getTrialStartDate();
+        if (startDate == null) {
+            return false;
+        }
         return appraisalExists(job, startDate,  Appraisal.TYPE_TRIAL);
     }
 

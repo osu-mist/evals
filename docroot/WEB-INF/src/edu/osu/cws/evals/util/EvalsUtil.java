@@ -121,7 +121,7 @@ public class EvalsUtil {
         String hostname = CWSUtil.getLocalHostname();
         System.out.println("hostname is " + hostname);
 
-        String filenameHead = portletRoot + Constants.ROOT_DIR;
+        String filenameHead = portletRoot + Constants.getRootDir();
 
         if (env.equals("backend"))
             filenameHead = filenameHead + "backend_";
@@ -148,16 +148,6 @@ public class EvalsUtil {
         if (specificFile.exists())
            return specificPropFile;
         return null;
-    }
-
-    public static int daysBeforeAppraisalDue(Job job, DateTime appraisalStartDate, String appraisalType,
-                                             Map<String, Configuration> configMap) throws Exception{
-        Configuration appraisalDueConfig = configMap.get(Appraisal.STATUS_APPRAISAL_DUE);
-        int offset = appraisalDueConfig.getIntValue();    //number of days before end date of appraisal
-
-        //determine appraisal due date.
-        DateTime dueDate = job.getEndEvalDate(appraisalStartDate, appraisalType).minusDays(offset);
-        return Days.daysBetween(new DateTime(), dueDate).getDays();
     }
 
     /**
@@ -232,28 +222,6 @@ public class EvalsUtil {
                     .setString("startWithSuffix"+i, directSupervisor.getSuffix());
             i++;
         }
-    }
-
-    /**
-     * Whether or not the current job and appraisal start date is before evals started
-     * processing evaluations.
-     *
-     * @param job
-     * @param startDate     DateTime object
-     * @param type
-     * @return
-     * @throws ParseException
-     */
-    public static boolean beforeEvalsTime(Job job, DateTime startDate, String type)
-            throws ParseException {
-        DateTime appraisalEndDate = job.getEndEvalDate(startDate, type);
-        System.out.print("appraisalEndDate = " + appraisalEndDate);
-        if (appraisalEndDate.isBefore(getEvalsStartDate())) {
-            System.out.println(", before evalsStartDate.");
-            return true;
-        }
-        System.out.println(".");
-        return false;
     }
 
     /**

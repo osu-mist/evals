@@ -861,4 +861,8 @@ public class Appraisal extends Evals {
     public void setRole(String role) {
         this.role = role;
     }
+
+    public boolean isEmployeeJobActive() {
+        return getJob().getStatus().equalsIgnoreCase("A");
+    }
 }

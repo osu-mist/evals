@@ -36,7 +36,7 @@ public class AppraisalCreation {
             if (startDate.isAfter(newDay)) {
                 startDate = startDate.minusYears(1); //last year
             }
-            AppraisalMgr.createAppraisal(job, startDate, Appraisal.TYPE_ANNUAL, goalsDueConfig);
+            AppraisalMgr.createAppraisal(job, startDate, Appraisal.TYPE_ANNUAL);
         }
     }
 }

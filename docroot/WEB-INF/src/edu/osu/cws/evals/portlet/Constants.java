@@ -5,6 +5,8 @@
  */
 package edu.osu.cws.evals.portlet;
 
+import java.io.File;
+
 public class Constants {
 
     public static final String JSP_HOME = "/jsp/home/start.jsp";
@@ -40,12 +42,6 @@ public class Constants {
     public static final String JSP_NOTICE_LIST = "/jsp/notices/list.jsp";
     public static final String JSP_NOTICE_EDIT = "/jsp/notices/edit.jsp";
 
-    //if appraisalStartDate is before FUL__GOALS_DUE date, create the appraisal these many
-    //days before appraialsDue.
-    public static final int DAYS_BEFORE_APPRAISAL_DUE_To_CREATE = 60;
-
-    public static final String ROOT_DIR = "WEB-INF/src/";
-
     // Used by several Hibernate classes when executing hierarchical queries
     public static final String CONNECT_BY = "CONNECT BY " +
             "pyvpasj_supervisor_pidm = prior pyvpasj_pidm AND " +
@@ -68,4 +64,36 @@ public class Constants {
 
     public static final String DATE_FORMAT = "MM/dd/yy";
     public static final String DATE_FORMAT_FULL = "MM/dd/yyyy";
+
+    public static final int MAX_ERROR_COUNT = 500;  //# of errors before aborting
+    public static final String EMAIL_BUNDLE_FILE = "edu.osu.cws.evals.portlet.Email";
+
+    // Private constants
+    private static final String ROOT_DIR = "WEB-INF/src/";
+    private static final String DEFAULT_PROPERTIES_FILE = "backend-config.properties";
+
+
+    /**
+     * The root directory of the EvalS project. The docroot directory is removed by the fabric
+     * script. During local dev & testing, we need to append docroot to the root_dir.
+     *
+     * @return
+     */
+    public static String getRootDir() {
+        if (new File("docroot").exists()) {
+            return "docroot/" + ROOT_DIR;
+        }
+
+        return ROOT_DIR;
+    }
+
+    /**
+     * The path to the default properties file. This value depends on ROOT_DIR which is calculated
+     * at runtime. That's why we have to provide a method for it.
+     *
+     * @return
+     */
+    public static String getDefaultPropertiesFile() {
+        return getRootDir() +  DEFAULT_PROPERTIES_FILE;
+    }
 }
