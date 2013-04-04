@@ -113,24 +113,23 @@ public class AppraisalMgr {
         return appraisal;
     }
 
-    public static List<Appraisal>  getActiveAppraisals(Job job)
-    {
-        return new ArrayList();
-    }
-
     /**
-     * creates an appraisal record and returns it
-     * @param job:  the job the appraisal record is created against
-     * @param Type:  possible values are trials, annual and initial.
-     * @             Initial is annual except the length of the period is defined by annual_eval_ind
-     * @return:  the appraisal record created
+     * Sets the status of the appraisal. If the startDate of the appraisal is before Nov 1st, 2011, we set the
+     * status to appraisalDue, else if
+     *
+     * @param startDate         DateTime object
+     * @param goalsDueConfig
+     * @param appraisal
      * @throws Exception
      */
-   /* public static Appraisal createAppraisal(Job job, String Type) throws Exception
-    {
-        return new Appraisal();
+    private static void createAppraisalStatus(DateTime startDate, Configuration goalsDueConfig,
+                                              Appraisal appraisal) throws Exception {
+        if (EvalsUtil.isDue(appraisal, goalsDueConfig) < 0) {
+            appraisal.setStatus(Appraisal.STATUS_GOALS_OVERDUE);
+        } else {
+            appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
+        }
     }
-    */
 
     /**
      * This method is called upon completion or closure of an trial appraisal to create the
@@ -372,7 +371,7 @@ public class AppraisalMgr {
      * @param job
      * @return trialAppraisal
      */
-    public static Appraisal getFirstTrialAppraisal(Job job) {
+    public static Appraisal getTrialAppraisal(Job job) {
         Session session = HibernateUtil.getCurrentSession();
 
         Appraisal trialAppraisal = (Appraisal) session.getNamedQuery("appraisal.getTrialAppraisal")
