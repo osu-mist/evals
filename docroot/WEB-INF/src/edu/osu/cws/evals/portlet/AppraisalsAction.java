@@ -234,15 +234,15 @@ public class AppraisalsAction implements ActionInterface {
      */
     public String update(PortletRequest request, PortletResponse response) throws Exception {
         initialize(request);
-        CompositeConfiguration config;
-
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
-        actionHelper.setAppraisalMgrParameters(appraisalMgr);
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
             return errorHandler.handleAccessDenied(request, response);
         }
+
+        CompositeConfiguration config;
+        AppraisalMgr appraisalMgr = new AppraisalMgr();
+        actionHelper.setAppraisalMgrParameters(appraisalMgr);
 
         try {
             appraisalMgr.processUpdateRequest(request.getParameterMap(), appraisal, permRule);
@@ -408,7 +408,6 @@ public class AppraisalsAction implements ActionInterface {
      */
     public String resendAppraisalToNolij(PortletRequest request, PortletResponse response) throws Exception {
         initialize(request);
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
 
         // Permission checks
         if (!actionHelper.isLoggedInUserReviewer()
@@ -419,7 +418,9 @@ public class AppraisalsAction implements ActionInterface {
             return errorHandler.handleAccessDenied(request, response);
         }
 
+        AppraisalMgr appraisalMgr = new AppraisalMgr();
         actionHelper.addToRequestMap("id", appraisal.getId());
+
         if (!actionHelper.isLoggedInUserReviewer()) {
             String errorMsg = resource.getString("appraisal-resend-permission-denied");
             actionHelper.addErrorsToRequest(errorMsg);
