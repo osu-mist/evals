@@ -185,7 +185,7 @@ public class EvalsPortlet extends GenericPortlet {
             hibSession = HibernateUtil.getCurrentSession();
             Transaction tx = hibSession.beginTransaction();
             actionHelper = new ActionHelper(request, response, getPortletContext());
-            //actionHelper.setUpUserPermissionInSession(false);
+            actionHelper.setUpUserPermission(false);
             if (actionHelper.isDemo()) {
                 actionHelper.setupDemoSwitch();
             }
