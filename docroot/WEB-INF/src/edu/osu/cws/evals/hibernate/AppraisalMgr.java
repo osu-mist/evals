@@ -133,26 +133,6 @@ public class AppraisalMgr {
         }
     }
 
-
-    public static List<Appraisal>  getActiveAppraisals(Job job)
-    {
-        return new ArrayList();
-    }
-
-    /**
-     * creates an appraisal record and returns it
-     * @param job:  the job the appraisal record is created against
-     * @param Type:  possible values are trials, annual and initial.
-     * @             Initial is annual except the length of the period is defined by annual_eval_ind
-     * @return:  the appraisal record created
-     * @throws Exception
-     */
-   /* public static Appraisal createAppraisal(Job job, String Type) throws Exception
-    {
-        return new Appraisal();
-    }
-    */
-
     /**
      * This method is called upon completion or closure of an trial appraisal to create the
      * initial appraisal record.
@@ -393,7 +373,7 @@ public class AppraisalMgr {
      * @param job
      * @return trialAppraisal
      */
-    public static Appraisal getFirstTrialAppraisal(Job job) {
+    public static Appraisal getTrialAppraisal(Job job) {
         Session session = HibernateUtil.getCurrentSession();
 
         Appraisal trialAppraisal = (Appraisal) session.getNamedQuery("appraisal.getTrialAppraisal")

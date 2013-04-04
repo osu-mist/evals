@@ -27,11 +27,21 @@ public class AppraisalsAction implements ActionInterface {
     private ActionHelper actionHelper;
 
     private HomeAction homeAction;
+
     private PortletRequest request;
+
     private Employee loggedInUser;
+
     private ResourceBundle resource;
+
     private ErrorHandler errorHandler;
-    
+
+    private Appraisal appraisal = null;
+
+    private PermissionRule permRule = null;
+
+    private String userRole;
+
     /**
      * Handles displaying a list of pending reviews for a given business center.
      *
@@ -66,7 +76,25 @@ public class AppraisalsAction implements ActionInterface {
         this.request = request;
         this.resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         this.loggedInUser = actionHelper.getLoggedOnUser();
+        initializeAppraisal();
+    }
 
+    /**
+     * Initializes an appraisal.
+     *
+     * @throws Exception
+     */
+    private void initializeAppraisal() throws Exception {
+        AppraisalMgr appraisalMgr = new AppraisalMgr();
+        int appraisalID = ParamUtil.getInteger(request, "id");
+        if (appraisalID > 0) {
+            actionHelper.setAppraisalMgrParameters(appraisalMgr);
+            appraisal = appraisalMgr.getAppraisal(appraisalID);
+            if(appraisal != null) {
+                permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
+                userRole = appraisal.getRole();
+            }
+        }
     }
 
     /**
@@ -140,30 +168,11 @@ public class AppraisalsAction implements ActionInterface {
      */
     public String display(PortletRequest request, PortletResponse response) throws Exception {
         initialize(request);
-        Appraisal appraisal;
-        PermissionRule permRule;
-        Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser();
-        int userId = currentlyLoggedOnUser.getId();
-
-        int appraisalID = ParamUtil.getInteger(request, "id");
-        if (appraisalID == 0) {
-            return errorHandler.handleAccessDenied(request, response);
-        }
-
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
-        actionHelper.setAppraisalMgrParameters(appraisalMgr);
-
-        // 1) Get the appraisal and permission rule
-        appraisal = appraisalMgr.getAppraisal(appraisalID);
-        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
             return errorHandler.handleAccessDenied(request, response);
         }
-
-        String userRole = appraisalMgr.getRole(appraisal, userId);
-        appraisal.setRole(userRole);
 
         actionHelper.setupMyTeamActiveAppraisals();
         if (actionHelper.isLoggedInUserReviewer()) {
@@ -225,18 +234,10 @@ public class AppraisalsAction implements ActionInterface {
      */
     public String update(PortletRequest request, PortletResponse response) throws Exception {
         initialize(request);
-        Session session = HibernateUtil.getCurrentSession();
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
         CompositeConfiguration config;
-        int id = ParamUtil.getInteger(request, "id", 0);
-        if (id == 0) {
-            actionHelper.addErrorsToRequest(resource.getString("appraisal-no-found"));
-            return homeAction.display(request, response);
-        }
 
+        AppraisalMgr appraisalMgr = new AppraisalMgr();
         actionHelper.setAppraisalMgrParameters(appraisalMgr);
-        Appraisal appraisal = (Appraisal) session.get(Appraisal.class, id);
-        PermissionRule permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
@@ -253,7 +254,6 @@ public class AppraisalsAction implements ActionInterface {
                 String env = config.getString("pdf.env");
                 createNolijPDF(appraisal, nolijDir, env, appraisalMgr);
             }
-
 
             // Creates the first annual appraisal if needed
             Map<String, Configuration> configurationMap =
@@ -303,11 +303,7 @@ public class AppraisalsAction implements ActionInterface {
         CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
         String filename = EvalsPDF.getNolijFileName(appraisal, dirName, env);
 
-        // 2) Grab the permissionRule
-        PermissionRule permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
-
         // 2) Create PDF
-
         String rootDir = actionHelper.getPortletContext().getRealPath("/");
         EvalsPDF.createPDF(appraisal, permRule, filename, resource, rootDir);
 
@@ -326,28 +322,11 @@ public class AppraisalsAction implements ActionInterface {
      */
     public String downloadPDF(PortletRequest request, PortletResponse response) throws Exception {
         initialize(request);
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
-        Appraisal appraisal;
-        PermissionRule permRule;
-
-        int appraisalID = ParamUtil.getInteger(request, "id");
-        if (appraisalID == 0) {
-            return errorHandler.handleAccessDenied(request, response);
-        }
-        actionHelper.setAppraisalMgrParameters(appraisalMgr);
-
-        // 1) Get the appraisal and permission rule
-        appraisal = appraisalMgr.getAppraisal(appraisalID);
-        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
             return errorHandler.handleAccessDenied(request, response);
         }
-
-        int userId = loggedInUser.getId();
-        String userRole = appraisalMgr.getRole(appraisal, userId);
-        appraisal.setRole(userRole);
 
         // 2) Compose a file name
         CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
@@ -430,17 +409,6 @@ public class AppraisalsAction implements ActionInterface {
     public String resendAppraisalToNolij(PortletRequest request, PortletResponse response) throws Exception {
         initialize(request);
         AppraisalMgr appraisalMgr = new AppraisalMgr();
-        Appraisal appraisal;
-
-        int appraisalID = ParamUtil.getInteger(request, "id");
-        if (appraisalID == 0) {
-            return errorHandler.handleAccessDenied(request, response);
-        }
-        actionHelper.setAppraisalMgrParameters(appraisalMgr);
-
-        // 1) Get the appraisal and permission rule
-        appraisal = appraisalMgr.getAppraisal(appraisalID);
-        appraisal.setRole(appraisalMgr.getRole(appraisal, loggedInUser.getId()));
 
         // Permission checks
         if (!actionHelper.isLoggedInUserReviewer()
@@ -450,10 +418,6 @@ public class AppraisalsAction implements ActionInterface {
         {
             return errorHandler.handleAccessDenied(request, response);
         }
-
-        int userId = loggedInUser.getId();
-        String userRole = appraisalMgr.getRole(appraisal, userId);
-        appraisal.setRole(userRole);
 
         actionHelper.addToRequestMap("id", appraisal.getId());
         if (!actionHelper.isLoggedInUserReviewer()) {
@@ -484,22 +448,6 @@ public class AppraisalsAction implements ActionInterface {
      */
     public String closeOutAppraisal(PortletRequest request, PortletResponse response) throws Exception {
         initialize(request);
-        Appraisal appraisal;
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
-        PermissionRule permRule;
-        int userId = loggedInUser.getId();
-
-        int appraisalID = ParamUtil.getInteger(request, "id");
-        if (appraisalID == 0) {
-            return errorHandler.handleAccessDenied(request, response);
-        }
-
-        actionHelper.setAppraisalMgrParameters(appraisalMgr);
-
-        // 1) Get the appraisal, permission rule and userRole
-        appraisal = appraisalMgr.getAppraisal(appraisalID);
-        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
-        String userRole = appraisalMgr.getRole(appraisal, userId);
 
         // Check to see if the logged in user has permission to access the appraisal
         boolean isAdminOrReviewer = userRole.equals("admin") || userRole.equals("reviewer");
@@ -527,21 +475,7 @@ public class AppraisalsAction implements ActionInterface {
      */
     public String setStatusToResultsDue(PortletRequest request, PortletResponse response) throws Exception {
         initialize(request);
-        Appraisal appraisal;
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
-        int userId = loggedInUser.getId();
 
-        int appraisalID = ParamUtil.getInteger(request, "id");
-        if (appraisalID == 0) {
-            return errorHandler.handleAccessDenied(request, response);
-        }
-
-        actionHelper.setAppraisalMgrParameters(appraisalMgr);
-
-        // 1) Get the appraisal and role
-        appraisal = appraisalMgr.getAppraisal(appraisalID);
-        String userRole = appraisalMgr.getRole(appraisal, userId);
-        appraisal.setRole(userRole);
         if (!userRole.equals("admin") && !userRole.equals(ActionHelper.ROLE_REVIEWER)) {
             return errorHandler.handleAccessDenied(request, response);
         }
