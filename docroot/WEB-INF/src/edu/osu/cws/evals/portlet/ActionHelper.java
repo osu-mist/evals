@@ -143,30 +143,16 @@ public class ActionHelper {
         PortletSession session = request.getPortletSession(true);
 
         Boolean isSupervisor = (Boolean) session.getAttribute("isSupervisor");
-        Boolean isReviewer = (Boolean) session.getAttribute("isReviewer");
-        Boolean isMasterAdmin = (Boolean) session.getAttribute("isSuperAdmin");
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
 
         if (refresh || isSupervisor == null) {
             isSupervisor = JobMgr.isSupervisor(loggedOnUser.getId(), null);
             session.setAttribute("isSupervisor", isSupervisor);
         }
-        if (refresh || isReviewer == null) {
-            isReviewer = getReviewer() != null;
-        }
-
-        if (refresh || isMasterAdmin == null) {
-            isMasterAdmin = isLoggedInUserMasterAdmin();
-        }
-
-        if (refresh || isAdmin == null) {
-            isAdmin = getAdmin() != null;
-        }
 
         addToRequestMap("isSupervisor", isSupervisor);
-        addToRequestMap("isReviewer", isReviewer);
-        addToRequestMap("isAdmin", isAdmin);
-        addToRequestMap("isMasterAdmin", isMasterAdmin);
+        addToRequestMap("isReviewer", getReviewer() != null);
+        addToRequestMap("isAdmin", getAdmin() != null);
+        addToRequestMap("isMasterAdmin", isLoggedInUserMasterAdmin());
         addToRequestMap("employee", loggedOnUser);
     }
 
