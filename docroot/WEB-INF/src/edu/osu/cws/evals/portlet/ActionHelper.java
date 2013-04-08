@@ -3,9 +3,10 @@ package edu.osu.cws.evals.portlet;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.Mailer;
 import edu.osu.cws.util.CWSUtil;
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 import javax.portlet.*;
 import java.sql.Timestamp;
@@ -441,8 +442,8 @@ public class ActionHelper {
             // If the screenName is numeric it means that we are using the Oracle db and
             // we need to query banner to fetch the onid username
             if (Pattern.matches("[0-9]+", screenName)) {
-                CompositeConfiguration config = (CompositeConfiguration) portletContext.getAttribute("environmentProp");
-                String bannerHostname = config.getString("banner.hostname");
+                PropertiesConfiguration config = getEvalsConfig();
+                String bannerHostname = EvalsUtil.getStringConfig("banner.hostname", config);
                 onidUsername = EmployeeMgr.getOnidUsername(screenName, bannerHostname);
             } else {
                 onidUsername = screenName;
@@ -464,6 +465,16 @@ public class ActionHelper {
      */
     public Object getPortletContextAttribute(String key) {
         return portletContext.getAttribute(key);
+    }
+
+    /**
+     * Returns the PropertiesConfiguration object that holds EvalS environment properties used
+     * for configuration.
+     *
+     * @return PropertiesConfiguration
+     */
+    public PropertiesConfiguration getEvalsConfig() {
+        return (PropertiesConfiguration) portletContext.getAttribute("environmentProp");
     }
 
     /**
@@ -792,9 +803,8 @@ public class ActionHelper {
      * @return
      */
     public boolean isDemo() {
-        CompositeConfiguration config = (CompositeConfiguration)
-                getPortletContextAttribute("environmentProp");
-        String demoHostname = config.getString("demo.hostname");
+        PropertiesConfiguration config = getEvalsConfig();
+        String demoHostname = EvalsUtil.getStringConfig("demo.hostname", config);
         String serverHostname = CWSUtil.getLocalHostname();
 
         return demoHostname.equals(serverHostname);

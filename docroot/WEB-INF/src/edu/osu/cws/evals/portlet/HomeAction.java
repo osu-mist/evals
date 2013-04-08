@@ -7,8 +7,9 @@ import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Employee;
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -38,7 +39,7 @@ public class HomeAction implements ActionInterface {
         Employee employee = actionHelper.getLoggedOnUser();
         int employeeId = employee.getId();
         String homeJSP = getHomeJSP(request);
-        CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
+        PropertiesConfiguration config = actionHelper.getEvalsConfig();
         boolean isAdmin = actionHelper.isLoggedInUserAdmin();
         boolean isReviewer = actionHelper.isLoggedInUserReviewer();
 
@@ -63,7 +64,7 @@ public class HomeAction implements ActionInterface {
 
         actionHelper.setRequiredActions();
         if (homeJSP.equals(Constants.JSP_HOME_REVIEWER)) {
-            int maxResults = config.getInt("reviewer.home.pending.max");
+            int maxResults = EvalsUtil.getIntConfig("reviewer.home.pending.max", config);
             ArrayList<Appraisal> appraisals = actionHelper.getReviewsForLoggedInUser(maxResults);
             actionHelper.addToRequestMap("appraisals", appraisals);
         }
@@ -88,8 +89,8 @@ public class HomeAction implements ActionInterface {
      *
      */
     private void helpLinks() {
-        CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
-        actionHelper.addToRequestMap("helpLinks", config.getStringArray("helpfulLinks"));
+        PropertiesConfiguration config = actionHelper.getEvalsConfig();
+        actionHelper.addToRequestMap("helpLinks", EvalsUtil.getStringConfig("helpfulLinks", config));
     }
 
     /**
