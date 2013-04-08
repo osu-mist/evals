@@ -9,13 +9,12 @@ import edu.osu.cws.evals.hibernate.CloseOutReasonMgr;
 import edu.osu.cws.evals.hibernate.NolijCopies;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsPDF;
-import edu.osu.cws.evals.util.HibernateUtil;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Session;
 
 import javax.portlet.*;
+import java.io.File;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -252,7 +251,7 @@ public class AppraisalsAction implements ActionInterface {
                 config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
                 String nolijDir = config.getString("pdf.nolijDir");
                 String env = config.getString("pdf.env");
-                createNolijPDF(appraisal, nolijDir, env, appraisalMgr);
+                GeneratePDF(appraisal, nolijDir, env, true);
             }
 
             // Creates the first annual appraisal if needed
@@ -297,19 +296,19 @@ public class AppraisalsAction implements ActionInterface {
         return homeAction.display(request, response);
     }
 
-    private void createNolijPDF(Appraisal appraisal, String dirName, String env,
-                                AppraisalMgr appraisalMgr) throws Exception {
-        // 1) Compose a file name
-        CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
-        String filename = EvalsPDF.getNolijFileName(appraisal, dirName, env);
-
-        // 2) Create PDF
+    private String GeneratePDF(Appraisal appraisal, String dirName, String env, boolean insertTable)
+            throws Exception {
+        // Create PDF
         String rootDir = actionHelper.getPortletContext().getRealPath("/");
-        EvalsPDF.createPDF(appraisal, permRule, filename, resource, rootDir);
+        String filename = EvalsPDF.createPDF(appraisal, permRule, dirName, resource, rootDir, env);
 
-        // 3) Insert a record into the nolij_copies table
-        String onlyFilename = filename.replaceFirst(dirName, "");
-        NolijCopies.add(appraisal.getId(), onlyFilename);
+        // Insert a record into the nolij_copies table
+        if (insertTable) {
+            String onlyFilename = filename.replaceFirst(dirName, "");
+            NolijCopies.add(appraisal.getId(), onlyFilename);
+        }
+
+        return filename;
     }
 
     /**
@@ -328,16 +327,14 @@ public class AppraisalsAction implements ActionInterface {
             return errorHandler.handleAccessDenied(request, response);
         }
 
-        // 2) Compose a file name
+        // 1) Generate config and tmpDir
         CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
         String tmpDir = config.getString("pdf.tmpDir");
-        String filename = EvalsPDF.getNolijFileName(appraisal, tmpDir, "dev2");
 
-        // 3) Create PDF
-        String rootDir = actionHelper.getPortletContext().getRealPath("/");
-        EvalsPDF.createPDF(appraisal, permRule, filename, resource, rootDir);
+        // 2) Create PDF
+        String filename = GeneratePDF(appraisal, tmpDir, "dev2", false);
 
-        // 4) Read the PDF file and provide to the user as attachment
+        // 3) Read the PDF file and provide to the user as attachment
         if (response instanceof ResourceResponse) {
             String title = appraisal.getJob().getJobTitle().replace(" ", "_");
             String employeeName = appraisal.getJob().getEmployee().getName().replace(" ", "_");
@@ -362,10 +359,10 @@ public class AppraisalsAction implements ActionInterface {
             in.close();
             out.close();
 
-            // 5) Delete the temp PDF file generated
-            EvalsPDF.deletePDF(filename);
+            // 4) Delete the temp PDF file generated
+            File pdfFile = new File(filename);
+            pdfFile.delete();
         }
-
         return null;
     }
 
@@ -431,7 +428,7 @@ public class AppraisalsAction implements ActionInterface {
         CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
         String nolijDir = config.getString("pdf.nolijDir");
         String env = config.getString("pdf.env");
-        createNolijPDF(appraisal, nolijDir, env, appraisalMgr);
+        GeneratePDF(appraisal, nolijDir, env, true);
 
         SessionMessages.add(request, "appraisal-sent-to-nolij-success");
 
