@@ -573,7 +573,7 @@ public class ActionHelper {
         ArrayList<RequiredAction> employeeRequiredActions;
         ArrayList<RequiredAction> administrativeActions = new ArrayList<RequiredAction>();
         ArrayList<Appraisal> myActiveAppraisals;
-        ArrayList<Appraisal> supervisorActions;
+        ArrayList<Appraisal> mySupervisingAppraisals;
         RequiredAction reviewerAction;
         Reviewer reviewer;
         ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
@@ -585,8 +585,8 @@ public class ActionHelper {
 
         // add supervisor required actions, if user has team's active appraisals
         if(getFromRequestMap("myTeamsActiveAppraisals") != null){
-            supervisorActions = (ArrayList<Appraisal>) getFromRequestMap("myTeamsActiveAppraisals");
-            administrativeActions = getAppraisalActions(supervisorActions, "supervisor", resource);
+            mySupervisingAppraisals = (ArrayList<Appraisal>) getFromRequestMap("myTeamsActiveAppraisals");
+            administrativeActions = getAppraisalActions(mySupervisingAppraisals, "supervisor", resource);
         }
 
         reviewer = getReviewer(loggedOnUser.getId());
