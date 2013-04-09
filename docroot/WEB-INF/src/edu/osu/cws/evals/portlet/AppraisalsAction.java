@@ -289,12 +289,34 @@ public class AppraisalsAction implements ActionInterface {
                 Appraisal.STATUS_CLOSED};
         if (ArrayUtils.contains(afterReviewStatus, status)
                 && actionHelper.isLoggedInUserReviewer()) {
-            actionHelper.removeReviewAppraisalInSession(appraisal);
+            removeReviewAppraisalInSession(appraisal);
         } else {
             updateAppraisalInSession(request, appraisal);
         }
 
         return homeAction.display(request, response);
+    }
+
+    /**
+     * Handles removing an appraisal from the reviewList stored in session. This method is called
+     * by the AppraisalsAction.update method after a reviewer submits a review.
+     *
+     * @param appraisal
+     * @throws Exception
+     */
+    private void removeReviewAppraisalInSession(Appraisal appraisal) throws Exception {
+        List<Appraisal> reviewList = actionHelper.getReviewsForLoggedInUser(-1);
+        List<Appraisal> tempList = new ArrayList<Appraisal>();
+        tempList.addAll(reviewList);
+        for (Appraisal appraisalInSession: tempList) {
+            if (appraisalInSession.getId() == appraisal.getId()) {
+                reviewList.remove(appraisalInSession);
+                break;
+            }
+        }
+
+        PortletSession session = request.getPortletSession(true);
+        session.setAttribute("reviewList", reviewList);
     }
 
     private void createNolijPDF(Appraisal appraisal, String dirName, String env,
@@ -377,10 +399,9 @@ public class AppraisalsAction implements ActionInterface {
      * @param appraisal     appraisal to update in session
      * @throws Exception
      */
-    public void updateAppraisalInSession(PortletRequest request, Appraisal appraisal) throws Exception {
-        initialize(request);
+    private void updateAppraisalInSession(PortletRequest request, Appraisal appraisal) throws Exception {
         List<Appraisal>  appraisals;
-        int employeeId = loggedInUser.getId();
+
         if (appraisal.getRole().equals("employee")) {
             appraisals = actionHelper.getMyActiveAppraisals();
         } else if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR)) {
