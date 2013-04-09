@@ -299,11 +299,11 @@ public class EvalsPortlet extends GenericPortlet {
     private void createMailer() throws Exception {
         ResourceBundle resources = ResourceBundle.getBundle("edu.osu.cws.evals.portlet.Email");
         PropertiesConfiguration config = actionHelper.getEvalsConfig();
-        String hostname = EvalsUtil.getStringConfig("mail.hostname", config);
-        String from = EvalsUtil.getStringConfig("mail.fromAddress", config);
-        String replyTo = EvalsUtil.getStringConfig("mail.replyToAddress", config);
-        String linkUrl = EvalsUtil.getStringConfig("mail.linkUrl", config);
-        String helpLinkUrl = EvalsUtil.getStringConfig("helpfulLinks.url", config);
+        String hostname = config.getString("mail.hostname");
+        String from = config.getString("mail.fromAddress");
+        String replyTo = config.getString("mail.replyToAddress");
+        String linkUrl = config.getString("mail.linkUrl");
+        String helpLinkUrl = config.getString("helpfulLinks.url");
         Map<String, Configuration> configurationMap = (Map<String, Configuration>)
                 getPortletContext().getAttribute("configurations");
         Mailer mailer = new Mailer(resources, hostname, from, linkUrl,  helpLinkUrl,
@@ -317,8 +317,8 @@ public class EvalsPortlet extends GenericPortlet {
      */
     private void createLogger() {
         PropertiesConfiguration config = actionHelper.getEvalsConfig();
-        String serverName = EvalsUtil.getStringConfig("log.serverName", config);
-        String environment = EvalsUtil.getStringConfig("log.environment", config);
+        String serverName = config.getString("log.serverName");
+        String environment = config.getString("log.environment");
         EvalsLogger evalsLogger = new EvalsLogger(serverName, environment);
         getPortletContext().setAttribute("log", evalsLogger);
     }
@@ -360,7 +360,7 @@ public class EvalsPortlet extends GenericPortlet {
         message += infoMsg + "\n";
 
         // Set the Hibernate config file and store properties in portletContext
-        String hibernateConfig = EvalsUtil.getStringConfig("hibernate-cfg-file", config);
+        String hibernateConfig = config.getString("hibernate-cfg-file");
         infoMsg = "using hibernate cfg file - " + hibernateConfig;
         message += infoMsg + "\n";
         HibernateUtil.setConfig(hibernateConfig);

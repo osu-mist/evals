@@ -64,7 +64,7 @@ public class HomeAction implements ActionInterface {
 
         actionHelper.setRequiredActions();
         if (homeJSP.equals(Constants.JSP_HOME_REVIEWER)) {
-            int maxResults = EvalsUtil.getIntConfig("reviewer.home.pending.max", config);
+            int maxResults = config.getInt("reviewer.home.pending.max");
             ArrayList<Appraisal> appraisals = actionHelper.getReviewsForLoggedInUser(maxResults);
             actionHelper.addToRequestMap("appraisals", appraisals);
         }
@@ -90,7 +90,7 @@ public class HomeAction implements ActionInterface {
      */
     private void helpLinks() {
         PropertiesConfiguration config = actionHelper.getEvalsConfig();
-        actionHelper.addToRequestMap("helpLinks", EvalsUtil.getStringConfig("helpfulLinks", config));
+        actionHelper.addToRequestMap("helpLinks", config.getString("helpfulLinks"));
     }
 
     /**

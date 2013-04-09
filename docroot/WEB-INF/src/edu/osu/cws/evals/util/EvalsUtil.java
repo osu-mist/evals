@@ -109,16 +109,16 @@ public class EvalsUtil {
      * @portletRoot: Root directory of the running portlet
      * @return: name of the configuration file specific to the hosting environment.
      */
-    private static String getEvalsPropFile(String portletRoot) {
+    private static String getPropertyFileName(String portletRoot) {
         String hostname = CWSUtil.getLocalHostname();
         System.out.println("hostname is " + hostname);
         String filenameHead = portletRoot + Constants.getRootDir();
-        String specificPropFile = filenameHead  + "evals.properties";
-        System.out.println("specificPropFile is " + specificPropFile);
+        String propertyFileName = filenameHead  + "evals.properties";
+        System.out.println("propertyFileName is " + propertyFileName);
 
-        File specificFile = new File(specificPropFile);
+        File specificFile = new File(propertyFileName);
         if (specificFile.exists()) {
-           return specificPropFile;
+           return propertyFileName;
         }
 
         return null;
@@ -141,12 +141,34 @@ public class EvalsUtil {
         }
 
         // Get the path and name of properties file to load
-        String propertyFile = getEvalsPropFile(portletRoot);
+        String propertyFile = getPropertyFileName(portletRoot);
         if (propertyFile != null) {
-            return new PropertiesConfiguration(propertyFile);
+            return overWriteDefaultConfigs(new PropertiesConfiguration(propertyFile));
         }
 
         return null;
+    }
+
+    /**
+     * Parses through the properties defined in the configuration file. It tries to find if there
+     * is a host/vm specific property that overwrites the value of each one of the properties. If it
+     * finds a host property that takes precedence, it overwrites the default value with the host
+     * specific one.
+     *
+     * @param config
+     * @return
+     */
+    private static PropertiesConfiguration overWriteDefaultConfigs(PropertiesConfiguration config) {
+        String hostPrefix = EvalsUtil.getPropertyPrefix();
+        for (Iterator keys = config.getKeys(); keys.hasNext();) {
+            String key = keys.next().toString();
+            String hostBasedKey = hostPrefix + "." + key;
+            if (config.containsKey(hostBasedKey)) {
+                config.setProperty(key, config.getString(hostBasedKey));
+            }
+        }
+
+        return config;
     }
 
     /**
@@ -170,42 +192,6 @@ public class EvalsUtil {
         }
 
         return  hostname;
-    }
-
-    /**
-     * Returns the string value from the configuration object. It tries to find if there's a
-     * value that matches: prefix.key. The prefix comes from getPropertyPrefix(). If not it uses
-     * the value that matches the key.
-     *
-     * @param key
-     * @param configuration
-     * @return
-     */
-    public static String getStringConfig(String key, PropertiesConfiguration configuration) {
-        String prefix = EvalsUtil.getPropertyPrefix() + ".";
-        if (configuration.containsKey(prefix + key)) {
-            key = prefix + key;
-        }
-
-        return configuration.getString(key);
-    }
-
-    /**
-     * Returns the int value from the configuration object. It tries to find if there's a
-     * value that matches: prefix.key. The prefix comes from getPropertyPrefix(). If not it uses
-     * the value that matches the key.
-     *
-     * @param key
-     * @param configuration
-     * @return
-     */
-    public static int getIntConfig(String key, PropertiesConfiguration configuration) {
-        String prefix = EvalsUtil.getPropertyPrefix() + ".";
-        if (configuration.containsKey(prefix + key)) {
-            key = prefix + key;
-        }
-
-        return configuration.getInt(key);
     }
 
     /**

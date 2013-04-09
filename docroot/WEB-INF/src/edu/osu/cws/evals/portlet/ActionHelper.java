@@ -443,7 +443,7 @@ public class ActionHelper {
             // we need to query banner to fetch the onid username
             if (Pattern.matches("[0-9]+", screenName)) {
                 PropertiesConfiguration config = getEvalsConfig();
-                String bannerHostname = EvalsUtil.getStringConfig("banner.hostname", config);
+                String bannerHostname = config.getString("banner.hostname");
                 onidUsername = EmployeeMgr.getOnidUsername(screenName, bannerHostname);
             } else {
                 onidUsername = screenName;
@@ -804,7 +804,7 @@ public class ActionHelper {
      */
     public boolean isDemo() {
         PropertiesConfiguration config = getEvalsConfig();
-        String demoHostname = EvalsUtil.getStringConfig("demo.hostname", config);
+        String demoHostname = config.getString("demo.hostname");
         String serverHostname = CWSUtil.getLocalHostname();
 
         return demoHostname.equals(serverHostname);

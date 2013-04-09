@@ -249,7 +249,7 @@ public class AppraisalsAction implements ActionInterface {
             String signAppraisal = ParamUtil.getString(request, "sign-appraisal");
             if (signAppraisal != null && !signAppraisal.equals("")) {
                 config = actionHelper.getEvalsConfig();
-                String nolijDir = EvalsUtil.getStringConfig("pdf.nolijDir", config);
+                String nolijDir = config.getString("pdf.nolijDir");
                 String env = config.getString("pdf.env");
                 createNolijPDF(appraisal, nolijDir, env, appraisalMgr);
             }
@@ -328,7 +328,7 @@ public class AppraisalsAction implements ActionInterface {
 
         // 2) Compose a file name
         PropertiesConfiguration config = actionHelper.getEvalsConfig();
-        String tmpDir = EvalsUtil.getStringConfig("pdf.tmpDir", config);
+        String tmpDir = config.getString("pdf.tmpDir");
         String filename = EvalsPDF.getNolijFileName(appraisal, tmpDir, "dev2");
 
         // 3) Create PDF
@@ -427,8 +427,8 @@ public class AppraisalsAction implements ActionInterface {
 
         // If there is a problem, createNolijPDF will throw an exception
         PropertiesConfiguration config = actionHelper.getEvalsConfig();
-        String nolijDir = EvalsUtil.getStringConfig("pdf.nolijDir", config);
-        String env = EvalsUtil.getStringConfig("pdf.env", config);
+        String nolijDir = config.getString("pdf.nolijDir");
+        String env = config.getString("pdf.env");
         createNolijPDF(appraisal, nolijDir, env, appraisalMgr);
 
         SessionMessages.add(request, "appraisal-sent-to-nolij-success");
