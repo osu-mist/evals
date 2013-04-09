@@ -296,14 +296,14 @@ public class AppraisalsAction implements ActionInterface {
         return homeAction.display(request, response);
     }
 
-    private String GeneratePDF(Appraisal appraisal, String dirName, String env, boolean insertTable)
-            throws Exception {
+    private String GeneratePDF(Appraisal appraisal, String dirName, String env,
+                               boolean  insertRecordIntoTable) throws Exception {
         // Create PDF
         String rootDir = actionHelper.getPortletContext().getRealPath("/");
         String filename = EvalsPDF.createPDF(appraisal, permRule, dirName, resource, rootDir, env);
 
         // Insert a record into the nolij_copies table
-        if (insertTable) {
+        if (insertRecordIntoTable) {
             String onlyFilename = filename.replaceFirst(dirName, "");
             NolijCopies.add(appraisal.getId(), onlyFilename);
         }
