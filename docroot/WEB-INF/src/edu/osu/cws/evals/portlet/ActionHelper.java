@@ -366,7 +366,7 @@ public class ActionHelper {
      * @throws Exception
      */
     public Employee getLoggedOnUser() throws Exception {
-        return  loggedOnUser;
+        return loggedOnUser;
     }
 
     /**

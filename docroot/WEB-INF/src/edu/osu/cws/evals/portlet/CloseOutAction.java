@@ -53,7 +53,7 @@ public class CloseOutAction implements ActionInterface {
     public String add(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
         boolean isAdmin = actionHelper.getAdmin() != null;
-        if (isAdmin) {
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
