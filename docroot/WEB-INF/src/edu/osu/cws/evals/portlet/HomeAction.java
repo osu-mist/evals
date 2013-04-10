@@ -20,8 +20,10 @@ import java.util.ResourceBundle;
 
 public class HomeAction implements ActionInterface {
     private ActionHelper actionHelper;
+
     private static Log _log = LogFactoryUtil.getLog(HomeAction.class);
     private ErrorHandler errorHandler;
+
 
     /**
      * Takes care of grabbing all the information needed to display the home view sections
@@ -36,12 +38,10 @@ public class HomeAction implements ActionInterface {
     public String display(PortletRequest request, PortletResponse response) throws Exception {
         Map Notices = (Map)actionHelper.getPortletContextAttribute("Notices");
         actionHelper.addToRequestMap("homePageNotice", Notices.get("Homepage Notice"));
-        Employee employee = actionHelper.getLoggedOnUser();
-        int employeeId = employee.getId();
         String homeJSP = getHomeJSP(request);
         PropertiesConfiguration config = actionHelper.getEvalsConfig();
-        boolean isAdmin = actionHelper.isLoggedInUserAdmin();
-        boolean isReviewer = actionHelper.isLoggedInUserReviewer();
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        boolean isReviewer = actionHelper.getReviewer() != null;
 
         // specify menu type, help links and yellow box to display in home view
         actionHelper.useNormalMenu();
@@ -51,7 +51,8 @@ public class HomeAction implements ActionInterface {
 
         actionHelper.setupMyActiveAppraisals();
         actionHelper.setupMyTeamActiveAppraisals();
-        ArrayList<Appraisal> myActiveAppraisals = (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myActiveAppraisals");
+        ArrayList<Appraisal> myActiveAppraisals =
+                (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myActiveAppraisals");
         ArrayList<Appraisal> myTeamsActiveAppraisals  =
                 (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myTeamsActiveAppraisals");
 
@@ -158,7 +159,7 @@ public class HomeAction implements ActionInterface {
         session.setAttribute("loggedOnUser", employee);
         session.removeAttribute(ActionHelper.ALL_MY_ACTIVE_APPRAISALS);
         session.removeAttribute(ActionHelper.MY_TEAMS_ACTIVE_APPRAISALS);
-        actionHelper.setUpUserPermissionInSession(true);
+        actionHelper.setUpUserPermission(true);
 
         return display(request, response);
     }
@@ -178,15 +179,17 @@ public class HomeAction implements ActionInterface {
         String homeJsp = Constants.JSP_HOME;
         String currentRole = actionHelper.getCurrentRole();
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
+        boolean isReviewer = actionHelper.getReviewer() != null;
+        boolean isAdmin = actionHelper.getAdmin() != null;
 
         if (currentRole.equals(ActionHelper.ROLE_ADMINISTRATOR)) {
-            if (!actionHelper.isLoggedInUserAdmin()) {
+            if (!isAdmin) {
                 actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             } else {
                 homeJsp = Constants.JSP_HOME_ADMIN;
             }
         } else if (currentRole.equals(ActionHelper.ROLE_REVIEWER)) {
-            if (!actionHelper.isLoggedInUserReviewer()) {
+            if (!isReviewer) {
                 actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             } else {
                 homeJsp = Constants.JSP_HOME_REVIEWER;

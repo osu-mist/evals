@@ -38,15 +38,32 @@ public class ActionHelper {
     private PortletContext portletContext;
 
     private PortletRequest request;
+
     private PortletResponse response;
+
     private Employee loggedOnUser;
+
+    private HashMap<String,Object> requestMap;
+
+    private ResourceBundle bundle;
 
     public ActionHelper(PortletRequest request, PortletResponse response,
                         PortletContext portletContext) throws Exception {
         this.request = request;
         this.response = response;
         this.portletContext = portletContext;
+        this.bundle = (ResourceBundle) portletContext.getAttribute("resourceBundle");
+        setRequestMap();
         setLoggedOnUser();
+    }
+
+    private void setRequestMap() {
+        PortletSession session = request.getPortletSession(true);
+        requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
+        if (requestMap == null) {
+            requestMap = new HashMap<String, Object>();
+            session.setAttribute(REQUEST_MAP, requestMap);
+        }
     }
 
     /**
@@ -123,51 +140,23 @@ public class ActionHelper {
         return myTeamAppraisals;
     }
 
-    /**
-     * Checks the user permission level and sets up some flags in the session object to store those
-     * permissions.
-     *
-     * @param refresh   Update the user permissions, even if they have already been set
-     * @throws Exception
-     */
-    public void setUpUserPermissionInSession(boolean refresh) throws Exception {
+    public void setUpUserPermission(boolean refresh) throws Exception {
         PortletSession session = request.getPortletSession(true);
 
         Boolean isSupervisor = (Boolean) session.getAttribute("isSupervisor");
+
         if (refresh || isSupervisor == null) {
             isSupervisor = JobMgr.isSupervisor(loggedOnUser.getId(), null);
             session.setAttribute("isSupervisor", isSupervisor);
         }
+
         addToRequestMap("isSupervisor", isSupervisor);
-
-        Boolean isReviewer = (Boolean) session.getAttribute("isReviewer");
-        if (refresh || isReviewer == null) {
-            isReviewer = getReviewer(loggedOnUser.getId()) != null;
-            session.setAttribute("isReviewer", isReviewer);
-        }
-        addToRequestMap("isReviewer", isReviewer);
-
-        Boolean isMasterAdmin = (Boolean) session.getAttribute("isSuperAdmin");
-        if (refresh || isMasterAdmin == null) {
-            if (getAdmin(loggedOnUser.getId()) != null &&
-                    getAdmin(loggedOnUser.getId()).getIsMaster()) {
-                isMasterAdmin = true;
-            } else {
-                isMasterAdmin = false;
-            }
-            session.setAttribute("isMasterAdmin", isMasterAdmin);
-        }
-        addToRequestMap("isMasterAdmin", isMasterAdmin);
-
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        if (refresh || isAdmin == null) {
-            isAdmin = getAdmin(loggedOnUser.getId()) != null;
-            session.setAttribute("isAdmin", isAdmin);
-        }
-        addToRequestMap("isAdmin", isAdmin);
-
+        addToRequestMap("isReviewer", getReviewer() != null);
+        addToRequestMap("isAdmin", getAdmin() != null);
+        addToRequestMap("isMasterAdmin", isLoggedInUserMasterAdmin());
         addToRequestMap("employee", loggedOnUser);
     }
+
 
     /**
      * Updates the admins List in the portletContext. This method is called by
@@ -255,7 +244,7 @@ public class ActionHelper {
             String businessCenterName = ParamUtil.getString(request, "businessCenterName");
 
             if (businessCenterName.equals("")) {
-                businessCenterName = getBusinessCenterForLoggedInReviewer();
+                businessCenterName = getReviewer().getBusinessCenterName();
             }
             AppraisalMgr appraisalMgr = new AppraisalMgr();
             reviewList = appraisalMgr.getReviews(businessCenterName, -1);
@@ -273,18 +262,6 @@ public class ActionHelper {
         }
 
         return outList;
-    }
-
-    /**
-     * Returns the business center name for the currently logged in user that is a reviewer.
-     *
-     * @return
-     * @throws Exception
-     */
-    public String getBusinessCenterForLoggedInReviewer() throws Exception {
-        String businessCenterName;
-        businessCenterName = getReviewer(loggedOnUser.getId()).getBusinessCenterName();
-        return businessCenterName;
     }
 
     /**
@@ -389,7 +366,7 @@ public class ActionHelper {
      * @throws Exception
      */
     public Employee getLoggedOnUser() throws Exception {
-        return  loggedOnUser;
+        return loggedOnUser;
     }
 
     /**
@@ -478,49 +455,31 @@ public class ActionHelper {
     }
 
     /**
-     * Takes in a pidm, and looks up in the reviewers HashMap stored in the portlet context
-     * to figure out if the current logged in user is a reviewer. If yes, then we return the
-     * Reviewer object if not, it returns null.
+     * Looks up in the reviewers HashMap stored in the portlet context
+     * to figure out if the current logged in user is a reviewer.
+     * If yes, then we return the Reviewer object if not, it returns null.
      *
-     * @param pidm  Pidm of currently logged in user
      * @return Reviewer
      */
-    public Reviewer getReviewer(int pidm) {
+    public Reviewer getReviewer() {
         HashMap<Integer, Reviewer> reviewerMap =
                 (HashMap<Integer, Reviewer>) portletContext.getAttribute("reviewers");
 
-        return reviewerMap.get(pidm);
+        return reviewerMap.get(loggedOnUser.getId());
     }
 
     /**
-     * Takes in a pidm, and looks up in the admins HashMap stored in the portlet context
-     * to figure out if the current logged in user is a reviewer. If yes, then we return the
-     * Admin object if not, it returns false.
+     * Looks up in the admins HashMap stored in the portlet context
+     * to figure out if the current logged in user is a reviewer.
+     * If yes, then we return the Admin object if not, it returns false.
      *
-     * @param pidm
      * @return Admin
      */
-    private Admin getAdmin(int pidm) {
+    public Admin getAdmin() {
         HashMap<Integer, Admin> adminMap =
                 (HashMap<Integer, Admin>) portletContext.getAttribute("admins");
 
-        return adminMap.get(pidm);
-    }
-
-    /**
-     * Returns true if the logged in user is admin, false otherwise.
-     *
-     * @return boolean
-     * @throws Exception
-     */
-    public boolean isLoggedInUserAdmin() throws Exception {
-        PortletSession session = request.getPortletSession(true);
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        if (isAdmin == null) {
-            setUpUserPermissionInSession(false);
-            isAdmin = (Boolean) session.getAttribute("isAdmin");
-        }
-        return isAdmin;
+        return adminMap.get(loggedOnUser.getId());
     }
 
     /**
@@ -530,29 +489,10 @@ public class ActionHelper {
      * @throws Exception
      */
     public boolean isLoggedInUserMasterAdmin() throws Exception {
-        PortletSession session = request.getPortletSession(true);
-        Boolean isMasterAdmin = (Boolean) session.getAttribute("isMasterAdmin");
-        if (isMasterAdmin == null) {
-            setUpUserPermissionInSession(false);
-            isMasterAdmin = (Boolean) session.getAttribute("isMasterAdmin");
+        if (getAdmin() == null) {
+            return false;
         }
-        return isMasterAdmin;
-    }
-
-    /**
-     * Returns true if the logged in user is reviewer, false otherwise.
-     *
-     * @return boolean
-     * @throws Exception
-     */
-    public boolean isLoggedInUserReviewer() throws Exception {
-        PortletSession session = request.getPortletSession(true);
-        Boolean isReviewer = (Boolean) session.getAttribute("isReviewer");
-        if (isReviewer == null) {
-            setUpUserPermissionInSession(false);
-            isReviewer = (Boolean) session.getAttribute("isReviewer");
-        }
-        return isReviewer;
+        return getAdmin().getIsMaster();
     }
 
     /**
@@ -565,7 +505,7 @@ public class ActionHelper {
         PortletSession session = request.getPortletSession(true);
         Boolean isSupervisor = (Boolean) session.getAttribute("isSupervisor");
         if (isSupervisor == null) {
-            setUpUserPermissionInSession(false);
+            setUpUserPermission(false);
             isSupervisor = (Boolean) session.getAttribute("isSupervisor");
         }
         return isSupervisor;
@@ -587,23 +527,21 @@ public class ActionHelper {
         ArrayList<Appraisal> supervisorActions;
         RequiredAction reviewerAction;
         Reviewer reviewer;
-        ResourceBundle resource = (ResourceBundle) portletContext.getAttribute("resourceBundle");
-
 
         myActiveAppraisals = (ArrayList<Appraisal>) getFromRequestMap("myActiveAppraisals");
-        employeeRequiredActions = getAppraisalActions(myActiveAppraisals, "employee", resource);
+        employeeRequiredActions = getAppraisalActions(myActiveAppraisals, "employee");
         addToRequestMap("employeeActions", employeeRequiredActions);
 
         // add supervisor required actions, if user has team's active appraisals
         if(getFromRequestMap("myTeamsActiveAppraisals") != null){
             supervisorActions = (ArrayList<Appraisal>) getFromRequestMap("myTeamsActiveAppraisals");
-            administrativeActions = getAppraisalActions(supervisorActions, "supervisor", resource);
+            administrativeActions = getAppraisalActions(supervisorActions, "supervisor");
         }
 
-        reviewer = getReviewer(loggedOnUser.getId());
+        reviewer = getReviewer();
         if (reviewer != null) {
             String businessCenterName = reviewer.getBusinessCenterName();
-            reviewerAction = getReviewerAction(businessCenterName, resource);
+            reviewerAction = getReviewerAction(businessCenterName);
             if (reviewerAction != null) {
                 administrativeActions.add(reviewerAction);
             }
@@ -618,12 +556,11 @@ public class ActionHelper {
      *
      * @param appraisalList     List of appraisals to check for actions required
      * @param role              Role of the currently logged in user
-     * @param resource          Resource bundle to pass in to RequiredAction bean
      * @return  outList
      * @throws edu.osu.cws.evals.models.ModelException
      */
     public ArrayList<RequiredAction> getAppraisalActions(List<Appraisal> appraisalList,
-                                                         String role, ResourceBundle resource) throws Exception {
+                                                         String role) throws Exception {
         Configuration configuration;
         HashMap permissionRuleMap = (HashMap) portletContext.getAttribute("permissionRules");
         Map<String, Configuration> configurationMap =
@@ -667,7 +604,7 @@ public class ActionHelper {
 
                 actionReq = new RequiredAction();
                 actionReq.setParameters(anchorParams);
-                actionReq.setAnchorText(actionRequired, appraisal, resource, configuration);
+                actionReq.setAnchorText(actionRequired, appraisal, bundle, configuration);
                 outList.add(actionReq);
             }
         }
@@ -678,12 +615,11 @@ public class ActionHelper {
      * Returns the required action for the business center reviewer.
      *
      * @param businessCenterName
-     * @param resource
      * @return
      * @throws Exception
      */
-    private RequiredAction getReviewerAction(String businessCenterName, ResourceBundle resource
-                                             ) throws Exception {
+    private RequiredAction getReviewerAction(String businessCenterName)
+            throws Exception {
         int reviewCount;
         List<Appraisal> reviewList = getReviewsForLoggedInUser(-1);
         if (reviewList != null) {
@@ -701,7 +637,7 @@ public class ActionHelper {
         HashMap<String, String> parameters = new HashMap<String, String>();
         parameters.put("action", "reviewList");
         parameters.put("controller", "AppraisalsAction");
-        requiredAction.setAnchorText("action-required-review", reviewCount, resource);
+        requiredAction.setAnchorText("action-required-review", reviewCount, bundle);
         requiredAction.setParameters(parameters);
 
         return requiredAction;
@@ -714,10 +650,7 @@ public class ActionHelper {
      * @param request
      */
     public void setRequestAttributes(RenderRequest request) {
-        PortletSession session = request.getPortletSession(true);
-
         addToRequestMap("currentRole", getCurrentRole());
-        HashMap<String,Object> requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
 
         for (Map.Entry<String, Object> entry : requestMap.entrySet()) {
             request.setAttribute(entry.getKey(), entry.getValue());
@@ -733,18 +666,7 @@ public class ActionHelper {
      * @return
      */
     public void addToRequestMap(String key, Object object) {
-        PortletSession session = request.getPortletSession(true);
-        HashMap<String,Object> requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
-        if  (requestMap == null) {
-            requestMap = new HashMap<String, Object>();
-            requestMap.put(key, object);
-            session.setAttribute(REQUEST_MAP,requestMap);
-        }
-        else {
-            requestMap.put(key, object);
-        }
-        session.setAttribute(REQUEST_MAP, requestMap);
-
+        requestMap.put(key, object);
     }
 
     /**
@@ -754,11 +676,6 @@ public class ActionHelper {
      * @return object from requestMap searching from key
      */
     public Object getFromRequestMap(String key) {
-        PortletSession session = request.getPortletSession(true);
-        HashMap<String,Object> requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
-        if (requestMap == null){
-            return null;
-        }
         return requestMap.get(key);
     }
 
@@ -780,19 +697,17 @@ public class ActionHelper {
      */
     public String getCurrentRole() {
         PortletSession session = request.getPortletSession(true);
-        String currentRole = (String) session.getAttribute("currentRole");
+        String currentRole = ParamUtil.getString(request, "currentRole");
 
-        String roleFromRequest = ParamUtil.getString(request, "currentRole");
-        if (!roleFromRequest.equals("")) {
-            currentRole = roleFromRequest;
+        if (!currentRole.equals("")) {
+            session.setAttribute("currentRole", currentRole);
+        } else {
+            currentRole = (String) session.getAttribute("currentRole");
+            if (currentRole == null || currentRole.equals("")){
+                currentRole = ROLE_SELF;
+            }
             session.setAttribute("currentRole", currentRole);
         }
-
-        if (currentRole == null || currentRole.equals("")) {
-            currentRole = ROLE_SELF;
-            session.setAttribute("currentRole", currentRole);
-        }
-
         return currentRole;
     }
 

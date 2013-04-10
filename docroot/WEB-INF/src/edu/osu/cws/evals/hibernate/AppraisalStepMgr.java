@@ -11,8 +11,8 @@ import java.util.List;
 public class AppraisalStepMgr {
 
     /**
-     * Uses list(session) method to grab a list of AppraisalStep. Then
-     * it creates a map of appraisal steps using "action"-"appointmentType"-
+     * Grabs a list of AppraisalStep.
+     * Then it creates a map of appraisal steps using "action"-"appointmentType"-
      * "originalStatus" as the hashmap key.
      *
      * @return ruleMap
@@ -21,7 +21,7 @@ public class AppraisalStepMgr {
         HashMap stepsMap = new HashMap();
         String key;
         Session session = HibernateUtil.getCurrentSession();
-        List<AppraisalStep> results = (List<AppraisalStep>) this.list(session);
+        List<AppraisalStep> results = session.createQuery("from edu.osu.cws.evals.models.AppraisalStep").list();
         results.size();
 
         for (AppraisalStep step : results) {
@@ -33,17 +33,5 @@ public class AppraisalStepMgr {
         }
 
         return stepsMap;
-    }
-
-    /**
-     * Retrieves a list of AppraisalStep from the database.
-     *
-     * @param session
-     * @return
-     * @throws Exception
-     */
-    public List list(Session session) throws Exception {
-        List result = session.createQuery("from edu.osu.cws.evals.models.AppraisalStep").list();
-        return result;
     }
 }

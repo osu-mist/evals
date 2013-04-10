@@ -30,7 +30,8 @@ public class NoticeAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -52,7 +53,8 @@ public class NoticeAction implements ActionInterface {
      */
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
         Notice notice = new Notice();

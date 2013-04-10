@@ -4,6 +4,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AdminMgr;
 import edu.osu.cws.evals.models.Admin;
+import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.ModelException;
 
 import javax.portlet.PortletRequest;
@@ -32,7 +33,8 @@ public class AdminsAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 

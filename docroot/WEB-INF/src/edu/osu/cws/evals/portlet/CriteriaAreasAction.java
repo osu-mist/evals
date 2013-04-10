@@ -30,7 +30,9 @@ public class CriteriaAreasAction implements ActionInterface {
      * @throws Exception
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        // Check that the logged in user is admin
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -62,14 +64,15 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String add(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        Employee loggedOnUser = actionHelper.getLoggedOnUser();
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
         CriteriaMgr criteriaMgrArea = new CriteriaMgr();
         CriterionArea criterionArea = new CriterionArea();
         CriterionDetail criterionDetail = new CriterionDetail();
-        Employee loggedOnUser = actionHelper.getLoggedOnUser();
 
         // Fetch list of appointment types to use in add form
         actionHelper.addToRequestMap("appointmentTypes", new AppointmentTypeMgr().list());
@@ -115,7 +118,8 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -158,7 +162,8 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String delete(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -204,7 +209,8 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String updateSequence(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 

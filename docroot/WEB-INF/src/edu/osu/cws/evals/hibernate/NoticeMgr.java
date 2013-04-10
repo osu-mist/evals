@@ -15,7 +15,9 @@ public class NoticeMgr {
      */
     public static Notice get(int ancestorID) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return (Notice)session.getNamedQuery("notice.singleNoticeByAncestorID").setInteger("ancestorID", ancestorID).uniqueResult();
+        return (Notice)session.getNamedQuery("notice.singleNoticeByAncestorID")
+                .setInteger("ancestorID", ancestorID)
+                .uniqueResult();
     }
 
     /**
@@ -39,8 +41,8 @@ public class NoticeMgr {
      */
     public static ArrayList<Notice> list() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        ArrayList<Notice> noticeList = (ArrayList<Notice>)session.getNamedQuery("notice.noticeList").list();
-        return noticeList;
+        return (ArrayList<Notice>)session.getNamedQuery("notice.noticeList")
+                .list();
     }
 
     /**

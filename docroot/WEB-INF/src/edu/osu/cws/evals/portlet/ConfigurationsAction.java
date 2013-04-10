@@ -3,6 +3,7 @@ package edu.osu.cws.evals.portlet;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.ConfigurationMgr;
 import edu.osu.cws.evals.models.Configuration;
+import edu.osu.cws.evals.models.Employee;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -24,7 +25,8 @@ public class ConfigurationsAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -47,7 +49,8 @@ public class ConfigurationsAction implements ActionInterface {
      */
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
