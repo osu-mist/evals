@@ -116,8 +116,8 @@ public class EvalsUtil {
         String propertyFileName = filenameHead  + "evals.properties";
         System.out.println("propertyFileName is " + propertyFileName);
 
-        File specificFile = new File(propertyFileName);
-        if (specificFile.exists()) {
+        File propertyFile = new File(propertyFileName);
+        if (propertyFile.exists() && propertyFile.canRead()) {
            return propertyFileName;
         }
 
