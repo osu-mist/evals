@@ -422,17 +422,7 @@ public class Job extends Evals implements Serializable {
         DateTime initialStartDate = getInitialEvalStartDate();
         DateTime endFirstEval = initialStartDate.plusMonths(annualInd);
 
-        // Check if we are within the evaluation period of the first annual evaluation
-        if (initialStartDate.isBeforeNow() && endFirstEval.isAfterNow()) {
-            // Check if the first annual evaluation has not been created
-            if (!AppraisalMgr.AnnualExists(this, initialStartDate)) {
-                // Check if the first annual evaluation should be created
-                return !initialStartDate.isAfterNow();
-            }
-
-        }
-
-        return false;
+        return !initialStartDate.isAfterNow() && endFirstEval.isAfterNow();
     }
 
     public DateTime getAnnualStartDateBasedOnJobBeginDate(int year)
