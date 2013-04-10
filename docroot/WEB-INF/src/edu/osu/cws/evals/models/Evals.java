@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.ResourceBundle;
 
 
 import com.liferay.portal.kernel.log.Log;
@@ -24,6 +25,10 @@ public class Evals {
      * HashMap used to store validation error messages.
      */
     protected HashMap errors = new HashMap();
+
+    private static Log _log = LogFactoryUtil.getLog(CriterionArea.class);
+
+    protected static ResourceBundle bundle = ResourceBundle.getBundle("edu.osu.cws.evals.portlet.Language");
 
     public boolean validate() throws ModelException {
         String validateMethodName;
@@ -75,5 +80,4 @@ public class Evals {
         return aggregateErrors;
     }
 
-    private static Log _log = LogFactoryUtil.getLog(CriterionArea.class);
 }

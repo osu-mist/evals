@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Assessment extends Evals implements Comparable<Assessment> {
+
     private int id;
 
     private Appraisal appraisal;

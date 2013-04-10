@@ -5,13 +5,9 @@
 
 package edu.osu.cws.evals.models;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class CriterionArea extends Evals {
-
 
     private int id = 0;
 
@@ -31,26 +27,6 @@ public class CriterionArea extends Evals {
 
     private String description;
 
-    /**
-     * Validation error message for name is public because the add.jsp
-     * needs to access this static variable in order to do js validation
-     */
-    public static final String nameRequired =
-            "Please enter an area name for the evaluation criteria";
-
-    /**
-     * descriptionRequired static variable is public because add.jsp needs to
-     * access it to provide js validation
-     */
-    public static final String descriptionRequired =
-            "Please enter an evaluation criteria description";
-
-    /**
-     * Validation error message for appointmentType
-     */
-    private static final String appointmentTypeRequired =
-            "Please select an appointment type";
-
     public CriterionArea() { }
 
     /**
@@ -64,7 +40,7 @@ public class CriterionArea extends Evals {
         // If there were any previous validation errors remove them.
         this.errors.remove("name");
         if (this.name == null || this.name.equals("")) {
-            nameErrors.add(nameRequired);
+            nameErrors.add(bundle.getString("criteria-nameRequired"));
         }
 
         if (nameErrors.size() > 0) {
@@ -86,9 +62,9 @@ public class CriterionArea extends Evals {
         // If there were any previous validation errors remove them.
         this.errors.remove("appointmentType");
         if (this.appointmentType == null) {
-            appointmentErrors.add(appointmentTypeRequired);
+            appointmentErrors.add(bundle.getString("criteria-appointmentTypeRequired"));
         } else if (this.appointmentType.equals("")) {
-            appointmentErrors.add(appointmentTypeRequired);
+            appointmentErrors.add(bundle.getString("criteria-appointmentTypeRequired"));
         }
 
         if (appointmentErrors.size() > 0) {
@@ -169,28 +145,6 @@ public class CriterionArea extends Evals {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    /**
-     * Method called by Hibernate util classes to validate the description.
-     *
-     * @return errors
-     */
-    public boolean validateDescription() {
-        ArrayList<String> descriptionErrors = new ArrayList<String>();
-
-        // If there were any previous validation errors remove them.
-        this.errors.remove("description");
-        if (this.description == null || this.description.equals("")) {
-            descriptionErrors.add(descriptionRequired);
-        }
-
-        if (descriptionErrors.size() > 0) {
-            this.errors.put("description", descriptionErrors);
-            return false;
-        }
-
-        return true;
     }
 
 }

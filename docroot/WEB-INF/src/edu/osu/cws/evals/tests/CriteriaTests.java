@@ -216,8 +216,6 @@ public class CriteriaTests {
      */
     @Test(groups = {"unitttest"})
     public void shouldRequireDescription() {
-        assert !criterionObject.validateDescription() :
-                "A valid description should be required";
         assert criterionObject.getErrors().containsKey("description") :
                 "Missing description error msg";
         /* @todo

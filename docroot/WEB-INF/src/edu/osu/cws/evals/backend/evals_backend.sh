@@ -23,17 +23,22 @@ LIB_DIR=$WEB_INF/lib
 CLASS_DIR=$WEB_INF/classes
 
 CLASSPATH=$CLASSPATH:$CLASS_DIR
+CLASSPATH=$CLASSPATH:$LIB_DIR/aopalliance.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/c3p0-0.9.1.2.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/cglib-2.2.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/commons-collections-3.1.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/commons-configuration-1.6.jar
+CLASSPATH=$CLASSPATH:$LIB_DIR/commons-email-1.3.1.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/commons-lang-2.6.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/commons-logging-1.1.1.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/dbunit-2.4.8.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/dom4j-1.6.1.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/gelfj-0.8.jar
+CLASSPATH=$CLASSPATH:$LIB_DIR/guice-3.0.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/hibernate3.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/hibernate-jpa-2.0-api-1.0.0.Final.jar
+CLASSPATH=$CLASSPATH:$LIB_DIR/javax.inject.jar
+CLASSPATH=$CLASSPATH:$LIB_DIR/joda-time-2.2.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/ojdbc6.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/esources_en.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/slf4j-api-1.6.1.jar
@@ -51,5 +56,5 @@ CLASSPATH=$CLASSPATH:/$PORTAL_LIB_EXT/portal-kernel.jar
 CLASSPATH=$CLASSPATH:/$PORTAL_LIB_EXT/jta.jar
 
 cd $PORTLET_ROOT
-$JAVA_HOME/bin/java -classpath $CLASSPATH edu.osu.cws.evals.backend.BackendMgr
+$JAVA_HOME/bin/java -classpath $CLASSPATH edu.osu.cws.evals.backend.BackendAction
 

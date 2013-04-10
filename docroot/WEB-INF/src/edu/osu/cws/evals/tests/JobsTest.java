@@ -6,6 +6,7 @@ import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.joda.time.DateTime;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -149,11 +150,11 @@ public class JobsTest {
     private void assertCorrectNewAnnualStartDateForAnnualInd18(Job job, Calendar cal, int month,
                                                                int year) throws Exception {
         job.setBeginDate(cal.getTime());
-        Calendar newStartDate = job.getNewAnnualStartDate();
+        DateTime newStartDate = job.getNewAnnualStartDate();
 
-        assert newStartDate.get(Calendar.YEAR) == year;
-        assert newStartDate.get(Calendar.MONTH) == month;
-        assert newStartDate.get(Calendar.DAY_OF_MONTH) == 1;
+        assert newStartDate.getYear() == year;
+        assert newStartDate.getMonthOfYear() == month;
+        assert newStartDate.getDayOfMonth() == 1;
     }
 
     public void shouldReturnCorrectNewAnnualStartDateForFirstAnnualIfAnnualIndIs18Case2()
@@ -170,11 +171,11 @@ public class JobsTest {
         cal.set(Calendar.YEAR, 2010);
 
         job.setBeginDate(cal.getTime());
-        Calendar newStartDate = job.getNewAnnualStartDate();
+        DateTime newStartDate = job.getNewAnnualStartDate();
 
-        assert newStartDate.get(Calendar.YEAR) == 2011;
-        assert newStartDate.get(Calendar.MONTH) == Calendar.JANUARY;
-        assert newStartDate.get(Calendar.DAY_OF_MONTH) == 1;
+        assert newStartDate.getYear() == 2011;
+        assert newStartDate.getMonthOfYear() == Calendar.JANUARY;
+        assert newStartDate.getDayOfMonth() == 1;
     }
 
     public void shouldParseJobFromString() {

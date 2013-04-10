@@ -16,10 +16,11 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="edu.osu.cws.util.CWSUtil" %>
 <%@ page import="edu.osu.cws.evals.portlet.ActionHelper" %>
-
+<%@ page import="javax.portlet.*" %>
 
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.ResourceBundle" %>
 
 <%@ page isELIgnored ="false" %>
 
@@ -32,6 +33,8 @@ String errorMsg = (String) renderRequest.getAttribute("errorMsg");
 if (errorMsg != null && !errorMsg.equals("")) {
     errorMsg = "<ul><li>"+StringUtils.replace(errorMsg, "\n", "</li><li>")+"</ul>";
 }
+PortletContext ctx = portletConfig.getPortletContext();
+ResourceBundle bundle = (ResourceBundle)ctx.getAttribute("resourceBundle");
 %>
 
 <div class="osu-cws"> <!-- Full wrapper for portlet (closed in footer.jsp) -->

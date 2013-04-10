@@ -18,6 +18,7 @@ public class NoticeAction implements ActionInterface {
 
     private HomeAction homeAction;
 
+    private ErrorHandler errorHandler;
 
     /**
      * Handles listing the notice.
@@ -29,8 +30,9 @@ public class NoticeAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
-            return ErrorHandler.handleAccessDenied(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         ArrayList<Notice> noticeList = NoticeMgr.list();
@@ -51,8 +53,9 @@ public class NoticeAction implements ActionInterface {
      */
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
-            return ErrorHandler.handleAccessDenied(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
         Notice notice = new Notice();
         try {
@@ -94,5 +97,8 @@ public class NoticeAction implements ActionInterface {
         this.homeAction = homeAction;
     }
 
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
+    }
 }
 

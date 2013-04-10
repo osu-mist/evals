@@ -81,7 +81,7 @@ jQuery(document).ready(function() {
   jQuery("#<portlet:namespace />fm").submit(function() {
     var errors = "";
     if (jQuery("#<portlet:namespace />reason").val() == "") {
-      errors = "<li><%= CloseOutReason.validReasonRequired %></li>";
+      errors = "<li><%= bundle.getString("CloseOutReason-validReasonRequired") %></li>";
     }
     if (errors != "") {
       jQuery("#<portlet:namespace />flash").html(

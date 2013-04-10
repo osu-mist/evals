@@ -11,7 +11,9 @@ import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Assessment;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.models.PermissionRule;
+import edu.osu.cws.evals.portlet.Constants;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -163,13 +165,15 @@ public class EvalsPDF {
         Job job = appraisal.getJob();
         if (dispalyEmployeeRebuttal(rule)) {
             String employeeName = job.getEmployee().getName();
-            String employeeSignDate = EvalsUtil.formatDate(appraisal.getEmployeeSignedDate());
+            DateTime employeeSignedDate = new DateTime(appraisal.getEmployeeSignedDate());
+            String employeeSignDate = employeeSignedDate.toString(Constants.DATE_FORMAT);
             employeeCell.addElement(new Phrase(employeeName, INFO_FONT));
             employeeDateCell.addElement(new Phrase(employeeSignDate, INFO_FONT));
         }
         if (appraisal.getReleaseDate() != null) {
+            DateTime releaseDate = new DateTime(appraisal.getReleaseDate());
             String supervisorName = job.getSupervisor().getEmployee().getName();
-            String supervisorSignDate = EvalsUtil.formatDate(appraisal.getReleaseDate());
+            String supervisorSignDate = releaseDate.toString(Constants.DATE_FORMAT);
             supervisorCell.addElement(new Phrase(supervisorName, INFO_FONT));
             supervisorDateCell.addElement(new Phrase(supervisorSignDate, INFO_FONT));
         }
@@ -184,7 +188,7 @@ public class EvalsPDF {
         signatureTable.addCell(employeeDateCell);
 
         PdfPCell middlePaddingCell = new PdfPCell();
-        middlePaddingCell.setRowspan(signatureTableMaxRows-2);
+        middlePaddingCell.setRowspan(signatureTableMaxRows - 2);
         middlePaddingCell.setBorder(Rectangle.TOP);
         signatureTable.addCell(middlePaddingCell);
 
@@ -250,7 +254,8 @@ public class EvalsPDF {
         boolean displayReviewer = appraisal.getReleaseDate() != null && appraisal.getReviewSubmitDate() != null;
         if (displayReviewer) {
             String reviewerName = appraisal.getReviewer().getName();
-            String reviewDate = EvalsUtil.formatDate(appraisal.getReviewSubmitDate());
+            DateTime reviewSubmitDate = new DateTime(appraisal.getReviewSubmitDate());
+            String reviewDate = reviewSubmitDate.toString(Constants.DATE_FORMAT);
             reviewerCell.setPhrase(new Phrase(reviewerName, INFO_FONT));
             reviewerDateCell.setPhrase(new Phrase(reviewDate, INFO_FONT));
         }

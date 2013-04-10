@@ -4,9 +4,13 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppointmentTypeMgr;
 import edu.osu.cws.evals.hibernate.CriteriaMgr;
+<<<<<<< HEAD
 import edu.osu.cws.evals.models.CriterionArea;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.ModelException;
+=======
+import edu.osu.cws.evals.models.*;
+>>>>>>> feature/23533-port-develop2-commits
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -20,6 +24,8 @@ public class CriteriaAreasAction implements ActionInterface {
 
     private HomeAction homeAction;
 
+    private ErrorHandler errorHandler;
+
     /**
      * Takes the request object and passes the employeeType to the hibernate util class.
      * It returns an array of CriterionArea POJO.
@@ -31,8 +37,9 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
-            return ErrorHandler.handleAccessDenied(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         String appointmentType = ParamUtil.getString(request, "appointmentType",
@@ -60,13 +67,14 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String add(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
-            return ErrorHandler.handleAccessDenied(request, response);
+        Employee loggedOnUser = actionHelper.getLoggedOnUser();
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         CriteriaMgr criteriaMgrArea = new CriteriaMgr();
         CriterionArea criterionArea = new CriterionArea();
-        Employee loggedOnUser = actionHelper.getLoggedOnUser();
 
         // Fetch list of appointment types to use in add form
         actionHelper.addToRequestMap("appointmentTypes", new AppointmentTypeMgr().list());
@@ -111,8 +119,9 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
-            return ErrorHandler.handleAccessDenied(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         CriteriaMgr criteriaMgr = new CriteriaMgr();
@@ -150,8 +159,9 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String delete(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
-            return ErrorHandler.handleAccessDenied(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         int criteriaID = ParamUtil.getInteger(request, "id");
@@ -192,5 +202,9 @@ public class CriteriaAreasAction implements ActionInterface {
 
     public void setHomeAction(HomeAction homeAction) {
         this.homeAction = homeAction;
+    }
+
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
     }
 }

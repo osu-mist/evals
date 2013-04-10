@@ -13,17 +13,20 @@ import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.util.*;
 
 import java.io.File;
-import java.text.MessageFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import edu.osu.cws.evals.models.*;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Period;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class EvalsUtil {
-    private static Date evalsStartDate = null;
+    private static DateTime evalsStartDate = null;
 
     /**
      *
@@ -33,7 +36,7 @@ public class EvalsUtil {
      * name of the config should be "goalsDue".
      * @return a Date object presenting the date a certain status is due.
      */
-    public static Date getDueDate(Appraisal appraisal, Configuration config) throws Exception {
+    public static DateTime getDueDate(Appraisal appraisal, Configuration config) throws Exception {
         if (config == null)  //Should not need to do this.
             return null;
 
@@ -41,30 +44,29 @@ public class EvalsUtil {
         if (config.getAction().equals("subtract"))
             offset = offset * (-1);
 
-        Date refDate = appraisal.getStartDate();
-        Calendar dueDay = Calendar.getInstance();
+        DateTime refDate = new DateTime(appraisal.getStartDate());
         String ref = config.getReferencePoint();
 
         //System.out.println("reference point = " + ref);
 
         if (ref.equals("end"))
-            refDate = appraisal.getEndDate();
+            refDate = new DateTime(appraisal.getEndDate());
         else if (ref.equals("GOALS_REQUIRED_MOD_DATE"))
         {
-            refDate = appraisal.getGoalsRequiredModificationDate();
+            refDate = new DateTime(appraisal.getGoalsRequiredModificationDate());
             //System.out.println("reference date = " + refDate);
         }
         else if (ref.equals("employee_signed_date"))
-            refDate = appraisal.getEmployeeSignedDate();
-        else if (ref.equals("firstEmailSentDate"))
-            refDate = EmailMgr.getFirstEmail(appraisal.getId(), "jobTerminated").getSentDate();
+            refDate = new DateTime(appraisal.getEmployeeSignedDate());
+        else if (ref.equals("firstEmailSentDate")) {
+            Email firstEmail = EmailMgr.getFirstEmail(appraisal.getId(), "jobTerminated");
+            refDate = new DateTime(firstEmail.getSentDate());
+        }
 
         if (refDate == null) //error
             return null;
 
-        dueDay.setTime(refDate);
-        dueDay.add(Calendar.DAY_OF_MONTH, offset);  //Assumes the offset type is Calendar.DAY_OF_MONTH
-        return dueDay.getTime();
+        return refDate.plusDays(offset);  //Assumes the offset type is Calendar.DAY_OF_MONTH
     }
 
 
@@ -80,9 +82,8 @@ public class EvalsUtil {
      * @return <0 < overdue, 0 due, >0 due day in the future, or not due yet.
      */
     public static int isDue(Appraisal appraisal, Configuration config) throws Exception {
-        Date dueDate = getDueDate(appraisal, config);
-        //System.out.println("due date = " + dueDate);
-        return (CWSUtil.daysBetween(dueDate, new Date()));  //@@@Need to check direction
+        DateTime dueDate = getDueDate(appraisal, config);
+        return Days.daysBetween(new DateTime(), dueDate).getDays();
     }
 
     /**
@@ -94,21 +95,10 @@ public class EvalsUtil {
       * @return  true if need to send another email, false otherwise.
       */
      public static boolean anotherEmail(Email lastEmail, Configuration config) throws Exception {
-         int frequency = config.getIntValue();
-         int daysPassed = CWSUtil.daysBetween(new Date(), lastEmail.getSentDate());
-         return (daysPassed > frequency);
+         DateTime sentDate = new DateTime(lastEmail.getSentDate());
+         int offset = config.getIntValue();
+         return sentDate.plusDays(offset).isBeforeNow();
      }
-
-    /**
-     * Formats date object with the standard MM/dd/yy used throughout the application.
-     *
-     * @param date
-     * @return
-     */
-    public static String formatDate(Date date) {
-        return MessageFormat.format("{0,date,MM/dd/yy}",new Object[]{date});
-    }
-
 
     /**
      * This method assumes the existence of the following files:
@@ -131,7 +121,7 @@ public class EvalsUtil {
         String hostname = CWSUtil.getLocalHostname();
         System.out.println("hostname is " + hostname);
 
-        String filenameHead = portletRoot + Constants.ROOT_DIR;
+        String filenameHead = portletRoot + Constants.getRootDir();
 
         if (env.equals("backend"))
             filenameHead = filenameHead + "backend_";
@@ -158,22 +148,6 @@ public class EvalsUtil {
         if (specificFile.exists())
            return specificPropFile;
         return null;
-    }
-
-    public static int daysBeforeAppraisalDue(Job job, Date appraisalStartDate, String appraisalType,
-                                             Map<String, Configuration> configMap) throws Exception{
-        Configuration appraisalDueConfig = configMap.get(Appraisal.STATUS_APPRAISAL_DUE);
-        int offset = appraisalDueConfig.getIntValue();    //number of days before end date of appraisal
-
-        //determine appraisal due date.
-        Date appraisalEndDate = job.getEndEvalDate(appraisalStartDate, appraisalType);
-
-        Calendar appraisalDueCal = Calendar.getInstance();
-        appraisalDueCal.setTime(appraisalEndDate);
-        appraisalDueCal.add(Calendar.DAY_OF_MONTH, -offset);
-        Date appraisalDueDate = appraisalDueCal.getTime();
-        System.out.println("appraisalDueDate = " + appraisalDueDate);
-        return CWSUtil.daysBetween(appraisalDueDate, new Date());
     }
 
     /**
@@ -207,8 +181,8 @@ public class EvalsUtil {
         }
 
         if (config != null) {
-            Date dueDate = EvalsUtil.getDueDate(appraisal, config);
-            return -1 * CWSUtil.getRemainDays(dueDate);
+            DateTime dueDate = EvalsUtil.getDueDate(appraisal, config);
+            return Days.daysBetween(new DateTime(), dueDate).getDays();
         }
 
         return 0;
@@ -251,39 +225,17 @@ public class EvalsUtil {
     }
 
     /**
-     * Whether or not the current job and appraisal start date is before evals started
-     * processing evaluations.
-     *
-     * @param job
-     * @param startDate
-     * @param type
-     * @return
-     * @throws ParseException
-     */
-    public static boolean beforeEvalsTime(Job job, Date startDate, String type)
-            throws ParseException {
-        Date appraisalEndDate = job.getEndEvalDate(startDate, type);
-        System.out.print("appraisalEndDate = " + appraisalEndDate);
-        if (appraisalEndDate.before(getEvalsStartDate() )) {
-            System.out.println(", before evalsStartDate.");
-            return true;
-        }
-        System.out.println(".");
-        return false;
-    }
-
-    /**
      * Parses the constant EVALS_START_DATE and stores a date object in evalsStartDate.
      *
-     * @return
+     * @return  DateTime object
      * @throws ParseException
      */
-    public static Date getEvalsStartDate() throws ParseException {
+    public static DateTime getEvalsStartDate() throws ParseException {
         if (evalsStartDate != null) {
             return evalsStartDate;
         } else {
-            SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
-            evalsStartDate = fmt.parse(Constants.EVALS_START_DATE);
+            DateTimeFormatter fmt = DateTimeFormat.forPattern(Constants.DATE_FORMAT_FULL);
+            evalsStartDate = fmt.parseDateTime(Constants.EVALS_START_DATE);
         }
 
         return evalsStartDate;

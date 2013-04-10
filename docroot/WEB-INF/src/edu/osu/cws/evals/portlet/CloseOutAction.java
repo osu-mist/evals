@@ -4,6 +4,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.CloseOutReasonMgr;
 import edu.osu.cws.evals.models.CloseOutReason;
+import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.ModelException;
 
 import javax.portlet.PortletRequest;
@@ -17,6 +18,8 @@ public class CloseOutAction implements ActionInterface {
 
     private HomeAction homeAction;
 
+    private ErrorHandler errorHandler;
+
     /**
      * Handles listing the close out reasons.
      *
@@ -27,8 +30,9 @@ public class CloseOutAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
-            return ErrorHandler.handleAccessDenied(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         ArrayList<CloseOutReason> reasonsList = CloseOutReasonMgr.list(false);
@@ -48,9 +52,9 @@ public class CloseOutAction implements ActionInterface {
      */
     public String add(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-
-        if (!actionHelper.isLoggedInUserAdmin()) {
-            return ErrorHandler.handleAccessDenied(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         String reason = ParamUtil.getString(request, "reason");
@@ -76,8 +80,9 @@ public class CloseOutAction implements ActionInterface {
      */
     public String delete(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserAdmin()) {
-            return ErrorHandler.handleAccessDenied(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         int id = ParamUtil.getInteger(request, "id");
@@ -109,5 +114,9 @@ public class CloseOutAction implements ActionInterface {
 
     public void setHomeAction(HomeAction homeAction) {
         this.homeAction = homeAction;
+    }
+
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
     }
 }
