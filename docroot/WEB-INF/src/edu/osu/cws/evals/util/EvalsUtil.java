@@ -9,6 +9,7 @@ package edu.osu.cws.evals.util;
  */
 
 import edu.osu.cws.evals.hibernate.EmailMgr;
+import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.util.*;
 
@@ -17,13 +18,15 @@ import java.text.ParseException;
 import java.util.*;
 
 import edu.osu.cws.evals.models.*;
+import org.apache.commons.configuration.*;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
-import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+
+import javax.portlet.PortletContext;
 
 public class EvalsUtil {
     private static DateTime evalsStartDate = null;
@@ -101,53 +104,94 @@ public class EvalsUtil {
      }
 
     /**
-     * This method assumes the existence of the following files:
-     *  WEB-INF/src/backend_ecs_dev.properties
-     *  WEB-INF/src/backend_ecs_prod.properties
-     *  WEB-INF/src/ecs_dev.properties
-     *  WEB-INF/src/ecs_prod.properties
-     * @param env:  Only valid values are: "web" from the web environment, "backend" from backend cron.
+     * This method assumes the existence of the following file: WEB-INF/src/evals.properties
+     *
      * @portletRoot: Root directory of the running portlet
      * @return: name of the configuration file specific to the hosting environment.
-     * If a properties file matches the hostname exists, it returns that.
-     * Else, it figures out if it's the ECS's development or production environment, and returns the appropriate filename.
-     * Else, it returns null.
      */
-    public static String getSpecificConfigFile(String env, String portletRoot)
-    {
-        if (!env.equals("web") && !env.equals("backend")) //invalid
-           return null;
-
+    private static String getPropertyFileName(String portletRoot) {
         String hostname = CWSUtil.getLocalHostname();
         System.out.println("hostname is " + hostname);
-
         String filenameHead = portletRoot + Constants.getRootDir();
+        String propertyFileName = filenameHead  + "evals.properties";
+        System.out.println("propertyFileName is " + propertyFileName);
 
-        if (env.equals("backend"))
-            filenameHead = filenameHead + "backend_";
-
-        String specificPropFile = filenameHead + hostname + ".properties";
-        //System.out.println("specificProfFile is " + specificPropFile);
-        File specificFile = new File(specificPropFile);
-        if (specificFile.exists())
-           return specificPropFile;
-
-        //If we get here, the specific config file based on hostname does not exist.
-        //Check for the ECS environment
-        specificPropFile = null;
-        if (hostname.indexOf("ucsadm") > 0) //ECS environment
-        {
-           if (hostname.indexOf("dev.") > 0) //ECS dev env
-              specificPropFile = filenameHead + "ecs_dev"  +  ".properties";
-            else  //production enviornment
-              specificPropFile = filenameHead + "ecs_prod"  +  ".properties";
+        File propertyFile = new File(propertyFileName);
+        if (propertyFile.exists() && propertyFile.canRead()) {
+           return propertyFileName;
         }
 
-        System.out.println("specificPropFile = " + specificPropFile);
-        specificFile = new File(specificPropFile);
-        if (specificFile.exists())
-           return specificPropFile;
         return null;
+    }
+
+    /**
+     * Returns the evals.properties PropertiesConfiguration object. It figures out if it is
+     * called from the web or backend based on whether or not the portletContext is null or not.
+     *
+     * @param context       PortletContext
+     * @return
+     * @throws Exception
+     */
+    public static PropertiesConfiguration loadEvalsConfig(PortletContext context)
+            throws Exception {
+        // If we have a portletContext object, we are called from the web and need to get the path
+        String portletRoot = "";
+        if (context != null) {
+            portletRoot = context.getRealPath("/");
+        }
+
+        // Get the path and name of properties file to load
+        String propertyFile = getPropertyFileName(portletRoot);
+        if (propertyFile != null) {
+            return overWriteDefaultConfigs(new PropertiesConfiguration(propertyFile));
+        }
+
+        return null;
+    }
+
+    /**
+     * Parses through the properties defined in the configuration file. It tries to find if there
+     * is a host/vm specific property that overwrites the value of each one of the properties. If it
+     * finds a host property that takes precedence, it overwrites the default value with the host
+     * specific one.
+     *
+     * @param config
+     * @return
+     */
+    private static PropertiesConfiguration overWriteDefaultConfigs(PropertiesConfiguration config) {
+        String hostPrefix = EvalsUtil.getPropertyPrefix();
+        for (Iterator keys = config.getKeys(); keys.hasNext();) {
+            String key = keys.next().toString();
+            String hostBasedKey = hostPrefix + "." + key;
+            if (config.containsKey(hostBasedKey)) {
+                config.setProperty(key, config.getString(hostBasedKey));
+            }
+        }
+
+        return config;
+    }
+
+    /**
+     * Returns the property prefix to use when looking for properties overwritten in the
+     * evals.properties file.
+     * It figures out if it's the ECS's development or production environment, and returns either:
+     * "ecs_dev" or "ecs_prod"
+     * Else, it returns the hostname.
+     *
+     * @return String
+     */
+    private static String getPropertyPrefix() {
+        String hostname = CWSUtil.getLocalHostname();
+
+        if (hostname.contains("ucsadm")) { // ECS environment
+            if (hostname.contains("dev.")) { //ECS dev env
+                return "ecs_dev";
+            } else {  //production environment
+                return "ecs_prod";
+            }
+        }
+
+        return  hostname;
     }
 
     /**
