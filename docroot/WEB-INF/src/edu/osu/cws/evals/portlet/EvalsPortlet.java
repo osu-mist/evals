@@ -17,7 +17,6 @@ import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.util.*;
 import edu.osu.cws.util.CWSUtil;
 import edu.osu.cws.util.Logger;
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -46,12 +45,6 @@ public class EvalsPortlet extends GenericPortlet {
      * doView method.
      */
 	protected String viewJSP = null;
-
-    /**
-     * Name of default properties file that is loaded the first time the
-     * portlet is loaded.
-     */
-    private static final String defaultProperties = "default.properties";
 
     private PermissionRuleMgr permissionRuleMgr = new PermissionRuleMgr();
     private AppraisalStepMgr appraisalStepMgr = new AppraisalStepMgr();
@@ -256,14 +249,15 @@ public class EvalsPortlet extends GenericPortlet {
             String message = "";
 
             try {
-                message += loadEnvironmentProperties(request);
-                createLogger();
-                message += "Created logger object\n";
+                message += loadEnvironmentProperties();
 
                 hibSession = HibernateUtil.getCurrentSession();
                 Transaction tx = hibSession.beginTransaction();
 
                 actionHelper = new ActionHelper(request, null, getPortletContext());
+
+                createLogger();
+                message += "Created logger object\n";
                 createMailer();
                 message += "Mailer setup successfully\n";
                 getPortletContext().setAttribute("permissionRules", permissionRuleMgr.list());
@@ -298,12 +292,13 @@ public class EvalsPortlet extends GenericPortlet {
     /**
      * Creates a Mailer instance and stores it in the portlet context. It fetches the mail properties from
      * the environmentProp attribute in portlet context that comes from the properties files.
+     * Requires the actionHelper private member to be instantiated.
      *
      * @throws Exception
      */
     private void createMailer() throws Exception {
         ResourceBundle resources = ResourceBundle.getBundle("edu.osu.cws.evals.portlet.Email");
-        CompositeConfiguration config = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
+        PropertiesConfiguration config = actionHelper.getEvalsConfig();
         String hostname = config.getString("mail.hostname");
         String from = config.getString("mail.fromAddress");
         String replyTo = config.getString("mail.replyToAddress");
@@ -318,10 +313,10 @@ public class EvalsPortlet extends GenericPortlet {
 
     /**
      * Creates an instance of EvalsLogger, grabs the properties from the properties file and stores the
-     * log instance in the portletContext.
+     * log instance in the portletContext. Requires actionHelper private member to be setup.
      */
     private void createLogger() {
-        CompositeConfiguration config = (CompositeConfiguration) getPortletContext().getAttribute("environmentProp");
+        PropertiesConfiguration config = actionHelper.getEvalsConfig();
         String serverName = config.getString("log.serverName");
         String environment = config.getString("log.environment");
         EvalsLogger evalsLogger = new EvalsLogger(serverName, environment);
@@ -348,35 +343,27 @@ public class EvalsPortlet extends GenericPortlet {
      * properties file: hostname.properties. The config object is then stored
      * in the portletContext.
      *
-     * @param request
      * @throws Exception
      * @return message  Information logging to specify which files were loaded
      */
-    private String loadEnvironmentProperties(PortletRequest request) throws Exception {
+    private String loadEnvironmentProperties() throws Exception {
         String message = "";
         String infoMsg = "";
-        CompositeConfiguration config = new CompositeConfiguration();
-        String portletRoot = getPortletContext().getRealPath("/");
-        String propertyFile = EvalsUtil.getSpecificConfigFile("web", portletRoot);
 
-        // First load hostname.properties. Then try to load default.properties
-        if (propertyFile != null) {
-            PropertiesConfiguration propConfig =  new PropertiesConfiguration(propertyFile);
-            config.addConfiguration(propConfig);
-            infoMsg = propertyFile + " - loaded";
+        // Load evals.properties
+        PropertiesConfiguration config = EvalsUtil.loadEvalsConfig(getPortletContext());
+        if (config != null) {
+            infoMsg = " evals.properties - loaded";
         } else {
-            infoMsg = propertyFile + " - not found";
+            infoMsg =  "evals.properties - not found";
         }
         message += infoMsg + "\n";
 
-        config.addConfiguration(new PropertiesConfiguration(defaultProperties));
-        infoMsg = defaultProperties + " - loaded";
-        message += infoMsg + "\n";
-
         // Set the Hibernate config file and store properties in portletContext
-        infoMsg = "using hibernate cfg file - " + config.getString("hibernate-cfg-file");
+        String hibernateConfig = config.getString("hibernate-cfg-file");
+        infoMsg = "using hibernate cfg file - " + hibernateConfig;
         message += infoMsg + "\n";
-        HibernateUtil.setConfig(config.getString("hibernate-cfg-file"));
+        HibernateUtil.setConfig(hibernateConfig);
         getPortletContext().setAttribute("environmentProp", config);
 
         return message;
