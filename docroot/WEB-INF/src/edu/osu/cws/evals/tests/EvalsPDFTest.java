@@ -24,14 +24,14 @@ public class EvalsPDFTest {
 
     @Test(expectedExceptions = {Exception.class})
     public void shouldFailWithInvalidEnvironemnt() throws Exception {
-        EvalsPDF.getNolijFileName(appraisal, null, "invalid");
+        EvalsPDF.getFileName(appraisal, null, "invalid");
     }
 
     public void shouldUsePassAndEnvironmentInFilePrefix() throws Exception {
-        String filename = EvalsPDF.getNolijFileName(appraisal, "", "prod");
+        String filename = EvalsPDF.getFileName(appraisal, "", "prod");
         assert filename.contains("prod_pass-") : "Invalid file prefix: " + filename;
 
-        filename = EvalsPDF.getNolijFileName(appraisal, "", "dev2");
+        filename = EvalsPDF.getFileName(appraisal, "", "dev2");
         assert filename.contains("dev2_pass-") : "Invalid file prefix: " + filename;
     }
 
@@ -40,7 +40,7 @@ public class EvalsPDFTest {
         String expectedFilename;
 
         int fiscalYear = Calendar.getInstance().get(Calendar.YEAR);
-        filename = EvalsPDF.getNolijFileName(appraisal, "/tmp/testo/", "prod");
+        filename = EvalsPDF.getFileName(appraisal, "/tmp/testo/", "prod");
         expectedFilename = "/tmp/testo/prod_pass-1234_" + fiscalYear + "_C555-.pdf";
         assert filename.equals(expectedFilename);
 
