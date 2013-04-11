@@ -6,7 +6,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.CloseOutReasonMgr;
-import edu.osu.cws.evals.hibernate.NolijCopies;
+import edu.osu.cws.evals.hibernate.NolijCopyMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsPDF;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -331,7 +331,7 @@ public class AppraisalsAction implements ActionInterface {
         // Insert a record into the nolij_copies table
         if (insertRecordIntoTable) {
             String onlyFilename = filename.replaceFirst(dirName, "");
-            NolijCopies.add(appraisal.getId(), onlyFilename);
+            NolijCopyMgr.add(appraisal.getId(), onlyFilename);
         }
 
         return filename;

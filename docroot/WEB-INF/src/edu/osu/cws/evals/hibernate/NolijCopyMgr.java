@@ -7,7 +7,7 @@ import org.hibernate.Transaction;
 
 import java.util.Date;
 
-public class NolijCopies {
+public class NolijCopyMgr {
 
     /**
      * Handles adding a new nolij_copy entry to the nolij_copies table.
