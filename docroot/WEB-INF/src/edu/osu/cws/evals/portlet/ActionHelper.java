@@ -289,28 +289,6 @@ public class ActionHelper {
     }
 
     /**
-     * Handles removing an appraisal from the reviewList stored in session. This method is called
-     * by the AppraisalsAction.update method after a reviewer submits a review.
-     *
-     * @param appraisal
-     * @throws Exception
-     */
-    public void removeReviewAppraisalInSession(Appraisal appraisal) throws Exception {
-        List<Appraisal> reviewList = getReviewsForLoggedInUser(-1);
-        List<Appraisal> tempList = new ArrayList<Appraisal>();
-        tempList.addAll(reviewList);
-        for (Appraisal appraisalInSession: tempList) {
-            if (appraisalInSession.getId() == appraisal.getId()) {
-                reviewList.remove(appraisalInSession);
-                break;
-            }
-        }
-
-        PortletSession session = request.getPortletSession(true);
-        session.setAttribute(REVIEW_LIST, reviewList);
-    }
-
-    /**
      * Checks if the context cache is outdated and refreshes the context cache:
      * admins, reviewers and configuration lists and maps. If the context cache is refreshed, it
      * updates the context cache timestamp in the portlet context.
@@ -524,7 +502,7 @@ public class ActionHelper {
         ArrayList<RequiredAction> employeeRequiredActions;
         ArrayList<RequiredAction> administrativeActions = new ArrayList<RequiredAction>();
         ArrayList<Appraisal> myActiveAppraisals;
-        ArrayList<Appraisal> supervisorActions;
+        ArrayList<Appraisal> mySupervisingAppraisals;
         RequiredAction reviewerAction;
         Reviewer reviewer;
 
@@ -534,8 +512,9 @@ public class ActionHelper {
 
         // add supervisor required actions, if user has team's active appraisals
         if(getFromRequestMap("myTeamsActiveAppraisals") != null){
-            supervisorActions = (ArrayList<Appraisal>) getFromRequestMap("myTeamsActiveAppraisals");
-            administrativeActions = getAppraisalActions(supervisorActions, "supervisor");
+
+            mySupervisingAppraisals = (ArrayList<Appraisal>) getFromRequestMap("myTeamsActiveAppraisals");
+            administrativeActions = getAppraisalActions(mySupervisingAppraisals, "supervisor");
         }
 
         reviewer = getReviewer();

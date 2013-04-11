@@ -15,7 +15,6 @@ import edu.osu.cws.evals.portlet.Constants;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -47,8 +46,10 @@ public class EvalsPDF {
      * @param environment   either "prod" or "dev2"
      * @return filename     composed of: dirname+prod_pass-[PIDM]_[FISCAL YEAR]_[POSITION NUMBER]-.pdf
      * @throws Exception    If the environment is not valid
+     *
+     * remains public, so the test methods don't break.
      */
-    public static String getNolijFileName(Appraisal appraisal, String dirName, String environment)
+    public static String getFileName(Appraisal appraisal, String dirName, String environment)
             throws Exception {
         String filename = "";
 
@@ -87,16 +88,18 @@ public class EvalsPDF {
      *
      * @param appraisal     Appraisal object
      * @param rule          PermissionRule object to decide what sections to display
-     * @param filename      Full path and filename used to store the PDF
+     * @param dirName       the directory PDF files resides.
      * @param resource      ResourceBundle object
      * @param rootDir       Root directory where the images and other resources can be found
+     * @param env   either "prod" or "dev2"
      * @throws Exception
      */
-    public static void createPDF(Appraisal appraisal, PermissionRule rule, String filename,
-                                 ResourceBundle resource, String rootDir) throws Exception {
+    public static String createPDF(Appraisal appraisal, PermissionRule rule, String dirName,
+                                 ResourceBundle resource, String rootDir, String env)
+            throws Exception {
 
         //@todo: escape any text before writing it to the PDF doc??
-
+        String filename = getFileName(appraisal, dirName, env);
         Rectangle pageSize = new Rectangle(612f, 792f);
         Document document = new Document(pageSize, 50f, 40f, 24f, 24f);
         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(filename));
@@ -111,18 +114,7 @@ public class EvalsPDF {
             document.add(getSignatureTable(appraisal, rule, resource, document));
         }
         document.close();
-    }
-
-    /**
-     * Handles deleting the temporary PDF file that the user downloads
-     *
-     * @param filename      Full path and name of temporary PDF file
-     * @return
-     */
-    public static boolean deletePDF(String filename) throws Exception {
-        File pdfFile = new File(filename);
-
-        return pdfFile.delete();
+        return filename;
     }
 
     /**
