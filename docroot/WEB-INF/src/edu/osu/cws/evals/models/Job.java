@@ -387,13 +387,8 @@ public class Job extends Evals implements Serializable {
         DateTime newStartDate = getInitialEvalStartDate();
 
         if (!isWithinInitialPeriod()) {
-            if (annualInd == 18) { // offset month of year if annualInd is 18
-                int month = 6 + newStartDate.getMonthOfYear();
-                newStartDate = newStartDate.withMonthOfYear(month);
-            }
-
-            // if it's not within initial pay period, we need to set the year to current year
-            newStartDate.withYear(new DateTime().getYear());
+            newStartDate = newStartDate.plusMonths(annualInd);
+            newStartDate = newStartDate.withYear(new DateTime().getYear());
         }
 
         return newStartDate;
