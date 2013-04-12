@@ -9,12 +9,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import edu.osu.cws.evals.hibernate.AppraisalMgr;
-import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
-import org.joda.time.Period;
 
 public class Job extends Evals implements Serializable {
     private int id;
@@ -387,23 +384,16 @@ public class Job extends Evals implements Serializable {
      * @throws Exception
      */
     public DateTime getNewAnnualStartDate() throws Exception {
-        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        DateTime initialStartDate = getInitialEvalStartDate();
-        DateTime newStartDate = initialStartDate;
+        DateTime newStartDate = getInitialEvalStartDate();
 
-        // Verify that this is not the first annual appraisal and that annualInd is 18
-        // if (isn't 1st evaluation && annualInd == 18) {
-        boolean firstAnnualStartDate = isFirstAnnualStartDate();
-        if (!firstAnnualStartDate && annualInd == 18) {
-            int month = 6 + initialStartDate.getMonthOfYear();
-            newStartDate = newStartDate.withMonthOfYear(month);
-        }
+        if (!isWithinInitialPeriod()) {
+            if (annualInd == 18) { // offset month of year if annualInd is 18
+                int month = 6 + newStartDate.getMonthOfYear();
+                newStartDate = newStartDate.withMonthOfYear(month);
+            }
 
-        // If this is the first annual evaluation and the indicator is 18, use initial date for year
-        if (firstAnnualStartDate && annualInd == 18) {
-            newStartDate = initialStartDate;
-        } else {
-            newStartDate.withYear(currentYear);
+            // if it's not within initial pay period, we need to set the year to current year
+            newStartDate.withYear(new DateTime().getYear());
         }
 
         return newStartDate;
@@ -417,7 +407,7 @@ public class Job extends Evals implements Serializable {
      * @return
      * @throws Exception
      */
-    private boolean isFirstAnnualStartDate() throws Exception {
+    private boolean isWithinInitialPeriod() throws Exception {
         // Calculate the end date of the 1st annual evaluation
         DateTime initialStartDate = getInitialEvalStartDate();
         DateTime endFirstEval = initialStartDate.plusMonths(annualInd);
