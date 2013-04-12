@@ -22,8 +22,8 @@ public class HomeAction implements ActionInterface {
     private ActionHelper actionHelper;
 
     private static Log _log = LogFactoryUtil.getLog(HomeAction.class);
-    private ErrorHandler errorHandler;
 
+    private ErrorHandler errorHandler;
 
     /**
      * Takes care of grabbing all the information needed to display the home view sections

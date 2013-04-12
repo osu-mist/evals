@@ -113,7 +113,7 @@ public class EvalsUtil {
         String hostname = CWSUtil.getLocalHostname();
         System.out.println("hostname is " + hostname);
         String filenameHead = portletRoot + Constants.getRootDir();
-        String propertyFileName = filenameHead  + "evals.properties";
+        String propertyFileName = filenameHead  + Constants.PROPERTIES_FILENAME;
         System.out.println("propertyFileName is " + propertyFileName);
 
         File propertyFile = new File(propertyFileName);
