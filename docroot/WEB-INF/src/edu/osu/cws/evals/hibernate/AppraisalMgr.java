@@ -1125,15 +1125,15 @@ public class AppraisalMgr {
      * configuration values to see whether the status is due or overdue.
      * @todo: handle: STATUS_GOALS_REACTIVATED in next release
      *
-     * @param status
      * @param appraisal
      * @param configMap
      * @return
      * @throws Exception
      */
-    public static String getNewStatus(String status, Appraisal appraisal,
+    public static String getNewStatus(Appraisal appraisal,
                                       Map<String, Configuration> configMap) throws Exception {
         String newStatus = null;
+        String status = appraisal.getStatus();
         Configuration config = configMap.get(status); //config object of this status
 
         if (status.contains(Appraisal.DUE) && EvalsUtil.isDue(appraisal, config) <= 0) {
