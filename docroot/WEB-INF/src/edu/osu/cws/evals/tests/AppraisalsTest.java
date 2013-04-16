@@ -173,7 +173,7 @@ public class AppraisalsTest {
         Appraisal modifiedAppraisal = loadAppraisalSaveList();
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
-        appraisalMgr.updateAppraisal(modifiedAppraisal);
+        AppraisalMgr.updateAppraisal(modifiedAppraisal, new Employee());
         tx.commit();
         // no exception means success
     }
@@ -237,7 +237,7 @@ public class AppraisalsTest {
             assessment.setSupervisorResult("supervisor results txt");
         }
 
-        appraisalMgr.updateAppraisal(updatedAppraisal);
+        AppraisalMgr.updateAppraisal(updatedAppraisal, new Employee());
         tx.commit();
 
 
@@ -265,7 +265,7 @@ public class AppraisalsTest {
         appraisalMgr.setLoggedInUser(modifiedAppraisal.getJob().getEmployee());
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
-        appraisalMgr.updateAppraisal(modifiedAppraisal);
+        AppraisalMgr.updateAppraisal(modifiedAppraisal, new Employee());
         tx.commit();
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assert assessment.getGoal() != null :
@@ -281,7 +281,7 @@ public class AppraisalsTest {
         appraisalMgr.setLoggedInUser(new EmployeeMgr().findByOnid("luf", null));
         session = HibernateUtil.getCurrentSession();
         tx = session.beginTransaction();
-        appraisalMgr.updateAppraisal(modifiedAppraisal);
+        AppraisalMgr.updateAppraisal(modifiedAppraisal, new Employee());
         tx.commit();
         for (Assessment assessment : modifiedAppraisal.getAssessments()) {
             assert assessment.getGoal().equals("second edit of goal") :
