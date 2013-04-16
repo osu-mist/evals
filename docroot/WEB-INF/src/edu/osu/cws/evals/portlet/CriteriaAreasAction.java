@@ -4,13 +4,10 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppointmentTypeMgr;
 import edu.osu.cws.evals.hibernate.CriteriaMgr;
-<<<<<<< HEAD
 import edu.osu.cws.evals.models.CriterionArea;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.ModelException;
-=======
-import edu.osu.cws.evals.models.*;
->>>>>>> feature/23533-port-develop2-commits
+
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;

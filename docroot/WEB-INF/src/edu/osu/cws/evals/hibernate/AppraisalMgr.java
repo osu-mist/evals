@@ -204,10 +204,12 @@ public class AppraisalMgr {
      * modified, a new record is inserted in the assessments_logs table.
      *
      * @param modifiedAppraisal
+     * @param loggedInUser
      * @return
      * @throws ModelException
      */
-    public boolean updateAppraisal(Appraisal modifiedAppraisal) throws ModelException {
+    public static boolean updateAppraisal(Appraisal modifiedAppraisal, Employee loggedInUser)
+            throws ModelException {
         String originalGoalText;
         String updatedGoalTextGoalText;
         String originalNewGoalText;
@@ -264,86 +266,6 @@ public class AppraisalMgr {
         return true;
     }
 
-
-    /**
-     * Processes the processAction request (Map) and tries to save the appraisal. This method
-     * moves the appraisal to the next appraisal step and sends any emails if necessary.
-     *
-     * @param request
-     * @param appraisal
-     * @param permRule
-     * @throws Exception
-     */
-    public void processUpdateRequest(Map request, Appraisal appraisal, PermissionRule permRule)
-            throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        Configuration resultsDueConfig = configurationMap.get(Appraisal.STATUS_RESULTS_DUE);
-        Job supervisorJob = appraisal.getJob().getSupervisor();
-
-        // set the overdue value before updating the status
-        String beforeUpdateStatus = appraisal.getStatus();
-        // calculate overdue value & set the appraisal.overdue value
-        AppraisalMgr.updateOverdue(appraisal, configurationMap);
-        int oldOverdue = appraisal.getOverdue();
-
-        // update appraisal & assessment fields based on permission rules
-        setAppraisalFields(request, appraisal, permRule);
-
-        boolean statusChanged = !appraisal.getStatus().equals(beforeUpdateStatus);
-        if (statusChanged) {
-            // Using the old status value call setStatusOverdue()
-            String overdueMethod = StringUtils.capitalize(beforeUpdateStatus);
-            overdueMethod = "set" + overdueMethod.replace("Due", "Overdue");
-            try {
-                // call setStageOverdue method
-                Method controllerMethod = appraisal.getClass().getDeclaredMethod(overdueMethod,
-                        Integer.class);
-                controllerMethod.invoke(appraisal, oldOverdue);
-            } catch (NoSuchMethodException e) {
-                // don't do anything since some methods might not exist.
-            }
-
-            // Assign the new status based on configuration values
-            String status = appraisal.getStatus();
-            String newStatus = AppraisalMgr.getNewStatus(status, appraisal, configurationMap);
-            if (newStatus != null) {
-                appraisal.setStatus(newStatus);
-            }
-
-            // If the new status is valid for overdue, refresh the overdue value
-            if (appraisal.getStatus().contains(Appraisal.OVERDUE)) {
-                AppraisalMgr.updateOverdue(appraisal, configurationMap);
-            } else {
-                appraisal.setOverdue(-999);
-            }
-        }
-
-
-        //@todo: validate appraisal
-
-        // save changes to db
-        updateAppraisal(appraisal);
-
-        // Send email if needed
-        String appointmentType = appraisal.getJob().getAppointmentType();
-        AppraisalStep appraisalStep;
-        String employeeResponse = appraisal.getRebuttal();
-
-        // If the employee signs and provides a rebuttal, we want to use a different
-        // appraisal step so that we can send an email to the reviewer.
-        if (submittedRebuttal(request, employeeResponse)) {
-            String appraisalStepKey = "submit-response-" + appointmentType;
-            appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
-        } else {
-            appraisalStep = getAppraisalStepKey(request, appointmentType, permRule);
-        }
-
-        EmailType emailType = appraisalStep.getEmailType();
-        if (emailType != null) {
-            mailer.sendMail(appraisal, emailType);
-        }
-    }
-
     /**
      * Creates the first annual appraisal if needed. The first annual appraisal is created if:
      *  1) The current appraisal is of type: trial
@@ -385,198 +307,6 @@ public class AppraisalMgr {
                 .uniqueResult();
         return trialAppraisal;
     }
-
-    /**
-     * Handles updating the appraisal fields in the appraisal and assessment objects.
-     *
-     * @param request
-     * @param appraisal
-     * @param permRule
-     */
-    public void setAppraisalFields(Map<String, String[]> request, Appraisal appraisal, PermissionRule permRule)
-            throws Exception{
-        String parameterKey = "";
-
-        // Save Goals
-        if (permRule.getGoals() != null && permRule.getGoals().equals("e")) {
-            for (Assessment assessment : appraisal.getAssessments()) {
-                String assessmentID = Integer.toString(assessment.getId());
-                parameterKey = "appraisal.goal." + assessmentID;
-                if (request.get(parameterKey) != null) {
-                    assessment.setGoal(request.get(parameterKey)[0]);
-                }
-            }
-            if (request.get("submit-goals") != null) {
-                appraisal.setGoalsSubmitDate(new Date());
-            }
-            if (request.get("approve-goals") != null) {
-                appraisal.setGoalApprovedDate(new Date());
-                appraisal.setGoalsApprover(loggedInUser);
-            }
-        }
-        // Save newGoals
-        if (permRule.getNewGoals() != null && permRule.getNewGoals().equals("e")) {
-            for (Assessment assessment : appraisal.getAssessments()) {
-                String assessmentID = Integer.toString(assessment.getId());
-                parameterKey = "appraisal.newGoal." + assessmentID;
-                //assessment.setNewGoals(request.get(parameterKey)[0]);
-            }
-        }
-        // Save goalComments
-        if (permRule.getGoalComments() != null && permRule.getGoalComments().equals("e")) {
-            if (request.get("appraisal.goalsComments") != null) {
-                appraisal.setGoalsComments(request.get("appraisal.goalsComments")[0]);
-            }
-        }
-        // Save employee results
-        if (permRule.getResults() != null && permRule.getResults().equals("e")) {
-            for (Assessment assessment : appraisal.getAssessments()) {
-                String assessmentID = Integer.toString(assessment.getId());
-                parameterKey = "assessment.employeeResult." + assessmentID;
-                if (request.get(parameterKey) != null) {
-                    assessment.setEmployeeResult(request.get(parameterKey)[0]);
-                }
-            }
-        }
-        // Save Supervisor Results
-        if (permRule.getSupervisorResults() != null && permRule.getSupervisorResults().equals("e")) {
-            for (Assessment assessment : appraisal.getAssessments()) {
-                String assessmentID = Integer.toString(assessment.getId());
-                parameterKey = "assessment.supervisorResult." + assessmentID;
-                if (request.get(parameterKey) != null) {
-                    assessment.setSupervisorResult(request.get(parameterKey)[0]);
-                }
-            }
-        }
-        if (request.get("submit-results") != null) {
-            appraisal.setResultSubmitDate(new Date());
-        }
-        // Save evaluation
-        if (permRule.getEvaluation() != null && permRule.getEvaluation().equals("e")) {
-            if (request.get("appraisal.evaluation") != null) {
-                appraisal.setEvaluation(request.get("appraisal.evaluation")[0]);
-            }
-            if (request.get("appraisal.rating") != null) {
-                appraisal.setRating(Integer.parseInt(request.get("appraisal.rating")[0]));
-            }
-            if (request.get(permRule.getSubmit()) != null) {
-                appraisal.setEvaluationSubmitDate(new Date());
-                appraisal.setEvaluator(loggedInUser);
-            }
-        }
-        // Save review
-        if (permRule.getReview() != null && permRule.getReview().equals("e")) {
-            if (request.get("appraisal.review") != null) {
-                appraisal.setReview(request.get("appraisal.review")[0]);
-            }
-            if (request.get(permRule.getSubmit()) != null) {
-                appraisal.setReviewer(loggedInUser);
-                appraisal.setReviewSubmitDate(new Date());
-            }
-        }
-        if (request.get("sign-appraisal") != null) {
-            appraisal.setEmployeeSignedDate(new Date());
-        }
-        if (request.get("release-appraisal") != null) {
-            appraisal.setReleaseDate(new Date());
-        }
-        // Save employee response
-        if (permRule.getEmployeeResponse() != null && permRule.getEmployeeResponse().equals("e")) {
-            appraisal.setRebuttal(request.get("appraisal.rebuttal")[0]);
-            String employeeResponse = appraisal.getRebuttal();
-            if (submittedRebuttal(request, employeeResponse)) {
-                appraisal.setRebuttalDate(new Date());
-            }
-        }
-        // Save supervisor rebuttal read
-        if (permRule.getRebuttalRead() != null && permRule.getRebuttalRead().equals("e")
-                && request.get("read-appraisal-rebuttal") != null) {
-            appraisal.setSupervisorRebuttalRead(new Date());
-        }
-
-        // Save the close out reason
-        if (appraisal.getRole().equals(ActionHelper.ROLE_REVIEWER) || appraisal.getRole().equals("admin")) {
-            if (request.get("appraisal.closeOutReasonId") != null) {
-                int closeOutReasonId = Integer.parseInt(request.get("appraisal.closeOutReasonId")[0]);
-                CloseOutReason reason = CloseOutReasonMgr.get(closeOutReasonId);
-
-                appraisal.setCloseOutBy(loggedInUser);
-                appraisal.setCloseOutDate(new Date());
-                appraisal.setCloseOutReason(reason);
-                appraisal.setOriginalStatus(appraisal.getStatus());
-            }
-        }
-
-        // If the appraisalStep object has a new status, update the appraisal object
-        String appointmentType = appraisal.getJob().getAppointmentType();
-        AppraisalStep appraisalStep = getAppraisalStepKey(request, appointmentType, permRule);
-        String newStatus = appraisalStep.getNewStatus();
-        if (newStatus != null && !newStatus.equals(appraisal.getStatus())) {
-            appraisal.setStatus(newStatus);
-            String employeeResponse = appraisal.getRebuttal();
-            if (submittedRebuttal(request, employeeResponse)) {
-                appraisal.setStatus(Appraisal.STATUS_REBUTTAL_READ_DUE);
-            }
-        }
-        if (appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
-            appraisal.setGoalsRequiredModificationDate(new Date());
-        }
-    }
-
-    /**
-     * Specifies whether or not the employee submitted a rebuttal when the appraisal was signed.
-     *
-     * @param request
-     * @param employeeResponse
-     * @return
-     */
-    private boolean submittedRebuttal(Map<String, String[]> request, String employeeResponse) {
-        return request.get("sign-appraisal") != null &&
-                employeeResponse != null && !employeeResponse.equals("");
-    }
-
-
-    /**
-     * Figures out the appraisal step key for the button that the user pressed when the appraisal
-     * form was submitted.
-     *
-     * @param request
-     * @param appointmentType
-     * @param permRule
-     * @return
-     */
-    private AppraisalStep getAppraisalStepKey(Map request, String appointmentType,
-                                              PermissionRule permRule) {
-        AppraisalStep appraisalStep;
-        String appraisalStepKey;
-        ArrayList<String> appraisalButtons = new ArrayList<String>();
-        if (permRule.getSaveDraft() != null) {
-            appraisalButtons.add(permRule.getSaveDraft());
-        }
-        if (permRule.getRequireModification() != null) {
-            appraisalButtons.add(permRule.getRequireModification());
-        }
-        if (permRule.getSubmit() != null) {
-            appraisalButtons.add(permRule.getSubmit());
-        }
-        // close out button
-        appraisalButtons.add("close-appraisal");
-
-        for (String button : appraisalButtons) {
-            // If this button is the one the user clicked, use it to look up the
-            // appraisalStepKey
-            if (request.get(button) != null) {
-                appraisalStepKey = button + "-" + appointmentType;
-                appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
-                if (appraisalStep != null) {
-                    return appraisalStep;
-                }
-            }
-        }
-
-        return new AppraisalStep();
-    }
-
 
     /**
      * Figures out the current user role in the appraisal and returns the respective permission
@@ -1366,15 +1096,15 @@ public class AppraisalMgr {
      * configuration values to see whether the status is due or overdue.
      * @todo: handle: STATUS_GOALS_REACTIVATED in next release
      *
-     * @param status
      * @param appraisal
      * @param configMap
      * @return
      * @throws Exception
      */
-    public static String getNewStatus(String status, Appraisal appraisal,
+    public static String getNewStatus(Appraisal appraisal,
                                       Map<String, Configuration> configMap) throws Exception {
         String newStatus = null;
+        String status = appraisal.getStatus();
         Configuration config = configMap.get(status); //config object of this status
 
         if (status.contains(Appraisal.DUE) && EvalsUtil.isDue(appraisal, config) <= 0) {
