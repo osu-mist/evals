@@ -862,4 +862,26 @@ public class Appraisal extends Evals {
 
         return null;
     }
+
+    /**
+     * Loads lazy associations
+     */
+    public void loadLazyAssociations() {
+        job.toString();
+        Job supervisor = job.getSupervisor();
+        if (supervisor != null && supervisor.getEmployee() != null) {
+            supervisor.getEmployee().toString();
+        }
+        if (job.getEmployee() != null) {
+            job.getEmployee().toString();
+        }
+        if (getCloseOutReason() != null) {
+            getCloseOutReason().getReason();
+        }
+        for (Assessment assessment : getCurrentGoalVersion().getSortedAssessments()) {
+            for (AssessmentCriteria assessmentCriteria : assessment.getAssessmentCriteria()) {
+                assessmentCriteria.getCriteriaArea().getName();
+            }
+        }
+    }
 }

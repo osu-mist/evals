@@ -198,26 +198,7 @@ public class AppraisalsAction implements ActionInterface {
 
         Map Notices = (Map)actionHelper.getPortletContextAttribute("Notices");
         actionHelper.addToRequestMap("appraisalNotice", Notices.get("Appraisal Notice"));
-
-        // Initialze lazy appraisal associations
-        Job job = appraisal.getJob();
-        job.toString();
-        Job supervisor = job.getSupervisor();
-        if (supervisor != null && supervisor.getEmployee() != null) {
-            supervisor.getEmployee().toString();
-        }
-        if (job.getEmployee() != null) {
-            job.getEmployee().toString();
-        }
-        if (appraisal.getCloseOutReason() != null) {
-            appraisal.getCloseOutReason().getReason();
-        }
-        for (Assessment assessment : appraisal.getCurrentGoalVersion().getSortedAssessments()) {
-            for (AssessmentCriteria assessmentCriteria : assessment.getAssessmentCriteria()) {
-                assessmentCriteria.getCriteriaArea().getName();
-            }
-        }
-        // End of initialize lazy appraisal associations
+        appraisal.loadLazyAssociations();
 
         actionHelper.addToRequestMap("appraisal", appraisal);
         actionHelper.addToRequestMap("permissionRule", permRule);
@@ -225,7 +206,6 @@ public class AppraisalsAction implements ActionInterface {
 
         return Constants.JSP_APPRAISAL;
     }
-
 
     /**
      * Handles updating the appraisal form.
