@@ -182,7 +182,7 @@ public class AppraisalMgr {
             session.save(appraisal);
 
             Assessment newAssessment;
-            for (Assessment origAssesment: trialAppraisal.getAssessments()) {
+            for (Assessment origAssesment: trialAppraisal.getCurrentGoalVersion().getAssessments()) {
                 newAssessment = new Assessment();
                 //@todo
                 //newAssessment.setCriterionDetail(origAssesment.getCriterionDetail());
@@ -218,7 +218,7 @@ public class AppraisalMgr {
 
         // Validate the data first before we try to save anything
         modifiedAppraisal.validate();
-        for (Assessment assessment : modifiedAppraisal.getAssessments()) {
+        for (Assessment assessment : modifiedAppraisal.getCurrentGoalVersion().getAssessments()) {
             assessment.validate();
         }
 
@@ -226,7 +226,7 @@ public class AppraisalMgr {
         Session session = HibernateUtil.getCurrentSession();
         session.saveOrUpdate(modifiedAppraisal);
 
-        for (Assessment assessment : modifiedAppraisal.getAssessments()) {
+        for (Assessment assessment : modifiedAppraisal.getCurrentGoalVersion().getAssessments()) {
             assessment.setModifiedDate(new Date());
             session.saveOrUpdate(assessment);  //@todo: joan: Do we need to do this everytime?
 

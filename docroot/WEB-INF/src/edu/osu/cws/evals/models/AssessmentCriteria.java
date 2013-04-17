@@ -1,13 +1,11 @@
 package edu.osu.cws.evals.models;
 
-public class AssessmentCriteria {
+public class AssessmentCriteria implements Comparable<AssessmentCriteria> {
     private int id;
 
-    private int assessmentID;
-
-    private int criteriaAreaID;
-
-    private boolean checked;
+    private CriterionArea criteriaArea;
+    private Assessment assessment;
+    private Boolean checked;
 
     public AssessmentCriteria() {}
 
@@ -19,27 +17,39 @@ public class AssessmentCriteria {
         this.id = id;
     }
 
-    public int getAssessmentID() {
-        return assessmentID;
+    public CriterionArea getCriteriaArea() {
+        return criteriaArea;
     }
 
-    public void setAssessmentID(int assessmentID) {
-        this.assessmentID = assessmentID;
+    public void setCriteriaArea(CriterionArea criteriaArea) {
+        this.criteriaArea = criteriaArea;
     }
 
-    public int getCriteriaAreaID() {
-        return criteriaAreaID;
+    public Assessment getAssessment() {
+        return assessment;
     }
 
-    public void setCriteriaAreaID(int criteriaAreaID) {
-        this.criteriaAreaID = criteriaAreaID;
+    public void setAssessment(Assessment assessment) {
+        this.assessment = assessment;
     }
 
-    public boolean isChecked() {
+    public Boolean getChecked() {
         return checked;
     }
 
-    public void setChecked(boolean checked) {
+    public void setChecked(Boolean checked) {
         this.checked = checked;
+    }
+
+    /**
+     * Assessment Criteria objects are sorted based on the name of the criteria area associated.
+     *
+     * @param otherAssessmentCriteria
+     * @return
+     */
+    public int compareTo(AssessmentCriteria otherAssessmentCriteria) {
+        String thisName = this.criteriaArea.getName();
+        String otherName = otherAssessmentCriteria.criteriaArea.getName();
+        return thisName.compareTo(otherName);
     }
 }

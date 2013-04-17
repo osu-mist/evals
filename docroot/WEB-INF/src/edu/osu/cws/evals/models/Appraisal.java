@@ -156,7 +156,7 @@ public class Appraisal extends Evals {
 
     private Integer overdue;
 
-    private Set<Assessment> assessments = new HashSet<Assessment>();
+    private Set<GoalVersion> goalVersions = new HashSet<GoalVersion>();
 
     private Integer goalsOverdue;
 
@@ -395,18 +395,6 @@ public class Appraisal extends Evals {
 
         return MessageFormat.format("{0,date,MM/dd/yy} - {1,date,MM/dd/yy}",
                 new Object[]{getStartDate(), getEndDate()});
-    }
-
-    /**
-     * Returns a sorted list of assessments. The assessment pojo class
-     * implements comparable interface which makes this easy.
-     *
-     * @return
-     */
-    public List getSortedAssessments() {
-        List sortedAssessments = new ArrayList(assessments);
-        Collections.sort(sortedAssessments);
-        return sortedAssessments;
     }
 
     /**
@@ -728,17 +716,12 @@ public class Appraisal extends Evals {
         this.closeOutReason = closeOutReason;
     }
 
-    public Set<Assessment> getAssessments() {
-        return assessments;
+    public Set<GoalVersion> getGoalVersions() {
+        return goalVersions;
     }
 
-    public void setAssessments(Set<Assessment> assessments) {
-        this.assessments = assessments;
-    }
-
-    public void addAssessment(Assessment assessment) {
-        assessment.setAppraisal(this);
-        this.assessments.add(assessment);
+    public void setGoalVersions(Set<GoalVersion> goalVersions) {
+        this.goalVersions = goalVersions;
     }
 
     public Employee getReopenedBy() {
@@ -864,5 +847,19 @@ public class Appraisal extends Evals {
 
     public boolean isEmployeeJobActive() {
         return getJob().getStatus().equalsIgnoreCase("A");
+    }
+
+    /**
+     * Returns the currently active goal version. In this release, we only support 1 goal version
+     * per Appraisal. In the future, when we allow goals reactivation, we'll allow more than one.
+     *
+     * @return
+     */
+    public GoalVersion getCurrentGoalVersion() {
+        if (goalVersions != null && !goalVersions.isEmpty()) {
+            return (GoalVersion) goalVersions.toArray()[0];
+        }
+
+        return null;
     }
 }

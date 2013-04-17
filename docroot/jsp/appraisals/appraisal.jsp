@@ -88,8 +88,8 @@
     </c:if>
 
     <div class="appraisal-criteria">
-    <c:forEach var="assessment" items="${appraisal.sortedAssessments}" varStatus="loopStatus">
-        <%@ include file="/jsp/appraisals/criteria.jsp"%>
+    <c:forEach var="assessment" items="${appraisal.currentGoalVersion.sortedAssessments}" varStatus="loopStatus">
+        <%@ include file="/jsp/appraisals/assessments.jsp"%>
     </c:forEach>
     </div>
 

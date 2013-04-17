@@ -212,10 +212,10 @@ public class AppraisalsAction implements ActionInterface {
         if (appraisal.getCloseOutReason() != null) {
             appraisal.getCloseOutReason().getReason();
         }
-        appraisal.getSortedAssessments().size();
-        for (Assessment assessment : appraisal.getAssessments()) {
-            //@todo
-            //assessment.getCriterionDetail().getAreaID();
+        for (Assessment assessment : appraisal.getCurrentGoalVersion().getSortedAssessments()) {
+            for (AssessmentCriteria assessmentCriteria : assessment.getAssessmentCriteria()) {
+                assessmentCriteria.getCriteriaArea().getName();
+            }
         }
         // End of initialize lazy appraisal associations
 
@@ -395,7 +395,7 @@ public class AppraisalsAction implements ActionInterface {
 
         // Save Goals
         if (permRule.getGoals() != null && permRule.getGoals().equals("e")) {
-            for (Assessment assessment : appraisal.getAssessments()) {
+            for (Assessment assessment : appraisal.getCurrentGoalVersion().getAssessments()) {
                 String assessmentID = Integer.toString(assessment.getId());
                 parameterKey = "appraisal.goal." + assessmentID;
                 if (requestMap.get(parameterKey) != null) {
@@ -412,7 +412,7 @@ public class AppraisalsAction implements ActionInterface {
         }
         // Save newGoals
         if (permRule.getNewGoals() != null && permRule.getNewGoals().equals("e")) {
-            for (Assessment assessment : appraisal.getAssessments()) {
+            for (Assessment assessment : appraisal.getCurrentGoalVersion().getAssessments()) {
                 String assessmentID = Integer.toString(assessment.getId());
                 parameterKey = "appraisal.newGoal." + assessmentID;
                 //@todo: can this be removed? do the perm rules need to be updated?
@@ -427,7 +427,7 @@ public class AppraisalsAction implements ActionInterface {
         }
         // Save employee results
         if (permRule.getResults() != null && permRule.getResults().equals("e")) {
-            for (Assessment assessment : appraisal.getAssessments()) {
+            for (Assessment assessment : appraisal.getCurrentGoalVersion().getAssessments()) {
                 String assessmentID = Integer.toString(assessment.getId());
                 parameterKey = "assessment.employeeResult." + assessmentID;
                 if (requestMap.get(parameterKey) != null) {
@@ -437,7 +437,7 @@ public class AppraisalsAction implements ActionInterface {
         }
         // Save Supervisor Results
         if (permRule.getSupervisorResults() != null && permRule.getSupervisorResults().equals("e")) {
-            for (Assessment assessment : appraisal.getAssessments()) {
+            for (Assessment assessment : appraisal.getCurrentGoalVersion().getAssessments()) {
                 String assessmentID = Integer.toString(assessment.getId());
                 parameterKey = "assessment.supervisorResult." + assessmentID;
                 if (requestMap.get(parameterKey) != null) {

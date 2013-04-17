@@ -7,10 +7,7 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.LineSeparator;
-import edu.osu.cws.evals.models.Appraisal;
-import edu.osu.cws.evals.models.Assessment;
-import edu.osu.cws.evals.models.Job;
-import edu.osu.cws.evals.models.PermissionRule;
+import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.Constants;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -18,6 +15,7 @@ import org.joda.time.DateTime;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 public class EvalsPDF {
 
@@ -616,7 +614,9 @@ public class EvalsPDF {
         Paragraph sectionText;
         int i = 0;
 
-        for (Assessment assessment : (java.util.List<Assessment>) appraisal.getSortedAssessments()) {
+        GoalVersion currentGoalVersion = appraisal.getCurrentGoalVersion();
+        List<Assessment> sortedAssessments = currentGoalVersion.getSortedAssessments();
+        for (Assessment assessment : sortedAssessments) {
             i++;
             /* @todo
             String areaText = i + ". " + assessment.getCriterionDetail().getAreaID().getName().toUpperCase() + ":";

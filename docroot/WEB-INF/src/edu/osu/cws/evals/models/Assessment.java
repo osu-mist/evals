@@ -1,17 +1,12 @@
 package edu.osu.cws.evals.models;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Assessment extends Evals implements Comparable<Assessment> {
 
     private int id;
 
     private Appraisal appraisal;
-
-    //@todo
-    //private CriterionDetail criterionDetail;
 
     private String goal;
 
@@ -23,7 +18,7 @@ public class Assessment extends Evals implements Comparable<Assessment> {
 
     private Date modifiedDate;
 
-    private int goalVersionID;
+    private GoalVersion goalVersion;
 
     private int sequence;
 
@@ -32,6 +27,8 @@ public class Assessment extends Evals implements Comparable<Assessment> {
     private Date deleteDate;
 
     private Set<GoalLog> goalLogs = new HashSet<GoalLog>();
+
+    private Set<AssessmentCriteria> assessmentCriteria = new HashSet<AssessmentCriteria>();
 
     public Assessment() { }
 
@@ -61,14 +58,6 @@ public class Assessment extends Evals implements Comparable<Assessment> {
         this.id = id;
     }
 
-    public int getGoalVersionID() {
-        return goalVersionID;
-    }
-
-    public void setGoalVersionID(int goalVersionID) {
-        this.goalVersionID = goalVersionID;
-    }
-
     public int getSequence() {
         return sequence;
     }
@@ -84,15 +73,6 @@ public class Assessment extends Evals implements Comparable<Assessment> {
     public void setAppraisal(Appraisal appraisal) {
         this.appraisal = appraisal;
     }
-
-    //@todo
-    /*public CriterionDetail getCriterionDetail() {
-        return criterionDetail;
-    }
-
-    public void setCriterionDetail(CriterionDetail criterionDetail) {
-        this.criterionDetail = criterionDetail;
-    }*/
 
     public String getGoal() {
         return goal;
@@ -163,6 +143,22 @@ public class Assessment extends Evals implements Comparable<Assessment> {
         this.goalLogs.add(goalLog);
     }
 
+    public GoalVersion getGoalVersion() {
+        return goalVersion;
+    }
+
+    public void setGoalVersion(GoalVersion goalVersion) {
+        this.goalVersion = goalVersion;
+    }
+
+    public Set<AssessmentCriteria> getAssessmentCriteria() {
+        return assessmentCriteria;
+    }
+
+    public void setAssessmentCriteria(Set<AssessmentCriteria> assessmentCriteria) {
+        this.assessmentCriteria = assessmentCriteria;
+    }
+
     public int compareTo(Assessment otherAssessment) {
         final int BEFORE = -1;
         final int EQUAL = 0;
@@ -172,17 +168,34 @@ public class Assessment extends Evals implements Comparable<Assessment> {
             return EQUAL;
         }
 
-        //@todo
-        /*if (this.getCriterionDetail().getAreaID().getSequence() <
-                otherAssessment.getCriterionDetail().getAreaID().getSequence()) {
+        if (this.sequence < otherAssessment.sequence) {
             return BEFORE;
         }
 
-        if (this.getCriterionDetail().getAreaID().getSequence() >
-                otherAssessment.getCriterionDetail().getAreaID().getSequence()) {
+        if (this.sequence > otherAssessment.sequence) {
             return AFTER;
-        }*/
+        }
 
         return EQUAL;
+    }
+
+    /**
+     * Returns a sorted list of AssessmentCriteria by the name of CriteriaArea.name.
+     *
+     * @return
+     */
+    public List<AssessmentCriteria> getSortedAssessmentCriteria() {
+        List<AssessmentCriteria> sortedAssessmentCriteria = new ArrayList(assessmentCriteria);
+        Collections.sort(sortedAssessmentCriteria);
+        return sortedAssessmentCriteria;
+    }
+
+    /**
+     * Whether or not the Assessment has been deleted.
+     *
+     * @return
+     */
+    public Boolean isDeleted() {
+        return deleterPidm != null && deleteDate != null;
     }
 }
