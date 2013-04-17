@@ -12,9 +12,13 @@
             </generator>
         </id>
 
-        <property name="assessmentID" type="int" column="ASSESSMENT_ID"/>
-        <property name="criteriaAreaID" type="int" column="CRITERIA_AREA_ID"/>
         <property name="checked" type="boolean" column="CHECKED"/>
+        <many-to-one name="assessment" class="edu.osu.cws.evals.models.Assessment"
+                     column="ASSESSMENT_ID"
+                     not-null="true"/>
+        <many-to-one name="criteriaArea" class="edu.osu.cws.evals.models.CriterionArea"
+                     column="CRITERIA_AREA_ID"
+                     not-null="true"/>
 
     </class>
 

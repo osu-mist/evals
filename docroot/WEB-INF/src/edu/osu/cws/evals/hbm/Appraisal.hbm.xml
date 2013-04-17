@@ -69,9 +69,9 @@
         <many-to-one name="reopenedBy" class="edu.osu.cws.evals.models.Employee"
                      column="REOPENER_PIDM"
                      not-null="false"/>
-        <set name="assessments" inverse="true">
+        <set name="goalVersions" inverse="true">
             <key column="APPRAISAL_ID"/>
-            <one-to-many class="edu.osu.cws.evals.models.Assessment" />
+            <one-to-many class="edu.osu.cws.evals.models.GoalVersion" />
         </set>
     </class>
     <sql-query name="appraisal.reviewCount"><![CDATA[

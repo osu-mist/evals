@@ -12,10 +12,18 @@
             </generator>
         </id>
 
-        <property name="appraisalID" type="int" column="APPRAISAL_ID"/>
-        <property name="approverPidm" type="date" column="APPROVER_PIDM"/>
+        <property name="approverPidm" type="int" column="APPROVER_PIDM"/>
         <property name="createDate" type="date" column="CREATE_DATE"/>
-        <property name="approvedDate" type="date" column="APRROVED_DATE"/>
+        <property name="approvedDate" type="date" column="APPROVED_DATE"/>
+
+        <many-to-one name="appraisal" class="edu.osu.cws.evals.models.Appraisal"
+                     column="APPRAISAL_ID"
+                     not-null="true" />
+
+        <set name="assessments" inverse="true" batch-size="30">
+            <key column="GOAL_VERSION_ID"/>
+            <one-to-many class="edu.osu.cws.evals.models.Assessment"/>
+        </set>
 
     </class>
 
