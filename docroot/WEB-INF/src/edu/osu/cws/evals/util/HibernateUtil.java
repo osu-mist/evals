@@ -3,6 +3,10 @@ package edu.osu.cws.evals.util;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import java.io.IOException;
+import java.util.Properties;
+import java.io.File;
+import java.io.FileInputStream;
 
 public class HibernateUtil {
 
@@ -25,7 +29,7 @@ public class HibernateUtil {
      * Static variable used to keep track of what hibernate config file the java
      * class should be using. By default it uses the test configuration db.
      */
-    private static String config = TEST_CONFIG;
+    private static String configFileName = TEST_CONFIG;
 
     /**
      * Method used to create the Hibernate session. This method is private to ensure
@@ -36,7 +40,16 @@ public class HibernateUtil {
     private static SessionFactory buildSessionFactory() {
         try {
             // Create the SessionFactory from hibernate.cfg.xml
-            return new Configuration().configure(config).buildSessionFactory();
+            Configuration config = new Configuration();
+            config.configure(configFileName);
+
+            File hbms = new File
+                    ("/opt/luminis/products/tomcat/tomcat-portal/webapps/evals/WEB-INF/src/edu/osu/cws/evals/hbm");
+            File extra = new File
+                    ("/opt/luminis/products/tomcat/tomcat-portal/webapps/evals/WEB-INF/src/extra.properties");
+            config.addProperties(ExtraProperties(extra));
+            config.addDirectory(hbms);
+            return config.buildSessionFactory();
 
         } catch (Throwable ex) {
             // Make sure you log the exception, as it might be swallowed
@@ -44,6 +57,20 @@ public class HibernateUtil {
             throw new ExceptionInInitializerError(ex);
         }
     }
+
+    private static Properties ExtraProperties(File filename)
+    {
+        Properties prop = new Properties();
+        try {
+            FileInputStream in = new FileInputStream(filename);
+            prop.load(in);
+            in.close();
+        } catch(IOException e) {
+            System.err.println("File not found.");
+        }
+        return prop;
+    }
+
 
     /**
      * This is a getter method that returns the hibernate session used by the application.
@@ -70,7 +97,7 @@ public class HibernateUtil {
      * @param configName
      */
     public static void setConfig(String configName) {
-        config = configName;
+        configFileName = configName;
     }
 
     /**
