@@ -177,7 +177,7 @@ public class Mailer {
             return null;
         }
 
-        if(testMailToAddress != null){
+        if(testMailToAddress != null && !testMailToAddress.equals("")){
            mailToArray[0] = testMailToAddress;
            return mailToArray;
         }
