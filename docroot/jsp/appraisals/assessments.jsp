@@ -2,11 +2,8 @@
 Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 %>
 <fieldset>
-<%-- @todo
-<h3 class="secret"><c:out value="${assessment.criterionDetail.areaID.name}"/></h3>
-<legend><c:out value="${assessment.criterionDetail.areaID.name}"/></legend>
-<p class="instructions"><c:out value="${assessment.criterionDetail.description}" /></p>
---%>
+<h3 class="secret"><liferay-ui:message key="appraisal-assessment-header"/>${loopStatus.index + 1}</h3>
+<legend><liferay-ui:message key="appraisal-assessment-header"/>${loopStatus.index + 1}</legend>
 
 <c:choose>
     <c:when test="${permissionRule.goals == 'e'}">
@@ -21,24 +18,10 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
         </fieldset>
     </c:when>
 </c:choose>
-<p class="pass-hide">Role = '${appraisal.role}', permissionRule.goals = '${permissionRule.goals}',
-    permissionRule.results = '${permissionRule.results}'</p>
+<c:forEach var="assessmentCriteria" items="${assessment.sortedAssessmentCriteria}" varStatus="loopStatus2">
+    <%@ include file="/jsp/appraisals/assessmentCriteria.jsp"%>
+</c:forEach>
 
-<c:choose>
-    <c:when test="${permissionRule.newGoals == 'e'}">
-        <label for="<portlet:namespace />appraisal.newGoals.${assessment.id}"><liferay-ui:message key="appraisal-newGoals" /></label>
-        <liferay-ui:input-textarea param="appraisal.newGoals.${assessment.id}"
-            defaultValue="${assessment.newGoals}" />
-    </c:when>
-    <c:when test="${permissionRule.newGoals == 'v'}">
-        <fieldset>
-            <legend><liferay-ui:message key="appraisal-newGoals" /></legend>
-            <%-- @todo getNewGoals no longer exists
-            <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAssessment.getNewGoals()) %></p>
-            --%>
-        </fieldset>
-    </c:when>
-</c:choose>
 
 <c:choose>
     <c:when test="${permissionRule.results == 'e'}">
