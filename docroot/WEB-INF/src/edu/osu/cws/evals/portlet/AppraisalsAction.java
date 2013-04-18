@@ -381,6 +381,16 @@ public class AppraisalsAction implements ActionInterface {
                 if (requestMap.get(parameterKey) != null) {
                     assessment.setGoal(requestMap.get(parameterKey)[0]);
                 }
+
+                // Save the assessment criteria for each assessment.
+                for (AssessmentCriteria assessmentCriteria : assessment.getAssessmentCriteria()) {
+                    parameterKey = "appraisal.assessmentCriteria." + assessmentCriteria.getId();
+                    if (requestMap.get(parameterKey) != null) {
+                        assessmentCriteria.setChecked(true);
+                    } else {
+                        assessmentCriteria.setChecked(false);
+                    }
+                }
             }
             if (requestMap.get("submit-goals") != null) {
                 appraisal.setGoalsSubmitDate(new Date());
