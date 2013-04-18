@@ -164,10 +164,6 @@ public class Assessment extends Evals implements Comparable<Assessment> {
         final int EQUAL = 0;
         final int AFTER = 1;
 
-        if (this == otherAssessment) {
-            return EQUAL;
-        }
-
         if (this.sequence < otherAssessment.sequence) {
             return BEFORE;
         }
