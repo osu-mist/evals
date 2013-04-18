@@ -35,6 +35,7 @@ public class Mailer {
     private Map<String, Configuration> configMap;
     private String replyTo;
     private EvalsLogger logger;
+    private String testMailToAddress;
 
     Map<String, String> logFields = new HashMap<String, String>();
 
@@ -52,7 +53,7 @@ public class Mailer {
      */
     public Mailer(ResourceBundle resources, String hostName, String from, String linkURL,
                   String helpLinkURL, Map<String, Configuration> map, EvalsLogger logger,
-                  String replyTo) {
+                  String replyTo, String testMailToAddress) {
         this.emailBundle = resources;
         this.from = from;
         this.hostName = hostName;
@@ -61,6 +62,7 @@ public class Mailer {
         configMap = map;
         this.logger = logger;
         this.replyTo = replyTo;
+        this.testMailToAddress = testMailToAddress;
     }
 
     /**
@@ -173,6 +175,11 @@ public class Mailer {
             logLongMessage = "Job for appraisal " + appraisal.getId() + " is null";
             logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
             return null;
+        }
+
+        if(testMailToAddress != null && !testMailToAddress.equals("")){
+           mailToArray[0] = testMailToAddress;
+           return mailToArray;
         }
 
         for (String recipient : mailToArray) {

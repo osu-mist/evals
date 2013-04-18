@@ -304,10 +304,11 @@ public class EvalsPortlet extends GenericPortlet {
         String replyTo = config.getString("mail.replyToAddress");
         String linkUrl = config.getString("mail.linkUrl");
         String helpLinkUrl = config.getString("helpfulLinks.url");
+        String testMailToAddress = config.getString("mail.testMailToAddress");
         Map<String, Configuration> configurationMap = (Map<String, Configuration>)
                 getPortletContext().getAttribute("configurations");
         Mailer mailer = new Mailer(resources, hostname, from, linkUrl,  helpLinkUrl,
-                configurationMap, getLog(), replyTo);
+                configurationMap, getLog(), replyTo, testMailToAddress);
         getPortletContext().setAttribute("mailer", mailer);
     }
 
@@ -353,9 +354,9 @@ public class EvalsPortlet extends GenericPortlet {
         // Load evals.properties
         PropertiesConfiguration config = EvalsUtil.loadEvalsConfig(getPortletContext());
         if (config != null) {
-            infoMsg = " evals.properties - loaded";
+            infoMsg = "properties - loaded";
         } else {
-            infoMsg =  "evals.properties - not found";
+            infoMsg = "properties - not found";
         }
         message += infoMsg + "\n";
 
