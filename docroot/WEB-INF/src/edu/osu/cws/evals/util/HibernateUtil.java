@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.util;
 
+import edu.osu.cws.evals.portlet.Constants;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -24,32 +25,35 @@ public class HibernateUtil {
      */
     public static final String CONFIG_PATH = "docroot/WEB-INF/src/";
 
+    private static Configuration hibernateConfig = null;
 
     /**
-     * Static variable used to keep track of what hibernate config file the java
-     * class should be using. By default it uses the test configuration db.
+     * Method used to set the Hibernate configuration.
+     *
+     * @param   configFileName
+     * @param   hbmPathPrefix
+     * @param   extraConfigFilePath
      */
-    private static String configFileName = TEST_CONFIG;
+    public static void setHibernateConfig(String configFileName, String hbmPathPrefix, String extraConfigFilePath)
+    {
+        String hbmDir = hbmPathPrefix + Constants.getRootDir() + "edu/osu/cws/evals/hbm";
+        hibernateConfig = new Configuration().configure(configFileName);
+        hibernateConfig.addDirectory(new File(hbmDir));
+        hibernateConfig.addProperties(ExtraProperties(extraConfigFilePath));
+    }
 
     /**
      * Method used to create the Hibernate session. This method is private to ensure
      * it is only called once during the initialization of the sessionFactory property.
      *
-     * @return          Hibenate's session
+     * @return  Hibernate's session
      */
     private static SessionFactory buildSessionFactory() {
         try {
-            // Create the SessionFactory from hibernate.cfg.xml
-            Configuration config = new Configuration();
-            config.configure(configFileName);
-
-            File hbms = new File
-                    ("/opt/luminis/products/tomcat/tomcat-portal/webapps/evals/WEB-INF/src/edu/osu/cws/evals/hbm");
-            File extra = new File
-                    ("/opt/luminis/products/tomcat/tomcat-portal/webapps/evals/WEB-INF/src/extra.properties");
-            config.addProperties(ExtraProperties(extra));
-            config.addDirectory(hbms);
-            return config.buildSessionFactory();
+            if (hibernateConfig == null)
+                //this should not be as caller is supposed to call setHibernateConfig first
+                return null;
+            return hibernateConfig.buildSessionFactory();
 
         } catch (Throwable ex) {
             // Make sure you log the exception, as it might be swallowed
@@ -58,7 +62,7 @@ public class HibernateUtil {
         }
     }
 
-    private static Properties ExtraProperties(File filename)
+    private static Properties ExtraProperties(String filename)
     {
         Properties prop = new Properties();
         try {
@@ -88,16 +92,6 @@ public class HibernateUtil {
             System.err.println("Initial getSessionFactory failed." + e);
             throw new ExceptionInInitializerError(e);
         }
-    }
-
-    /**
-     * Use this method to set the name of the hibernate configuration file to load. This
-     * method is called by EvalsPortlet.portletSetup.
-     *
-     * @param configName
-     */
-    public static void setConfig(String configName) {
-        configFileName = configName;
     }
 
     /**
