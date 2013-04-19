@@ -37,9 +37,10 @@ public class HibernateUtil {
     public static void setHibernateConfig(String configFileName, String hbmPathPrefix, String extraConfigFilePath)
     {
         String hbmDir = hbmPathPrefix + Constants.getRootDir() + "edu/osu/cws/evals/hbm";
+        Properties extraProperties = getExtraProperties(extraConfigFilePath);
         hibernateConfig = new Configuration().configure(configFileName);
         hibernateConfig.addDirectory(new File(hbmDir));
-        hibernateConfig.addProperties(ExtraProperties(extraConfigFilePath));
+        hibernateConfig.addProperties(extraProperties);
     }
 
     /**
@@ -62,7 +63,12 @@ public class HibernateUtil {
         }
     }
 
-    private static Properties ExtraProperties(String filename)
+    /**
+     * Method used to get extra properties from a file.
+     *
+     * @param   filename
+     */
+    private static Properties getExtraProperties(String filename)
     {
         Properties prop = new Properties();
         try {
