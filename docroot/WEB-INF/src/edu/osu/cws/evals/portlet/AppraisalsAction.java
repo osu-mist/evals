@@ -391,6 +391,14 @@ public class AppraisalsAction implements ActionInterface {
                         assessmentCriteria.setChecked(false);
                     }
                 }
+
+                // Save the deleted flag if present
+                parameterKey = "appraisal.assessment.deleted." + assessmentID;
+                String[] deletedFlag = requestMap.get(parameterKey);
+                if (deletedFlag != null && deletedFlag[0].equals("1")) {
+                    assessment.setDeleteDate(new Date());
+                    assessment.setDeleterPidm(loggedInUser.getId());
+                }
             }
             if (requestMap.get("submit-goals") != null) {
                 appraisal.setGoalsSubmitDate(new Date());

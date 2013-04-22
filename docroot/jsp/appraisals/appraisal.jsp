@@ -274,7 +274,31 @@
         jQuery('textarea').autogrow();
       </c:if>
       
-      
+
+      // Handle deletion of assessments
+      jQuery(".assessment-delete").click(function() {
+        // Verify that the user wants to delete the assessment
+        var response = confirm('<liferay-ui:message key="appraisal-assessment-delete-confirm"/>');
+        if (response) {
+          var classes = jQuery(this).attr('class').split(/\s+/);
+
+          // Find the id of the assessment we're deleting
+          var deleteFlagSelector = ".appraisal-assessment-deleted-";
+          var assessmentSelector = ".appraisal-assessment-";
+          jQuery.each(classes, function(index, item) {
+            if (item.indexOf("delete.id.") != -1) {
+              var assessmentId = item.replace("delete.id.", "");
+              deleteFlagSelector += assessmentId;
+              assessmentSelector += assessmentId;
+            }
+          });
+
+          jQuery(deleteFlagSelector).val(1); // set the deleted flag
+          jQuery(assessmentSelector).hide('slow'); // hide assessment
+        }
+        return false;
+      });
+
     });
     </script>
     </c:if>
