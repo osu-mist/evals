@@ -375,16 +375,64 @@ public class AppraisalsAction implements ActionInterface {
 
         // Save Goals
         if (permRule.getGoals() != null && permRule.getGoals().equals("e")) {
-            for (Assessment assessment : appraisal.getCurrentGoalVersion().getAssessments()) {
+
+            // The order is important since we'll append at the end the new assessments
+            List<Assessment> assessments = appraisal.getCurrentGoalVersion().getSortedAssessments();
+            int oldAssessmentTotal = assessments.size();
+
+            // begin adding new goals!!!
+            Integer numberOfAssessmentsAdded = 0;
+            if (requestMap.get("assessmentCount") != null) {
+                Integer newAssessmentTotal = Integer.parseInt(requestMap.get("assessmentCount")[0]);
+                numberOfAssessmentsAdded = newAssessmentTotal - oldAssessmentTotal;
+            }
+
+            if (numberOfAssessmentsAdded > 0) {
+                for (int newId = 1; newId <= numberOfAssessmentsAdded; newId++) {
+                    int sequence = newId + oldAssessmentTotal;
+                    // check that newly added assignments were not removed afterwards
+                    parameterKey = "appraisal.assessment.deleted." + sequence;
+                    String[] deletedFlag = requestMap.get(parameterKey);
+                    if (deletedFlag != null && deletedFlag[0].equals("0")) {
+
+                        List<CriterionArea> criterionAreas = new ArrayList<CriterionArea>();
+                        for (AssessmentCriteria assessmentCriteria : assessments.iterator().next().getAssessmentCriteria()) {
+                            criterionAreas.add(assessmentCriteria.getCriteriaArea());
+                        }
+                        Assessment assessment = AppraisalMgr.createNewAssessment(appraisal.getCurrentGoalVersion(), sequence, criterionAreas);
+                        assessments.add(assessment);
+                    }
+                }
+            }
+            // end adding new goals
+
+            int i = 0;
+
+            Collections.sort(assessments);
+            for (Assessment assessment : assessments) {
                 String assessmentID = Integer.toString(assessment.getId());
+
+                // catch any newly added assignments, where the assessmentId is different.
+                i++;
+                if (i > oldAssessmentTotal) {
+                    // For newly added assessments, sequence matches the id in the html form
+                    assessmentID = ((Integer) assessment.getSequence()).toString();
+                }
                 parameterKey = "appraisal.goal." + assessmentID;
                 if (requestMap.get(parameterKey) != null) {
                     assessment.setGoal(requestMap.get(parameterKey)[0]);
                 }
 
                 // Save the assessment criteria for each assessment.
+                int j = 0; // used to calculate id of newly added assessment criteria
                 for (AssessmentCriteria assessmentCriteria : assessment.getAssessmentCriteria()) {
-                    parameterKey = "appraisal.assessmentCriteria." + assessmentCriteria.getId();
+                    j++;
+                    int suffix = assessmentCriteria.getId();
+                    if (i > oldAssessmentTotal) {
+                        // For newly added assessments, sequence matches the id in the html form
+                        suffix = assessment.getSequence() * j;
+                    }
+                    parameterKey = "appraisal.assessmentCriteria." + suffix;
                     if (requestMap.get(parameterKey) != null) {
                         assessmentCriteria.setChecked(true);
                     } else {
@@ -406,15 +454,6 @@ public class AppraisalsAction implements ActionInterface {
             if (requestMap.get("approve-goals") != null) {
                 appraisal.setGoalApprovedDate(new Date());
                 appraisal.setGoalsApprover(loggedInUser);
-            }
-        }
-        // Save newGoals
-        if (permRule.getNewGoals() != null && permRule.getNewGoals().equals("e")) {
-            for (Assessment assessment : appraisal.getCurrentGoalVersion().getAssessments()) {
-                String assessmentID = Integer.toString(assessment.getId());
-                parameterKey = "appraisal.newGoal." + assessmentID;
-                //@todo: can this be removed? do the perm rules need to be updated?
-//                assessment.setNewGoals(requestMap.get(parameterKey)[0]);
             }
         }
         // Save goalComments

@@ -85,6 +85,8 @@
         </portlet:actionURL>" method="post" name="<portlet:namespace />request_form">
 
         <input type="hidden" name="id" value="${appraisal.id}"/>
+        <input type="hidden" id="assessmentCount" name="assessmentCount"
+               value="<%= appraisal.getCurrentGoalVersion().getAssessments().size()%>"/>
     </c:if>
 
     <div class="appraisal-criteria">
@@ -208,6 +210,12 @@
         value="<liferay-ui:message key="${permissionRule.submit}" />">
         </c:if>
 
+        <c:if test="${permissionRule.goals == 'e'}">
+        <input name="addAssessment"
+               type="submit" id="addAssessment"
+        value="<liferay-ui:message key="appraisal-assessment-add"/>">
+        </c:if>
+
         <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}">
         </form>
     </div><!-- end pass-actions-->
@@ -273,7 +281,9 @@
       <c:if test="${appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_DUE%>' && appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_OVERDUE%>' ||  not empty appraisal.rebuttal}">
         jQuery('textarea').autogrow();
       </c:if>
-      
+
+        // @todo: need to think about accessibility of delete/add assessments.
+        // @todo: need to be able to delete newly added assessments
 
       // Handle deletion of assessments
       jQuery(".assessment-delete").click(function() {
@@ -298,6 +308,74 @@
         }
         return false;
       });
+
+      // Handle add assessments
+      jQuery(".osu-cws #addAssessment").click(function() {
+        // clone first assessment as a model
+        var newAssessment = jQuery(jQuery('.appraisal-criteria fieldset')[0]).clone(true);
+        var assessmentCount = jQuery('.appraisal-criteria fieldset').size() + 1;
+
+        // legend, fieldset class and h3 for accessibility
+        newAssessment.attr('class', 'appraisal-assessment-' + assessmentCount);
+        var legendHtml = newAssessment.find('legend').html();
+        legendHtml = legendHtml.replace('#1', '#' + assessmentCount);
+
+        newAssessment.find('legend').html(legendHtml);
+        newAssessment.find('h3.secret').html('<liferay-ui:message key="appraisal-assessment-header"/>' + assessmentCount);
+
+        // Update remove link @todo: the jquery handler neds to be added
+        var removeLinkClass = newAssessment.find('legend a').attr('class');
+        removeLinkClass = removeLinkClass.replace(/\.\d+/, '') + "." + assessmentCount;
+        newAssessment.find('legend a').attr('class', removeLinkClass);
+
+        // delete flag hidden input
+        var deleteFlagInput = jQuery(newAssessment.find(':input:hidden')[0]);
+        var deleteFlagClass = deleteFlagInput.attr('class').replace(/\d+/, '');
+        deleteFlagClass += assessmentCount;
+        deleteFlagInput.attr('class', deleteFlagClass);
+        var deleteFlagName = deleteFlagInput.attr('name').replace(/\.\d+/, '');
+        deleteFlagName += "." + assessmentCount;
+        deleteFlagInput.attr('name', deleteFlagName);
+        deleteFlagInput.val(0);
+
+        var goalLabelFor = jQuery(newAssessment.find('label')[0]).attr('for').replace(/\.\d+/, '');
+        goalLabelFor += "." + assessmentCount;
+        jQuery(newAssessment.find('label')[0]).attr('for', goalLabelFor);
+        var goalTextAreaId = newAssessment.find('textarea').attr('id').replace(/\.\d+/, '');
+        goalTextAreaId += "." + assessmentCount;
+        newAssessment.find('textarea').attr('id', goalTextAreaId); 
+        newAssessment.find('textarea').attr('name', goalTextAreaId);
+        newAssessment.find('textarea').attr('class', ''); // clear any class inputs
+
+        // assessment criterias checkboxes
+        jQuery.each(newAssessment.find(':checkbox'), function(index, element) {
+            // The AssessmentCriteria checkboxes have suffixes. In order to make them unique ids in
+            // in the form, we're using multiples of assmentCount starting with assessmentCount
+            var checkBoxName = jQuery(element).attr('name').replace(/\.\d+/, '');
+            checkBoxName += "." + (assessmentCount * (index + 1));
+            jQuery(element).attr('name', checkBoxName);
+            jQuery(element).attr('id', checkBoxName);
+            jQuery(element).removeAttr('checked');
+        });
+
+        // assessment criterias labels
+        jQuery.each(newAssessment.find('label'), function(index, element) {
+            var checkBoxName = jQuery(element).attr('for').replace(/\.\d+/, '');
+            checkBoxName += "." + (assessmentCount * index);
+            // The first label is the Goals label, the rest should be assessment criterias
+            if (index != 0) {
+              jQuery(element).attr('for', checkBoxName);
+            }
+        });
+
+        newAssessment.appendTo('.appraisal-criteria');
+        jQuery('.appraisal-assessment-' + assessmentCount + ' textarea').val(''); // clearing this before appending it didn't work
+
+        jQuery('#assessmentCount').val(assessmentCount);
+
+        return false;
+      })
+
 
     });
     </script>

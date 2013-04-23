@@ -1,7 +1,6 @@
 package edu.osu.cws.evals.hibernate;
 
 import edu.osu.cws.evals.models.*;
-import edu.osu.cws.evals.portlet.ActionHelper;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.EvalsUtil;
@@ -9,20 +8,12 @@ import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.StandardBasicTypes;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1150,5 +1141,38 @@ public class AppraisalMgr {
         }
 
         return false;
+    }
+
+    /**
+     * Takes care of creating a new Assessment object with the assessment criterias and sets up
+     * the goal version association.
+     *
+     * @param goalVersion
+     * @param sequence
+     * @param criterionAreas
+     * @return
+     */
+    public static Assessment createNewAssessment(GoalVersion goalVersion, int sequence,
+                                     List<CriterionArea> criterionAreas) {
+        Session session = HibernateUtil.getCurrentSession();
+        Assessment assessment = new Assessment();
+        assessment.setAppraisal(goalVersion.getAppraisal());
+        assessment.setGoalVersion(goalVersion);
+        assessment.setCreateDate(new Date());
+        assessment.setModifiedDate(new Date());
+        assessment.setSequence(sequence);
+        session.save(assessment);
+
+        Set<AssessmentCriteria> assessmentCriterias = new HashSet<AssessmentCriteria>();
+        for (CriterionArea criterionArea : criterionAreas) {
+            AssessmentCriteria assessmentCriteria = new AssessmentCriteria();
+            assessmentCriteria.setAssessment(assessment);
+            assessmentCriteria.setCriteriaArea(criterionArea);
+            session.save(assessmentCriteria);
+            assessmentCriterias.add(assessmentCriteria);
+        }
+        assessment.setAssessmentCriteria(assessmentCriterias);
+
+        return assessment;
     }
 }
