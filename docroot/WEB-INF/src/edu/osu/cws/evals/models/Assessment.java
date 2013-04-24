@@ -20,6 +20,12 @@ public class Assessment extends Evals implements Comparable<Assessment> {
 
     private GoalVersion goalVersion;
 
+    /**
+     * The sequence represents the order in which the objects are displayed in the evaluation form.
+     * The sequence numbers should be unique for all assessments that belong to a single goal version.
+     * In other words, some sequence #s will correspond to deleted assessments that are not displayed
+     * to the user.
+     */
     private int sequence;
 
     private Integer deleterPidm;

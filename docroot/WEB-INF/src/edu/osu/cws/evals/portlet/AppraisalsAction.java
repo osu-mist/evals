@@ -379,6 +379,8 @@ public class AppraisalsAction implements ActionInterface {
             // The order is important since we'll append at the end the new assessments
             List<Assessment> assessments = appraisal.getCurrentGoalVersion().getSortedAssessments();
             int oldAssessmentTotal = assessments.size();
+            // map used to get the form indexed based on the assessment sequence
+            Map<Integer, String> sequenceToFormIndex = new HashMap<Integer, String>();
 
             // begin adding new goals!!!
             Integer numberOfAssessmentsAdded = 0;
@@ -388,15 +390,21 @@ public class AppraisalsAction implements ActionInterface {
             }
 
             if (numberOfAssessmentsAdded > 0) {
+                // get the sequence of the last assessment in the goal version
+                // we'll increment this sequence as we add each new assessment
+                Integer sequence = Integer.parseInt(requestMap.get("assessmentSequence")[0]);
+
                 for (int newId = 1; newId <= numberOfAssessmentsAdded; newId++) {
-                    int sequence = newId + oldAssessmentTotal;
+                    Integer formIndex = newId + oldAssessmentTotal;
                     // check that newly added assignments were not removed afterwards
-                    parameterKey = "appraisal.assessment.deleted." + sequence;
+                    parameterKey = "appraisal.assessment.deleted." + formIndex;
                     String[] deletedFlag = requestMap.get(parameterKey);
                     if (deletedFlag != null && deletedFlag[0].equals("0")) {
+                        sequence++; // only increase sequence when we add an assessment
+                        sequenceToFormIndex.put(sequence, formIndex.toString());
 
                         List<CriterionArea> criterionAreas = new ArrayList<CriterionArea>();
-                        for (AssessmentCriteria assessmentCriteria : assessments.iterator().next().getAssessmentCriteria()) {
+                        for (AssessmentCriteria assessmentCriteria : assessments.iterator().next().getSortedAssessmentCriteria()) {
                             criterionAreas.add(assessmentCriteria.getCriteriaArea());
                         }
                         Assessment assessment = AppraisalMgr.createNewAssessment(appraisal.getCurrentGoalVersion(), sequence, criterionAreas);
@@ -414,9 +422,10 @@ public class AppraisalsAction implements ActionInterface {
 
                 // catch any newly added assignments, where the assessmentId is different.
                 i++;
+                String formIndex = sequenceToFormIndex.get(assessment.getSequence());
                 if (i > oldAssessmentTotal) {
-                    // For newly added assessments, sequence matches the id in the html form
-                    assessmentID = ((Integer) assessment.getSequence()).toString();
+                    // For newly added assessments, the formIndex is used instead of assessment id
+                    assessmentID = formIndex;
                 }
                 parameterKey = "appraisal.goal." + assessmentID;
                 if (requestMap.get(parameterKey) != null) {
@@ -425,12 +434,13 @@ public class AppraisalsAction implements ActionInterface {
 
                 // Save the assessment criteria for each assessment.
                 int j = 0; // used to calculate id of newly added assessment criteria
-                for (AssessmentCriteria assessmentCriteria : assessment.getAssessmentCriteria()) {
+                for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
                     j++;
                     int suffix = assessmentCriteria.getId();
                     if (i > oldAssessmentTotal) {
-                        // For newly added assessments, sequence matches the id in the html form
-                        suffix = assessment.getSequence() * j;
+                        // For newly added assessments, the formIndex is used as the base for
+                        // assessment criteria ids.
+                        suffix = Integer.parseInt(formIndex) * j;
                     }
                     parameterKey = "appraisal.assessmentCriteria." + suffix;
                     if (requestMap.get(parameterKey) != null) {

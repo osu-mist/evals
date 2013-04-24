@@ -86,7 +86,9 @@
 
         <input type="hidden" name="id" value="${appraisal.id}"/>
         <input type="hidden" id="assessmentCount" name="assessmentCount"
-               value="<%= appraisal.getCurrentGoalVersion().getAssessments().size()%>"/>
+               value="<%= appraisal.getCurrentGoalVersion().getSortedAssessments().size()%>"/>
+        <input type="hidden" id="assessmentSequence" name="assessmentSequence"
+               value="${appraisal.currentGoalVersion.lastSequence}"/>
     </c:if>
 
     <div class="appraisal-criteria">
@@ -286,7 +288,7 @@
         // @todo: need to be able to delete newly added assessments
 
       // Handle deletion of assessments
-      jQuery(".assessment-delete").click(function() {
+      function assessmentDelete() {
         // Verify that the user wants to delete the assessment
         var response = confirm('<liferay-ui:message key="appraisal-assessment-delete-confirm"/>');
         if (response) {
@@ -307,19 +309,22 @@
           jQuery(assessmentSelector).hide('slow'); // hide assessment
         }
         return false;
+      }
+
+      jQuery(".assessment-delete").click(function() {
+        return assessmentDelete.call(this);
       });
 
       // Handle add assessments
       jQuery(".osu-cws #addAssessment").click(function() {
         // clone first assessment as a model
-        var newAssessment = jQuery(jQuery('.appraisal-criteria fieldset')[0]).clone(true);
+        var newAssessment = jQuery('.appraisal-criteria fieldset:last-child').clone(true);
         var assessmentCount = jQuery('.appraisal-criteria fieldset').size() + 1;
 
         // legend, fieldset class and h3 for accessibility
         newAssessment.attr('class', 'appraisal-assessment-' + assessmentCount);
         var legendHtml = newAssessment.find('legend').html();
-        legendHtml = legendHtml.replace('#1', '#' + assessmentCount);
-
+        legendHtml = legendHtml.replace(/#\d+/, '#' + assessmentCount);
         newAssessment.find('legend').html(legendHtml);
         newAssessment.find('h3.secret').html('<liferay-ui:message key="appraisal-assessment-header"/>' + assessmentCount);
 
@@ -338,12 +343,13 @@
         deleteFlagInput.attr('name', deleteFlagName);
         deleteFlagInput.val(0);
 
-        var goalLabelFor = jQuery(newAssessment.find('label')[0]).attr('for').replace(/\.\d+/, '');
+        // goal label + textarea
+        var goalLabelFor = newAssessment.find('label:first').attr('for').replace(/\.\d+/, '');
         goalLabelFor += "." + assessmentCount;
         jQuery(newAssessment.find('label')[0]).attr('for', goalLabelFor);
         var goalTextAreaId = newAssessment.find('textarea').attr('id').replace(/\.\d+/, '');
         goalTextAreaId += "." + assessmentCount;
-        newAssessment.find('textarea').attr('id', goalTextAreaId); 
+        newAssessment.find('textarea').attr('id', goalTextAreaId);
         newAssessment.find('textarea').attr('name', goalTextAreaId);
         newAssessment.find('textarea').attr('class', ''); // clear any class inputs
 
@@ -372,10 +378,12 @@
         jQuery('.appraisal-assessment-' + assessmentCount + ' textarea').val(''); // clearing this before appending it didn't work
 
         jQuery('#assessmentCount').val(assessmentCount);
+        jQuery('.appraisal-assessment-' + assessmentCount + ' a.assessment-delete').click(function() {
+          return assessmentDelete.call(this);
+        });
 
         return false;
       })
-
 
     });
     </script>
