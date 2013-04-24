@@ -6,8 +6,6 @@ public class Assessment extends Evals implements Comparable<Assessment> {
 
     private int id;
 
-    private Appraisal appraisal;
-
     private String goal;
 
     private String employeeResult;
@@ -70,14 +68,6 @@ public class Assessment extends Evals implements Comparable<Assessment> {
 
     public void setSequence(int sequence) {
         this.sequence = sequence;
-    }
-
-    public Appraisal getAppraisal() {
-        return appraisal;
-    }
-
-    public void setAppraisal(Appraisal appraisal) {
-        this.appraisal = appraisal;
     }
 
     public String getGoal() {

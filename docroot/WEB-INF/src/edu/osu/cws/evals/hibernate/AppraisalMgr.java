@@ -1156,7 +1156,6 @@ public class AppraisalMgr {
                                      List<CriterionArea> criterionAreas) {
         Session session = HibernateUtil.getCurrentSession();
         Assessment assessment = new Assessment();
-        assessment.setAppraisal(goalVersion.getAppraisal());
         assessment.setGoalVersion(goalVersion);
         assessment.setCreateDate(new Date());
         assessment.setModifiedDate(new Date());
