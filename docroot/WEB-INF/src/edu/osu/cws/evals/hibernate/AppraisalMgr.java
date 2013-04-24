@@ -95,7 +95,7 @@ public class AppraisalMgr {
                 //@todo
                 //detail = criterion.getCurrentDetail();
                 assessment = new Assessment();
-                assessment.setAppraisal(appraisal);
+//                assessment.setAppraisal(appraisal);
                 //@todo
                 // assessment.setCriterionDetail(detail);
                 assessment.setCreateDate(new Date());
@@ -178,7 +178,7 @@ public class AppraisalMgr {
                 //@todo
                 //newAssessment.setCriterionDetail(origAssesment.getCriterionDetail());
                 newAssessment.setGoal(origAssesment.getGoal());
-                newAssessment.setAppraisal(appraisal);
+//                newAssessment.setAppraisal(appraisal);
                 newAssessment.setCreateDate(new Date());
                 newAssessment.setEmployeeResult(origAssesment.getEmployeeResult());
                 newAssessment.setSupervisorResult(origAssesment.getSupervisorResult());

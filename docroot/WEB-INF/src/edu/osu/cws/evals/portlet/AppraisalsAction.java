@@ -375,80 +375,33 @@ public class AppraisalsAction implements ActionInterface {
 
         // Save Goals
         if (permRule.getGoals() != null && permRule.getGoals().equals("e")) {
-
             // The order is important since we'll append at the end the new assessments
             List<Assessment> assessments = appraisal.getCurrentGoalVersion().getSortedAssessments();
             int oldAssessmentTotal = assessments.size();
-            // map used to get the form indexed based on the assessment sequence
-            Map<Integer, String> sequenceToFormIndex = new HashMap<Integer, String>();
+            Map<Integer, String> sequenceToFormIndex = jsAddNewAssessments(requestMap, assessments,
+                    oldAssessmentTotal);
 
-            // begin adding new goals!!!
-            Integer numberOfAssessmentsAdded = 0;
-            if (requestMap.get("assessmentCount") != null) {
-                Integer newAssessmentTotal = Integer.parseInt(requestMap.get("assessmentCount")[0]);
-                numberOfAssessmentsAdded = newAssessmentTotal - oldAssessmentTotal;
-            }
 
-            if (numberOfAssessmentsAdded > 0) {
-                // get the sequence of the last assessment in the goal version
-                // we'll increment this sequence as we add each new assessment
-                Integer sequence = Integer.parseInt(requestMap.get("assessmentSequence")[0]);
-
-                for (int newId = 1; newId <= numberOfAssessmentsAdded; newId++) {
-                    Integer formIndex = newId + oldAssessmentTotal;
-                    // check that newly added assignments were not removed afterwards
-                    parameterKey = "appraisal.assessment.deleted." + formIndex;
-                    String[] deletedFlag = requestMap.get(parameterKey);
-                    if (deletedFlag != null && deletedFlag[0].equals("0")) {
-                        sequence++; // only increase sequence when we add an assessment
-                        sequenceToFormIndex.put(sequence, formIndex.toString());
-
-                        List<CriterionArea> criterionAreas = new ArrayList<CriterionArea>();
-                        for (AssessmentCriteria assessmentCriteria : assessments.iterator().next().getSortedAssessmentCriteria()) {
-                            criterionAreas.add(assessmentCriteria.getCriteriaArea());
-                        }
-                        Assessment assessment = AppraisalMgr.createNewAssessment(appraisal.getCurrentGoalVersion(), sequence, criterionAreas);
-                        assessments.add(assessment);
-                    }
-                }
-            }
-            // end adding new goals
-
-            int i = 0;
-
+            int assessmentFormIndex = 0;
             Collections.sort(assessments);
             for (Assessment assessment : assessments) {
                 String assessmentID = Integer.toString(assessment.getId());
 
                 // catch any newly added assignments, where the assessmentId is different.
-                i++;
+                assessmentFormIndex++;
                 String formIndex = sequenceToFormIndex.get(assessment.getSequence());
-                if (i > oldAssessmentTotal) {
+                if (assessmentFormIndex > oldAssessmentTotal) {
                     // For newly added assessments, the formIndex is used instead of assessment id
+                    // formIndex is used since one of the newly added assessments could have been
+                    // deleted before the form was submitted.
                     assessmentID = formIndex;
                 }
                 parameterKey = "appraisal.goal." + assessmentID;
                 if (requestMap.get(parameterKey) != null) {
                     assessment.setGoal(requestMap.get(parameterKey)[0]);
                 }
+                updateAssessmentCriteria(requestMap, oldAssessmentTotal, assessmentFormIndex, assessment, formIndex);
 
-                // Save the assessment criteria for each assessment.
-                int j = 0; // used to calculate id of newly added assessment criteria
-                for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
-                    j++;
-                    int suffix = assessmentCriteria.getId();
-                    if (i > oldAssessmentTotal) {
-                        // For newly added assessments, the formIndex is used as the base for
-                        // assessment criteria ids.
-                        suffix = Integer.parseInt(formIndex) * j;
-                    }
-                    parameterKey = "appraisal.assessmentCriteria." + suffix;
-                    if (requestMap.get(parameterKey) != null) {
-                        assessmentCriteria.setChecked(true);
-                    } else {
-                        assessmentCriteria.setChecked(false);
-                    }
-                }
 
                 // Save the deleted flag if present
                 parameterKey = "appraisal.assessment.deleted." + assessmentID;
@@ -565,6 +518,84 @@ public class AppraisalsAction implements ActionInterface {
         if (appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
             appraisal.setGoalsRequiredModificationDate(new Date());
         }
+    }
+
+    /**
+     * Handles updating the
+     *
+     * @param requestMap
+     * @param oldAssessmentTotal
+     * @param assessmentFormIndex
+     * @param assessment
+     * @param formIndex
+     */
+    private void updateAssessmentCriteria(Map<String, String[]> requestMap, int oldAssessmentTotal,
+                                          int assessmentFormIndex, Assessment assessment, String formIndex) {
+        String parameterKey;// Save the assessment criteria for each assessment.
+        int assessmentCriteriaFormIndex = 0; // used to calculate id of newly added assessment criteria
+        for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
+            assessmentCriteriaFormIndex++;
+            int suffix = assessmentCriteria.getId();
+            if (assessmentFormIndex > oldAssessmentTotal) {
+                // For newly added assessments, the formIndex is used as the base for
+                // assessment criteria ids.
+                suffix = Integer.parseInt(formIndex) * assessmentCriteriaFormIndex;
+            }
+            parameterKey = "appraisal.assessmentCriteria." + suffix;
+            if (requestMap.get(parameterKey) != null) {
+                assessmentCriteria.setChecked(true);
+            } else {
+                assessmentCriteria.setChecked(false);
+            }
+        }
+    }
+
+    /**
+     * Handles adding new assessments that were added to an appraisal via JS. The new assessment
+     * objects are saved along with their sequence, creator pidm and date.
+     *
+     * @param requestMap
+     * @param assessments               List of original non-deleted assessments
+     * @param oldAssessmentTotal        The # of assessments before we started added more via js
+     * @return
+     */
+    private Map<Integer, String> jsAddNewAssessments(Map<String, String[]> requestMap,
+                                                     List<Assessment> assessments, int oldAssessmentTotal) {
+        String parameterKey;// map used to get the form indexed based on the assessment sequence
+        Map<Integer, String> sequenceToFormIndex = new HashMap<Integer, String>();
+
+        // begin adding new goals!!!
+        Integer numberOfAssessmentsAdded = 0;
+        if (requestMap.get("assessmentCount") != null) {
+            Integer newAssessmentTotal = Integer.parseInt(requestMap.get("assessmentCount")[0]);
+            numberOfAssessmentsAdded = newAssessmentTotal - oldAssessmentTotal;
+        }
+
+        if (numberOfAssessmentsAdded > 0) {
+            // get the sequence of the last assessment in the goal version
+            // we'll increment this sequence as we add each new assessment
+            Integer sequence = Integer.parseInt(requestMap.get("assessmentSequence")[0]);
+
+            for (int newId = 1; newId <= numberOfAssessmentsAdded; newId++) {
+                Integer formIndex = newId + oldAssessmentTotal;
+                // check that newly added assignments were not removed afterwards
+                parameterKey = "appraisal.assessment.deleted." + formIndex;
+                String[] deletedFlag = requestMap.get(parameterKey);
+                if (deletedFlag != null && deletedFlag[0].equals("0")) {
+                    sequence++; // only increase sequence when we add an assessment
+                    sequenceToFormIndex.put(sequence, formIndex.toString());
+
+                    List<CriterionArea> criterionAreas = new ArrayList<CriterionArea>();
+                    for (AssessmentCriteria assessmentCriteria : assessments.iterator().next().getSortedAssessmentCriteria()) {
+                        criterionAreas.add(assessmentCriteria.getCriteriaArea());
+                    }
+                    Assessment assessment = AppraisalMgr.createNewAssessment(appraisal.getCurrentGoalVersion(), sequence, criterionAreas);
+                    assessments.add(assessment);
+                }
+            }
+        }
+        // end adding new goals
+        return sequenceToFormIndex;
     }
 
     /**
