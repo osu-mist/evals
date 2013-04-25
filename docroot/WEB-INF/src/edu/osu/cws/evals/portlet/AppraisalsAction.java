@@ -9,6 +9,7 @@ import edu.osu.cws.evals.hibernate.CloseOutReasonMgr;
 import edu.osu.cws.evals.hibernate.NolijCopyMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsPDF;
+import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.ArrayUtils;
@@ -253,6 +254,10 @@ public class AppraisalsAction implements ActionInterface {
             if (response instanceof ActionResponse) {
                 ((ActionResponse) response).setWindowState(WindowState.MAXIMIZED);
             }
+
+            // remove the object from session so that display picks up new assessment associations
+            HibernateUtil.getCurrentSession().flush();
+            HibernateUtil.getCurrentSession().clear();
             return display(request, response);
         }
 
