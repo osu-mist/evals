@@ -319,6 +319,7 @@
       jQuery(".osu-cws #addAssessment").click(function() {
         // clone first assessment as a model
         var newAssessment = jQuery('.appraisal-criteria fieldset:last-child').clone(true);
+        newAssessment.show(); // last assessment could have been deleted
         var assessmentCount = jQuery('.appraisal-criteria fieldset').size() + 1;
 
         // legend, fieldset class and h3 for accessibility
