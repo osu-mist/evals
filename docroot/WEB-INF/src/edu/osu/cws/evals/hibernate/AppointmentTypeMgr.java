@@ -13,7 +13,7 @@ public class AppointmentTypeMgr {
      *
      * @return
      */
-    public List list() throws Exception {
+    public static List list() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         return session.createQuery("from edu.osu.cws.evals.models.AppointmentType").list();
     }

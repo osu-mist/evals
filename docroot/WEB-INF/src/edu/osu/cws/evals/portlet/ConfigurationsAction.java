@@ -59,8 +59,7 @@ public class ConfigurationsAction implements ActionInterface {
 
         if (id != 0) {
             try {
-                ConfigurationMgr configurationMgr = new ConfigurationMgr();
-                configurationMgr.edit(id, value);
+                ConfigurationMgr.edit(id, value);
                 actionHelper.updateContextTimestamp();
                 actionHelper.setAdminPortletData();
             } catch (Exception e) {

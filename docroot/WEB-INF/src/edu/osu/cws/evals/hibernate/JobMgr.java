@@ -38,7 +38,7 @@ public class JobMgr {
      * @return boolean
      * @throws edu.osu.cws.evals.models.ModelException
      */
-    public boolean isUpperSupervisor(Job job, int pidm) throws ModelException {
+    public static boolean isUpperSupervisor(Job job, int pidm) throws ModelException {
         Job supervisorJob = job.getSupervisor();
 
         // Iterate over the supervising chain. If the supervisor has no employee associated

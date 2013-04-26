@@ -19,7 +19,7 @@ public class PermissionRuleMgr {
      * @return ruleMap
      * @throws Exception
      */
-    public HashMap list() throws Exception {
+    public static HashMap list() throws Exception {
         HashMap ruleMap = new HashMap();
         PermissionRule rule;
         String key;

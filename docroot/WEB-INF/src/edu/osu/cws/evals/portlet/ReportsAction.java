@@ -796,13 +796,12 @@ public class ReportsAction implements ActionInterface {
         // Check supervisor report to see if it's the current user's report or in her
         // supervising chain
         if (supervisorReport) {
-            JobMgr jobMgr = new JobMgr();
 
             if (isMyReport) {
                 return true;
             }
 
-            if (jobMgr.isUpperSupervisor(currentSupervisorJob, employeeID)) {
+            if (JobMgr.isUpperSupervisor(currentSupervisorJob, employeeID)) {
                 return true;
             }
         }
