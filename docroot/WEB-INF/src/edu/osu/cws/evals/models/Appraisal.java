@@ -835,9 +835,6 @@ public class Appraisal extends Evals {
      * @return
      */
     public String getRole() {
-        if (role == null) {
-            role = "";
-        }
         return role;
     }
 

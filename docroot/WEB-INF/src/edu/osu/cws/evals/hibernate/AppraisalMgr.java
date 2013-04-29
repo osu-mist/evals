@@ -41,17 +41,8 @@ public class AppraisalMgr {
     private static final String REPORT_LIST_WHERE = " where status not in ('completed', 'archived', " +
             "'closed') ";
 
-    private Employee loggedInUser;
-
     private Appraisal appraisal = new Appraisal();
-    private CriteriaMgr criteriaMgr = new CriteriaMgr();
-    private JobMgr jobMgr = new JobMgr();
-    private EmployeeMgr employeeMgr = new EmployeeMgr();
-    private HashMap appraisalSteps;
-    private HashMap permissionRules;
-    private HashMap<Integer, Admin> admins = new HashMap<Integer, Admin>();
-    private HashMap<Integer, Reviewer> reviewers = new HashMap<Integer, Reviewer>();
-    private Mailer mailer;
+
     Map<String, Configuration> configurationMap;
 
     /**
@@ -309,24 +300,6 @@ public class AppraisalMgr {
     }
 
     /**
-     * Figures out the current user role in the appraisal and returns the respective permission
-     * rule for that user role and action in the appraisal.
-     *
-     * @param appraisal
-     * @return
-     * @throws Exception
-     */
-    public PermissionRule getAppraisalPermissionRule(Appraisal appraisal) throws Exception {
-        String permissionKey = "";
-        String role = getRole(appraisal, loggedInUser.getId());
-        permissionKey = appraisal.getStatus()+"-"+ role;
-
-        PermissionRule permissionRule = (PermissionRule) permissionRules.get(permissionKey);
-
-        return permissionRule;
-    }
-
-    /**
      * Returns a list of active appraisals for all the jobs that the current pidm holds. If the
      * posno and suffix are provided, the evaluations are specific to the job.
      * The fields that are returned in the appraisal are:
@@ -469,61 +442,6 @@ public class AppraisalMgr {
     }
 
     /**
-     * Returns the role (employee, supervisor, immediate supervisor or reviewer) of the pidm
-     * in the given appraisal. Return empty string if the pidm does not have any role on the
-     * appraisal.
-     *
-     * @param appraisal     appraisal to check role in
-     * @param pidm          pidm of the user to check
-     * @return role
-     * @throws Exception
-     */
-    public String getRole(Appraisal appraisal, int pidm) throws Exception {
-        if (appraisal.getRole() != null && !appraisal.getRole().equals("")) {
-            return appraisal.getRole();
-        }
-
-        Session session = HibernateUtil.getCurrentSession();
-        Job supervisor;
-        if (pidm == appraisal.getJob().getEmployee().getId()) {
-            appraisal.setRole("employee");
-            return appraisal.getRole();
-        }
-
-        supervisor = appraisal.getJob().getSupervisor();
-        if (supervisor != null && pidm == supervisor.getEmployee().getId()) {
-            appraisal.setRole("supervisor");
-            return appraisal.getRole();
-        }
-
-        String query = "from edu.osu.cws.evals.models.Reviewer where " +
-                "businessCenterName = :businessCenterName and employee.id = :pidm " +
-                "and employee.status = 'A'";
-        List reviewerList = session.createQuery(query)
-                .setString("businessCenterName", appraisal.getJob().getBusinessCenterName())
-                .setInteger("pidm", pidm)
-                .list();
-
-        if (reviewerList.size() != 0) {
-            appraisal.setRole("reviewer");
-            return appraisal.getRole();
-        }
-
-        if (jobMgr.isUpperSupervisor(appraisal.getJob(), pidm)) {
-            appraisal.setRole("upper-supervisor");
-            return appraisal.getRole();
-        }
-
-        //@todo: the admin role below needs tests
-        if (admins.containsKey(pidm)) {
-            appraisal.setRole("admin");
-            return appraisal.getRole();
-        }
-
-        return "";
-    }
-
-    /**
      * It returns the appraisal that matches the id.
      * It also adds the currentSupervisor to the appraisal object.
      *
@@ -618,32 +536,8 @@ public class AppraisalMgr {
         return getReviewCountByStatus(bcName, Appraisal.STATUS_REVIEW_OVERDUE);
     }
 
-    public void setLoggedInUser(Employee loggedInUser) {
-        this.loggedInUser = loggedInUser;
-    }
-
-    public void setAppraisalSteps(HashMap appraisalSteps) {
-        this.appraisalSteps = appraisalSteps;
-    }
-
-    public void setPermissionRules(HashMap permissionRules) {
-        this.permissionRules = permissionRules;
-    }
-
-    public void setAdmins(HashMap<Integer, Admin> admins) {
-        this.admins = admins;
-    }
-
-    public void setMailer(Mailer mailer) {
-        this.mailer = mailer;
-    }
-
     public void setConfigurationMap(Map<String, Configuration> configurationMap) {
         this.configurationMap = configurationMap;
-    }
-
-    public void setReviewers(HashMap<Integer, Reviewer> reviewers) {
-        this.reviewers = reviewers;
     }
 
     /**
