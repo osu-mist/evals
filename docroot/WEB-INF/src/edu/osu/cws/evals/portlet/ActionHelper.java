@@ -17,9 +17,11 @@ import java.util.regex.Pattern;
  * ActionHelper class used to map user form actions to respective class methods.
  */
 public class ActionHelper {
+    public static final String ROLE_EMPLOYEE = "employee";
     public static final String ROLE_ADMINISTRATOR = "administrator";
     public static final String ROLE_REVIEWER = "reviewer";
     public static final String ROLE_SUPERVISOR = "supervisor";
+    public static final String ROLE_UPPER_SUPERVISOR = "upper-supervisor";
     public static final String ROLE_SELF = "self";
     public static final String ALL_MY_ACTIVE_APPRAISALS = "allMyActiveAppraisals";
     public static final String MY_TEAMS_ACTIVE_APPRAISALS = "myTeamsActiveAppraisals";
@@ -270,22 +272,10 @@ public class ActionHelper {
      * @param appraisalMgr
      */
     public void setAppraisalMgrParameters(AppraisalMgr appraisalMgr) {
-        HashMap permissionRules = (HashMap) portletContext.getAttribute("permissionRules");
-        HashMap<Integer, Admin> admins = (HashMap<Integer, Admin>) portletContext.getAttribute("admins");
-        HashMap<Integer, Reviewer> reviewers = (HashMap<Integer, Reviewer>) portletContext.getAttribute("reviewers");
-        HashMap appraisalSteps = (HashMap) portletContext.getAttribute("appraisalSteps");
-        Mailer mailer = (Mailer) portletContext.getAttribute("mailer");
         Map<String, Configuration> configurationMap =
                 (Map<String, Configuration>) portletContext.getAttribute("configurations");
 
-        appraisalMgr.setPermissionRules(permissionRules);
-        appraisalMgr.setLoggedInUser(loggedOnUser);
-        appraisalMgr.setAdmins(admins);
-        appraisalMgr.setReviewers(reviewers);
-        appraisalMgr.setAppraisalSteps(appraisalSteps);
-        appraisalMgr.setMailer(mailer);
         appraisalMgr.setConfigurationMap(configurationMap);
-
     }
 
     /**

@@ -6,6 +6,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.CloseOutReasonMgr;
+import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.NolijCopyMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsPDF;
@@ -90,10 +91,67 @@ public class AppraisalsAction implements ActionInterface {
             actionHelper.setAppraisalMgrParameters(appraisalMgr);
             appraisal = appraisalMgr.getAppraisal(appraisalID);
             if(appraisal != null) {
-                permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
-                userRole = appraisal.getRole();
+                userRole = getRole();
+                appraisal.setRole(userRole);
+                setAppraisalPermissionRule();
             }
         }
+    }
+
+    /**
+     * Figures out the current user role in the appraisal and returns the respective permission
+     * rule for that user role and action in the appraisal.
+     *
+     * @throws Exception
+     */
+    private void setAppraisalPermissionRule() throws Exception {
+        HashMap permissionRules =
+                (HashMap) actionHelper.getPortletContext().getAttribute("permissionRules");
+        PermissionRule permissionRule =
+                (PermissionRule) permissionRules.get(appraisal.getStatus() + "-" + userRole);
+
+        permRule = permissionRule;
+    }
+
+    /**
+     * Returns the role (employee, supervisor, immediate supervisor or reviewer) of
+     * the given appraisal.
+     * Return empty string if the pidm does not have any role on the appraisal.
+     *
+     * @return role
+     * @throws Exception
+     */
+    public String getRole() throws Exception {
+        int pidm = loggedInUser.getId();
+
+        if (pidm == appraisal.getJob().getEmployee().getId()) {
+            return ActionHelper.ROLE_EMPLOYEE;
+        }
+
+        Job supervisor = appraisal.getJob().getSupervisor();
+        if (supervisor != null && pidm == supervisor.getEmployee().getId()) {
+            return ActionHelper.ROLE_SUPERVISOR;
+        }
+
+        Reviewer reviewer  = actionHelper.getReviewer();
+        if (reviewer != null)
+        {
+            String bcName  = appraisal.getJob().getBusinessCenterName();
+            if (bcName.equals(reviewer.getBusinessCenterName())) {
+                return ActionHelper.ROLE_REVIEWER;
+            }
+        }
+
+        JobMgr jobMgr = new JobMgr();
+        if (jobMgr.isUpperSupervisor(appraisal.getJob(), pidm)) {
+            return ActionHelper.ROLE_UPPER_SUPERVISOR;
+        }
+
+        if (actionHelper.getAdmin() != null) {
+            return ActionHelper.ROLE_ADMINISTRATOR;
+        }
+
+        return "";
     }
 
     /**
@@ -183,16 +241,16 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         if (isReviewer && appraisal.getEmployeeSignedDate() != null &&
-                !appraisal.getRole().equals("employee")) {
+                !appraisal.getRole().equals(ActionHelper.ROLE_EMPLOYEE)) {
             actionHelper.addToRequestMap("displayResendNolij", true);
         }
         if (isReviewer || isAdmin && appraisal.isOpen()
-                && !userRole.equals("employee")) {
+                && !userRole.equals(ActionHelper.ROLE_EMPLOYEE)) {
             actionHelper.addToRequestMap("displayCloseOutAppraisal", true);
         }
         String status = appraisal.getStatus();
         if ((isAdmin || isReviewer) &&
-                status.equals(Appraisal.STATUS_GOALS_APPROVED) && !userRole.equals("employee")) {
+                status.equals(Appraisal.STATUS_GOALS_APPROVED) && !userRole.equals(ActionHelper.ROLE_EMPLOYEE)) {
             actionHelper.addToRequestMap("displaySetAppraisalStatus", true);
         }
 
@@ -255,9 +313,9 @@ public class AppraisalsAction implements ActionInterface {
                 GeneratePDF(appraisal, nolijDir, env, true);
             }
 
-            if (appraisal.getRole().equals("supervisor")) {
+            if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR)) {
                 actionHelper.setupMyTeamActiveAppraisals();
-            } else if (appraisal.getRole().equals("employee")) {
+            } else if (appraisal.getRole().equals(ActionHelper.ROLE_EMPLOYEE)) {
                 actionHelper.setupMyActiveAppraisals();
             }
         } catch (ModelException e) {
@@ -490,7 +548,7 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         // Save the close out reason
-        if (appraisal.getRole().equals(ActionHelper.ROLE_REVIEWER) || appraisal.getRole().equals("admin")) {
+        if (appraisal.getRole().equals(ActionHelper.ROLE_REVIEWER) || appraisal.getRole().equals(ActionHelper.ROLE_ADMINISTRATOR )) {
             if (requestMap.get("appraisal.closeOutReasonId") != null) {
                 int closeOutReasonId = Integer.parseInt(requestMap.get("appraisal.closeOutReasonId")[0]);
                 CloseOutReason reason = CloseOutReasonMgr.get(closeOutReasonId);
@@ -723,7 +781,8 @@ public class AppraisalsAction implements ActionInterface {
         initialize(request);
 
         // Check to see if the logged in user has permission to access the appraisal
-        boolean isAdminOrReviewer = userRole.equals("admin") || userRole.equals("reviewer");
+        boolean isAdminOrReviewer = userRole.equals(ActionHelper.ROLE_ADMINISTRATOR )
+                || userRole.equals(ActionHelper.ROLE_REVIEWER);
         if (permRule == null || !isAdminOrReviewer) {
             return errorHandler.handleAccessDenied(request, response);
         }
@@ -749,7 +808,7 @@ public class AppraisalsAction implements ActionInterface {
     public String setStatusToResultsDue(PortletRequest request, PortletResponse response) throws Exception {
         initialize(request);
 
-        if (!userRole.equals("admin") && !userRole.equals(ActionHelper.ROLE_REVIEWER)) {
+        if (!userRole.equals(ActionHelper.ROLE_ADMINISTRATOR ) && !userRole.equals(ActionHelper.ROLE_REVIEWER)) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
