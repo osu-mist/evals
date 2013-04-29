@@ -383,7 +383,7 @@ public class AppraisalsAction implements ActionInterface {
             // The order is important since we'll append at the end the new assessments
             List<Assessment> assessments = appraisal.getCurrentGoalVersion().getSortedAssessments();
             int oldAssessmentTotal = assessments.size();
-            Map<Integer, String> sequenceToFormIndex = jsAddNewAssessments(requestMap, assessments,
+            Map<Integer, String> sequenceToFormIndex = addNewAssessments(requestMap, assessments,
                     oldAssessmentTotal);
 
 
@@ -564,8 +564,8 @@ public class AppraisalsAction implements ActionInterface {
      * @param oldAssessmentTotal        The # of assessments before we started added more via js
      * @return
      */
-    private Map<Integer, String> jsAddNewAssessments(Map<String, String[]> requestMap,
-                                                     List<Assessment> assessments, int oldAssessmentTotal) {
+    private Map<Integer, String> addNewAssessments(Map<String, String[]> requestMap,
+                                                   List<Assessment> assessments, int oldAssessmentTotal) {
         String parameterKey;// map used to get the form indexed based on the assessment sequence
         Map<Integer, String> sequenceToFormIndex = new HashMap<Integer, String>();
 

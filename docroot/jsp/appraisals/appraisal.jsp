@@ -285,9 +285,17 @@
       </c:if>
 
         // @todo: need to think about accessibility of delete/add assessments.
-        // @todo: need to be able to delete newly added assessments
 
-      // Handle deletion of assessments
+      /**
+       * Handles deletion of assessments. The html coressponding to the assessments is not removed
+       * from the DOM. Instead the assessment is hidden and the hidden input with class:
+       * appraisal-assessment-deleted-NUM where NUM is the id of the assessment is set to 1 to let the
+       * java code know that this assesment has been deleted. A confirmation js pop-up is displayed to the
+       * user to let them know that they are about to delete an assessment. This method returns false to
+       * prevent the anchor link from being followed since this is just a js action.
+       *
+       * @return {Boolean}
+       */
       function assessmentDelete() {
         // Verify that the user wants to delete the assessment
         var response = confirm('<liferay-ui:message key="appraisal-assessment-delete-confirm"/>');
@@ -315,12 +323,25 @@
         return assessmentDelete.call(this);
       });
 
-      // Handle add assessments
+      /**
+       * Handles adding a new assessment to the DOM. This js method clones the last .appraisal-criteria
+       * fieldset in the form. The logic in this function is to update the various classes, names and ids
+       * of the various html elements in the .appraisal-criteria fieldset. The various labels, inputs,
+       * textareas and checkboxes in an assessment have in the html classes/name/id information about what
+       * assessment the property belongs to. This is so that the java side knows what assessment a goal is
+       * associated to and what assessment the assessment criteria are associated to.
+       *
+       * We chose to use js to clone & add an assessment because we didn't find an easy what for an ajax
+       * serveResource call to return html from the assessment.jsp. The ajax serveResource calls can return
+       * json, but we couldn't figure out how to get the serveResource method to parse a single jsp file.
+       */
       jQuery(".osu-cws #addAssessment").click(function() {
-        // clone first assessment as a model
+        // clone last assessment in the form for modification
         var newAssessment = jQuery('.appraisal-criteria fieldset:last-child').clone(true);
         newAssessment.show(); // last assessment could have been deleted
         var assessmentCount = jQuery('.appraisal-criteria fieldset').size() + 1;
+
+        // The rest of this function takes care of updating ids, names and classes
 
         // legend, fieldset class and h3 for accessibility
         newAssessment.attr('class', 'appraisal-assessment-' + assessmentCount);
@@ -329,7 +350,8 @@
         newAssessment.find('legend').html(legendHtml);
         newAssessment.find('h3.secret').html('<liferay-ui:message key="appraisal-assessment-header"/>' + assessmentCount);
 
-        // Update remove link @todo: the jquery handler neds to be added
+
+        // Delete Assessment Link
         var removeLinkClass = newAssessment.find('legend a').attr('class');
         removeLinkClass = removeLinkClass.replace(/\.\d+/, '') + "." + assessmentCount;
         newAssessment.find('legend a').attr('class', removeLinkClass);
@@ -375,10 +397,13 @@
             }
         });
 
-        newAssessment.appendTo('.appraisal-criteria');
+        newAssessment.appendTo('.appraisal-criteria'); // add new assessment to form
         jQuery('.appraisal-assessment-' + assessmentCount + ' textarea').val(''); // clearing this before appending it didn't work
 
+        // update # of assessment in form
         jQuery('#assessmentCount').val(assessmentCount);
+
+        // set a handler for the delete link in the newly added assessment
         jQuery('.appraisal-assessment-' + assessmentCount + ' a.assessment-delete').click(function() {
           return assessmentDelete.call(this);
         });

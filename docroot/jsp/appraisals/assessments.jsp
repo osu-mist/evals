@@ -1,4 +1,8 @@
 <%
+// This file renders a single assessment in the form with: goals, employee/supervisor results and
+// assessment criteria checkboxes. It loops through the assessment.sortedAssessmentCriteria to
+// include appraisals/assessmentCriteria which is the jsp that generates the checkboxes
+
 Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 %>
 <fieldset class="appraisal-assessment-${assessment.id}">
