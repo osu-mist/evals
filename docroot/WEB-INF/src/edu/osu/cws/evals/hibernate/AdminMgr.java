@@ -4,6 +4,7 @@ import edu.osu.cws.evals.models.Admin;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.ModelException;
 import edu.osu.cws.evals.util.HibernateUtil;
+import org.apache.taglibs.standard.lang.jpath.adapter.StatusIterationContext;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -13,17 +14,16 @@ public class AdminMgr {
 
     /**
      * Uses list() method to grab a list of admins. Then
-     * it creates a map of admins using "pidm"as the key and the
+     * it creates a map of admins using "pidm" as the key and the
      * admin object as the value.
      *
      * @return ruleMap
      */
-    public HashMap<Integer, Admin> mapByEmployeeId() throws Exception {
+    public static HashMap<Integer, Admin> mapByEmployeeId() throws Exception {
         HashMap<Integer, Admin> admins = new HashMap<Integer, Admin>();
-        for (Admin admin : this.list()) {
+        for (Admin admin : AdminMgr.list()) {
             admins.put(admin.getEmployee().getId(),  admin);
         }
-
         return admins;
     }
 
@@ -33,7 +33,7 @@ public class AdminMgr {
      * @throws Exception
      * @return List<Admin>
      */
-    public List<Admin> list() throws Exception {
+    public static List<Admin> list() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         List<Admin> admins = session.createQuery("from edu.osu.cws.evals.models.Admin admin " +
                 "order by admin.isMaster").list();
@@ -48,7 +48,7 @@ public class AdminMgr {
      * @return success
      * @throws Exception
      */
-    public boolean delete(int id) throws Exception {
+    public static boolean delete(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Admin admin = (Admin) session.get(Admin.class, id);
         if (admin == null) {
@@ -64,7 +64,7 @@ public class AdminMgr {
      * @return Admin
      * @throws Exception
      */
-    public Admin get(int id) throws Exception {
+    public static Admin get(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         return (Admin) session.get(Admin.class, id);
     }
@@ -76,7 +76,7 @@ public class AdminMgr {
      * @return Admin
      * @throws Exception
      */
-    public Admin findByOnid(String onid) throws Exception {
+    public static Admin findByOnid(String onid) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         String query = "from edu.osu.cws.evals.models.Admin admin where admin.employee.onid = :onid";
         List<Admin> results = (List<Admin>) session.createQuery(query)
@@ -98,11 +98,9 @@ public class AdminMgr {
      * @return
      * @throws Exception
      */
-    public boolean add(String onid, String isMasterValue, Employee loggedInUser) throws Exception {
-        EmployeeMgr employeeMgr = new EmployeeMgr();
-        Employee employee = employeeMgr.findByOnid(onid, null);
+    public static boolean add(String onid, String isMasterValue, Employee loggedInUser) throws Exception {
+        Employee employee = EmployeeMgr.findByOnid(onid, null);
         boolean isMaster = isMasterValue.equals("1");
-
 
         // Check that the employee object is valid
         if (employee.getStatus() == null || !employee.getStatus().equals("A")) {
@@ -122,7 +120,7 @@ public class AdminMgr {
         admin.setScope("test");
 
         Session session = HibernateUtil.getCurrentSession();
-        add(admin, session);
+        AdminMgr.add(admin, session);
 
         return true;
     }
@@ -134,7 +132,7 @@ public class AdminMgr {
      * @param session
      * @throws Exception
      */
-    private void add(Admin admin, Session session) throws Exception {
+    private static void add(Admin admin, Session session) throws Exception {
         admin.validate();
         session.save(admin);
     }

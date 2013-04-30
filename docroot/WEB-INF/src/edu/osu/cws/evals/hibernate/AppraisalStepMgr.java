@@ -17,7 +17,7 @@ public class AppraisalStepMgr {
      *
      * @return ruleMap
      */
-    public HashMap list() throws Exception {
+    public static HashMap list() throws Exception {
         HashMap stepsMap = new HashMap();
         String key;
         Session session = HibernateUtil.getCurrentSession();

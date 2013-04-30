@@ -16,8 +16,6 @@ import java.util.Map;
 
 public class CriteriaMgr {
 
-    private EmployeeMgr employeeMgr = new EmployeeMgr();
-
     /**
      * The default appointment type to use when displaying criteria information.
      */
@@ -33,9 +31,9 @@ public class CriteriaMgr {
      * @return errors   An array of error messages, but empty array on success.
      * @throws Exception
      */
-    public boolean add(CriterionArea area, CriterionDetail details, Employee creator)
+    public static boolean add(CriterionArea area, CriterionDetail details, Employee creator)
             throws Exception {
-        int sequence = getNextSequence(area.getAppointmentType());
+        int sequence = CriteriaMgr.getNextSequence(area.getAppointmentType());
 
         area.setCreator(creator);
         area.setSequence(sequence);
@@ -69,7 +67,7 @@ public class CriteriaMgr {
      * @return
      * @throws Exception
      */
-    public boolean edit(Map<String, String[]> request, int id, Employee loggedInUser) throws Exception {
+    public static boolean edit(Map<String, String[]> request, int id, Employee loggedInUser) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         CriterionArea newCriterion = new CriterionArea();
         CriterionDetail newDetails = new CriterionDetail();
@@ -82,7 +80,7 @@ public class CriteriaMgr {
             propagateEdit = request.get("propagateEdit")[0] != null;
         }
 
-        criterion = get(id);
+        criterion = CriteriaMgr.get(id);
 
         boolean areaChanged = false;
         boolean descriptionChanged = false;
@@ -104,18 +102,18 @@ public class CriteriaMgr {
 
         if (areaChanged && !descriptionChanged) {
             // copy all the values from the old CriterionArea
-            copyCriterion(loggedInUser, newCriterion, criterion);
+            CriteriaMgr.copyCriterion(loggedInUser, newCriterion, criterion);
             newCriterion.setName(name);
 
             // copy all the values form the old CriterionDetail
-            copyDetails(loggedInUser, newDetails, criterion, criterionDescription);
+            CriteriaMgr.copyDetails(loggedInUser, newDetails, criterion, criterionDescription);
 
             // validate both new area + description
             newCriterion.validate();
             newDetails.validate();
 
             // set old criteria as deleted
-            setCriteriaDeleteProperties(loggedInUser, criterion);
+            CriteriaMgr.setCriteriaDeleteProperties(loggedInUser, criterion);
 
             // save pojos
             session.save(newCriterion);
@@ -124,7 +122,7 @@ public class CriteriaMgr {
             session.save(newDetails);
         } else if (!areaChanged && descriptionChanged) {
             // copy all the values form the old CriterionDetail
-            copyDetails(loggedInUser, newDetails, criterion, description);
+            CriteriaMgr.copyDetails(loggedInUser, newDetails, criterion, description);
 
             // validate both new area + description
             newDetails.validate();
@@ -134,18 +132,18 @@ public class CriteriaMgr {
             session.save(newDetails);
         } else if (areaChanged && descriptionChanged) {
             // copy all the values from the old CriterionArea
-            copyCriterion(loggedInUser, newCriterion, criterion);
+            CriteriaMgr.copyCriterion(loggedInUser, newCriterion, criterion);
             newCriterion.setName(name);
 
             // copy all the values form the old CriterionDetail
-            copyDetails(loggedInUser, newDetails, criterion, description);
+            CriteriaMgr.copyDetails(loggedInUser, newDetails, criterion, description);
 
             // validate both new area + description
             newCriterion.validate();
             newDetails.validate();
 
             // set old criteria as deleted
-            setCriteriaDeleteProperties(loggedInUser, criterion);
+            CriteriaMgr.setCriteriaDeleteProperties(loggedInUser, criterion);
 
             // save pojos
             session.save(newCriterion);
@@ -175,7 +173,7 @@ public class CriteriaMgr {
      * @param loggedInUser
      * @param criterion
      */
-    private void setCriteriaDeleteProperties(Employee loggedInUser, CriterionArea criterion) {
+    private static void setCriteriaDeleteProperties(Employee loggedInUser, CriterionArea criterion) {
         criterion.setDeleteDate(new Date());
         criterion.setDeleter(loggedInUser);
     }
@@ -189,7 +187,7 @@ public class CriteriaMgr {
      * @param criterion
      * @param criterionDescription
      */
-    private void copyDetails(Employee loggedInUser, CriterionDetail newDetails, CriterionArea criterion, String criterionDescription) {
+    private static void copyDetails(Employee loggedInUser, CriterionDetail newDetails, CriterionArea criterion, String criterionDescription) {
         newDetails.setDescription(criterionDescription);
         newDetails.setAreaID(criterion);
         newDetails.setCreateDate(new Date());
@@ -203,7 +201,7 @@ public class CriteriaMgr {
      * @param newCriterion
      * @param criterion
      */
-    private void copyCriterion(Employee loggedInUser, CriterionArea newCriterion, CriterionArea criterion) {
+    private static void copyCriterion(Employee loggedInUser, CriterionArea newCriterion, CriterionArea criterion) {
         newCriterion.setName(criterion.getName());
         newCriterion.setSequence(criterion.getSequence());
         newCriterion.setCreator(loggedInUser);
@@ -219,7 +217,7 @@ public class CriteriaMgr {
      * @return criteria        List of CriterionAreas
      * @throws edu.osu.cws.evals.models.ModelException
      */
-    public List<CriterionArea> list(String appointmentType) throws ModelException, Exception {
+    public static List<CriterionArea> list(String appointmentType) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         List result = session.createQuery("from edu.osu.cws.evals.models.CriterionArea where " +
                 "appointmentType = :appointmentType AND deleteDate IS NULL ORDER BY name")
@@ -237,10 +235,10 @@ public class CriteriaMgr {
      * @throws Exception
      * @return
      */
-    public boolean delete(int id, Employee deleter) throws Exception {
+    public static boolean delete(int id, Employee deleter) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         CriterionArea criterion;
-        criterion = get(id);
+        criterion = CriteriaMgr.get(id);
 
         // check that the criteria is valid
         if (criterion == null || criterion.getDeleteDate() != null) {
@@ -263,7 +261,7 @@ public class CriteriaMgr {
      * @return
      * @throws Exception
      */
-    public boolean updateSequence(int id, int newPosition) throws Exception {
+    public static boolean updateSequence(int id, int newPosition) throws Exception {
         CriterionArea criterion = get(id);
 
         if (criterion == null || criterion.getDeleteDate() != null) {
@@ -305,7 +303,7 @@ public class CriteriaMgr {
      * @param moveCriteriaToSmallerSequence
      * @param session
      */
-    private void updateSequence(int newPosition, int originalPosition, String appointmentType,
+    private static void updateSequence(int newPosition, int originalPosition, String appointmentType,
                                 int lowerBound, int upperBound,
                                 boolean moveCriteriaToSmallerSequence, Session session) {
         String query = "from edu.osu.cws.evals.models.CriterionArea where deleteDate is null " +
@@ -337,7 +335,7 @@ public class CriteriaMgr {
      * @param appointmentType
      * @return
      */
-    public int getNextSequence(String appointmentType) throws Exception {
+    public static int getNextSequence(String appointmentType) throws Exception {
         int availableSequence = 0;
         Session hsession = HibernateUtil.getCurrentSession();
         Query countQry = hsession.createQuery("select count(*) from edu.osu.cws.evals.models.CriterionArea " +
@@ -362,7 +360,7 @@ public class CriteriaMgr {
      * @return
      * @throws Exception
      */
-    public CriterionArea get(int id) throws Exception {
+    public static CriterionArea get(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         return (CriterionArea) session.get(CriterionArea.class, id);
     }

@@ -14,7 +14,7 @@ public class BusinessCenterMgr {
      *
      * @return
      */
-    public List<BusinessCenter> list() throws Exception {
+    public static List<BusinessCenter> list() throws Exception {
         List<BusinessCenter> result;
         Session session = HibernateUtil.getCurrentSession();
         return session.createQuery("from edu.osu.cws.evals.models.BusinessCenter order by name").list();

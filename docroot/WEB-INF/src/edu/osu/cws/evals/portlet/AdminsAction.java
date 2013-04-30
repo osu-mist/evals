@@ -63,10 +63,9 @@ public class AdminsAction implements ActionInterface {
 
         String onid = ParamUtil.getString(request, "onid");
         String isMaster = ParamUtil.getString(request, "isAdmin");
-        AdminMgr adminMgr = new AdminMgr();
 
         try {
-            adminMgr.add(onid,  isMaster, actionHelper.getLoggedOnUser());
+            AdminMgr.add(onid,  isMaster, actionHelper.getLoggedOnUser());
             actionHelper.updateContextTimestamp();
             actionHelper.setAdminPortletData();
             SessionMessages.add(request, "admin-added");
@@ -94,12 +93,12 @@ public class AdminsAction implements ActionInterface {
         }
 
         int id = ParamUtil.getInteger(request, "id");
-        AdminMgr adminMgr = new AdminMgr();
+
         try {
 
             // If the user clicks on the delete link the first time, use confirm page
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
-                Admin admin = adminMgr.get(id);
+                Admin admin = AdminMgr.get(id);
                 if (admin.getEmployee() != null) { // initialize name due to lazy-loading
                     admin.getEmployee().getName();
                 }
@@ -112,7 +111,7 @@ public class AdminsAction implements ActionInterface {
                 return list(request, response);
             }
 
-            adminMgr.delete(id);
+            AdminMgr.delete(id);
             actionHelper.updateContextTimestamp();
             actionHelper.setAdminPortletData();
             SessionMessages.add(request, "admin-deleted");

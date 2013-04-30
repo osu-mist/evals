@@ -46,9 +46,6 @@ public class EvalsPortlet extends GenericPortlet {
      */
 	protected String viewJSP = null;
 
-    private PermissionRuleMgr permissionRuleMgr = new PermissionRuleMgr();
-    private AppraisalStepMgr appraisalStepMgr = new AppraisalStepMgr();
-
     /**
      * Helper Liferay object to store error messages into the server's log file
      */
@@ -260,9 +257,9 @@ public class EvalsPortlet extends GenericPortlet {
                 message += "Created logger object\n";
                 createMailer();
                 message += "Mailer setup successfully\n";
-                getPortletContext().setAttribute("permissionRules", permissionRuleMgr.list());
+                getPortletContext().setAttribute("permissionRules", PermissionRuleMgr.list());
                 message += "Stored Permission Rules in portlet context\n";
-                getPortletContext().setAttribute("appraisalSteps", appraisalStepMgr.list());
+                getPortletContext().setAttribute("appraisalSteps", AppraisalStepMgr.list());
                 message += "Stored Appraisal Steps in portlet context\n";
                 loadResourceBundle();
                 message += "Stored resource bundle Language.properties in portlet context\n";
