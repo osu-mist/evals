@@ -39,8 +39,7 @@ public class ReviewersAction implements ActionInterface {
 
         actionHelper.refreshContextCache();
         ArrayList<Reviewer> reviewersList = (ArrayList<Reviewer>) actionHelper.getPortletContextAttribute("reviewersList");
-        BusinessCenterMgr businessCenterMgr = new BusinessCenterMgr();
-        ArrayList<BusinessCenter> businessCenters = (ArrayList<BusinessCenter>) businessCenterMgr.list();
+        ArrayList<BusinessCenter> businessCenters = (ArrayList<BusinessCenter>) BusinessCenterMgr.list();
 
         actionHelper.addToRequestMap("isMaster", actionHelper.isLoggedInUserMasterAdmin());
         actionHelper.addToRequestMap("reviewersList", reviewersList);
@@ -73,16 +72,14 @@ public class ReviewersAction implements ActionInterface {
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
 
         // Check whether or not the user is already a reviewer user
-        EmployeeMgr employeeMgr = new EmployeeMgr();
-        Employee onidUser = employeeMgr.findByOnid(onid, null);
+        Employee onidUser = EmployeeMgr.findByOnid(onid, null);
         if (isReviewer) {
             actionHelper.addErrorsToRequest(resource.getString("already-reviewer"));
             return list(request, response);
         }
 
         try {
-            ReviewerMgr reviewerMgr = new ReviewerMgr();
-            reviewerMgr.add(onid, businessCenterName);
+            ReviewerMgr.add(onid, businessCenterName);
             actionHelper.updateContextTimestamp();
             actionHelper.setAdminPortletData();
             SessionMessages.add(request, "reviewer-added");
@@ -109,12 +106,11 @@ public class ReviewersAction implements ActionInterface {
         }
 
         int id = ParamUtil.getInteger(request, "id");
-        ReviewerMgr reviewerMgr = new ReviewerMgr();
         try {
 
             // If the user clicks on the delete link the first time, use confirm page
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
-                Reviewer reviewer = reviewerMgr.get(id);
+                Reviewer reviewer = ReviewerMgr.get(id);
                 if (reviewer.getEmployee() != null) {
                     reviewer.getEmployee().getName(); // initialize name due to lazy-loading
                 }
@@ -127,7 +123,7 @@ public class ReviewersAction implements ActionInterface {
                 return list(request, response);
             }
 
-            reviewerMgr.delete(id);
+            ReviewerMgr.delete(id);
             actionHelper.updateContextTimestamp();
             actionHelper.setAdminPortletData();
             SessionMessages.add(request, "reviewer-deleted");

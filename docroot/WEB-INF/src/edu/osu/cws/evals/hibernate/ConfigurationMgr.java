@@ -18,10 +18,10 @@ public class ConfigurationMgr {
      * @return
      * @throws Exception
      */
-    public Map<String, Configuration> mapByName() throws Exception {
+    public static Map<String, Configuration> mapByName() throws Exception {
         HashMap<String, Configuration> configs = new HashMap<String, Configuration>();
         List<Configuration> configsList = new ArrayList<Configuration>();
-        configsList = list();
+        configsList = ConfigurationMgr.list();
         for (Configuration configuration : configsList) {
             configs.put(configuration.getName(), configuration);
         }
@@ -34,14 +34,14 @@ public class ConfigurationMgr {
      * @throws Exception
      * @return
      */
-    public List<Configuration> list() throws Exception {
+    public static List<Configuration> list() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         List<Configuration> result = session.createQuery("from edu.osu.cws.evals.models.Configuration configuration " +
                 "order by configuration.section, configuration.sequence").list();
         return result;
     }
 
-    public boolean edit(int id, String value) throws Exception {
+    public static boolean edit(int id, String value) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Configuration configuration = (Configuration) session.get(Configuration.class, id);
         if (configuration == null) {

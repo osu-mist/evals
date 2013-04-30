@@ -29,14 +29,6 @@ public class ActionHelper {
     private static final String REVIEW_LIST_MAX_RESULTS = "reviewListMaxResults";
     public static final String REQUEST_MAP = "requestMap";
 
-    private EmployeeMgr employeeMgr = new EmployeeMgr();
-
-    private AdminMgr adminMgr = new AdminMgr();
-
-    private ReviewerMgr reviewerMgr = new ReviewerMgr();
-
-    private ConfigurationMgr configurationMgr = new ConfigurationMgr();
-
     private PortletContext portletContext;
 
     private PortletRequest request;
@@ -168,8 +160,8 @@ public class ActionHelper {
      * @throws Exception
      */
     private void setEvalsAdmins() throws Exception {
-        portletContext.setAttribute("admins", adminMgr.mapByEmployeeId());
-        List<Admin> admins = adminMgr.list();
+        portletContext.setAttribute("admins", AdminMgr.mapByEmployeeId());
+        List<Admin> admins = AdminMgr.list();
         // Call getName on the admins object to initialize the employee name
         for (Admin admin : admins) {
             if (admin.getEmployee() != null) {
@@ -187,8 +179,8 @@ public class ActionHelper {
      * @throws Exception
      */
     private void setEvalsReviewers() throws Exception {
-        portletContext.setAttribute("reviewers", reviewerMgr.mapByEmployeeId());
-        List<Reviewer> reviewers = reviewerMgr.list();
+        portletContext.setAttribute("reviewers", ReviewerMgr.mapByEmployeeId());
+        List<Reviewer> reviewers = ReviewerMgr.list();
         // Call getName on the reviewers object to initialize the employee name
         for (Reviewer reviewer : reviewers) {
             if (reviewer.getEmployee() != null) {
@@ -206,8 +198,8 @@ public class ActionHelper {
      * @throws Exception
      */
     private void setEvalsConfiguration() throws Exception {
-        portletContext.setAttribute("configurations", configurationMgr.mapByName());
-        portletContext.setAttribute("configurationsList", configurationMgr.list());
+        portletContext.setAttribute("configurations", ConfigurationMgr.mapByName());
+        portletContext.setAttribute("configurationsList", ConfigurationMgr.list());
     }
 
     /**
@@ -351,7 +343,7 @@ public class ActionHelper {
 
         // if not in session, get it from db
         if (loggedOnUser == null) {
-            loggedOnUser = employeeMgr.findByOnid(getLoggedOnUsername(), "employee-with-jobs");
+            loggedOnUser = EmployeeMgr.findByOnid(getLoggedOnUsername(), "employee-with-jobs");
             loggedOnUser.setLoadJobs(false);
             session.setAttribute("loggedOnUser", loggedOnUser);
             refreshContextCache();

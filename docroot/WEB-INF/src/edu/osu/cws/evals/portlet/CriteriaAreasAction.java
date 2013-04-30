@@ -43,7 +43,7 @@ public class CriteriaAreasAction implements ActionInterface {
                 CriteriaMgr.DEFAULT_APPOINTMENT_TYPE);
 
         try {
-            List<CriterionArea> criterionList = new CriteriaMgr().list(appointmentType);
+            List<CriterionArea> criterionList = CriteriaMgr.list(appointmentType);
             actionHelper.addToRequestMap("criteria", criterionList);
         } catch (ModelException e) {
             actionHelper.addErrorsToRequest(e.getMessage());
@@ -70,11 +70,10 @@ public class CriteriaAreasAction implements ActionInterface {
             return errorHandler.handleAccessDenied(request, response);
         }
 
-        CriteriaMgr criteriaMgrArea = new CriteriaMgr();
         CriterionArea criterionArea = new CriterionArea();
 
         // Fetch list of appointment types to use in add form
-        actionHelper.addToRequestMap("appointmentTypes", new AppointmentTypeMgr().list());
+        actionHelper.addToRequestMap("appointmentTypes", AppointmentTypeMgr.list());
 
         // When the criterionAreaId == null means that the user clicks on the Add Criteria
         // link. Otherwise the form was submitted
@@ -89,7 +88,7 @@ public class CriteriaAreasAction implements ActionInterface {
             criterionArea.setDescription(description);
 
             try {
-                if (criteriaMgrArea.add(criterionArea, loggedOnUser)) {
+                if (CriteriaMgr.add(criterionArea, loggedOnUser)) {
                     SessionMessages.add(request, "criteria-saved");
                     return list(request, response);
                 }
@@ -121,16 +120,15 @@ public class CriteriaAreasAction implements ActionInterface {
             return errorHandler.handleAccessDenied(request, response);
         }
 
-        CriteriaMgr criteriaMgr = new CriteriaMgr();
         CriterionArea criterionArea = new CriterionArea();
 
         try {
             int criterionAreaId = ParamUtil.getInteger(request, "criterionAreaId");
             if (request instanceof RenderRequest) {
-                criterionArea = criteriaMgr.get(criterionAreaId);
+                criterionArea = CriteriaMgr.get(criterionAreaId);
             } else {
                 Employee loggedOnUser = actionHelper.getLoggedOnUser();
-                criteriaMgr.edit(request.getParameterMap(), criterionAreaId, loggedOnUser);
+                CriteriaMgr.edit(request.getParameterMap(), criterionAreaId, loggedOnUser);
                 return list(request, response);
             }
         } catch (ModelException e) {
@@ -162,13 +160,12 @@ public class CriteriaAreasAction implements ActionInterface {
         }
 
         int criteriaID = ParamUtil.getInteger(request, "id");
-        CriteriaMgr criteriaMgrArea = new CriteriaMgr();
         try {
             Employee loggedOnUser = actionHelper.getLoggedOnUser();
 
             // If the user clicks on the delete link the first time, use confirm page
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
-                CriterionArea criterion = criteriaMgrArea.get(criteriaID);
+                CriterionArea criterion = CriteriaMgr.get(criteriaID);
                 actionHelper.addToRequestMap("criterion", criterion);
                 return Constants.JSP_CRITERIA_DELETE;
             }
@@ -177,7 +174,7 @@ public class CriteriaAreasAction implements ActionInterface {
             if (!ParamUtil.getString(request, "cancel").equals("")) {
                 return list(request, response);
             }
-            criteriaMgrArea.delete(criteriaID, loggedOnUser);
+            CriteriaMgr.delete(criteriaID, loggedOnUser);
             SessionMessages.add(request, "criteria-deleted");
         } catch (ModelException e) {
             actionHelper.addErrorsToRequest(e.getMessage());
