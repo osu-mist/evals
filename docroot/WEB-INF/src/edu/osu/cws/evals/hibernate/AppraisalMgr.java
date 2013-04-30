@@ -57,11 +57,13 @@ public class AppraisalMgr {
      */
     public static Appraisal createAppraisal(Job job, DateTime startDate, String type)
             throws Exception {
-        CriteriaMgr criteriaMgr = new CriteriaMgr();
         Appraisal appraisal = new Appraisal();
-        //@todo
-        // CriterionDetail detail;
-        Assessment assessment;
+        GoalVersion goalVersion = new GoalVersion();
+        goalVersion.setAppraisal(appraisal);
+
+        // The first goal version doesn't need to be approved
+        goalVersion.setApprovedDate(new Date());
+        goalVersion.setApproverPidm(job.getEmployee().getId());
 
         if (!type.equals(Appraisal.TYPE_TRIAL) && !type.equals(Appraisal.TYPE_ANNUAL) &&
                 !type.equals(Appraisal.TYPE_INITIAL)) {
@@ -85,22 +87,15 @@ public class AppraisalMgr {
         appraisal.setEndDate(CWSUtil.toDate(endDate));
 
         if (appraisal.validate()) {
-            String appointmentType = job.getAppointmentType();
-            List<CriterionArea> criteriaList = criteriaMgr.list(appointmentType);
             Session session = HibernateUtil.getCurrentSession();
-            session.save(appraisal);///441
+            session.save(appraisal);
+            session.save(goalVersion);
 
-            // Create assessment and associate it to appraisal
-            for (CriterionArea criterion : criteriaList) {
-                //@todo
-                //detail = criterion.getCurrentDetail();
-                assessment = new Assessment();
-                assessment.setAppraisal(appraisal);
-                //@todo
-                // assessment.setCriterionDetail(detail);
-                assessment.setCreateDate(new Date());
-                assessment.setModifiedDate(new Date());
-                session.save(assessment);
+            // Create the assessments & assessment criteria
+            String appointmentType = job.getAppointmentType();
+            List<CriterionArea> criteriaList = CriteriaMgr.list(appointmentType);
+            for (int i = 0; i < Constants.BLANK_ASSESSMENTS_IN_NEW_EVALUATION; i++) {
+                AppraisalMgr.createNewAssessment(goalVersion, i, criteriaList);
             }
         }
 
@@ -1044,5 +1039,37 @@ public class AppraisalMgr {
         }
 
         return false;
+    }
+
+    /**
+     * Takes care of creating a new Assessment object with the assessment criterias and sets up
+     * the goal version association.
+     *
+     * @param goalVersion
+     * @param sequence
+     * @param criterionAreas
+     * @return
+     */
+    public static Assessment createNewAssessment(GoalVersion goalVersion, int sequence,
+                                     List<CriterionArea> criterionAreas) {
+        Session session = HibernateUtil.getCurrentSession();
+        Assessment assessment = new Assessment();
+        assessment.setGoalVersion(goalVersion);
+        assessment.setCreateDate(new Date());
+        assessment.setModifiedDate(new Date());
+        assessment.setSequence(sequence);
+        session.save(assessment);
+
+        Set<AssessmentCriteria> assessmentCriterias = new HashSet<AssessmentCriteria>();
+        for (CriterionArea criterionArea : criterionAreas) {
+            AssessmentCriteria assessmentCriteria = new AssessmentCriteria();
+            assessmentCriteria.setAssessment(assessment);
+            assessmentCriteria.setCriteriaArea(criterionArea);
+            session.save(assessmentCriteria);
+            assessmentCriterias.add(assessmentCriteria);
+        }
+        assessment.setAssessmentCriteria(assessmentCriterias);
+
+        return assessment;
     }
 }

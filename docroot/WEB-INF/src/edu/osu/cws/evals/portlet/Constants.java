@@ -60,6 +60,9 @@ public class Constants {
 
     public static final Integer SEARCH_MAX_RESULTS = 20;
 
+    // The # of blank assessments that are created for a new evaluation
+    public static final Integer BLANK_ASSESSMENTS_IN_NEW_EVALUATION = 5;
+
     public static final long PORTLET_RELOAD_FREQUENCY = 1000 * 60 * 60 * 24; //1 days in ms
 
     public static final String DATE_FORMAT = "MM/dd/yy";
