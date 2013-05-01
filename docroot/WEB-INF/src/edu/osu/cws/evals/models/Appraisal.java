@@ -881,4 +881,24 @@ public class Appraisal extends Evals {
             }
         }
     }
+
+    /**
+     * Returns a new Appraisal pojo with the properties copied over from the trialAppraisal.
+     *
+     * @param trialAppraisal
+     * @return
+     */
+    public static Appraisal copyPropertiesFromTrial(Appraisal trialAppraisal) {
+        Appraisal appraisal = new Appraisal();
+        appraisal.setType(Appraisal.TYPE_ANNUAL);
+        appraisal.setJob(trialAppraisal.getJob());
+        appraisal.setCreateDate(new Date());
+        appraisal.setStartDate(trialAppraisal.getJob().getInitialEvalStartDate().toDate());
+        appraisal.setGoalsSubmitDate(trialAppraisal.getGoalsSubmitDate());
+        appraisal.setGoalsApprover(trialAppraisal.getGoalsApprover());
+        appraisal.setGoalApprovedDate(trialAppraisal.getGoalApprovedDate());
+        appraisal.setRating(0);
+
+        return appraisal;
+    }
 }

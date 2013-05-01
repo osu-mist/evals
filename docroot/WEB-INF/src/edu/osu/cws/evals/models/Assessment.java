@@ -198,4 +198,25 @@ public class Assessment extends Evals implements Comparable<Assessment> {
     public Boolean isDeleted() {
         return deleterPidm != null && deleteDate != null;
     }
+
+    /**
+     * Returns a new Assessment object with the trialAssessment properties set as well as the
+     * goalVersion association setup.
+     *
+     * @param trialAssessment
+     * @param goalVersion
+     * @return
+     */
+    public static Assessment copyPropertiesFromTrial(Assessment trialAssessment,
+                                                     GoalVersion goalVersion) {
+        Assessment newAssessment = new Assessment();
+        newAssessment.setGoal(trialAssessment.getGoal());
+        newAssessment.setCreateDate(new Date());
+        newAssessment.setEmployeeResult(trialAssessment.getEmployeeResult());
+        newAssessment.setSupervisorResult(trialAssessment.getSupervisorResult());
+        newAssessment.setModifiedDate(new Date());
+        newAssessment.setGoalVersion(goalVersion);
+        newAssessment.setSequence(trialAssessment.getSequence());
+        return newAssessment;
+    }
 }

@@ -87,4 +87,23 @@ public class GoalVersion {
 
         return sortedAssessments;
     }
+
+    /**
+     * Copies properties from the trialAppraisal's goalVersion and sets up association with
+     * newAppraisal into a new instance of GoalVersion.
+     *
+     * @param trialAppraisal
+     * @param newAppraisal
+     * @return
+     */
+    public static GoalVersion copyPropertiesFromTrial(Appraisal trialAppraisal,
+                                                      Appraisal newAppraisal) {
+        GoalVersion goalVersion = new GoalVersion();
+        goalVersion.setAppraisal(newAppraisal);
+        goalVersion.setCreateDate(new Date());
+        goalVersion.setApprovedDate(new Date());
+        goalVersion.setApproverPidm(trialAppraisal.getCurrentGoalVersion().getApproverPidm());
+
+        return goalVersion;
+    }
 }

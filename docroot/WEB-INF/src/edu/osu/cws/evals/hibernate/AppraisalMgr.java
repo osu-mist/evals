@@ -139,17 +139,8 @@ public class AppraisalMgr {
      */
     public static Appraisal createInitialAppraisalAfterTrial(Appraisal trialAppraisal,
                                                              Configuration resultsDueConfig) throws Exception {
-        Appraisal appraisal = new Appraisal();
-        appraisal.setType(Appraisal.TYPE_ANNUAL);
-        appraisal.setJob(trialAppraisal.getJob());
-        appraisal.setCreateDate(new Date());
-        Date initialEvalStartDate = appraisal.getJob().getInitialEvalStartDate().toDate();
-        appraisal.setStartDate(initialEvalStartDate);
-        appraisal.setGoalsSubmitDate(trialAppraisal.getGoalsSubmitDate());
-        appraisal.setGoalsApprover(trialAppraisal.getGoalsApprover());
-        appraisal.setGoalApprovedDate(trialAppraisal.getGoalApprovedDate());
-        appraisal.setRating(0);
-
+        // copy appraisal & properties
+        Appraisal appraisal = Appraisal.copyPropertiesFromTrial(trialAppraisal);
         DateTime startDate = new DateTime(appraisal.getStartDate());
         DateTime endDate = appraisal.getJob().getEndEvalDate(startDate, Appraisal.TYPE_INITIAL);
         appraisal.setEndDate(CWSUtil.toDate(endDate));
@@ -163,22 +154,27 @@ public class AppraisalMgr {
             appraisal.setStatus(Appraisal.STATUS_GOALS_APPROVED);
         }
 
+        // copy over goal version
+        GoalVersion goalVersion = GoalVersion.copyPropertiesFromTrial(trialAppraisal, appraisal);
+
         if (appraisal.validate()) {
             Session session = HibernateUtil.getCurrentSession();
             session.save(appraisal);
+            session.save(goalVersion);
 
-            Assessment newAssessment;
-            for (Assessment origAssesment: trialAppraisal.getCurrentGoalVersion().getAssessments()) {
-                newAssessment = new Assessment();
-                //@todo
-                //newAssessment.setCriterionDetail(origAssesment.getCriterionDetail());
-                newAssessment.setGoal(origAssesment.getGoal());
-                newAssessment.setAppraisal(appraisal);
-                newAssessment.setCreateDate(new Date());
-                newAssessment.setEmployeeResult(origAssesment.getEmployeeResult());
-                newAssessment.setSupervisorResult(origAssesment.getSupervisorResult());
-                newAssessment.setModifiedDate(new Date());
+            // copy assessment objects
+            for (Assessment oldAssessment: trialAppraisal.getCurrentGoalVersion().getAssessments()) {
+                Assessment newAssessment = Assessment.copyPropertiesFromTrial(oldAssessment, goalVersion);
                 session.save(newAssessment);
+
+                // copy assessment criteria objects for this new assessment
+                for (AssessmentCriteria oldAssessmentCriteria : oldAssessment.getAssessmentCriteria()) {
+                    AssessmentCriteria newAssessmentCriteria = new AssessmentCriteria();
+                    newAssessmentCriteria.setChecked(oldAssessmentCriteria.getChecked());
+                    newAssessmentCriteria.setCriteriaArea(oldAssessmentCriteria.getCriteriaArea());
+                    newAssessmentCriteria.setAssessment(newAssessment);
+                    session.save(newAssessmentCriteria);
+                }
             }
         }
 
