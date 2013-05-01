@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  */
 public class ActionHelper {
     public static final String ROLE_EMPLOYEE = "employee";
-    public static final String ROLE_ADMINISTRATOR = "administrator";
+    public static final String ROLE_ADMINISTRATOR = "admin";
     public static final String ROLE_REVIEWER = "reviewer";
     public static final String ROLE_SUPERVISOR = "supervisor";
     public static final String ROLE_UPPER_SUPERVISOR = "upper-supervisor";

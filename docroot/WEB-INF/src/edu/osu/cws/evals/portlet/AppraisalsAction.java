@@ -166,7 +166,6 @@ public class AppraisalsAction implements ActionInterface {
         initialize(request);
         List<Appraisal> appraisals = new ArrayList<Appraisal>();
         actionHelper.addToRequestMap("pageTitle", "search-results");
-
         boolean isAdmin = actionHelper.getAdmin() != null;
         boolean isReviewer = actionHelper.getReviewer() != null;
 
