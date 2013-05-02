@@ -81,7 +81,7 @@ public class AppraisalMgr {
             // Create the assessments & assessment criteria
             String appointmentType = job.getAppointmentType();
             List<CriterionArea> criteriaList = CriteriaMgr.list(appointmentType);
-            for (int i = 0; i < Constants.BLANK_ASSESSMENTS_IN_NEW_EVALUATION; i++) {
+            for (int i = 1; i <= Constants.BLANK_ASSESSMENTS_IN_NEW_EVALUATION; i++) {
                 AppraisalMgr.createNewAssessment(goalVersion, i, criteriaList);
             }
         }
