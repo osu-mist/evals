@@ -7,7 +7,7 @@ public class GoalVersion {
 
     private Appraisal appraisal;
 
-    private int approverPidm;
+    private Integer approverPidm;
 
     private Date createDate;
 
@@ -86,5 +86,20 @@ public class GoalVersion {
         }
 
         return sortedAssessments;
+    }
+
+    /**
+     * Returns the sequence of the last assessment in the collection.
+     *
+     * @return
+     */
+    public Integer getLastSequence() {
+        Integer lastSequence = 0;
+        for (Assessment assessment : assessments) {
+            if (assessment.getSequence() > lastSequence) {
+                lastSequence = assessment.getSequence();
+            }
+        }
+        return lastSequence;
     }
 }
