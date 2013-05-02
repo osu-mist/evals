@@ -7,7 +7,7 @@ public class GoalVersion {
 
     private Appraisal appraisal;
 
-    private int approverPidm;
+    private Integer approverPidm;
 
     private Date createDate;
 
