@@ -28,9 +28,11 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
         </fieldset>
     </c:when>
 </c:choose>
-<c:forEach var="assessmentCriteria" items="${assessment.sortedAssessmentCriteria}" varStatus="loopStatus2">
-    <%@ include file="/jsp/appraisals/assessmentCriteria.jsp"%>
-</c:forEach>
+<c:if test="${permissionRule.goals != null}">
+    <c:forEach var="assessmentCriteria" items="${assessment.sortedAssessmentCriteria}" varStatus="loopStatus2">
+        <%@ include file="/jsp/appraisals/assessmentCriteria.jsp"%>
+    </c:forEach>
+</c:if>
 
 
 <c:choose>
