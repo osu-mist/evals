@@ -380,49 +380,8 @@ public class AppraisalsAction implements ActionInterface {
 
         // Save Goals
         if (permRule.getGoals() != null && permRule.getGoals().equals("e")) {
-            // The order is important since we'll append at the end the new assessments
-            List<Assessment> assessments = appraisal.getCurrentGoalVersion().getSortedAssessments();
-            int oldAssessmentTotal = assessments.size();
-            Map<Integer, String> sequenceToFormIndex = addNewAssessments(requestMap, assessments,
-                    oldAssessmentTotal);
+            updateGoals(requestMap);
 
-
-            int assessmentFormIndex = 0;
-            Collections.sort(assessments);
-            for (Assessment assessment : assessments) {
-                String assessmentID = Integer.toString(assessment.getId());
-
-                // catch any newly added assignments, where the assessmentId is different.
-                assessmentFormIndex++;
-                String formIndex = sequenceToFormIndex.get(assessment.getSequence());
-                if (assessmentFormIndex > oldAssessmentTotal) {
-                    // For newly added assessments, the formIndex is used instead of assessment id
-                    // formIndex is used since one of the newly added assessments could have been
-                    // deleted before the form was submitted.
-                    assessmentID = formIndex;
-                }
-                parameterKey = "appraisal.goal." + assessmentID;
-                if (requestMap.get(parameterKey) != null) {
-                    assessment.setGoal(requestMap.get(parameterKey)[0]);
-                }
-                updateAssessmentCriteria(requestMap, oldAssessmentTotal, assessmentFormIndex, assessment, formIndex);
-
-
-                // Save the deleted flag if present
-                parameterKey = "appraisal.assessment.deleted." + assessmentID;
-                String[] deletedFlag = requestMap.get(parameterKey);
-                if (deletedFlag != null && deletedFlag[0].equals("1")) {
-                    assessment.setDeleteDate(new Date());
-                    assessment.setDeleterPidm(loggedInUser.getId());
-                }
-            }
-            if (requestMap.get("submit-goals") != null) {
-                appraisal.setGoalsSubmitDate(new Date());
-            }
-            if (requestMap.get("approve-goals") != null) {
-                appraisal.setGoalApprovedDate(new Date());
-                appraisal.setGoalsApprover(loggedInUser);
-            }
         }
         // Save goalComments
         if (permRule.getGoalComments() != null && permRule.getGoalComments().equals("e")) {
@@ -526,7 +485,58 @@ public class AppraisalsAction implements ActionInterface {
     }
 
     /**
-     * Handles updating the
+     * Handles updating the goals. Sets the goals, and assessment criteria. Adds/Removes assessments
+     * if the user did so in the html form.
+     *
+     * @param requestMap
+     */
+    private void updateGoals(Map<String, String[]> requestMap) {
+        String parameterKey;// The order is important since we'll append at the end the new assessments
+        List<Assessment> assessments = appraisal.getCurrentGoalVersion().getSortedAssessments();
+        int oldAssessmentTotal = assessments.size();
+        Map<Integer, String> sequenceToFormIndex = addNewAssessments(requestMap, assessments,
+                oldAssessmentTotal);
+
+
+        int assessmentFormIndex = 0;
+        Collections.sort(assessments);
+        for (Assessment assessment : assessments) {
+            String assessmentID = Integer.toString(assessment.getId());
+
+            // catch any newly added assignments, where the assessmentId is different.
+            assessmentFormIndex++;
+            String formIndex = sequenceToFormIndex.get(assessment.getSequence());
+            if (assessmentFormIndex > oldAssessmentTotal) {
+                // For newly added assessments, the formIndex is used instead of assessment id
+                // formIndex is used since one of the newly added assessments could have been
+                // deleted before the form was submitted.
+                assessmentID = formIndex;
+            }
+            parameterKey = "appraisal.goal." + assessmentID;
+            if (requestMap.get(parameterKey) != null) {
+                assessment.setGoal(requestMap.get(parameterKey)[0]);
+            }
+            updateAssessmentCriteria(requestMap, oldAssessmentTotal, assessmentFormIndex, assessment, formIndex);
+
+            // Save the deleted flag if present
+            parameterKey = "appraisal.assessment.deleted." + assessmentID;
+            String[] deletedFlag = requestMap.get(parameterKey);
+            if (deletedFlag != null && deletedFlag[0].equals("1")) {
+                assessment.setDeleteDate(new Date());
+                assessment.setDeleterPidm(loggedInUser.getId());
+            }
+        }
+        if (requestMap.get("submit-goals") != null) {
+            appraisal.setGoalsSubmitDate(new Date());
+        }
+        if (requestMap.get("approve-goals") != null) {
+            appraisal.setGoalApprovedDate(new Date());
+            appraisal.setGoalsApprover(loggedInUser);
+        }
+    }
+
+    /**
+     * Handles updating the assessment criteria checkboxes.
      *
      * @param requestMap
      * @param oldAssessmentTotal
