@@ -1,28 +1,18 @@
 package edu.osu.cws.evals.hibernate;
 
 import edu.osu.cws.evals.models.*;
-import edu.osu.cws.evals.portlet.ActionHelper;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
-import edu.osu.cws.evals.util.Mailer;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.StandardBasicTypes;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -60,10 +50,7 @@ public class AppraisalMgr {
         Appraisal appraisal = new Appraisal();
         GoalVersion goalVersion = new GoalVersion();
         goalVersion.setAppraisal(appraisal);
-
-        // The first goal version doesn't need to be approved
-        goalVersion.setApprovedDate(new Date());
-        goalVersion.setApproverPidm(job.getEmployee().getId());
+        goalVersion.setCreateDate(new Date());
 
         if (!type.equals(Appraisal.TYPE_TRIAL) && !type.equals(Appraisal.TYPE_ANNUAL) &&
                 !type.equals(Appraisal.TYPE_INITIAL)) {
