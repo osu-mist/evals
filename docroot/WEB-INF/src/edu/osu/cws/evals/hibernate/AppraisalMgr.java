@@ -32,9 +32,6 @@ public class AppraisalMgr {
     private static final String REPORT_LIST_WHERE = " where status not in ('completed', 'archived', " +
             "'closed') ";
 
-    private Appraisal appraisal = new Appraisal();
-
-    Map<String, Configuration> configurationMap;
 
     /**
      * This method creates an appraisal for the given job by calling the Hibernate
@@ -440,9 +437,9 @@ public class AppraisalMgr {
      * @return Appraisal
      * @throws Exception
      */
-    public Appraisal getAppraisal(int id) throws Exception {
+    public static Appraisal getAppraisal(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        appraisal = (Appraisal) session.get(Appraisal.class, id);
+        Appraisal appraisal = (Appraisal) session.get(Appraisal.class, id);
 
         return appraisal;
     }
@@ -458,7 +455,7 @@ public class AppraisalMgr {
      * @throws Exception
      */
     //@todo: Joan: don't do anything with job.endDate, that's not reliable.
-    public ArrayList<Appraisal> getReviews(String businessCenterName, int maxResults) throws Exception {
+    public static ArrayList<Appraisal> getReviews(String businessCenterName, int maxResults) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Query hibernateQuery = session.getNamedQuery("appraisal.getReviews")
                 .setString("bc", businessCenterName);
@@ -477,7 +474,7 @@ public class AppraisalMgr {
      * @return
      * @throws Exception
      */
-    public int getReviewCount(String businessCenterName) throws Exception {
+    public static int getReviewCount(String businessCenterName) throws Exception {
         int reviewCount = 0;
         Session session = HibernateUtil.getCurrentSession();
         List results = session.getNamedQuery("appraisal.reviewCount")
@@ -525,10 +522,6 @@ public class AppraisalMgr {
      */
     public static int getReviewOvedDueCount(String bcName) throws Exception {
         return getReviewCountByStatus(bcName, Appraisal.STATUS_REVIEW_OVERDUE);
-    }
-
-    public void setConfigurationMap(Map<String, Configuration> configurationMap) {
-        this.configurationMap = configurationMap;
     }
 
     /**
@@ -687,7 +680,7 @@ public class AppraisalMgr {
      * @return
      * @throws Exception
      */
-    public List<Appraisal> search(String searchTerm, int pidm, boolean isAdmin,
+    public static List<Appraisal> search(String searchTerm, int pidm, boolean isAdmin,
                                   boolean isSupervisor, String bcName) throws Exception {
         List<Job> jobs;
 
