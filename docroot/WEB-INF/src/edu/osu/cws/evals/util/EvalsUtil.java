@@ -285,13 +285,25 @@ public class EvalsUtil {
         return evalsStartDate;
     }
 
-    public static EvalsLogger createLogger(PropertiesConfiguration config) {
+    /**
+     * Creates an EvalsLogger instance
+     *
+     * @return EvalsLogger
+     * @throws Exception
+     */
+    public static EvalsLogger createLogger(PropertiesConfiguration config) throws Exception{
         String serverName = config.getString("log.serverName");
         String environment = config.getString("log.environment");
 
         return new EvalsLogger(serverName, environment);
     }
 
+    /**
+     * Creates an Mailer instance
+     *
+     * @return Mailer
+     * @throws Exception
+     */
     public static Mailer createMailer(PropertiesConfiguration config,
                                       Map<String, Configuration> configurationMap,
                                       EvalsLogger logger) throws Exception {
