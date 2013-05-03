@@ -253,7 +253,8 @@ public class EvalsPortlet extends GenericPortlet {
 
                 actionHelper = new ActionHelper(request, null, getPortletContext());
 
-                createLogger();
+                getPortletContext().setAttribute("log",
+                        EvalsUtil.createLogger(actionHelper.getEvalsConfig()));
                 message += "Created logger object\n";
                 createMailer();
                 message += "Mailer setup successfully\n";
@@ -294,31 +295,11 @@ public class EvalsPortlet extends GenericPortlet {
      * @throws Exception
      */
     private void createMailer() throws Exception {
-        ResourceBundle resources = ResourceBundle.getBundle("edu.osu.cws.evals.portlet.Email");
         PropertiesConfiguration config = actionHelper.getEvalsConfig();
-        String hostname = config.getString("mail.hostname");
-        String from = config.getString("mail.fromAddress");
-        String replyTo = config.getString("mail.replyToAddress");
-        String linkUrl = config.getString("mail.linkUrl");
-        String helpLinkUrl = config.getString("helpfulLinks.url");
-        String testMailToAddress = config.getString("mail.testMailToAddress");
         Map<String, Configuration> configurationMap = (Map<String, Configuration>)
                 getPortletContext().getAttribute("configurations");
-        Mailer mailer = new Mailer(resources, hostname, from, linkUrl,  helpLinkUrl,
-                configurationMap, getLog(), replyTo, testMailToAddress);
+        Mailer mailer = EvalsUtil.createMailer(config, configurationMap, getLog());
         getPortletContext().setAttribute("mailer", mailer);
-    }
-
-    /**
-     * Creates an instance of EvalsLogger, grabs the properties from the properties file and stores the
-     * log instance in the portletContext. Requires actionHelper private member to be setup.
-     */
-    private void createLogger() {
-        PropertiesConfiguration config = actionHelper.getEvalsConfig();
-        String serverName = config.getString("log.serverName");
-        String environment = config.getString("log.environment");
-        EvalsLogger evalsLogger = new EvalsLogger(serverName, environment);
-        getPortletContext().setAttribute("log", evalsLogger);
     }
 
     /**

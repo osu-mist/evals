@@ -696,19 +696,11 @@ public class AppraisalMgr {
      * @return
      * @throws Exception
      */
-    public List<Appraisal> search(String searchTerm, int pidm, boolean isAdmin,
+    public List<Appraisal> search(String searchTerm, int pidm,
                                   boolean isSupervisor, String bcName) throws Exception {
-        List<Job> jobs;
 
-        if (!isAdmin) {
-            int supervisorPidm = 0;
-            if (isSupervisor) {
-                supervisorPidm = pidm;
-            }
-            jobs = JobMgr.search(searchTerm, bcName, supervisorPidm);
-        } else {
-            jobs = JobMgr.search(searchTerm, "", 0);
-        }
+        int supervisorPidm = isSupervisor? pidm : 0;
+        List<Job> jobs = JobMgr.search(searchTerm, bcName,supervisorPidm);
 
         String hql = "select new edu.osu.cws.evals.models.Appraisal ( " +
             "id, job.jobTitle, job.positionNumber, startDate, endDate, type, " +

@@ -191,7 +191,7 @@ public class AppraisalsAction implements ActionInterface {
             AppraisalMgr appraisalMgr = new AppraisalMgr();
 
             try {
-                appraisals = appraisalMgr.search(searchTerm, pidm, isAdmin, isSupervisor, bcName);
+                appraisals = appraisalMgr.search(searchTerm, pidm, isSupervisor, bcName);
 
                 if (appraisals.isEmpty()) {
                     if (isAdmin) {
