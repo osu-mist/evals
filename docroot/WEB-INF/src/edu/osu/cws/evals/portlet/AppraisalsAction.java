@@ -93,8 +93,9 @@ public class AppraisalsAction implements ActionInterface {
             appraisal = appraisalMgr.getAppraisal(appraisalID);
             if(appraisal != null) {
                 userRole = getRole();
+                permRule = getAppraisalPermissionRule();
                 appraisal.setRole(userRole);
-                setAppraisalPermissionRule();
+                appraisal.setPermissionRule(permRule);
             }
         }
     }
@@ -105,13 +106,13 @@ public class AppraisalsAction implements ActionInterface {
      *
      * @throws Exception
      */
-    private void setAppraisalPermissionRule() throws Exception {
+    private PermissionRule getAppraisalPermissionRule() throws Exception {
         HashMap permissionRules =
                 (HashMap) actionHelper.getPortletContext().getAttribute("permissionRules");
         PermissionRule permissionRule =
                 (PermissionRule) permissionRules.get(appraisal.getStatus() + "-" + userRole);
 
-        permRule = permissionRule;
+        return permissionRule;
     }
 
     /**
