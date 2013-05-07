@@ -20,7 +20,7 @@
                      column="APPRAISAL_ID"
                      not-null="true" />
 
-        <set name="assessments" inverse="true" batch-size="30">
+        <set name="assessments" inverse="true" batch-size="30" cascade="all">
             <key column="GOAL_VERSION_ID"/>
             <one-to-many class="edu.osu.cws.evals.models.Assessment"/>
         </set>

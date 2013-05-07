@@ -69,7 +69,7 @@
         <many-to-one name="reopenedBy" class="edu.osu.cws.evals.models.Employee"
                      column="REOPENER_PIDM"
                      not-null="false"/>
-        <set name="goalVersions" inverse="true">
+        <set name="goalVersions" inverse="true" cascade="all">
             <key column="APPRAISAL_ID"/>
             <one-to-many class="edu.osu.cws.evals.models.GoalVersion" />
         </set>

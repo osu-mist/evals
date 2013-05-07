@@ -65,6 +65,11 @@ public class GoalVersion {
         this.assessments = assessments;
     }
 
+    public void addAssessment(Assessment assessment) {
+        assessment.setGoalVersion(this);
+        assessments.add(assessment);
+    }
+
     /**
      * Returns a sorted list of assessments. The assessment pojo class
      * implements comparable interface which makes this easy. It removes deleted assessments from
@@ -98,11 +103,10 @@ public class GoalVersion {
      */
     public static GoalVersion copyPropertiesFromTrial(Appraisal trialAppraisal,
                                                       Appraisal newAppraisal) {
+        //@todo: remove this method
         GoalVersion goalVersion = new GoalVersion();
         goalVersion.setAppraisal(newAppraisal);
         goalVersion.setCreateDate(new Date());
-        goalVersion.setApprovedDate(new Date());
-        goalVersion.setApproverPidm(trialAppraisal.getCurrentGoalVersion().getApproverPidm());
 
         return goalVersion;
     }

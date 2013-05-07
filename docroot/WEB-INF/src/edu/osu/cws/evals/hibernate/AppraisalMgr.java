@@ -124,11 +124,9 @@ public class AppraisalMgr {
     public static Appraisal createInitialAppraisalAfterTrial(Appraisal trialAppraisal,
                                                              Configuration resultsDueConfig) throws Exception {
         // copy appraisal & properties
-        Appraisal appraisal = Appraisal.copyPropertiesFromTrial(trialAppraisal);
-        DateTime startDate = new DateTime(appraisal.getStartDate());
-        DateTime endDate = appraisal.getJob().getEndEvalDate(startDate, Appraisal.TYPE_INITIAL);
-        appraisal.setEndDate(CWSUtil.toDate(endDate));
+        Appraisal appraisal = Appraisal.createFirstAnnual(trialAppraisal);
 
+        // set the status
         int resultsDue = EvalsUtil.isDue(appraisal, resultsDueConfig);
         if (resultsDue == 0) {
             appraisal.setStatus(Appraisal.STATUS_RESULTS_DUE);
@@ -138,29 +136,8 @@ public class AppraisalMgr {
             appraisal.setStatus(Appraisal.STATUS_GOALS_APPROVED);
         }
 
-        // copy over goal version
-        GoalVersion goalVersion = GoalVersion.copyPropertiesFromTrial(trialAppraisal, appraisal);
-
-        if (appraisal.validate()) {
-            Session session = HibernateUtil.getCurrentSession();
-            session.save(appraisal);
-            session.save(goalVersion);
-
-            // copy assessment objects
-            for (Assessment oldAssessment: trialAppraisal.getCurrentGoalVersion().getAssessments()) {
-                Assessment newAssessment = Assessment.copyPropertiesFromTrial(oldAssessment, goalVersion);
-                session.save(newAssessment);
-
-                // copy assessment criteria objects for this new assessment
-                for (AssessmentCriteria oldAssessmentCriteria : oldAssessment.getAssessmentCriteria()) {
-                    AssessmentCriteria newAssessmentCriteria = new AssessmentCriteria();
-                    newAssessmentCriteria.setChecked(oldAssessmentCriteria.getChecked());
-                    newAssessmentCriteria.setCriteriaArea(oldAssessmentCriteria.getCriteriaArea());
-                    newAssessmentCriteria.setAssessment(newAssessment);
-                    session.save(newAssessmentCriteria);
-                }
-            }
-        }
+        Session session = HibernateUtil.getCurrentSession();
+        session.save(appraisal);
 
         return appraisal;
     }

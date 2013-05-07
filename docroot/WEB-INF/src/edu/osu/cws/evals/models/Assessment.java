@@ -155,6 +155,11 @@ public class Assessment extends Evals implements Comparable<Assessment> {
         this.assessmentCriteria = assessmentCriteria;
     }
 
+    public void addAssessmentCriteria(AssessmentCriteria assessmentCriterion) {
+        assessmentCriterion.setAssessment(this);
+        assessmentCriteria.add(assessmentCriterion);
+    }
+
     public int compareTo(Assessment otherAssessment) {
         final int BEFORE = -1;
         final int EQUAL = 0;
@@ -196,19 +201,23 @@ public class Assessment extends Evals implements Comparable<Assessment> {
      * goalVersion association setup.
      *
      * @param trialAssessment
-     * @param goalVersion
      * @return
      */
-    public static Assessment copyPropertiesFromTrial(Assessment trialAssessment,
-                                                     GoalVersion goalVersion) {
+    public static Assessment copyPropertiesFromTrial(Assessment trialAssessment) {
         Assessment newAssessment = new Assessment();
         newAssessment.setGoal(trialAssessment.getGoal());
         newAssessment.setCreateDate(new Date());
         newAssessment.setEmployeeResult(trialAssessment.getEmployeeResult());
         newAssessment.setSupervisorResult(trialAssessment.getSupervisorResult());
         newAssessment.setModifiedDate(new Date());
-        newAssessment.setGoalVersion(goalVersion);
         newAssessment.setSequence(trialAssessment.getSequence());
+
+        // copy assessment criteria objects for this new assessment
+        for (AssessmentCriteria trialAssessmentCriteria : trialAssessment.getAssessmentCriteria()) {
+            AssessmentCriteria newAssessmentCriteria = AssessmentCriteria.copyPropertiesFromTrial(trialAssessmentCriteria);
+            newAssessment.addAssessmentCriteria(newAssessmentCriteria);
+        }
+
         return newAssessment;
     }
 }

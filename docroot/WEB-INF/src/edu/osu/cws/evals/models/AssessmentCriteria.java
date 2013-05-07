@@ -52,4 +52,19 @@ public class AssessmentCriteria implements Comparable<AssessmentCriteria> {
         String otherName = otherAssessmentCriteria.criteriaArea.getName();
         return thisName.compareTo(otherName);
     }
+
+    /**
+     * Returns a new instance of AssessmentCriteria with properties copied over from the trial
+     * AssessmentCriteria that is passed in.
+     *
+     * @param trialAssessmentCriteria
+     * @return
+     */
+    public static AssessmentCriteria copyPropertiesFromTrial(AssessmentCriteria trialAssessmentCriteria) {
+        AssessmentCriteria newAssessmentCriteria = new AssessmentCriteria();
+        newAssessmentCriteria.setChecked(trialAssessmentCriteria.getChecked());
+        newAssessmentCriteria.setCriteriaArea(trialAssessmentCriteria.getCriteriaArea());
+
+        return newAssessmentCriteria;
+    }
 }

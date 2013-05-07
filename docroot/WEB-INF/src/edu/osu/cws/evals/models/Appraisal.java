@@ -1,5 +1,8 @@
 package edu.osu.cws.evals.models;
 
+import edu.osu.cws.util.CWSUtil;
+import org.joda.time.DateTime;
+
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -830,6 +833,11 @@ public class Appraisal extends Evals {
         this.rebuttalReadOverdue = rebuttalReadOverdue;
     }
 
+    public void addGoalVersion(GoalVersion goalVersion) {
+        goalVersion.setAppraisal(this);
+        goalVersions.add(goalVersion);
+    }
+
     /**
      * Role of the logged in user for this appraisal. This is used
      * in the getViewStatus() method.
@@ -896,12 +904,13 @@ public class Appraisal extends Evals {
     }
 
     /**
-     * Returns a new Appraisal pojo with the properties copied over from the trialAppraisal.
+     * Returns a new Appraisal pojo with the properties copied over from the trialAppraisal. It
+     * also calls the copyPropertiesFromTrial method recursively over the associations.
      *
      * @param trialAppraisal
      * @return
      */
-    public static Appraisal copyPropertiesFromTrial(Appraisal trialAppraisal) {
+    public static Appraisal createFirstAnnual(Appraisal trialAppraisal) {
         Appraisal appraisal = new Appraisal();
         appraisal.setType(Appraisal.TYPE_ANNUAL);
         appraisal.setJob(trialAppraisal.getJob());
@@ -911,6 +920,23 @@ public class Appraisal extends Evals {
         appraisal.setGoalsApprover(trialAppraisal.getGoalsApprover());
         appraisal.setGoalApprovedDate(trialAppraisal.getGoalApprovedDate());
         appraisal.setRating(0);
+
+        // calculate & set the end date
+        DateTime startDate = new DateTime(appraisal.getStartDate());
+        DateTime endDate = appraisal.getJob().getEndEvalDate(startDate, Appraisal.TYPE_INITIAL);
+        appraisal.setEndDate(CWSUtil.toDate(endDate));
+
+        // copy over goal version
+        //@todo: remove this method call
+        GoalVersion goalVersion = GoalVersion.copyPropertiesFromTrial(trialAppraisal, appraisal);
+        appraisal.addGoalVersion(goalVersion);
+
+        // copy assessment objects
+        //@todo: leaving this loop block here since we'll be removing the goalsVersion association in a future commit
+        for (Assessment oldAssessment: trialAppraisal.getCurrentGoalVersion().getAssessments()) {
+            Assessment newAssessment = Assessment.copyPropertiesFromTrial(oldAssessment);
+            goalVersion.addAssessment(newAssessment);
+        }
 
         return appraisal;
     }
