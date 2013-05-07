@@ -62,10 +62,10 @@ jQuery(document).ready(function() {
   jQuery("#<portlet:namespace />fm").submit(function() {
     var errors = "";
     if (jQuery("#<portlet:namespace />name").val() == "") {
-      errors = "<li><%= CriterionArea.nameRequired %></li>";
+      errors = "<li><%= bundle.getString("criteria-nameRequired") %></li>";
     }
     if (jQuery("#<portlet:namespace />description").val() == "") {
-      errors += "<li><%= CriterionArea.descriptionRequired %></li>"
+      errors += "<li><%= bundle.getString("criteria-descriptionRequired") %></li>";
     }
     if (errors != "") {
       jQuery("#<portlet:namespace />flash").html(

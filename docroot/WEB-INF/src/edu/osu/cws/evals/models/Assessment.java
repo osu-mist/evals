@@ -6,8 +6,6 @@ public class Assessment extends Evals implements Comparable<Assessment> {
 
     private int id;
 
-    private Appraisal appraisal;
-
     private String goal;
 
     private String employeeResult;
@@ -20,6 +18,12 @@ public class Assessment extends Evals implements Comparable<Assessment> {
 
     private GoalVersion goalVersion;
 
+    /**
+     * The sequence represents the order in which the objects are displayed in the evaluation form.
+     * The sequence numbers should be unique for all assessments that belong to a single goal version.
+     * In other words, some sequence #s will correspond to deleted assessments that are not displayed
+     * to the user.
+     */
     private int sequence;
 
     private Integer deleterPidm;
@@ -64,14 +68,6 @@ public class Assessment extends Evals implements Comparable<Assessment> {
 
     public void setSequence(int sequence) {
         this.sequence = sequence;
-    }
-
-    public Appraisal getAppraisal() {
-        return appraisal;
-    }
-
-    public void setAppraisal(Appraisal appraisal) {
-        this.appraisal = appraisal;
     }
 
     public String getGoal() {
@@ -163,10 +159,6 @@ public class Assessment extends Evals implements Comparable<Assessment> {
         final int BEFORE = -1;
         final int EQUAL = 0;
         final int AFTER = 1;
-
-        if (this == otherAssessment) {
-            return EQUAL;
-        }
 
         if (this.sequence < otherAssessment.sequence) {
             return BEFORE;

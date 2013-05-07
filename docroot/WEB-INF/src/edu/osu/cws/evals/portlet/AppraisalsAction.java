@@ -10,6 +10,7 @@ import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.NolijCopyMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsPDF;
+import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.evals.util.Mailer;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.ArrayUtils;
@@ -85,15 +86,14 @@ public class AppraisalsAction implements ActionInterface {
      * @throws Exception
      */
     private void initializeAppraisal() throws Exception {
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
         int appraisalID = ParamUtil.getInteger(request, "id");
         if (appraisalID > 0) {
-            actionHelper.setAppraisalMgrParameters(appraisalMgr);
-            appraisal = appraisalMgr.getAppraisal(appraisalID);
+            appraisal = AppraisalMgr.getAppraisal(appraisalID);
             if(appraisal != null) {
                 userRole = getRole();
-                appraisal.setRole(userRole);
                 setAppraisalPermissionRule();
+                appraisal.setRole(userRole);
+                appraisal.setPermissionRule(permRule);
             }
         }
     }
@@ -107,10 +107,8 @@ public class AppraisalsAction implements ActionInterface {
     private void setAppraisalPermissionRule() throws Exception {
         HashMap permissionRules =
                 (HashMap) actionHelper.getPortletContext().getAttribute("permissionRules");
-        PermissionRule permissionRule =
+        permRule =
                 (PermissionRule) permissionRules.get(appraisal.getStatus() + "-" + userRole);
-
-        permRule = permissionRule;
     }
 
     /**
@@ -166,7 +164,6 @@ public class AppraisalsAction implements ActionInterface {
         initialize(request);
         List<Appraisal> appraisals = new ArrayList<Appraisal>();
         actionHelper.addToRequestMap("pageTitle", "search-results");
-
         boolean isAdmin = actionHelper.getAdmin() != null;
         boolean isReviewer = actionHelper.getReviewer() != null;
 
@@ -189,10 +186,9 @@ public class AppraisalsAction implements ActionInterface {
             if (isReviewer) {
                 bcName = actionHelper.getReviewer().getBusinessCenterName();
             }
-            AppraisalMgr appraisalMgr = new AppraisalMgr();
 
             try {
-                appraisals = appraisalMgr.search(searchTerm, pidm, isAdmin, isSupervisor, bcName);
+                appraisals = AppraisalMgr.search(searchTerm, pidm, isSupervisor, bcName);
 
                 if (appraisals.isEmpty()) {
                     if (isAdmin) {
@@ -311,6 +307,10 @@ public class AppraisalsAction implements ActionInterface {
             if (response instanceof ActionResponse) {
                 ((ActionResponse) response).setWindowState(WindowState.MAXIMIZED);
             }
+
+            // remove the object from session so that display picks up new assessment associations
+            HibernateUtil.getCurrentSession().flush();
+            HibernateUtil.getCurrentSession().clear();
             return display(request, response);
         }
 
@@ -433,29 +433,8 @@ public class AppraisalsAction implements ActionInterface {
 
         // Save Goals
         if (permRule.getGoals() != null && permRule.getGoals().equals("e")) {
-            for (Assessment assessment : appraisal.getCurrentGoalVersion().getAssessments()) {
-                String assessmentID = Integer.toString(assessment.getId());
-                parameterKey = "appraisal.goal." + assessmentID;
-                if (requestMap.get(parameterKey) != null) {
-                    assessment.setGoal(requestMap.get(parameterKey)[0]);
-                }
-            }
-            if (requestMap.get("submit-goals") != null) {
-                appraisal.setGoalsSubmitDate(new Date());
-            }
-            if (requestMap.get("approve-goals") != null) {
-                appraisal.setGoalApprovedDate(new Date());
-                appraisal.setGoalsApprover(loggedInUser);
-            }
-        }
-        // Save newGoals
-        if (permRule.getNewGoals() != null && permRule.getNewGoals().equals("e")) {
-            for (Assessment assessment : appraisal.getCurrentGoalVersion().getAssessments()) {
-                String assessmentID = Integer.toString(assessment.getId());
-                parameterKey = "appraisal.newGoal." + assessmentID;
-                //@todo: can this be removed? do the perm rules need to be updated?
-//                assessment.setNewGoals(requestMap.get(parameterKey)[0]);
-            }
+            updateGoals(requestMap);
+
         }
         // Save goalComments
         if (permRule.getGoalComments() != null && permRule.getGoalComments().equals("e")) {
@@ -556,6 +535,135 @@ public class AppraisalsAction implements ActionInterface {
         if (appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
             appraisal.setGoalsRequiredModificationDate(new Date());
         }
+    }
+
+    /**
+     * Handles updating the goals. Sets the goals, and assessment criteria. Adds/Removes assessments
+     * if the user did so in the html form.
+     *
+     * @param requestMap
+     */
+    private void updateGoals(Map<String, String[]> requestMap) {
+        String parameterKey;
+        // The order is important since we'll append at the end the new assessments
+        List<Assessment> assessments = appraisal.getCurrentGoalVersion().getSortedAssessments();
+        int oldAssessmentTotal = assessments.size();
+        Map<Integer, String> sequenceToFormIndex = addNewAssessments(requestMap, assessments);
+
+
+        int assessmentFormIndex = 0;
+        Collections.sort(assessments);
+        for (Assessment assessment : assessments) {
+            String assessmentID = Integer.toString(assessment.getId());
+
+            // catch any newly added assignments, where the assessmentId is different.
+            assessmentFormIndex++;
+            String formIndex = sequenceToFormIndex.get(assessment.getSequence());
+            if (assessmentFormIndex > oldAssessmentTotal) {
+                // For newly added assessments, the formIndex is used instead of assessment id
+                // formIndex is used since one of the newly added assessments could have been
+                // deleted before the form was submitted.
+                assessmentID = formIndex;
+            }
+            parameterKey = "appraisal.goal." + assessmentID;
+            if (requestMap.get(parameterKey) != null) {
+                assessment.setGoal(requestMap.get(parameterKey)[0]);
+            }
+            updateAssessmentCriteria(requestMap, oldAssessmentTotal, assessmentFormIndex, assessment, formIndex);
+
+            // Save the deleted flag if present
+            parameterKey = "appraisal.assessment.deleted." + assessmentID;
+            String[] deletedFlag = requestMap.get(parameterKey);
+            if (deletedFlag != null && deletedFlag[0].equals("1")) {
+                assessment.setDeleteDate(new Date());
+                assessment.setDeleterPidm(loggedInUser.getId());
+            }
+        }
+        if (requestMap.get("submit-goals") != null) {
+            appraisal.setGoalsSubmitDate(new Date());
+        }
+        if (requestMap.get("approve-goals") != null) {
+            appraisal.setGoalApprovedDate(new Date());
+            appraisal.setGoalsApprover(loggedInUser);
+        }
+    }
+
+    /**
+     * Handles updating the assessment criteria checkboxes.
+     *
+     * @param requestMap
+     * @param oldAssessmentTotal
+     * @param assessmentFormIndex
+     * @param assessment
+     * @param formIndex
+     */
+    private void updateAssessmentCriteria(Map<String, String[]> requestMap, int oldAssessmentTotal,
+                                          int assessmentFormIndex, Assessment assessment, String formIndex) {
+        String parameterKey;// Save the assessment criteria for each assessment.
+        int assessmentCriteriaFormIndex = 0; // used to calculate id of newly added assessment criteria
+        for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
+            assessmentCriteriaFormIndex++;
+            int suffix = assessmentCriteria.getId();
+            if (assessmentFormIndex > oldAssessmentTotal) {
+                // For newly added assessments, the formIndex is used as the base for
+                // assessment criteria ids.
+                suffix = Integer.parseInt(formIndex) * assessmentCriteriaFormIndex;
+            }
+            parameterKey = "appraisal.assessmentCriteria." + suffix;
+            if (requestMap.get(parameterKey) != null) {
+                assessmentCriteria.setChecked(true);
+            } else {
+                assessmentCriteria.setChecked(false);
+            }
+        }
+    }
+
+    /**
+     * Handles adding new assessments that were added to an appraisal via JS. The new assessment
+     * objects are saved along with their sequence, creator pidm and date.
+     *
+     * @param requestMap
+     * @param assessments               List of original non-deleted assessments
+     * @return
+     */
+    private Map<Integer, String> addNewAssessments(Map<String, String[]> requestMap,
+                                                   List<Assessment> assessments) {
+        String parameterKey;// map used to get the form indexed based on the assessment sequence
+        int oldAssessmentTotal = assessments.size();
+        Map<Integer, String> sequenceToFormIndex = new HashMap<Integer, String>();
+
+        // begin adding new goals!!!
+        Integer numberOfAssessmentsAdded = 0;
+        if (requestMap.get("assessmentCount") != null) {
+            Integer newAssessmentTotal = Integer.parseInt(requestMap.get("assessmentCount")[0]);
+            numberOfAssessmentsAdded = newAssessmentTotal - oldAssessmentTotal;
+        }
+
+        if (numberOfAssessmentsAdded > 0) {
+            // get the sequence of the last assessment in the goal version
+            // we'll increment this sequence as we add each new assessment
+            Integer sequence = Integer.parseInt(requestMap.get("assessmentSequence")[0]);
+
+            for (int newId = 1; newId <= numberOfAssessmentsAdded; newId++) {
+                Integer formIndex = newId + oldAssessmentTotal;
+                // check that newly added assignments were not removed afterwards
+                parameterKey = "appraisal.assessment.deleted." + formIndex;
+                String[] deletedFlag = requestMap.get(parameterKey);
+                if (deletedFlag != null && deletedFlag[0].equals("0")) {
+                    sequence++; // only increase sequence when we add an assessment
+                    sequenceToFormIndex.put(sequence, formIndex.toString());
+
+                    List<CriterionArea> criterionAreas = new ArrayList<CriterionArea>();
+                    for (AssessmentCriteria assessmentCriteria : assessments.iterator().next().getSortedAssessmentCriteria()) {
+                        criterionAreas.add(assessmentCriteria.getCriteriaArea());
+                    }
+                    Assessment assessment = AppraisalMgr.createNewAssessment(appraisal.getCurrentGoalVersion(), sequence, criterionAreas);
+                    assessments.add(assessment);
+                }
+            }
+        }
+        // end adding new goals
+        return sequenceToFormIndex;
     }
 
     /**
@@ -730,7 +838,6 @@ public class AppraisalsAction implements ActionInterface {
             return errorHandler.handleAccessDenied(request, response);
         }
 
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
         actionHelper.addToRequestMap("id", appraisal.getId());
 
         if (!isReviewer) {

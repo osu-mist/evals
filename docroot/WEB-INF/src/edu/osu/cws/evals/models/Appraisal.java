@@ -180,6 +180,8 @@ public class Appraisal extends Evals {
      */
     private String role;
 
+    private PermissionRule permissionRule;
+
     private ArrayList<String> statusHiddenFromEmployee = new ArrayList<String>();
 
     public Appraisal() { }
@@ -835,11 +837,22 @@ public class Appraisal extends Evals {
      * @return
      */
     public String getRole() {
+        if(role == null) {
+            role = "";
+        }
         return role;
     }
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public PermissionRule getPermissionRule() {
+        return permissionRule;
+    }
+
+    public void setPermissionRule(PermissionRule permissionRule) {
+        this.permissionRule = permissionRule;
     }
 
     public boolean isEmployeeJobActive() {

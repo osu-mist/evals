@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  */
 public class ActionHelper {
     public static final String ROLE_EMPLOYEE = "employee";
-    public static final String ROLE_ADMINISTRATOR = "administrator";
+    public static final String ROLE_ADMINISTRATOR = "admin";
     public static final String ROLE_REVIEWER = "reviewer";
     public static final String ROLE_SUPERVISOR = "supervisor";
     public static final String ROLE_UPPER_SUPERVISOR = "upper-supervisor";
@@ -240,8 +240,7 @@ public class ActionHelper {
             if (businessCenterName.equals("")) {
                 businessCenterName = getReviewer().getBusinessCenterName();
             }
-            AppraisalMgr appraisalMgr = new AppraisalMgr();
-            reviewList = appraisalMgr.getReviews(businessCenterName, -1);
+            reviewList = AppraisalMgr.getReviews(businessCenterName, -1);
             session.setAttribute(REVIEW_LIST, reviewList);
         }
 
@@ -256,18 +255,6 @@ public class ActionHelper {
         }
 
         return outList;
-    }
-
-    /**
-     * Setups up parameters from portletContext needed by AppraisalMgr class.
-     *
-     * @param appraisalMgr
-     */
-    public void setAppraisalMgrParameters(AppraisalMgr appraisalMgr) {
-        Map<String, Configuration> configurationMap =
-                (Map<String, Configuration>) portletContext.getAttribute("configurations");
-
-        appraisalMgr.setConfigurationMap(configurationMap);
     }
 
     /**
@@ -586,8 +573,7 @@ public class ActionHelper {
         if (reviewList != null) {
             reviewCount = reviewList.size();
         } else {
-            AppraisalMgr appraisalMgr = new AppraisalMgr();
-            reviewCount = appraisalMgr.getReviewCount(businessCenterName);
+            reviewCount = AppraisalMgr.getReviewCount(businessCenterName);
         }
 
         RequiredAction requiredAction = new RequiredAction();

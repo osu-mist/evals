@@ -1,28 +1,18 @@
 package edu.osu.cws.evals.hibernate;
 
 import edu.osu.cws.evals.models.*;
-import edu.osu.cws.evals.portlet.ActionHelper;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
-import edu.osu.cws.evals.util.Mailer;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.StandardBasicTypes;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,9 +31,6 @@ public class AppraisalMgr {
     private static final String REPORT_LIST_WHERE = " where status not in ('completed', 'archived', " +
             "'closed') ";
 
-    private Appraisal appraisal = new Appraisal();
-
-    Map<String, Configuration> configurationMap;
 
     /**
      * This method creates an appraisal for the given job by calling the Hibernate
@@ -60,10 +47,7 @@ public class AppraisalMgr {
         Appraisal appraisal = new Appraisal();
         GoalVersion goalVersion = new GoalVersion();
         goalVersion.setAppraisal(appraisal);
-
-        // The first goal version doesn't need to be approved
-        goalVersion.setApprovedDate(new Date());
-        goalVersion.setApproverPidm(job.getEmployee().getId());
+        goalVersion.setCreateDate(new Date());
 
         if (!type.equals(Appraisal.TYPE_TRIAL) && !type.equals(Appraisal.TYPE_ANNUAL) &&
                 !type.equals(Appraisal.TYPE_INITIAL)) {
@@ -94,7 +78,7 @@ public class AppraisalMgr {
             // Create the assessments & assessment criteria
             String appointmentType = job.getAppointmentType();
             List<CriterionArea> criteriaList = CriteriaMgr.list(appointmentType);
-            for (int i = 0; i < Constants.BLANK_ASSESSMENTS_IN_NEW_EVALUATION; i++) {
+            for (int i = 1; i <= Constants.BLANK_ASSESSMENTS_IN_NEW_EVALUATION; i++) {
                 AppraisalMgr.createNewAssessment(goalVersion, i, criteriaList);
             }
         }
@@ -440,9 +424,9 @@ public class AppraisalMgr {
      * @return Appraisal
      * @throws Exception
      */
-    public Appraisal getAppraisal(int id) throws Exception {
+    public static Appraisal getAppraisal(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        appraisal = (Appraisal) session.get(Appraisal.class, id);
+        Appraisal appraisal = (Appraisal) session.get(Appraisal.class, id);
 
         return appraisal;
     }
@@ -458,7 +442,7 @@ public class AppraisalMgr {
      * @throws Exception
      */
     //@todo: Joan: don't do anything with job.endDate, that's not reliable.
-    public ArrayList<Appraisal> getReviews(String businessCenterName, int maxResults) throws Exception {
+    public static ArrayList<Appraisal> getReviews(String businessCenterName, int maxResults) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Query hibernateQuery = session.getNamedQuery("appraisal.getReviews")
                 .setString("bc", businessCenterName);
@@ -477,7 +461,7 @@ public class AppraisalMgr {
      * @return
      * @throws Exception
      */
-    public int getReviewCount(String businessCenterName) throws Exception {
+    public static int getReviewCount(String businessCenterName) throws Exception {
         int reviewCount = 0;
         Session session = HibernateUtil.getCurrentSession();
         List results = session.getNamedQuery("appraisal.reviewCount")
@@ -525,10 +509,6 @@ public class AppraisalMgr {
      */
     public static int getReviewOvedDueCount(String bcName) throws Exception {
         return getReviewCountByStatus(bcName, Appraisal.STATUS_REVIEW_OVERDUE);
-    }
-
-    public void setConfigurationMap(Map<String, Configuration> configurationMap) {
-        this.configurationMap = configurationMap;
     }
 
     /**
@@ -687,19 +667,10 @@ public class AppraisalMgr {
      * @return
      * @throws Exception
      */
-    public List<Appraisal> search(String searchTerm, int pidm, boolean isAdmin,
-                                  boolean isSupervisor, String bcName) throws Exception {
-        List<Job> jobs;
-
-        if (!isAdmin) {
-            int supervisorPidm = 0;
-            if (isSupervisor) {
-                supervisorPidm = pidm;
-            }
-            jobs = JobMgr.search(searchTerm, bcName, supervisorPidm);
-        } else {
-            jobs = JobMgr.search(searchTerm, "", 0);
-        }
+    public static List<Appraisal> search(String searchTerm, int pidm, boolean isSupervisor,
+                                         String bcName) throws Exception {
+        int supervisorPidm = isSupervisor? pidm : 0;
+        List<Job> jobs = JobMgr.search(searchTerm, bcName,supervisorPidm);
 
         String hql = "select new edu.osu.cws.evals.models.Appraisal ( " +
             "id, job.jobTitle, job.positionNumber, startDate, endDate, type, " +

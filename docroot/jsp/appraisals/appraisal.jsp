@@ -27,7 +27,7 @@
 
 <div id="pass-appraisal-form" class="osu-cws">
 
-<c:if test="${showForm}">
+<c:if test="${showForm and !empty appraisalNotice.text}">
     <span class="portlet-msg-alert">
     <c:out value = "${appraisalNotice.text}"/>
 
@@ -85,6 +85,10 @@
         </portlet:actionURL>" method="post" name="<portlet:namespace />request_form">
 
         <input type="hidden" name="id" value="${appraisal.id}"/>
+        <input type="hidden" id="assessmentCount" name="assessmentCount"
+               value="<%= appraisal.getCurrentGoalVersion().getSortedAssessments().size()%>"/>
+        <input type="hidden" id="assessmentSequence" name="assessmentSequence"
+               value="${appraisal.currentGoalVersion.lastSequence}"/>
     </c:if>
 
     <div class="appraisal-criteria">
@@ -208,6 +212,12 @@
         value="<liferay-ui:message key="${permissionRule.submit}" />">
         </c:if>
 
+        <c:if test="${permissionRule.goals == 'e'}">
+        <input name="addAssessment"
+               type="submit" id="addAssessment"
+        value="<liferay-ui:message key="appraisal-assessment-add"/>">
+        </c:if>
+
         <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}">
         </form>
     </div><!-- end pass-actions-->
@@ -273,8 +283,134 @@
       <c:if test="${appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_DUE%>' && appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_OVERDUE%>' ||  not empty appraisal.rebuttal}">
         jQuery('textarea').autogrow();
       </c:if>
-      
-      
+
+        // @todo: need to think about accessibility of delete/add assessments.
+
+      /**
+       * Handles deletion of assessments. The html coressponding to the assessments is not removed
+       * from the DOM. Instead the assessment is hidden and the hidden input with class:
+       * appraisal-assessment-deleted-NUM where NUM is the id of the assessment is set to 1 to let the
+       * java code know that this assesment has been deleted. A confirmation js pop-up is displayed to the
+       * user to let them know that they are about to delete an assessment. This method returns false to
+       * prevent the anchor link from being followed since this is just a js action.
+       *
+       * @return {Boolean}
+       */
+      function assessmentDelete() {
+        // Verify that the user wants to delete the assessment
+        var response = confirm('<liferay-ui:message key="appraisal-assessment-delete-confirm"/>');
+        if (response) {
+          var classes = jQuery(this).attr('class').split(/\s+/);
+
+          // Find the id of the assessment we're deleting
+          var deleteFlagSelector = ".appraisal-assessment-deleted-";
+          var assessmentSelector = ".appraisal-assessment-";
+          jQuery.each(classes, function(index, item) {
+            if (item.indexOf("delete.id.") != -1) {
+              var assessmentId = item.replace("delete.id.", "");
+              deleteFlagSelector += assessmentId;
+              assessmentSelector += assessmentId;
+            }
+          });
+
+          jQuery(deleteFlagSelector).val(1); // set the deleted flag
+          jQuery(assessmentSelector).hide('slow'); // hide assessment
+        }
+        return false;
+      }
+
+      jQuery(".assessment-delete").click(function() {
+        return assessmentDelete.call(this);
+      });
+
+      /**
+       * Handles adding a new assessment to the DOM. This js method clones the last .appraisal-criteria
+       * fieldset in the form. The logic in this function is to update the various classes, names and ids
+       * of the various html elements in the .appraisal-criteria fieldset. The various labels, inputs,
+       * textareas and checkboxes in an assessment have in the html classes/name/id information about what
+       * assessment the property belongs to. This is so that the java side knows what assessment a goal is
+       * associated to and what assessment the assessment criteria are associated to.
+       *
+       * We chose to use js to clone & add an assessment because we didn't find an easy what for an ajax
+       * serveResource call to return html from the assessment.jsp. The ajax serveResource calls can return
+       * json, but we couldn't figure out how to get the serveResource method to parse a single jsp file.
+       */
+      jQuery(".osu-cws #addAssessment").click(function() {
+        // clone last assessment in the form for modification
+        var newAssessment = jQuery('.appraisal-criteria fieldset:last-child').clone(true);
+        newAssessment.show(); // last assessment could have been deleted
+        var assessmentCount = jQuery('.appraisal-criteria fieldset').size() + 1;
+
+        // The rest of this function takes care of updating ids, names and classes
+
+        // legend, fieldset class and h3 for accessibility
+        newAssessment.attr('class', 'appraisal-assessment-' + assessmentCount);
+        var legendHtml = newAssessment.find('legend').html();
+        legendHtml = legendHtml.replace(/#\d+/, '#' + assessmentCount);
+        newAssessment.find('legend').html(legendHtml);
+        newAssessment.find('h3.secret').html('<liferay-ui:message key="appraisal-assessment-header"/>' + assessmentCount);
+
+
+        // Delete Assessment Link
+        var removeLinkClass = newAssessment.find('legend a').attr('class');
+        removeLinkClass = removeLinkClass.replace(/\.\d+/, '') + "." + assessmentCount;
+        newAssessment.find('legend a').attr('class', removeLinkClass);
+
+        // delete flag hidden input
+        var deleteFlagInput = jQuery(newAssessment.find(':input:hidden')[0]);
+        var deleteFlagClass = deleteFlagInput.attr('class').replace(/\d+/, '');
+        deleteFlagClass += assessmentCount;
+        deleteFlagInput.attr('class', deleteFlagClass);
+        var deleteFlagName = deleteFlagInput.attr('name').replace(/\.\d+/, '');
+        deleteFlagName += "." + assessmentCount;
+        deleteFlagInput.attr('name', deleteFlagName);
+        deleteFlagInput.val(0);
+
+        // goal label + textarea
+        var goalLabelFor = newAssessment.find('label:first').attr('for').replace(/\.\d+/, '');
+        goalLabelFor += "." + assessmentCount;
+        jQuery(newAssessment.find('label')[0]).attr('for', goalLabelFor);
+        var goalTextAreaId = newAssessment.find('textarea').attr('id').replace(/\.\d+/, '');
+        goalTextAreaId += "." + assessmentCount;
+        newAssessment.find('textarea').attr('id', goalTextAreaId);
+        newAssessment.find('textarea').attr('name', goalTextAreaId);
+        newAssessment.find('textarea').attr('class', ''); // clear any class inputs
+
+        // assessment criterias checkboxes
+        jQuery.each(newAssessment.find(':checkbox'), function(index, element) {
+            // The AssessmentCriteria checkboxes have suffixes. In order to make them unique ids in
+            // in the form, we're using multiples of assmentCount starting with assessmentCount
+            var checkBoxName = jQuery(element).attr('name').replace(/\.\d+/, '');
+            checkBoxName += "." + (assessmentCount * (index + 1));
+            jQuery(element).attr('name', checkBoxName);
+            jQuery(element).attr('id', checkBoxName);
+            jQuery(element).removeAttr('checked');
+        });
+
+        // assessment criterias labels
+        jQuery.each(newAssessment.find('label'), function(index, element) {
+            var checkBoxName = jQuery(element).attr('for').replace(/\.\d+/, '');
+            checkBoxName += "." + (assessmentCount * index);
+            // The first label is the Goals label, the rest should be assessment criterias
+            if (index != 0) {
+              jQuery(element).attr('for', checkBoxName);
+            }
+        });
+
+        newAssessment.appendTo('.appraisal-criteria'); // add new assessment to form
+        jQuery('.appraisal-assessment-' + assessmentCount + ' textarea').val(''); // clearing this before appending it didn't work
+
+        // update # of assessment in form
+        jQuery('#assessmentCount').val(assessmentCount);
+
+        // set a handler for the delete link in the newly added assessment
+        jQuery('.appraisal-assessment-' + assessmentCount + ' a.assessment-delete').click(function() {
+          return assessmentDelete.call(this);
+        });
+
+        return false;
+      })
+
     });
     </script>
     </c:if>

@@ -1,10 +1,20 @@
 <%
+// This file renders a single assessment in the form with: goals, employee/supervisor results and
+// assessment criteria checkboxes. It loops through the assessment.sortedAssessmentCriteria to
+// include appraisals/assessmentCriteria which is the jsp that generates the checkboxes
+
 Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 %>
-<fieldset>
+<fieldset class="appraisal-assessment-${assessment.id}">
 <h3 class="secret"><liferay-ui:message key="appraisal-assessment-header"/>${loopStatus.index + 1}</h3>
-<legend><liferay-ui:message key="appraisal-assessment-header"/>${loopStatus.index + 1}</legend>
+<legend>
+    <liferay-ui:message key="appraisal-assessment-header"/>${loopStatus.index + 1}
+    <a class="delete img-only assessment-delete delete.id.${assessment.id}" title="<liferay-ui:message key="appraisal-assessment-delete"/>"
+       href="#"><liferay-ui:message key="appraisal-assessment-delete"/></a>
+</legend>
 
+<input type="hidden" class="appraisal-assessment-deleted-${assessment.id}" name="<portlet:namespace />appraisal.assessment.deleted.${assessment.id}"
+       value="0"/>
 <c:choose>
     <c:when test="${permissionRule.goals == 'e'}">
         <label for="<portlet:namespace />appraisal.goal.${assessment.id}"><liferay-ui:message key="appraisal-goals" /></label>
@@ -18,9 +28,11 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
         </fieldset>
     </c:when>
 </c:choose>
-<c:forEach var="assessmentCriteria" items="${assessment.sortedAssessmentCriteria}" varStatus="loopStatus2">
-    <%@ include file="/jsp/appraisals/assessmentCriteria.jsp"%>
-</c:forEach>
+<c:if test="${permissionRule.goals != null}">
+    <c:forEach var="assessmentCriteria" items="${assessment.sortedAssessmentCriteria}" varStatus="loopStatus2">
+        <%@ include file="/jsp/appraisals/assessmentCriteria.jsp"%>
+    </c:forEach>
+</c:if>
 
 
 <c:choose>

@@ -7,7 +7,7 @@ public class GoalVersion {
 
     private Appraisal appraisal;
 
-    private int approverPidm;
+    private Integer approverPidm;
 
     private Date createDate;
 
@@ -33,11 +33,11 @@ public class GoalVersion {
         this.appraisal = appraisal;
     }
 
-    public int getApproverPidm() {
+    public Integer getApproverPidm() {
         return approverPidm;
     }
 
-    public void setApproverPidm(int approverPidm) {
+    public void setApproverPidm(Integer approverPidm) {
         this.approverPidm = approverPidm;
     }
 
@@ -105,5 +105,20 @@ public class GoalVersion {
         goalVersion.setApproverPidm(trialAppraisal.getCurrentGoalVersion().getApproverPidm());
 
         return goalVersion;
+    }
+
+    /*
+     * Returns the sequence of the last assessment in the collection.
+     *
+     * @return
+     */
+    public Integer getLastSequence() {
+        Integer lastSequence = 0;
+        for (Assessment assessment : assessments) {
+            if (assessment.getSequence() > lastSequence) {
+                lastSequence = assessment.getSequence();
+            }
+        }
+        return lastSequence;
     }
 }
