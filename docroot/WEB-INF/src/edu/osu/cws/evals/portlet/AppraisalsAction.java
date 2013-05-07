@@ -366,8 +366,6 @@ public class AppraisalsAction implements ActionInterface {
 
         // set the overdue value before updating the status
         String beforeUpdateStatus = appraisal.getStatus();
-        // calculate overdue value & set the appraisal.overdue value
-        AppraisalMgr.updateOverdue(appraisal, configurationMap);
         int oldOverdue = appraisal.getOverdue();
 
         // update appraisal & assessment fields based on permission rules
@@ -388,17 +386,12 @@ public class AppraisalsAction implements ActionInterface {
             }
 
             // Assign the new status based on configuration values
-            String newStatus = AppraisalMgr.getNewStatus(appraisal, configurationMap);
+            String newStatus = appraisal.getNewStatus(configurationMap);
             if (newStatus != null) {
                 appraisal.setStatus(newStatus);
             }
 
-            // If the new status is valid for overdue, refresh the overdue value
-            if (appraisal.getStatus().contains(Appraisal.OVERDUE)) {
-                AppraisalMgr.updateOverdue(appraisal, configurationMap);
-            } else {
-                appraisal.setOverdue(-999);
-            }
+            appraisal.setOverdue(-999);
         }
 
         // save changes to db
