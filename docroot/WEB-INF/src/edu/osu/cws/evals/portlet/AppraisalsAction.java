@@ -86,11 +86,9 @@ public class AppraisalsAction implements ActionInterface {
      * @throws Exception
      */
     private void initializeAppraisal() throws Exception {
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
         int appraisalID = ParamUtil.getInteger(request, "id");
         if (appraisalID > 0) {
-            actionHelper.setAppraisalMgrParameters(appraisalMgr);
-            appraisal = appraisalMgr.getAppraisal(appraisalID);
+            appraisal = AppraisalMgr.getAppraisal(appraisalID);
             if(appraisal != null) {
                 userRole = getRole();
                 appraisal.setRole(userRole);
@@ -189,10 +187,9 @@ public class AppraisalsAction implements ActionInterface {
             if (isReviewer) {
                 bcName = actionHelper.getReviewer().getBusinessCenterName();
             }
-            AppraisalMgr appraisalMgr = new AppraisalMgr();
 
             try {
-                appraisals = appraisalMgr.search(searchTerm, pidm, isSupervisor, bcName);
+                appraisals = AppraisalMgr.search(searchTerm, pidm, isSupervisor, bcName);
 
                 if (appraisals.isEmpty()) {
                     if (isAdmin) {
@@ -842,7 +839,6 @@ public class AppraisalsAction implements ActionInterface {
             return errorHandler.handleAccessDenied(request, response);
         }
 
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
         actionHelper.addToRequestMap("id", appraisal.getId());
 
         if (!isReviewer) {

@@ -366,7 +366,7 @@ public class AppraisalsTest {
     }
 
     public void shouldOnlyIncludeReviewDueOrReviewPastDueInAppraisalReviewList() throws Exception {
-        for (Appraisal appraisal : appraisalMgr.getReviews("UABC", -1)) {
+        for (Appraisal appraisal : AppraisalMgr.getReviews("UABC", -1)) {
             assert appraisal.getStatus().equals(Appraisal.STATUS_REVIEW_DUE)
                     || appraisal.getStatus().equals(Appraisal.STATUS_REVIEW_OVERDUE);
         }
@@ -374,7 +374,7 @@ public class AppraisalsTest {
 
     public void getReviewsShouldIncludeOnlyNeededFields() throws Exception {
         //@todo: a couple of extra fields were added to the reviews: supervisor first/last name and tsOrgCode
-        for (Appraisal appraisal : appraisalMgr.getReviews("UABC", -1)) {
+        for (Appraisal appraisal : AppraisalMgr.getReviews("UABC", -1)) {
             assert appraisal.getId() != 0 : "Missing appraisalID";
             assert !appraisal.getJob().getEmployee().getName().equals("") : "Missing employeeName";
             assert !appraisal.getJob().getJobTitle().equals("") : "Missing jobTitle";
@@ -384,8 +384,8 @@ public class AppraisalsTest {
     }
 
     public void shouldReturnCorrectReviewCount() throws Exception {
-        assert appraisalMgr.getReviewCount("UABC") == 2;
-        assert appraisalMgr.getReviewCount("foobar") == 0;
+        assert AppraisalMgr.getReviewCount("UABC") == 2;
+        assert AppraisalMgr.getReviewCount("foobar") == 0;
     }
 
     /**
