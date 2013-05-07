@@ -27,7 +27,7 @@
 
 <div id="pass-appraisal-form" class="osu-cws">
 
-<c:if test="${showForm}">
+<c:if test="${showForm and !empty appraisalNotice.text}">
     <span class="portlet-msg-alert">
     <c:out value = "${appraisalNotice.text}"/>
 

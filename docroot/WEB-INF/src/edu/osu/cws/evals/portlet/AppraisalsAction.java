@@ -167,7 +167,6 @@ public class AppraisalsAction implements ActionInterface {
         initialize(request);
         List<Appraisal> appraisals = new ArrayList<Appraisal>();
         actionHelper.addToRequestMap("pageTitle", "search-results");
-
         boolean isAdmin = actionHelper.getAdmin() != null;
         boolean isReviewer = actionHelper.getReviewer() != null;
 
@@ -193,7 +192,7 @@ public class AppraisalsAction implements ActionInterface {
             AppraisalMgr appraisalMgr = new AppraisalMgr();
 
             try {
-                appraisals = appraisalMgr.search(searchTerm, pidm, isAdmin, isSupervisor, bcName);
+                appraisals = appraisalMgr.search(searchTerm, pidm, isSupervisor, bcName);
 
                 if (appraisals.isEmpty()) {
                     if (isAdmin) {
