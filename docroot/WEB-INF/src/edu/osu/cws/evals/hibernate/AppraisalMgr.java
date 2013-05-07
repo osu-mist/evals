@@ -5,7 +5,6 @@ import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
-import edu.osu.cws.evals.util.Mailer;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
@@ -48,11 +47,10 @@ public class AppraisalMgr {
      */
     public static Appraisal createAppraisal(Job job, DateTime startDate, String type)
             throws Exception {
-        CriteriaMgr criteriaMgr = new CriteriaMgr();
         Appraisal appraisal = new Appraisal();
-        //@todo
-        // CriterionDetail detail;
-        Assessment assessment;
+        GoalVersion goalVersion = new GoalVersion();
+        goalVersion.setAppraisal(appraisal);
+        goalVersion.setCreateDate(new Date());
 
         if (!type.equals(Appraisal.TYPE_TRIAL) && !type.equals(Appraisal.TYPE_ANNUAL) &&
                 !type.equals(Appraisal.TYPE_INITIAL)) {
@@ -76,22 +74,15 @@ public class AppraisalMgr {
         appraisal.setEndDate(CWSUtil.toDate(endDate));
 
         if (appraisal.validate()) {
-            String appointmentType = job.getAppointmentType();
-            List<CriterionArea> criteriaList = criteriaMgr.list(appointmentType);
             Session session = HibernateUtil.getCurrentSession();
-            session.save(appraisal);///441
+            session.save(appraisal);
+            session.save(goalVersion);
 
-            // Create assessment and associate it to appraisal
-            for (CriterionArea criterion : criteriaList) {
-                //@todo
-                //detail = criterion.getCurrentDetail();
-                assessment = new Assessment();
-//                assessment.setAppraisal(appraisal);
-                //@todo
-                // assessment.setCriterionDetail(detail);
-                assessment.setCreateDate(new Date());
-                assessment.setModifiedDate(new Date());
-                session.save(assessment);
+            // Create the assessments & assessment criteria
+            String appointmentType = job.getAppointmentType();
+            List<CriterionArea> criteriaList = CriteriaMgr.list(appointmentType);
+            for (int i = 1; i <= Constants.BLANK_ASSESSMENTS_IN_NEW_EVALUATION; i++) {
+                AppraisalMgr.createNewAssessment(goalVersion, i, criteriaList);
             }
         }
 

@@ -33,11 +33,11 @@ public class GoalVersion {
         this.appraisal = appraisal;
     }
 
-    public int getApproverPidm() {
+    public Integer getApproverPidm() {
         return approverPidm;
     }
 
-    public void setApproverPidm(int approverPidm) {
+    public void setApproverPidm(Integer approverPidm) {
         this.approverPidm = approverPidm;
     }
 
