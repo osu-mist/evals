@@ -385,12 +385,6 @@ public class AppraisalsAction implements ActionInterface {
                 // don't do anything since some methods might not exist.
             }
 
-            // Assign the new status based on configuration values
-            String newStatus = appraisal.getNewStatus(configurationMap);
-            if (newStatus != null) {
-                appraisal.setStatus(newStatus);
-            }
-
             appraisal.setOverdue(-999);
         }
 

@@ -1,6 +1,5 @@
 package edu.osu.cws.evals.models;
 
-import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.util.EvalsUtil;
 
 import java.text.MessageFormat;
@@ -897,8 +896,7 @@ public class Appraisal extends Evals {
      */
     public void updateOverdue(Map<String, Configuration> configurationMap)
             throws Exception {
-        int overdue = EvalsUtil.getOverdue(this, configurationMap);
-        setOverdue(overdue);
+        overdue = EvalsUtil.getOverdue(this, configurationMap);
     }
 
     /**
