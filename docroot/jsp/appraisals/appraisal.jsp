@@ -92,9 +92,11 @@
     </c:if>
 
     <div class="appraisal-criteria">
-    <c:forEach var="assessment" items="${appraisal.currentGoalVersion.sortedAssessments}" varStatus="loopStatus">
-        <%@ include file="/jsp/appraisals/assessments.jsp"%>
-    </c:forEach>
+        <c:if test="${permissionRule.goals == 'e' || permissionRule.goals == 'v'}">
+            <c:forEach var="assessment" items="${appraisal.currentGoalVersion.sortedAssessments}" varStatus="loopStatus">
+                <%@ include file="/jsp/appraisals/assessments.jsp"%>
+            </c:forEach>
+        </c:if>
     </div>
 
     <c:if test="${permissionRule.goals == 'e'}">
