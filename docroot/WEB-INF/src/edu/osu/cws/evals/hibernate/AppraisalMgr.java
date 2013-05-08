@@ -628,7 +628,6 @@ public class AppraisalMgr {
      *
      * @param searchTerm    osu id of or name the employee's appraisals we are searching
      * @param pidm          pidm of the logged in user
-     * @param isAdmin
      * @param isSupervisor
      * @param bcName
      * @return
@@ -886,21 +885,6 @@ public class AppraisalMgr {
         return ids;
     }
 
-
-    /**
-     * Calculates the overdue value for the appraisal object and updates the value in the object.
-     * It does not update the db.
-     *
-     * @param appraisal
-     * @param configurationMap
-     * @throws Exception
-     */
-    public static void updateOverdue(Appraisal appraisal, Map<String, Configuration> configurationMap)
-            throws Exception {
-        int overdue = EvalsUtil.getOverdue(appraisal, configurationMap);
-        appraisal.setOverdue(overdue);
-    }
-
     /**
      * Saves the overdue value by itself in the appraisal record.
      *
@@ -912,67 +896,6 @@ public class AppraisalMgr {
                 .setInteger("id", appraisal.getId())
                 .setInteger("overdue", appraisal.getOverdue())
                 .executeUpdate();
-    }
-
-    /**
-     * Calculates what should be the new status of a given appraisal. It looks at the
-     * configuration values to see whether the status is due or overdue.
-     * @todo: handle: STATUS_GOALS_REACTIVATED in next release
-     *
-     * @param appraisal
-     * @param configMap
-     * @return
-     * @throws Exception
-     */
-    public static String getNewStatus(Appraisal appraisal,
-                                      Map<String, Configuration> configMap) throws Exception {
-        String newStatus = null;
-        String status = appraisal.getStatus();
-        Configuration config = configMap.get(status); //config object of this status
-
-        if (status.contains(Appraisal.DUE) && EvalsUtil.isDue(appraisal, config) <= 0) {
-            newStatus = status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
-        } else if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)
-                &&  isGoalsReqModOverDue(appraisal, configMap)) {
-            //goalsRequiredModification is not overdue.
-            newStatus = Appraisal.STATUS_GOALS_OVERDUE;
-        } else if (status.equals(Appraisal.STATUS_GOALS_APPROVED)) {
-            //Need to check to see if it's time to change the status to results due
-            Configuration reminderConfig = configMap.get("firstResultDueReminder");
-            if (EvalsUtil.isDue(appraisal, reminderConfig) < 0) {
-                newStatus = Appraisal.STATUS_RESULTS_DUE;
-            }
-        }
-        return newStatus;
-    }
-
-    /**
-     * If goals are not due yet, then no
-     * If goals are due, check to see if goalsRequiredModification is overdue
-     * Goals modifications due date is a configuration parameter which
-     * defines how many days after requiredModification is submitted before they are due.
-     * If goals modification is over due, then yes.
-     * @param appraisal
-     * @param configMap
-     * @return true if both goals are overdue and goalsRequiredModification is overdue. Otherwise false.
-     * @throws Exception
-     */
-    private static boolean isGoalsReqModOverDue(Appraisal appraisal,
-                                                Map<String, Configuration> configMap) throws Exception
-    {
-        Configuration goalsDueConfig = configMap.get(Appraisal.STATUS_GOALS_DUE); //this config exists
-
-        if (EvalsUtil.isDue(appraisal, goalsDueConfig) <= 0) { //goals due or overdue
-            System.out.println(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION + ", goals overdue");
-            //goals is due or overdue.  Is goalsRequiredModification overdue?
-            Configuration modConfig = configMap.get("goalsRequiredModificationDue");
-
-            if (EvalsUtil.isDue(appraisal, modConfig) < 0) {  // requiredModification is over due.
-               return true;
-            }
-        }
-
-        return false;
     }
 
     /**
