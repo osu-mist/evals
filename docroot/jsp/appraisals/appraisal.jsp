@@ -97,6 +97,14 @@
     </c:forEach>
     </div>
 
+    <c:if test="${permissionRule.goals == 'e'}">
+        <ul class="ul-h-nav">
+            <li><a href="#" class="img-txt add" id="addAssessment">
+                <liferay-ui:message key="appraisal-assessment-add"/></a>
+            </li>
+        </ul>
+    </c:if>
+
     <c:choose>
         <c:when test="${permissionRule.goalComments == 'e'}">
             <fieldset>
@@ -210,12 +218,6 @@
         <input name="${permissionRule.submit}" class="evals-show-confirm"
                type="submit" id="<portlet:namespace />${permissionRule.submit}"
         value="<liferay-ui:message key="${permissionRule.submit}" />">
-        </c:if>
-
-        <c:if test="${permissionRule.goals == 'e'}">
-        <input name="addAssessment"
-               type="submit" id="addAssessment"
-        value="<liferay-ui:message key="appraisal-assessment-add"/>">
         </c:if>
 
         <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}">
