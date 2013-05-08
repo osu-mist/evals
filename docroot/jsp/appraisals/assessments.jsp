@@ -9,8 +9,11 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 <h3 class="secret"><liferay-ui:message key="appraisal-assessment-header"/>${loopStatus.index + 1}</h3>
 <legend>
     <liferay-ui:message key="appraisal-assessment-header"/>${loopStatus.index + 1}
-    <a class="delete img-only assessment-delete delete.id.${assessment.id}" title="<liferay-ui:message key="appraisal-assessment-delete"/>"
-       href="#"><liferay-ui:message key="appraisal-assessment-delete"/></a>
+    <c:if test="${permissionRule.goals == 'e'}">
+        <a class="delete img-only assessment-delete delete.id.${assessment.id}"
+           title="<liferay-ui:message key="appraisal-assessment-delete"/>"
+           href="#"><liferay-ui:message key="appraisal-assessment-delete"/></a>
+    </c:if>
 </legend>
 
 <input type="hidden" class="appraisal-assessment-deleted-${assessment.id}" name="<portlet:namespace />appraisal.assessment.deleted.${assessment.id}"
