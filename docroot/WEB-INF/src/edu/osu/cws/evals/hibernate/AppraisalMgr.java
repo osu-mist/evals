@@ -126,9 +126,6 @@ public class AppraisalMgr {
         // copy appraisal & properties
         Appraisal appraisal = Appraisal.createFirstAnnual(trialAppraisal);
 
-        // set the status. The cron job will update the status if needed
-        appraisal.setStatus(Appraisal.STATUS_GOALS_APPROVED);
-
         Session session = HibernateUtil.getCurrentSession();
         session.save(appraisal);
 

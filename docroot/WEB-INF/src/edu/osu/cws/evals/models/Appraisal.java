@@ -921,6 +921,9 @@ public class Appraisal extends Evals {
         appraisal.setGoalApprovedDate(trialAppraisal.getGoalApprovedDate());
         appraisal.setRating(0);
 
+        // set the status. The cron job will update the status if needed
+        appraisal.setStatus(Appraisal.STATUS_GOALS_APPROVED);
+
         // calculate & set the end date
         DateTime startDate = new DateTime(appraisal.getStartDate());
         DateTime endDate = appraisal.getJob().getEndEvalDate(startDate, Appraisal.TYPE_INITIAL);
