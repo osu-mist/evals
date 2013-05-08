@@ -126,15 +126,8 @@ public class AppraisalMgr {
         // copy appraisal & properties
         Appraisal appraisal = Appraisal.createFirstAnnual(trialAppraisal);
 
-        // set the status
-        int resultsDue = EvalsUtil.isDue(appraisal, resultsDueConfig);
-        if (resultsDue == 0) {
-            appraisal.setStatus(Appraisal.STATUS_RESULTS_DUE);
-        } else if (resultsDue < 0) {
-            appraisal.setStatus(Appraisal.STATUS_RESULTS_OVERDUE);
-        } else {
-            appraisal.setStatus(Appraisal.STATUS_GOALS_APPROVED);
-        }
+        // set the status. The cron job will update the status if needed
+        appraisal.setStatus(Appraisal.STATUS_GOALS_APPROVED);
 
         Session session = HibernateUtil.getCurrentSession();
         session.save(appraisal);
