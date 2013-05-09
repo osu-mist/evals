@@ -26,10 +26,16 @@
     }
     jQuery(document).ready(function() {
         // Handle submit buttons that need confirmation
-        jQuery("input.evals-show-confirm").click(function() {
+        jQuery("input.evals-show-confirm").click(function(event) {
+            // if a previous js action aborted the click, don't show the confirm box
+            if (event.isDefaultPrevented != undefined && event.isDefaultPrevented == true) {
+                return false;
+            }
+
             var buttonText = jQuery(this).val();
             return <portlet:namespace/>confirmBox(buttonText);
         });
+
         // Handle the links in action menu bar that need confirmation
         jQuery("span.evals-show-confirm a").click(function() {
             var buttonText = "";

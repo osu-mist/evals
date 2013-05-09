@@ -46,6 +46,7 @@ ResourceBundle bundle = (ResourceBundle)ctx.getAttribute("resourceBundle");
     <%@ include file="/jsp/menuMax.jsp"%>
 </c:if>
 
+<a name="evals-flash"></a>
 <div id="<portlet:namespace />flash">
     <c:if test="${!empty errorMsg}">
     <span class="portlet-msg-error">${errorMsg}</span>

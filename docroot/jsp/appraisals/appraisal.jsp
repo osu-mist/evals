@@ -1,3 +1,4 @@
+<%@ page import="edu.osu.cws.evals.portlet.Constants" %>
 <%@ include file="/jsp/init.jsp"%>
 <% Appraisal formAppraisal = (Appraisal) renderRequest.getAttribute("appraisal"); %>
 
@@ -273,6 +274,30 @@
         return true;
       });
 
+            //@todo: add erors to the top and scroll to it.
+      // Handle validation of assessments' goals
+      jQuery("#<portlet:namespace />submit-goals").click(function(event) {
+         // remove any previous goal errors
+        jQuery('.appraisal-criteria fieldset').each(function(index, element) {
+          removeJSError.call(element);
+        })
+
+        if (!validateGoals()) {
+          //set property so that we can check in other handlers if we can abort
+          event.isDefaultPrevented = true;
+
+          // set error message at the top and scroll to the top of eval form
+          jQuery("#<portlet:namespace />flash").html(
+            '<span class="portlet-msg-error"><ul><liferay-ui:message key="appraisal-assessment-goalErrors" /></ul></span>'
+          );
+          location.href="#evals-flash";
+
+          return false;
+        }
+
+        return true;
+      });
+
 
       // Handle rebuttal show/hide
       jQuery("#<portlet:namespace />show-rebuttal").click(function() {
@@ -413,9 +438,93 @@
         });
 
         return false;
-      })
-
+      });
     });
+
+    /**
+     * Whether or not the goals textarea is empty in an assessment.
+     *
+     * @return {Boolean}
+     */
+    function areGoalsEmpty() {
+        return jQuery(this).find('textarea').val().trim() == "";
+    }
+
+    /**
+     * Whether or not all criteria assessment checkboxes in an assessment are unchecked.
+     *
+     * @return {Boolean}
+     */
+    function areGoalsCheckboxesEmtpy() {
+        return jQuery(this).find('input:checkbox:checked').size() == 0;
+    }
+
+    /**
+     * Whether or not a given assessment has been deleted by the user via js.
+     *
+     * @return {Boolean}
+     */
+    function isAssesmentDeleted() {
+      // find the delete flag hidden input
+      var deleteFlag = jQuery(this).find('input:hidden').filter(function(index) {
+          return jQuery(this).attr('class').indexOf('appraisal-assessment-deleted-') == 0;
+      });
+      return deleteFlag.val() != 0
+    }
+
+    /**
+     * Removes a goal js error if set.
+     */
+    function removeJSError() {
+      jQuery(this).find('.js-error').remove();
+    }
+
+    /**
+     * Validates the goals. It checks:
+     * 1) at least Constants.MIN_REQUIRED_ASSESSMENTS of non-empty goals are provided in form
+     * 2) User doesn't have empty goals with criteria assessments checked
+     * 3) User doesn't have criteria assessments completely unchecked with entered goals.
+     * @return {Boolean}
+     */
+    function validateGoals() {
+      // get a list of non empty and not-deleted assessments
+      var nonEmptyAssessments = jQuery('.appraisal-criteria fieldset').filter(function(index) {
+        if (isAssesmentDeleted.call(this)) { // filter out deleted assessments
+          return false;
+        }
+
+        var emptyGoals = areGoalsEmpty.call(this);
+        var emptyCheckboxes = areGoalsCheckboxesEmtpy.call(this);
+
+        return !emptyGoals && !emptyCheckboxes;
+      }).size();
+
+      // specify validation error of too low # of assessments
+      if (nonEmptyAssessments < <%= Constants.MIN_REQUIRED_ASSESSMENTS %>) {
+        alert('<liferay-ui:message key="appraisal-assessment-min" /> <%= Constants.MIN_REQUIRED_ASSESSMENTS %>');
+        return false;
+      }
+
+      // validate each assessment to verify that we don't have non-empty goals with no criterias checked or vice-versa
+      var validGoals = true;
+      jQuery('.appraisal-criteria fieldset').filter(function(index) {
+        if (isAssesmentDeleted.call(this)) { // filter out deleted assessments
+          return false;
+        }
+
+        var emptyGoals = areGoalsEmpty.call(this);
+        var emptyCheckboxes = areGoalsCheckboxesEmtpy.call(this);
+
+        return (emptyGoals && !emptyCheckboxes) || (!emptyGoals && emptyCheckboxes);
+      }).each(function(index, element) {
+        validGoals = false;
+        // add error message
+        jQuery(element).append('<span class="js-error"><liferay-ui:message key="appraisal-assessment-validation" /></span>');
+      });
+
+      return validGoals;
+    }
+
     </script>
     </c:if>
 
