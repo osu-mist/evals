@@ -60,6 +60,9 @@ public class Constants {
 
     public static final Integer SEARCH_MAX_RESULTS = 20;
 
+    // The minimum # of assessments required in the evaluation form
+    public static final Integer MIN_REQUIRED_ASSESSMENTS = 1;
+
     // The # of blank assessments that are created for a new evaluation
     public static final Integer BLANK_ASSESSMENTS_IN_NEW_EVALUATION = 5;
 
