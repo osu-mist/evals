@@ -3,9 +3,10 @@ package edu.osu.cws.evals.portlet;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.BusinessCenterMgr;
-import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.hibernate.ReviewerMgr;
-import edu.osu.cws.evals.models.*;
+import edu.osu.cws.evals.models.BusinessCenter;
+import edu.osu.cws.evals.models.ModelException;
+import edu.osu.cws.evals.models.Reviewer;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -38,7 +39,8 @@ public class ReviewersAction implements ActionInterface {
         }
 
         actionHelper.refreshContextCache();
-        ArrayList<Reviewer> reviewersList = (ArrayList<Reviewer>) actionHelper.getPortletContextAttribute("reviewersList");
+        ArrayList<Reviewer> reviewersList =
+                (ArrayList<Reviewer>) actionHelper.getPortletContextAttribute("reviewersList");
         ArrayList<BusinessCenter> businessCenters = (ArrayList<BusinessCenter>) BusinessCenterMgr.list();
 
         actionHelper.addToRequestMap("isMaster", actionHelper.isLoggedInUserMasterAdmin());
@@ -72,7 +74,6 @@ public class ReviewersAction implements ActionInterface {
         String businessCenterName = ParamUtil.getString(request, "businessCenterName");
 
         // Check whether or not the user is already a reviewer user
-        Employee onidUser = EmployeeMgr.findByOnid(onid, null);
         if (isReviewer) {
             actionHelper.addErrorsToRequest(resource.getString("already-reviewer"));
             return list(request, response);
@@ -107,7 +108,6 @@ public class ReviewersAction implements ActionInterface {
 
         int id = ParamUtil.getInteger(request, "id");
         try {
-
             // If the user clicks on the delete link the first time, use confirm page
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
                 Reviewer reviewer = ReviewerMgr.get(id);

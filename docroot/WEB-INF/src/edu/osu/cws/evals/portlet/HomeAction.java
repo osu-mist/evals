@@ -7,7 +7,6 @@ import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Employee;
-import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
@@ -37,7 +36,7 @@ public class HomeAction implements ActionInterface {
     public String display(PortletRequest request, PortletResponse response) throws Exception {
         Map Notices = (Map)actionHelper.getPortletContextAttribute("Notices");
         actionHelper.addToRequestMap("homePageNotice", Notices.get("Homepage Notice"));
-        String homeJSP = getHomeJSP(request);
+        String homeJSP = getHomeJSP();
         PropertiesConfiguration config = actionHelper.getEvalsConfig();
         boolean isAdmin = actionHelper.getAdmin() != null;
         boolean isReviewer = actionHelper.getReviewer() != null;
@@ -170,11 +169,10 @@ public class HomeAction implements ActionInterface {
      * view that file. If the user doesn't have access to that view, it
      * returns the default home-jsp.
      *
-     * @param request
      * @return
      * @throws Exception
      */
-    private String getHomeJSP(PortletRequest request) throws Exception {
+    private String getHomeJSP() throws Exception {
         String homeJsp = Constants.JSP_HOME;
         String currentRole = actionHelper.getCurrentRole();
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");

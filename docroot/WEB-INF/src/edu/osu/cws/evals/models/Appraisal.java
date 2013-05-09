@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.models;
 
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
 import org.joda.time.DateTime;
 
@@ -942,5 +943,78 @@ public class Appraisal extends Evals {
         }
 
         return appraisal;
+    }
+
+    /*
+     * Calculates the overdue value for the appraisal object and updates the value in the object.
+     * It does not update the db.
+     *
+     * @param configurationMap
+     * @throws Exception
+     */
+    public void updateOverdue(Map<String, Configuration> configurationMap)
+            throws Exception {
+        overdue = EvalsUtil.getOverdue(this, configurationMap);
+    }
+
+    /**
+     * Calculates what should be the new status of a given appraisal. It looks at the
+     * configuration values to see whether the status is due or overdue.
+     * @todo: handle: STATUS_GOALS_REACTIVATED in next release
+     *
+     * @param configMap
+     * @return
+     * @throws Exception
+     */
+    public String getNewStatus(Map<String, Configuration> configMap)
+            throws Exception {
+
+        String newStatus = null;
+        String status = getStatus();
+        Configuration config = configMap.get(status); //config object of this status
+
+        if (status.contains(Appraisal.DUE) && EvalsUtil.isDue(this, config) <= 0) {
+            newStatus = status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
+        } else if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)
+                && isGoalsReqModOverDue(configMap)) {
+            //goalsRequiredModification is not overdue.
+            newStatus = Appraisal.STATUS_GOALS_OVERDUE;
+        } else if (status.equals(Appraisal.STATUS_GOALS_APPROVED)) {
+            //Need to check to see if it's time to change the status to results due
+            Configuration reminderConfig = configMap.get("firstResultDueReminder");
+            if (EvalsUtil.isDue(this, reminderConfig) < 0) {
+                newStatus = Appraisal.STATUS_RESULTS_DUE;
+            }
+        }
+        return newStatus;
+    }
+
+    /**
+     * If goals are not due yet, then no
+     * If goals are due, check to see if goalsRequiredModification is overdue
+     * Goals modifications due date is a configuration parameter which
+     * defines how many days after requiredModification is submitted before they are due.
+     * If goals modification is over due, then yes.
+     *
+     * @param configMap
+     * @return true if both goals are overdue and goalsRequiredModification is overdue. Otherwise false.
+     * @throws Exception
+     */
+    private boolean isGoalsReqModOverDue(Map<String, Configuration> configMap)
+            throws Exception {
+
+        Configuration goalsDueConfig = configMap.get(Appraisal.STATUS_GOALS_DUE); //this config exists
+
+        if (EvalsUtil.isDue(this, goalsDueConfig) <= 0) { //goals due or overdue
+            System.out.println(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION + ", goals overdue");
+            //goals is due or overdue.  Is goalsRequiredModification overdue?
+            Configuration modConfig = configMap.get("goalsRequiredModificationDue");
+
+            if (EvalsUtil.isDue(this, modConfig) < 0) {  // requiredModification is over due.
+                return true;
+            }
+        }
+
+        return false;
     }
 }

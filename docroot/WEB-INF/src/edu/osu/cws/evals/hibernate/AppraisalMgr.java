@@ -14,8 +14,6 @@ import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.HashMap;
-import java.util.Iterator;
 
 public class AppraisalMgr {
 
@@ -90,12 +88,11 @@ public class AppraisalMgr {
      * Sets the status of the appraisal. If the startDate of the appraisal is before Nov 1st, 2011, we set the
      * status to appraisalDue, else if
      *
-     * @param startDate         DateTime object
      * @param goalsDueConfig
      * @param appraisal
      * @throws Exception
      */
-    private static void createAppraisalStatus(DateTime startDate, Configuration goalsDueConfig,
+    private static void createAppraisalStatus(Configuration goalsDueConfig,
                                               Appraisal appraisal) throws Exception {
         if (EvalsUtil.isDue(appraisal, goalsDueConfig) < 0) {
             appraisal.setStatus(Appraisal.STATUS_GOALS_OVERDUE);
@@ -117,12 +114,11 @@ public class AppraisalMgr {
      * PYVPASJ.annual_eval_ind.
      *
      * @param  trialAppraisal: this is the newly closed or completed trial appraisal
-     * @param resultsDueConfig
      * @return the newly created appraisal
      * @throws Exception
      */
-    public static Appraisal createInitialAppraisalAfterTrial(Appraisal trialAppraisal,
-                                                             Configuration resultsDueConfig) throws Exception {
+    public static Appraisal createInitialAppraisalAfterTrial(Appraisal trialAppraisal)
+            throws Exception {
         // copy appraisal & properties
         Appraisal appraisal = Appraisal.createFirstAnnual(trialAppraisal);
 
@@ -205,15 +201,12 @@ public class AppraisalMgr {
      *  2) The job annual_indicator != 0
      *
      * @param trialAppraisal
-     * @param configurationMap
      * @throws Exception
      * @return appraisal    The first annual appraisal created, null otherwise
      */
-    public static Appraisal createFirstAnnualAppraisal(Appraisal trialAppraisal,
-                                                Map<String, Configuration>  configurationMap)
+    public static Appraisal createFirstAnnualAppraisal(Appraisal trialAppraisal)
             throws Exception {
         Job job = trialAppraisal.getJob();
-        Configuration resultsDueConfig = configurationMap.get(Appraisal.STATUS_RESULTS_DUE);
 
         if (!trialAppraisal.getType().equals(Appraisal.TYPE_TRIAL)) {
             return null;
@@ -221,7 +214,7 @@ public class AppraisalMgr {
         if (job.getAnnualInd() == 0) {
             return null;
         }
-        return AppraisalMgr.createInitialAppraisalAfterTrial(trialAppraisal, resultsDueConfig);
+        return AppraisalMgr.createInitialAppraisalAfterTrial(trialAppraisal);
     }
 
     /**
@@ -510,10 +503,7 @@ public class AppraisalMgr {
      */
     public static boolean trialAppraisalExists(Job job) throws Exception {
         DateTime startDate = job.getTrialStartDate();
-        if (startDate == null) {
-            return false;
-        }
-        return appraisalExists(job, startDate,  Appraisal.TYPE_TRIAL);
+        return startDate != null && appraisalExists(job, startDate, Appraisal.TYPE_TRIAL);
     }
 
     /** select count(*) from appraisals where job.... and startDAte = startDate and type = type
@@ -628,7 +618,6 @@ public class AppraisalMgr {
      *
      * @param searchTerm    osu id of or name the employee's appraisals we are searching
      * @param pidm          pidm of the logged in user
-     * @param isAdmin
      * @param isSupervisor
      * @param bcName
      * @return
@@ -669,7 +658,6 @@ public class AppraisalMgr {
         }
 
         Session session = HibernateUtil.getCurrentSession();
-        List<Appraisal> appraisals = new ArrayList<Appraisal>();
         if (conditions == null) {
             conditions = new ArrayList<String>();
         }
@@ -703,7 +691,7 @@ public class AppraisalMgr {
 
         List<Appraisal> temp =  (ArrayList<Appraisal>) query.list();
 
-        appraisals = addSupervisorToAppraisals(temp);
+        List<Appraisal> appraisals = addSupervisorToAppraisals(temp);
         return appraisals;
     }
 
@@ -886,21 +874,6 @@ public class AppraisalMgr {
         return ids;
     }
 
-
-    /**
-     * Calculates the overdue value for the appraisal object and updates the value in the object.
-     * It does not update the db.
-     *
-     * @param appraisal
-     * @param configurationMap
-     * @throws Exception
-     */
-    public static void updateOverdue(Appraisal appraisal, Map<String, Configuration> configurationMap)
-            throws Exception {
-        int overdue = EvalsUtil.getOverdue(appraisal, configurationMap);
-        appraisal.setOverdue(overdue);
-    }
-
     /**
      * Saves the overdue value by itself in the appraisal record.
      *
@@ -912,67 +885,6 @@ public class AppraisalMgr {
                 .setInteger("id", appraisal.getId())
                 .setInteger("overdue", appraisal.getOverdue())
                 .executeUpdate();
-    }
-
-    /**
-     * Calculates what should be the new status of a given appraisal. It looks at the
-     * configuration values to see whether the status is due or overdue.
-     * @todo: handle: STATUS_GOALS_REACTIVATED in next release
-     *
-     * @param appraisal
-     * @param configMap
-     * @return
-     * @throws Exception
-     */
-    public static String getNewStatus(Appraisal appraisal,
-                                      Map<String, Configuration> configMap) throws Exception {
-        String newStatus = null;
-        String status = appraisal.getStatus();
-        Configuration config = configMap.get(status); //config object of this status
-
-        if (status.contains(Appraisal.DUE) && EvalsUtil.isDue(appraisal, config) <= 0) {
-            newStatus = status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
-        } else if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)
-                &&  isGoalsReqModOverDue(appraisal, configMap)) {
-            //goalsRequiredModification is not overdue.
-            newStatus = Appraisal.STATUS_GOALS_OVERDUE;
-        } else if (status.equals(Appraisal.STATUS_GOALS_APPROVED)) {
-            //Need to check to see if it's time to change the status to results due
-            Configuration reminderConfig = configMap.get("firstResultDueReminder");
-            if (EvalsUtil.isDue(appraisal, reminderConfig) < 0) {
-                newStatus = Appraisal.STATUS_RESULTS_DUE;
-            }
-        }
-        return newStatus;
-    }
-
-    /**
-     * If goals are not due yet, then no
-     * If goals are due, check to see if goalsRequiredModification is overdue
-     * Goals modifications due date is a configuration parameter which
-     * defines how many days after requiredModification is submitted before they are due.
-     * If goals modification is over due, then yes.
-     * @param appraisal
-     * @param configMap
-     * @return true if both goals are overdue and goalsRequiredModification is overdue. Otherwise false.
-     * @throws Exception
-     */
-    private static boolean isGoalsReqModOverDue(Appraisal appraisal,
-                                                Map<String, Configuration> configMap) throws Exception
-    {
-        Configuration goalsDueConfig = configMap.get(Appraisal.STATUS_GOALS_DUE); //this config exists
-
-        if (EvalsUtil.isDue(appraisal, goalsDueConfig) <= 0) { //goals due or overdue
-            System.out.println(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION + ", goals overdue");
-            //goals is due or overdue.  Is goalsRequiredModification overdue?
-            Configuration modConfig = configMap.get("goalsRequiredModificationDue");
-
-            if (EvalsUtil.isDue(appraisal, modConfig) < 0) {  // requiredModification is over due.
-               return true;
-            }
-        }
-
-        return false;
     }
 
     /**

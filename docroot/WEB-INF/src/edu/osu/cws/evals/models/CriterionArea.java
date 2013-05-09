@@ -5,7 +5,8 @@
 
 package edu.osu.cws.evals.models;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
 
 public class CriterionArea extends Evals {
 

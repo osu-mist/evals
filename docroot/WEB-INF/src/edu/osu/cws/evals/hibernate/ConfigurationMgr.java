@@ -5,10 +5,12 @@ import edu.osu.cws.evals.models.ModelException;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ConfigurationMgr {
 
@@ -20,9 +22,7 @@ public class ConfigurationMgr {
      */
     public static Map<String, Configuration> mapByName() throws Exception {
         HashMap<String, Configuration> configs = new HashMap<String, Configuration>();
-        List<Configuration> configsList = new ArrayList<Configuration>();
-        configsList = ConfigurationMgr.list();
-        for (Configuration configuration : configsList) {
+        for (Configuration configuration : ConfigurationMgr.list()) {
             configs.put(configuration.getName(), configuration);
         }
         return configs;
@@ -36,7 +36,8 @@ public class ConfigurationMgr {
      */
     public static List<Configuration> list() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        List<Configuration> result = session.createQuery("from edu.osu.cws.evals.models.Configuration configuration " +
+        List<Configuration> result = session.createQuery(
+                "from edu.osu.cws.evals.models.Configuration configuration " +
                 "order by configuration.section, configuration.sequence").list();
         return result;
     }

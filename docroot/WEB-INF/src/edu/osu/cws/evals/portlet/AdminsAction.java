@@ -4,7 +4,6 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AdminMgr;
 import edu.osu.cws.evals.models.Admin;
-import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.ModelException;
 
 import javax.portlet.PortletRequest;
@@ -39,7 +38,8 @@ public class AdminsAction implements ActionInterface {
         }
 
         actionHelper.refreshContextCache();
-        ArrayList<Admin> adminsList = (ArrayList<Admin>) actionHelper.getPortletContextAttribute("adminsList");
+        ArrayList<Admin> adminsList =
+                (ArrayList<Admin>) actionHelper.getPortletContextAttribute("adminsList");
         actionHelper.addToRequestMap("isMaster", actionHelper.isLoggedInUserMasterAdmin());
         actionHelper.addToRequestMap("adminsList", adminsList);
         actionHelper.useMaximizedMenu();
@@ -65,7 +65,7 @@ public class AdminsAction implements ActionInterface {
         String isMaster = ParamUtil.getString(request, "isAdmin");
 
         try {
-            AdminMgr.add(onid,  isMaster, actionHelper.getLoggedOnUser());
+            AdminMgr.add(onid, isMaster, actionHelper.getLoggedOnUser());
             actionHelper.updateContextTimestamp();
             actionHelper.setAdminPortletData();
             SessionMessages.add(request, "admin-added");
@@ -95,7 +95,6 @@ public class AdminsAction implements ActionInterface {
         int id = ParamUtil.getInteger(request, "id");
 
         try {
-
             // If the user clicks on the delete link the first time, use confirm page
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
                 Admin admin = AdminMgr.get(id);

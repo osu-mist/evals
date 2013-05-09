@@ -4,7 +4,6 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.CloseOutReasonMgr;
 import edu.osu.cws.evals.models.CloseOutReason;
-import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.ModelException;
 
 import javax.portlet.PortletRequest;

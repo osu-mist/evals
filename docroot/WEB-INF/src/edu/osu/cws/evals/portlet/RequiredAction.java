@@ -4,13 +4,10 @@ package edu.osu.cws.evals.portlet;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.util.EvalsUtil;
-import edu.osu.cws.util.CWSUtil;
-import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
 import java.text.MessageFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 

@@ -2,20 +2,18 @@ package edu.osu.cws.evals.util;
 
 
 import com.itextpdf.text.*;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.draw.LineSeparator;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.Constants;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.Calendar;
 import java.util.List;
+import java.util.ResourceBundle;
 
 public class EvalsPDF {
 
@@ -100,7 +98,6 @@ public class EvalsPDF {
         String filename = getFileName(appraisal, dirName, env);
         Rectangle pageSize = new Rectangle(612f, 792f);
         Document document = new Document(pageSize, 50f, 40f, 24f, 24f);
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(filename));
         document.open();
 
         document.add(getLetterHead(resource, rootDir));
@@ -109,7 +106,7 @@ public class EvalsPDF {
         addEvaluation(appraisal, rule, resource, document, rootDir);
         addRebuttal(appraisal, rule, resource, document);
         if (appraisal.getEmployeeSignedDate() != null) {
-            document.add(getSignatureTable(appraisal, rule, resource, document));
+            document.add(getSignatureTable(appraisal, rule, resource));
         }
         document.close();
         return filename;
@@ -122,12 +119,11 @@ public class EvalsPDF {
      * @param appraisal
      * @param rule
      * @param resource
-     * @param document
      * @return
      * @throws DocumentException
      */
     private static PdfPTable getSignatureTable(Appraisal appraisal, PermissionRule rule,
-                                               ResourceBundle resource, Document document) throws DocumentException {
+                                               ResourceBundle resource) throws DocumentException {
         int signatureTableMaxCols = 29;
         int signatureTableMaxRows = 7;
         int nameColSpan = 8;
@@ -292,7 +288,6 @@ public class EvalsPDF {
     private static void addRebuttal(Appraisal appraisal, PermissionRule rule, ResourceBundle resource,
                                        Document document) throws DocumentException {
         boolean displayEmployeeRebuttal = dispalyEmployeeRebuttal(rule);
-        boolean displayRebuttalRead = StringUtils.containsAny(rule.getRebuttalRead(), "ev");
 
         if (displayEmployeeRebuttal && appraisal.getRebuttal() != null) {
             String rebuttalLblText= resource.getString("appraisal-employee-response").toUpperCase();

@@ -3,8 +3,8 @@ package edu.osu.cws.evals.portlet;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.NoticeMgr;
 import edu.osu.cws.evals.models.Employee;
-import edu.osu.cws.evals.models.Notice;
 import edu.osu.cws.evals.models.ModelException;
+import edu.osu.cws.evals.models.Notice;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;

@@ -13,7 +13,9 @@ import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
-import javax.portlet.*;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
+import javax.portlet.PortletSession;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -172,7 +174,7 @@ public class ReportsAction implements ActionInterface {
             displaySearchResults = search(searchTerm, request);
         }
 
-        setIsMyReport(request);
+        setIsMyReport();
         breadcrumbList = getBreadcrumbs();
         // set the bc name using the scope value of the 2nd breadcrumb if applicable
         if (!displaySearchResults && paramMap.get(Constants.BC_NAME) == null) {
@@ -180,13 +182,13 @@ public class ReportsAction implements ActionInterface {
         }
 
         if (!canViewReport(request)) {
-            accessDeniedReset(request);
+            accessDeniedReset();
             displaySearchResults = false;
         }
 
         if (!displaySearchResults) {
             if (getScope().equals(SCOPE_SUPERVISOR)) {
-                rightPaneData(request);
+                rightPaneData();
             }
 
             // Check if we are viewing a supervisor report of a mere employee
@@ -200,7 +202,7 @@ public class ReportsAction implements ActionInterface {
             if (displayAppraisalSearchList) { // display appraisal list of single employee
                 searchResults = new ArrayList<Job>();
                 searchResults.add(currentSupervisorJob); // add single employee as the result
-                isAppraisalSearch = activeAppraisalList(request, response);
+                isAppraisalSearch = activeAppraisalList();
                 if (!isAppraisalSearch) { //employee had no evaluations
                     String prevSearchTerm = ParamUtil.getString(request, "prevSearchTerm");
                     if (!StringUtils.isEmpty(prevSearchTerm)) { // go back to previous search
@@ -227,9 +229,8 @@ public class ReportsAction implements ActionInterface {
      * Resets the paramMap values to the default report and sets the message of
      * access denied to the user.
      *
-     * @param request
      */
-    private void accessDeniedReset(PortletRequest request) {
+    private void accessDeniedReset() {
         paramMap.put(SCOPE, DEFAULT_SCOPE);
         paramMap.put(SCOPE_VALUE, DEFAULT_SCOPE_VALUE);
         breadcrumbList = new ArrayList<Breadcrumb>();
@@ -325,7 +326,7 @@ public class ReportsAction implements ActionInterface {
                 resource.getString("report-search-js-validation-supervisor"));
 
         // My Report data
-        showMyReportLink(request);
+        showMyReportLink();
 
         // list of breadcrumbs used when the request only needs OSU as the breadcrumbs
         List<Breadcrumb> crumbListWithRootOnly = new ArrayList<Breadcrumb>();
@@ -390,10 +391,9 @@ public class ReportsAction implements ActionInterface {
      * Fetches from the db the data needed for the right pane for supervisors:
      * my evaluations and myTeam evaluations.
      *
-     * @param request
      * @throws Exception
      */
-    private void rightPaneData(PortletRequest request) throws Exception {
+    private void rightPaneData() throws Exception {
         int supervisorLevelPidm = currentSupervisorJob.getEmployee().getId();
         String supervisorLevelPosno = currentSupervisorJob.getPositionNumber();
         String supervisorLevelSuffix = currentSupervisorJob.getSuffix();
@@ -410,12 +410,10 @@ public class ReportsAction implements ActionInterface {
      * search result employee. If the employee doesn't have any appraisals, we show an error
      * message to the user telling them about this.
      *
-     * @param request
-     * @param response
      * @return
      * @throws Exception
      */
-    private boolean activeAppraisalList(PortletRequest request, PortletResponse response)
+    private boolean activeAppraisalList()
             throws Exception {
         listAppraisals = AppraisalMgr.getEmployeeAppraisalList(searchResults);
 
@@ -808,7 +806,7 @@ public class ReportsAction implements ActionInterface {
         return false;
     }
 
-    private void setIsMyReport(PortletRequest request) throws Exception {
+    private void setIsMyReport() throws Exception {
         if (getScope().equals(SCOPE_SUPERVISOR)) {
             int employeeID = actionHelper.getLoggedOnUser().getId();
             isMyReport = currentSupervisorJob.getEmployee().getId() == employeeID;
@@ -845,11 +843,10 @@ public class ReportsAction implements ActionInterface {
      * Whether or not the my report link should be displayed. It also passes to the jsp
      * the needed values to generate the my report links.
      *
-     * @param request
      * @return
      * @throws Exception
      */
-    private void showMyReportLink(PortletRequest request) throws Exception {
+    private void showMyReportLink() throws Exception {
         boolean showMyReportLink = false;
         Employee loggedInUser = actionHelper.getLoggedOnUser();
         boolean isReviewer = actionHelper.getReviewer() != null;
@@ -981,7 +978,7 @@ public class ReportsAction implements ActionInterface {
                         String scopeValue = currentSupervisorJob.getIdKey();
 
                         paramMap.put(SCOPE, SCOPE_SUPERVISOR);
-                        paramMap.put(SCOPE_VALUE, scopeValue.toString());
+                        paramMap.put(SCOPE_VALUE, scopeValue);
                         return false;
                     default:
                         return true;

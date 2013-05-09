@@ -30,10 +30,9 @@ public class CWSUtil {
      * @return true is target is the same as start or end, or target is between start and end.  False otherwise.
      */
     public static boolean isWithinPeriod(DateTime start, DateTime end, DateTime target) {
-        if (target.equals(start) || target.equals(end))   //on the boundary
-            return true;
+        return target.equals(start) || target.equals(end) ||
+                (target.isAfter(start) && target.isBefore(end));
 
-        return (target.isAfter(start) && target.isBefore(end));
     }
 
     /**

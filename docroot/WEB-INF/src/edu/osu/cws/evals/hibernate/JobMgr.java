@@ -104,10 +104,9 @@ public class JobMgr {
      * @return a list of not terminated jobs of businessType.
      */
     public static List<Job> listNotTerminatedJobs(String appointmentType) throws Exception {
-        List<Job> jobs = new ArrayList<Job>();
         Session session = HibernateUtil.getCurrentSession();
 
-        jobs = session.createQuery("from edu.osu.cws.evals.models.Job job " +
+        List<Job> jobs = session.createQuery("from edu.osu.cws.evals.models.Job job " +
                 "where job.status != 'T' and job.appointmentType = :appointmentType")
                 .setString("appointmentType", appointmentType)
                 .list();
@@ -266,7 +265,7 @@ public class JobMgr {
         BigDecimal result = (BigDecimal) query.uniqueResult();
 
         int supervisorCount = Integer.parseInt(result.toString());
-       return supervisorCount < 1;
+        return supervisorCount < 1;
     }
 
     /**
