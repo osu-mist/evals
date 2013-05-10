@@ -84,22 +84,6 @@ public class AppraisalMgr {
         return appraisal;
     }
 
-    /**
-     * Sets the status of the appraisal. If the startDate of the appraisal is before Nov 1st, 2011, we set the
-     * status to appraisalDue, else if
-     *
-     * @param goalsDueConfig
-     * @param appraisal
-     * @throws Exception
-     */
-    private static void createAppraisalStatus(Configuration goalsDueConfig,
-                                              Appraisal appraisal) throws Exception {
-        if (EvalsUtil.isDue(appraisal, goalsDueConfig) < 0) {
-            appraisal.setStatus(Appraisal.STATUS_GOALS_OVERDUE);
-        } else {
-            appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
-        }
-    }
 
     /**
      * This method is called upon completion or closure of an trial appraisal to create the
@@ -486,12 +470,11 @@ public class AppraisalMgr {
         String query = "select appraisal.id from edu.osu.cws.evals.models.Appraisal appraisal " +
                 "where status not in ('completed', 'closed', 'archived')";
 
-        result =  session.createQuery(query).list();
+        result = session.createQuery(query).list();
         ids = new int[result.size()];
         for (int i = 0; i < result.size(); i++) {
             ids[i] = (Integer) result.get(i);
         }
-
 
         return ids;
     }
@@ -691,8 +674,7 @@ public class AppraisalMgr {
 
         List<Appraisal> temp =  (ArrayList<Appraisal>) query.list();
 
-        List<Appraisal> appraisals = addSupervisorToAppraisals(temp);
-        return appraisals;
+        return addSupervisorToAppraisals(temp);
     }
 
     /**

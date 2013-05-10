@@ -23,7 +23,8 @@ import java.io.RandomAccessFile;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class AppraisalsAction implements ActionInterface {
+public class
+        AppraisalsAction implements ActionInterface {
     private ActionHelper actionHelper;
 
     private HomeAction homeAction;
@@ -319,9 +320,9 @@ public class AppraisalsAction implements ActionInterface {
         String[] afterReviewStatus = {Appraisal.STATUS_RELEASE_DUE, Appraisal.STATUS_RELEASE_OVERDUE,
                 Appraisal.STATUS_CLOSED};
         if (ArrayUtils.contains(afterReviewStatus, status) && isReviewer) {
-            removeReviewAppraisalInSession(appraisal);
+            removeReviewAppraisalInSession();
         } else {
-            updateAppraisalInSession(appraisal);
+            updateAppraisalInSession();
         }
 
         return homeAction.display(request, response);
@@ -331,10 +332,9 @@ public class AppraisalsAction implements ActionInterface {
      * Handles removing an appraisal from the reviewList stored in session. This method is called
      * by the AppraisalsAction.update method after a reviewer submits a review.
      *
-     * @param appraisal
      * @throws Exception
      */
-    private void removeReviewAppraisalInSession(Appraisal appraisal) throws Exception {
+    private void removeReviewAppraisalInSession() throws Exception {
         List<Appraisal> reviewList = actionHelper.getReviewsForLoggedInUser(-1);
         List<Appraisal> tempList = new ArrayList<Appraisal>();
         tempList.addAll(reviewList);
@@ -780,10 +780,9 @@ public class AppraisalsAction implements ActionInterface {
      * This method updates the status of the appraisal in myTeam or myStatus to reflect the
      * changes from the update method.
      *
-     * @param appraisal     appraisal to update in session
      * @throws Exception
      */
-    private void updateAppraisalInSession(Appraisal appraisal) throws Exception {
+    private void updateAppraisalInSession() throws Exception {
         List<Appraisal>  appraisals;
 
         if (appraisal.getRole().equals("employee")) {
