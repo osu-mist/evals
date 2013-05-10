@@ -77,7 +77,7 @@ public class AppraisalMgr {
             String appointmentType = job.getAppointmentType();
             List<CriterionArea> criteriaList = CriteriaMgr.list(appointmentType);
             for (int i = 1; i <= Constants.BLANK_ASSESSMENTS_IN_NEW_EVALUATION; i++) {
-                AppraisalMgr.createNewAssessment(goalVersion, i, criteriaList);
+                createNewAssessment(goalVersion, i, criteriaList);
             }
         }
 
@@ -198,7 +198,7 @@ public class AppraisalMgr {
         if (job.getAnnualInd() == 0) {
             return null;
         }
-        return AppraisalMgr.createInitialAppraisalAfterTrial(trialAppraisal);
+        return createInitialAppraisalAfterTrial(trialAppraisal);
     }
 
     /**
@@ -562,7 +562,7 @@ public class AppraisalMgr {
      */
     public static boolean AnnualExists(Job job, DateTime appraisalStartDate) throws Exception
     {
-        if (AppraisalMgr.appraisalExists(job, appraisalStartDate, Appraisal.TYPE_ANNUAL))
+        if (appraisalExists(job, appraisalStartDate, Appraisal.TYPE_ANNUAL))
             return true;
 
         //If we get here, there is no record for the job for appraisalStartDate
@@ -572,7 +572,7 @@ public class AppraisalMgr {
         DateTime startDateBasedOnJobBeginDate = job.getAnnualStartDateBasedOnJobBeginDate(thisYear);
 
         return !startDateBasedOnJobBeginDate.equals(appraisalStartDate) &&
-                AppraisalMgr.appraisalExists(job, startDateBasedOnJobBeginDate, Appraisal.TYPE_ANNUAL);
+                appraisalExists(job, startDateBasedOnJobBeginDate, Appraisal.TYPE_ANNUAL);
     }
 
 
@@ -775,7 +775,7 @@ public class AppraisalMgr {
                     .list();
         }
 
-        return AppraisalMgr.addSupervisorToAppraisals(results);
+        return addSupervisorToAppraisals(results);
     }
 
     /**
