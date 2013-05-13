@@ -23,8 +23,7 @@ import java.io.RandomAccessFile;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class
-        AppraisalsAction implements ActionInterface {
+public class AppraisalsAction implements ActionInterface {
     private ActionHelper actionHelper;
 
     private HomeAction homeAction;
