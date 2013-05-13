@@ -38,15 +38,15 @@ public class AdminsTest {
         tx.commit();
     }
 
-    public void shouldListSortedAdminsByIsMasterAndThenByLastName() throws Exception {
+    public void shouldListSortedAdminsByIsMaster() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
         ArrayList<Admin> admins = (ArrayList<Admin>) AdminMgr.list();
-        assert admins.get(1).getIsMaster();
-        assert admins.get(1).getEmployee().getId() == 8712359 : "Incorrect sorting by name";
-
         assert admins.get(2).getIsMaster();
-        assert admins.get(2).getEmployee().getId() == 12345 : "Incorrect sorting by name";
+        assert admins.get(2).getEmployee().getId() == 8712359 : "Incorrect sorting by name";
+
+        assert admins.get(1).getIsMaster();
+        assert admins.get(1).getEmployee().getId() == 12345 : "Incorrect sorting by name";
 
         assert !admins.get(0).getIsMaster();
         assert admins.get(0).getEmployee().getId() == 12467 : "Incorrect sorting by name";
