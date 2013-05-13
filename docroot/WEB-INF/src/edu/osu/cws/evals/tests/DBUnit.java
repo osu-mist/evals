@@ -58,6 +58,7 @@ public class DBUnit {
      * Constructor which calls readConfigs to parse test and dev db credentials.
      */
     public DBUnit() {
+        HibernateUtil.setHibernateConfig(HibernateUtil.TEST_CONFIG, "", "");
         readConfigs();
     }
 
