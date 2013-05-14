@@ -563,7 +563,6 @@ public class ReportsTest {
     }
 
     public void shouldProductionCorrectChartSQLForSupervisor() {
-        String scope = ReportsAction.SCOPE_SUPERVISOR;
         String sql = "";
         String expectedSQL;
 
@@ -588,7 +587,7 @@ public class ReportsTest {
                 "pyvpasj_supervisor_suff = prior pyvpasj_suff ) GROUP BY root_supervisor_pidm"+
                 " ORDER BY sum(has_appraisal) DESC, root_supervisor_pidm";
 
-        sql = ReportMgr.getSupervisorChartSQL(scope, ReportsAction.REPORT_UNIT_BREAKDOWN,
+        sql = ReportMgr.getSupervisorChartSQL(ReportsAction.REPORT_UNIT_BREAKDOWN,
                 true, 2, false);
         assert sql.equals(expectedSQL);
 
@@ -607,7 +606,7 @@ public class ReportsTest {
                 "pyvpasj_supervisor_suff = prior pyvpasj_suff ) GROUP BY status"+
                 " ORDER BY sum(has_appraisal) DESC, status";
 
-        sql = ReportMgr.getSupervisorChartSQL(scope, ReportsAction.REPORT_STAGE_BREAKDOWN,
+        sql = ReportMgr.getSupervisorChartSQL(ReportsAction.REPORT_STAGE_BREAKDOWN,
                 true, 2, false);
         assert sql.equals(expectedSQL);
     }
