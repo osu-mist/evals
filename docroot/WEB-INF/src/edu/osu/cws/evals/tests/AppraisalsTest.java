@@ -451,7 +451,7 @@ public class AppraisalsTest {
         DateTime endDate = job.getEndEvalDate(today, Appraisal.TYPE_INITIAL);
 
         appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL);
-        appraisal = AppraisalMgr.createInitialAppraisalAfterTrial(appraisal, resultsDueConfig);
+        appraisal = AppraisalMgr.createInitialAppraisalAfterTrial(appraisal);
         assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
         assert appraisal.getEndDate().equals(endDate.toDate()) : "End date should have been today + 12 months.";
 
@@ -459,7 +459,7 @@ public class AppraisalsTest {
         endDate = job.getEndEvalDate(today, Appraisal.TYPE_INITIAL);
 
         appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL);
-        appraisal = AppraisalMgr.createInitialAppraisalAfterTrial(appraisal, resultsDueConfig);
+        appraisal = AppraisalMgr.createInitialAppraisalAfterTrial(appraisal);
         assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
         assert appraisal.getEndDate().equals(endDate.toDate()) : "End date should have been today + 18 months.";
     }

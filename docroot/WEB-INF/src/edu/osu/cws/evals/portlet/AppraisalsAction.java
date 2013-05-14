@@ -361,7 +361,7 @@ public class AppraisalsAction implements ActionInterface {
 
         // set the overdue value before updating the status
         String beforeUpdateStatus = appraisal.getStatus();
-        int oldOverdue = appraisal.getOverdue();
+        Integer oldOverdue = appraisal.getOverdue();
 
         // update appraisal & assessment fields based on permission rules
         setAppraisalFields(requestMap);
