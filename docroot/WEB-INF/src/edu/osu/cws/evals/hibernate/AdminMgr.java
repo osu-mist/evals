@@ -54,6 +54,7 @@ public class AdminMgr {
         if (admin == null) {
             throw new ModelException("Invalid Admin ID");
         }
+        session.delete(admin);
         return true;
     }
 
