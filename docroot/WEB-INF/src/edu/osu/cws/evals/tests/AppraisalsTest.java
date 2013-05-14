@@ -94,35 +94,6 @@ public class AppraisalsTest {
     }
 
     /**
-     * TestNG Dataprovider, returns an array of Configurations to be used in this test class.
-     *
-     * @return
-     */
-    @DataProvider(name = "jobAndGoalsDueAndResultsDueConfiguration")
-    public Object[][] loadJobAndGoalsDueAndResultsDueConfiguration() {
-        Configuration configuration = new Configuration();
-        configuration.setName(Appraisal.STATUS_GOALS_DUE);
-        configuration.setValue("30");
-        configuration.setReferencePoint("start");
-        configuration.setAction("substract");
-
-        Configuration configuration2 = new Configuration();
-        configuration2.setName(Appraisal.STATUS_GOALS_DUE);
-        configuration2.setValue("30");
-        configuration2.setReferencePoint("start");
-        configuration2.setAction("substract");
-
-        Session hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
-        Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
-        tx.commit();
-
-        return new Object[][] {
-                {job, configuration, configuration2}
-        };
-    }
-
-    /**
      * Method that builds an Appraisal with a bunch of data to save
      *
      * @return
@@ -443,9 +414,9 @@ public class AppraisalsTest {
         assert appraisal.getEndDate().equals(endDate.toDate()) : "End date should have been today + 9 months.";
     }
 
-    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueAndResultsDueConfiguration")
-    public void shouldUseStartDatePlusNumberOfMonthsInAnnualIndToSetTheEndDateForFirstAnnualAppraisal(Job job,
-            Configuration goalsDueConfig, Configuration resultsDueConfig) throws Exception {
+    @Test(groups = {"unittest"}, dataProvider = "Job")
+    public void shouldUseStartDatePlusNumberOfMonthsInAnnualIndToSetTheEndDateForFirstAnnualAppraisal(Job job)
+            throws Exception {
         DateTime today = new DateTime();
         job.setAnnualInd(12);
         DateTime endDate = job.getEndEvalDate(today, Appraisal.TYPE_INITIAL);
