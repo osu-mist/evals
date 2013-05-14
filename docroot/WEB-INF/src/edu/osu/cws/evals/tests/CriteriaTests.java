@@ -144,29 +144,6 @@ public class CriteriaTests {
     }
 
     /**
-     * Tests to make sure that when loading a CriterionArea from the db it loads the right number
-     * of CriteironDetail and that the getCurrentDetail method returns the most recent detail
-     * added.
-     */
-    @Test(groups = {"unittest"})
-    public void returnCurrentDetailsForCriterion() {
-        Session hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
-        CriterionArea result = (CriterionArea) hsession.load(CriterionArea.class, 1);
-        tx.commit();
-
-        Assert.assertEquals(result.getDescription(),
-                "How will you increase your communication skills?");
-        /* @todo
-        was
-        Assert.assertEquals(result.getDetails().size(), 2);
-        Assert.assertEquals(result.getCurrentDetail().getDescription(),
-                "How will you increase your communication skills?");
-        */
-    }
-
-
-    /**
      * Tests that criteria area names are required.
      */
     @Test(groups = {"unittest"})
@@ -211,22 +188,6 @@ public class CriteriaTests {
 
     }
 
-    /**
-     * Tests that a valid description is given to the CriterionDetail object.
-     */
-    @Test(groups = {"unitttest"})
-    public void shouldRequireDescription() {
-        assert criterionObject.getErrors().containsKey("description") :
-                "Missing description error msg";
-        /* @todo
-        was
-        assert !criteriaDetailObject.validateDescription() :
-                "A valid description should be required";
-        assert criteriaDetailObject.getErrors().containsKey("description") :
-                "Missing description error msg";
-         */
-    }
-
     @Test(groups={"unittest"}, expectedExceptions = {ModelException.class}, dataProvider = "criteria")
     public void shouldValidateAllAreaFields(CriterionArea area)
     //@todo
@@ -236,21 +197,6 @@ public class CriteriaTests {
         area.setName("");
         area.setAppointmentType(AppointmentType.CLASSIFIED);
         assert !area.validate() : "All fields in CriterionArea should check validation";
-    }
-
-    /**
-     * @param area
-     * @throws ModelException
-     */
-    @Test(groups={"unittest"}, expectedExceptions = {ModelException.class}, dataProvider = "criteria")
-    public void shouldValidateAllCriteriaDetails(CriterionArea area)
-    //@todo
-    // public void shouldValidateAllAreaFields(CriterionArea area, CriterionDetail details)
-            throws ModelException {
-
-        area.setDescription("");
-        assert !area.validate() : "All fields in CriterionDetail should check validation";
-
     }
 
     /**
