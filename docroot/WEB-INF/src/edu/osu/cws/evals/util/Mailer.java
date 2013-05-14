@@ -7,24 +7,23 @@ package edu.osu.cws.evals.util;
  * @date: 6/24/11
  */
 
-import java.lang.reflect.Method;
-import javax.mail.*;
-import java.util.*;
-import java.util.Map;
-import java.util.HashMap;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmailMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.ReviewerMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.Constants;
-import edu.osu.cws.util.*;
+import edu.osu.cws.util.CWSUtil;
+import edu.osu.cws.util.Logger;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.HtmlEmail;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
-import edu.osu.cws.evals.models.Email;
-import org.apache.commons.mail.*;
 
+import javax.mail.MessagingException;
+import java.lang.reflect.Method;
 import java.text.MessageFormat;
+import java.util.*;
 
 public class Mailer {
     private ResourceBundle emailBundle;
@@ -726,13 +725,13 @@ public class Mailer {
      * @throws Exception
      */
     private String getAddressee(Appraisal appraisal, String mailTo) throws Exception {
-        if (mailTo.indexOf("employee") > -1) {
+        if (mailTo.contains("employee")) {
             return appraisal.getJob().getEmployee().getConventionName();
         }
-        if (mailTo.indexOf("supervisor") > -1) {
+        if (mailTo.contains("supervisor")) {
             return appraisal.getJob().getSupervisor().getEmployee().getConventionName();
         }
-        if (mailTo.indexOf("reviewer") > -1) {
+        if (mailTo.contains("reviewer")) {
             return "Reviewer";
         }
         return "";

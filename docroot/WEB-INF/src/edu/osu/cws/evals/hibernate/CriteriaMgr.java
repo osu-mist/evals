@@ -5,12 +5,14 @@
  */
 package edu.osu.cws.evals.hibernate;
 
-import edu.osu.cws.evals.models.*;
+import edu.osu.cws.evals.models.AppointmentType;
+import edu.osu.cws.evals.models.CriterionArea;
+import edu.osu.cws.evals.models.Employee;
+import edu.osu.cws.evals.models.ModelException;
 import edu.osu.cws.evals.util.HibernateUtil;
-import org.hibernate.*;
+import org.hibernate.Session;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -58,10 +60,10 @@ public class CriteriaMgr {
      * @return
      * @throws Exception
      */
-    public static boolean edit(Map<String, String[]> request, int id, Employee loggedInUser) throws Exception {
+    public static boolean edit(Map<String, String[]> request, int id, Employee loggedInUser)
+            throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         CriterionArea newCriterion = new CriterionArea();
-        CriterionArea criterion;
 
         String description = request.get("description")[0];
         String name = request.get("name")[0];
@@ -70,7 +72,7 @@ public class CriteriaMgr {
             propagateEdit = request.get("propagateEdit")[0] != null;
         }
 
-        criterion = CriteriaMgr.get(id);
+        CriterionArea criterion = CriteriaMgr.get(id);
 
         boolean nameChanged = false;
         boolean descriptionChanged = false;
@@ -92,7 +94,6 @@ public class CriteriaMgr {
             CriteriaMgr.copyCriterion(loggedInUser, newCriterion, criterion);
             newCriterion.setName(name);
             newCriterion.setDescription(description);
-
 
             // validate both new area + description
             newCriterion.validate();
@@ -148,11 +149,11 @@ public class CriteriaMgr {
      */
     public static List<CriterionArea> list(String appointmentType) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        List result = session.createQuery("from edu.osu.cws.evals.models.CriterionArea where " +
+        List results = session.createQuery("from edu.osu.cws.evals.models.CriterionArea where " +
                 "appointmentType = :appointmentType AND deleteDate IS NULL ORDER BY name")
                 .setString("appointmentType", appointmentType)
                 .list();
-        return result;
+        return results;
     }
 
     /**
@@ -166,8 +167,7 @@ public class CriteriaMgr {
      */
     public static boolean delete(int id, Employee deleter) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        CriterionArea criterion;
-        criterion = CriteriaMgr.get(id);
+        CriterionArea  criterion = CriteriaMgr.get(id);
 
         // check that the criteria is valid
         if (criterion == null || criterion.getDeleteDate() != null) {

@@ -3,7 +3,6 @@ package edu.osu.cws.evals.portlet;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.ConfigurationMgr;
 import edu.osu.cws.evals.models.Configuration;
-import edu.osu.cws.evals.models.Employee;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;

@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.models;
 
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
 import org.joda.time.DateTime;
 import edu.osu.cws.evals.util.EvalsUtil;

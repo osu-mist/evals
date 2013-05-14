@@ -3,8 +3,6 @@ package edu.osu.cws.evals.portlet;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
-import edu.osu.cws.evals.util.EvalsUtil;
-import edu.osu.cws.evals.util.Mailer;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
@@ -94,8 +92,8 @@ public class ActionHelper {
 
         allMyActiveAppraisals = (ArrayList<Appraisal>) session.getAttribute(ALL_MY_ACTIVE_APPRAISALS);
         if (allMyActiveAppraisals == null) {
-            allMyActiveAppraisals = AppraisalMgr.getAllMyActiveAppraisals(loggedOnUser.getId(),
-                    null, null);
+            allMyActiveAppraisals =
+                    AppraisalMgr.getAllMyActiveAppraisals(loggedOnUser.getId(), null, null);
             session.setAttribute(ALL_MY_ACTIVE_APPRAISALS, allMyActiveAppraisals);
         }
         return allMyActiveAppraisals;
@@ -127,8 +125,8 @@ public class ActionHelper {
         ArrayList<Appraisal> myTeamAppraisals;
         myTeamAppraisals = (ArrayList<Appraisal>) session.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
         if (myTeamAppraisals == null) {
-            myTeamAppraisals = AppraisalMgr.getMyTeamsAppraisals(loggedOnUser.getId(),
-                    true, null, null);
+            myTeamAppraisals =
+                    AppraisalMgr.getMyTeamsAppraisals(loggedOnUser.getId(), true, null, null);
             session.setAttribute(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals);
         }
         return myTeamAppraisals;
@@ -265,7 +263,8 @@ public class ActionHelper {
      * @throws Exception
      */
     public void refreshContextCache() throws Exception {
-        Date contextCacheTimestamp = (Date) portletContext.getAttribute(EvalsPortlet.CONTEXT_CACHE_TIMESTAMP);
+        Date contextCacheTimestamp =
+                (Date) portletContext.getAttribute(EvalsPortlet.CONTEXT_CACHE_TIMESTAMP);
         Timestamp contextLastUpdate = ConfigurationMgr.getContextLastUpdate();
         if (contextCacheTimestamp != null && contextLastUpdate.after(contextCacheTimestamp)) {
             setAdminPortletData();
@@ -436,10 +435,7 @@ public class ActionHelper {
      * @throws Exception
      */
     public boolean isLoggedInUserMasterAdmin() throws Exception {
-        if (getAdmin() == null) {
-            return false;
-        }
-        return getAdmin().getIsMaster();
+        return getAdmin() != null && getAdmin().getIsMaster();
     }
 
     /**
@@ -472,8 +468,6 @@ public class ActionHelper {
         ArrayList<RequiredAction> administrativeActions = new ArrayList<RequiredAction>();
         ArrayList<Appraisal> myActiveAppraisals;
         ArrayList<Appraisal> mySupervisingAppraisals;
-        RequiredAction reviewerAction;
-        Reviewer reviewer;
 
         myActiveAppraisals = (ArrayList<Appraisal>) getFromRequestMap("myActiveAppraisals");
         employeeRequiredActions = getAppraisalActions(myActiveAppraisals, "employee");
@@ -482,14 +476,16 @@ public class ActionHelper {
         // add supervisor required actions, if user has team's active appraisals
         if(getFromRequestMap("myTeamsActiveAppraisals") != null){
 
-            mySupervisingAppraisals = (ArrayList<Appraisal>) getFromRequestMap("myTeamsActiveAppraisals");
-            administrativeActions = getAppraisalActions(mySupervisingAppraisals, "supervisor");
+            mySupervisingAppraisals =
+                    (ArrayList<Appraisal>) getFromRequestMap("myTeamsActiveAppraisals");
+            administrativeActions =
+                    getAppraisalActions(mySupervisingAppraisals, "supervisor");
         }
 
-        reviewer = getReviewer();
+        Reviewer reviewer = getReviewer();
         if (reviewer != null) {
             String businessCenterName = reviewer.getBusinessCenterName();
-            reviewerAction = getReviewerAction(businessCenterName);
+            RequiredAction reviewerAction = getReviewerAction(businessCenterName);
             if (reviewerAction != null) {
                 administrativeActions.add(reviewerAction);
             }
@@ -507,22 +503,21 @@ public class ActionHelper {
      * @return  outList
      * @throws edu.osu.cws.evals.models.ModelException
      */
-    public ArrayList<RequiredAction> getAppraisalActions(List<Appraisal> appraisalList,
-                                                         String role) throws Exception {
+    public ArrayList<RequiredAction> getAppraisalActions(List<Appraisal> appraisalList, String role)
+            throws Exception {
         Configuration configuration;
         HashMap permissionRuleMap = (HashMap) portletContext.getAttribute("permissionRules");
         Map<String, Configuration> configurationMap =
                 (Map<String, Configuration>) portletContext.getAttribute("configurations");
 
         ArrayList<RequiredAction> outList = new ArrayList<RequiredAction>();
-        String actionKey = "";
         RequiredAction actionReq;
         HashMap<String, String> anchorParams;
 
         for (Appraisal appraisal : appraisalList) {
             //get the status, compose the key "status"-"role"
             String appraisalStatus = appraisal.getStatus();
-            actionKey = appraisalStatus +"-"+role;
+            String actionKey = appraisalStatus +"-"+role;
 
             // Get the appropriate permissionrule object from the permissionRuleMap
             PermissionRule rule = (PermissionRule) permissionRuleMap.get(actionKey);
@@ -547,7 +542,8 @@ public class ActionHelper {
                     configuration = configurationMap.get(appraisalStatus);
                 }
                 if (configuration == null) {
-                    throw new ModelException("Could not find configuration object for status - " + appraisalStatus);
+                    throw new ModelException(
+                            "Could not find configuration object for status - " + appraisalStatus);
                 }
 
                 actionReq = new RequiredAction();
@@ -576,12 +572,12 @@ public class ActionHelper {
             reviewCount = AppraisalMgr.getReviewCount(businessCenterName);
         }
 
-        RequiredAction requiredAction = new RequiredAction();
         if (reviewCount == 0) {
             return null;
         }
 
         HashMap<String, String> parameters = new HashMap<String, String>();
+        RequiredAction requiredAction = new RequiredAction();
         parameters.put("action", "reviewList");
         parameters.put("controller", "AppraisalsAction");
         requiredAction.setAnchorText("action-required-review", reviewCount, bundle);
@@ -646,15 +642,13 @@ public class ActionHelper {
         PortletSession session = request.getPortletSession(true);
         String currentRole = ParamUtil.getString(request, "currentRole");
 
-        if (!currentRole.equals("")) {
-            session.setAttribute("currentRole", currentRole);
-        } else {
+        if (currentRole.equals("")) {
             currentRole = (String) session.getAttribute("currentRole");
             if (currentRole == null || currentRole.equals("")){
                 currentRole = ROLE_SELF;
             }
-            session.setAttribute("currentRole", currentRole);
         }
+        session.setAttribute("currentRole", currentRole);
         return currentRole;
     }
 

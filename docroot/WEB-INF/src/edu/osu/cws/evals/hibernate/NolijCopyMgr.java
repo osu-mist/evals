@@ -3,7 +3,6 @@ package edu.osu.cws.evals.hibernate;
 import edu.osu.cws.evals.models.NolijCopy;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import java.util.Date;
 

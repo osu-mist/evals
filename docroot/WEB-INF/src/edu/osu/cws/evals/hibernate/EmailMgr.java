@@ -1,17 +1,9 @@
 package edu.osu.cws.evals.hibernate;
 
-/**
- * Created by IntelliJ IDEA.
- * User: luf
- * Date: 7/2/11
- * Time: 12:29 PM
- * To change this template use File | Settings | File Templates.
- */
-
 import edu.osu.cws.evals.models.Email;
-import org.hibernate.Transaction;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
+
 import java.util.List;
 
 

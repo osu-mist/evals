@@ -5,9 +5,7 @@ import edu.osu.cws.evals.models.ModelException;
 import edu.osu.cws.evals.models.Reviewer;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,7 +19,6 @@ public class ReviewerMgr {
      */
     public static HashMap<Integer, Reviewer> mapByEmployeeId() throws Exception {
         HashMap<Integer, Reviewer> reviewers = new HashMap<Integer, Reviewer>();
-        Session session = HibernateUtil.getCurrentSession();
         for (Reviewer reviewer : ReviewerMgr.list()) {
             reviewers.put(reviewer.getEmployee().getId(), reviewer);
         }
@@ -29,16 +26,16 @@ public class ReviewerMgr {
     }
 
     /**
-     * Grabs a list of admins.
+     * Grabs a list of reviewers.
      *
      * @throws Exception
      * @return
      */
     public static List<Reviewer> list() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        List<Reviewer> result = session.createQuery("from edu.osu.cws.evals.models.Reviewer reviewer " +
+        List<Reviewer> results = session.createQuery("from edu.osu.cws.evals.models.Reviewer reviewer " +
                 "order by reviewer.businessCenterName").list();
-        return result;
+        return results;
     }
 
     /**
@@ -112,7 +109,8 @@ public class ReviewerMgr {
      * @return
      */
     private static Reviewer findByOnidBC(String onid, String businessCenterName, Session session) {
-        String query = "from edu.osu.cws.evals.models.Reviewer reviewer where reviewer.employee.onid = :onid " +
+        String query = "from edu.osu.cws.evals.models.Reviewer reviewer " +
+                "where reviewer.employee.onid = :onid " +
                 "and reviewer.businessCenterName = :businessCenterName";
         List<Reviewer> results = (List<Reviewer>) session.createQuery(query)
                 .setString("onid", onid)
@@ -177,9 +175,8 @@ public class ReviewerMgr {
      */
     public static List<Reviewer> getReviewers(String bcName) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        List<Reviewer> results = new ArrayList<Reviewer>();
         String query = "from edu.osu.cws.evals.models.Reviewer where businessCenterName = :bcName";
-        results = (List<Reviewer>) session.createQuery(query)
+        List<Reviewer> results = (List<Reviewer>) session.createQuery(query)
                 .setString("bcName", bcName)
                 .list();
         return results;

@@ -1,24 +1,13 @@
 package edu.osu.cws.evals.util;
 
-/**
- * Created by IntelliJ IDEA.
- * User: luf
- * Date: 7/1/11
- * Time: 10:57 AM
- * To change this template use File | Settings | File Templates.
- */
-
 import edu.osu.cws.evals.hibernate.EmailMgr;
+import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Configuration;
+import edu.osu.cws.evals.models.Email;
+import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.portlet.Constants;
-import edu.osu.cws.util.*;
-
-import java.io.File;
-import java.text.ParseException;
-import java.util.*;
-
-import edu.osu.cws.evals.models.*;
-import org.apache.commons.configuration.*;
+import edu.osu.cws.util.CWSUtil;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.joda.time.DateTime;
@@ -27,6 +16,9 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import javax.portlet.PortletContext;
+import java.io.File;
+import java.text.ParseException;
+import java.util.*;
 
 public class EvalsUtil {
     private static DateTime evalsStartDate = null;

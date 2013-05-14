@@ -14,19 +14,21 @@ import edu.osu.cws.evals.hibernate.AppraisalStepMgr;
 import edu.osu.cws.evals.hibernate.PermissionRuleMgr;
 import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.models.Employee;
-import edu.osu.cws.evals.util.*;
+import edu.osu.cws.evals.util.EvalsLogger;
+import edu.osu.cws.evals.util.EvalsUtil;
+import edu.osu.cws.evals.util.HibernateUtil;
+import edu.osu.cws.evals.util.Mailer;
 import edu.osu.cws.util.CWSUtil;
 import edu.osu.cws.util.Logger;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import javax.portlet.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.*;
-
-import javax.portlet.*;
 
 /**
  * <a href="EvalsPortlet.java.html"><b><i>View Source</i></b></a>
@@ -80,9 +82,8 @@ public class EvalsPortlet extends GenericPortlet {
      * @throws IOException
      * @throws PortletException
      */
-	public void doView(
-			RenderRequest renderRequest, RenderResponse renderResponse)
-		throws IOException, PortletException {
+	public void doView(RenderRequest renderRequest, RenderResponse renderResponse)
+            throws IOException, PortletException {
 
         // If processAction's delegate method was called, it set the viewJSP property to some
         // jsp value, if viewJSP is null, it means processAction was not called and we need to
@@ -97,9 +98,8 @@ public class EvalsPortlet extends GenericPortlet {
         actionHelper.removeRequestMap();
 	}
 
-    public void processAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws IOException, PortletException {
+    public void processAction(ActionRequest actionRequest, ActionResponse actionResponse)
+            throws IOException, PortletException {
         delegate(actionRequest, actionResponse);
 	}
 
@@ -107,7 +107,7 @@ public class EvalsPortlet extends GenericPortlet {
             throws PortletException, IOException {
         String result = "";
         String resourceID;
-        Session hibSession = null;
+        Session session = null;
 
         // The logic below is similar to delegate method, but instead we
         // need to return the value we get from ActionHelper method instead of
@@ -127,8 +127,8 @@ public class EvalsPortlet extends GenericPortlet {
                 homeAction.setErrorHandler(errorHandler);
                 controller.setHomeAction(homeAction);
 
-                hibSession = HibernateUtil.getCurrentSession();
-                Transaction tx = hibSession.beginTransaction();
+                session = HibernateUtil.getCurrentSession();
+                Transaction tx = session.beginTransaction();
                 Method controllerMethod = controller.getClass().getDeclaredMethod(
                         resourceID, PortletRequest.class, PortletResponse.class);
 
@@ -141,8 +141,8 @@ public class EvalsPortlet extends GenericPortlet {
                     return;
                 }
             } catch (Exception e) {
-                if (hibSession != null && hibSession.isOpen()) {
-                    hibSession.close();
+                if (session != null && session.isOpen()) {
+                    session.close();
                 }
                 handleEvalsException(e, "Error in serveResource", Logger.ERROR, request);
                 result="There was an error performing your request";
@@ -296,8 +296,8 @@ public class EvalsPortlet extends GenericPortlet {
      */
     private void createMailer() throws Exception {
         PropertiesConfiguration config = actionHelper.getEvalsConfig();
-        Map<String, Configuration> configurationMap = (Map<String, Configuration>)
-                getPortletContext().getAttribute("configurations");
+        Map<String, Configuration> configurationMap =
+                (Map<String, Configuration>)getPortletContext().getAttribute("configurations");
         Mailer mailer = EvalsUtil.createMailer(config, configurationMap, getLog());
         getPortletContext().setAttribute("mailer", mailer);
     }
@@ -345,7 +345,7 @@ public class EvalsPortlet extends GenericPortlet {
         HibernateUtil.setHibernateConfig(hibernateConfig,
                 getPortletContext().getRealPath("/"),
                 config.getString("extra-properties-path") +
-                config.getString("extra-properties-file"));
+                        config.getString("extra-properties-file"));
         getPortletContext().setAttribute("environmentProp", config);
 
         return message;
@@ -362,7 +362,6 @@ public class EvalsPortlet extends GenericPortlet {
      */
     private void handleEvalsException(Exception e, String shortMessage, String level, PortletRequest request) {
         try {
-            String employee = "";
             Map<String, String> grayLogFields = new HashMap<String, String>();
             PortletSession session = request.getPortletSession(true);
             EvalsLogger logger = getLog();
@@ -387,9 +386,7 @@ public class EvalsPortlet extends GenericPortlet {
         viewJSP = Constants.JSP_ERROR;
     }
 
-    protected void include(
-			String path, RenderRequest renderRequest,
-			RenderResponse renderResponse)
+    protected void include(String path, RenderRequest renderRequest,RenderResponse renderResponse)
 		throws IOException, PortletException {
 
 		PortletRequestDispatcher portletRequestDispatcher =

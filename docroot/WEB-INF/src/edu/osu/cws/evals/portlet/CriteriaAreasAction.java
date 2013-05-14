@@ -8,7 +8,6 @@ import edu.osu.cws.evals.models.CriterionArea;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.ModelException;
 
-
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;

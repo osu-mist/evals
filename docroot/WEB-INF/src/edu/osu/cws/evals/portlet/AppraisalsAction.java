@@ -140,8 +140,7 @@ public class AppraisalsAction implements ActionInterface {
             }
         }
 
-        JobMgr jobMgr = new JobMgr();
-        if (jobMgr.isUpperSupervisor(appraisal.getJob(), pidm)) {
+        if (JobMgr.isUpperSupervisor(appraisal.getJob(), pidm)) {
             return ActionHelper.ROLE_UPPER_SUPERVISOR;
         }
 
@@ -234,19 +233,21 @@ public class AppraisalsAction implements ActionInterface {
         if (isReviewer) {
             ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(-1);
             actionHelper.addToRequestMap("pendingReviews", reviews);
+            if (appraisal.getEmployeeSignedDate() != null &&
+                    !appraisal.getRole().equals(ActionHelper.ROLE_EMPLOYEE)) {
+                actionHelper.addToRequestMap("displayResendNolij", true);
+            }
         }
 
-        if (isReviewer && appraisal.getEmployeeSignedDate() != null &&
-                !appraisal.getRole().equals(ActionHelper.ROLE_EMPLOYEE)) {
-            actionHelper.addToRequestMap("displayResendNolij", true);
-        }
+
         if (isReviewer || isAdmin && appraisal.isOpen()
                 && !userRole.equals(ActionHelper.ROLE_EMPLOYEE)) {
             actionHelper.addToRequestMap("displayCloseOutAppraisal", true);
         }
         String status = appraisal.getStatus();
         if ((isAdmin || isReviewer) &&
-                status.equals(Appraisal.STATUS_GOALS_APPROVED) && !userRole.equals(ActionHelper.ROLE_EMPLOYEE)) {
+                status.equals(Appraisal.STATUS_GOALS_APPROVED) &&
+                !userRole.equals(ActionHelper.ROLE_EMPLOYEE)) {
             actionHelper.addToRequestMap("displaySetAppraisalStatus", true);
         }
 
@@ -318,9 +319,9 @@ public class AppraisalsAction implements ActionInterface {
         String[] afterReviewStatus = {Appraisal.STATUS_RELEASE_DUE, Appraisal.STATUS_RELEASE_OVERDUE,
                 Appraisal.STATUS_CLOSED};
         if (ArrayUtils.contains(afterReviewStatus, status) && isReviewer) {
-            removeReviewAppraisalInSession(appraisal);
+            removeReviewAppraisalInSession();
         } else {
-            updateAppraisalInSession(request, appraisal);
+            updateAppraisalInSession();
         }
 
         return homeAction.display(request, response);
@@ -330,10 +331,9 @@ public class AppraisalsAction implements ActionInterface {
      * Handles removing an appraisal from the reviewList stored in session. This method is called
      * by the AppraisalsAction.update method after a reviewer submits a review.
      *
-     * @param appraisal
      * @throws Exception
      */
-    private void removeReviewAppraisalInSession(Appraisal appraisal) throws Exception {
+    private void removeReviewAppraisalInSession() throws Exception {
         List<Appraisal> reviewList = actionHelper.getReviewsForLoggedInUser(-1);
         List<Appraisal> tempList = new ArrayList<Appraisal>();
         tempList.addAll(reviewList);
@@ -355,13 +355,9 @@ public class AppraisalsAction implements ActionInterface {
      * @param requestMap
      * @throws Exception
      */
-    private void processUpdateRequest(Map requestMap)
-            throws Exception {
+    private void processUpdateRequest(Map requestMap) throws Exception {
         HashMap appraisalSteps = (HashMap) actionHelper.getPortletContextAttribute("appraisalSteps");
-        Map<String, Configuration> configurationMap =
-                (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
         Mailer mailer = (Mailer) actionHelper.getPortletContextAttribute("mailer");
-
 
         // set the overdue value before updating the status
         String beforeUpdateStatus = appraisal.getStatus();
@@ -377,8 +373,8 @@ public class AppraisalsAction implements ActionInterface {
             overdueMethod = "set" + overdueMethod.replace("Due", "Overdue");
             try {
                 // call setStageOverdue method
-                Method controllerMethod = appraisal.getClass().getDeclaredMethod(overdueMethod,
-                        Integer.class);
+                Method controllerMethod = appraisal.getClass()
+                        .getDeclaredMethod(overdueMethod, Integer.class);
                 controllerMethod.invoke(appraisal, oldOverdue);
             } catch (NoSuchMethodException e) {
                 // don't do anything since some methods might not exist.
@@ -496,7 +492,8 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         // Save the close out reason
-        if (appraisal.getRole().equals(ActionHelper.ROLE_REVIEWER) || appraisal.getRole().equals(ActionHelper.ROLE_ADMINISTRATOR )) {
+        if (appraisal.getRole().equals(ActionHelper.ROLE_REVIEWER) ||
+                appraisal.getRole().equals(ActionHelper.ROLE_ADMINISTRATOR )) {
             if (requestMap.get("appraisal.closeOutReasonId") != null) {
                 int closeOutReasonId = Integer.parseInt(requestMap.get("appraisal.closeOutReasonId")[0]);
                 CloseOutReason reason = CloseOutReasonMgr.get(closeOutReasonId);
@@ -641,10 +638,12 @@ public class AppraisalsAction implements ActionInterface {
                     sequenceToFormIndex.put(sequence, formIndex.toString());
 
                     List<CriterionArea> criterionAreas = new ArrayList<CriterionArea>();
-                    for (AssessmentCriteria assessmentCriteria : assessments.iterator().next().getSortedAssessmentCriteria()) {
+                    for (AssessmentCriteria assessmentCriteria : assessments.iterator()
+                            .next().getSortedAssessmentCriteria()) {
                         criterionAreas.add(assessmentCriteria.getCriteriaArea());
                     }
-                    Assessment assessment = AppraisalMgr.createNewAssessment(appraisal.getCurrentGoalVersion(), sequence, criterionAreas);
+                    Assessment assessment = AppraisalMgr.createNewAssessment(appraisal
+                            .getCurrentGoalVersion(), sequence, criterionAreas);
                     assessments.add(assessment);
                 }
             }
@@ -780,11 +779,9 @@ public class AppraisalsAction implements ActionInterface {
      * This method updates the status of the appraisal in myTeam or myStatus to reflect the
      * changes from the update method.
      *
-     * @param request       PortletRequest
-     * @param appraisal     appraisal to update in session
      * @throws Exception
      */
-    private void updateAppraisalInSession(PortletRequest request, Appraisal appraisal) throws Exception {
+    private void updateAppraisalInSession() throws Exception {
         List<Appraisal>  appraisals;
 
         if (appraisal.getRole().equals("employee")) {
@@ -881,10 +878,12 @@ public class AppraisalsAction implements ActionInterface {
      * @return
      * @throws Exception
      */
-    public String setStatusToResultsDue(PortletRequest request, PortletResponse response) throws Exception {
+    public String setStatusToResultsDue(PortletRequest request, PortletResponse response)
+            throws Exception {
         initialize(request);
 
-        if (!userRole.equals(ActionHelper.ROLE_ADMINISTRATOR ) && !userRole.equals(ActionHelper.ROLE_REVIEWER)) {
+        if (!userRole.equals(ActionHelper.ROLE_ADMINISTRATOR ) &&
+                !userRole.equals(ActionHelper.ROLE_REVIEWER)) {
             return errorHandler.handleAccessDenied(request, response);
         }
 

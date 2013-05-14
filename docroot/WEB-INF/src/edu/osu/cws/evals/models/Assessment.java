@@ -214,7 +214,8 @@ public class Assessment extends Evals implements Comparable<Assessment> {
 
         // copy assessment criteria objects for this new assessment
         for (AssessmentCriteria trialAssessmentCriteria : trialAssessment.getAssessmentCriteria()) {
-            AssessmentCriteria newAssessmentCriteria = AssessmentCriteria.copyPropertiesFromTrial(trialAssessmentCriteria);
+            AssessmentCriteria newAssessmentCriteria =
+                    AssessmentCriteria.copyPropertiesFromTrial(trialAssessmentCriteria);
             newAssessment.addAssessmentCriteria(newAssessmentCriteria);
         }
 

@@ -14,8 +14,6 @@ import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.HashMap;
-import java.util.Iterator;
 
 public class AppraisalMgr {
 
@@ -79,30 +77,13 @@ public class AppraisalMgr {
             String appointmentType = job.getAppointmentType();
             List<CriterionArea> criteriaList = CriteriaMgr.list(appointmentType);
             for (int i = 1; i <= Constants.BLANK_ASSESSMENTS_IN_NEW_EVALUATION; i++) {
-                AppraisalMgr.createNewAssessment(goalVersion, i, criteriaList);
+                createNewAssessment(goalVersion, i, criteriaList);
             }
         }
 
         return appraisal;
     }
 
-    /**
-     * Sets the status of the appraisal. If the startDate of the appraisal is before Nov 1st, 2011, we set the
-     * status to appraisalDue, else if
-     *
-     * @param startDate         DateTime object
-     * @param goalsDueConfig
-     * @param appraisal
-     * @throws Exception
-     */
-    private static void createAppraisalStatus(DateTime startDate, Configuration goalsDueConfig,
-                                              Appraisal appraisal) throws Exception {
-        if (EvalsUtil.isDue(appraisal, goalsDueConfig) < 0) {
-            appraisal.setStatus(Appraisal.STATUS_GOALS_OVERDUE);
-        } else {
-            appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
-        }
-    }
 
     /**
      * This method is called upon completion or closure of an trial appraisal to create the
@@ -117,12 +98,11 @@ public class AppraisalMgr {
      * PYVPASJ.annual_eval_ind.
      *
      * @param  trialAppraisal: this is the newly closed or completed trial appraisal
-     * @param resultsDueConfig
      * @return the newly created appraisal
      * @throws Exception
      */
-    public static Appraisal createInitialAppraisalAfterTrial(Appraisal trialAppraisal,
-                                                             Configuration resultsDueConfig) throws Exception {
+    public static Appraisal createInitialAppraisalAfterTrial(Appraisal trialAppraisal)
+            throws Exception {
         // copy appraisal & properties
         Appraisal appraisal = Appraisal.createFirstAnnual(trialAppraisal);
 
@@ -205,15 +185,12 @@ public class AppraisalMgr {
      *  2) The job annual_indicator != 0
      *
      * @param trialAppraisal
-     * @param configurationMap
      * @throws Exception
      * @return appraisal    The first annual appraisal created, null otherwise
      */
-    public static Appraisal createFirstAnnualAppraisal(Appraisal trialAppraisal,
-                                                Map<String, Configuration>  configurationMap)
+    public static Appraisal createFirstAnnualAppraisal(Appraisal trialAppraisal)
             throws Exception {
         Job job = trialAppraisal.getJob();
-        Configuration resultsDueConfig = configurationMap.get(Appraisal.STATUS_RESULTS_DUE);
 
         if (!trialAppraisal.getType().equals(Appraisal.TYPE_TRIAL)) {
             return null;
@@ -221,7 +198,7 @@ public class AppraisalMgr {
         if (job.getAnnualInd() == 0) {
             return null;
         }
-        return AppraisalMgr.createInitialAppraisalAfterTrial(trialAppraisal, resultsDueConfig);
+        return createInitialAppraisalAfterTrial(trialAppraisal);
     }
 
     /**
@@ -493,12 +470,11 @@ public class AppraisalMgr {
         String query = "select appraisal.id from edu.osu.cws.evals.models.Appraisal appraisal " +
                 "where status not in ('completed', 'closed', 'archived')";
 
-        result =  session.createQuery(query).list();
+        result = session.createQuery(query).list();
         ids = new int[result.size()];
         for (int i = 0; i < result.size(); i++) {
             ids[i] = (Integer) result.get(i);
         }
-
 
         return ids;
     }
@@ -510,10 +486,7 @@ public class AppraisalMgr {
      */
     public static boolean trialAppraisalExists(Job job) throws Exception {
         DateTime startDate = job.getTrialStartDate();
-        if (startDate == null) {
-            return false;
-        }
-        return appraisalExists(job, startDate,  Appraisal.TYPE_TRIAL);
+        return startDate != null && appraisalExists(job, startDate, Appraisal.TYPE_TRIAL);
     }
 
     /** select count(*) from appraisals where job.... and startDAte = startDate and type = type
@@ -589,7 +562,7 @@ public class AppraisalMgr {
      */
     public static boolean AnnualExists(Job job, DateTime appraisalStartDate) throws Exception
     {
-        if (AppraisalMgr.appraisalExists(job, appraisalStartDate, Appraisal.TYPE_ANNUAL))
+        if (appraisalExists(job, appraisalStartDate, Appraisal.TYPE_ANNUAL))
             return true;
 
         //If we get here, there is no record for the job for appraisalStartDate
@@ -599,7 +572,7 @@ public class AppraisalMgr {
         DateTime startDateBasedOnJobBeginDate = job.getAnnualStartDateBasedOnJobBeginDate(thisYear);
 
         return !startDateBasedOnJobBeginDate.equals(appraisalStartDate) &&
-                AppraisalMgr.appraisalExists(job, startDateBasedOnJobBeginDate, Appraisal.TYPE_ANNUAL);
+                appraisalExists(job, startDateBasedOnJobBeginDate, Appraisal.TYPE_ANNUAL);
     }
 
 
@@ -668,7 +641,6 @@ public class AppraisalMgr {
         }
 
         Session session = HibernateUtil.getCurrentSession();
-        List<Appraisal> appraisals = new ArrayList<Appraisal>();
         if (conditions == null) {
             conditions = new ArrayList<String>();
         }
@@ -702,8 +674,7 @@ public class AppraisalMgr {
 
         List<Appraisal> temp =  (ArrayList<Appraisal>) query.list();
 
-        appraisals = addSupervisorToAppraisals(temp);
-        return appraisals;
+        return addSupervisorToAppraisals(temp);
     }
 
     /**
@@ -804,7 +775,7 @@ public class AppraisalMgr {
                     .list();
         }
 
-        return AppraisalMgr.addSupervisorToAppraisals(results);
+        return addSupervisorToAppraisals(results);
     }
 
     /**
