@@ -19,9 +19,8 @@ import java.util.*;
 public class CriteriaTests {
 
     CriterionArea criterionObject = new CriterionArea();
-    //@todo
-    //CriterionDetail criteriaDetailObject = new CriterionDetail();
-    CriteriaMgr criteriaMgrObject = new CriteriaMgr();
+
+    Transaction tx;
 
     /**
      * This setup method is run before this class gets executed in order to
@@ -29,24 +28,26 @@ public class CriteriaTests {
      * the testing db for tests.
      *
      */
-//    @BeforeClass
     @BeforeMethod
     public void setUp() throws Exception {
         DBUnit dbunit = new DBUnit();
         dbunit.seedDatabase();
+        initializeObjects();
+        Session session = HibernateUtil.getCurrentSession();
+        tx = session.beginTransaction();
+    }
+
+    @AfterMethod
+    public void tearDown() throws Exception {
+        tx.commit();
     }
 
     /**
      * This method is run before each one of the test methods gets executed. It
      * just resets the various criteria objects used in the tests to new values.
      */
-    @BeforeMethod
     public void initializeObjects() throws Exception {
         criterionObject = new CriterionArea();
-        //@todo
-        //criteriaDetailObject = new CriterionDetail();
-        criteriaMgrObject = new CriteriaMgr();
-        setUp();
     }
 
     /**
@@ -58,10 +59,8 @@ public class CriteriaTests {
     public Object[][] createData1() throws Exception {
         initializeObjects();
         String type = AppointmentType.CLASSIFIED;
-        Session hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
-        Employee creator = (Employee) hsession.load(Employee.class, 12345);
-        tx.commit();
+        Session session = HibernateUtil.getCurrentSession();
+        Employee creator = (Employee) session.load(Employee.class, 12345);
 
         criterionObject.setName("Some valid name");
         criterionObject.setDescription("Some valid description");
@@ -82,19 +81,12 @@ public class CriteriaTests {
      */
     @Test(groups = {"unittest"})
     public void returnActiveCriteriaForClassified() throws ModelException, Exception {
-        setUp();
-        List activeCriteriaList = criteriaMgrObject.list(CriteriaMgr.DEFAULT_APPOINTMENT_TYPE);
+        List activeCriteriaList = CriteriaMgr.list(CriteriaMgr.DEFAULT_APPOINTMENT_TYPE);
         CriterionArea expectedCriteria = new CriterionArea();
         CriterionArea expectedCriteria2 = new CriterionArea();
-        //@todo
-        //CriterionDetail expectedDetails = new CriterionDetail();
-        //CriterionDetail expectedDetails2 = new CriterionDetail();
 
         CriterionArea fakeCriteria;
         CriterionArea dbCriteria;
-        //@todo
-        //CriterionDetail fakeDetails;
-        //CriterionDetail dbDetails;
 
         String type = AppointmentType.CLASSIFIED;
 
@@ -103,26 +95,12 @@ public class CriteriaTests {
         expectedCriteria.setAppointmentType(type);
         expectedCriteria.setCreator(new Employee());
         expectedCriteria.setDescription("How will you improve your communication?");
-        /* @todo
-        was
-        expectedCriteria.setDetails(new HashSet<CriterionDetail>());
-        expectedDetails.setId(1);
-        expectedDetails.setDescription("How will you improve your communication?");
-        expectedCriteria.getDetails().add(expectedDetails);
-        */
 
         expectedCriteria2.setId(2);
         expectedCriteria2.setName("TECHNICAL SKILLS");
         expectedCriteria2.setAppointmentType(type);
         expectedCriteria2.setCreator(new Employee());
         expectedCriteria2.setDescription("What training will you obtain this year?");
-        /* @todo
-        was
-        expectedCriteria2.setDetails(new HashSet<CriterionDetail>());
-        expectedDetails2.setId(2);
-        expectedDetails2.setDescription("What training will you obtain this year?");
-        expectedCriteria2.getDetails().add(expectedDetails2);
-         */
 
         ArrayList expected = new ArrayList<CriterionArea>();
         expected.add(expectedCriteria);
@@ -133,13 +111,6 @@ public class CriteriaTests {
             fakeCriteria = (CriterionArea) expected.get(i);
             dbCriteria = (CriterionArea) activeCriteriaList.get(i);
             Assert.assertEquals(fakeCriteria.getId(), dbCriteria.getId());
-
-            /* @todo
-            was
-            fakeDetails = (CriterionDetail) fakeCriteria.getDetails().toArray()[0];
-            dbDetails = (CriterionDetail) fakeCriteria.getDetails().toArray()[0];
-            Assert.assertEquals(fakeDetails.getId(), dbDetails.getId());
-            */
         }
     }
 
@@ -188,39 +159,26 @@ public class CriteriaTests {
 
     }
 
-    @Test(groups={"unittest"}, expectedExceptions = {ModelException.class}, dataProvider = "criteria")
-    public void shouldValidateAllAreaFields(CriterionArea area)
-    //@todo
-    // public void shouldValidateAllAreaFields(CriterionArea area, CriterionDetail details)
-            throws ModelException {
-
-        area.setName("");
-        area.setAppointmentType(AppointmentType.CLASSIFIED);
-        assert !area.validate() : "All fields in CriterionArea should check validation";
-    }
-
     /**
      * Tests that saving a new Criteria object works correctly. The save method returns boolean
      * based on success of the operation.
      */
     @Test(groups = {"unittest"})
     public void addNewCriteria() throws Exception {
-        Session hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
-        Employee createdBy = (Employee) hsession.load(Employee.class, 12345);
+        Session session = HibernateUtil.getCurrentSession();
+        Employee createdBy = (Employee) session.load(Employee.class, 12345);
         String type = AppointmentType.CLASSIFIED;
-        tx.commit();
 
-        criterionObject.setName("Communication");
-        //@todo
-        //criteriaDetailObject.setDescription("How do you plan to improve your communication skills?");
+        String name = "Communication";
+        criterionObject.setName(name);
         criterionObject.setDescription("How do you plan to improve your communication skills?");
         criterionObject.setAppointmentType(type);
 
-        assert criteriaMgrObject.add(criterionObject, createdBy) :
-        //@todo
-        //assert criteriaMgrObject.add(criterionObject, criteriaDetailObject, createdBy) :
-                    "Valid data should save";
+        CriteriaMgr.add(criterionObject, createdBy);
+
+        boolean savedInDB = session.createQuery("from edu.osu.cws.evals.models.CriterionArea WHERE name = :name")
+                        .setString("name", name).list().size() == 1;
+        assert savedInDB : "Valid data should save";
     }
 
 
@@ -230,7 +188,7 @@ public class CriteriaTests {
      * @throws Exception
      */
     @Test(groups = {"unittest"})
-    public void editOnlyCriteriaNameShouldCreatesTwoNewPOJOs() throws Exception {
+    public void editOnlyCriteriaNameShouldWork() throws Exception {
         Map<String, String[]> request = new HashMap<String, String[]>();
         String newCriterionName = "New Name For Criteria";
         request.put("name", new String[] {newCriterionName});
@@ -240,39 +198,26 @@ public class CriteriaTests {
         int id = 1;
         EmployeeMgr employeeMgr = new EmployeeMgr();
         Employee employee = employeeMgr.findByOnid("cedenoj", null);
-        CriterionArea criterionArea =  criteriaMgrObject.get(id);
+        CriterionArea criterionArea =  CriteriaMgr.get(id);
 
         // grab old ids and properties to compare
         int oldCriterionAreaID = criterionArea.getId();
-        //@todo
-        //int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
 
-        criteriaMgrObject.edit(request, id, employee);
+        CriteriaMgr.edit(request, id, employee);
 
         // Double check that the deleted properties were set on pojo
-        criterionArea =  criteriaMgrObject.get(id);
+        criterionArea =  CriteriaMgr.get(id);
         assert criterionArea.getDeleteDate() != null : "Should have set deletedDate in old pojo";
         assert criterionArea.getDeleter() != null : "Should have set deleter in old pojo";
 
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            Transaction tx = session.beginTransaction();
-            criterionArea = (CriterionArea) session.
-                    createQuery("from edu.osu.cws.evals.models.CriterionArea WHERE name = :name")
-                    .setString("name", newCriterionName).list().get(0);
-            tx.commit();
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        criterionArea = (CriterionArea) session.
+                createQuery("from edu.osu.cws.evals.models.CriterionArea WHERE name = :name")
+                .setString("name", newCriterionName).list().get(0);
 
         // Checks that two new pojos were created
         assert oldCriterionAreaID != criterionArea.getId() :
                 "should have created a new criteria pojo";
-        /* @todo
-        assert oldCriterionDetailID != criterionArea.getCurrentDetail().getId() :
-                "should have created a new criteria detail pojo";
-        */
     }
 
     /**
@@ -281,52 +226,37 @@ public class CriteriaTests {
      * @throws Exception
      */
     @Test(groups = {"unittest"})
-    public void editOnlyCriteriaDescriptionShouldOnlyCreateNewDescriptionPOJO() throws Exception {
+    public void editOnlyCriteriaDescriptionShouldWork() throws Exception {
         Map<String, String[]> request = new HashMap<String, String[]>();
         String newCriterionName = "COMMUNICATION SKILLS";
         request.put("name", new String[] {newCriterionName});
         request.put("criterionAreaId", new String[] {"1"});
-        String newCriteriaDetail = "New Value for Criteria Description";
-        request.put("description", new String[] {newCriteriaDetail});
+        String newDescription = "New Value for Criteria Description";
+        request.put("description", new String[] {newDescription});
 
         int id = 1;
-        EmployeeMgr employeeMgr = new EmployeeMgr();
-        Employee employee = employeeMgr.findByOnid("cedenoj", null);
-        CriterionArea criterionArea =  criteriaMgrObject.get(id);
+        Employee employee = EmployeeMgr.findByOnid("cedenoj", null);
+        CriterionArea criterionArea =  CriteriaMgr.get(id);
 
         // grab old ids and properties to compare
         int oldCriterionAreaID = criterionArea.getId();
-        //@todo
-        //int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
 
-        criteriaMgrObject.edit(request, id, employee);
+        CriteriaMgr.edit(request, id, employee);
 
         // Double check that the deleted properties were set on pojo
-        criterionArea =  criteriaMgrObject.get(id);
-        assert criterionArea.getDeleteDate() == null : "Should not have set deletedDate in old pojo";
-        assert criterionArea.getDeleter() == null : "Should not have set deleter in old pojo";
+        criterionArea =  CriteriaMgr.get(id);
+        assert criterionArea.getDeleteDate() != null : "Should have set deletedDate in old pojo";
+        assert criterionArea.getDeleter() != null : "Should have set deleter in old pojo";
 
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            Transaction tx = session.beginTransaction();
-            criterionArea = (CriterionArea) session.
-                    createQuery("from edu.osu.cws.evals.models.CriterionArea WHERE name = :name")
-                    .setString("name", newCriterionName).list().get(0);
-            tx.commit();
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        criterionArea = (CriterionArea) session.
+                createQuery("from edu.osu.cws.evals.models.CriterionArea WHERE description = :desc")
+                .setString("desc", newDescription).list().get(0);
 
         // Checks that two new pojos were created
-        assert oldCriterionAreaID == criterionArea.getId() :
-                "should not have created a new criteria pojo";
-        /* @todo
-        assert oldCriterionDetailID != criterionArea.getCurrentDetail().getId() :
-                "should have created a new criteria detail pojo";
-        */
-        assert criterionArea.getDescription().equals(newCriteriaDetail);
-        //was assert criterionArea.getCurrentDetail().getDescription().equals(newCriteriaDetail);
+        assert oldCriterionAreaID != criterionArea.getId() :
+                "should have created a new criteria pojo";
+        assert criterionArea.getDescription().equals(newDescription);
     }
 
     /**
@@ -335,7 +265,7 @@ public class CriteriaTests {
      * @throws Exception
      */
     @Test(groups = {"unittest"})
-    public void editBothCriteriaNameAndDescriptionShouldCreatesTwoNewPOJOs() throws Exception {
+    public void editBothCriteriaNameAndDescriptionShouldWork() throws Exception {
         Map<String, String[]> request = new HashMap<String, String[]>();
         String newCriterionName = "New Name For Criteria";
         request.put("name", new String[] {newCriterionName});
@@ -346,42 +276,28 @@ public class CriteriaTests {
         int id = 1;
         EmployeeMgr employeeMgr = new EmployeeMgr();
         Employee employee = employeeMgr.findByOnid("cedenoj", null);
-        CriterionArea criterionArea =  criteriaMgrObject.get(id);
+        CriterionArea criterionArea =  CriteriaMgr.get(id);
 
         // grab old ids and properties to compare
         int oldCriterionAreaID = criterionArea.getId();
-        //@todo
-        //int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
 
-        criteriaMgrObject.edit(request, id, employee);
+        CriteriaMgr.edit(request, id, employee);
 
         // Double check that the deleted properties were set on pojo
-        criterionArea =  criteriaMgrObject.get(id);
+        criterionArea =  CriteriaMgr.get(id);
         assert criterionArea.getDeleteDate() != null : "Should have set deletedDate in old pojo";
         assert criterionArea.getDeleter() != null : "Should have set deleter in old pojo";
 
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            Transaction tx = session.beginTransaction();
-            criterionArea = (CriterionArea) session.
-                    createQuery("from edu.osu.cws.evals.models.CriterionArea WHERE name = :name")
-                    .setString("name", newCriterionName).list().get(0);
-            tx.commit();
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        criterionArea = (CriterionArea) session.
+                createQuery("from edu.osu.cws.evals.models.CriterionArea WHERE name = :name")
+                .setString("name", newCriterionName).list().get(0);
 
         // Checks that two new pojos were created
         assert oldCriterionAreaID != criterionArea.getId() :
                 "should have created a new criteria pojo";
-        /* @todo
-        assert oldCriterionDetailID != criterionArea.getCurrentDetail().getId() :
-                "should have created a new criteria detail pojo";
-        */
         assert criterionArea.getName().equals(newCriterionName) : "Should have updated name";
         assert criterionArea.getDescription().equals(newDetailDescription);
-        // was assert criterionArea.getCurrentDetail().getDescription().equals(newDetailDescription);
     }
 
     /**
@@ -395,79 +311,45 @@ public class CriteriaTests {
         String newCriterionName = "COMMUNICATION SKILLS";
         request.put("name", new String[] {newCriterionName});
         request.put("criterionAreaId", new String[] {"1"});
-        String newCriteriaDetail = "New Value for Criteria Description";
-        request.put("description", new String[] {newCriteriaDetail});
+        String newDescription = "New Value for Criteria Description";
+        request.put("description", new String[] {newDescription});
         request.put("propagateEdit", new String[] {"1"});
 
         int id = 1;
-        EmployeeMgr employeeMgr = new EmployeeMgr();
-        Employee employee = employeeMgr.findByOnid("cedenoj", null);
-        CriterionArea criterionArea =  criteriaMgrObject.get(id);
+        Employee employee = EmployeeMgr.findByOnid("cedenoj", null);
+        CriterionArea criterionArea =  CriteriaMgr.get(id);
 
         // grab old ids and properties to compare
         int oldCriterionAreaID = criterionArea.getId();
-        //@todo
-        //int oldCriterionDetailID = criterionArea.getCurrentDetail().getId();
 
-        criteriaMgrObject.edit(request, id, employee);
+        CriteriaMgr.edit(request, id, employee);
 
         // Double check that the deleted properties were set on pojo
-        criterionArea =  criteriaMgrObject.get(id);
-        assert criterionArea.getDeleteDate() == null : "Should not have set deletedDate in old pojo";
-        assert criterionArea.getDeleter() == null : "Should not have set deleter in old pojo";
+        criterionArea =  CriteriaMgr.get(id);
+        assert criterionArea.getDeleteDate() != null : "Should have set deletedDate in old pojo";
+        assert criterionArea.getDeleter() != null : "Should have set deleter in old pojo";
 
         Session session = HibernateUtil.getCurrentSession();
-        try {
-            Transaction tx = session.beginTransaction();
-            criterionArea = (CriterionArea) session.
-                    createQuery("from edu.osu.cws.evals.models.CriterionArea WHERE name = :name")
-                    .setString("name", newCriterionName).list().get(0);
-            tx.commit();
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        criterionArea = (CriterionArea) session.
+                createQuery("from edu.osu.cws.evals.models.CriterionArea WHERE description = :desc")
+                .setString("desc", newDescription).list().get(0);
 
         // Checks that two new pojos were created
-        assert oldCriterionAreaID == criterionArea.getId() :
-                "should not have created a new criteria pojo";
-        /* @todo
-        assert oldCriterionDetailID != criterionArea.getCurrentDetail().getId() :
-                "should have created a new criteria detail pojo";
-        */
-        assert criterionArea.getDescription().equals(newCriteriaDetail);
-        //was assert criterionArea.getCurrentDetail().getDescription().equals(newCriteriaDetail);
+        assert oldCriterionAreaID != criterionArea.getId() :
+                "should have created a new criteria pojo";
+        assert criterionArea.getDescription().equals(newDescription);
 
         session = HibernateUtil.getCurrentSession();
-        try {
-            Transaction tx = session.beginTransaction();
-            List<Assessment> results = (List<Assessment>) session.
-                    createQuery("from edu.osu.cws.evals.models.Assessment ORDER BY ID")
-                    .list();
-            tx.commit();
+        Integer newCount = session.createQuery("from edu.osu.cws.evals.models.AssessmentCriteria " +
+                        "where criteriaArea.id = :id")
+                .setInteger("id", criterionArea.getId()).list().size();
 
-            /* @todo
-            Assessment assessment = results.get(0);
-            assert assessment.getCriterionDetail().getId() != 3 :
-                    "Open Appraisals should have assessments' Criterion Detail ID modified";
+        Integer oldCount = session.createQuery("from edu.osu.cws.evals.models.AssessmentCriteria " +
+                        "where criteriaArea.id = :id")
+                .setInteger("id", oldCriterionAreaID).list().size();
 
-            assessment = results.get(1);
-            assert assessment.getCriterionDetail().getId() != 3 :
-                    "Open Appraisals should have assessments' Criterion Detail ID modified";
-
-            assessment = results.get(2);
-            assert assessment.getCriterionDetail().getId() == 3 :
-                    "Closed Appraisals should not have assessments' Criterion Detail ID modified";
-
-            assessment = results.get(3);
-            assert assessment.getCriterionDetail().getId() == 3 :
-                    "Completed Appraisals should not have assessments' Criterion Detail ID modified";
-            */
-
-        } catch (Exception e) {
-            session.close();
-            throw e;
-        }
+        assert newCount > 0 : "Should have created updated assessment criteria fk";
+        assert oldCount == 0 : "Should have created updated assessment criteria fk";
     }
 
     /**
@@ -477,12 +359,12 @@ public class CriteriaTests {
      */
     @Test(expectedExceptions = {ModelException.class})
     public void shouldNotDeleteCriteriaThatDoesntExist() throws Exception {
-        criteriaMgrObject.delete(9999, new Employee(12345));
+        CriteriaMgr.delete(9999, new Employee(12345));
     }
 
     @Test(expectedExceptions = {ModelException.class})
     public void shouldNotDeleteAlreadyDeletedcriteria() throws Exception {
-        criteriaMgrObject.delete(3, new Employee(12345));
+        CriteriaMgr.delete(3, new Employee(12345));
     }
 
 }
