@@ -44,7 +44,7 @@ public class AppraisalMgr {
             throws Exception {
         Appraisal appraisal = new Appraisal();
         GoalVersion goalVersion = new GoalVersion();
-        goalVersion.setAppraisal(appraisal);
+        appraisal.addGoalVersion(goalVersion);
         goalVersion.setCreateDate(new Date());
 
         if (!type.equals(Appraisal.TYPE_TRIAL) && !type.equals(Appraisal.TYPE_ANNUAL) &&
@@ -70,8 +70,6 @@ public class AppraisalMgr {
 
         if (appraisal.validate()) {
             Session session = HibernateUtil.getCurrentSession();
-            session.save(appraisal);
-            session.save(goalVersion);
 
             // Create the assessments & assessment criteria
             String appointmentType = job.getAppointmentType();
@@ -79,6 +77,7 @@ public class AppraisalMgr {
             for (int i = 1; i <= Constants.BLANK_ASSESSMENTS_IN_NEW_EVALUATION; i++) {
                 createNewAssessment(goalVersion, i, criteriaList);
             }
+            session.save(appraisal);
         }
 
         return appraisal;
@@ -882,18 +881,17 @@ public class AppraisalMgr {
                                      List<CriterionArea> criterionAreas) {
         Session session = HibernateUtil.getCurrentSession();
         Assessment assessment = new Assessment();
-        assessment.setGoalVersion(goalVersion);
+        goalVersion.addAssessment(assessment);
         assessment.setCreateDate(new Date());
         assessment.setModifiedDate(new Date());
         assessment.setSequence(sequence);
-        session.save(assessment);
 
         Set<AssessmentCriteria> assessmentCriterias = new HashSet<AssessmentCriteria>();
         for (CriterionArea criterionArea : criterionAreas) {
             AssessmentCriteria assessmentCriteria = new AssessmentCriteria();
+            assessment.addAssessmentCriteria(assessmentCriteria);
             assessmentCriteria.setAssessment(assessment);
             assessmentCriteria.setCriteriaArea(criterionArea);
-            session.save(assessmentCriteria);
             assessmentCriterias.add(assessmentCriteria);
         }
         assessment.setAssessmentCriteria(assessmentCriterias);
