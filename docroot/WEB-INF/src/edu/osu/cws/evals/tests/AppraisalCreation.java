@@ -17,7 +17,8 @@ public class AppraisalCreation {
 
     public static void main(String[] args) throws Exception {
         //@ todo add proper parameters
-        HibernateUtil.setHibernateConfig("hibernate.c3p0.ecs.dev.cfg.xml", "", "");
+//        HibernateUtil.setHibernateConfig("hibernate.c3p0.ecs.dev.cfg.xml", "", "");
+
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
         Configuration goalsDueConfig = (Configuration) session.load(Configuration.class, 1);
@@ -37,7 +38,9 @@ public class AppraisalCreation {
             if (startDate.isAfter(newDay)) {
                 startDate = startDate.minusYears(1); //last year
             }
-            AppraisalMgr.createAppraisal(job, startDate, Appraisal.TYPE_ANNUAL);
+
+            // comment out to create test appraisals
+//            AppraisalMgr.createAppraisal(job, startDate, Appraisal.TYPE_ANNUAL);
         }
     }
 }
