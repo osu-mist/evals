@@ -9,11 +9,14 @@ import java.util.ResourceBundle;
 public class ErrorHandler extends Evals {
 
     private ActionHelper actionHelper;
-    private static HomeAction homeAction = new HomeAction();
+    private HomeAction homeAction;
 
     public ErrorHandler(ActionHelper actionHelper) {
         this.actionHelper = actionHelper;
+        this.homeAction = new HomeAction();
+        homeAction.setActionHelper(actionHelper);
     }
+
 
     public String handleAccessDenied(PortletRequest request, PortletResponse response)
             throws Exception {

@@ -194,7 +194,6 @@ public class EvalsPortlet extends GenericPortlet {
                 controller.setErrorHandler(errorHandler);
                 HomeAction homeAction = new HomeAction();
                 homeAction.setActionHelper(actionHelper);
-                homeAction.setErrorHandler(errorHandler);
                 controller.setHomeAction(homeAction);
 
                 Method controllerMethod = controller.getClass().getDeclaredMethod(
@@ -252,7 +251,8 @@ public class EvalsPortlet extends GenericPortlet {
                 Transaction tx = hibSession.beginTransaction();
 
                 actionHelper = new ActionHelper(request, null, getPortletContext());
-
+                actionHelper.updateContextTimestamp();
+                actionHelper.setAdminPortletData();
                 getPortletContext().setAttribute("log",
                         EvalsUtil.createLogger(actionHelper.getEvalsConfig()));
                 message += "Created logger object\n";
@@ -264,8 +264,7 @@ public class EvalsPortlet extends GenericPortlet {
                 message += "Stored Appraisal Steps in portlet context\n";
                 loadResourceBundle();
                 message += "Stored resource bundle Language.properties in portlet context\n";
-                actionHelper.updateContextTimestamp();
-                actionHelper.setAdminPortletData();
+
                 tx.commit();
 
                 EvalsLogger logger =  getLog();
