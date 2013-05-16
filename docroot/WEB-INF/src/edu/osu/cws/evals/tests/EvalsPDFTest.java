@@ -23,16 +23,16 @@ public class EvalsPDFTest {
     }
 
     @Test(expectedExceptions = {Exception.class})
-    public void shouldFailWithInvalidEnvironemnt() throws Exception {
+    public void shouldFailWithInvalidEnvironment() throws Exception {
         EvalsPDF.getFileName(appraisal, null, "invalid");
     }
 
     public void shouldUsePassAndEnvironmentInFilePrefix() throws Exception {
         String filename = EvalsPDF.getFileName(appraisal, "", "prod");
-        assert filename.contains("prod_pass-") : "Invalid file prefix: " + filename;
+        assert filename.contains("prod_evals-") : "Invalid file prefix: " + filename;
 
         filename = EvalsPDF.getFileName(appraisal, "", "dev2");
-        assert filename.contains("dev2_pass-") : "Invalid file prefix: " + filename;
+        assert filename.contains("dev2_evals-") : "Invalid file prefix: " + filename;
     }
 
     public void shouldUsePidmFiscalYearAndPositionNoInFilename() throws Exception {
@@ -41,7 +41,7 @@ public class EvalsPDFTest {
 
         int fiscalYear = Calendar.getInstance().get(Calendar.YEAR);
         filename = EvalsPDF.getFileName(appraisal, "/tmp/testo/", "prod");
-        expectedFilename = "/tmp/testo/prod_pass-1234_" + fiscalYear + "_C555-.pdf";
+        expectedFilename = "/tmp/testo/prod_evals-1234_" + fiscalYear + "_C555-.pdf";
         assert filename.equals(expectedFilename);
 
     }

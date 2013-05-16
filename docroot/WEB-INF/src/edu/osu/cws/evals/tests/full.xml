@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <dataset>
-  <admins ID="1" EMPLOYEE_PIDM="12345" IS_MASTER="true" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0" SCOPE="hr"/>
-  <admins ID="2" EMPLOYEE_PIDM="12467" IS_MASTER="false" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0" SCOPE="hr"/>
-  <admins ID="3" EMPLOYEE_PIDM="8712359" IS_MASTER="true" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0" SCOPE="hr"/>
+  <admins ID="1" EMPLOYEE_PIDM="12345" IS_MASTER="true" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0"/>
+  <admins ID="2" EMPLOYEE_PIDM="12467" IS_MASTER="false" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0"/>
+  <admins ID="3" EMPLOYEE_PIDM="8712359" IS_MASTER="true" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0"/>
   <appointment_types NAME="Classified"/>
   <appraisal_steps ID="1" ACTION="submit" APPOINTMENT_TYPE="Classified" NEW_STATUS="goals-submitted" EMAIL_TYPE="goals-submitted"/>
   <appraisal_steps ID="2" ACTION="require-modification" APPOINTMENT_TYPE="Classified" NEW_STATUS="goals-require-modification" EMAIL_TYPE="goals-require-modification"/>
@@ -85,11 +85,26 @@
               TYPE="trial"
               overdue="0"
   />
+
+  <goals_versions ID="1" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="1"/>
+  <goals_versions ID="2" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="2"/>
+  <goals_versions ID="3" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="5"/>
+  <goals_versions ID="4" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="6"/>
+
   <goals_logs/>
-  <assessments ID="1" APPRAISAL_ID="1" CRITERION_DETAIL_ID="3" CREATE_DATE="2011-04-10 20:16:48.0" />
-  <assessments ID="2" APPRAISAL_ID="2" CRITERION_DETAIL_ID="3" CREATE_DATE="2011-04-10 20:16:48.0" />
-  <assessments ID="3" APPRAISAL_ID="5" CRITERION_DETAIL_ID="3" CREATE_DATE="2011-04-10 20:16:48.0" />
-  <assessments ID="4" APPRAISAL_ID="6" CRITERION_DETAIL_ID="3" CREATE_DATE="2011-04-10 20:16:48.0" />
+  <assessments ID="1" GOAL_VERSION_ID="1" CREATE_DATE="2011-04-10 20:16:48.0" SEQUENCE="1"/>
+  <assessments ID="2" GOAL_VERSION_ID="2" CREATE_DATE="2011-04-10 20:16:48.0" SEQUENCE="1"/>
+  <assessments ID="3" GOAL_VERSION_ID="3" CREATE_DATE="2011-04-10 20:16:48.0" SEQUENCE="1"/>
+  <assessments ID="4" GOAL_VERSION_ID="4" CREATE_DATE="2011-04-10 20:16:48.0" SEQUENCE="1"/>
+
+  <assessments_criteria ID="1" CRITERIA_AREA_ID="1" ASSESSMENT_ID="1" CHECKED="0"/>
+  <assessments_criteria ID="2" CRITERIA_AREA_ID="2" ASSESSMENT_ID="1" CHECKED="0"/>
+  <assessments_criteria ID="3" CRITERIA_AREA_ID="1" ASSESSMENT_ID="2" CHECKED="0"/>
+  <assessments_criteria ID="4" CRITERIA_AREA_ID="2" ASSESSMENT_ID="2" CHECKED="0"/>
+  <assessments_criteria ID="5" CRITERIA_AREA_ID="1" ASSESSMENT_ID="3" CHECKED="0"/>
+  <assessments_criteria ID="6" CRITERIA_AREA_ID="2" ASSESSMENT_ID="3" CHECKED="0"/>
+  <assessments_criteria ID="7" CRITERIA_AREA_ID="1" ASSESSMENT_ID="4" CHECKED="0"/>
+  <assessments_criteria ID="8" CRITERIA_AREA_ID="2" ASSESSMENT_ID="4" CHECKED="0"/>
 
   <business_centers NAME="UABC"/>
   <business_centers NAME="AABC"/>
@@ -98,12 +113,10 @@
   <closeout_reasons ID="3" REASON="Lateral move does not require eval" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" DELETE_DATE="2011-05-14 07:41:11.0" />
   <closeout_reasons ID="4" REASON="Abducted by Aliens" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" />
 
-  <criteria_areas ID="1" NAME="COMMUNICATION SKILLS" APPOINTMENT_TYPE="Classified" SEQUENCE="1" CREATE_DATE="2011-04-10 20:16:48.0" CREATOR_PIDM="12345"/>
-  <criteria_areas ID="2" NAME="TECHNICAL SKILLS" APPOINTMENT_TYPE="Classified" SEQUENCE="2" CREATE_DATE="2011-04-11 09:57:08.0" CREATOR_PIDM="12345"/>
-  <criteria_areas ID="3" NAME="DELETETED CRITERIA AREA" APPOINTMENT_TYPE="Classified" SEQUENCE="3" CREATE_DATE="2011-04-11 09:57:08.0" CREATOR_PIDM="12345" DELETE_DATE="2011-04-11 09:57:08.0"/>
-  <criteria_details ID="1" AREA_ID="1" DESCRIPTION="How will you improve your communication?" CREATE_DATE="2011-04-11 10:00:19.0" CREATOR_PIDM="12345"/>
-  <criteria_details ID="2" AREA_ID="2" DESCRIPTION="What training will you obtain this year?" CREATE_DATE="2011-04-11 10:31:58.0" CREATOR_PIDM="12345"/>
-  <criteria_details ID="3" AREA_ID="1" DESCRIPTION="How will you increase your communication skills?" CREATE_DATE="2011-04-12 14:30:23.0" CREATOR_PIDM="12345"/>
+  <criteria_areas ID="1" NAME="COMMUNICATION SKILLS" DESCRIPTION="How will you improve your communication?" APPOINTMENT_TYPE="Classified" CREATE_DATE="2011-04-10 20:16:48.0" CREATOR_PIDM="12345"/>
+  <criteria_areas ID="2" NAME="TECHNICAL SKILLS" DESCRIPTION="What training will you obtain this year?" APPOINTMENT_TYPE="Classified" CREATE_DATE="2011-04-11 09:57:08.0" CREATOR_PIDM="12345"/>
+  <criteria_areas ID="3" NAME="DELETETED CRITERIA AREA" DESCRIPTION="How will you increase your communication skills?" APPOINTMENT_TYPE="Classified" CREATE_DATE="2011-04-11 09:57:08.0" CREATOR_PIDM="12345" DELETE_DATE="2011-04-11 09:57:08.0"/>
+
   <email_types TYPE="goals-submitted" MAILTO="employee"/>
   <email_types TYPE="goals-require-modification" MAILTO="employee"/>
   <emails

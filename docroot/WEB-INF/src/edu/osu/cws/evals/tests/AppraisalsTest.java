@@ -8,22 +8,25 @@ import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Test
 public class AppraisalsTest {
 
     Appraisal appraisal = new Appraisal();
-    AppraisalMgr appraisalMgr = new AppraisalMgr();
-    EmployeeMgr employeeMgr = new EmployeeMgr();
     Employee employee = new Employee();
+    Transaction tx;
+    Session session;
+    Job job;
+    
     /**
      * This setup method is run before this class gets executed in order to
      * set the Hibernate environment to TESTING. This will ensure that we use
@@ -34,25 +37,26 @@ public class AppraisalsTest {
     public void setUp() throws Exception {
         DBUnit dbunit = new DBUnit();
         dbunit.seedDatabase();
+        session = HibernateUtil.getCurrentSession();
+        tx = session.beginTransaction();
+        job = (Job) session.load(Job.class, new Job(new Employee(12345), "1234", "00"));
     }
 
+    @AfterMethod
+    public void tearDown() throws Exception {
+        if (session.isOpen()) {
+            tx.commit();
+        }
+    }
     /**
      * This method tests that the AppraisalMgr class can create an appraisal given a Job object.
      *
      * @throws Exception
      */
-    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
-    public void shouldCreateAnAppraisal(Job job, Configuration configuration) throws Exception {
+    @Test(groups = {"unittest"})
+    public void shouldCreateAnAppraisal() throws Exception {
         assert AppraisalMgr.createAppraisal(job, new DateTime(),  Appraisal.TYPE_ANNUAL).getId() != 0 :
                 "AppraisalMgr.createAppraisal should return id of appraisal";
-    }
-
-    @Test(groups = {"unittest"},  expectedExceptions = ModelException.class)
-    public void appraisalShouldRequireValidJob() throws Exception {
-        Job invalidJob = new Job();
-
-        assert AppraisalMgr.createAppraisal(invalidJob, new DateTime(),  Appraisal.TYPE_ANNUAL).getId() != 0 :
-                "AppraisalMgr.createAppraisal should require valid Job";
     }
 
     /**
@@ -61,66 +65,16 @@ public class AppraisalsTest {
      */
     @DataProvider(name = "job")
     public Object[][] loadJob() {
-        Session hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
-        Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
-        tx.commit();
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx1 = session.beginTransaction();
+        Job job = (Job) session.load(Job.class, new Job(new Employee(12345), "1234", "00"));
+        tx1.commit();
 
         return new Object[][] {
                 {job}
         };
     }
 
-    /**
-     * TestNG Dataprovider, returns an array of Configurations to be used in this test class.
-     * @return
-     */
-    @DataProvider(name = "jobAndGoalsDueConfiguration")
-    public Object[][] loadJobAndGoalsDueConfiguration() {
-        Configuration configuration = new Configuration();
-        configuration.setName(Appraisal.STATUS_GOALS_DUE);
-        configuration.setValue("30");
-        configuration.setReferencePoint("start");
-        configuration.setAction("substract");
-
-        Session hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
-        Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
-        tx.commit();
-
-        return new Object[][] {
-                {job, configuration}
-        };
-    }
-
-    /**
-     * TestNG Dataprovider, returns an array of Configurations to be used in this test class.
-     *
-     * @return
-     */
-    @DataProvider(name = "jobAndGoalsDueAndResultsDueConfiguration")
-    public Object[][] loadJobAndGoalsDueAndResultsDueConfiguration() {
-        Configuration configuration = new Configuration();
-        configuration.setName(Appraisal.STATUS_GOALS_DUE);
-        configuration.setValue("30");
-        configuration.setReferencePoint("start");
-        configuration.setAction("substract");
-
-        Configuration configuration2 = new Configuration();
-        configuration2.setName(Appraisal.STATUS_GOALS_DUE);
-        configuration2.setValue("30");
-        configuration2.setReferencePoint("start");
-        configuration2.setAction("substract");
-
-        Session hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
-        Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
-        tx.commit();
-
-        return new Object[][] {
-                {job, configuration, configuration2}
-        };
-    }
 
     /**
      * Method that builds an Appraisal with a bunch of data to save
@@ -129,18 +83,16 @@ public class AppraisalsTest {
      */
     public Appraisal loadAppraisalSaveList() throws Exception {
         Session hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
-        tx.commit();
 
-        int appraisalID =  AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL)
+        Appraisal appraisal1 = AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
+        int appraisalID =  appraisal1
                 .getId();
         hsession = HibernateUtil.getCurrentSession();
-        tx = hsession.beginTransaction();
+        hsession.evict(appraisal1);
         Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
-        tx.commit();
 
-        employee = employeeMgr.findByOnid("luf", null);
+        employee = EmployeeMgr.findByOnid("luf", null);
         updatedAppraisal.setId(appraisalID);
 
         updatedAppraisal.setEvaluator(employee);
@@ -171,39 +123,33 @@ public class AppraisalsTest {
     public void updateAppraisalModelData()
             throws Exception {
         Appraisal modifiedAppraisal = loadAppraisalSaveList();
-        Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        AppraisalMgr.updateAppraisal(modifiedAppraisal, new Employee());
-        tx.commit();
+        Employee loggedInUser = EmployeeMgr.findByOnid("luf", null);
+        AppraisalMgr.updateAppraisal(modifiedAppraisal, loggedInUser);
         // no exception means success
     }
 
     public Appraisal loadAppraisalAssessments() throws Exception {
         Session hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
-        tx.commit();
 
-        int appraisalID =  AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL)
-                .getId();
-        hsession = HibernateUtil.getCurrentSession();
-        tx = hsession.beginTransaction();
-        Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
-        tx.commit();
-        employee = employeeMgr.findByOnid("luf", null);
+        Appraisal appraisal =  AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
+        Integer appraisalID = appraisal.getId();
+        hsession.evict(appraisal);
+        appraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
+        employee = EmployeeMgr.findByOnid("luf", null);
 
-        updatedAppraisal.setEvaluator(employee);
-        updatedAppraisal.setGoalApprovedDate(new Date());
-        updatedAppraisal.setGoalsComments("goal comments data");
-        updatedAppraisal.setResultSubmitDate(new Date());
-        updatedAppraisal.setEvaluation("evaluation text");
-        updatedAppraisal.setRating(1);
+        appraisal.setEvaluator(employee);
+        appraisal.setGoalApprovedDate(new Date());
+        appraisal.setGoalsComments("goal comments data");
+        appraisal.setResultSubmitDate(new Date());
+        appraisal.setEvaluation("evaluation text");
+        appraisal.setRating(1);
 
-        for (Assessment assessment : updatedAppraisal.getCurrentGoalVersion().getAssessments()) {
+        for (Assessment assessment : appraisal.getCurrentGoalVersion().getAssessments()) {
             assessment.setEmployeeResult("employee results txt");
             assessment.setSupervisorResult("supervisor results txt");
         }
-        return updatedAppraisal;
+        return appraisal;
     }
 
     @Test(groups = {"unittest"})
@@ -212,36 +158,34 @@ public class AppraisalsTest {
 
         // Create the appraisal for this test
         Session hsession = HibernateUtil.getCurrentSession();
-        Transaction tx = hsession.beginTransaction();
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
-        tx.commit();
-        int appraisalID =  AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL)
+        Appraisal appraisal1 = AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
+        int appraisalID =  appraisal1
                 .getId();
 
         // Grab the freshly created appraisal from the db before we start
         // updating the properties.
-        employee = employeeMgr.findByOnid("luf", null);
-        hsession = HibernateUtil.getCurrentSession();
-        tx = hsession.beginTransaction();
-        Appraisal updatedAppraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
+        employee = EmployeeMgr.findByOnid("luf", null);
 
-        updatedAppraisal.setEvaluator(employee);
-        updatedAppraisal.setGoalApprovedDate(new Date());
-        updatedAppraisal.setGoalsComments("goal comments data");
-        updatedAppraisal.setResultSubmitDate(new Date());
-        updatedAppraisal.setEvaluation("evaluation text");
-        updatedAppraisal.setRating(1);
+        appraisal1.setEvaluator(employee);
+        appraisal1.setGoalApprovedDate(new Date());
+        appraisal1.setGoalsComments("goal comments data");
+        appraisal1.setResultSubmitDate(new Date());
+        appraisal1.setEvaluation("evaluation text");
+        appraisal1.setRating(1);
 
-        for (Assessment assessment : updatedAppraisal.getCurrentGoalVersion().getAssessments()) {
+        for (Assessment assessment : appraisal1.getCurrentGoalVersion().getAssessments()) {
             assessment.setEmployeeResult("employee results txt");
             assessment.setSupervisorResult("supervisor results txt");
         }
 
-        AppraisalMgr.updateAppraisal(updatedAppraisal, new Employee());
+        AppraisalMgr.updateAppraisal(appraisal1, employee);
         tx.commit();
+        hsession = HibernateUtil.getCurrentSession();
+        tx = hsession.beginTransaction();
+        appraisal1 = (Appraisal) hsession.load(Appraisal.class, appraisalID);
 
-
-        for (Assessment assessment : updatedAppraisal.getCurrentGoalVersion().getAssessments()) {
+        for (Assessment assessment : appraisal1.getCurrentGoalVersion().getAssessments()) {
             assert assessment.getEmployeeResult() != null :
                     "Appraisal assessments employee result failed to save";
             assert assessment.getSupervisorResult() != null :
@@ -262,12 +206,7 @@ public class AppraisalsTest {
         for (Assessment assessment : modifiedAppraisal.getCurrentGoalVersion().getAssessments()) {
             assessment.setGoal("first edit of goal");
         }
-        //@ todo
-        //appraisalMgr.setLoggedInUser(modifiedAppraisal.getJob().getEmployee());
-        Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        AppraisalMgr.updateAppraisal(modifiedAppraisal, new Employee());
-        tx.commit();
+        AppraisalMgr.updateAppraisal(modifiedAppraisal, modifiedAppraisal.getJob().getEmployee());
         for (Assessment assessment : modifiedAppraisal.getCurrentGoalVersion().getAssessments()) {
             assert assessment.getGoal() != null :
                     "Appraisal assessments goals failed to save";
@@ -279,12 +218,8 @@ public class AppraisalsTest {
         for (Assessment assessment : modifiedAppraisal.getCurrentGoalVersion().getAssessments()) {
             assessment.setGoal("second edit of goal");
         }
-        // @ todo
-        //appraisalMgr.setLoggedInUser(new EmployeeMgr().findByOnid("luf", null));
-        session = HibernateUtil.getCurrentSession();
-        tx = session.beginTransaction();
-        AppraisalMgr.updateAppraisal(modifiedAppraisal, new Employee());
-        tx.commit();
+        Employee loggedInUser = EmployeeMgr.findByOnid("luf", null);
+        AppraisalMgr.updateAppraisal(modifiedAppraisal, loggedInUser);
         for (Assessment assessment : modifiedAppraisal.getCurrentGoalVersion().getAssessments()) {
             assert assessment.getGoal().equals("second edit of goal") :
                     "Appraisal assessments goals failed to save";
@@ -298,7 +233,7 @@ public class AppraisalsTest {
         int pidm = 12345;
         ArrayList<Appraisal> myActiveAppraisals = AppraisalMgr.getAllMyActiveAppraisals(pidm,
                 null, null);
-        assert myActiveAppraisals.size() == 6 : "Invalid size of active appraisals";
+        assert myActiveAppraisals.size() == 7 : "Invalid size of active appraisals";
         for (Appraisal ap : myActiveAppraisals) {
             assert ap.getId() != new Integer(0) : "id should be present in list of appraisals";
             assert ap.getJob().getJobTitle() != null : "job title should be present in list of appraisals";
@@ -313,7 +248,7 @@ public class AppraisalsTest {
         int pidm = 12467;
         List<Appraisal> teamActiveAppraisals = AppraisalMgr.getMyTeamsAppraisals(pidm, true,
                 null, null);
-        assert teamActiveAppraisals.size() == 6 : "Invalid size of team active appraisals";
+        assert teamActiveAppraisals.size() == 7 : "Invalid size of team active appraisals";
         for (Appraisal ap : teamActiveAppraisals) {
             assert ap.getId() != 0 :
                     "id should be present in list of team appraisals";
@@ -333,36 +268,6 @@ public class AppraisalsTest {
             assert ap.getJob().getAppointmentType() != null :
                     "appointment type name should be present in list of team appraisals";
         }
-    }
-
-    public void shouldReturnEmptyStringWhenPidmHasNoRole() throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        Appraisal appraisal = (Appraisal) session.load(Appraisal.class, 1);
-
-        int invalidPidm = 1111;
-        //@ todo
-        //assert appraisalMgr.getRole(appraisal, invalidPidm).equals("");
-        tx.commit();
-    }
-
-    public void shouldDetectEmployeeRoleInAppraisal() throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        Appraisal appraisal = (Appraisal) session.load(Appraisal.class, 1);
-        tx.commit();
-        // @ todo
-        //assert appraisalMgr.getRole(appraisal, 12345).equals("employee");
-    }
-
-    public void shouldDetectReviewerRoleInAppraisal() throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        Appraisal appraisal = (Appraisal) session.load(Appraisal.class, 1);
-
-        //@ todo
-        //assert appraisalMgr.getRole(appraisal, 787812).equals("reviewer");
-        tx.commit();
     }
 
     public void shouldOnlyIncludeReviewDueOrReviewPastDueInAppraisalReviewList() throws Exception {
@@ -395,25 +300,23 @@ public class AppraisalsTest {
      */
 /*    public void createAppraisals() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
         Configuration goalsDueConfig = (Configuration) session.load(Configuration.class, 1);
         List<Job> results = (List<Job>) session.createQuery("from edu.osu.cws.evals.models.Job where status = 'A'").list();
-        tx.commit();
         for (Job job : results) {
             AppraisalMgr.createAppraisal(job, new Date(), Appraisal.TYPE_ANNUAL, goalsDueConfig);
         }
     }*/
 
-    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
-    public void shouldSetTheStartDateWhenCreatingAppraisal(Job job, Configuration configuration) throws Exception {
+    @Test(groups = {"unittest"})
+    public void shouldSetTheStartDateWhenCreatingAppraisal() throws Exception {
         DateTime today = new DateTime();
         appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_ANNUAL);
-        assert appraisal.getStartDate().equals(today);
+        assert appraisal.getStartDate().equals(today.toDate());
     }
 
-    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration",
+    @Test(groups = {"unittest"},
             expectedExceptions = {ModelException.class})
-    public void shouldOnlyCreateTwoTypesOfAppraisals(Job job, Configuration configuration) throws Exception {
+    public void shouldOnlyCreateTwoTypesOfAppraisals() throws Exception {
         DateTime today = new DateTime();
         appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_ANNUAL);
         assert appraisal != null;
@@ -426,93 +329,86 @@ public class AppraisalsTest {
 
     }
 
-    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
-    public void shouldUseStartDatePlusNumberOfMonthsInTrialIndToSetTheEndDateForTrialAppraisal(Job job,
-            Configuration configuration) throws Exception {
+    @Test(groups = {"unittest"})
+    public void shouldUseStartDatePlusNumberOfMonthsInTrialIndToSetTheEndDateForTrialAppraisal()
+            throws Exception {
         DateTime today = new DateTime();
         DateTime endDate = job.getEndEvalDate(today, Appraisal.TYPE_TRIAL);
 
         appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL);
-        assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
+        assert appraisal.getStartDate().equals(today.toDate()) : "Start date should be set correctly.";
         assert appraisal.getEndDate().equals(endDate.toDate()) : "End date should have been today + 6 months.";
 
         job.setTrialInd(9);
         endDate = job.getEndEvalDate(today, Appraisal.TYPE_TRIAL);
         appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL);
-        assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
+        assert appraisal.getStartDate().equals(today.toDate()) : "Start date should be set correctly.";
         assert appraisal.getEndDate().equals(endDate.toDate()) : "End date should have been today + 9 months.";
     }
 
-    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueAndResultsDueConfiguration")
-    public void shouldUseStartDatePlusNumberOfMonthsInAnnualIndToSetTheEndDateForFirstAnnualAppraisal(Job job,
-            Configuration goalsDueConfig, Configuration resultsDueConfig) throws Exception {
+    @Test(groups = {"unittest"})
+    public void shouldUseStartDatePlusNumberOfMonthsInAnnualIndToSetTheEndDateForFirstAnnualAppraisal()
+            throws Exception {
         DateTime today = new DateTime();
+        job = (Job) session.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         job.setAnnualInd(12);
+
+        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL);
+        assert appraisal.getStartDate().equals(today.toDate()) : "Start date should be set correctly.";
+
+        // for some reason I couldn't fetch the job.
+        DateTime expectedStartDate = new DateTime().withYear(2010).withTimeAtStartOfDay()
+                .withMonthOfYear(DateTimeConstants.FEBRUARY).withDayOfMonth(1);
+        DateTime expectedEndDate = expectedStartDate.plusMonths(12).minusDays(1);
+        appraisal = AppraisalMgr.createInitialAppraisalAfterTrial(appraisal);
+        assert appraisal.getStartDate().equals(expectedStartDate.toDate()) : "Start date should be set correctly.";
+        assert appraisal.getEndDate().equals(expectedEndDate.toDate()) : "End date should have been today + 12 months.";
+
+        job.setAnnualInd(18);
         DateTime endDate = job.getEndEvalDate(today, Appraisal.TYPE_INITIAL);
 
         appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL);
         appraisal = AppraisalMgr.createInitialAppraisalAfterTrial(appraisal);
-        assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
-        assert appraisal.getEndDate().equals(endDate.toDate()) : "End date should have been today + 12 months.";
-
-        job.setAnnualInd(18);
-        endDate = job.getEndEvalDate(today, Appraisal.TYPE_INITIAL);
-
-        appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL);
-        appraisal = AppraisalMgr.createInitialAppraisalAfterTrial(appraisal);
-        assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
-        assert appraisal.getEndDate().equals(endDate.toDate()) : "End date should have been today + 18 months.";
+        expectedEndDate = expectedStartDate.plusMonths(18).minusDays(1);
+        assert appraisal.getStartDate().equals(expectedStartDate.toDate()) : "Start date should be set correctly.";
+        assert appraisal.getEndDate().equals(expectedEndDate.toDate()) : "End date should have been today + 18 months.";
     }
 
-    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
-    public void shouldUseTwelveMonthsForAllAnnualAppraisalsAfterTheFirstOne(Job job, Configuration configuration)
+    @Test(groups = {"unittest"})
+    public void shouldUseTwelveMonthsForAllAnnualAppraisalsAfterTheFirstOne()
             throws Exception {
         DateTime today = new DateTime();
         job.setAnnualInd(100);
         DateTime endDate = job.getEndEvalDate(today, Appraisal.TYPE_ANNUAL);
 
         appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_ANNUAL);
-        assert appraisal.getStartDate().equals(today) : "Start date should be set correctly.";
+        assert appraisal.getStartDate().equals(today.toDate()) : "Start date should be set correctly.";
         assert appraisal.getEndDate().equals(endDate.toDate()) :
                 "End date should have been today + 12 months for annual appraisals.";
     }
 
-    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
-    public void shouldSetStatusToAppraisalDueIfStartDateIsBeforeNov1st2011(Job job)
+    @Test(groups = {"unittest"})
+    public void shouldSetStatusToGoalsDueOnCreation()
             throws Exception{
         String startPointString = "10/29/2011";
         DateTimeFormatter fmt = DateTimeFormat.forPattern(Constants.DATE_FORMAT_FULL);
         DateTime startPointDate = fmt.parseDateTime(startPointString);
 
         appraisal = AppraisalMgr.createAppraisal(job, startPointDate, Appraisal.TYPE_ANNUAL);
-        assert appraisal.getStartDate().equals(startPointDate) : "Start date should be set correctly.";
-        assert appraisal.getStatus().equals(Appraisal.STATUS_APPRAISAL_DUE) :
+        assert appraisal.getStartDate().equals(startPointDate.toDate()) : "Start date should be set correctly.";
+        assert appraisal.getStatus().equals(Appraisal.STATUS_GOALS_DUE) :
                 "appraisal status should have been appraisalDue, instead got - " + appraisal.getStatus();
     }
 
-/*    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
-    public void shouldSetStatusToGoalsOverdueIfGoalsAreDueInPast(Job job, Configuration configuration)
+    @Test(groups = {"unittest"})
+    public void shouldSetStatusToGoalsDueIfAppraisalIsAfterNov1st2011AndGoalsAreNotDueInPast()
             throws Exception {
-        //@todo: not sure how to test this
-        String startPointString = "11/01/2011";
-        SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
-        Date startPointDate = fmt.parse(startPointString);
-
-        appraisal = AppraisalMgr.createAppraisal(job, startPointDate, Appraisal.TYPE_ANNUAL, configuration);
-        assert appraisal.getStartDate().equals(startPointDate) : "Start date should be set correctly.";
-        assert appraisal.getStatus().equals("appraisalDue") :
-                "appraisal status should have been appraisalDue, instead got - " + appraisal.getStatus();
-    }*/
-
-    @Test(groups = {"unittest"}, dataProvider = "jobAndGoalsDueConfiguration")
-    public void shouldSetStatusToGoalsDueIfAppraisalIsAfterNov1st2011AndGoalsAreNotDueInPast(Job job,
-            Configuration configuration) throws Exception {
         String startPointString = "11/01/2012";
         DateTimeFormatter fmt = DateTimeFormat.forPattern(Constants.DATE_FORMAT_FULL);
         DateTime startPointDate = fmt.parseDateTime(startPointString);
 
         appraisal = AppraisalMgr.createAppraisal(job, startPointDate, Appraisal.TYPE_ANNUAL);
-        assert appraisal.getStartDate().equals(startPointDate) : "Start date should be set correctly.";
+        assert appraisal.getStartDate().equals(startPointDate.toDate()) : "Start date should be set correctly.";
         assert appraisal.getStatus().equals(Appraisal.STATUS_GOALS_DUE) :
                 "appraisal status should have been goalsDue, instead got - " + appraisal.getStatus();
     }
@@ -565,12 +461,10 @@ public class AppraisalsTest {
         job.setPositionNumber("1234");
         job.setSuffix("00");
 
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.MONTH, Calendar.MAY);
-        cal.set(Calendar.DAY_OF_MONTH, 14);
-        Date startDate = cal.getTime();
+        DateTime startDateTime = new DateTime().withTimeAtStartOfDay().withDayOfMonth(14)
+                .withMonthOfYear(DateTimeConstants.MAY).withYear(2010);
 
-        assert AppraisalMgr.appraisalExists(job, new DateTime(startDate), "annual");
+        assert AppraisalMgr.appraisalExists(job, startDateTime, "annual");
 
         job.setPositionNumber("4444");
         assert AppraisalMgr.openTrialAppraisalExists(job);
@@ -585,9 +479,7 @@ public class AppraisalsTest {
     @Test(groups={"pending"})
     public void shouldUpdateAppraisalStatusAndOriginalStatus() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
         Appraisal appraisal = (Appraisal) session.load(Appraisal.class, 1);
-        tx.commit();
         appraisal.setStatus(Appraisal.STATUS_CLOSED);
         appraisal.setOriginalStatus(Appraisal.STATUS_GOALS_DUE);
         AppraisalMgr.updateAppraisalStatus(appraisal);
