@@ -384,18 +384,15 @@
 
         // The rest of this function takes care of updating ids, names and classes
 
-        // legend, fieldset class and h3 for accessibility
+        // h3 for accessibility
         newAssessment.attr('class', 'appraisal-assessment-' + assessmentCount);
-        var legendHtml = newAssessment.find('legend').html();
-        legendHtml = legendHtml.replace(/#\d+/, '#' + assessmentCount);
-        newAssessment.find('legend').html(legendHtml);
         newAssessment.find('h3.secret').html('<liferay-ui:message key="appraisal-assessment-header"/>' + assessmentCount);
 
 
         // Delete Assessment Link
-        var removeLinkClass = newAssessment.find('legend a').attr('class');
+        var removeLinkClass = newAssessment.find('a.delete').attr('class');
         removeLinkClass = removeLinkClass.replace(/\.\d+/, '') + "." + assessmentCount;
-        newAssessment.find('legend a').attr('class', removeLinkClass);
+        newAssessment.find('a.delete').attr('class', removeLinkClass);
 
         // delete flag hidden input
         var deleteFlagInput = jQuery(newAssessment.find(':input:hidden')[0]);
@@ -443,11 +440,6 @@
 
         // update # of assessment in form
         jQuery('#assessmentCount').val(assessmentCount);
-
-        // set a handler for the delete link in the newly added assessment
-        jQuery('.appraisal-assessment-' + assessmentCount + ' a.assessment-delete').click(function() {
-          return assessmentDelete.call(this);
-        });
 
         return false;
       });

@@ -8,7 +8,5 @@
     </c:if>
 />
 <label for="<portlet:namespace />appraisal.assessmentCriteria.${assessmentCriteria.id}">
-    <c:out value="${assessmentCriteria.criteriaArea.name}"/></label>
-<liferay-ui:icon-help message="${assessmentCriteria.criteriaArea.description}"/>
-
-<%--@todo: need to provide to js a map of ids with criteria name + description to create things on the fly--%>
+    <span title="${assessmentCriteria.criteriaArea.description}">
+        <c:out value="${assessmentCriteria.criteriaArea.name}"/></span></label>

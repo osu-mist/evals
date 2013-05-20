@@ -7,14 +7,6 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 %>
 <fieldset class="appraisal-assessment-${assessment.id}">
 <h3 class="secret"><liferay-ui:message key="appraisal-assessment-header"/>${loopStatus.index + 1}</h3>
-<legend>
-    <liferay-ui:message key="appraisal-assessment-header"/>${loopStatus.index + 1}
-    <c:if test="${permissionRule.goals == 'e'}">
-        <a class="delete img-only assessment-delete delete.id.${assessment.id}"
-           title="<liferay-ui:message key="appraisal-assessment-delete"/>"
-           href="#"><liferay-ui:message key="appraisal-assessment-delete"/></a>
-    </c:if>
-</legend>
 
 <input type="hidden" class="appraisal-assessment-deleted-${assessment.id}" name="<portlet:namespace />appraisal.assessment.deleted.${assessment.id}"
        value="0"/>
@@ -26,15 +18,29 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
     </c:when>
     <c:when test="${permissionRule.goals == 'v'}">
         <fieldset>
-            <legend><liferay-ui:message key="appraisal-goals" /></legend>
+            <legend><span><liferay-ui:message key="appraisal-goals" /></span></legend>
             <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAssessment.getGoal()) %></p>
+            <c:if test="${permissionRule.goals == 'v'}">
+                    <c:forEach var="assessmentCriteria" items="${assessment.sortedAssessmentCriteria}" varStatus="loopStatus2">
+                        <%@ include file="/jsp/appraisals/assessmentCriteria.jsp"%>
+                    </c:forEach>
+            </c:if>
         </fieldset>
     </c:when>
 </c:choose>
-<c:if test="${permissionRule.goals != null}">
-    <c:forEach var="assessmentCriteria" items="${assessment.sortedAssessmentCriteria}" varStatus="loopStatus2">
-        <%@ include file="/jsp/appraisals/assessmentCriteria.jsp"%>
-    </c:forEach>
+
+<c:if test="${permissionRule.goals == 'e'}">
+    <div class="assessment-criteria">
+        <c:forEach var="assessmentCriteria" items="${assessment.sortedAssessmentCriteria}" varStatus="loopStatus2">
+            <%@ include file="/jsp/appraisals/assessmentCriteria.jsp"%>
+        </c:forEach>
+    </div>
+</c:if>
+
+<c:if test="${permissionRule.goals == 'e'}">
+    <a class="delete img-txt assessment-delete delete.id.${assessment.id}"
+       title="<liferay-ui:message key="appraisal-assessment-delete"/>"
+       href="#"><liferay-ui:message key="appraisal-assessment-delete"/></a>
 </c:if>
 
 
@@ -46,7 +52,7 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
     </c:when>
     <c:when test="${permissionRule.results == 'v'}">
         <fieldset>
-            <legend><liferay-ui:message key="appraisal-employee-results" /></legend>
+            <legend><span><liferay-ui:message key="appraisal-employee-results" /></span></legend>
             <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAssessment.getEmployeeResult()) %></p>
         </fieldset>
     </c:when>
@@ -60,7 +66,7 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
     </c:when>
     <c:when test="${permissionRule.supervisorResults == 'v'}">
         <fieldset>
-            <legend><liferay-ui:message key="appraisal-result-comments" /></legend>
+            <legend><span><liferay-ui:message key="appraisal-result-comments" /></span></legend>
             <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAssessment.getSupervisorResult()) %></p>
         </fieldset>
     </c:when>
