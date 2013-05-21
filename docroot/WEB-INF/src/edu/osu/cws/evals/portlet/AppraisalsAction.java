@@ -55,7 +55,7 @@ public class AppraisalsAction implements ActionInterface {
 
         // Check that the logged in user is admin
         boolean isReviewer = actionHelper.getReviewer() != null;
-        if (isReviewer) {
+        if (!isReviewer) {
             return errorHandler.handleAccessDenied(request, response);
         }
 

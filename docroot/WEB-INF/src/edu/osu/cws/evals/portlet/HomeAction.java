@@ -21,8 +21,6 @@ public class HomeAction implements ActionInterface {
     private ActionHelper actionHelper;
 
     private static Log _log = LogFactoryUtil.getLog(HomeAction.class);
-    private ErrorHandler errorHandler;
-
     /**
      * Takes care of grabbing all the information needed to display the home view sections
      * (req. actionHelper, my appraisals, my team, reviews and admins) and sets the information
@@ -104,7 +102,8 @@ public class HomeAction implements ActionInterface {
     public String demoResetAppraisal(PortletRequest request, PortletResponse response) throws Exception {
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isDemo()) {
-            return errorHandler.handleAccessDenied(request, response);
+            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
+            return display(request, response);
         }
 
         int id = ParamUtil.getInteger(request, "id");
@@ -142,8 +141,10 @@ public class HomeAction implements ActionInterface {
      * @return
      */
     public String demoSwitchUser(PortletRequest request, PortletResponse response) throws Exception {
+        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isDemo()) {
-            return errorHandler.handleAccessDenied(request, response);
+            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
+            return display(request, response);
         }
 
         PortletSession session = request.getPortletSession(true);
@@ -211,6 +212,6 @@ public class HomeAction implements ActionInterface {
     }
 
     public void setErrorHandler(ErrorHandler errorHandler) {
-        this.errorHandler = errorHandler;
+        // we do nothing in this method.
     }
 }
