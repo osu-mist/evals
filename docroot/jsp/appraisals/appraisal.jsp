@@ -94,9 +94,12 @@
 
     <div class="appraisal-criteria">
         <c:if test="${permissionRule.goals == 'e' || permissionRule.goals == 'v'}">
-            <c:forEach var="assessment" items="${appraisal.currentGoalVersion.sortedAssessments}" varStatus="loopStatus">
-                <%@ include file="/jsp/appraisals/assessments.jsp"%>
-            </c:forEach>
+            <fieldset>
+                <legend><liferay-ui:message key="appraisal-details"/></legend>
+                <c:forEach var="assessment" items="${appraisal.currentGoalVersion.sortedAssessments}" varStatus="loopStatus">
+                    <%@ include file="/jsp/appraisals/assessments.jsp"%>
+                </c:forEach>
+            </fieldset>
         </c:if>
     </div>
 
@@ -378,16 +381,15 @@
        */
       jQuery(".osu-cws #addAssessment").click(function() {
         // clone last assessment in the form for modification
-        var newAssessment = jQuery('.appraisal-criteria fieldset:last-child').clone(true);
+        var newAssessment = jQuery('.appraisal-criteria fieldset>div:last-child').clone(true);
         newAssessment.show(); // last assessment could have been deleted
-        var assessmentCount = jQuery('.appraisal-criteria fieldset').size() + 1;
+        var assessmentCount = jQuery('.appraisal-criteria fieldset>div').size() + 1;
 
         // The rest of this function takes care of updating ids, names and classes
 
         // h3 for accessibility
         newAssessment.attr('class', 'appraisal-assessment-' + assessmentCount);
         newAssessment.find('h3.secret').html('<liferay-ui:message key="appraisal-assessment-header"/>' + assessmentCount);
-
 
         // Delete Assessment Link
         var removeLinkClass = newAssessment.find('a.delete').attr('class');
@@ -405,6 +407,9 @@
         deleteFlagInput.val(0);
 
         // goal label + textarea
+        var goalLabelVal = newAssessment.find('label:first').html().replace(/\d+/, '');
+        goalLabelVal += + assessmentCount;
+        jQuery(newAssessment.find('label')[0]).html(goalLabelVal);
         var goalLabelFor = newAssessment.find('label:first').attr('for').replace(/\.\d+/, '');
         goalLabelFor += "." + assessmentCount;
         jQuery(newAssessment.find('label')[0]).attr('for', goalLabelFor);
@@ -435,7 +440,7 @@
             }
         });
 
-        newAssessment.appendTo('.appraisal-criteria'); // add new assessment to form
+        newAssessment.appendTo('.appraisal-criteria>fieldset'); // add new assessment to form
         jQuery('.appraisal-assessment-' + assessmentCount + ' textarea').val(''); // clearing this before appending it didn't work
 
         // update # of assessment in form
@@ -467,7 +472,7 @@
        *
        * @return {Boolean}
        */
-      function isAssesmentDeleted() {
+      function isAssessmentDeleted() {
         // find the delete flag hidden input
         var deleteFlag = jQuery(this).find('input:hidden').filter(function(index) {
             return jQuery(this).attr('class').indexOf('appraisal-assessment-deleted-') == 0;
@@ -491,8 +496,8 @@
        */
       function validateGoals() {
         // get a list of non empty and not-deleted assessments
-        var nonEmptyAssessments = jQuery('.appraisal-criteria fieldset').filter(function(index) {
-          if (isAssesmentDeleted.call(this)) { // filter out deleted assessments
+        var nonEmptyAssessments = jQuery('.appraisal-criteria fieldset>div').filter(function(index) {
+          if (isAssessmentDeleted.call(this)) { // filter out deleted assessments
             return false;
           }
 
@@ -510,8 +515,8 @@
 
         // validate each assessment to verify that we don't have non-empty goals with no criterias checked or vice-versa
         var validGoals = true;
-        jQuery('.appraisal-criteria fieldset').filter(function(index) {
-          if (isAssesmentDeleted.call(this)) { // filter out deleted assessments
+        jQuery('.appraisal-criteria fieldset>div').filter(function(index) {
+          if (isAssessmentDeleted.call(this)) { // filter out deleted assessments
             return false;
           }
 
@@ -534,7 +539,7 @@
        */
       function deleteEmptyAssessments() {
         jQuery('.appraisal-criteria fieldset').filter(function(index) {
-          if (isAssesmentDeleted.call(this)) { // filter out deleted assessments
+          if (isAssessmentDeleted.call(this)) { // filter out deleted assessments
             return false;
           }
 

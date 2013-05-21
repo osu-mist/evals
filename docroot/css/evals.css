@@ -46,18 +46,35 @@
     color: #555;
 }
 
+.appraisal-criteria div div {
+  margin: 0 1.5em 0 5.5em;
+}
+
+.appraisal-criteria textarea {
+    width: 100%;
+}
+
 .appraisal-criteria fieldset {
   padding-top: 1em;
 }
 
+.appraisal-criteria div {
+  margin-bottom: 2em;
+}
+
 .appraisal-criteria fieldset label {
   float: left;
-  width: 5.5em;
+  width: 5em;
   font-size: 90%;
 }
 
+.appraisal-criteria fieldset a.delete {
+  float: right;
+  margin-right: 0.5em;
+}
+
 .appraisal-criteria fieldset fieldset {
-    margin-left: 6em;
+    margin-left: 5.5em;
     min-height: 3.5em;
     padding-top: 0.5em;
 }
@@ -76,11 +93,11 @@
 .appraisal-criteria fieldset fieldset legend span {
     position: absolute;
     top: 0;
-    left: -6.5em;
+    left: -6em;
 }
 
 .appraisal-criteria .assessment-criteria {
-    margin-left: 6em;
+    margin: 0 0 0 6em;
 }
 
 .appraisal-criteria .assessment-criteria label {

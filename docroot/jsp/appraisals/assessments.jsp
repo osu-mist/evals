@@ -5,20 +5,27 @@
 
 Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 %>
-<fieldset class="appraisal-assessment-${assessment.id}">
+<div class="appraisal-assessment-${assessment.id}">
 <h3 class="secret"><liferay-ui:message key="appraisal-assessment-header"/>${loopStatus.index + 1}</h3>
+
+<c:if test="${permissionRule.goals == 'e'}">
+    <a class="delete img-txt assessment-delete delete.id.${assessment.id}"
+       title="<liferay-ui:message key="appraisal-assessment-delete"/>"
+       href="#"><liferay-ui:message key="appraisal-assessment-delete"/></a>
+</c:if>
 
 <input type="hidden" class="appraisal-assessment-deleted-${assessment.id}" name="<portlet:namespace />appraisal.assessment.deleted.${assessment.id}"
        value="0"/>
 <c:choose>
     <c:when test="${permissionRule.goals == 'e'}">
-        <label for="<portlet:namespace />appraisal.goal.${assessment.id}"><liferay-ui:message key="appraisal-goals" /></label>
-        <liferay-ui:input-textarea param="appraisal.goal.${assessment.id}"
-            defaultValue="${assessment.goal}" />
+        <label for="<portlet:namespace />appraisal.goal.${assessment.id}"><liferay-ui:message key="appraisal-goals" />
+            ${loopStatus.index + 1}</label>
+        <div><liferay-ui:input-textarea param="appraisal.goal.${assessment.id}"
+            defaultValue="${assessment.goal}" /></div>
     </c:when>
     <c:when test="${permissionRule.goals == 'v'}">
         <fieldset>
-            <legend><span><liferay-ui:message key="appraisal-goals" /></span></legend>
+            <legend><span><liferay-ui:message key="appraisal-goals" />${loopStatus.index + 1}</span></legend>
             <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAssessment.getGoal()) %></p>
             <c:if test="${permissionRule.goals == 'v'}">
                     <c:forEach var="assessmentCriteria" items="${assessment.sortedAssessmentCriteria}" varStatus="loopStatus2">
@@ -37,18 +44,11 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
     </div>
 </c:if>
 
-<c:if test="${permissionRule.goals == 'e'}">
-    <a class="delete img-txt assessment-delete delete.id.${assessment.id}"
-       title="<liferay-ui:message key="appraisal-assessment-delete"/>"
-       href="#"><liferay-ui:message key="appraisal-assessment-delete"/></a>
-</c:if>
-
-
 <c:choose>
     <c:when test="${permissionRule.results == 'e'}">
         <label for="<portlet:namespace />assessment.employeeResult.${assessment.id}"><liferay-ui:message key="appraisal-employee-results" /></label>
-        <liferay-ui:input-textarea param="assessment.employeeResult.${assessment.id}"
-            defaultValue="${assessment.employeeResult}" />
+        <div><liferay-ui:input-textarea param="assessment.employeeResult.${assessment.id}"
+            defaultValue="${assessment.employeeResult}" /></div>
     </c:when>
     <c:when test="${permissionRule.results == 'v'}">
         <fieldset>
@@ -61,8 +61,8 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 <c:choose>
     <c:when test="${permissionRule.supervisorResults == 'e'}">
         <label for="<portlet:namespace />assessment.supervisorResult.${assessment.id}"><liferay-ui:message key="appraisal-result-comments" /></label>
-        <liferay-ui:input-textarea param="assessment.supervisorResult.${assessment.id}"
-            defaultValue="${assessment.supervisorResult}" />
+        <div><liferay-ui:input-textarea param="assessment.supervisorResult.${assessment.id}"
+            defaultValue="${assessment.supervisorResult}" /></div>
     </c:when>
     <c:when test="${permissionRule.supervisorResults == 'v'}">
         <fieldset>
@@ -71,4 +71,4 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
         </fieldset>
     </c:when>
 </c:choose>
-</fieldset>
+</div>
