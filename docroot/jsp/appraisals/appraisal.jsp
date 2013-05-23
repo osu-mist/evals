@@ -327,6 +327,12 @@
        * and internally to remove empty assessments before submitting the form.
        */
       function setGoalDeleteFlag() {
+        var allAssessments = jQuery('.appraisal-criteria>fieldset').children().length - 1;
+        var deletedAssessments = jQuery('.appraisal-criteria>fieldset>div:hidden').length;
+        if((allAssessments - deletedAssessments) == 1) {
+            alert('<liferay-ui:message key="appraisal-assessment-delete-all"/>');
+            return false;
+        }
         var classes = jQuery(this).attr('class').split(/\s+/);
         var deleteFlagSelector = ".appraisal-assessment-deleted-";
         var assessmentSelector = ".appraisal-assessment-";
