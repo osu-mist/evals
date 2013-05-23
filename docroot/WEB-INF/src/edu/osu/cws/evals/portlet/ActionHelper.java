@@ -367,7 +367,8 @@ public class ActionHelper {
             if (Pattern.matches("[0-9]+", screenName)) {
                 PropertiesConfiguration config = getEvalsConfig();
                 String bannerHostname = config.getString("banner.hostname");
-                onidUsername = EmployeeMgr.getOnidUsername(screenName, bannerHostname);
+                String luminisHostname = config.getString("luminis.hostname");
+                onidUsername = EmployeeMgr.getOnidUsername(screenName, bannerHostname, luminisHostname);
             } else {
                 onidUsername = screenName;
             }
