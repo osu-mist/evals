@@ -2,14 +2,14 @@ package edu.osu.cws.evals.util;
 
 
 import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.LineSeparator;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.Constants;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
@@ -98,11 +98,13 @@ public class EvalsPDF {
         String filename = getFileName(appraisal, dirName, env);
         Rectangle pageSize = new Rectangle(612f, 792f);
         Document document = new Document(pageSize, 50f, 40f, 24f, 24f);
+        PdfWriter.getInstance(document, new FileOutputStream(filename));
         document.open();
 
         document.add(getLetterHead(resource, rootDir));
         document.add(getInfoTable(appraisal, resource, rule));
-        addAssessments(appraisal, rule, resource, document);
+        addAssessments(appraisal, rule, resource, document, rootDir);
+        addCriteriaLegend(document, appraisal, resource);
         addEvaluation(appraisal, rule, resource, document, rootDir);
         addRebuttal(appraisal, rule, resource, document);
         if (appraisal.getEmployeeSignedDate() != null) {
@@ -605,7 +607,7 @@ public class EvalsPDF {
      * @throws DocumentException
      */
     private static void addAssessments(Appraisal appraisal, PermissionRule rule, ResourceBundle resource,
-                                       Document document) throws DocumentException {
+                                       Document document, String rootDir) throws Exception {
         Paragraph sectionText;
         int i = 0;
 
@@ -613,21 +615,8 @@ public class EvalsPDF {
         List<Assessment> sortedAssessments = currentGoalVersion.getSortedAssessments();
         for (Assessment assessment : sortedAssessments) {
             i++;
-            /* @todo
-            String areaText = i + ". " + assessment.getCriterionDetail().getAreaID().getName().toUpperCase() + ":";
-            String descriptionText = " (" + assessment.getCriterionDetail().getDescription() + ")";
-            */
 
-            String areaText = "";
-            String descriptionText = "";
-
-            Chunk area = new Chunk(areaText, FONT_BOLD_12);
-            area.setUnderline(1f, -2f);
-
-            Phrase description = new Phrase(descriptionText, FONT_10);
             sectionText = new Paragraph();
-            sectionText.add(area);
-            sectionText.add(description);
             sectionText.setSpacingBefore(BEFORE_SPACING);
             document.add(sectionText);
 
@@ -635,12 +624,18 @@ public class EvalsPDF {
             boolean displayEmployeeResults = StringUtils.containsAny(rule.getResults(), "ev");
             boolean displaySupervisorResults = StringUtils.containsAny(rule.getSupervisorResults(), "ev");
             if (displayGoals) {
-                Paragraph goalsLabel = new Paragraph(resource.getString("appraisal-goals"), FONT_BOLDITALIC_10);
+                String goalLabel = resource.getString("appraisal-goals") + i;
+                Chunk goalChunk = new Chunk(goalLabel, FONT_BOLDITALIC_10);
+                goalChunk.setUnderline(1f, -2f);
+
+                Paragraph goalsLabel = new Paragraph(goalChunk);
+                goalsLabel.setSpacingBefore(BEFORE_SPACING);
                 Paragraph goals = new Paragraph(assessment.getGoal(), FONT_10);
-                goalsLabel.setIndentationLeft(LEFT_INDENTATION);
                 goals.setIndentationLeft(LEFT_INDENTATION);
                 document.add(goalsLabel);
                 document.add(goals);
+
+                addAssessmentsCriteria(document, rootDir, assessment, resource);
             }
 
             if (displayEmployeeResults) {
@@ -666,5 +661,116 @@ public class EvalsPDF {
             }
 
         }
+    }
+
+    /**
+     * Adds the assessments criteria checkboxes for a single assessment.
+     *
+     * @param document
+     * @param rootDir
+     * @param assessment
+     * @param resource
+     * @throws DocumentException
+     * @throws IOException
+     */
+    private static void addAssessmentsCriteria(Document document, String rootDir, Assessment assessment,
+                                               ResourceBundle resource) throws DocumentException, IOException {
+        int ratingMaxCols = 45;
+        PdfPTable criteriaTable = new PdfPTable(ratingMaxCols);
+        PdfPCell emptyLeftCol = new PdfPCell();
+        emptyLeftCol.setBorder(Rectangle.NO_BORDER);
+        emptyLeftCol.setRowspan(4);
+        criteriaTable.addCell(emptyLeftCol);
+        criteriaTable.setWidthPercentage(100f);
+        PdfPCell cell;
+
+        // Use an image for the unchecked box
+        Image checkedImg = Image.getInstance(rootDir + IMAGE_CHECKBOX_CHECKED);
+        checkedImg.scaleToFit(10f, 10f);
+        PdfPCell checkedBox = new PdfPCell(checkedImg, false);
+        checkedBox.setColspan(1);
+        checkedBox.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        checkedBox.setBorder(Rectangle.NO_BORDER);
+        checkedBox.setPaddingLeft(2f);
+
+        // Use an image for the checked box.
+        Image uncheckedImg = Image.getInstance(rootDir + IMAGE_CHECKBOX_UNCHECKED);
+        uncheckedImg.scaleToFit(10f, 10f);
+        PdfPCell uncheckedBox = new PdfPCell(uncheckedImg, false);
+        uncheckedBox.setColspan(1);
+        uncheckedBox.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        uncheckedBox.setBorder(Rectangle.NO_BORDER);
+        uncheckedBox.setPaddingLeft(2f);
+
+        // empty space
+        Paragraph sectionText = new Paragraph();
+        sectionText.setSpacingBefore(BEFORE_SPACING);
+        document.add(sectionText);
+
+        Paragraph criteriaLabel = new Paragraph(resource.getString("appraisal-selected-criteria"), FONT_BOLDITALIC_10);
+        criteriaLabel.setIndentationLeft(LEFT_INDENTATION);
+        document.add(criteriaLabel);
+
+        for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
+            if (assessmentCriteria.getChecked() != null && assessmentCriteria.getChecked()) {
+                criteriaTable.addCell(checkedBox);
+            } else {
+                criteriaTable.addCell(uncheckedBox);
+            }
+            cell = new PdfPCell(new Paragraph(assessmentCriteria.getCriteriaArea().getName(), FONT_10));
+
+            int colspan = (ratingMaxCols - 5) / 4;
+            cell.setColspan(colspan);
+            cell.setBorder(Rectangle.NO_BORDER);
+            criteriaTable.addCell(cell);
+        }
+
+        document.add(criteriaTable);
+    }
+
+    /**
+     * Adds the criteria area legend.
+     *
+     * @param document
+     * @param appraisal
+     * @param resource
+     * @throws DocumentException
+     */
+    private static void addCriteriaLegend(Document document, Appraisal appraisal, ResourceBundle resource)
+            throws DocumentException {
+        GoalVersion goalVersion = (GoalVersion) appraisal.getGoalVersions().toArray()[0];
+        Assessment assessment = (Assessment) goalVersion.getAssessments().toArray()[0];
+        PdfPTable criteriaTable = new PdfPTable(41);
+        PdfPCell emptyLeftCol = new PdfPCell();
+        emptyLeftCol.setBorder(Rectangle.NO_BORDER);
+        emptyLeftCol.setRowspan(assessment.getAssessmentCriteria().size());
+        criteriaTable.addCell(emptyLeftCol);
+        criteriaTable.setWidthPercentage(100f);
+        PdfPCell cell;
+
+        // empty space
+        Paragraph sectionText = new Paragraph();
+        sectionText.setSpacingBefore(BEFORE_SPACING);
+        document.add(sectionText);
+
+        Chunk criteriaChunk = new Chunk(resource.getString("appraisal-criteria-legend"), FONT_BOLDITALIC_10);
+        criteriaChunk.setUnderline(1f, -2f);
+        Paragraph criteriaLabel = new Paragraph(criteriaChunk);
+        document.add(criteriaLabel);
+
+
+        for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
+            cell = new PdfPCell(new Paragraph(assessmentCriteria.getCriteriaArea().getName(), FONT_10));
+            cell.setColspan(10);
+            cell.setBorder(Rectangle.NO_BORDER);
+            criteriaTable.addCell(cell);
+
+            cell = new PdfPCell(new Paragraph(assessmentCriteria.getCriteriaArea().getDescription(), FONT_10));
+            cell.setColspan(30);
+            cell.setBorder(Rectangle.NO_BORDER);
+            criteriaTable.addCell(cell);
+        }
+
+        document.add(criteriaTable);
     }
 }
