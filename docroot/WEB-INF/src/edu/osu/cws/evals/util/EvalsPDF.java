@@ -712,7 +712,7 @@ public class EvalsPDF {
         document.add(criteriaLabel);
 
         for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
-            if (assessmentCriteria.getChecked()) {
+            if (assessmentCriteria.getChecked() != null && assessmentCriteria.getChecked()) {
                 criteriaTable.addCell(checkedBox);
             } else {
                 criteriaTable.addCell(uncheckedBox);
