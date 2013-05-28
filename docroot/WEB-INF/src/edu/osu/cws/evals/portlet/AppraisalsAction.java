@@ -240,7 +240,7 @@ public class AppraisalsAction implements ActionInterface {
         }
 
 
-        if (isReviewer || isAdmin && appraisal.isOpen()
+        if ((isReviewer || isAdmin) && appraisal.isOpen()
                 && !userRole.equals(ActionHelper.ROLE_EMPLOYEE)) {
             actionHelper.addToRequestMap("displayCloseOutAppraisal", true);
         }
