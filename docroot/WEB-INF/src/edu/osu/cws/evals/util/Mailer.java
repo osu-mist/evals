@@ -447,8 +447,7 @@ public class Mailer {
      */
     private String goalsApprovedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsApproved_body");
-        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(),
-                getDueDate(appraisal));
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
     }
 
     /**
