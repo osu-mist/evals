@@ -12,6 +12,7 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
     <a class="delete img-txt assessment-delete delete.id.${assessment.id}"
        title="<liferay-ui:message key="appraisal-assessment-delete"/>"
        href="#"><liferay-ui:message key="appraisal-assessment-delete"/></a>
+    <div class="osu-cws-clear-both"></div>
 </c:if>
 
 <input type="hidden" class="appraisal-assessment-deleted-${assessment.id}" name="<portlet:namespace />appraisal.assessment.deleted.${assessment.id}"

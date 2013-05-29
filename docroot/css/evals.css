@@ -86,8 +86,8 @@
 .appraisal-criteria fieldset fieldset legend {
     float: left;
     position: relative;
-    padding: 0;
-    margin-left: -1em;
+    padding: 0 !important;
+    margin-left: -1em !important;
 }
 
 .appraisal-criteria fieldset fieldset legend span {

@@ -9,4 +9,4 @@
 />
 <label for="<portlet:namespace />appraisal.assessmentCriteria.${assessmentCriteria.id}">
     <span title="${assessmentCriteria.criteriaArea.description}">
-        <c:out value="${assessmentCriteria.criteriaArea.name}"/></span></label>
+        <c:out value="${assessmentCriteria.criteriaArea.name}"/></span><sup>[?]</sup></label>
