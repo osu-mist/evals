@@ -96,6 +96,10 @@
     left: -6em;
 }
 
+.ie .appraisal-criteria fieldset fieldset legend span {
+    top: 1em;
+}
+
 .appraisal-criteria .assessment-criteria {
     margin: 0 0 0 6em;
 }
