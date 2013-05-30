@@ -281,7 +281,7 @@
       // Handle validation of assessments' goals
       jQuery("#<portlet:namespace />submit-goals").click(function(event) {
          // remove any previous goal errors
-        jQuery('.appraisal-criteria fieldset').each(function(index, element) {
+        jQuery('.appraisal-criteria fieldset>div').each(function(index, element) {
           removeJSError.call(element);
         })
 
@@ -544,7 +544,7 @@
        * submitted. We clear out the deleted assessments because it's easier to do it via js
        */
       function deleteEmptyAssessments() {
-        jQuery('.appraisal-criteria fieldset').filter(function(index) {
+        jQuery('.appraisal-criteria fieldset>div').filter(function(index) {
           if (isAssessmentDeleted.call(this)) { // filter out deleted assessments
             return false;
           }

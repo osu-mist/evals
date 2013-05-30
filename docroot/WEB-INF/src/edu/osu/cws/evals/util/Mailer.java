@@ -310,6 +310,10 @@ public class Mailer {
             String supervisorName = supervisor.getConventionName();
             String emailAddress = supervisor.getEmail();
 
+            if(testMailToAddress != null && !testMailToAddress.equals("")){
+                emailAddress = testMailToAddress;
+            }
+
             if (emailAddress == null || emailAddress.equals("")) {
                 logNullEmail(supervisor);
                 return;
