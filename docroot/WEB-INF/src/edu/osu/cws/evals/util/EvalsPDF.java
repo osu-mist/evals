@@ -104,12 +104,12 @@ public class EvalsPDF {
         document.add(getLetterHead(resource, rootDir));
         document.add(getInfoTable(appraisal, resource, rule));
         addAssessments(appraisal, rule, resource, document, rootDir);
-        addCriteriaLegend(document, appraisal, resource);
         addEvaluation(appraisal, rule, resource, document, rootDir);
         addRebuttal(appraisal, rule, resource, document);
         if (appraisal.getEmployeeSignedDate() != null) {
             document.add(getSignatureTable(appraisal, rule, resource));
         }
+        addCriteriaLegend(document, appraisal, resource);
         document.close();
         return filename;
     }
@@ -738,6 +738,9 @@ public class EvalsPDF {
      */
     private static void addCriteriaLegend(Document document, Appraisal appraisal, ResourceBundle resource)
             throws DocumentException {
+        LineSeparator line = new LineSeparator(1, 100, null, Element.ALIGN_CENTER, -12);
+        document.add(line);
+
         GoalVersion goalVersion = (GoalVersion) appraisal.getGoalVersions().toArray()[0];
         Assessment assessment = (Assessment) goalVersion.getAssessments().toArray()[0];
         PdfPTable criteriaTable = new PdfPTable(41);
