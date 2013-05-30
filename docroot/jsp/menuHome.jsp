@@ -1,5 +1,5 @@
 <h2 class="secret"><liferay-ui:message key="evals-title"/></h2>
-<div id="pass-top-menu" class="action-menu-wrapper">
+<div class="portlet-top-menu action-menu-wrapper">
     <ul class="portlet-action-menu">
         <li
           <c:if test="${not empty isHome}">
