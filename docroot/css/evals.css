@@ -381,7 +381,7 @@ tr.ui-state-highlight {
     margin: 1em 0 0 0;
 }
 
-#pass-top-menu ul.portlet-action-menu li.reports ul {
+.portlet-top-menu ul.portlet-action-menu li.reports ul {
   width: 8em;
 }
 
