@@ -14,10 +14,7 @@ import edu.osu.cws.evals.hibernate.AppraisalStepMgr;
 import edu.osu.cws.evals.hibernate.PermissionRuleMgr;
 import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.models.Employee;
-import edu.osu.cws.evals.util.EvalsLogger;
-import edu.osu.cws.evals.util.EvalsUtil;
-import edu.osu.cws.evals.util.HibernateUtil;
-import edu.osu.cws.evals.util.Mailer;
+import edu.osu.cws.evals.util.*;
 import edu.osu.cws.util.CWSUtil;
 import edu.osu.cws.util.Logger;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -297,8 +294,8 @@ public class EvalsPortlet extends GenericPortlet {
         PropertiesConfiguration config = actionHelper.getEvalsConfig();
         Map<String, Configuration> configurationMap =
                 (Map<String, Configuration>)getPortletContext().getAttribute("configurations");
-        Mailer mailer = EvalsUtil.createMailer(config, configurationMap, getLog());
-        getPortletContext().setAttribute("mailer", mailer);
+        MailerInterface mailerInterface = EvalsUtil.createMailer(config, configurationMap, getLog());
+        getPortletContext().setAttribute("mailer", mailerInterface);
     }
 
     /**
