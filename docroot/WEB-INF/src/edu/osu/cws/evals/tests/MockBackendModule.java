@@ -16,20 +16,18 @@ public class MockBackendModule extends AbstractModule{
     @Override
     protected void configure() {
         HibernateUtil.setHibernateConfig(HibernateUtil.TEST_CONFIG, "", "");
-
-//        bind(LoggingInterface.class).to(MockLogger.class);
     }
 
     @Provides @Singleton
     MailerInterface provideMailer() {
-        MailerInterface mailerInterface = null;
+        MailerInterface mailer = null;
         try {
-            mailerInterface = new MockMailer();
+            mailer = new MockMailer();
         } catch (Exception e) {
             // do something
         }
 
-        return mailerInterface;
+        return mailer;
     }
 
     @Provides @Singleton

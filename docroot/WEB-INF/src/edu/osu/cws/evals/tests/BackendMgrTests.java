@@ -8,13 +8,12 @@ import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.util.HibernateUtil;
+import edu.osu.cws.evals.util.MailerInterface;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.joda.time.DateTime;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.Date;
 
 @Test
 public class BackendMgrTests {
@@ -172,7 +171,7 @@ public class BackendMgrTests {
 
         // create appraisal for testing
         Appraisal appraisal = AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
-        MockMailer mockMailer = (MockMailer) mgr.getMailerInterface();
+        MockMailer mockMailer = (MockMailer) mgr.getMailer();
         mockMailer.setSendMailReturnValue(true); // let sendMail return true
         assert mgr.sendMail(appraisal);
         assert mockMailer.getEmailType().getMailTo().equals("employee");
@@ -187,7 +186,7 @@ public class BackendMgrTests {
 
         // setup test objects
         Appraisal appraisal = AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
-        MockMailer mockMailer = (MockMailer) mgr.getMailerInterface();
+        MockMailer mockMailer = (MockMailer) mgr.getMailer();
         mockMailer.setSendMailReturnValue(false); // let sendMail return false
         Integer errorCalls = mgr.getDataErrorCount();
 
@@ -206,7 +205,7 @@ public class BackendMgrTests {
         // create appraisal for testing
         Appraisal appraisal = AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
         appraisal.setStatus(Appraisal.STATUS_APPRAISAL_DUE);
-        MockMailer mockMailer = (MockMailer) mgr.getMailerInterface();
+        MockMailer mockMailer = (MockMailer) mgr.getMailer();
         mockMailer.setSendMailReturnValue(true); // let sendMail return true
 
         // check that there are no mail messages for supervisor to begin with

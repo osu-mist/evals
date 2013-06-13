@@ -357,7 +357,7 @@ public class AppraisalsAction implements ActionInterface {
      */
     private void processUpdateRequest(Map requestMap) throws Exception {
         HashMap appraisalSteps = (HashMap) actionHelper.getPortletContextAttribute("appraisalSteps");
-        MailerInterface mailerInterface = (MailerInterface) actionHelper.getPortletContextAttribute("mailer");
+        MailerInterface mailer = (MailerInterface) actionHelper.getPortletContextAttribute("mailer");
 
         // set the overdue value before updating the status
         String beforeUpdateStatus = appraisal.getStatus();
@@ -402,7 +402,7 @@ public class AppraisalsAction implements ActionInterface {
 
         EmailType emailType = appraisalStep.getEmailType();
         if (emailType != null) {
-            mailerInterface.sendMail(appraisal, emailType);
+            mailer.sendMail(appraisal, emailType);
         }
     }
 

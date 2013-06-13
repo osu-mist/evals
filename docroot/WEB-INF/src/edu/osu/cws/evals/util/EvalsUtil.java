@@ -310,9 +310,7 @@ public class EvalsUtil {
         if (!environment.startsWith("prod")){
             testMailToAddress = config.getString("mail.testMailToAddress");
         }
-        MailerInterface mailerInterface = new Mailer(resources, hostname, from, linkUrl,  helpLinkUrl,
-                                   configurationMap, logger, replyTo, testMailToAddress);
-
-        return mailerInterface;
+        return new Mailer(resources, hostname, from, linkUrl,  helpLinkUrl, configurationMap,
+                logger, replyTo, testMailToAddress);
     }
 }

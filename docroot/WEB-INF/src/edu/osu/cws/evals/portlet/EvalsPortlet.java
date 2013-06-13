@@ -294,8 +294,8 @@ public class EvalsPortlet extends GenericPortlet {
         PropertiesConfiguration config = actionHelper.getEvalsConfig();
         Map<String, Configuration> configurationMap =
                 (Map<String, Configuration>)getPortletContext().getAttribute("configurations");
-        MailerInterface mailerInterface = EvalsUtil.createMailer(config, configurationMap, getLog());
-        getPortletContext().setAttribute("mailer", mailerInterface);
+        MailerInterface mailer = EvalsUtil.createMailer(config, configurationMap, getLog());
+        getPortletContext().setAttribute("mailer", mailer);
     }
 
     /**
