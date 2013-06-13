@@ -119,6 +119,8 @@
 
   <email_types TYPE="goals-submitted" MAILTO="employee"/>
   <email_types TYPE="goals-require-modification" MAILTO="employee"/>
+  <email_types TYPE="goalsDue" MAILTO="employee"/>
+  <email_types TYPE="appraisalDue" MAILTO="supervisor"/>
   <emails
       ID="1"
       APPRAISAL_ID="1"
@@ -255,7 +257,7 @@
         PYVPASJ_SAL_GRADE="0"
         PYVPASJ_SAL_STEP="0"
         PYVPASJ_TRIAL_IND="18"
-        PYVPASJ_ANNUAL_IND="12"
+        PYVPASJ_ANNUAL_IND="0"
         PYVPASJ_EVAL_DATE="2010-01-30"
         PYVPASJ_ORGN_DESC="testing"/>
   <jobs
@@ -458,6 +460,15 @@
           />
   <configurations
           ID="5"
+          SECTION="appraisals"
+          NAME="firstGoalDueReminder"
+          SEQUENCE="5"
+          VALUE="30"
+          REFERENCE_POINT=""
+          ACTION=""
+          />
+  <configurations
+          ID="6"
           SECTION="notifications"
           NAME="configurations-frequency-terminate-emails"
           SEQUENCE="3"
@@ -466,7 +477,7 @@
           ACTION=""
           />
   <configurations
-          ID="6"
+          ID="7"
           SECTION="notifications"
           NAME="configurations-employee-result-notifications"
           SEQUENCE="2"
@@ -475,7 +486,7 @@
           ACTION=""
           />
   <configurations
-          ID="7"
+          ID="8"
           SECTION="notifications"
           NAME="configurations-review-due-notifications"
           SEQUENCE="1"

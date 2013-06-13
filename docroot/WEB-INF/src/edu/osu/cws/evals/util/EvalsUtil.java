@@ -283,7 +283,7 @@ public class EvalsUtil {
      * @return EvalsLogger
      * @throws Exception
      */
-    public static EvalsLogger createLogger(PropertiesConfiguration config) throws Exception{
+    public static LoggingInterface createLogger(PropertiesConfiguration config) throws Exception{
         String serverName = config.getString("log.serverName");
         String environment = config.getString("log.environment");
 
@@ -296,9 +296,9 @@ public class EvalsUtil {
      * @return Mailer
      * @throws Exception
      */
-    public static Mailer createMailer(PropertiesConfiguration config,
+    public static MailerInterface createMailer(PropertiesConfiguration config,
                                       Map<String, Configuration> configurationMap,
-                                      EvalsLogger logger) throws Exception {
+                                      LoggingInterface logger) throws Exception {
         ResourceBundle resources = ResourceBundle.getBundle(Constants.EMAIL_BUNDLE_FILE);
         String hostname = config.getString("mail.hostname");
         String from = config.getString("mail.fromAddress");
@@ -310,9 +310,7 @@ public class EvalsUtil {
         if (!environment.startsWith("prod")){
             testMailToAddress = config.getString("mail.testMailToAddress");
         }
-        Mailer mailer = new Mailer(resources, hostname, from, linkUrl,  helpLinkUrl,
-                                   configurationMap, logger, replyTo, testMailToAddress);
-
-        return mailer;
+        return new Mailer(resources, hostname, from, linkUrl,  helpLinkUrl, configurationMap,
+                logger, replyTo, testMailToAddress);
     }
 }

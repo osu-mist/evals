@@ -17,7 +17,7 @@ import edu.osu.cws.util.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EvalsLogger {
+public class EvalsLogger implements LoggingInterface {
 
     private Logger logger;
     private String appName = "CWS-EvalS";

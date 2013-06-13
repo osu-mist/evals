@@ -11,7 +11,7 @@ import edu.osu.cws.evals.hibernate.NolijCopyMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsPDF;
 import edu.osu.cws.evals.util.HibernateUtil;
-import edu.osu.cws.evals.util.Mailer;
+import edu.osu.cws.evals.util.MailerInterface;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -357,7 +357,7 @@ public class AppraisalsAction implements ActionInterface {
      */
     private void processUpdateRequest(Map requestMap) throws Exception {
         HashMap appraisalSteps = (HashMap) actionHelper.getPortletContextAttribute("appraisalSteps");
-        Mailer mailer = (Mailer) actionHelper.getPortletContextAttribute("mailer");
+        MailerInterface mailer = (MailerInterface) actionHelper.getPortletContextAttribute("mailer");
 
         // set the overdue value before updating the status
         String beforeUpdateStatus = appraisal.getStatus();

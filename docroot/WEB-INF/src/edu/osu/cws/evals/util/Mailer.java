@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.*;
 
-public class Mailer {
+public class Mailer implements MailerInterface {
     private ResourceBundle emailBundle;
     private String hostName;
     private String from;
@@ -33,7 +33,7 @@ public class Mailer {
     private String helpLinkURL;
     private Map<String, Configuration> configMap;
     private String replyTo;
-    private EvalsLogger logger;
+    private LoggingInterface logger;
     private String testMailToAddress;
 
     Map<String, String> logFields = new HashMap<String, String>();
@@ -51,7 +51,7 @@ public class Mailer {
      * @param replyTo
      */
     public Mailer(ResourceBundle resources, String hostName, String from, String linkURL,
-                  String helpLinkURL, Map<String, Configuration> map, EvalsLogger logger,
+                  String helpLinkURL, Map<String, Configuration> map, LoggingInterface logger,
                   String replyTo, String testMailToAddress) {
         this.emailBundle = resources;
         this.from = from;
@@ -290,7 +290,7 @@ public class Mailer {
      * @param emailList
      * @throws Exception
      */
-    public void sendSupervisorMail(Employee supervisor,String middleBody,
+    public void sendSupervisorMail(Employee supervisor, String middleBody,
                                    List<Email> emailList) {
 
         try {

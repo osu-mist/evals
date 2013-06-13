@@ -38,9 +38,9 @@ public class ConfigurationsTest {
         assert configs.get(1).getId() == 2;
         assert configs.get(2).getId() == 4;
         assert configs.get(3).getId() == 3;
-        assert configs.get(4).getId() == 7;
-        assert configs.get(5).getId() == 6;
-        assert configs.get(6).getId() == 5;
+        assert configs.get(5).getId() == 8;
+        assert configs.get(6).getId() == 7;
+        assert configs.get(7).getId() == 6;
     }
 
     public void shouldProvideMapUsingNameAsKey() throws Exception {
