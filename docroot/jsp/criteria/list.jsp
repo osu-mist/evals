@@ -26,6 +26,7 @@ addURL.setParameter("controller", "CriteriaAreasAction");
         <tr class="portlet-section-header results-header">
             <th>Name</th>
             <th>Description</th>
+            <th>Appointment Type</th>
             <th><liferay-ui:message key="actions"/></th>
         </tr>
     </thead>
@@ -34,6 +35,7 @@ addURL.setParameter("controller", "CriteriaAreasAction");
     <tr id="<portlet:namespace/>criterion-${criterion.id}">
         <td>${criterion.name}</td>
         <td>${criterion.description}</td>
+        <td>${criterion.appointmentType}</td>
         <td>
         <a class="<portlet:namespace/>criterion-edit"
             onclick="return <portlet:namespace/>edit(${criterion.id});" href="<portlet:renderURL
