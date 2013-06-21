@@ -150,7 +150,7 @@ public class CriteriaMgr {
     public static List<CriterionArea> list(String appointmentType) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         List results = session.createQuery("from edu.osu.cws.evals.models.CriterionArea where " +
-                "appointmentType = :appointmentType AND deleteDate IS NULL ORDER BY name")
+                "appointmentType = :appointmentType AND deleteDate IS NULL ORDER BY appointmentType, name")
                 .setString("appointmentType", appointmentType)
                 .list();
         return results;
