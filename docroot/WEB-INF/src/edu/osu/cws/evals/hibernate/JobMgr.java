@@ -12,9 +12,11 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import javax.xml.crypto.Data;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 public class JobMgr {
 
@@ -123,11 +125,14 @@ public class JobMgr {
         List<Job> jobs;
         Session session = HibernateUtil.getCurrentSession();
 
+        Date currentDate = new Date();
         String query = "select new edu.osu.cws.evals.models.Job(employee.id, positionNumber, suffix, " +
                 "status, appointmentType) from edu.osu.cws.evals.models.Job job " +
-                "where job.status != 'T' and job.appointmentType = :appointmentType";
+                "where job.status != 'T' and job.appointmentType = :appointmentType " +
+                "and job.beginDate <= :currentDate and job.suffix = '00'";
         jobs = session.createQuery(query)
                 .setString("appointmentType", appointmentType)
+                .setDate("currentDate", currentDate)
                 .list();
         return jobs;
     }
