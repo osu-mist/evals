@@ -35,7 +35,7 @@
     </span>
 </c:if>
 
-    <h2><liferay-ui:message key="appraisal-classified-title" />: <liferay-ui:message key="${appraisal.viewStatus}" /></h2>
+    <h2><c:out value = "${appraisal.job.appointmentType} "/><liferay-ui:message key="appraisal-title" />: <liferay-ui:message key="${appraisal.viewStatus}" /></h2>
     <liferay-ui:success key="draft-saved" message="draft-saved" />
     <liferay-ui:success key="appraisal-sent-to-nolij-success" message="appraisal-sent-to-nolij-success" />
     <liferay-ui:success key="appraisal-set-status-success" message="appraisal-set-status-success" />
