@@ -413,6 +413,15 @@ public class AppraisalsTest {
                 "appraisal status should have been goalsDue, instead got - " + appraisal.getStatus();
     }
 
+    public void shouldSaveOverdue() throws Exception {
+        appraisal = AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
+        assert appraisal.getOverdue() == null;
+        appraisal.setOverdue(7);
+        AppraisalMgr.saveOverdue(appraisal);
+        Appraisal appraisal1 = AppraisalMgr.getAppraisal(appraisal.getId());
+        assert appraisal1.getOverdue() == 7;
+    }
+
     public void shouldCreateFirstAnnualAppraisalIfTrialAppraisalIsClosedOrCompletedOrRebuttalDue() {
         //@todo: code is written, I just have to test it out
     }
