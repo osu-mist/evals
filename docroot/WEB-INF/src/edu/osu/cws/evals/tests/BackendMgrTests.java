@@ -4,7 +4,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import edu.osu.cws.evals.backend.BackendMgr;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
+import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.models.Appraisal;
+import edu.osu.cws.evals.models.Email;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.util.HibernateUtil;
@@ -14,6 +16,8 @@ import org.hibernate.Transaction;
 import org.joda.time.DateTime;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.util.List;
 
 @Test
 public class BackendMgrTests {
@@ -237,6 +241,52 @@ public class BackendMgrTests {
         tx.commit();
     }
 
+    public void shouldReturnCorrectSupervisorEmailList() {
+        BackendMgr mgr = getMgrInstance();
+        Employee supervisor = new Employee();
+        supervisor.setId(7);
+
+        List<Email> emailList = mgr.getSupervisorEmailList(supervisor);
+        assert emailList.isEmpty();
+        emailList.add(new Email(1, Appraisal.STATUS_APPRAISAL_DUE));
+        assert !mgr.getSupervisorEmailList(supervisor).isEmpty();
+    }
+
+    public void shouldEmailSupervisor() throws Exception {
+        BackendMgr mgr = getMgrInstance();
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+
+        // add supervisor to the list so that we can try to send mock email
+        Employee supervisor = EmployeeMgr.findById(12467, null);
+        tx.commit();
+
+        List<Email> emailList = mgr.getSupervisorEmailList(supervisor);
+        emailList.add(new Email(1, "email type"));
+        // add test message to email buffer
+        mgr.getSupervisorEmailMessages().put(12467, new StringBuffer());
+
+        MockMailer mailer = (MockMailer) mgr.getMailer();
+        assert mailer.getSupervisorIds().isEmpty() : "No emails should have been sent";
+        mgr.emailSupervisors();
+        assert mailer.getSupervisorIds().size() == 1 : "Only 1 email should have been sent";
+        assert mailer.getSupervisorIds().get(0) == 12467 : "Email sent to wrong supervisor";
+    }
+
+    public void shouldSendEmailReviewers() throws Exception {
+        BackendMgr mgr = getMgrInstance();
+
+        // We only have 1 evaluation in overdue and another one in overdue status
+        MockMailer mailer = (MockMailer) mgr.getMailer();
+        assert mailer.getReviewDueCount() == 0;
+        assert mailer.getReviewOverdueCount() == 0;
+        assert mailer.getSendReviewerCallsCount() == 0;
+        mgr.emailReviewers();
+        assert mailer.getReviewOverdueCount() == 1;
+        assert mailer.getReviewDueCount() == 1;
+        assert mailer.getSendReviewerCallsCount() == 1;
+    }
+
     /**
      * Helper method to return count of evaluations in db
      *
@@ -257,17 +307,4 @@ public class BackendMgrTests {
         Injector injector = Guice.createInjector(new MockBackendModule());
         return injector.getInstance(BackendMgr.class);
     }
-
-//    Things to test:
-//    getSupervisorEmailList()
-//    emailSupervisors()
-//    emailReviewers()
-//
-//    Appraisal.updateOverdue()
-//    AppraisalMgr.saveOverdue()
-//
-//    EmailMgr.getLastEmail()
-//    EvalsUtil.anotherEmail
-
-
 }

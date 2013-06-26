@@ -6,6 +6,7 @@ import edu.osu.cws.evals.models.EmailType;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.util.MailerInterface;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MockMailer implements MailerInterface {
@@ -14,6 +15,15 @@ public class MockMailer implements MailerInterface {
 
     // used to change return value of sendMail()
     private boolean sendMailReturnValue = false;
+
+    // used to check whether or not send supervisor was called and the parameters
+    private ArrayList<Integer> supervisorIds = new ArrayList<Integer>();
+
+    // used to keep track of email count sent to bc reviewers.
+    private int reviewOverdueCount = 0;
+    private int reviewDueCount = 0;
+    private String[] reviewerEmails;
+    private int sendReviewerCallsCount = 0;
 
     public boolean sendMail(Appraisal appraisal, EmailType emailType) {
         this.emailType = emailType;
@@ -26,18 +36,36 @@ public class MockMailer implements MailerInterface {
 
     public void sendSupervisorMail(Employee supervisor, String middleBody,
                             List<Email> emailList) {
-        return;
+        this.supervisorIds.add(supervisor.getId());
     }
 
     public void sendReviewerMail(String[] emailAddresses, int dueCount, int OverDueCount) {
-        return;
+        sendReviewerCallsCount++;
+        reviewDueCount = dueCount;
+        reviewOverdueCount = OverDueCount;
     }
 
     public EmailType getEmailType() {
         return emailType;
     }
 
+    public int getSendReviewerCallsCount() {
+        return sendReviewerCallsCount;
+    }
+
+    public int getReviewOverdueCount() {
+        return reviewOverdueCount;
+    }
+
+    public int getReviewDueCount() {
+        return reviewDueCount;
+    }
+
     public void setSendMailReturnValue(boolean sendMailReturnValue) {
         this.sendMailReturnValue = sendMailReturnValue;
+    }
+
+    public ArrayList<Integer> getSupervisorIds() {
+        return supervisorIds;
     }
 }
