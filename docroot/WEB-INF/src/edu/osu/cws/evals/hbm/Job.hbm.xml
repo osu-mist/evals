@@ -28,6 +28,11 @@
         <property name="trialInd" length="45" type="int" column="PYVPASJ_TRIAL_IND"/>
         <property name="annualInd" length="45" type="int" column="PYVPASJ_ANNUAL_IND"/>
         <property name="evalDate" length="45" type="timestamp" column="PYVPASJ_EVAL_DATE"/>
+        <property name="salaryLow" type="double" column="PYVPASJ_LOW"/>
+        <property name="salaryMidpoint" type="double" column="PYVPASJ_MIDPOINT"/>
+        <property name="salaryHigh" type="double" column="PYVPASJ_HIGH"/>
+        <property name="salaryCurrent" type="double" column="PYVPASJ_SALARY"/>
+        <property name="salaryGrpCode" type="string" length="6" column="PYVPASJ_SGRP_CODE"/>
 
         <many-to-one name="supervisor" class="edu.osu.cws.evals.models.Job" not-null="false" fetch="select">
             <column name="PYVPASJ_SUPERVISOR_PIDM"/>

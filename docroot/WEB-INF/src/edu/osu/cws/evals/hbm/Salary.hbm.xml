@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping auto-import="false" >
+
+    <class name="edu.osu.cws.evals.models.Salary" table="salaries"
+           dynamic-insert="true"
+           dynamic-update="true">
+        <id name="id" type="int" column="ID">
+            <generator class="native">
+                <param name="sequence">pass_seq</param>
+            </generator>
+        </id>
+
+        <property name="low" type="double" column="SALARY_LOW"/>
+        <property name="midPoint" type="double" column="SALARY_MIDPOINT"/>
+        <property name="high" type="double" column="SALARY_HIGH"/>
+        <property name="current" type="double" column="SALARY_CURRENT"/>
+        <property name="sgrpCode" length="6" type="string" column="SALARY_SGRP_CODE"/>
+
+    </class>
+
+</hibernate-mapping>
