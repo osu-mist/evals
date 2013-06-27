@@ -419,6 +419,42 @@
         PYVPASJ_ANNUAL_IND="12"
         PYVPASJ_EVAL_DATE="2010-01-30"
         PYVPASJ_ORGN_DESC="testing"/>
+    <jobs
+        PYVPASJ_PIDM="60001"
+        PYVPASJ_DESC="Back to the future"
+        PYVPASJ_POSN="12345"
+        PYVPASJ_SUFF="01"
+        PYVPASJ_ECLS_CODE="kjlkjlk"
+        PYVPASJ_APPOINTMENT_TYPE="Classified"
+        PYVPASJ_BEGIN_DATE="2015-05-14"
+        PYVPASJ_BCTR_TITLE="AABC"
+        PYVPASJ_ORGN_CODE_TS="test"
+        PYVPASJ_STATUS="T"
+        PYVPASJ_PCLS_CODE="test"
+        PYVPASJ_SAL_GRADE="0"
+        PYVPASJ_SAL_STEP="0"
+        PYVPASJ_TRIAL_IND="6"
+        PYVPASJ_ANNUAL_IND="12"
+        PYVPASJ_EVAL_DATE="2010-01-30"
+        PYVPASJ_ORGN_DESC="testing"/>
+    <jobs
+        PYVPASJ_PIDM="60002"
+        PYVPASJ_DESC="Back to the history"
+        PYVPASJ_POSN="12345"
+        PYVPASJ_SUFF="AA"
+        PYVPASJ_ECLS_CODE="kjlkjlk"
+        PYVPASJ_APPOINTMENT_TYPE="Classified"
+        PYVPASJ_BEGIN_DATE="2011-05-14"
+        PYVPASJ_BCTR_TITLE="AABC"
+        PYVPASJ_ORGN_CODE_TS="test"
+        PYVPASJ_STATUS="T"
+        PYVPASJ_PCLS_CODE="test"
+        PYVPASJ_SAL_GRADE="0"
+        PYVPASJ_SAL_STEP="0"
+        PYVPASJ_TRIAL_IND="6"
+        PYVPASJ_ANNUAL_IND="12"
+        PYVPASJ_EVAL_DATE="2010-01-30"
+        PYVPASJ_ORGN_DESC="testing"/>
   <permission_rules ID="1" STATUS="goalsDue" ROLE="employee" GOALS="e" ACTION_REQUIRED="goalsDue"/>
   <permission_rules ID="2" STATUS="goalsDue" ROLE="immediate-supervisor" GOALS="e"/>
   <status/>
