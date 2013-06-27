@@ -76,6 +76,7 @@ public class JobsTest {
         List<Job> jobs = JobMgr.listShortNotTerminatedJobs(AppointmentType.CLASSIFIED);
         assert jobs.size() != 0 : "Missing jobs from list";
         for (Job job : jobs) {
+            job = JobMgr.getJob(job.getEmployee().getId(), job.getPositionNumber(), job.getSuffix());
             assert job.getSuffix().equals("00") : "Only jobs with suffix '00' will be created";
             assert job.getBeginDate().compareTo(new Date()) <= 0 : "Jobs with future begin date will not be created";
         }
