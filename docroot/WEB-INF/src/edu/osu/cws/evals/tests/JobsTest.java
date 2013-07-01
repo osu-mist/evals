@@ -3,7 +3,6 @@ package edu.osu.cws.evals.tests;
 import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.HibernateUtil;
-import org.apache.commons.lang.ArrayUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.joda.time.DateTime;
@@ -14,11 +13,8 @@ import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-<<<<<<< HEAD
 import java.util.Collections;
-=======
 import java.util.Date;
->>>>>>> gitlab/feature/24514-24512-appraisal-creation
 import java.util.List;
 
 @Test
