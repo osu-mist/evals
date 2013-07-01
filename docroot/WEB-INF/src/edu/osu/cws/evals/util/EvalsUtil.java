@@ -218,7 +218,7 @@ public class EvalsUtil {
 
         if (config != null) {
             DateTime dueDate = EvalsUtil.getDueDate(appraisal, config);
-            return Days.daysBetween(new DateTime(), dueDate).getDays();
+            return Days.daysBetween(dueDate, new DateTime()).getDays();
         }
 
         return 0;
