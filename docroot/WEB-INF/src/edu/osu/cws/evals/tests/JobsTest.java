@@ -14,7 +14,11 @@ import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+<<<<<<< HEAD
 import java.util.Collections;
+=======
+import java.util.Date;
+>>>>>>> gitlab/feature/24514-24512-appraisal-creation
 import java.util.List;
 
 @Test
@@ -115,6 +119,19 @@ public class JobsTest {
 
         assert classifiedITJobCount > 0 : "Should have fetched some jobs";
         assert classifiedJobCount > 0 : "Should have fetched some jobs";
+    }
+
+    public void listShortNotTerminatedJobsShouldOnlyInclude00SuffixAndNonFutureBeginDate() throws Exception {
+        ArrayList<String> appointmentTypes = new ArrayList<String>();
+        Collections.addAll(appointmentTypes, new String[] {AppointmentType.CLASSIFIED});
+
+        List<Job> jobs = JobMgr.listShortNotTerminatedJobs(appointmentTypes);
+        assert jobs.size() != 0 : "Missing jobs from list";
+        for (Job job : jobs) {
+            job = JobMgr.getJob(job.getEmployee().getId(), job.getPositionNumber(), job.getSuffix());
+            assert job.getSuffix().equals("00") : "Only jobs with suffix '00' will be created";
+            assert job.getBeginDate().compareTo(new Date()) <= 0 : "Jobs with future begin date will not be created";
+        }
     }
 
     public void getJobShouldReturnNullWhenNotFound() throws Exception {

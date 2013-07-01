@@ -15,6 +15,7 @@ import org.hibernate.Session;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 public class JobMgr {
 
@@ -128,9 +129,12 @@ public class JobMgr {
 
         String query = "select new edu.osu.cws.evals.models.Job(employee.id, positionNumber, suffix, " +
                 "status, appointmentType) from edu.osu.cws.evals.models.Job job " +
-                "where job.status != 'T' and job.appointmentType in (:appointmentTypes)";
+                "where job.status != 'T' and job.appointmentType in (:appointmentTypes) " +
+                "and job.beginDate <= :currentDate and job.suffix = '00'";
+
         jobs = session.createQuery(query)
                 .setParameterList("appointmentTypes", appointmentTypes)
+                .setDate("currentDate", new Date())
                 .list();
         return jobs;
     }
