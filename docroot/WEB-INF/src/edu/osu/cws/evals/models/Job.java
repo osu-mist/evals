@@ -59,6 +59,12 @@ public class Job extends Evals implements Serializable {
 
     private Date evalDate;
 
+    private Double salaryLow;
+    private Double salaryMidpoint;
+    private Double salaryHigh;
+    private Double salaryCurrent;
+    private String salaryGrpCode;
+
     private Set appraisals = new HashSet();
 
     /**
@@ -340,6 +346,46 @@ public class Job extends Evals implements Serializable {
         this.appraisals = appraisals;
     }
 
+    public Double getSalaryLow() {
+        return salaryLow;
+    }
+
+    public void setSalaryLow(Double salaryLow) {
+        this.salaryLow = salaryLow;
+    }
+
+    public Double getSalaryMidpoint() {
+        return salaryMidpoint;
+    }
+
+    public void setSalaryMidpoint(Double salaryMidpoint) {
+        this.salaryMidpoint = salaryMidpoint;
+    }
+
+    public Double getSalaryHigh() {
+        return salaryHigh;
+    }
+
+    public void setSalaryHigh(Double salaryHigh) {
+        this.salaryHigh = salaryHigh;
+    }
+
+    public Double getSalaryCurrent() {
+        return salaryCurrent;
+    }
+
+    public void setSalaryCurrent(Double salaryCurrent) {
+        this.salaryCurrent = salaryCurrent;
+    }
+
+    public String getSalaryGrpCode() {
+        return salaryGrpCode;
+    }
+
+    public void setSalaryGrpCode(String salaryGrpCode) {
+        this.salaryGrpCode = salaryGrpCode;
+    }
+
     /**
      * Trial start date doed not need to be the first date of the month.
      * @return  (DateTime) start date of the trial appraisal period.
@@ -487,6 +533,27 @@ public class Job extends Evals implements Serializable {
 
     public String getIdKey() {
         return getEmployee().getId() + "_" + positionNumber + "_" + suffix;
+    }
+
+    /**
+     * Returns a new Salary based on the current salary data in the Job. Only appointment
+     * type allowed to return salary information is Classified IT.
+     *
+     * @return
+     */
+    public Salary getSalary() {
+        if (!appointmentType.equals(AppointmentType.CLASSIFIED_IT)) {
+            return null;
+        }
+
+        Salary salary = new Salary();
+        salary.setCurrent(this.salaryCurrent);
+        salary.setHigh(this.salaryHigh);
+        salary.setLow(this.salaryLow);
+        salary.setMidPoint(this.salaryMidpoint);
+        salary.setSgrpCode(this.salaryGrpCode);
+
+        return salary;
     }
 }
 

@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import edu.osu.cws.evals.backend.BackendMgr;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
+import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Email;
 import edu.osu.cws.evals.models.Employee;

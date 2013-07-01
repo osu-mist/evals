@@ -85,6 +85,17 @@
               TYPE="trial"
               overdue="0"
   />
+  <appraisals ID="8"
+              START_DATE="2013-01-01"
+              END_DATE="2014-01-31"
+              STATUS="goalsDue"
+              JOB_PIDM="74589"
+              POSITION_NUMBER="85392"
+              JOB_SUFFIX="00"
+              CREATE_DATE="2010-05-01"
+              TYPE="annual"
+              overdue="0"
+  />
 
   <goals_versions ID="1" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="1"/>
   <goals_versions ID="2" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="2"/>
@@ -419,6 +430,29 @@
         PYVPASJ_ANNUAL_IND="12"
         PYVPASJ_EVAL_DATE="2010-01-30"
         PYVPASJ_ORGN_DESC="testing"/>
+    <jobs
+        PYVPASJ_PIDM="74589"
+        PYVPASJ_DESC="Chef "
+        PYVPASJ_POSN="85392"
+        PYVPASJ_SUFF="00"
+        PYVPASJ_ECLS_CODE="kjlkjlk"
+        PYVPASJ_APPOINTMENT_TYPE="Classified IT"
+        PYVPASJ_BEGIN_DATE="2011-05-14"
+        PYVPASJ_BCTR_TITLE="AABC"
+        PYVPASJ_ORGN_CODE_TS="test"
+        PYVPASJ_STATUS="A"
+        PYVPASJ_PCLS_CODE="test"
+        PYVPASJ_SAL_GRADE="0"
+        PYVPASJ_SAL_STEP="0"
+        PYVPASJ_TRIAL_IND="6"
+        PYVPASJ_ANNUAL_IND="12"
+        PYVPASJ_EVAL_DATE="2010-01-30"
+        PYVPASJ_ORGN_DESC="testing"
+        PYVPASJ_LOW="2000"
+        PYVPASJ_MIDPOINT="3000"
+        PYVPASJ_HIGH="4000"
+        PYVPASJ_SALARY="2500"
+        PYVPASJ_SGRP_CODE="123456"/>
   <permission_rules ID="1" STATUS="goalsDue" ROLE="employee" GOALS="e" ACTION_REQUIRED="goalsDue"/>
   <permission_rules ID="2" STATUS="goalsDue" ROLE="immediate-supervisor" GOALS="e"/>
   <status/>
@@ -494,4 +528,13 @@
           REFERENCE_POINT=""
           ACTION=""
           />
+  <salaries
+          ID="1"
+          APPRAISAL_ID="8"
+          SALARY_LOW="2000"
+          SALARY_MIDPOINT="3000"
+          SALARY_HIGH="4000"
+          SALARY_CURRENT="2500"
+          SALARY_SGRP_CODE="123456"
+        />
 </dataset>
