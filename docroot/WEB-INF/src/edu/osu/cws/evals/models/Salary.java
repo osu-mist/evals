@@ -11,6 +11,8 @@ public class Salary {
 
     private Double current;
 
+    private Double increase;
+
     private String sgrpCode;
 
     private Integer appraisalId;
@@ -53,6 +55,14 @@ public class Salary {
 
     public void setCurrent(Double current) {
         this.current = current;
+    }
+
+    public Double getIncrease() {
+        return increase;
+    }
+
+    public void setIncrease(Double increase) {
+        this.increase = increase;
     }
 
     public String getSgrpCode() {
