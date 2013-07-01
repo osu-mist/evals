@@ -3,6 +3,7 @@ package edu.osu.cws.evals.tests;
 import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.HibernateUtil;
+import org.apache.commons.lang.ArrayUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.joda.time.DateTime;
@@ -11,7 +12,9 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 @Test
@@ -60,7 +63,9 @@ public class JobsTest {
     }
 
     public void listShortNotTerminatedJobsShouldOnlyIncludePidmAndPosNoAndSuffix() throws Exception {
-        List<Job> jobs = JobMgr.listShortNotTerminatedJobs(AppointmentType.CLASSIFIED);
+        ArrayList<String> appointmentTypes = new ArrayList<String>();
+        Collections.addAll(appointmentTypes, new String[] {AppointmentType.CLASSIFIED});
+        List<Job> jobs = JobMgr.listShortNotTerminatedJobs(appointmentTypes);
         assert jobs.size() != 0 : "Missing jobs from list";
         for (Job job : jobs) {
             assert job.getEmployee().getId() != 0 : "Missing required property";
@@ -69,6 +74,47 @@ public class JobsTest {
             assert !job.getStatus().equals("T");
             assert job.getAppointmentType().equals(AppointmentType.CLASSIFIED);
         }
+    }
+
+    public void listShortNotTerminatedJobsShouldFilterByAppointmentType() throws Exception {
+        ArrayList<String> appointmentTypes = new ArrayList<String>();
+        Collections.addAll(appointmentTypes, new String[] {AppointmentType.CLASSIFIED_IT});
+
+        // Try getting only Classified IT
+        List<Job> jobs = JobMgr.listShortNotTerminatedJobs(appointmentTypes);
+        assert jobs.size() != 0 : "Missing jobs from list";
+        for (Job job : jobs) {
+            assert job.getAppointmentType().equals(AppointmentType.CLASSIFIED_IT);
+        }
+
+        // Try getting only Classified
+        appointmentTypes = new ArrayList<String>();
+        Collections.addAll(appointmentTypes, new String[] {AppointmentType.CLASSIFIED});
+        jobs = JobMgr.listShortNotTerminatedJobs(appointmentTypes);
+        assert jobs.size() != 0 : "Missing jobs from list";
+        for (Job job : jobs) {
+            assert job.getAppointmentType().equals(AppointmentType.CLASSIFIED);
+        }
+
+        // Try getting both appointment types
+        appointmentTypes = new ArrayList<String>();
+        Collections.addAll(appointmentTypes, new String[]
+                {AppointmentType.CLASSIFIED, AppointmentType.CLASSIFIED_IT});
+        jobs = JobMgr.listShortNotTerminatedJobs(appointmentTypes);
+        assert jobs.size() != 0 : "Missing jobs from list";
+        int classifiedJobCount = 0;
+        int classifiedITJobCount = 0;
+        for (Job job : jobs) {
+            if (job.getAppointmentType().equals(AppointmentType.CLASSIFIED)) {
+                classifiedJobCount++;
+            }
+            if (job.getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
+                classifiedITJobCount++;
+            }
+        }
+
+        assert classifiedITJobCount > 0 : "Should have fetched some jobs";
+        assert classifiedJobCount > 0 : "Should have fetched some jobs";
     }
 
     public void getJobShouldReturnNullWhenNotFound() throws Exception {
@@ -242,5 +288,21 @@ public class JobsTest {
     public void shouldFindOrgCodeAsBC() throws Exception {
         assert JobMgr.findOrgCode("654321", "UABC") == true;
         assert JobMgr.findOrgCode("654321", "AABC") == false;
+    }
+
+    public void getSalaryShouldReturnSalaryObjectForITAppointmentTypes() throws Exception {
+        Job job = JobMgr.getJob(74589, "85392", "00");
+        Salary salary = job.getSalary();
+        assert salary.getCurrent() == 2500;
+        assert salary.getHigh() == 4000;
+        assert salary.getLow() == 2000;
+        assert salary.getMidPoint() == 3000;
+        assert salary.getSgrpCode().equals("123456");
+    }
+
+    public void getSalaryShouldReturnNullForNonITAppointmentTypes() throws Exception {
+        Job job = new Job();
+        job.setAppointmentType(AppointmentType.CLASSIFIED);
+        assert job.getSalary() == null : "We only support Classified IT when getting salary info";
     }
 }

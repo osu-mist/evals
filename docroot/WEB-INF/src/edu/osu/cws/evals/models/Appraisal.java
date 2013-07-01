@@ -163,6 +163,8 @@ public class Appraisal extends Evals {
 
     private Set<GoalVersion> goalVersions = new HashSet<GoalVersion>();
 
+    private Set<Salary> salaries = new HashSet<Salary>();
+
     private Integer goalsOverdue;
 
     private Integer goalsApprovalOverdue;
@@ -838,6 +840,14 @@ public class Appraisal extends Evals {
     public void addGoalVersion(GoalVersion goalVersion) {
         goalVersion.setAppraisal(this);
         goalVersions.add(goalVersion);
+    }
+
+    public Set<Salary> getSalaries() {
+        return salaries;
+    }
+
+    public void setSalaries(Set<Salary> salaries) {
+        this.salaries = salaries;
     }
 
     /**

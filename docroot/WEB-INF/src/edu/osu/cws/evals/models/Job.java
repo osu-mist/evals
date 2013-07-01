@@ -534,5 +534,26 @@ public class Job extends Evals implements Serializable {
     public String getIdKey() {
         return getEmployee().getId() + "_" + positionNumber + "_" + suffix;
     }
+
+    /**
+     * Returns a new Salary based on the current salary data in the Job. Only appointment
+     * type allowed to return salary information is Classified IT.
+     *
+     * @return
+     */
+    public Salary getSalary() {
+        if (!appointmentType.equals(AppointmentType.CLASSIFIED_IT)) {
+            return null;
+        }
+
+        Salary salary = new Salary();
+        salary.setCurrent(this.salaryCurrent);
+        salary.setHigh(this.salaryHigh);
+        salary.setLow(this.salaryLow);
+        salary.setMidPoint(this.salaryMidpoint);
+        salary.setSgrpCode(this.salaryGrpCode);
+
+        return salary;
+    }
 }
 

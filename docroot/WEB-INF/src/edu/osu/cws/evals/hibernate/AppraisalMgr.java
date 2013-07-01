@@ -898,4 +898,26 @@ public class AppraisalMgr {
 
         return assessment;
     }
+
+    /**
+     * Deletes any existing salary record for a given appraisal if it exists. Then creates & saves
+     * a new salary record for an appraisal.
+     *
+     * @param appraisal
+     * @return
+     */
+    public static Salary createOrUpdateSalary(Appraisal appraisal) {
+        Session session = HibernateUtil.getCurrentSession();
+        // delete salary object if it exists
+        session.getNamedQuery("salary.deleteSalaryForAppraisal")
+                .setInteger("appraisalId", appraisal.getId())
+                .executeUpdate();
+
+        // create new salary object
+        Salary salary = appraisal.getJob().getSalary();
+        salary.setAppraisalId(appraisal.getId());
+        session.save(salary);
+
+        return salary;
+    }
 }

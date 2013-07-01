@@ -422,6 +422,25 @@ public class AppraisalsTest {
         assert appraisal1.getOverdue() == 7;
     }
 
+    public void shouldDeleteExistingSalary() throws Exception {
+        appraisal = AppraisalMgr.getAppraisal(8);
+        AppraisalMgr.createOrUpdateSalary(appraisal);
+
+        String getExistingSalary = "from edu.osu.cws.evals.models.Salary where id = 1";
+        String getSalary = "from edu.osu.cws.evals.models.Salary where appraisalId = :appraisal_id";
+
+        assert session.createQuery(getExistingSalary).list().size() == 0 : "should be deleted";
+        Salary salary = (Salary) session.createQuery(getSalary)
+                .setInteger("appraisal_id", 8).list().get(0);
+
+        assert salary.getAppraisalId() == 8;
+        assert salary.getLow() == 2000;
+        assert salary.getMidPoint() == 3000;
+        assert salary.getHigh() == 4000;
+        assert salary.getCurrent() == 2500;
+        assert salary.getSgrpCode().equals("123456");
+    }
+
     public void shouldCreateFirstAnnualAppraisalIfTrialAppraisalIsClosedOrCompletedOrRebuttalDue() {
         //@todo: code is written, I just have to test it out
     }

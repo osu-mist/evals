@@ -114,20 +114,23 @@ public class JobMgr {
     }
 
     /**
+     * Gets a list of jobs that are not terminated (status != T) that match the provided
+     * appointment types. The job objects only have a few properties populated: pidm,
+     * position number, suffi, job status and appointment type.
      *
-     * @param appointmentType
+     * @param appointmentTypes  ArrayList of different appointment types to fetch jobs for.
      * @return
      * @throws Exception
      */
-    public static List<Job> listShortNotTerminatedJobs(String appointmentType) throws Exception {
+    public static List<Job> listShortNotTerminatedJobs(ArrayList<String> appointmentTypes) throws Exception {
         List<Job> jobs;
         Session session = HibernateUtil.getCurrentSession();
 
         String query = "select new edu.osu.cws.evals.models.Job(employee.id, positionNumber, suffix, " +
                 "status, appointmentType) from edu.osu.cws.evals.models.Job job " +
-                "where job.status != 'T' and job.appointmentType = :appointmentType";
+                "where job.status != 'T' and job.appointmentType in (:appointmentTypes)";
         jobs = session.createQuery(query)
-                .setString("appointmentType", appointmentType)
+                .setParameterList("appointmentTypes", appointmentTypes)
                 .list();
         return jobs;
     }
