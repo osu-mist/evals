@@ -103,7 +103,7 @@ public class EvalsPDF {
         PdfWriter.getInstance(document, new FileOutputStream(filename));
         document.open();
 
-        document.add(getLetterHead(resource, rootDir));
+        document.add(getLetterHead(appraisal, resource, rootDir));
         document.add(getInfoTable(appraisal, resource, rule));
         addAssessments(appraisal, rule, resource, document, rootDir);
         addEvaluation(appraisal, rule, resource, document, rootDir);
@@ -699,7 +699,8 @@ public class EvalsPDF {
      * @return PdfPTable
      * @throws Exception
      */
-    public static PdfPTable getLetterHead(ResourceBundle resource, String rootDir) throws Exception {
+    public static PdfPTable getLetterHead(Appraisal appraisal, ResourceBundle resource,
+                                          String rootDir) throws Exception {
         PdfPTable header = new PdfPTable(3);
         header.setWidthPercentage(100f);
         Paragraph paragraph;
@@ -719,7 +720,8 @@ public class EvalsPDF {
         cell.setBorder(Rectangle.NO_BORDER);
         header.addCell(cell);
 
-        paragraph = new Paragraph(resource.getString("classified-employee-appraisal-record"), FONT_BOLD_14);
+        String title = appraisal.getJob().getAppointmentType() + " " + resource.getString("appraisal-title");
+        paragraph = new Paragraph(title, FONT_BOLD_14);
         paragraph.setAlignment(Element.ALIGN_RIGHT);
         cell = new PdfPCell(paragraph);
         cell.setBorder(Rectangle.NO_BORDER);
