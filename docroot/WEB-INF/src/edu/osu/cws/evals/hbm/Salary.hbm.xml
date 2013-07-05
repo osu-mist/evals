@@ -18,6 +18,7 @@
         <property name="current" type="double" column="SALARY_CURRENT"/>
         <property name="sgrpCode" length="6" type="string" column="SALARY_SGRP_CODE"/>
         <property name="appraisalId" type="int" column="APPRAISAL_ID"/>
+        <property name="increase" type="double" column="SALARY_INCREASE"/>
 
     </class>
 

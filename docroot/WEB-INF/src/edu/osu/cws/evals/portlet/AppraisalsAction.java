@@ -259,6 +259,18 @@ public class AppraisalsAction implements ActionInterface {
         actionHelper.addToRequestMap("permissionRule", permRule);
         actionHelper.useMaximizedMenu();
 
+        if (appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
+            Map<String, Configuration> configurationMap =
+                    (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
+            String increaseRate2Value = configurationMap.get("IT-increase-rate2-value").getValue();
+            String increaseRate1MinVal = configurationMap.get("IT-increase-rate1-min-value").getValue();
+            String increaseRate1MaxVal= configurationMap.get("IT-increase-rate1-max-value").getValue();
+
+            actionHelper.addToRequestMap("increaseRate2Value", increaseRate2Value);
+            actionHelper.addToRequestMap("increaseRate1MinVal", increaseRate1MinVal);
+            actionHelper.addToRequestMap("increaseRate1MaxVal", increaseRate1MaxVal);
+        }
+
         return Constants.JSP_APPRAISAL;
     }
 
@@ -460,6 +472,10 @@ public class AppraisalsAction implements ActionInterface {
                 appraisal.setEvaluationSubmitDate(new Date());
                 appraisal.setEvaluator(loggedInUser);
             }
+
+            if (appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
+                saveRecommendedIncrease(requestMap);
+            }
         }
         // Save review
         if (permRule.getReview() != null && permRule.getReview().equals("e")) {
@@ -650,6 +666,46 @@ public class AppraisalsAction implements ActionInterface {
         }
         // end adding new goals
         return sequenceToFormIndex;
+    }
+
+    /**
+     * Saves the rating on the salary object based on the rating the user selected:
+     * Rating 1 -   the user can specify a value within a range (min & max values are in configuration
+     *              table. If the current salary is at the top of the pay range, the increase is set to 0.
+     * Rating 2 -   the increase is set automatically by a configuration value
+     * Rating 3 -   the increase is set to 0
+     *
+     * @param requestMap
+     */
+    private void saveRecommendedIncrease(Map<String, String[]> requestMap) throws ModelException {
+        Map<String, Configuration> configurationMap =
+                (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
+        String configValue = configurationMap.get("IT-increase-rate2-value").getValue();
+        Double increaseRate2Value = Double.parseDouble(configValue);
+
+        configValue = configurationMap.get("IT-increase-rate1-min-value").getValue();
+        Double increaseRate1MinVal = Double.parseDouble(configValue);
+
+        configValue = configurationMap.get("IT-increase-rate1-max-value").getValue();
+        Double increaseRate1MaxVal= Double.parseDouble(configValue);
+
+        Salary salary = appraisal.getSalary();
+        Double increaseValue = 0d;
+        if (appraisal.getRating() == 1) {
+            // can only specify an increase if the salary is not at the top pay range
+            if (salary.getCurrent() < salary.getHigh()) {
+                Double submittedIncrease = Double.parseDouble(requestMap.get("appraisal.salary.increase")[0]);
+                if (submittedIncrease >= increaseRate1MinVal && submittedIncrease <= increaseRate1MaxVal) {
+                    increaseValue = submittedIncrease;
+                } else {
+                    throw new ModelException(resource.getString("appraisal-salary-increase-error-invalid-change"));
+                }
+            }
+        } else if (appraisal.getRating() == 2) {
+            increaseValue = increaseRate2Value;
+        }
+
+        salary.setIncrease(increaseValue);
     }
 
     /**

@@ -138,6 +138,11 @@ public class AppraisalMgr {
         Session session = HibernateUtil.getCurrentSession();
         session.saveOrUpdate(modifiedAppraisal);
 
+        // save salary object if present
+        if (modifiedAppraisal.getSalary() != null) {
+            session.saveOrUpdate(modifiedAppraisal.getSalary());
+        }
+
         for (Assessment assessment : modifiedAppraisal.getCurrentGoalVersion().getAssessments()) {
             assessment.setModifiedDate(new Date());
             session.saveOrUpdate(assessment);  //@todo: joan: Do we need to do this everytime?

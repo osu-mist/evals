@@ -267,6 +267,14 @@
           alert("<%= bundle.getString("appraisal-ratingRequired") %>");
         }
 
+        // add validation specific to salary increase for IT
+        <c:if test="${appraisal.job.appointmentType == 'Classified IT'}">
+            var increaseValidationError = validateIncrease();
+            if (validateIncrease() != '') {
+                errors += '<li>' + increaseValidationError + '</li>';
+            }
+        </c:if>
+
         if (errors != "") {
           jQuery("#<portlet:namespace />flash").html(
             '<span class="portlet-msg-error"><ul>'+errors+'</ul></span>'

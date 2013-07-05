@@ -850,6 +850,14 @@ public class Appraisal extends Evals {
         this.salaries = salaries;
     }
 
+    public Salary getSalary() {
+        if (salaries.isEmpty()) {
+            return null;
+        }
+
+        // There should only be 1 object, return it
+        return salaries.iterator().next();
+    }
     /**
      * Role of the logged in user for this appraisal. This is used
      * in the getViewStatus() method.
@@ -912,6 +920,11 @@ public class Appraisal extends Evals {
             for (AssessmentCriteria assessmentCriteria : assessment.getAssessmentCriteria()) {
                 assessmentCriteria.getCriteriaArea().getName();
             }
+        }
+
+        // load salary if available. This applies only to IT
+        if (this.getSalary() != null) {
+            this.getSalary().toString();
         }
     }
 
@@ -1027,5 +1040,18 @@ public class Appraisal extends Evals {
         }
 
         return false;
+    }
+
+    /**
+     * Returns a Date object which contains the salary eligibility date for the
+     * given appraisal.
+     *
+     * @return
+     */
+    public Date getSalaryEligibilityDate() {
+        DateTime sed = new DateTime(this.startDate);
+        sed.withYear(new DateTime().getYear());
+
+        return sed.toDate();
     }
 }
