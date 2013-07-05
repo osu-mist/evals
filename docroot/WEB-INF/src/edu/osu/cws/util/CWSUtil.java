@@ -158,4 +158,16 @@ public class CWSUtil {
     public static boolean validateOrgCode(String orgCode) {
         return StringUtils.isNumeric(orgCode) && orgCode.length() == Constants.MAX_ORG_CODE_DIGITS;
     }
+
+    /**
+     * Formats a given amount into a currency string.
+     *
+     * @param amount
+     * @return
+     */
+    public static String formatCurrency(Double amount) {
+        NumberFormat fmt = NumberFormat.getCurrencyInstance();
+        return fmt.format(amount);
+    }
+
 }

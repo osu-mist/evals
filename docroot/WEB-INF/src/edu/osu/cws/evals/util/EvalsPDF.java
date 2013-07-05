@@ -6,6 +6,7 @@ import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.LineSeparator;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.Constants;
+import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
@@ -22,6 +23,7 @@ public class EvalsPDF {
     public static final Font FONT_BOLD_12 = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
     public static final Font FONT_BOLD_11 = new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD);
     public static final Font FONT_BOLDITALIC_10 = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLDITALIC);
+    public static final Font FONT_BOLD_10 = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD);
     public static final Font FONT_10 = new Font(Font.FontFamily.HELVETICA, 10);
     public static final Font FONT_ITALIC_10 = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLDITALIC);
     public static final Font FONT_BOLD_14 = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD);
@@ -407,18 +409,151 @@ public class EvalsPDF {
             cell.setBorder(Rectangle.NO_BORDER);
             rating.addCell(cell);
 
-            if (appraisal.getRating() != null && appraisal.getRating() == 4) {
-                rating.addCell(checkedBox);
-            } else {
-                rating.addCell(uncheckedBox);
+            // Classified IT evals don't allow rating 4
+            if (!appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
+                if (appraisal.getRating() != null && appraisal.getRating() == 4) {
+                    rating.addCell(checkedBox);
+                } else {
+                    rating.addCell(uncheckedBox);
+                }
+                cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-4"), FONT_10));
+                cell.setColspan(ratingMaxCols - 2);
+                cell.setBorder(Rectangle.NO_BORDER);
+                rating.addCell(cell);
             }
-            cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-4"), FONT_10));
-            cell.setColspan(ratingMaxCols - 2);
-            cell.setBorder(Rectangle.NO_BORDER);
-            rating.addCell(cell);
 
             document.add(rating);
+
+            // only Classified IT evals get the salary table
+            if (appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
+                addSalaryTable(appraisal, resource, document);
+            }
         }
+    }
+
+    /**
+     * Adds the salary table for IT evaluations.
+     *
+     * @param appraisal
+     * @param resource
+     * @param document
+     * @throws DocumentException
+     */
+    private static void addSalaryTable(Appraisal appraisal, ResourceBundle resource,
+                                          Document document) throws DocumentException {
+
+        Paragraph sectionTitle = new Paragraph(resource.getString("appraisal-salary-section-title"),
+                FONT_BOLDITALIC_10);
+        sectionTitle.setIndentationLeft(LEFT_INDENTATION);
+        sectionTitle.setSpacingBefore(BEFORE_SPACING);
+        sectionTitle.setSpacingAfter(6f);
+        document.add(sectionTitle);
+
+        PdfPTable salaryTable = new PdfPTable(7);
+        salaryTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        salaryTable.setWidthPercentage(98.3f);
+        salaryTable.setKeepTogether(true);
+        // specify column widths dynamically since we need varying widths
+        float[] columnWidths = new float[] {20f, 20f, 25f, 20f, 20f, 26f, 20f};
+        salaryTable.setWidths(columnWidths);
+
+        PdfPCell cell;
+        Phrase phrase;
+
+        // Heading Row
+        phrase = new Phrase(resource.getString("appraisal-salary-eligibility-date")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+        phrase = new Phrase(resource.getString("appraisal-salary-current")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+        phrase = new Phrase(resource.getString("appraisal-salary-control-point")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+        phrase = new Phrase(resource.getString("appraisal-salary-control-point-value")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+        phrase = new Phrase(resource.getString("appraisal-salary-control-high")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+        phrase = new Phrase(resource.getString("appraisal-salary-recommended-increase") +": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+        phrase = new Phrase(resource.getString("appraisal-salary-after-increase")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        // Data Rows
+        // Salary Eligibility Date
+        DateTime salaryEligibilityDate = new DateTime(appraisal.getSalaryEligibilityDate());
+        String sed = salaryEligibilityDate.toString("MM/dd");
+        phrase = new Phrase(sed, FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+        // Current Salary
+        Salary salary = appraisal.getSalary();
+        phrase = new Phrase(CWSUtil.formatCurrency(salary.getCurrent()), FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+        // Above/Below Control Point
+        Chunk c3 = new Chunk("    X    .", FONT_10);
+        c3.setUnderline(0.5f, -1.5f);
+        Chunk c4 = new Chunk("          .", FONT_10);
+        c4.setUnderline(0.5f, -1.5f);
+        Chunk c1 = new Chunk(resource.getString("appraisal-salary-above"), FONT_10);
+        phrase = new Phrase(c1);
+        boolean aboveControlPoint = salary.getCurrent() >= salary.getMidPoint();
+        if (aboveControlPoint) {
+            phrase.add(c3);
+        } else {
+            phrase.add(c4);
+        }
+        Chunk c2 = new Chunk("\n" + resource.getString("appraisal-salary-below"), FONT_10);
+        phrase.add(c2);
+        if (!aboveControlPoint) {
+            phrase.add(c3);
+        } else {
+            phrase.add(c4);
+        }
+        cell = new PdfPCell(phrase);
+        cell.setPaddingBottom(5f);
+        salaryTable.addCell(cell);
+
+        // Control Point Value
+        phrase = new Phrase(CWSUtil.formatCurrency(salary.getMidPoint()), FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+        // High Control Point
+        phrase = new Phrase(CWSUtil.formatCurrency(salary.getHigh()), FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+        // Recommended Increase
+        Double increase = salary.getIncrease();
+        if (increase == null) {
+            increase = 0d;
+        }
+        phrase = new Phrase(increase.toString() + "%", FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+        // Salary After Increase
+        Double salaryAfterIncrease = salary.getCurrent() * (1 + increase / 100);
+        phrase = new Phrase(CWSUtil.formatCurrency(salaryAfterIncrease), FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+        document.add(salaryTable);
     }
 
     /**
