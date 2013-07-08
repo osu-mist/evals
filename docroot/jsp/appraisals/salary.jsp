@@ -3,44 +3,40 @@
     <table>
         <thead>
             <tr class="results-header">
-                <th><liferay-ui:message key="appraisal-salary-eligibility-date"/></th>
-                <th><liferay-ui:message key="appraisal-salary-current"/></th>
-                <th><liferay-ui:message key="appraisal-salary-control-point"/></th>
                 <th><liferay-ui:message key="appraisal-salary-control-point-value"/></th>
                 <th><liferay-ui:message key="appraisal-salary-control-high"/></th>
+                <th><liferay-ui:message key="appraisal-salary-control-point"/></th>
                 <th><liferay-ui:message key="appraisal-salary-recommended-increase"/></th>
+                <th><liferay-ui:message key="appraisal-salary-current"/></th>
                 <th><liferay-ui:message key="appraisal-salary-after-increase"/></th>
+                <th><liferay-ui:message key="appraisal-salary-eligibility-date"/></th>
+
             </tr>
         </thead>
         <tbody>
             <tr class="results-row">
-                <%--remove the year and verify it's correct--%>
-                <td><fmt:formatDate value="${appraisal.salaryEligibilityDate}" pattern="MM/dd"/></td>
-                <td><fmt:formatNumber type="currency" value="${appraisal.salary.current}"/></td>
-                <td><liferay-ui:message key="appraisal-salary-above"/>
-                    <span class="control-point">
-                        <c:if test="${appraisal.salary.current >= appraisal.salary.midPoint}">
-                            X
-                        </c:if>&nbsp;
-                    </span>
-                    <br />
-
-                    <liferay-ui:message key="appraisal-salary-below"/>
-                    <span class="control-point">
-                        <c:if test="${appraisal.salary.current < appraisal.salary.midPoint}">
-                            X
-                        </c:if>&nbsp;
-                    </span>
-                </td>
                 <td><fmt:formatNumber type="currency" value="${appraisal.salary.midPoint}"/></td>
                 <td><fmt:formatNumber type="currency" value="${appraisal.salary.high}"/></td>
+                <td>
+                    <c:if test="${appraisal.salary.current > appraisal.salary.midPoint}">
+                        <liferay-ui:message key="appraisal-salary-above"/>
+                    </c:if>
+                    <c:if test="${appraisal.salary.current < appraisal.salary.midPoint}">
+                        <liferay-ui:message key="appraisal-salary-below"/>
+                    </c:if>
+                    <c:if test="${appraisal.salary.current == appraisal.salary.midPoint}">
+                        <liferay-ui:message key="appraisal-salary-at"/>
+                    </c:if>
+                </td>
                 <td><input type="text" id="<portlet:namespace />appraisal.salary.increase"
                            name="<portlet:namespace />appraisal.salary.increase"
                            value="<c:out value="${appraisal.salary.increase}"/>"
-                           class="recommended-salary"/>%<br/>
+                           class="recommended-salary"/>
                     <span class="recommended-salary-hint"></span>
                 </td>
+                <td><fmt:formatNumber type="currency" value="${appraisal.salary.current}"/></td>
                 <td class="salary-after-increase"></td>
+                <td><fmt:formatDate value="${appraisal.salaryEligibilityDate}" pattern="MM/dd"/></td>
             </tr>
         </tbody>
     </table>
@@ -66,7 +62,6 @@
         function resetRecommendedIncrease(resetValue) {
             // reset any increase range hints if present
             jQuery('.recommended-salary-hint').html('');
-            jQuery('.recommended-salary-hint').removeClass('js-info');
 
             // rating value that the user selected
             var rating = jQuery('input:radio[name=<portlet:namespace />appraisal.rating]:checked').val();
@@ -79,18 +74,15 @@
             // If the supervisor rates a 1, we only enable the input box if current salary is not at top range
             if (rating == 1 && !isSalaryAtHighPoint) {
                 if (resetValue) {
-                    jQuery(".osu-cws input.recommended-salary").val(${increaseRate1MinVal});
+                    jQuery(".osu-cws input.recommended-salary").val('');
                 }
                 jQuery(".osu-cws input.recommended-salary").removeAttr('disabled');
                 jQuery(".osu-cws input.recommended-salary").removeAttr('readonly');
 
                 // set the range hint
-                var hint = '<liferay-ui:message key="appraisal-salary-increase-hint-min"/>'
-                        + ${increaseRate1MinVal} + '%, ' +
-                        '<liferay-ui:message key="appraisal-salary-increase-hint-max"/>'
-                        + ${increaseRate1MaxVal} + '%';
+                var hint = '(<liferay-ui:message key="appraisal-salary-increase-hint-range"/> '
+                        + ${increaseRate1MinVal} + ' - ' + ${increaseRate1MaxVal} + ')';
                 jQuery('.recommended-salary-hint').html(hint);
-                jQuery('.recommended-salary-hint').addClass('js-info');
             } else if (rating == 2) {
                 increase = ${increaseRate2Value}; // disable the inputs as well if rating is 2 or 3
             }
