@@ -4,6 +4,7 @@
         <thead>
             <tr class="results-header">
                 <th><liferay-ui:message key="appraisal-salary-control-point-value"/></th>
+                <th><liferay-ui:message key="appraisal-salary-control-low"/></th>
                 <th><liferay-ui:message key="appraisal-salary-control-high"/></th>
                 <th><liferay-ui:message key="appraisal-salary-control-point"/></th>
                 <th><liferay-ui:message key="appraisal-salary-recommended-increase"/></th>
@@ -16,6 +17,7 @@
         <tbody>
             <tr class="results-row">
                 <td><fmt:formatNumber type="currency" value="${appraisal.salary.midPoint}"/></td>
+                <td><fmt:formatNumber type="currency" value="${appraisal.salary.low}"/></td>
                 <td><fmt:formatNumber type="currency" value="${appraisal.salary.high}"/></td>
                 <td>
                     <c:if test="${appraisal.salary.current > appraisal.salary.midPoint}">
