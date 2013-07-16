@@ -33,7 +33,7 @@
                 <td><input type="text" id="<portlet:namespace />appraisal.salary.increase"
                            name="<portlet:namespace />appraisal.salary.increase"
                            value="<c:out value="${appraisal.salary.increase}"/>"
-                           class="recommended-salary"/>
+                           class="recommended-salary" disabled="" readonly=""/>%
                     <span class="recommended-salary-hint"></span>
                 </td>
                 <td><fmt:formatNumber type="currency" value="${appraisal.salary.current}"/></td>
@@ -52,9 +52,13 @@
         <c:if test="${appraisal.salary.increase != null}">
             resetSalaryValue = false;
         </c:if>
-        resetRecommendedIncrease(resetSalaryValue);
-        // set the salary increase so the salary table gets populated correctly.
-        setSalaryIncrease();
+
+        // Only make the increase textarea editable when the evaluation is editable.
+        <c:if test="${permissionRule.evaluation == 'e'}">
+            resetRecommendedIncrease(resetSalaryValue);
+            // set the salary increase so the salary table gets populated correctly.
+            setSalaryIncrease();
+        </c:if>
 
         /**
          * Resets the recommended increase value, by enabling or disabling the textbox depending
