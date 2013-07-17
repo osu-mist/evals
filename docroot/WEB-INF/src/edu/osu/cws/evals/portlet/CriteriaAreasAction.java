@@ -38,11 +38,8 @@ public class CriteriaAreasAction implements ActionInterface {
             return errorHandler.handleAccessDenied(request, response);
         }
 
-        String appointmentType = ParamUtil.getString(request, "appointmentType",
-                CriteriaMgr.DEFAULT_APPOINTMENT_TYPE);
-
         try {
-            List<CriterionArea> criterionList = CriteriaMgr.list(appointmentType);
+            List<CriterionArea> criterionList = CriteriaMgr.listAll();
             actionHelper.addToRequestMap("criteria", criterionList);
         } catch (ModelException e) {
             actionHelper.addErrorsToRequest(e.getMessage());

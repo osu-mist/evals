@@ -157,6 +157,21 @@ public class CriteriaMgr {
     }
 
     /**
+     * Gets a list of criteria with all appointment types.
+     *
+     * @param
+     * @return criteria        List of CriterionAreas
+     * @throws edu.osu.cws.evals.models.ModelException
+     */
+    public static List<CriterionArea> listAll() throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        List results = session.createQuery("from edu.osu.cws.evals.models.CriterionArea where " +
+                "deleteDate IS NULL ORDER BY appointmentType, name")
+                .list();
+        return results;
+    }
+
+    /**
      * Takes an ID of the CriterionArea the user is trying to delete. If successful, an empty
      * array is returned, otherwise, the array will contain error messages.
      *
