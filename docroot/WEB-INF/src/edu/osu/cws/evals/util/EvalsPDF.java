@@ -449,94 +449,89 @@ public class EvalsPDF {
         sectionTitle.setSpacingAfter(6f);
         document.add(sectionTitle);
 
-        PdfPTable salaryTable = new PdfPTable(7);
+        float[] columnWidths = new float[] {20f, 20f, 20f, 20f, 26f, 20f, 26f, 20f};
+        PdfPTable salaryTable = new PdfPTable(columnWidths.length);
         salaryTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
         salaryTable.setWidthPercentage(98.3f);
         salaryTable.setKeepTogether(true);
         // specify column widths dynamically since we need varying widths
-        float[] columnWidths = new float[] {20f, 20f, 25f, 20f, 20f, 26f, 20f};
         salaryTable.setWidths(columnWidths);
 
         PdfPCell cell;
         Phrase phrase;
 
         // Heading Row
-        phrase = new Phrase(resource.getString("appraisal-salary-eligibility-date")+": ", FONT_BOLD_10);
-        cell = new PdfPCell(phrase);
-        salaryTable.addCell(cell);
-
-        phrase = new Phrase(resource.getString("appraisal-salary-current")+": ", FONT_BOLD_10);
-        cell = new PdfPCell(phrase);
-        salaryTable.addCell(cell);
-
-        phrase = new Phrase(resource.getString("appraisal-salary-control-point")+": ", FONT_BOLD_10);
-        cell = new PdfPCell(phrase);
-        salaryTable.addCell(cell);
-
         phrase = new Phrase(resource.getString("appraisal-salary-control-point-value")+": ", FONT_BOLD_10);
         cell = new PdfPCell(phrase);
         salaryTable.addCell(cell);
+
+
+        phrase = new Phrase(resource.getString("appraisal-salary-control-low")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
 
         phrase = new Phrase(resource.getString("appraisal-salary-control-high")+": ", FONT_BOLD_10);
         cell = new PdfPCell(phrase);
         salaryTable.addCell(cell);
 
+
+        phrase = new Phrase(resource.getString("appraisal-salary-control-point")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
         phrase = new Phrase(resource.getString("appraisal-salary-recommended-increase") +": ", FONT_BOLD_10);
         cell = new PdfPCell(phrase);
         salaryTable.addCell(cell);
+
+
+        phrase = new Phrase(resource.getString("appraisal-salary-current")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
 
         phrase = new Phrase(resource.getString("appraisal-salary-after-increase")+": ", FONT_BOLD_10);
         cell = new PdfPCell(phrase);
         salaryTable.addCell(cell);
 
 
+        phrase = new Phrase(resource.getString("appraisal-salary-eligibility-date")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
         // Data Rows
-        // Salary Eligibility Date
-        DateTime salaryEligibilityDate = new DateTime(appraisal.getSalaryEligibilityDate());
-        String sed = salaryEligibilityDate.toString("MM/dd");
-        phrase = new Phrase(sed, FONT_10);
-        cell = new PdfPCell(phrase);
-        salaryTable.addCell(cell);
-
-        // Current Salary
         Salary salary = appraisal.getSalary();
-        phrase = new Phrase(CWSUtil.formatCurrency(salary.getCurrent()), FONT_10);
-        cell = new PdfPCell(phrase);
-        salaryTable.addCell(cell);
-
-        // Above/Below Control Point
-        Chunk c3 = new Chunk("    X    .", FONT_10);
-        c3.setUnderline(0.5f, -1.5f);
-        Chunk c4 = new Chunk("          .", FONT_10);
-        c4.setUnderline(0.5f, -1.5f);
-        Chunk c1 = new Chunk(resource.getString("appraisal-salary-above"), FONT_10);
-        phrase = new Phrase(c1);
-        boolean aboveControlPoint = salary.getCurrent() >= salary.getMidPoint();
-        if (aboveControlPoint) {
-            phrase.add(c3);
-        } else {
-            phrase.add(c4);
-        }
-        Chunk c2 = new Chunk("\n" + resource.getString("appraisal-salary-below"), FONT_10);
-        phrase.add(c2);
-        if (!aboveControlPoint) {
-            phrase.add(c3);
-        } else {
-            phrase.add(c4);
-        }
-        cell = new PdfPCell(phrase);
-        cell.setPaddingBottom(5f);
-        salaryTable.addCell(cell);
-
         // Control Point Value
         phrase = new Phrase(CWSUtil.formatCurrency(salary.getMidPoint()), FONT_10);
         cell = new PdfPCell(phrase);
         salaryTable.addCell(cell);
 
+
+        // Low Control Point
+        phrase = new Phrase(CWSUtil.formatCurrency(salary.getLow()), FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
         // High Control Point
         phrase = new Phrase(CWSUtil.formatCurrency(salary.getHigh()), FONT_10);
         cell = new PdfPCell(phrase);
         salaryTable.addCell(cell);
+
+
+        // Above/Below Control Point
+        String belowOrAboveOrAt = resource.getString("appraisal-salary-at");
+        if (salary.getCurrent() > salary.getMidPoint()) {
+            belowOrAboveOrAt = resource.getString("appraisal-salary-above");
+        } else if (salary.getCurrent() < salary.getMidPoint()) {
+            belowOrAboveOrAt = resource.getString("appraisal-salary-below");
+        }
+        phrase = new Phrase(belowOrAboveOrAt, FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
 
         // Recommended Increase
         Double increase = salary.getIncrease();
@@ -547,9 +542,24 @@ public class EvalsPDF {
         cell = new PdfPCell(phrase);
         salaryTable.addCell(cell);
 
+
+        // Current Salary
+        phrase = new Phrase(CWSUtil.formatCurrency(salary.getCurrent()), FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
         // Salary After Increase
         Double salaryAfterIncrease = salary.getCurrent() * (1 + increase / 100);
         phrase = new Phrase(CWSUtil.formatCurrency(salaryAfterIncrease), FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        // Salary Eligibility Date
+        DateTime salaryEligibilityDate = new DateTime(appraisal.getSalaryEligibilityDate());
+        String sed = salaryEligibilityDate.toString("MM/dd");
+        phrase = new Phrase(sed, FONT_10);
         cell = new PdfPCell(phrase);
         salaryTable.addCell(cell);
 
