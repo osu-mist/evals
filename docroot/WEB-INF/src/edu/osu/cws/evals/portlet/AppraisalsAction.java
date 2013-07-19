@@ -408,6 +408,10 @@ public class AppraisalsAction implements ActionInterface {
         if (submittedRebuttal(requestMap, employeeResponse)) {
             String appraisalStepKey = "submit-response-" + appointmentType;
             appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
+            // If the appointment type doesn't exist in the table, use "Default" type.
+            if (appraisalStep == null) {
+                appraisalStep = (AppraisalStep) appraisalSteps.get("submit-response-Default");
+            }
         } else {
             appraisalStep = getAppraisalStep(requestMap, appointmentType);
         }
@@ -739,9 +743,11 @@ public class AppraisalsAction implements ActionInterface {
             if (requestMap.get(button) != null) {
                 appraisalStepKey = button + "-" + appointmentType;
                 appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
-                if (appraisalStep != null) {
-                    return appraisalStep;
+                // If the appointment type doesn't exist in the table, use "Default" type.
+                if (appraisalStep == null) {
+                    return (AppraisalStep) appraisalSteps.get(button + "-" + "Default");
                 }
+                return appraisalStep;
             }
         }
 

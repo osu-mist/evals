@@ -32,8 +32,8 @@ public class AppraisalStepsTest {
         tx.commit();
         //@todo: does the test below make sense without the original status in the appraisal_step
         // table?
-        assert steps.containsKey("submit-Classified") : "Missing step in hashmap";
-        assert steps.containsKey("require-modification-Classified") : "Missing step in hashmap";
+        assert steps.containsKey("submit-") : "Missing step in hashmap";
+        assert steps.containsKey("require-modification-") : "Missing step in hashmap";
         assert steps.size() == 2 :
                 "AppraisalStepMgr.list() should find all appraisalSteps";
     }
