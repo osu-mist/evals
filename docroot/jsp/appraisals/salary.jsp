@@ -3,12 +3,12 @@
     <table>
         <thead>
             <tr class="results-header">
+                <th><liferay-ui:message key="appraisal-salary-current"/></th>
                 <th><liferay-ui:message key="appraisal-salary-control-point-value"/></th>
                 <th><liferay-ui:message key="appraisal-salary-control-low"/></th>
                 <th><liferay-ui:message key="appraisal-salary-control-high"/></th>
                 <th><liferay-ui:message key="appraisal-salary-control-point"/></th>
                 <th><liferay-ui:message key="appraisal-salary-recommended-increase"/></th>
-                <th><liferay-ui:message key="appraisal-salary-current"/></th>
                 <th><liferay-ui:message key="appraisal-salary-after-increase"/></th>
                 <th><liferay-ui:message key="appraisal-salary-eligibility-date"/></th>
 
@@ -16,6 +16,7 @@
         </thead>
         <tbody>
             <tr class="results-row">
+                <td><fmt:formatNumber type="currency" value="${appraisal.salary.current}"/></td>
                 <td><fmt:formatNumber type="currency" value="${appraisal.salary.midPoint}"/></td>
                 <td><fmt:formatNumber type="currency" value="${appraisal.salary.low}"/></td>
                 <td><fmt:formatNumber type="currency" value="${appraisal.salary.high}"/></td>
@@ -36,7 +37,6 @@
                            class="recommended-salary" disabled="" readonly=""/>
                     <span class="recommended-salary-hint"></span>
                 </td>
-                <td><fmt:formatNumber type="currency" value="${appraisal.salary.current}"/></td>
                 <td class="salary-after-increase"></td>
                 <td><fmt:formatDate value="${appraisal.salaryEligibilityDate}" pattern="MM/dd"/></td>
             </tr>

@@ -461,6 +461,11 @@ public class EvalsPDF {
         Phrase phrase;
 
         // Heading Row
+        phrase = new Phrase(resource.getString("appraisal-salary-current")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
         phrase = new Phrase(resource.getString("appraisal-salary-control-point-value")+": ", FONT_BOLD_10);
         cell = new PdfPCell(phrase);
         salaryTable.addCell(cell);
@@ -486,11 +491,6 @@ public class EvalsPDF {
         salaryTable.addCell(cell);
 
 
-        phrase = new Phrase(resource.getString("appraisal-salary-current")+": ", FONT_BOLD_10);
-        cell = new PdfPCell(phrase);
-        salaryTable.addCell(cell);
-
-
         phrase = new Phrase(resource.getString("appraisal-salary-after-increase")+": ", FONT_BOLD_10);
         cell = new PdfPCell(phrase);
         salaryTable.addCell(cell);
@@ -503,6 +503,12 @@ public class EvalsPDF {
 
         // Data Rows
         Salary salary = appraisal.getSalary();
+        // Current Salary
+        phrase = new Phrase(CWSUtil.formatCurrency(salary.getCurrent()), FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
         // Control Point Value
         phrase = new Phrase(CWSUtil.formatCurrency(salary.getMidPoint()), FONT_10);
         cell = new PdfPCell(phrase);
@@ -538,13 +544,7 @@ public class EvalsPDF {
         if (increase == null) {
             increase = 0d;
         }
-        phrase = new Phrase(increase.toString() + "%", FONT_10);
-        cell = new PdfPCell(phrase);
-        salaryTable.addCell(cell);
-
-
-        // Current Salary
-        phrase = new Phrase(CWSUtil.formatCurrency(salary.getCurrent()), FONT_10);
+        phrase = new Phrase(increase.toString(), FONT_10);
         cell = new PdfPCell(phrase);
         salaryTable.addCell(cell);
 
