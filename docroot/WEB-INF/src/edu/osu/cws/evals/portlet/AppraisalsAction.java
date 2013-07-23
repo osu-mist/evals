@@ -260,18 +260,49 @@ public class AppraisalsAction implements ActionInterface {
         actionHelper.useMaximizedMenu();
 
         if (appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
-            Map<String, Configuration> configurationMap =
-                    (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
-            String increaseRate2Value = configurationMap.get("IT-increase-rate2-value").getValue();
-            String increaseRate1MinVal = configurationMap.get("IT-increase-rate1-min-value").getValue();
-            String increaseRate1MaxVal= configurationMap.get("IT-increase-rate1-max-value").getValue();
-
-            actionHelper.addToRequestMap("increaseRate2Value", increaseRate2Value);
-            actionHelper.addToRequestMap("increaseRate1MinVal", increaseRate1MinVal);
-            actionHelper.addToRequestMap("increaseRate1MaxVal", increaseRate1MaxVal);
+            setSalaryValues();
         }
 
         return Constants.JSP_APPRAISAL;
+    }
+
+    /**
+     * Sets for the jsp the salary range values for Classified IT evaluations. The range and fixed
+     * increase values depend on whether or not the current salary is above or below the control
+     * point.
+     */
+    private void setSalaryValues() {
+        Map<String, String> salaryValidationValues = getSalaryValidationValues();
+
+        actionHelper.addToRequestMap("increaseRate2Value", salaryValidationValues.get("increaseRate2Value"));
+        actionHelper.addToRequestMap("increaseRate1MinVal", salaryValidationValues.get("increaseRate1MinVal"));
+        actionHelper.addToRequestMap("increaseRate1MaxVal", salaryValidationValues.get("increaseRate1MaxVal"));
+    }
+
+    /**
+     * Returns a map with the correct salary increase validation values depending on whether or not
+     * the current salary is above or below the midpoint.
+     *
+     * @return
+     */
+    private Map<String, String> getSalaryValidationValues() {
+        Map<String, String> salaryValidationValues = new HashMap<String, String>();
+        String aboveOrBelow = "below";
+        if (appraisal.getSalary().getCurrent() > appraisal.getSalary().getMidPoint()) {
+            aboveOrBelow = "above";
+        }
+
+        Map<String, Configuration> configurationMap =
+                (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
+        String increaseRate2Value = configurationMap.get("IT-increase-rate2-" + aboveOrBelow + "-control-value").getValue();
+        String increaseRate1MinVal = configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-min-value").getValue();
+        String increaseRate1MaxVal= configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-max-value").getValue();
+
+        salaryValidationValues.put("increaseRate2Value", increaseRate2Value);
+        salaryValidationValues.put("increaseRate1MinVal", increaseRate1MinVal);
+        salaryValidationValues.put("increaseRate1MaxVal", increaseRate1MaxVal);
+
+        return salaryValidationValues;
     }
 
     /**
@@ -679,19 +710,18 @@ public class AppraisalsAction implements ActionInterface {
      * Rating 2 -   the increase is set automatically by a configuration value
      * Rating 3 -   the increase is set to 0
      *
+     * The allowed range for rating 1 and fixed value for rating 2 depend on whether or not the
+     * current salary is above or below the control point.
+     *
      * @param requestMap
      */
     private void saveRecommendedIncrease(Map<String, String[]> requestMap) throws ModelException {
-        Map<String, Configuration> configurationMap =
-                (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
-        String configValue = configurationMap.get("IT-increase-rate2-value").getValue();
-        Double increaseRate2Value = Double.parseDouble(configValue);
-
-        configValue = configurationMap.get("IT-increase-rate1-min-value").getValue();
-        Double increaseRate1MinVal = Double.parseDouble(configValue);
-
-        configValue = configurationMap.get("IT-increase-rate1-max-value").getValue();
-        Double increaseRate1MaxVal= Double.parseDouble(configValue);
+        // get the salary validation values. They change depending on whether current salary is
+        // above or below the midpoint
+        Map<String, String> salaryValidationValues = getSalaryValidationValues();
+        Double increaseRate2Value = Double.parseDouble(salaryValidationValues.get("increaseRate2Value"));
+        Double increaseRate1MinVal = Double.parseDouble(salaryValidationValues.get("increaseRate1MinVal"));
+        Double increaseRate1MaxVal= Double.parseDouble(salaryValidationValues.get("increaseRate1MaxVal"));
 
         Salary salary = appraisal.getSalary();
         Double increaseValue = 0d;
