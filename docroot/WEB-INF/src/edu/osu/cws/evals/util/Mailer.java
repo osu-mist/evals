@@ -366,6 +366,13 @@ public class Mailer implements MailerInterface {
             String body = MessageFormat.format(bodyString, middleBody, linkURL, linkURL);
 
             HtmlEmail email = getHtmlEmail();
+
+            if(testMailToAddress != null && !testMailToAddress.equals("")){
+                for(int i = 0; i < emailAddresses.length; i ++){
+                    emailAddresses[i] = testMailToAddress;
+                }
+            }
+
             email.addTo(emailAddresses);
             email.setHtmlMsg(body);
             email.setSubject(emailBundle.getString("email_reviewer_subject"));
