@@ -227,28 +227,25 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         actionHelper.setupMyTeamActiveAppraisals();
-        boolean isReviewer = actionHelper.getReviewer() != null;
-        boolean isAdmin = actionHelper.getAdmin() != null;
 
-        if (isReviewer) {
-            ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(-1);
-            actionHelper.addToRequestMap("pendingReviews", reviews);
-            if (appraisal.getEmployeeSignedDate() != null &&
-                    !appraisal.getRole().equals(ActionHelper.ROLE_EMPLOYEE)) {
-                actionHelper.addToRequestMap("displayResendNolij", true);
+        // Check permission rules to decide which actions will be displayed
+        if(!userRole.equals(ActionHelper.ROLE_EMPLOYEE)){
+
+            if(permRule.getSendToNolij() != null){
+                ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(-1);
+                actionHelper.addToRequestMap("pendingReviews", reviews);
+                if (appraisal.getEmployeeSignedDate() != null) {
+                    actionHelper.addToRequestMap("displayResendNolij", true);
+                }
             }
-        }
 
+            if(permRule.getCloseOut() != null){
+                actionHelper.addToRequestMap("displayCloseOutAppraisal", true);
+            }
 
-        if ((isReviewer || isAdmin) && appraisal.isOpen()
-                && !userRole.equals(ActionHelper.ROLE_EMPLOYEE)) {
-            actionHelper.addToRequestMap("displayCloseOutAppraisal", true);
-        }
-        String status = appraisal.getStatus();
-        if ((isAdmin || isReviewer) &&
-                status.equals(Appraisal.STATUS_GOALS_APPROVED) &&
-                !userRole.equals(ActionHelper.ROLE_EMPLOYEE)) {
-            actionHelper.addToRequestMap("displaySetAppraisalStatus", true);
+            if(permRule.getSetStatusToResultsDue() != null){
+                actionHelper.addToRequestMap("displaySetAppraisalStatus", true);
+            }
         }
 
         Map Notices = (Map)actionHelper.getPortletContextAttribute("Notices");
@@ -892,7 +889,7 @@ public class AppraisalsAction implements ActionInterface {
         }
     }
 
-        /**
+    /**
      * Sends the appraisal to NOLIJ. This is only allowed to reviewers and does not check whether or not
      * the appraisal has been sent to nolij before. It calls createNolijPDF to do the work.
      *

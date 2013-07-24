@@ -33,6 +33,14 @@ public class PermissionRule extends Evals implements Cloneable {
 
     private String actionRequired;
 
+    private String downloadPDF;
+
+    private String closeOut;
+
+    private String sendToNolij;
+
+    private String setStatusToResultsDue;
+
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -165,5 +173,37 @@ public class PermissionRule extends Evals implements Cloneable {
 
     public void setActionRequired(String actionRequired) {
         this.actionRequired = actionRequired;
+    }
+
+    public String getDownloadPDF() {
+        return downloadPDF;
+    }
+
+    public void setDownloadPDF(String downloadPDF) {
+        this.downloadPDF = downloadPDF;
+    }
+
+    public String getCloseOut() {
+        return closeOut;
+    }
+
+    public void setCloseOut(String closeOut) {
+        this.closeOut = closeOut;
+    }
+
+    public String getSendToNolij() {
+        return sendToNolij;
+    }
+
+    public void setSendToNolij(String sendToNolij) {
+        this.sendToNolij = sendToNolij;
+    }
+
+    public String getSetStatusToResultsDue() {
+        return setStatusToResultsDue;
+    }
+
+    public void setSetStatusToResultsDue(String setStatusToResultsDue) {
+        this.setStatusToResultsDue = setStatusToResultsDue;
     }
 }
