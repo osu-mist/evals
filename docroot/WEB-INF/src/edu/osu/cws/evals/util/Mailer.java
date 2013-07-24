@@ -84,40 +84,11 @@ public class Mailer implements MailerInterface {
             }
 
             HtmlEmail email = getHtmlEmail();
-            String mailTo = emailType.getMailTo();
-            String mailCC = emailType.getCc();
-            String mailBCC = emailType.getBcc();
-            boolean hasRecipients = false;
-
-            if (mailTo != null && !mailTo.equals("")) {
-                String[] to = getRecipients(mailTo, appraisal);
-                if (to != null && to.length != 0) {
-                    email.addTo(to);
-                    hasRecipients = true;
-                }
-            }
-
-            if (mailCC != null && !mailCC.equals("")) {
-                String[] cc = getRecipients(mailCC, appraisal);
-                if (cc != null && cc.length != 0) {
-                    email.addCc(cc);
-                    hasRecipients = true;
-                }
-            }
-
-            if (mailBCC != null && !mailBCC.equals("")) {
-                String[] bcc = getRecipients(mailBCC, appraisal);
-                if (bcc != null && bcc.length != 0) {
-                    email.addBcc(bcc);
-                    hasRecipients = true;
-                }
-            }
-
-            if (!hasRecipients) {
+            if (!setEmailRecipients(appraisal, email, emailType)) {
                 return false;
             }
 
-            String addressee = getAddressee(appraisal,mailTo);
+            String addressee = getAddressee(appraisal, emailType.getMailTo());
             String body = getBody(appraisal, emailType, addressee);
             email.setHtmlMsg(body);
 
@@ -144,6 +115,49 @@ public class Mailer implements MailerInterface {
 
         return true;
    }
+
+    /**
+     * Looks at the email type object and sets the cc, bcc and to fields in the email object.
+     * If there were no recipients to add, it returns false.
+     *
+     * @param appraisal
+     * @param email
+     * @param emailType
+     * @return
+     * @throws Exception
+     */
+    private boolean setEmailRecipients(Appraisal appraisal, HtmlEmail email, EmailType emailType)
+            throws Exception {
+        boolean hasRecipients = false;
+        String mailTo = emailType.getMailTo();
+        String mailCC = emailType.getCc();
+        String mailBCC = emailType.getBcc();
+
+        if (mailTo != null && !mailTo.equals("")) {
+            String[] to = getRecipients(mailTo, appraisal);
+            if (to != null && to.length != 0) {
+                email.addTo(to);
+                hasRecipients = true;
+            }
+        }
+
+        if (mailCC != null && !mailCC.equals("")) {
+            String[] cc = getRecipients(mailCC, appraisal);
+            if (cc != null && cc.length != 0) {
+                email.addCc(cc);
+                hasRecipients = true;
+            }
+        }
+
+        if (mailBCC != null && !mailBCC.equals("")) {
+            String[] bcc = getRecipients(mailBCC, appraisal);
+            if (bcc != null && bcc.length != 0) {
+                email.addBcc(bcc);
+                hasRecipients = true;
+            }
+        }
+        return hasRecipients;
+    }
 
     private HtmlEmail getHtmlEmail() throws EmailException {
         HtmlEmail email = new HtmlEmail();
@@ -292,20 +306,11 @@ public class Mailer implements MailerInterface {
      */
     public void sendSupervisorMail(Employee supervisor, String middleBody,
                                    List<Email> emailList) {
-
         try {
-            String bcName = JobMgr.getBusinessCenter(supervisor.getId());
-            if (bcName == null) //supervisor has no job, Error
-            {
-                String shortMsg = "From sendSupervisorMail: supervisor has no active job";
-                String longMsg = "Supervisor PIDM: " + supervisor.getId() +
-                        ", has no active job.";
-                logger.log(Logger.ERROR, shortMsg, longMsg);
+            String bcDescritor = getBCDescriptor(supervisor);
+            if (bcDescritor == null) {
                 return;
             }
-
-            String bcKey = "businesscenter_" + bcName + "_descriptor";
-            String bcDescritor = emailBundle.getString(bcKey);
 
             String supervisorName = supervisor.getConventionName();
             String emailAddress = supervisor.getEmail();
@@ -349,6 +354,27 @@ public class Mailer implements MailerInterface {
                 logger.log(Logger.ERROR, shortMessage, logLongMessage);
             } catch (Exception logError) { }
         }
+    }
+
+    /**
+     * Checks that the supervisor job exists and returns the BC descriptor for the
+     * supervisor's job bc.
+     *
+     * @param supervisor
+     * @return
+     * @throws Exception
+     */
+    private String getBCDescriptor(Employee supervisor) throws Exception {
+        String bcName = JobMgr.getBusinessCenter(supervisor.getId());
+        if (bcName == null) { //supervisor has no job, Error
+            String shortMsg = "From sendSupervisorMail: supervisor has no active job";
+            String longMsg = "Supervisor PIDM: " + supervisor.getId() +
+                    ", has no active job.";
+            logger.log(Logger.ERROR, shortMsg, longMsg);
+            return null;
+        }
+
+        return emailBundle.getString("businesscenter_" + bcName + "_descriptor");
     }
 
     /**
@@ -509,8 +535,15 @@ public class Mailer implements MailerInterface {
      */
     private String appraisalOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_appraisalOverdue_body");
-        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
+        String body = MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
                 appraisal.getReviewPeriod(), getDueDate(appraisal));
+
+        // Add extra message for classified IT as required by bargaining agreement
+        if (appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
+            body += emailBundle.getString("email_appraisalOverdue_IT_body");
+        }
+
+        return body;
     }
 
     /**
@@ -657,6 +690,23 @@ public class Mailer implements MailerInterface {
     private String jobTerminatedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_jobTerminated_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal));
+    }
+
+    /**
+     * Fetch the body for closed emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String classifiedITNoIncreaseBody(Appraisal appraisal) throws Exception {
+        Configuration config = configMap.get("IT-increase-withhold-warn2-days");
+        int daysToNotifyEmployee = config.getIntValue();
+
+        Employee employee = appraisal.getJob().getEmployee();
+        String employeeName = employee.getConventionName();
+        String bodyString = emailBundle.getString("email_classifiedITNoIncrease_body");
+        String sed = new DateTime(appraisal.getSalaryEligibilityDate()).toString("MM/dd");
+        return MessageFormat.format(bodyString, employeeName, sed, daysToNotifyEmployee);
     }
 
     /**
