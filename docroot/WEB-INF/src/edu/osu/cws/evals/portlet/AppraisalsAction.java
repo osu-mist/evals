@@ -247,6 +247,9 @@ public class AppraisalsAction implements ActionInterface {
                 actionHelper.addToRequestMap("displaySetAppraisalStatus", true);
             }
         }
+        if(permRule.getDownloadPDF() != null){
+            actionHelper.addToRequestMap("displayDownloadPdf", true);
+        }
 
         Map Notices = (Map)actionHelper.getPortletContextAttribute("Notices");
         actionHelper.addToRequestMap("appraisalNotice", Notices.get("Appraisal Notice"));
