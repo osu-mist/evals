@@ -16,4 +16,6 @@ public interface MailerInterface {
                             List<Email> emailList);
 
     void sendReviewerMail(String[] emailAddresses, int dueCount, int OverDueCount);
+
+    String getAppraisalOverdueITWarning() throws Exception;
 }

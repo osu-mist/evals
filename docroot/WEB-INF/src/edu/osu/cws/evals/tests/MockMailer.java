@@ -45,6 +45,11 @@ public class MockMailer implements MailerInterface {
         reviewOverdueCount = OverDueCount;
     }
 
+
+    public String getAppraisalOverdueITWarning() throws Exception {
+        return "";
+    }
+
     public EmailType getEmailType() {
         return emailType;
     }

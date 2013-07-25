@@ -535,15 +535,18 @@ public class Mailer implements MailerInterface {
      */
     private String appraisalOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_appraisalOverdue_body");
-        String body = MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
                 appraisal.getReviewPeriod(), getDueDate(appraisal));
+    }
 
-        // Add extra message for classified IT as required by bargaining agreement
-        if (appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
-            body += emailBundle.getString("email_appraisalOverdue_IT_body");
-        }
-
-        return body;
+    /**
+     * Fetch the warning for appraisalOverdue emailType
+     * @return
+     * @throws Exception
+     */
+    public String getAppraisalOverdueITWarning() throws Exception {
+        // extra message for classified IT as required by bargaining agreement
+        return emailBundle.getString("email_appraisalOverdue_IT_body");
     }
 
     /**
