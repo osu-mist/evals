@@ -64,15 +64,24 @@ public class EmailMgr {
     }
 
 
-    /** @todo: Don't need this for now.  Just leave it as a stub.
+    /**
      * select count(*) from emails where apparaisalID, emailType
-     * @param apparaisalID
+     *
+     * @param appraisalID
      * @param emailType
      * @return an integer indicating the number of emails sent for appraisalId and emailType.
      */
-    public static int getEmailCount(int apparaisalID, String emailType)
-    {
-        return 1;
+    public static int getEmailCount(int appraisalID, String emailType) {
+        Session session = HibernateUtil.getCurrentSession();
+        String query = "select count(*) from edu.osu.cws.evals.models.Email email " +
+                "where email.appraisalId = :appraisalId and email.emailType = :emailType";
+
+        Object countObj = session.createQuery(query)
+                .setInteger("appraisalId", appraisalID)
+                .setString("emailType", emailType)
+                .list().get(0);
+
+        return Integer.parseInt(countObj.toString());
     }
 
 
