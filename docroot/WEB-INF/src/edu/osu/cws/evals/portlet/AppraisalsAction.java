@@ -447,7 +447,11 @@ public class AppraisalsAction implements ActionInterface {
             appraisalStep = getAppraisalStep(requestMap, appointmentType);
         }
 
-        EmailType emailType = appraisalStep.getEmailType();
+        EmailType emailType = null;
+        if (appraisalStep != null) {
+            emailType = appraisalStep.getEmailType();
+        }
+
         if (emailType != null) {
             mailer.sendMail(appraisal, emailType);
         }
@@ -559,7 +563,11 @@ public class AppraisalsAction implements ActionInterface {
         // If the appraisalStep object has a new status, update the appraisal object
         String appointmentType = appraisal.getJob().getAppointmentType();
         AppraisalStep appraisalStep = getAppraisalStep(requestMap, appointmentType);
-        String newStatus = appraisalStep.getNewStatus();
+        String newStatus = null;
+        if (appraisalStep != null) {
+            newStatus = appraisalStep.getNewStatus();
+        }
+
         if (newStatus != null && !newStatus.equals(appraisal.getStatus())) {
             appraisal.setStatus(newStatus);
             String employeeResponse = appraisal.getRebuttal();
@@ -781,7 +789,7 @@ public class AppraisalsAction implements ActionInterface {
             }
         }
 
-        return new AppraisalStep();
+        return null;
     }
 
     private String GeneratePDF(Appraisal appraisal, String dirName, String env,
