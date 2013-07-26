@@ -260,7 +260,16 @@
       });
 
       // Handle validation of rating
-      jQuery("#<portlet:namespace />submit-appraisal").click(function() {
+      jQuery("#<portlet:namespace />submit-appraisal").click(function(event) {
+
+        //Supervisor Results and Overall Evaluation cannot be empty when submitting appraisal
+        var emptyResults = areResultsEmpty();
+        if(emptyResults){
+            alert('<liferay-ui:message key="appraisal-supervisor-empty-results"/>');
+            event.isDefaultPrevented = true;
+            return false;
+        }
+
         var errors = "";
         if (jQuery("input[name=submit-appraisal]").length > 0 &&
               jQuery("input[name=<portlet:namespace />appraisal.rating]:checked",
@@ -312,6 +321,26 @@
         deleteEmptyAssessments();
 
         return true;
+      });
+
+      //Employee Results cannot be empty when submitting results
+      jQuery("#<portlet:namespace />submit-results").click(function(event) {
+          var emptyResults = areResultsEmpty();
+          if(emptyResults){
+              alert('<liferay-ui:message key="appraisal-employee-empty-results"/>');
+              event.isDefaultPrevented = true;
+              return false;
+          }
+      });
+
+      //Supervisor Results and Overall Evaluation cannot be empty when releasing appraisal
+      jQuery("#<portlet:namespace />release-appraisal").click(function(event) {
+          var emptyResults = areResultsEmpty();
+          if(emptyResults){
+              alert('<liferay-ui:message key="appraisal-supervisor-empty-results"/>');
+              event.isDefaultPrevented = true;
+              return false;
+          }
       });
 
 
@@ -479,8 +508,20 @@
        *
        * @return {Boolean}
        */
-      function areGoalsCheckboxesEmtpy() {
+      function areGoalsCheckboxesEmpty() {
           return jQuery(this).find('input:checkbox:checked').size() == 0;
+      }
+
+      /**
+      * Whether or not there is at least one empty result.
+      *
+      * @return {Boolean}
+      */
+      function areResultsEmpty() {
+          var isEmpty = jQuery('.lfr-textarea').filter(function(){
+              return jQuery.trim(this.value) == '';
+          });
+          return isEmpty.length > 0;
       }
 
       /**
@@ -518,7 +559,7 @@
           }
 
           var emptyGoals = areGoalsEmpty.call(this);
-          var emptyCheckboxes = areGoalsCheckboxesEmtpy.call(this);
+          var emptyCheckboxes = areGoalsCheckboxesEmpty.call(this);
 
           return !emptyGoals && !emptyCheckboxes;
         }).size();
@@ -537,7 +578,7 @@
           }
 
           var emptyGoals = areGoalsEmpty.call(this);
-          var emptyCheckboxes = areGoalsCheckboxesEmtpy.call(this);
+          var emptyCheckboxes = areGoalsCheckboxesEmpty.call(this);
 
           return (emptyGoals && !emptyCheckboxes) || (!emptyGoals && emptyCheckboxes);
         }).each(function(index, element) {
@@ -561,7 +602,7 @@
 
           // filter out assessments with empty goals and unchecked assessment criterias
           var emptyGoals = areGoalsEmpty.call(this);
-          var emptyCheckboxes = areGoalsCheckboxesEmtpy.call(this);
+          var emptyCheckboxes = areGoalsCheckboxesEmpty.call(this);
           return emptyGoals && emptyCheckboxes;
         }).each(function(index, element) {
           // delete the empty assessment so it won't be saved.
