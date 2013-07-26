@@ -41,12 +41,14 @@
     <liferay-ui:success key="appraisal-set-status-success" message="appraisal-set-status-success" />
 
     <ul class="actions">
-        <li><liferay-ui:icon
-            image="../document_library/pdf"
-            url="<%=renderResponse.encodeURL(downloadPDFURL.toString())%>"
-            label="true"
-            message="appraisal-download-pdf"
-        /></li>
+        <c:if test="${not empty displayDownloadPdf}">
+            <li><liferay-ui:icon
+                image="../document_library/pdf"
+                url="<%=renderResponse.encodeURL(downloadPDFURL.toString())%>"
+                label="true"
+                message="appraisal-download-pdf"
+            /></li>
+        </c:if>
         <c:if test="${not empty displayResendNolij}">
             <li><liferay-ui:icon
                 image="copy"

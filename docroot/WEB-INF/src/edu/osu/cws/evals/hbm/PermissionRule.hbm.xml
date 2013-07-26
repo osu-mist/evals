@@ -25,6 +25,10 @@
         <property name="requireModification" length="45" column="REQUIRE_MODIFICATION"/>
         <property name="submit" length="45" column="SUBMIT"/>
         <property name="actionRequired" length="45" column="ACTION_REQUIRED"/>
+        <property name="downloadPDF" length="1" column="DOWNLOAD_PDF"/>
+        <property name="closeOut" length="1" column="CLOSEOUT"/>
+        <property name="sendToNolij" length="1" column="SEND_TO_NOLIJ"/>
+        <property name="setStatusToResultsDue" length="1" column="SET_STATUS_TO_RESULTS_DUE"/>
     </class>
 
 </hibernate-mapping>
