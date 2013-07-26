@@ -516,7 +516,10 @@
       * @return {Boolean}
       */
       function areResultsEmpty() {
-          return jQuery('.lfr-textarea').filter("[value='']").length > 0;
+          var isEmpty = jQuery('.lfr-textarea').filter(function(){
+              return jQuery.trim(this.value) == '';
+          });
+          return isEmpty.length > 0;
       }
 
       /**
