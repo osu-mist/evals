@@ -558,10 +558,7 @@
             return false;
           }
 
-          var emptyGoals = areGoalsEmpty.call(this);
-          var emptyCheckboxes = areGoalsCheckboxesEmpty.call(this);
-
-          return !emptyGoals && !emptyCheckboxes;
+          return !areGoalsEmpty.call(this);
         }).size();
 
         // specify validation error of too low # of assessments
@@ -570,7 +567,7 @@
           return false;
         }
 
-        // validate each assessment to verify that we don't have non-empty goals with no criterias checked or vice-versa
+        // validate each assessment to verify that we don't have non-empty goals with no criteria checked or vice-versa
         var validGoals = true;
         jQuery('.appraisal-criteria fieldset>div').filter(function(index) {
           if (isAssessmentDeleted.call(this)) { // filter out deleted assessments
@@ -580,7 +577,7 @@
           var emptyGoals = areGoalsEmpty.call(this);
           var emptyCheckboxes = areGoalsCheckboxesEmpty.call(this);
 
-          return (emptyGoals && !emptyCheckboxes) || (!emptyGoals && emptyCheckboxes);
+          return !emptyGoals && emptyCheckboxes;
         }).each(function(index, element) {
           validGoals = false;
           // add error message
@@ -600,10 +597,8 @@
             return false;
           }
 
-          // filter out assessments with empty goals and unchecked assessment criterias
-          var emptyGoals = areGoalsEmpty.call(this);
-          var emptyCheckboxes = areGoalsCheckboxesEmpty.call(this);
-          return emptyGoals && emptyCheckboxes;
+          // filter out assessments with empty goals (ignore criteria checkboxes)
+          return areGoalsEmpty.call(this);
         }).each(function(index, element) {
           // delete the empty assessment so it won't be saved.
           var deleteLink = jQuery(element).find('.assessment-delete');
