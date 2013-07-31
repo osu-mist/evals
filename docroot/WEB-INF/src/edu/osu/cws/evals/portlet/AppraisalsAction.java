@@ -796,7 +796,8 @@ public class AppraisalsAction implements ActionInterface {
                                boolean  insertRecordIntoTable) throws Exception {
         // Create PDF
         String rootDir = actionHelper.getPortletContext().getRealPath("/");
-        String filename = EvalsPDF.createPDF(appraisal, permRule, dirName, resource, rootDir, env);
+        EvalsPDF PdfGenerator = new EvalsPDF(rootDir, appraisal, resource, dirName, env);
+        String filename = PdfGenerator.createPDF();
 
         // Insert a record into the nolij_copies table
         if (insertRecordIntoTable) {

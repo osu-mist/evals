@@ -24,14 +24,17 @@ public class EvalsPDFTest {
 
     @Test(expectedExceptions = {Exception.class})
     public void shouldFailWithInvalidEnvironment() throws Exception {
-        EvalsPDF.getFileName(appraisal, null, "invalid");
+        EvalsPDF PdfGenerator = new EvalsPDF("", appraisal, null, "", "invalid");
+        PdfGenerator.getFileName();
     }
 
     public void shouldUsePassAndEnvironmentInFilePrefix() throws Exception {
-        String filename = EvalsPDF.getFileName(appraisal, "", "prod");
+        EvalsPDF PdfGenerator1 = new EvalsPDF("", appraisal, null, "", "prod");
+        String filename = PdfGenerator1.getFileName();
         assert filename.contains("prod_evals-") : "Invalid file prefix: " + filename;
 
-        filename = EvalsPDF.getFileName(appraisal, "", "dev2");
+        EvalsPDF PdfGenerator2 = new EvalsPDF("", appraisal, null, "", "dev2");
+        filename = PdfGenerator2.getFileName();
         assert filename.contains("dev2_evals-") : "Invalid file prefix: " + filename;
     }
 
@@ -40,7 +43,8 @@ public class EvalsPDFTest {
         String expectedFilename;
 
         int fiscalYear = Calendar.getInstance().get(Calendar.YEAR);
-        filename = EvalsPDF.getFileName(appraisal, "/tmp/testo/", "prod");
+        EvalsPDF PdfGenerator = new EvalsPDF("", appraisal, null, "/tmp/testo/", "prod");
+        filename = PdfGenerator.getFileName();
         expectedFilename = "/tmp/testo/prod_evals-1234_" + fiscalYear + "_C555-.pdf";
         assert filename.equals(expectedFilename);
 
