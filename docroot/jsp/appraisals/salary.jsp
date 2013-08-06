@@ -56,9 +56,9 @@
         // Only make the increase textarea editable when the evaluation is editable.
         <c:if test="${permissionRule.evaluation == 'e'}">
             resetRecommendedIncrease(resetSalaryValue);
-            // set the salary increase so the salary table gets populated correctly.
-            setSalaryIncrease();
         </c:if>
+        // set the salary increase so the salary table gets populated correctly.
+        setSalaryIncrease();
 
         /**
          * Resets the recommended increase value, by enabling or disabling the textbox depending
