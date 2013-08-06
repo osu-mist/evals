@@ -259,7 +259,7 @@
         return true;
       });
 
-      // Handle validation of rating
+      // Handles validation
       jQuery("#<portlet:namespace />submit-appraisal").click(function(event) {
 
         //Supervisor Results and Overall Evaluation cannot be empty when submitting appraisal
@@ -298,7 +298,7 @@
 
             //@todo: add erors to the top and scroll to it.
       // Handle validation of assessments' goals
-      jQuery("#<portlet:namespace />submit-goals").click(function(event) {
+      jQuery("#<portlet:namespace />submit-goals, #<portlet:namespace />approve-goals").click(function(event) {
          // remove any previous goal errors
         jQuery('.appraisal-criteria fieldset>div').each(function(index, element) {
           removeJSError.call(element);
