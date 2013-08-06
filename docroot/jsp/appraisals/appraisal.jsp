@@ -318,7 +318,10 @@
         }
 
         // remove empty assessments because it's much easier to do it via js than in java
-        deleteEmptyAssessments();
+        if (<portlet:namespace/>confirmBox('Submit Goals') || <portlet:namespace/>confirmBox('Approve Goals')) {
+            deleteEmptyAssessments();
+            window.removedEmpty = true;
+        }
 
         return true;
       });

@@ -27,12 +27,19 @@
     jQuery(document).ready(function() {
         // Handle submit buttons that need confirmation
         jQuery("input.evals-show-confirm").click(function(event) {
+            var buttonText = jQuery(this).val();
+            // for submit goals and approve goals, returns true after removing empty goals
+            if (buttonText == 'Submit Goals' || buttonText == 'Approve Goals') {
+                if (window.removedEmpty) {
+                    return true;
+                }
+                return false;
+            }
             // if a previous js action aborted the click, don't show the confirm box
             if (event.isDefaultPrevented != undefined && event.isDefaultPrevented == true) {
                 return false;
             }
 
-            var buttonText = jQuery(this).val();
             return <portlet:namespace/>confirmBox(buttonText);
         });
 
