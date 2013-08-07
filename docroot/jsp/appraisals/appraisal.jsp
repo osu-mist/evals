@@ -283,7 +283,6 @@
             if(jQuery(".osu-cws input.recommended-salary").val() == ''){
                 alert('<liferay-ui:message key="appraisal-salary-increase-required"/>');
                 event.isDefaultPrevented = true;
-                return false;
             }
             var increaseValidationError = validateIncrease();
             if (validateIncrease() != '') {
