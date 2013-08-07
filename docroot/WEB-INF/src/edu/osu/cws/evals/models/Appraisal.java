@@ -1032,7 +1032,7 @@ public class Appraisal extends Evals {
         if (EvalsUtil.isDue(this, goalsDueConfig) <= 0) { //goals due or overdue
             System.out.println(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION + ", goals overdue");
             //goals is due or overdue.  Is goalsRequiredModification overdue?
-            Configuration modConfig = configMap.get("goalsRequiredModificationDue");
+            Configuration modConfig = configMap.get("goalsRequiredModification");
 
             if (EvalsUtil.isDue(this, modConfig) < 0) {  // requiredModification is over due.
                 return true;
