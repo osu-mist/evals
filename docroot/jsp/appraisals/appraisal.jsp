@@ -277,7 +277,6 @@
           errors = "<li><%= bundle.getString("appraisal-ratingRequired") %></li>";
           alert("<%= bundle.getString("appraisal-ratingRequired") %>");
           event.isDefaultPrevented = true;
-          return false;
         }
 
         // add validation specific to salary increase for IT
