@@ -406,7 +406,7 @@
        */
       function assessmentDelete() {
         // Verify that the user wants to delete the assessment
-        var response = confirm('<liferay-ui:message key="appraisal-assessment-delete-confirm"/>');
+        var response = confirm("<liferay-ui:message key="appraisal-assessment-delete-confirm"/>");
         if (response) {
           setGoalDeleteFlag.call(this);
         }
