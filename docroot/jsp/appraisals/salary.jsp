@@ -138,6 +138,7 @@
             var increaseValidationError = validateIncrease();
             if (increaseValidationError != '') {
                 alert(increaseValidationError); // display error message
+                jQuery(".osu-cws input.recommended-salary").val('');
                 return false;
             }
 
