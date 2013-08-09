@@ -172,7 +172,6 @@ public class AppraisalsAction implements ActionInterface {
         boolean isSupervisor = !isReviewer && actionHelper.isLoggedInUserSupervisor();
 
         if (!isAdmin && !isReviewer && !isSupervisor)  {
-            ((ActionResponse) response).setWindowState(WindowState.NORMAL);
             return errorHandler.handleAccessDenied(request, response);
         }
 
