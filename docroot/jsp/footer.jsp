@@ -30,8 +30,8 @@
             var buttonText = jQuery(this).val();
             // for submit goals and approve goals, returns true after removing empty goals
             if (buttonText == 'Submit Goals' || buttonText == 'Approve Goals') {
-                if (window.removedEmpty) {
-                    return true;
+                if (window.readyToSubmit) {
+                    return <portlet:namespace/>confirmBox(buttonText);
                 }
                 return false;
             }

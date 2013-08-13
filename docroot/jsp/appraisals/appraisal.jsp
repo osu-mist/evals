@@ -298,14 +298,15 @@
 
             //@todo: add erors to the top and scroll to it.
       // Handle validation of assessments' goals
-      jQuery("#<portlet:namespace />submit-goals").click(function(event) {
+      jQuery("#<portlet:namespace />submit-goals, #<portlet:namespace />approve-goals").click(function(event) {
          // remove any previous goal errors
         jQuery('.appraisal-criteria fieldset>div').each(function(index, element) {
           removeJSError.call(element);
         })
 
         if (!validateGoals()) {
-          //set property so that we can check in other handlers if we can abort
+          window.readyToSubmit = false;
+            //set property so that we can check in other handlers if we can abort
           event.isDefaultPrevented = true;
 
           // set error message at the top and scroll to the top of eval form
@@ -318,10 +319,8 @@
         }
 
         // remove empty assessments because it's much easier to do it via js than in java
-        if (<portlet:namespace/>confirmBox('Submit Goals') || <portlet:namespace/>confirmBox('Approve Goals')) {
-            deleteEmptyAssessments();
-            window.removedEmpty = true;
-        }
+        deleteEmptyAssessments();
+        window.readyToSubmit = true;
 
         return true;
       });
