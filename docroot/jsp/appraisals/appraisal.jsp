@@ -310,7 +310,8 @@
         })
 
         if (!validateGoals()) {
-          //set property so that we can check in other handlers if we can abort
+          window.readyToSubmit = false;
+            //set property so that we can check in other handlers if we can abort
           event.isDefaultPrevented = true;
 
           // set error message at the top and scroll to the top of eval form
@@ -324,6 +325,7 @@
 
         // remove empty assessments because it's much easier to do it via js than in java
         deleteEmptyAssessments();
+        window.readyToSubmit = true;
 
         return true;
       });
