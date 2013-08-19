@@ -15,6 +15,11 @@
         <property name="approverPidm" type="int" column="APPROVER_PIDM"/>
         <property name="createDate" type="date" column="CREATE_DATE"/>
         <property name="approvedDate" type="date" column="APPROVED_DATE"/>
+        <property name="requestApproved" type="boolean" column="REQUEST_APPROVED"/>
+        <property name="decisionPidm" type="int" column="DECISION_PIDM"/>
+        <property name="timedOutAt" type="string" column="TIMED_OUT_AT"/>
+
+
 
         <many-to-one name="appraisal" class="edu.osu.cws.evals.models.Appraisal"
                      column="APPRAISAL_ID"
