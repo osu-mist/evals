@@ -743,7 +743,7 @@ public class EvalsPDF {
         GoalVersion currentGoalVersion = appraisal.getCurrentGoalVersion();
         List<Assessment> sortedAssessments = currentGoalVersion.getSortedAssessments();
 
-        boolean displayGoals = StringUtils.containsAny(permRule.getGoals(), "ev");
+        boolean displayGoals = StringUtils.containsAny(permRule.getApprovedGoals(), "ev");
         boolean displayEmployeeResults = StringUtils.containsAny(permRule.getResults(), "ev");
         boolean displaySupervisorResults = StringUtils.containsAny(permRule.getSupervisorResults(), "ev");
 

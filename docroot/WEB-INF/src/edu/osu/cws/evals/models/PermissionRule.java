@@ -7,9 +7,9 @@ public class PermissionRule extends Evals implements Cloneable {
 
     private String role;
 
-    private String goals;
+    private String approvedGoals;
 
-    private String newGoals;
+    private String unapprovedGoals;
 
     private String goalComments;
 
@@ -27,7 +27,7 @@ public class PermissionRule extends Evals implements Cloneable {
 
     private String saveDraft;
 
-    private String requireModification;
+    private String secondarySubmit;
 
     private String submit;
 
@@ -40,6 +40,8 @@ public class PermissionRule extends Evals implements Cloneable {
     private String sendToNolij;
 
     private String setStatusToResultsDue;
+
+    private String reactivateGoals;
 
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
@@ -71,20 +73,20 @@ public class PermissionRule extends Evals implements Cloneable {
         this.role = role;
     }
 
-    public String getGoals() {
-        return goals;
+    public String getApprovedGoals() {
+        return approvedGoals;
     }
 
-    public void setGoals(String goals) {
-        this.goals = goals;
+    public void setApprovedGoals(String approvedGoals) {
+        this.approvedGoals = approvedGoals;
     }
 
-    public String getNewGoals() {
-        return newGoals;
+    public String getUnapprovedGoals() {
+        return unapprovedGoals;
     }
 
-    public void setNewGoals(String newGoals) {
-        this.newGoals = newGoals;
+    public void setUnapprovedGoals(String unapprovedGoals) {
+        this.unapprovedGoals = unapprovedGoals;
     }
 
     public String getGoalComments() {
@@ -151,12 +153,12 @@ public class PermissionRule extends Evals implements Cloneable {
         this.employeeResponse = employeeResponse;
     }
 
-    public String getRequireModification() {
-        return requireModification;
+    public String getSecondarySubmit() {
+        return secondarySubmit;
     }
 
-    public void setRequireModification(String requireModification) {
-        this.requireModification = requireModification;
+    public void setSecondarySubmit(String secondarySubmit) {
+        this.secondarySubmit = secondarySubmit;
     }
 
     public String getSubmit() {
@@ -205,5 +207,13 @@ public class PermissionRule extends Evals implements Cloneable {
 
     public void setSetStatusToResultsDue(String setStatusToResultsDue) {
         this.setStatusToResultsDue = setStatusToResultsDue;
+    }
+
+    public String getReactivateGoals() {
+        return reactivateGoals;
+    }
+
+    public void setReactivateGoals(String reactivateGoals) {
+        this.reactivateGoals = reactivateGoals;
     }
 }

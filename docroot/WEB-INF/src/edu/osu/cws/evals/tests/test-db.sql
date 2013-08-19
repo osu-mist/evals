@@ -195,7 +195,7 @@ CREATE TABLE `goals_logs` (
   `ASSESSMENT_ID` int(11) NOT NULL,
   `AUTHOR_PIDM` int(11) NOT NULL,
   `CREATE_DATE` datetime NOT NULL,
-  `TYPE` varchar(45) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'default to null, which will be for normal goals. the value is new for new goals, used for goalsReactivated.',
+  `TYPE` varchar(45) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'default to null, which will be for normal approvedGoals. the value is new for new approvedGoals, used for goalsReactivated.',
   PRIMARY KEY (`ID`),
   KEY `assessmentID` (`ASSESSMENT_ID`),
   KEY `authorPidm` (`AUTHOR_PIDM`)
@@ -265,7 +265,7 @@ CREATE TABLE `permission_rules` (
   PRIMARY KEY (`ID`),
   KEY `status` (`STATUS`),
   KEY `submit` (`SUBMIT`),
-  KEY `requireModification` (`REQUIRE_MODIFICATION`),
+  KEY `secondarySubmit` (`REQUIRE_MODIFICATION`),
   KEY `saveDraft` (`SAVE_DRAFT`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3 ;
 CREATE TABLE `pyvpase` (

@@ -12,8 +12,8 @@
 
         <property name="status" length="32" column="STATUS"/>
         <property name="role" length="45" column="ROLE"/>
-        <property name="goals" length="1" column="GOALS"/>
-        <property name="newGoals" length="1" column="NEW_GOALS"/>
+        <property name="approvedGoals" length="1" column="APPROVED_GOALS"/>
+        <property name="unapprovedGoals" length="1" column="UNAPPROVED_GOALS"/>
         <property name="goalComments" length="1" column="GOAL_COMMENTS"/>
         <property name="results" length="1" column="RESULTS"/>
         <property name="supervisorResults" length="1" column="SUPERVISOR_RESULTS"/>
@@ -22,13 +22,14 @@
         <property name="employeeResponse" length="1" column="EMPLOYEE_RESPONSE"/>
         <property name="rebuttalRead" length="1" column="REBUTTAL_READ"/>
         <property name="saveDraft" length="45" column="SAVE_DRAFT"/>
-        <property name="requireModification" length="45" column="REQUIRE_MODIFICATION"/>
+        <property name="secondarySubmit" length="45" column="SECONDARY_SUBMIT"/>
         <property name="submit" length="45" column="SUBMIT"/>
         <property name="actionRequired" length="45" column="ACTION_REQUIRED"/>
         <property name="downloadPDF" length="1" column="DOWNLOAD_PDF"/>
         <property name="closeOut" length="1" column="CLOSEOUT"/>
         <property name="sendToNolij" length="1" column="SEND_TO_NOLIJ"/>
         <property name="setStatusToResultsDue" length="1" column="SET_STATUS_TO_RESULTS_DUE"/>
+        <property name="reactivateGoals" length="1" column="REACTIVATE_GOALS"/>
     </class>
 
 </hibernate-mapping>

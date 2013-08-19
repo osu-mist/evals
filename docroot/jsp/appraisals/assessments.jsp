@@ -8,7 +8,7 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 <div class="appraisal-assessment-${assessment.id}">
 <h3 class="secret"><liferay-ui:message key="appraisal-assessment-header"/>${loopStatus.index + 1}</h3>
 
-<c:if test="${permissionRule.goals == 'e'}">
+<c:if test="${permissionRule.approvedGoals == 'e'}">
     <a class="delete img-txt assessment-delete delete.id.${assessment.id}"
        title="<liferay-ui:message key="appraisal-assessment-delete"/>"
        href="#"><liferay-ui:message key="appraisal-assessment-delete"/></a>
@@ -18,17 +18,17 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
 <input type="hidden" class="appraisal-assessment-deleted-${assessment.id}" name="<portlet:namespace />appraisal.assessment.deleted.${assessment.id}"
        value="0"/>
 <c:choose>
-    <c:when test="${permissionRule.goals == 'e'}">
+    <c:when test="${permissionRule.approvedGoals == 'e'}">
         <label for="<portlet:namespace />appraisal.goal.${assessment.id}"><liferay-ui:message key="appraisal-goals" />
             ${loopStatus.index + 1}</label>
         <div><liferay-ui:input-textarea param="appraisal.goal.${assessment.id}"
             defaultValue="${assessment.goal}" /></div>
     </c:when>
-    <c:when test="${permissionRule.goals == 'v'}">
+    <c:when test="${permissionRule.approvedGoals == 'v'}">
         <fieldset>
             <legend><span><liferay-ui:message key="appraisal-goals" />${loopStatus.index + 1}</span></legend>
             <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAssessment.getGoal()) %></p>
-            <c:if test="${permissionRule.goals == 'v'}">
+            <c:if test="${permissionRule.approvedGoals == 'v'}">
                     <c:forEach var="assessmentCriteria" items="${assessment.sortedAssessmentCriteria}" varStatus="loopStatus2">
                         <%@ include file="/jsp/appraisals/assessmentCriteria.jsp"%>
                     </c:forEach>
@@ -37,7 +37,7 @@ Assessment formAssessment = (Assessment) pageContext.getAttribute("assessment");
     </c:when>
 </c:choose>
 
-<c:if test="${permissionRule.goals == 'e'}">
+<c:if test="${permissionRule.approvedGoals == 'e'}">
     <div class="assessment-criteria">
         <c:forEach var="assessmentCriteria" items="${assessment.sortedAssessmentCriteria}" varStatus="loopStatus2">
             <%@ include file="/jsp/appraisals/assessmentCriteria.jsp"%>
