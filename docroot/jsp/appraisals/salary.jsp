@@ -34,7 +34,7 @@
                 <td><input type="text" id="<portlet:namespace />appraisal.salary.increase"
                            name="<portlet:namespace />appraisal.salary.increase"
                            value="<c:out value="${appraisal.salary.increase}"/>"
-                           class="recommended-salary" disabled="" readonly=""/>
+                           class="recommended-salary" disabled="" readonly="" maxlength="3"/>
                     <span class="recommended-salary-hint"></span>
                 </td>
                 <td class="salary-after-increase"></td>
@@ -134,17 +134,20 @@
             setSalaryIncrease();
         });
 
-        jQuery(".osu-cws input.recommended-salary").change(function() {
-            var increaseValidationError = validateIncrease();
-            if (increaseValidationError != '') {
-                alert(increaseValidationError); // display error message
-                jQuery(".osu-cws input.recommended-salary").val('');
-                return false;
-            }
+        jQuery(".osu-cws input.recommended-salary").keyup(function(event) {
+            //if the key pressed is not ENTER, update the salary
+            if (event.keyCode != 13){
+                var increaseValidationError = validateIncrease();
+                if (increaseValidationError != '') {
+                    alert(increaseValidationError); // display error message
+                    jQuery(".osu-cws input.recommended-salary").val('');
+                    return false;
+                }
 
-            // If the increase is valid, update the salary after increase
-            setSalaryIncrease();
-            return true;
+                // If the increase is valid, update the salary after increase
+                setSalaryIncrease();
+                return true;
+            }
         });
     });
 
