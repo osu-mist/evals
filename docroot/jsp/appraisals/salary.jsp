@@ -134,21 +134,20 @@
             setSalaryIncrease();
         });
 
-        jQuery(".osu-cws input.recommended-salary").keyup(function(event) {
-            //if the key pressed is not ENTER, update the salary
-            if (event.keyCode != 13){
-                var increaseValidationError = validateIncrease();
-                if (increaseValidationError != '') {
-                    alert(increaseValidationError); // display error message
-                    jQuery(".osu-cws input.recommended-salary").val('');
-                    return false;
-                }
-
-                // If the increase is valid, update the salary after increase
-                setSalaryIncrease();
-                return true;
-            }
+        jQuery(".osu-cws input.recommended-salary").keyup(function() {
+            setSalaryIncrease();
         });
+
+        jQuery(".osu-cws input.recommended-salary").change(function() {
+            var increaseValidationError = validateIncrease();
+            if (increaseValidationError != '') {
+                alert(increaseValidationError); // display error message
+                jQuery(".osu-cws input.recommended-salary").val('');
+                return false;
+            }
+            return true;
+        });
+
     });
 
     /**
