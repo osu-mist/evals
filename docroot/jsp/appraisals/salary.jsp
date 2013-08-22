@@ -46,6 +46,14 @@
 
 <script type="text/javascript">
     jQuery(document).ready(function() {
+        //Bind this keypress function to all of the input tags
+        jQuery('html').keypress(function (event) {
+        //Deterime where our character code is coming from within the event
+            var charCode = event.charCode || event.keyCode;
+            if (charCode  == 13) { //Enter key's keycode
+                return false;
+            }
+        });
         // if a salary increase is present in db, we want to only reset the html properties
         var resetSalaryValue = true;
         // if no salary is saved in db, we want to reset the html and value as well.
@@ -143,6 +151,7 @@
             if (increaseValidationError != '') {
                 alert(increaseValidationError); // display error message
                 jQuery(".osu-cws input.recommended-salary").val('');
+                setSalaryIncrease();
                 return false;
             }
             return true;
