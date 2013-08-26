@@ -13,6 +13,12 @@ public class GoalVersion {
 
     private Date approvedDate;
 
+    private Boolean requestApproved;
+
+    private Integer decisionPidm;
+
+    private String timedOutAt;
+
     private Set<Assessment> assessments = new HashSet<Assessment>();
 
     public GoalVersion() {}
@@ -55,6 +61,30 @@ public class GoalVersion {
 
     public void setApprovedDate(Date approvedDate) {
         this.approvedDate = approvedDate;
+    }
+
+    public Boolean getRequestApproved() {
+        return requestApproved;
+    }
+
+    public void setRequestApproved(Boolean requestApproved) {
+        this.requestApproved = requestApproved;
+    }
+
+    public Integer getDecisionPidm() {
+        return decisionPidm;
+    }
+
+    public void setDecisionPidm(Integer decisionPidm) {
+        this.decisionPidm = decisionPidm;
+    }
+
+    public String getTimedOutAt() {
+        return timedOutAt;
+    }
+
+    public void setTimedOutAt(String timedOutAt) {
+        this.timedOutAt = timedOutAt;
     }
 
     public Set<Assessment> getAssessments() {

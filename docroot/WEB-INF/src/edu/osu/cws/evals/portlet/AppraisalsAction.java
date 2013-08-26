@@ -465,7 +465,7 @@ public class AppraisalsAction implements ActionInterface {
         String parameterKey = "";
 
         // Save Goals
-        if (permRule.getGoals() != null && permRule.getGoals().equals("e")) {
+        if (permRule.getApprovedGoals() != null && permRule.getApprovedGoals().equals("e")) {
             updateGoals(requestMap);
 
         }
@@ -765,8 +765,8 @@ public class AppraisalsAction implements ActionInterface {
         if (permRule.getSaveDraft() != null) {
             appraisalButtons.add(permRule.getSaveDraft());
         }
-        if (permRule.getRequireModification() != null) {
-            appraisalButtons.add(permRule.getRequireModification());
+        if (permRule.getSecondarySubmit() != null) {
+            appraisalButtons.add(permRule.getSecondarySubmit());
         }
         if (permRule.getSubmit() != null) {
             appraisalButtons.add(permRule.getSubmit());

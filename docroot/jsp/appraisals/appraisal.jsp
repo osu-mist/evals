@@ -5,7 +5,7 @@
 <jsp:useBean id="appraisal" class="edu.osu.cws.evals.models.Appraisal" scope="request" />
 <jsp:useBean id="permissionRule" class="edu.osu.cws.evals.models.PermissionRule" scope="request" />
 <c:set var="showForm" scope="request"
-       value="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}"/>
+       value="${not empty permissionRule.saveDraft || not empty permissionRule.secondarySubmit || not empty permissionRule.submit}"/>
 <portlet:resourceURL var="downloadPDFURL" id="downloadPDF" escapeXml="false">
     <portlet:param name="id" value="${appraisal.id}"/>
     <portlet:param name="controller" value="AppraisalsAction"/>
@@ -95,7 +95,7 @@
     </c:if>
 
     <div class="appraisal-criteria">
-        <c:if test="${permissionRule.goals == 'e' || permissionRule.goals == 'v'}">
+        <c:if test="${permissionRule.approvedGoals == 'e' || permissionRule.approvedGoals == 'v'}">
             <fieldset>
                 <legend><liferay-ui:message key="appraisal-details"/></legend>
                 <c:forEach var="assessment" items="${appraisal.currentGoalVersion.sortedAssessments}" varStatus="loopStatus">
@@ -105,7 +105,7 @@
         </c:if>
     </div>
 
-    <c:if test="${permissionRule.goals == 'e'}">
+    <c:if test="${permissionRule.approvedGoals == 'e'}">
         <ul class="ul-h-nav">
             <li><a href="#" class="img-txt add" id="addAssessment">
                 <liferay-ui:message key="appraisal-assessment-add"/></a>
@@ -217,9 +217,9 @@
         <input name="${permissionRule.saveDraft}" type="submit" value="<liferay-ui:message key="${permissionRule.saveDraft}" />">
         </c:if>
 
-        <c:if test="${not empty permissionRule.requireModification}">
-        <input name="${permissionRule.requireModification}" class="evals-show-confirm"
-               type="submit" value="<liferay-ui:message key="${permissionRule.requireModification}" />">
+        <c:if test="${not empty permissionRule.secondarySubmit}">
+        <input name="${permissionRule.secondarySubmit}" class="evals-show-confirm"
+               type="submit" value="<liferay-ui:message key="${permissionRule.secondarySubmit}" />">
         </c:if>
 
         <c:if test="${not empty permissionRule.submit}">
@@ -228,7 +228,7 @@
         value="<liferay-ui:message key="${permissionRule.submit}" />">
         </c:if>
 
-        <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}">
+        <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.secondarySubmit || not empty permissionRule.submit}">
         </form>
     </div><!-- end pass-actions-->
 
