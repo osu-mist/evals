@@ -46,14 +46,6 @@
 
 <script type="text/javascript">
     jQuery(document).ready(function() {
-        //Bind this keypress function to all of the input tags
-        jQuery('html').keypress(function (event) {
-        //Deterime where our character code is coming from within the event
-            var charCode = event.charCode || event.keyCode;
-            if (charCode  == 13) { //Enter key's keycode
-                return false;
-            }
-        });
         // if a salary increase is present in db, we want to only reset the html properties
         var resetSalaryValue = true;
         // if no salary is saved in db, we want to reset the html and value as well.
@@ -118,6 +110,9 @@
         function getSalaryAfterIncrease() {
             // calculate salary after increase
             var increasePercentage = jQuery(".osu-cws input.recommended-salary").val();
+            if (!(increasePercentage >= 0 && increasePercentage <= 999)) {
+                increasePercentage = 0;
+            }
             var salaryAfterIncrease = ${appraisal.salary.current} * (1 + increasePercentage / 100);
             salaryAfterIncrease = salaryAfterIncrease.toFixed(2); // round to 2 decimals
 
