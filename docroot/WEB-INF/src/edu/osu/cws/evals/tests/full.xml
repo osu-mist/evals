@@ -4,8 +4,8 @@
   <admins ID="2" EMPLOYEE_PIDM="12467" IS_MASTER="false" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0"/>
   <admins ID="3" EMPLOYEE_PIDM="8712359" IS_MASTER="true" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0"/>
   <appointment_types NAME="Classified"/>
-  <appraisal_steps ID="1" ACTION="submit" APPOINTMENT_TYPE="Classified" NEW_STATUS="goalsApprovalDue" EMAIL_TYPE="approvedGoals-submitted"/>
-  <appraisal_steps ID="2" ACTION="require-modification" APPOINTMENT_TYPE="Classified" NEW_STATUS="goalsRequiredModification" EMAIL_TYPE="approvedGoals-require-modification"/>
+  <appraisal_steps ID="1" ACTION="submit" APPOINTMENT_TYPE="Classified" NEW_STATUS="goalsApprovalDue" EMAIL_TYPE="goals-submitted"/>
+  <appraisal_steps ID="2" ACTION="require-modification" APPOINTMENT_TYPE="Classified" NEW_STATUS="goalsRequiredModification" EMAIL_TYPE="goals-require-modification"/>
   <appraisals ID="1"
               START_DATE="2011-05-14"
               END_DATE="2012-05-14"
