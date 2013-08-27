@@ -34,7 +34,7 @@
                 <td><input type="text" id="<portlet:namespace />appraisal.salary.increase"
                            name="<portlet:namespace />appraisal.salary.increase"
                            value="<c:out value="${appraisal.salary.increase}"/>"
-                           class="recommended-salary" disabled="" readonly=""/>
+                           class="recommended-salary" disabled="" readonly="" maxlength="3"/>
                     <span class="recommended-salary-hint"></span>
                 </td>
                 <td class="salary-after-increase"></td>
@@ -110,6 +110,9 @@
         function getSalaryAfterIncrease() {
             // calculate salary after increase
             var increasePercentage = jQuery(".osu-cws input.recommended-salary").val();
+            if (!(increasePercentage >= 0 && increasePercentage <= 999)) {
+                increasePercentage = 0;
+            }
             var salaryAfterIncrease = ${appraisal.salary.current} * (1 + increasePercentage / 100);
             salaryAfterIncrease = salaryAfterIncrease.toFixed(2); // round to 2 decimals
 
@@ -134,18 +137,21 @@
             setSalaryIncrease();
         });
 
+        jQuery(".osu-cws input.recommended-salary").keyup(function() {
+            setSalaryIncrease();
+        });
+
         jQuery(".osu-cws input.recommended-salary").change(function() {
             var increaseValidationError = validateIncrease();
             if (increaseValidationError != '') {
                 alert(increaseValidationError); // display error message
                 jQuery(".osu-cws input.recommended-salary").val('');
+                setSalaryIncrease();
                 return false;
             }
-
-            // If the increase is valid, update the salary after increase
-            setSalaryIncrease();
             return true;
         });
+
     });
 
     /**

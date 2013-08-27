@@ -732,7 +732,7 @@ public class AppraisalsAction implements ActionInterface {
 
         Salary salary = appraisal.getSalary();
         Double increaseValue = 0d;
-        if (appraisal.getRating() == 1) {
+        if (appraisal.getRating() == 1 && request.getParameter("save-draft") == null) {
             // can only specify an increase if the salary is not at the top pay range
             if (salary.getCurrent() < salary.getHigh()) {
                 Double submittedIncrease = Double.parseDouble(requestMap.get("appraisal.salary.increase")[0]);
