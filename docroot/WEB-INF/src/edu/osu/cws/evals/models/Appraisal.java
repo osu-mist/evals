@@ -926,16 +926,14 @@ public class Appraisal extends Evals {
      * and approvedDate equals null
      * return null is there isn't an unapproved goals version
      */
-    public List getUnapprovedGoalsVersions() {
-        List<GoalVersion> unApprovedGoalsVersions = new ArrayList<GoalVersion>();
+    public GoalVersion getUnapprovedGoalsVersion() {
         for (GoalVersion goalVersion : goalVersions) {
             if (goalVersion.isUnapproved()) {
-                unApprovedGoalsVersions.add(goalVersion);
+                return goalVersion;
             }
         }
 
-        Collections.sort(unApprovedGoalsVersions);
-        return unApprovedGoalsVersions;
+        return null;
     }
 
     /**

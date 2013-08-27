@@ -564,26 +564,11 @@ public class AppraisalsTest {
         GoalVersion goalVersion1 = new GoalVersion();
         goalVersion1.setId(1);
         goalVersion1.setCreateDate(new Date());
-        goalVersion1.setRequestApproved(true);
-
-        GoalVersion goalVersion2 = new GoalVersion();
-        goalVersion2.setId(2);
-        goalVersion2.setCreateDate(new DateTime().minusDays(1).toDate());
-        goalVersion2.setRequestApproved(true);
-
-        GoalVersion goalVersion3 = new GoalVersion();
-        goalVersion3.setId(3);
-        goalVersion3.setCreateDate(new DateTime().minusDays(2).toDate());
-        goalVersion3.setRequestApproved(true);
-
+        goalVersion1.setRequestApproved(false);
         appraisal.addGoalVersion(goalVersion1);
-        appraisal.addGoalVersion(goalVersion2);
-        appraisal.addGoalVersion(goalVersion3);
 
-        List<GoalVersion> goalVersions= appraisal.getUnapprovedGoalsVersions();
-        assert goalVersions.get(0).getId() == 1;
-        assert goalVersions.get(1).getId() == 2;
-        assert goalVersions.get(2).getId() == 3;
+        GoalVersion goalVersion = appraisal.getUnapprovedGoalsVersion();
+        assert goalVersion == null;
     }
 
     public void shouldReturnOnlyUnapprovedGoals() {
@@ -601,8 +586,7 @@ public class AppraisalsTest {
         appraisal.addGoalVersion(goalVersion1);
         appraisal.addGoalVersion(goalVersion2);
 
-        List<GoalVersion> goalVersions= appraisal.getUnapprovedGoalsVersions();
-        assert goalVersions.size() == 1;
-        assert goalVersions.get(0).getId() == 1;
+        GoalVersion goalVersions= appraisal.getUnapprovedGoalsVersion();
+        assert  goalVersions.getId() == 1;
     }
 }
