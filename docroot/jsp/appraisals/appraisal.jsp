@@ -25,6 +25,12 @@
     <portlet:param name="action" value="setStatusToResultsDue"/>
     <portlet:param name="controller" value="AppraisalsAction"/>
 </portlet:actionURL>
+<portlet:actionURL var="requestGoalsReactivation" escapeXml="false">
+    <portlet:param name="id" value="${appraisal.id}"/>
+    <portlet:param name="action" value="requestGoalsReactivation"/>
+    <portlet:param name="controller" value="AppraisalsAction"/>
+</portlet:actionURL>
+
 
 <div id="pass-appraisal-form" class="osu-cws">
 
@@ -74,6 +80,14 @@
                 message="appraisal-move-to-results-due"
                 cssClass="evals-show-confirm"
                 toolTip="appraisal-move-to-results-due"
+            /></li>
+        </c:if>
+        <c:if test="${not empty displayReactivateGoals}">
+            <li><liferay-ui:icon
+                image="copy"
+                url="<%=renderResponse.encodeURL(requestGoalsReactivation.toString())%>"
+                label="true"
+                message="reactivate-goals"
             /></li>
         </c:if>
     </ul>
