@@ -902,6 +902,43 @@ public class Appraisal extends Evals {
     }
 
     /**
+     * Walked through GoalsVersions and pick the ones that are approved
+     * and sort them by approvedDate desc.
+     * An approved goalsVersion is a goalsVersion whose approvedDate is not null.
+     * When none, return an empty list.
+     * @return
+     */
+    public List getApprovedGoalsVersions() {
+        List<GoalVersion> approvedGoalsVersions = new ArrayList<GoalVersion>();
+        for (GoalVersion goalVersion : goalVersions) {
+            if (goalVersion.isApproved()) {
+                approvedGoalsVersions.add(goalVersion);
+            }
+        }
+
+        Collections.sort(approvedGoalsVersions);
+        return approvedGoalsVersions;
+    }
+
+    /**
+     * Walked through goalsVersions to see if there is an unapproved goals version
+     * An unapproved goalsVersion is a goalsVersion with a requestApproved = 1
+     * and approvedDate equals null
+     * return null is there isn't an unapproved goals version
+     */
+    public List getUnapprovedGoalsVersions() {
+        List<GoalVersion> unApprovedGoalsVersions = new ArrayList<GoalVersion>();
+        for (GoalVersion goalVersion : goalVersions) {
+            if (goalVersion.isUnapproved()) {
+                unApprovedGoalsVersions.add(goalVersion);
+            }
+        }
+
+        Collections.sort(unApprovedGoalsVersions);
+        return unApprovedGoalsVersions;
+    }
+
+    /**
      * Loads lazy associations
      */
     public void loadLazyAssociations() {
