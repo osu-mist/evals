@@ -246,6 +246,11 @@ public class AppraisalsAction implements ActionInterface {
                 actionHelper.addToRequestMap("displaySetAppraisalStatus", true);
             }
         }
+
+        if(permRule.getReactivateGoals() != null){
+            actionHelper.addToRequestMap("displayReactivateGoals", true);
+        }
+
         if(permRule.getDownloadPDF() != null){
             actionHelper.addToRequestMap("displayDownloadPdf", true);
         }
