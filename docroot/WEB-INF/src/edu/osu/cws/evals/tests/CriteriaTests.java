@@ -301,58 +301,6 @@ public class CriteriaTests {
     }
 
     /**
-     * Tests that when only the criteria description is modified in the edit action,
-     * it creates one pojo for the description
-     * @throws Exception
-     */
-    @Test(groups = {"unittest"})
-    public void editPropagateShouldOnlyPropagateOnOpenAppraisals() throws Exception {
-        Map<String, String[]> request = new HashMap<String, String[]>();
-        String newCriterionName = "COMMUNICATION SKILLS";
-        request.put("name", new String[] {newCriterionName});
-        request.put("criterionAreaId", new String[] {"1"});
-        String newDescription = "New Value for Criteria Description";
-        request.put("description", new String[] {newDescription});
-        request.put("propagateEdit", new String[] {"1"});
-
-        int id = 1;
-        Employee employee = EmployeeMgr.findByOnid("cedenoj", null);
-        CriterionArea criterionArea =  CriteriaMgr.get(id);
-
-        // grab old ids and properties to compare
-        int oldCriterionAreaID = criterionArea.getId();
-
-        CriteriaMgr.edit(request, id, employee);
-
-        // Double check that the deleted properties were set on pojo
-        criterionArea =  CriteriaMgr.get(id);
-        assert criterionArea.getDeleteDate() != null : "Should have set deletedDate in old pojo";
-        assert criterionArea.getDeleter() != null : "Should have set deleter in old pojo";
-
-        Session session = HibernateUtil.getCurrentSession();
-        criterionArea = (CriterionArea) session.
-                createQuery("from edu.osu.cws.evals.models.CriterionArea WHERE description = :desc")
-                .setString("desc", newDescription).list().get(0);
-
-        // Checks that two new pojos were created
-        assert oldCriterionAreaID != criterionArea.getId() :
-                "should have created a new criteria pojo";
-        assert criterionArea.getDescription().equals(newDescription);
-
-        session = HibernateUtil.getCurrentSession();
-        Integer newCount = session.createQuery("from edu.osu.cws.evals.models.AssessmentCriteria " +
-                        "where criteriaArea.id = :id")
-                .setInteger("id", criterionArea.getId()).list().size();
-
-        Integer oldCount = session.createQuery("from edu.osu.cws.evals.models.AssessmentCriteria " +
-                        "where criteriaArea.id = :id")
-                .setInteger("id", oldCriterionAreaID).list().size();
-
-        assert newCount > 0 : "Should have created updated assessment criteria fk";
-        assert oldCount == 0 : "Should have created updated assessment criteria fk";
-    }
-
-    /**
      * Tests to make sure that we get a ModelException when we try to delete a non-existent criteria.
      *
      * @throws Exception

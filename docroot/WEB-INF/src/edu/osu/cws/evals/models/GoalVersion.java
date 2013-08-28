@@ -2,7 +2,7 @@ package edu.osu.cws.evals.models;
 
 import java.util.*;
 
-public class GoalVersion {
+public class GoalVersion implements Comparable<GoalVersion> {
     private int id;
 
     private Appraisal appraisal;
@@ -100,6 +100,13 @@ public class GoalVersion {
         assessments.add(assessment);
     }
 
+    public boolean isApproved() {
+        return approvedDate != null;
+    }
+
+    public boolean isUnapproved() {
+        return requestApproved && !isApproved();
+    }
     /**
      * Returns a sorted list of assessments. The assessment pojo class
      * implements comparable interface which makes this easy. It removes deleted assessments from
@@ -121,6 +128,22 @@ public class GoalVersion {
         }
 
         return sortedAssessments;
+    }
+
+    public int compareTo(GoalVersion otherGoalVersion) {
+        final int BEFORE = -1;
+        final int EQUAL = 0;
+        final int AFTER = 1;
+
+        if (this.createDate.getTime() > otherGoalVersion.createDate.getTime()) {
+            return BEFORE;
+        }
+
+        if (this.createDate.getTime() < otherGoalVersion.createDate.getTime()) {
+            return AFTER;
+        }
+
+        return EQUAL;
     }
 
     /**
