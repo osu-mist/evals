@@ -87,7 +87,7 @@
                 image="copy"
                 url="<%=renderResponse.encodeURL(requestGoalsReactivation.toString())%>"
                 label="true"
-                message="reactivate-goals"
+                message="appraisal-request-goals-reactivation"
             /></li>
         </c:if>
     </ul>
