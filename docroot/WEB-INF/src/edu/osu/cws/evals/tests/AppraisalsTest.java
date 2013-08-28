@@ -110,6 +110,9 @@ public class AppraisalsTest {
         updatedAppraisal.setCloseOutDate(new Date());
         updatedAppraisal.setCloseOutBy(employee);
 
+        updatedAppraisal.getCurrentGoalVersion().setRequestApproved(true);
+        updatedAppraisal.getCurrentGoalVersion().setApprovedDate(new Date());
+
         return updatedAppraisal;
     }
 
@@ -145,6 +148,8 @@ public class AppraisalsTest {
         appraisal.setEvaluation("evaluation text");
         appraisal.setRating(1);
 
+        appraisal.getCurrentGoalVersion().setRequestApproved(true);
+
         for (Assessment assessment : appraisal.getCurrentGoalVersion().getAssessments()) {
             assessment.setEmployeeResult("employee results txt");
             assessment.setSupervisorResult("supervisor results txt");
@@ -173,6 +178,7 @@ public class AppraisalsTest {
         appraisal1.setResultSubmitDate(new Date());
         appraisal1.setEvaluation("evaluation text");
         appraisal1.setRating(1);
+        appraisal.getCurrentGoalVersion().setRequestApproved(true);
 
         for (Assessment assessment : appraisal1.getCurrentGoalVersion().getAssessments()) {
             assessment.setEmployeeResult("employee results txt");

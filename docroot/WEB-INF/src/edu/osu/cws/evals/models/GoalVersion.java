@@ -147,19 +147,23 @@ public class GoalVersion implements Comparable<GoalVersion> {
     }
 
     /**
-     * Copies properties from the trialAppraisal's goalVersion and sets up association with
+     * Copies properties from the trialGoalVersion's and sets up association with
      * newAppraisal into a new instance of GoalVersion.
      *
-     * @param trialAppraisal
+     * @param trialGoalVersion
      * @param newAppraisal
      * @return
      */
-    public static GoalVersion copyPropertiesFromTrial(Appraisal trialAppraisal,
+    public static GoalVersion copyPropertiesFromTrial(GoalVersion trialGoalVersion,
                                                       Appraisal newAppraisal) {
-        //@todo: remove this method
         GoalVersion goalVersion = new GoalVersion();
         goalVersion.setAppraisal(newAppraisal);
         goalVersion.setCreateDate(new Date());
+        goalVersion.setApproverPidm(trialGoalVersion.getApproverPidm());
+        goalVersion.setApprovedDate(trialGoalVersion.getApprovedDate());
+        goalVersion.setRequestApproved(trialGoalVersion.getRequestApproved());
+        goalVersion.setDecisionPidm(trialGoalVersion.getDecisionPidm());
+        goalVersion.setTimedOutAt(trialGoalVersion.getTimedOutAt());
 
         return goalVersion;
     }
