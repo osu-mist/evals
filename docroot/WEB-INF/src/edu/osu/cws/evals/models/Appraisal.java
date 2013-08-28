@@ -902,10 +902,9 @@ public class Appraisal extends Evals {
     }
 
     /**
-     * Walked through GoalsVersions and pick the ones that are approved
-     * and sort them by approvedDate desc.
-     * An approved goalsVersion is a goalsVersion whose approvedDate is not null.
-     * When none, return an empty list.
+     * Walk through goalVersions and return the ones that are approved sorted by approvedDate asc.
+     * An approved GoalVersion has approvedDate not set to null.
+     * When there are no approved GoalVersions, return an empty list.
      * @return
      */
     public List getApprovedGoalsVersions() {
@@ -921,10 +920,10 @@ public class Appraisal extends Evals {
     }
 
     /**
-     * Walked through goalsVersions to see if there is an unapproved goals version
-     * An unapproved goalsVersion is a goalsVersion with a requestApproved = 1
-     * and approvedDate equals null
-     * return null is there isn't an unapproved goals version
+     * Walk through goalVersions and return a single unapproved GoalVersion.
+     * An unapproved GoalVersion has requestApproved set to true and approvedDate set to null
+     * When there isn't an unapproved goals version, the method returns null. According to the
+     * business requirements, there should only be 1 unapproved GoalVersion at a single time.
      */
     public GoalVersion getUnapprovedGoalsVersion() {
         for (GoalVersion goalVersion : goalVersions) {

@@ -143,13 +143,7 @@ public class GoalVersion implements Comparable<GoalVersion> {
             return AFTER;
         }
 
-        if (this.id == otherGoalVersion.getId()) {
-            return EQUAL;
-        }
-
-        // We shouldn't get here. It's not a valid case for two goal versions to have the same
-        // create date, but different ids.
-        return BEFORE;
+        return EQUAL;
     }
 
     /**
