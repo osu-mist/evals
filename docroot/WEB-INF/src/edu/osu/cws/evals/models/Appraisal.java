@@ -906,7 +906,7 @@ public class Appraisal extends Evals {
      * When there are no approved GoalVersions, return an empty list.
      * @return
      */
-    public List getApprovedGoalsVersions() {
+    public List<GoalVersion> getApprovedGoalsVersions() {
         List<GoalVersion> approvedGoalsVersions = new ArrayList<GoalVersion>();
         for (GoalVersion goalVersion : goalVersions) {
             if (goalVersion.isApproved()) {
@@ -992,7 +992,7 @@ public class Appraisal extends Evals {
         appraisal.setEndDate(CWSUtil.toDate(endDate));
 
         // copy over goal version
-        for (GoalVersion trialGoalVersion : trialAppraisal.getGoalVersions()) {
+        for (GoalVersion trialGoalVersion : trialAppraisal.getApprovedGoalsVersions()) {
             GoalVersion goalVersion = GoalVersion.copyPropertiesFromTrial(trialGoalVersion, appraisal);
             appraisal.addGoalVersion(goalVersion);
 

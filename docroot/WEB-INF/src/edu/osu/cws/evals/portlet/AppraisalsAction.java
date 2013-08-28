@@ -465,7 +465,7 @@ public class AppraisalsAction implements ActionInterface {
         String parameterKey = "";
 
         // Save Goals
-        if (permRule.getApprovedGoals() != null && permRule.getApprovedGoals().equals("e")) {
+        if (permRule.getUnapprovedGoals() != null && permRule.getUnapprovedGoals().equals("e")) {
             updateGoals(requestMap);
 
         }
@@ -591,6 +591,11 @@ public class AppraisalsAction implements ActionInterface {
      */
     private void updateGoals(Map<String, String[]> requestMap) {
         String parameterKey;
+        // if there isn't an unapproved goals versions exit
+        if (appraisal.getUnapprovedGoalsVersion() == null) {
+            return;
+        }
+
         // The order is important since we'll append at the end the new assessments
         List<Assessment> assessments = appraisal.getUnapprovedGoalsVersion().getSortedAssessments();
         int oldAssessmentTotal = assessments.size();

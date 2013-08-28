@@ -139,14 +139,14 @@ public class AppraisalMgr {
 
         for (GoalVersion goalVersion : modifiedAppraisal.getGoalVersions()) {
             for (Assessment assessment : goalVersion.getAssessments()) {
-                assessment.setModifiedDate(new Date());
+                assessment.setModifiedDate(new Date()); //@todo: need to figure out a better way to set this. It isn't always updated
                 session.saveOrUpdate(assessment);  //@todo: joan: Do we need to do this everytime?
 
                 // Create new assessment log if necessary
                 originalGoalText = assessment.getLastGoalLog(GoalLog.DEFAULT_GOAL_TYPE).getContent();
                 updatedGoalTextGoalText = assessment.getGoal();
                 //@todo: use a hash instead of comparing these two long text fields
-                if (!originalGoalText.equals(updatedGoalTextGoalText) && updatedGoalTextGoalText != null) {
+                if (!originalGoalText.equals(updatedGoalTextGoalText)) {
                     goalLog = new GoalLog();
                     goalLog.setCreateDate(new Date());
                     goalLog.setAuthor(loggedInUser);
