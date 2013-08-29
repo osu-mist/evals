@@ -499,6 +499,16 @@ public class Mailer implements MailerInterface {
     }
 
     /**
+     * Fetch the body for a goalsReactivationRequested emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String goalsReactivationRequestedBody(Appraisal appraisal) throws Exception {
+        return emailBundle.getString("email_goalsReactivationRequested_body");
+    }
+
+    /**
      * Fetch the body for a resultsDue emailType
      * @param appraisal
      * @return
