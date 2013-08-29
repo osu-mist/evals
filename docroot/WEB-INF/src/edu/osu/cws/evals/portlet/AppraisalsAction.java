@@ -1003,6 +1003,39 @@ public class AppraisalsAction implements ActionInterface {
         return homeAction.display(request, response);
     }
 
+    public String requestGoalsReactivation(PortletRequest request, PortletResponse response)
+            throws Exception{
+        initialize(request);
+
+        // Check to see if the logged in user has permission to access the appraisal
+        // Check that user making request is employee & status is goals approved
+        if (permRule == null || !userRole.equals(ActionHelper.ROLE_EMPLOYEE) ||
+                !appraisal.getStatus().equals(Appraisal.STATUS_GOALS_APPROVED)) {
+            return errorHandler.handleAccessDenied(request, response);
+        }
+
+
+        HashMap<String,AppraisalStep> appraisalSteps =
+                (HashMap) actionHelper.getPortletContextAttribute("appraisalSteps");
+        AppraisalStep appraisalStep = appraisalSteps.get("request-goals-reactivation-Default");
+
+        // send email to supervisor
+        MailerInterface mailer = (MailerInterface) actionHelper.getPortletContextAttribute("mailer");
+        EmailType emailType = appraisalStep.getEmailType();
+        mailer.sendMail(appraisal, emailType);
+
+        // update status
+        appraisal.setOriginalStatus(appraisal.getStatus());
+        appraisal.setStatus(appraisalStep.getNewStatus());
+        AppraisalMgr.updateAppraisalStatus(appraisal);
+        SessionMessages.add(request, "appraisal-goals-reactivation-requested");
+
+        // update status of cached appraisal object
+        updateAppraisalInSession();
+
+        return display(request, response);
+    }
+
     public void setActionHelper(ActionHelper actionHelper) {
         this.actionHelper = actionHelper;
     }

@@ -42,9 +42,6 @@
 </c:if>
 
     <h2><c:out value = "${appraisal.job.appointmentType} "/><liferay-ui:message key="appraisal-title" />: <liferay-ui:message key="${appraisal.viewStatus}" /></h2>
-    <liferay-ui:success key="draft-saved" message="draft-saved" />
-    <liferay-ui:success key="appraisal-sent-to-nolij-success" message="appraisal-sent-to-nolij-success" />
-    <liferay-ui:success key="appraisal-set-status-success" message="appraisal-set-status-success" />
 
     <ul class="actions">
         <c:if test="${not empty displayDownloadPdf}">
@@ -88,9 +85,15 @@
                 url="<%=renderResponse.encodeURL(requestGoalsReactivation.toString())%>"
                 label="true"
                 message="appraisal-request-goals-reactivation"
+                cssClass="evals-show-confirm"
             /></li>
         </c:if>
     </ul>
+
+    <liferay-ui:success key="draft-saved" message="draft-saved" />
+    <liferay-ui:success key="appraisal-goals-reactivation-requested" message="appraisal-goals-reactivation-requested" />
+    <liferay-ui:success key="appraisal-sent-to-nolij-success" message="appraisal-sent-to-nolij-success" />
+    <liferay-ui:success key="appraisal-set-status-success" message="appraisal-set-status-success" />
 
     <%@ include file="/jsp/appraisals/info.jsp"%>
 
