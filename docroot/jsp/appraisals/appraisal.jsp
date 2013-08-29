@@ -113,7 +113,10 @@
             <legend><liferay-ui:message key="appraisal-details"/></legend>
             <c:if test="${not empty appraisal.approvedGoalsVersions}">
                 <c:forEach var="goalsVersion" items="${appraisal.approvedGoalsVersions}" varStatus="loopStatus">
-                    <c:out value = "Goals approved on ${goalsVersion.approvedDate}:"/>
+                    <div class="goals-header">
+                        <liferay-ui:message key="appraisal-goals-approved-on"/>
+                        <fmt:formatDate value="${goalsVersion.approvedDate}" pattern="MM/dd/yy"/>:
+                    </div>
                     <c:forEach var="assessment" items="${goalsVersion.sortedAssessments}" varStatus="loopStatus">
                         <%@ include file="/jsp/appraisals/assessments.jsp"%>
                     </c:forEach>
@@ -122,7 +125,9 @@
 
             <c:if test="${not empty appraisal.unapprovedGoalsVersion}">
                 <c:if test="${permissionRule.unapprovedGoals == 'e' || permissionRule.unapprovedGoals == 'v'}">
-                    <c:out value = "Goals to be approved:"/>
+                    <div class="goals-header">
+                        <liferay-ui:message key="appraisal-goals-need-approved"/>
+                    </div>
                     <c:forEach var="assessment" items="${appraisal.unapprovedGoalsVersion.sortedAssessments}" varStatus="loopStatus">
                         <%@ include file="/jsp/appraisals/assessments.jsp"%>
                     </c:forEach>
@@ -199,7 +204,7 @@
                     </p>
                 </fieldset>
           </c:if>
-            
+
             <c:choose>
                 <c:when test="${permissionRule.employeeResponse == 'e'}">
                     <c:if test="${empty appraisal.rebuttal}">
@@ -392,7 +397,7 @@
           jQuery('textarea').autogrow();
           return false;
       });
-      
+
 
       // Using jQuery plugin to expand textareas as you type
       <c:if test="${appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_DUE%>' && appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_OVERDUE%>' ||  not empty appraisal.rebuttal}">
