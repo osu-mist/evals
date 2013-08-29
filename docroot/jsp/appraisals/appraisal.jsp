@@ -109,14 +109,33 @@
     </c:if>
 
     <div class="appraisal-criteria">
-        <c:if test="${permissionRule.approvedGoals == 'e' || permissionRule.approvedGoals == 'v'}">
-            <fieldset>
-                <legend><liferay-ui:message key="appraisal-details"/></legend>
-                <c:forEach var="assessment" items="${appraisal.currentGoalVersion.sortedAssessments}" varStatus="loopStatus">
-                    <%@ include file="/jsp/appraisals/assessments.jsp"%>
+        <fieldset>
+            <legend><liferay-ui:message key="appraisal-details"/></legend>
+            <c:if test="${not empty appraisal.approvedGoalsVersions}">
+                <c:forEach var="goalsVersion" items="${appraisal.approvedGoalsVersions}" varStatus="loopStatus">
+                    <c:out value = "Goals approved on ${goalsVersion.approvedDate}:"/>
+                    <c:forEach var="assessment" items="${goalsVersion.sortedAssessments}" varStatus="loopStatus">
+                        <%@ include file="/jsp/appraisals/assessments.jsp"%>
+                    </c:forEach>
                 </c:forEach>
-            </fieldset>
-        </c:if>
+            </c:if>
+
+            <c:if test="${not empty appraisal.unapprovedGoalsVersion}">
+                <c:if test="${permissionRule.unapprovedGoals == 'e' || permissionRule.unapprovedGoals == 'v'}">
+                    <c:out value = "Goals to be approved:"/>
+                    <c:forEach var="assessment" items="${appraisal.unapprovedGoalsVersion.sortedAssessments}" varStatus="loopStatus">
+                        <%@ include file="/jsp/appraisals/assessments.jsp"%>
+                    </c:forEach>
+                    <c:if test="${permissionRule.unapprovedGoals == 'e'}">
+                        <ul class="ul-h-nav">
+                            <li><a href="#" class="img-txt add" id="addAssessment">
+                                <liferay-ui:message key="appraisal-assessment-add"/></a>
+                            </li>
+                        </ul>
+                    </c:if>
+                </c:if>
+            </c:if>
+        </fieldset>
     </div>
 
     <c:if test="${permissionRule.approvedGoals == 'e'}">

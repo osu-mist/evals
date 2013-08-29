@@ -950,9 +950,13 @@ public class Appraisal extends Evals {
         if (getCloseOutReason() != null) {
             getCloseOutReason().getReason();
         }
-        for (Assessment assessment : getCurrentGoalVersion().getSortedAssessments()) {
-            for (AssessmentCriteria assessmentCriteria : assessment.getAssessmentCriteria()) {
-                assessmentCriteria.getCriteriaArea().getName();
+
+        // iterate over goalVersions to load data
+        for (GoalVersion goalVersion : goalVersions) {
+            for (Assessment assessment : goalVersion.getSortedAssessments()) {
+                for (AssessmentCriteria assessmentCriteria : assessment.getAssessmentCriteria()) {
+                    assessmentCriteria.getCriteriaArea().getName();
+                }
             }
         }
 

@@ -105,6 +105,9 @@ public class GoalVersion implements Comparable<GoalVersion> {
     }
 
     public boolean isUnapproved() {
+        if (requestApproved == null) {
+            return false;
+        }
         return requestApproved && !isApproved();
     }
     /**
