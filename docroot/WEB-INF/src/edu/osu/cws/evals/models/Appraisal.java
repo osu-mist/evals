@@ -3,7 +3,6 @@ package edu.osu.cws.evals.models;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
 import org.joda.time.DateTime;
-import edu.osu.cws.evals.util.EvalsUtil;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -907,7 +906,7 @@ public class Appraisal extends Evals {
      * When there are no approved GoalVersions, return an empty list.
      * @return
      */
-    public List getApprovedGoalsVersions() {
+    public List<GoalVersion> getApprovedGoalsVersions() {
         List<GoalVersion> approvedGoalsVersions = new ArrayList<GoalVersion>();
         for (GoalVersion goalVersion : goalVersions) {
             if (goalVersion.isApproved()) {
@@ -950,9 +949,13 @@ public class Appraisal extends Evals {
         if (getCloseOutReason() != null) {
             getCloseOutReason().getReason();
         }
-        for (Assessment assessment : getCurrentGoalVersion().getSortedAssessments()) {
-            for (AssessmentCriteria assessmentCriteria : assessment.getAssessmentCriteria()) {
-                assessmentCriteria.getCriteriaArea().getName();
+
+        // iterate over goalVersions to load data
+        for (GoalVersion goalVersion : goalVersions) {
+            for (Assessment assessment : goalVersion.getSortedAssessments()) {
+                for (AssessmentCriteria assessmentCriteria : assessment.getAssessmentCriteria()) {
+                    assessmentCriteria.getCriteriaArea().getName();
+                }
             }
         }
 
@@ -989,15 +992,15 @@ public class Appraisal extends Evals {
         appraisal.setEndDate(CWSUtil.toDate(endDate));
 
         // copy over goal version
-        //@todo: remove this method call
-        GoalVersion goalVersion = GoalVersion.copyPropertiesFromTrial(trialAppraisal, appraisal);
-        appraisal.addGoalVersion(goalVersion);
+        for (GoalVersion trialGoalVersion : trialAppraisal.getApprovedGoalsVersions()) {
+            GoalVersion goalVersion = GoalVersion.copyPropertiesFromTrial(trialGoalVersion, appraisal);
+            appraisal.addGoalVersion(goalVersion);
 
-        // copy assessment objects
-        //@todo: leaving this loop block here since we'll be removing the goalsVersion association in a future commit
-        for (Assessment oldAssessment: trialAppraisal.getCurrentGoalVersion().getAssessments()) {
-            Assessment newAssessment = Assessment.copyPropertiesFromTrial(oldAssessment);
-            goalVersion.addAssessment(newAssessment);
+            // copy assessment objects
+            for (Assessment oldAssessment: trialGoalVersion.getAssessments()) {
+                Assessment newAssessment = Assessment.copyPropertiesFromTrial(oldAssessment);
+                goalVersion.addAssessment(newAssessment);
+            }
         }
 
         return appraisal;

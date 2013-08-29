@@ -470,7 +470,7 @@ public class AppraisalsAction implements ActionInterface {
         String parameterKey = "";
 
         // Save Goals
-        if (permRule.getApprovedGoals() != null && permRule.getApprovedGoals().equals("e")) {
+        if (permRule.getUnapprovedGoals() != null && permRule.getUnapprovedGoals().equals("e")) {
             updateGoals(requestMap);
 
         }
@@ -482,21 +482,25 @@ public class AppraisalsAction implements ActionInterface {
         }
         // Save employee results
         if (permRule.getResults() != null && permRule.getResults().equals("e")) {
-            for (Assessment assessment : appraisal.getCurrentGoalVersion().getAssessments()) {
-                String assessmentID = Integer.toString(assessment.getId());
-                parameterKey = "assessment.employeeResult." + assessmentID;
-                if (requestMap.get(parameterKey) != null) {
-                    assessment.setEmployeeResult(requestMap.get(parameterKey)[0]);
+            for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
+                for (Assessment assessment : goalVersion.getAssessments()) {
+                    String assessmentID = Integer.toString(assessment.getId());
+                    parameterKey = "assessment.employeeResult." + assessmentID;
+                    if (requestMap.get(parameterKey) != null) {
+                        assessment.setEmployeeResult(requestMap.get(parameterKey)[0]);
+                    }
                 }
             }
         }
         // Save Supervisor Results
         if (permRule.getSupervisorResults() != null && permRule.getSupervisorResults().equals("e")) {
-            for (Assessment assessment : appraisal.getCurrentGoalVersion().getAssessments()) {
-                String assessmentID = Integer.toString(assessment.getId());
-                parameterKey = "assessment.supervisorResult." + assessmentID;
-                if (requestMap.get(parameterKey) != null) {
-                    assessment.setSupervisorResult(requestMap.get(parameterKey)[0]);
+            for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
+                for (Assessment assessment : goalVersion.getAssessments()) {
+                    String assessmentID = Integer.toString(assessment.getId());
+                    parameterKey = "assessment.supervisorResult." + assessmentID;
+                    if (requestMap.get(parameterKey) != null) {
+                        assessment.setSupervisorResult(requestMap.get(parameterKey)[0]);
+                    }
                 }
             }
         }
@@ -592,8 +596,13 @@ public class AppraisalsAction implements ActionInterface {
      */
     private void updateGoals(Map<String, String[]> requestMap) {
         String parameterKey;
+        // if there isn't an unapproved goals versions exit
+        if (appraisal.getUnapprovedGoalsVersion() == null) {
+            return;
+        }
+
         // The order is important since we'll append at the end the new assessments
-        List<Assessment> assessments = appraisal.getCurrentGoalVersion().getSortedAssessments();
+        List<Assessment> assessments = appraisal.getUnapprovedGoalsVersion().getSortedAssessments();
         int oldAssessmentTotal = assessments.size();
         Map<Integer, String> sequenceToFormIndex = addNewAssessments(requestMap, assessments);
 
@@ -630,8 +639,8 @@ public class AppraisalsAction implements ActionInterface {
             appraisal.setGoalsSubmitDate(new Date());
         }
         if (requestMap.get("approve-goals") != null) {
-            appraisal.setGoalApprovedDate(new Date());
-            appraisal.setGoalsApprover(loggedInUser);
+            appraisal.getUnapprovedGoalsVersion().setApprovedDate(new Date());
+            appraisal.getUnapprovedGoalsVersion().setApproverPidm(loggedInUser.getId());
         }
     }
 
@@ -706,7 +715,7 @@ public class AppraisalsAction implements ActionInterface {
                         criterionAreas.add(assessmentCriteria.getCriteriaArea());
                     }
                     Assessment assessment = AppraisalMgr.createNewAssessment(appraisal
-                            .getCurrentGoalVersion(), sequence, criterionAreas);
+                            .getUnapprovedGoalsVersion(), sequence, criterionAreas);
                     assessments.add(assessment);
                 }
             }

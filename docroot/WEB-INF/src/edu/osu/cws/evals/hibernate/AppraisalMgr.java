@@ -46,6 +46,8 @@ public class AppraisalMgr {
         GoalVersion goalVersion = new GoalVersion();
         appraisal.addGoalVersion(goalVersion);
         goalVersion.setCreateDate(new Date());
+        // the first goal version is automatically approved
+        goalVersion.setRequestApproved(true);
 
         if (!type.equals(Appraisal.TYPE_TRIAL) && !type.equals(Appraisal.TYPE_ANNUAL) &&
                 !type.equals(Appraisal.TYPE_INITIAL)) {
@@ -124,15 +126,7 @@ public class AppraisalMgr {
             throws ModelException {
         String originalGoalText;
         String updatedGoalTextGoalText;
-        String originalNewGoalText;
-        String updatedNewGoalText;
         GoalLog goalLog;
-
-        // Validate the data first before we try to save anything
-        modifiedAppraisal.validate();
-        for (Assessment assessment : modifiedAppraisal.getCurrentGoalVersion().getAssessments()) {
-            assessment.validate();
-        }
 
         // Try to save the data
         Session session = HibernateUtil.getCurrentSession();
@@ -143,42 +137,28 @@ public class AppraisalMgr {
             session.saveOrUpdate(modifiedAppraisal.getSalary());
         }
 
-        for (Assessment assessment : modifiedAppraisal.getCurrentGoalVersion().getAssessments()) {
-            assessment.setModifiedDate(new Date());
-            session.saveOrUpdate(assessment);  //@todo: joan: Do we need to do this everytime?
+        for (GoalVersion goalVersion : modifiedAppraisal.getGoalVersions()) {
+            for (Assessment assessment : goalVersion.getAssessments()) {
+                assessment.setModifiedDate(new Date()); //@todo: need to figure out a better way to set this. It isn't always updated
+                session.saveOrUpdate(assessment);  //@todo: joan: Do we need to do this everytime?
 
-            // Create new assessment log if necessary
-            originalGoalText = assessment.getLastGoalLog(GoalLog.DEFAULT_GOAL_TYPE).getContent();
-            updatedGoalTextGoalText = assessment.getGoal();
-            //@todo: use a hash instead of comparing these two long text fields
-            if (!originalGoalText.equals(updatedGoalTextGoalText) && updatedGoalTextGoalText != null) {
-                goalLog = new GoalLog();
-                goalLog.setCreateDate(new Date());
-                goalLog.setAuthor(loggedInUser);
-                if (updatedGoalTextGoalText.equals("")) {
-                    updatedGoalTextGoalText = "empty";
+                // Create new assessment log if necessary
+                originalGoalText = assessment.getLastGoalLog(GoalLog.DEFAULT_GOAL_TYPE).getContent();
+                updatedGoalTextGoalText = assessment.getGoal();
+                //@todo: use a hash instead of comparing these two long text fields
+                if (!originalGoalText.equals(updatedGoalTextGoalText)) {
+                    goalLog = new GoalLog();
+                    goalLog.setCreateDate(new Date());
+                    goalLog.setAuthor(loggedInUser);
+                    if (updatedGoalTextGoalText.equals("")) {
+                        updatedGoalTextGoalText = "empty";
+                    }
+                    goalLog.setContent(updatedGoalTextGoalText);
+                    assessment.addAssessmentLog(goalLog);
+                    session.save(goalLog);
                 }
-                goalLog.setContent(updatedGoalTextGoalText);
-                assessment.addAssessmentLog(goalLog);
-                session.save(goalLog);
+
             }
-
-
-            originalNewGoalText = assessment.getLastGoalLog(GoalLog.NEW_GOAL_TYPE).getContent();
-            //updatedNewGoalText = assessment.getUnapprovedGoals();
-            //@todo: use a hash instead of comparing these two long text fields
-            /*if (!originalNewGoalText.equals("") && updatedNewGoalText != null) {
-                goalLog = new GoalLog();
-                goalLog.setCreateDate(new Date());
-                goalLog.setAuthor(loggedInUser);
-                if (updatedNewGoalText.equals("")) {
-                    updatedNewGoalText = "empty";
-                }
-                goalLog.setContent(updatedNewGoalText);
-                goalLog.setType(GoalLog.NEW_GOAL_TYPE);
-                assessment.addAssessmentLog(goalLog);
-                session.save(goalLog);
-            }*/
         }
         return true;
     }
