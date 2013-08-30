@@ -575,7 +575,7 @@ public class AppraisalsTest {
         GoalVersion goalVersion1 = new GoalVersion();
         goalVersion1.setId(1);
         goalVersion1.setCreateDate(new Date());
-        goalVersion1.setRequestApproved(false);
+        goalVersion1.setRequestApproved(true);
         appraisal.addGoalVersion(goalVersion1);
 
         GoalVersion goalVersion = appraisal.getUnapprovedGoalsVersion();
@@ -587,12 +587,11 @@ public class AppraisalsTest {
         GoalVersion goalVersion1 = new GoalVersion();
         goalVersion1.setId(1);
         goalVersion1.setCreateDate(new Date());
-        goalVersion1.setRequestApproved(true);
 
         GoalVersion goalVersion2 = new GoalVersion();
         goalVersion2.setId(2);
         goalVersion2.setCreateDate(new DateTime().minusDays(1).toDate());
-        goalVersion2.setRequestApproved(false);
+        goalVersion2.setRequestApproved(true);
 
         appraisal.addGoalVersion(goalVersion1);
         appraisal.addGoalVersion(goalVersion2);

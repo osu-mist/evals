@@ -65,6 +65,8 @@ public class Constants {
 
     // The # of blank assessments that are created for a new evaluation
     public static final Integer BLANK_ASSESSMENTS_IN_NEW_EVALUATION = 5;
+    // The # of blank assessments that are created when goals are reactivated
+    public static final Integer BLANK_ASSESSMENTS_IN_REACTIVATED_GOALS = 1;
 
     public static final long PORTLET_RELOAD_FREQUENCY = 1000 * 60 * 60 * 24; //1 days in ms
 

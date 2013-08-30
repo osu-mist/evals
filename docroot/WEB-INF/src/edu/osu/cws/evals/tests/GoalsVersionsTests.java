@@ -16,11 +16,9 @@ public class GoalsVersionsTests {
 
     public void shouldBeUnapprovedWhenRequestedIsApprovedButApprovedDateIsNull() {
         GoalVersion goalVersion = new GoalVersion();
-        goalVersion.setRequestApproved(true);
         assert goalVersion.isUnapproved();
 
-        // set the approved date, to make the goal version approved
-        goalVersion.setApprovedDate(new Date());
+        goalVersion.setRequestApproved(true);
         assert !goalVersion.isUnapproved();
     }
 }

@@ -62,7 +62,8 @@ public class RequiredAction {
 
         if (key.contains("goals-due") || key.contains("goals-overdue") ||
                 key.contains("results-due") || key.contains("results-overdue") ||
-                key.contains("signature-due") || key.contains("signature-overdue")
+                key.contains("signature-due") || key.contains("signature-overdue") ||
+                key.contains("action-team-goals-reactivation")
                 ) {
             pattern = changeKeyIfDueToday(key, numDays, resource);
             if (isTeamAction) {

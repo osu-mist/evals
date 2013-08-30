@@ -540,8 +540,14 @@ public class ActionHelper {
                     if (appraisalStatus.contains("Overdue")) {
                         appraisalStatus = appraisalStatus.replace("Overdue", "Due");
                     }
+
+                    if (appraisalStatus.equals(Appraisal.STATUS_GOALS_REACTIVATION_REQUESTED) ||
+                            appraisalStatus.equals(Appraisal.STATUS_GOALS_REACTIVATED)) {
+                        appraisalStatus += "Expiration";
+                    }
                     configuration = configurationMap.get(appraisalStatus);
                 }
+
                 if (configuration == null) {
                     throw new ModelException(
                             "Could not find configuration object for status - " + appraisalStatus);

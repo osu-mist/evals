@@ -105,7 +105,7 @@ public class GoalVersion implements Comparable<GoalVersion> {
     }
 
     public boolean isUnapproved() {
-        return requestApproved && !isApproved();
+        return requestApproved == null || (!requestApproved && !isApproved());
     }
     /**
      * Returns a sorted list of assessments. The assessment pojo class
