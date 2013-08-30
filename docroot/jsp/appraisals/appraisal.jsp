@@ -112,14 +112,38 @@
     </c:if>
 
     <div class="appraisal-criteria">
-        <c:if test="${permissionRule.approvedGoals == 'e' || permissionRule.approvedGoals == 'v'}">
-            <fieldset>
-                <legend><liferay-ui:message key="appraisal-details"/></legend>
-                <c:forEach var="assessment" items="${appraisal.currentGoalVersion.sortedAssessments}" varStatus="loopStatus">
-                    <%@ include file="/jsp/appraisals/assessments.jsp"%>
+        <fieldset>
+            <legend><liferay-ui:message key="appraisal-details"/></legend>
+            <c:if test="${not empty appraisal.approvedGoalsVersions}">
+                <c:forEach var="goalsVersion" items="${appraisal.approvedGoalsVersions}" varStatus="loopStatus">
+                    <div class="goals-header">
+                        <liferay-ui:message key="appraisal-goals-approved-on"/>
+                        <fmt:formatDate value="${goalsVersion.approvedDate}" pattern="MM/dd/yy"/>:
+                    </div>
+                    <c:forEach var="assessment" items="${goalsVersion.sortedAssessments}" varStatus="loopStatus">
+                        <%@ include file="/jsp/appraisals/assessments.jsp"%>
+                    </c:forEach>
                 </c:forEach>
-            </fieldset>
-        </c:if>
+            </c:if>
+
+            <c:if test="${not empty appraisal.unapprovedGoalsVersion}">
+                <c:if test="${permissionRule.unapprovedGoals == 'e' || permissionRule.unapprovedGoals == 'v'}">
+                    <div class="goals-header">
+                        <liferay-ui:message key="appraisal-goals-need-approved"/>
+                    </div>
+                    <c:forEach var="assessment" items="${appraisal.unapprovedGoalsVersion.sortedAssessments}" varStatus="loopStatus">
+                        <%@ include file="/jsp/appraisals/assessments.jsp"%>
+                    </c:forEach>
+                    <c:if test="${permissionRule.unapprovedGoals == 'e'}">
+                        <ul class="ul-h-nav">
+                            <li><a href="#" class="img-txt add" id="addAssessment">
+                                <liferay-ui:message key="appraisal-assessment-add"/></a>
+                            </li>
+                        </ul>
+                    </c:if>
+                </c:if>
+            </c:if>
+        </fieldset>
     </div>
 
     <c:if test="${permissionRule.approvedGoals == 'e'}">
@@ -183,7 +207,7 @@
                     </p>
                 </fieldset>
           </c:if>
-            
+
             <c:choose>
                 <c:when test="${permissionRule.employeeResponse == 'e'}">
                     <c:if test="${empty appraisal.rebuttal}">
@@ -376,7 +400,7 @@
           jQuery('textarea').autogrow();
           return false;
       });
-      
+
 
       // Using jQuery plugin to expand textareas as you type
       <c:if test="${appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_DUE%>' && appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_OVERDUE%>' ||  not empty appraisal.rebuttal}">
