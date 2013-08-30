@@ -395,3 +395,14 @@ tr.ui-state-highlight {
 .osu-cws-clear-both {
     clear: both;
 }
+
+/** Header for goals **/
+.osu-cws .goals-header {
+    border-bottom: solid 1px #ccc;
+    height: 20px;
+    font-size: 12px;
+    padding-top: .3em;
+    padding-left: 1em;
+    font-weight: bold;
+    margin-right: 12px;
+}
