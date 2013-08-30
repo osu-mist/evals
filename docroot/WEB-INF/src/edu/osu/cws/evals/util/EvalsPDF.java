@@ -737,16 +737,52 @@ public class EvalsPDF {
      * @throws com.itextpdf.text.DocumentException
      */
     private void addAssessments() throws Exception {
-        Paragraph sectionText;
-        int i = 0;
+        String goalHeader = "";
 
-        GoalVersion currentGoalVersion = appraisal.getCurrentGoalVersion();
-        List<Assessment> sortedAssessments = currentGoalVersion.getSortedAssessments();
+        List<GoalVersion> approvedGoalsVersions = appraisal.getApprovedGoalsVersions();
+        for (GoalVersion goalVersion : approvedGoalsVersions){
+            goalHeader = resource.getString("appraisal-goals-approved-on") + " " +
+                    new DateTime(goalVersion.getApprovedDate()).toString(Constants.DATE_FORMAT) + ":";
+            setGoalsHeader(goalHeader);
+            List<Assessment> sortedAssessments = goalVersion.getSortedAssessments();
+            displayAssessments(sortedAssessments);
+        }
 
-        boolean displayGoals = StringUtils.containsAny(permRule.getApprovedGoals(), "ev");
+        GoalVersion unapprovedGoalsVersion = appraisal.getUnapprovedGoalsVersion();
+        if (unapprovedGoalsVersion != null) {
+            goalHeader = resource.getString("appraisal-goals-need-approved");
+            setGoalsHeader(goalHeader);
+            List<Assessment> sortedAssessments = unapprovedGoalsVersion.getSortedAssessments();
+            displayAssessments(sortedAssessments);
+        }
+    }
+
+    /**
+     * Adds headers for different goals versions.
+     *
+     * @throws Exception
+     */
+    private void setGoalsHeader(String goalHeader) throws Exception {
+        Chunk goalHeaderChunk = new Chunk(goalHeader, FONT_BOLD_12);
+        goalHeaderChunk.setUnderline(1f, -2f);
+        Paragraph goalsHeader = new Paragraph(goalHeaderChunk);
+        goalsHeader.setSpacingBefore(BEFORE_SPACING);
+        document.add(goalsHeader);
+    }
+
+    /**
+     * Adds assessments for each goal version.
+     *
+     * @throws Exception
+     */
+    private void displayAssessments(List<Assessment> sortedAssessments) throws Exception {
+        boolean displayApprovedGoals = StringUtils.containsAny(permRule.getApprovedGoals(), "ev");
+        boolean displayUnapprovedGoals = StringUtils.containsAny(permRule.getUnapprovedGoals(), "ev");
         boolean displayEmployeeResults = StringUtils.containsAny(permRule.getResults(), "ev");
         boolean displaySupervisorResults = StringUtils.containsAny(permRule.getSupervisorResults(), "ev");
 
+        Paragraph sectionText;
+        int i = 0;
         for (Assessment assessment : sortedAssessments) {
             i++;
 
@@ -754,13 +790,12 @@ public class EvalsPDF {
             sectionText.setSpacingBefore(BEFORE_SPACING);
             document.add(sectionText);
 
-            if (displayGoals) {
+            if (displayApprovedGoals || displayUnapprovedGoals) {
                 String goalLabel = resource.getString("appraisal-goals") + i;
                 Chunk goalChunk = new Chunk(goalLabel, FONT_BOLDITALIC_10);
                 goalChunk.setUnderline(1f, -2f);
 
                 Paragraph goalsLabel = new Paragraph(goalChunk);
-                goalsLabel.setSpacingBefore(BEFORE_SPACING);
                 Paragraph goals = new Paragraph(assessment.getGoal(), FONT_10);
                 goals.setIndentationLeft(LEFT_INDENTATION);
                 document.add(goalsLabel);
@@ -769,7 +804,7 @@ public class EvalsPDF {
                 addAssessmentsCriteria(assessment);
             }
 
-            if (displayEmployeeResults) {
+            if (displayApprovedGoals && displayEmployeeResults) {
                 Paragraph resultsLabel = new Paragraph(resource.getString("appraisal-employee-results"),
                         FONT_BOLDITALIC_10);
                 Paragraph employeeResult = new Paragraph(assessment.getEmployeeResult(), FONT_10);
@@ -780,7 +815,7 @@ public class EvalsPDF {
                 document.add(employeeResult);
             }
 
-            if (displaySupervisorResults) {
+            if (displayApprovedGoals && displaySupervisorResults) {
                 Paragraph supervisorResultLbl = new Paragraph(resource.getString("appraisal-result-comments"),
                         FONT_BOLDITALIC_10);
                 Paragraph supervisorResult = new Paragraph(assessment.getSupervisorResult(), FONT_10);
@@ -790,7 +825,6 @@ public class EvalsPDF {
                 document.add(supervisorResultLbl);
                 document.add(supervisorResult);
             }
-
         }
     }
 
