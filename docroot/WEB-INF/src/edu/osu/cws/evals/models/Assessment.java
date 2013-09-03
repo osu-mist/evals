@@ -221,4 +221,12 @@ public class Assessment extends Evals implements Comparable<Assessment> {
 
         return newAssessment;
     }
+
+    /**
+     * Whether or not this assessment should be considered a new goal as far as permission rules are
+     * concerned.
+     */
+    public boolean isNewGoal() {
+        return goalVersion.isUnapproved();
+    }
 }

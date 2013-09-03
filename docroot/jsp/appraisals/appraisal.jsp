@@ -121,7 +121,7 @@
                         <fmt:formatDate value="${goalsVersion.approvedDate}" pattern="MM/dd/yy"/>:
                     </div>
                     <c:forEach var="assessment" items="${goalsVersion.sortedAssessments}" varStatus="loopStatus">
-                        <%@ include file="/jsp/appraisals/assessments.jsp"%>
+                        <%@ include file="/jsp/appraisals/assessment.jsp"%>
                     </c:forEach>
                 </c:forEach>
             </c:if>
@@ -132,7 +132,7 @@
                         <liferay-ui:message key="appraisal-goals-need-approved"/>
                     </div>
                     <c:forEach var="assessment" items="${appraisal.unapprovedGoalsVersion.sortedAssessments}" varStatus="loopStatus">
-                        <%@ include file="/jsp/appraisals/assessments.jsp"%>
+                        <%@ include file="/jsp/appraisals/assessment.jsp"%>
                     </c:forEach>
                     <c:if test="${permissionRule.unapprovedGoals == 'e'}">
                         <ul class="ul-h-nav">
@@ -146,13 +146,6 @@
         </fieldset>
     </div>
 
-    <c:if test="${permissionRule.approvedGoals == 'e'}">
-        <ul class="ul-h-nav">
-            <li><a href="#" class="img-txt add" id="addAssessment">
-                <liferay-ui:message key="appraisal-assessment-add"/></a>
-            </li>
-        </ul>
-    </c:if>
 
     <c:choose>
         <c:when test="${permissionRule.goalComments == 'e'}">
