@@ -113,7 +113,7 @@
             <fieldset>
                 <legend><liferay-ui:message key="appraisal-details"/></legend>
                 <c:forEach var="assessment" items="${appraisal.currentGoalVersion.sortedAssessments}" varStatus="loopStatus">
-                    <%@ include file="/jsp/appraisals/assessments.jsp"%>
+                    <%@ include file="/jsp/appraisals/assessment.jsp"%>
                 </c:forEach>
             </fieldset>
         </c:if>
