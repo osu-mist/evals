@@ -731,10 +731,9 @@ public class EvalsPDF {
 
 
     /**
-     * Adds each evaluation criteria, goals, employee results and supervisor results based on
-     * the permission rule.
+     * Adds headers and assessments based on goals versions
      *
-     * @throws com.itextpdf.text.DocumentException
+     * @throws
      */
     private void addAssessments() throws Exception {
         String goalHeader = "";
@@ -758,7 +757,7 @@ public class EvalsPDF {
     }
 
     /**
-     * Adds headers for different goals versions.
+     * Adds header for one goal version
      *
      * @throws Exception
      */
@@ -771,7 +770,7 @@ public class EvalsPDF {
     }
 
     /**
-     * Adds assessments for each goal version.
+     * Adds assessments for one goal version
      *
      * @throws Exception
      */
