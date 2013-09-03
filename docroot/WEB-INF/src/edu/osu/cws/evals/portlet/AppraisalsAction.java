@@ -569,7 +569,10 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         // Approve/Deny Goals Reactivation
-        goalReactivation(requestMap);
+        if (permRule.getSubmit().equals("approve-goals-reactivation") ||
+                permRule.getSecondarySubmit().equals("deny-goals-reactivation")) {
+            reactivationGoals(requestMap);
+        }
 
         // If the appraisalStep object has a new status, update the appraisal object
         String appointmentType = appraisal.getJob().getAppointmentType();
@@ -597,7 +600,7 @@ public class AppraisalsAction implements ActionInterface {
      * @param requestMap
      * @throws Exception
      */
-    private void goalReactivation(Map<String, String[]> requestMap) throws Exception {
+    private void reactivationGoals(Map<String, String[]> requestMap) throws Exception {
         Boolean goalReactivationDecision = null;
         if (requestMap.get("approve-goals-reactivation") != null) {
             goalReactivationDecision = true;
@@ -612,7 +615,7 @@ public class AppraisalsAction implements ActionInterface {
             unapprovedGoalsVersion.setDecisionPidm(loggedInUser.getId());
             unapprovedGoalsVersion.setRequestApproved(goalReactivationDecision);
             if (goalReactivationDecision) {
-                AppraisalMgr.addAssessmentForReactivatedGoal(unapprovedGoalsVersion, appraisal);
+                AppraisalMgr.addAssessmentForGoalsReactivation(unapprovedGoalsVersion, appraisal);
             }
         }
     }
@@ -1069,7 +1072,7 @@ public class AppraisalsAction implements ActionInterface {
         SessionMessages.add(request, "appraisal-goals-reactivation-requested");
 
         // create goalVersion pojo && associate it
-        AppraisalMgr.addUnapprovedGoalVersion(appraisal);
+        AppraisalMgr.addGoalVersion(appraisal);
 
         // update status of cached appraisal object
         updateAppraisalInSession();

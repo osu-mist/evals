@@ -106,9 +106,9 @@ public class AppraisalMgr {
      * @param appraisal
      * @throws Exception
      */
-    public static void addAssessmentForReactivatedGoal(GoalVersion unapprovedGoalsVersion,
-                                                       Appraisal appraisal) throws Exception {
-        AppraisalMgr.addAssessmentToGoalVersion(unapprovedGoalsVersion,
+    public static void addAssessmentForGoalsReactivation(GoalVersion unapprovedGoalsVersion,
+                                                         Appraisal appraisal) throws Exception {
+        addAssessmentToGoalVersion(unapprovedGoalsVersion,
                 Constants.BLANK_ASSESSMENTS_IN_REACTIVATED_GOALS, appraisal);
 
         Session session = HibernateUtil.getCurrentSession();
@@ -942,7 +942,7 @@ public class AppraisalMgr {
      *
      * @param appraisal
      */
-    public static void addUnapprovedGoalVersion(Appraisal appraisal) {
+    public static void addGoalVersion(Appraisal appraisal) {
         Session session = HibernateUtil.getCurrentSession();
         GoalVersion unApprovedGoalVersion = new GoalVersion();
         unApprovedGoalVersion.setCreateDate(new Date());

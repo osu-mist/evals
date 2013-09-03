@@ -533,8 +533,7 @@ public class ActionHelper {
                 anchorParams.put("controller", "AppraisalsAction");
                 String appraisalID = Integer.toString(appraisal.getId());
                 anchorParams.put("id", appraisalID);
-                if (appraisalStatus.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION) ||
-                        appraisalStatus.equals(Appraisal.STATUS_GOALS_REACTIVATED)) {
+                if (appraisalStatus.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
                     configuration = configurationMap.get(Appraisal.STATUS_GOALS_DUE);
                 } else {
                     if (appraisalStatus.contains("Overdue")) {
