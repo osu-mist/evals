@@ -17,7 +17,7 @@
 
 <div class="appraisal-assessment-${assessment.id}">
     <h3 class="secret"><liferay-ui:message key="appraisal-assessment-header"/>${loopStatus.index + 1}</h3>
-    <c:if test="${goalStatus== 'e'}">
+    <c:if test="${goalStatus == 'e'}">
         <a class="delete img-txt assessment-delete delete.id.${assessment.id}"
            title="<liferay-ui:message key="appraisal-assessment-delete"/>"
            href="#"><liferay-ui:message key="appraisal-assessment-delete"/></a>
