@@ -74,15 +74,45 @@ public class AppraisalMgr {
             Session session = HibernateUtil.getCurrentSession();
 
             // Create the assessments & assessment criteria
-            String appointmentType = job.getAppointmentType();
-            List<CriterionArea> criteriaList = CriteriaMgr.list(appointmentType);
-            for (int i = 1; i <= Constants.BLANK_ASSESSMENTS_IN_NEW_EVALUATION; i++) {
-                createNewAssessment(goalVersion, i, criteriaList);
-            }
+            addAssessmentToGoalVersion(goalVersion, Constants.BLANK_ASSESSMENTS_IN_NEW_EVALUATION,
+                    appraisal);
             session.save(appraisal);
         }
 
         return appraisal;
+    }
+
+    /**
+     * Creates a series of new assessments and adds them to a goal version.
+     *
+     * @param goalVersion
+     * @param count
+     * @param appraisal
+     */
+    public static void addAssessmentToGoalVersion(GoalVersion goalVersion, int count,
+                                                   Appraisal appraisal) throws Exception {
+        String appointmentType = appraisal.getJob().getAppointmentType();
+        List<CriterionArea> criteriaList = CriteriaMgr.list(appointmentType);
+        for (int i = 1; i <= count; i++) {
+            createNewAssessment(goalVersion, i, criteriaList);
+        }
+    }
+
+    /**
+     * Creates assessments and associated objects for a goal version once the goals reactivation
+     * is approved.
+     *
+     * @param unapprovedGoalsVersion
+     * @param appraisal
+     * @throws Exception
+     */
+    public static void addAssessmentForGoalsReactivation(GoalVersion unapprovedGoalsVersion,
+                                                         Appraisal appraisal) throws Exception {
+        addAssessmentToGoalVersion(unapprovedGoalsVersion,
+                Constants.BLANK_ASSESSMENTS_IN_REACTIVATED_GOALS, appraisal);
+
+        Session session = HibernateUtil.getCurrentSession();
+        session.save(unapprovedGoalsVersion);
     }
 
 
@@ -150,7 +180,7 @@ public class AppraisalMgr {
                     goalLog = new GoalLog();
                     goalLog.setCreateDate(new Date());
                     goalLog.setAuthor(loggedInUser);
-                    if (updatedGoalTextGoalText.equals("")) {
+                    if (updatedGoalTextGoalText == null || updatedGoalTextGoalText.equals("")) {
                         updatedGoalTextGoalText = "empty";
                     }
                     goalLog.setContent(updatedGoalTextGoalText);
@@ -904,5 +934,19 @@ public class AppraisalMgr {
         session.save(salary);
 
         return salary;
+    }
+
+    /**
+     * Creates a new un approved goal version. It doesn't create the associated assessments
+     * since the goal version might not be approved by the supervisor.
+     *
+     * @param appraisal
+     */
+    public static void addGoalVersion(Appraisal appraisal) {
+        Session session = HibernateUtil.getCurrentSession();
+        GoalVersion unApprovedGoalVersion = new GoalVersion();
+        unApprovedGoalVersion.setCreateDate(new Date());
+        appraisal.addGoalVersion(unApprovedGoalVersion);
+        session.save(unApprovedGoalVersion);
     }
 }

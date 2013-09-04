@@ -27,6 +27,7 @@ public class Appraisal extends Evals {
     public static final String STATUS_GOALS_DUE = "goalsDue";
     public static final String STATUS_GOALS_OVERDUE = "goalsOverdue";
     public static final String STATUS_GOALS_REACTIVATED = "goalsReactivated";
+    public static final String STATUS_GOALS_REACTIVATION_REQUESTED = "goalsReactivationRequested";
     public static final String STATUS_GOALS_REQUIRED_MODIFICATION = "goalsRequiredModification";
     public static final String STATUS_REBUTTAL_READ_DUE = "rebuttalReadDue";
     public static final String STATUS_REBUTTAL_READ_OVERDUE = "rebuttalReadOverdue";

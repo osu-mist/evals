@@ -44,18 +44,20 @@ public class EvalsUtil {
 
         //System.out.println("reference point = " + ref);
 
-        if (ref.equals("end"))
+        if (ref.equals("end")) {
             refDate = new DateTime(appraisal.getEndDate());
-        else if (ref.equals("GOALS_REQUIRED_MOD_DATE"))
-        {
+        } else if (ref.equals("GOALS_REQUIRED_MOD_DATE")) {
             refDate = new DateTime(appraisal.getGoalsRequiredModificationDate());
             //System.out.println("reference date = " + refDate);
-        }
-        else if (ref.equals("employee_signed_date"))
+        } else if (ref.equals("employee_signed_date")) {
             refDate = new DateTime(appraisal.getEmployeeSignedDate());
-        else if (ref.equals("firstEmailSentDate")) {
+        } else if (ref.equals("firstEmailSentDate")) {
             Email firstEmail = EmailMgr.getFirstEmail(appraisal.getId(), "jobTerminated");
             refDate = new DateTime(firstEmail.getSentDate());
+        } else if (ref.equals("goal_reactivation_request")) {
+            if (appraisal.getUnapprovedGoalsVersion() != null) {
+                refDate = new DateTime(appraisal.getUnapprovedGoalsVersion().getCreateDate());
+            }
         }
 
         if (refDate == null) //error

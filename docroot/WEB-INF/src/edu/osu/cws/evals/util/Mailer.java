@@ -495,7 +495,7 @@ public class Mailer implements MailerInterface {
      */
     private String goalsReactivatedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsReactivated_body");
-        return MessageFormat.format(bodyString, appraisal.getReviewPeriod(), getDueDate(appraisal));
+        return MessageFormat.format(bodyString, appraisal.getReviewPeriod());
     }
 
     /**
@@ -506,6 +506,16 @@ public class Mailer implements MailerInterface {
      */
     private String goalsReactivationRequestedBody(Appraisal appraisal) throws Exception {
         return emailBundle.getString("email_goalsReactivationRequested_body");
+    }
+
+    /**
+     * Fetch the body for a goalsReactivationRequested emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String goalsReactivationDeniedBody(Appraisal appraisal) throws Exception {
+        return emailBundle.getString("email_goalsReactivationDenied_body");
     }
 
     /**

@@ -568,6 +568,12 @@ public class AppraisalsAction implements ActionInterface {
             }
         }
 
+        // Approve/Deny Goals Reactivation
+        if (permRule.getSubmit().equals("approve-goals-reactivation") ||
+                permRule.getSecondarySubmit().equals("deny-goals-reactivation")) {
+            reactivationGoals(requestMap);
+        }
+
         // If the appraisalStep object has a new status, update the appraisal object
         String appointmentType = appraisal.getJob().getAppointmentType();
         AppraisalStep appraisalStep = getAppraisalStep(requestMap, appointmentType);
@@ -585,6 +591,32 @@ public class AppraisalsAction implements ActionInterface {
         }
         if (appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
             appraisal.setGoalsRequiredModificationDate(new Date());
+        }
+    }
+
+    /**
+     * Handles approving/denying goals reactivation request.
+     *
+     * @param requestMap
+     * @throws Exception
+     */
+    private void reactivationGoals(Map<String, String[]> requestMap) throws Exception {
+        Boolean goalReactivationDecision = null;
+        if (requestMap.get("approve-goals-reactivation") != null) {
+            goalReactivationDecision = true;
+        } else if (requestMap.get("deny-goals-reactivation") != null) {
+            goalReactivationDecision = false;
+        }
+
+        GoalVersion unapprovedGoalsVersion = appraisal.getUnapprovedGoalsVersion();
+        if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR) &&
+                appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REACTIVATION_REQUESTED) &&
+                goalReactivationDecision != null && unapprovedGoalsVersion != null) {
+            unapprovedGoalsVersion.setDecisionPidm(loggedInUser.getId());
+            unapprovedGoalsVersion.setRequestApproved(goalReactivationDecision);
+            if (goalReactivationDecision) {
+                AppraisalMgr.addAssessmentForGoalsReactivation(unapprovedGoalsVersion, appraisal);
+            }
         }
     }
 
@@ -1038,6 +1070,9 @@ public class AppraisalsAction implements ActionInterface {
         appraisal.setStatus(appraisalStep.getNewStatus());
         AppraisalMgr.updateAppraisalStatus(appraisal);
         SessionMessages.add(request, "appraisal-goals-reactivation-requested");
+
+        // create goalVersion pojo && associate it
+        AppraisalMgr.addGoalVersion(appraisal);
 
         // update status of cached appraisal object
         updateAppraisalInSession();
