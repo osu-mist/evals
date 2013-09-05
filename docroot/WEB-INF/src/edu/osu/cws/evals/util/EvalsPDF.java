@@ -746,7 +746,7 @@ public class EvalsPDF {
                         new DateTime(goalVersion.getApprovedDate()).toString(Constants.DATE_FORMAT) + ":";
                 setGoalsHeader(goalHeader);
                 List<Assessment> sortedAssessments = goalVersion.getSortedAssessments();
-                displayAssessments(sortedAssessments, approvedCount);
+                approvedCount = displayAssessments(sortedAssessments, approvedCount);
             }
         }
 
@@ -779,7 +779,7 @@ public class EvalsPDF {
      *
      * @throws Exception
      */
-    private void displayAssessments(List<Assessment> sortedAssessments, int approvedCount) throws Exception {
+    private int displayAssessments(List<Assessment> sortedAssessments, int approvedCount) throws Exception {
         boolean displayApprovedGoals = StringUtils.containsAny(permRule.getApprovedGoals(), "ev");
         boolean displayUnapprovedGoals = StringUtils.containsAny(permRule.getUnapprovedGoals(), "ev");
         boolean displayEmployeeResults = StringUtils.containsAny(permRule.getResults(), "ev");
@@ -840,6 +840,7 @@ public class EvalsPDF {
                 }
             }
         }
+        return approvedCount;
     }
 
     /**
