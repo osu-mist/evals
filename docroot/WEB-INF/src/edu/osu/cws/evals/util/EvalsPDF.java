@@ -737,6 +737,7 @@ public class EvalsPDF {
      */
     private void addAssessments() throws Exception {
         String goalHeader = "";
+        int approvedCount = 0;
 
         if(StringUtils.containsAny(permRule.getApprovedGoals(), "ev")) {
             List<GoalVersion> approvedGoalsVersions = appraisal.getApprovedGoalsVersions();
@@ -745,7 +746,7 @@ public class EvalsPDF {
                         new DateTime(goalVersion.getApprovedDate()).toString(Constants.DATE_FORMAT) + ":";
                 setGoalsHeader(goalHeader);
                 List<Assessment> sortedAssessments = goalVersion.getSortedAssessments();
-                displayAssessments(sortedAssessments);
+                displayAssessments(sortedAssessments, approvedCount);
             }
         }
 
@@ -755,7 +756,7 @@ public class EvalsPDF {
                 goalHeader = resource.getString("appraisal-goals-need-approved");
                 setGoalsHeader(goalHeader);
                 List<Assessment> sortedAssessments = unapprovedGoalsVersion.getSortedAssessments();
-                displayAssessments(sortedAssessments);
+                displayAssessments(sortedAssessments, approvedCount);
             }
         }
     }
@@ -778,14 +779,13 @@ public class EvalsPDF {
      *
      * @throws Exception
      */
-    private void displayAssessments(List<Assessment> sortedAssessments) throws Exception {
+    private void displayAssessments(List<Assessment> sortedAssessments, int approvedCount) throws Exception {
         boolean displayApprovedGoals = StringUtils.containsAny(permRule.getApprovedGoals(), "ev");
         boolean displayUnapprovedGoals = StringUtils.containsAny(permRule.getUnapprovedGoals(), "ev");
         boolean displayEmployeeResults = StringUtils.containsAny(permRule.getResults(), "ev");
         boolean displaySupervisorResults = StringUtils.containsAny(permRule.getSupervisorResults(), "ev");
 
         Paragraph sectionText;
-        int approvedCount = 0;
         int unapprovedCount = 0;
 
         for (Assessment assessment : sortedAssessments) {
