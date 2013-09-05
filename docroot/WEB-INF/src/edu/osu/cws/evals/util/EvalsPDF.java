@@ -796,7 +796,7 @@ public class EvalsPDF {
 
             if (displayApprovedGoals || displayUnapprovedGoals) {
                 String goalLabel = "";
-                if (displayApprovedGoals) {
+                if (!assessment.isNewGoal()) {
                     approvedCount ++;
                     goalLabel = resource.getString("appraisal-goals") + approvedCount;
                 } else {
