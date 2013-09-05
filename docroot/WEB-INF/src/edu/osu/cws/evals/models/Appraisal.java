@@ -2,6 +2,7 @@ package edu.osu.cws.evals.models;
 
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
+import org.apache.commons.lang.ArrayUtils;
 import org.joda.time.DateTime;
 
 import java.text.MessageFormat;
@@ -888,14 +889,22 @@ public class Appraisal extends Evals {
     }
 
     /**
-     * Returns the currently active goal version. In this release, we only support 1 goal version
-     * per Appraisal. In the future, when we allow goals reactivation, we'll allow more than one.
+     * Return the most recently created goal version where the goals haven't been approved by the
+     * supervisor and the goals reactivation request hasn't been denied.
      *
      * @return
      */
-    public GoalVersion getCurrentGoalVersion() {
-        if (goalVersions != null && !goalVersions.isEmpty()) {
-            return (GoalVersion) goalVersions.toArray()[0];
+    public GoalVersion getReactivatedGoalVersion() {
+        List<GoalVersion> goalVersionList = new ArrayList<GoalVersion>();
+        for (GoalVersion goalVersion : goalVersions) {
+            if (!goalVersion.areGoalsApproved() && goalVersion.goalReactivationPendingOrApproved()) {
+                goalVersionList.add(goalVersion);
+            }
+        }
+
+        if (!goalVersionList.isEmpty()) {
+            Collections.sort(goalVersionList);
+            return goalVersionList.get(goalVersionList.size() -1);
         }
 
         return null;
@@ -910,7 +919,7 @@ public class Appraisal extends Evals {
     public List<GoalVersion> getApprovedGoalsVersions() {
         List<GoalVersion> approvedGoalsVersions = new ArrayList<GoalVersion>();
         for (GoalVersion goalVersion : goalVersions) {
-            if (goalVersion.isApproved()) {
+            if (goalVersion.areGoalsApproved()) {
                 approvedGoalsVersions.add(goalVersion);
             }
         }
@@ -927,7 +936,7 @@ public class Appraisal extends Evals {
      */
     public GoalVersion getUnapprovedGoalsVersion() {
         for (GoalVersion goalVersion : goalVersions) {
-            if (goalVersion.isUnapproved()) {
+            if (goalVersion.isRequestUnapproved()) {
                 return goalVersion;
             }
         }
@@ -1034,11 +1043,13 @@ public class Appraisal extends Evals {
         String newStatus = null;
         String status = getStatus();
         Configuration config = configMap.get(status); //config object of this status
+        Configuration timeoutGoalsReactivationReqConfig = configMap.get("goalsReactivationRequestedExpiration");
+        Configuration timeoutNewGoalsConfig = configMap.get("goalsReactivatedExpiration");
 
         if (status.contains(Appraisal.DUE) && EvalsUtil.isDue(this, config) <= 0) {
             newStatus = status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
         } else if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)
-                && isGoalsReqModOverDue(configMap)) {
+                && isGoalsReqModOverDue(configMap) && !areGoalsReactivated()) {
             //goalsRequiredModification is not overdue.
             newStatus = Appraisal.STATUS_GOALS_OVERDUE;
         } else if (status.equals(Appraisal.STATUS_GOALS_APPROVED)) {
@@ -1048,6 +1059,17 @@ public class Appraisal extends Evals {
                 newStatus = Appraisal.STATUS_RESULTS_DUE;
             }
         }
+
+        // change status by timing out goals reactivation request and employee new goals submit
+        boolean goalReactivationExpired = status.equals(STATUS_GOALS_REACTIVATION_REQUESTED)
+                && EvalsUtil.isDue(this, timeoutGoalsReactivationReqConfig) <= 0;
+        boolean goalReactivatedExpired = status.equals(STATUS_GOALS_REACTIVATED)
+                && EvalsUtil.isDue(this, timeoutNewGoalsConfig) <= 0;
+
+        if (goalReactivationExpired || goalReactivatedExpired) {
+            newStatus = STATUS_GOALS_APPROVED;
+        }
+
         return newStatus;
     }
 
@@ -1091,5 +1113,23 @@ public class Appraisal extends Evals {
         sed.withYear(new DateTime().getYear());
 
         return sed.toDate();
+    }
+
+    /**
+     * Figure out if the appraisal is currently in goals reactivated loop.
+     * Basically if we are not in approvalDue status or later and there's more than 1
+     * goal version.
+     */
+    private boolean areGoalsReactivated() {
+        boolean hasMultipleGoalVersions = goalVersions.size() > 1;
+
+        String[] goalsReactivatedStatus = {
+            "goalsApprovalDue",
+            "goalsApprovalOverdue",
+            "goalsReactivated",
+            "goalsReactivationRequested"
+        };
+
+        return hasMultipleGoalVersions && ArrayUtils.contains(goalsReactivatedStatus, status);
     }
 }

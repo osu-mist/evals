@@ -740,7 +740,7 @@ public class EvalsPDF {
         Paragraph sectionText;
         int i = 0;
 
-        GoalVersion currentGoalVersion = appraisal.getCurrentGoalVersion();
+        GoalVersion currentGoalVersion = (GoalVersion) appraisal.getGoalVersions().toArray()[0];
         List<Assessment> sortedAssessments = currentGoalVersion.getSortedAssessments();
 
         boolean displayGoals = StringUtils.containsAny(permRule.getApprovedGoals(), "ev");

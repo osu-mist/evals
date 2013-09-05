@@ -106,9 +106,9 @@
 
         <input type="hidden" name="id" value="${appraisal.id}"/>
         <input type="hidden" id="assessmentCount" name="assessmentCount"
-               value="<%= appraisal.getCurrentGoalVersion().getSortedAssessments().size()%>"/>
+               value="-1"/> <!-- @todo: this needs to be updated -->
         <input type="hidden" id="assessmentSequence" name="assessmentSequence"
-               value="${appraisal.currentGoalVersion.lastSequence}"/>
+               value="-1"/> <!-- @todo: this needs to be updated -->
     </c:if>
 
     <div class="appraisal-criteria">
