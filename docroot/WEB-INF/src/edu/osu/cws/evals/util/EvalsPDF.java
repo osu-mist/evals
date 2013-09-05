@@ -738,21 +738,25 @@ public class EvalsPDF {
     private void addAssessments() throws Exception {
         String goalHeader = "";
 
-        List<GoalVersion> approvedGoalsVersions = appraisal.getApprovedGoalsVersions();
-        for (GoalVersion goalVersion : approvedGoalsVersions){
-            goalHeader = resource.getString("appraisal-goals-approved-on") + " " +
-                    new DateTime(goalVersion.getApprovedDate()).toString(Constants.DATE_FORMAT) + ":";
-            setGoalsHeader(goalHeader);
-            List<Assessment> sortedAssessments = goalVersion.getSortedAssessments();
-            displayAssessments(sortedAssessments);
+        if(StringUtils.containsAny(permRule.getApprovedGoals(), "ev")) {
+            List<GoalVersion> approvedGoalsVersions = appraisal.getApprovedGoalsVersions();
+            for (GoalVersion goalVersion : approvedGoalsVersions){
+                goalHeader = resource.getString("appraisal-goals-approved-on") + " " +
+                        new DateTime(goalVersion.getApprovedDate()).toString(Constants.DATE_FORMAT) + ":";
+                setGoalsHeader(goalHeader);
+                List<Assessment> sortedAssessments = goalVersion.getSortedAssessments();
+                displayAssessments(sortedAssessments);
+            }
         }
 
-        GoalVersion unapprovedGoalsVersion = appraisal.getUnapprovedGoalsVersion();
-        if (unapprovedGoalsVersion != null) {
-            goalHeader = resource.getString("appraisal-goals-need-approved");
-            setGoalsHeader(goalHeader);
-            List<Assessment> sortedAssessments = unapprovedGoalsVersion.getSortedAssessments();
-            displayAssessments(sortedAssessments);
+        if(StringUtils.containsAny(permRule.getUnapprovedGoals(), "ev")) {
+            GoalVersion unapprovedGoalsVersion = appraisal.getUnapprovedGoalsVersion();
+            if (unapprovedGoalsVersion != null) {
+                goalHeader = resource.getString("appraisal-goals-need-approved");
+                setGoalsHeader(goalHeader);
+                List<Assessment> sortedAssessments = unapprovedGoalsVersion.getSortedAssessments();
+                displayAssessments(sortedAssessments);
+            }
         }
     }
 
@@ -781,16 +785,25 @@ public class EvalsPDF {
         boolean displaySupervisorResults = StringUtils.containsAny(permRule.getSupervisorResults(), "ev");
 
         Paragraph sectionText;
-        int i = 0;
+        int approvedCount = 0;
+        int unapprovedCount = 0;
+
         for (Assessment assessment : sortedAssessments) {
-            i++;
 
             sectionText = new Paragraph();
             sectionText.setSpacingBefore(BEFORE_SPACING);
             document.add(sectionText);
 
             if (displayApprovedGoals || displayUnapprovedGoals) {
-                String goalLabel = resource.getString("appraisal-goals") + i;
+                String goalLabel = "";
+                if (displayApprovedGoals) {
+                    approvedCount ++;
+                    goalLabel = resource.getString("appraisal-goals") + approvedCount;
+                } else {
+                    unapprovedCount ++;
+                    goalLabel = resource.getString("appraisal-goals") + unapprovedCount;
+                }
+
                 Chunk goalChunk = new Chunk(goalLabel, FONT_BOLDITALIC_10);
                 goalChunk.setUnderline(1f, -2f);
 
@@ -803,26 +816,28 @@ public class EvalsPDF {
                 addAssessmentsCriteria(assessment);
             }
 
-            if (displayApprovedGoals && displayEmployeeResults) {
-                Paragraph resultsLabel = new Paragraph(resource.getString("appraisal-employee-results"),
-                        FONT_BOLDITALIC_10);
-                Paragraph employeeResult = new Paragraph(assessment.getEmployeeResult(), FONT_10);
-                resultsLabel.setSpacingBefore(BEFORE_SPACING);
-                resultsLabel.setIndentationLeft(LEFT_INDENTATION);
-                employeeResult.setIndentationLeft(LEFT_INDENTATION);
-                document.add(resultsLabel);
-                document.add(employeeResult);
-            }
+            if (!assessment.isNewGoal()) {
+                if (displayEmployeeResults) {
+                    Paragraph resultsLabel = new Paragraph(resource.getString("appraisal-employee-results"),
+                            FONT_BOLDITALIC_10);
+                    Paragraph employeeResult = new Paragraph(assessment.getEmployeeResult(), FONT_10);
+                    resultsLabel.setSpacingBefore(BEFORE_SPACING);
+                    resultsLabel.setIndentationLeft(LEFT_INDENTATION);
+                    employeeResult.setIndentationLeft(LEFT_INDENTATION);
+                    document.add(resultsLabel);
+                    document.add(employeeResult);
+                }
 
-            if (displayApprovedGoals && displaySupervisorResults) {
-                Paragraph supervisorResultLbl = new Paragraph(resource.getString("appraisal-result-comments"),
-                        FONT_BOLDITALIC_10);
-                Paragraph supervisorResult = new Paragraph(assessment.getSupervisorResult(), FONT_10);
-                supervisorResultLbl.setSpacingBefore(BEFORE_SPACING);
-                supervisorResultLbl.setIndentationLeft(LEFT_INDENTATION);
-                supervisorResult.setIndentationLeft(LEFT_INDENTATION);
-                document.add(supervisorResultLbl);
-                document.add(supervisorResult);
+                if (displaySupervisorResults) {
+                    Paragraph supervisorResultLbl = new Paragraph(resource.getString("appraisal-result-comments"),
+                            FONT_BOLDITALIC_10);
+                    Paragraph supervisorResult = new Paragraph(assessment.getSupervisorResult(), FONT_10);
+                    supervisorResultLbl.setSpacingBefore(BEFORE_SPACING);
+                    supervisorResultLbl.setIndentationLeft(LEFT_INDENTATION);
+                    supervisorResult.setIndentationLeft(LEFT_INDENTATION);
+                    document.add(supervisorResultLbl);
+                    document.add(supervisorResult);
+                }
             }
         }
     }
