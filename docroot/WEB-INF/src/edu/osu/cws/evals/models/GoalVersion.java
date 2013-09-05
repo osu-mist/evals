@@ -114,7 +114,7 @@ public class GoalVersion implements Comparable<GoalVersion> {
      */
     public boolean isRequestUnapproved() {
         return requestApproved == null ||
-                (!requestApproved && !areGoalsApproved());
+                (requestApproved && !areGoalsApproved());
     }
 
     /**
