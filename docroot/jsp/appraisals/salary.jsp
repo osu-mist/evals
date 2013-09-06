@@ -11,7 +11,6 @@
                 <th><liferay-ui:message key="appraisal-salary-recommended-increase"/></th>
                 <th><liferay-ui:message key="appraisal-salary-after-increase"/></th>
                 <th><liferay-ui:message key="appraisal-salary-eligibility-date"/></th>
-
             </tr>
         </thead>
         <tbody>
@@ -41,7 +40,9 @@
                 <td><fmt:formatDate value="${appraisal.salaryEligibilityDate}" pattern="MM/dd"/></td>
             </tr>
         </tbody>
+        <tbody>
     </table>
+    <div class="salary-comment"></div>
 </fieldset>
 
 <script type="text/javascript">
@@ -78,28 +79,39 @@
             var isSalaryAtHighPoint = ${appraisal.salary.current} >= ${appraisal.salary.high};
 
             // If the supervisor rates a 1, we only enable the input box if current salary is not at top range
-            if (rating == 1 && !isSalaryAtHighPoint) {
-                if (resetValue) {
-                    jQuery(".osu-cws input.recommended-salary").val('');
-                }
-                jQuery(".osu-cws input.recommended-salary").removeAttr('disabled');
-                jQuery(".osu-cws input.recommended-salary").removeAttr('readonly');
+            if (!isSalaryAtHighPoint) {
+                if (rating == 1) {
+                    if (resetValue) {
+                        jQuery(".osu-cws input.recommended-salary").val('');
+                    }
+                    jQuery(".osu-cws input.recommended-salary").removeAttr('disabled');
+                    jQuery(".osu-cws input.recommended-salary").removeAttr('readonly');
 
-                // set the range hint
-                var hint = '(<liferay-ui:message key="appraisal-salary-increase-hint-range"/> '
-                        + ${increaseRate1MinVal} + ' - ' + ${increaseRate1MaxVal} + ')';
-                jQuery('.recommended-salary-hint').html(hint);
-            } else if (rating == 2) {
-                increase = ${increaseRate2Value}; // disable the inputs as well if rating is 2 or 3
+                    // set the range hint
+                    var hint = '(<liferay-ui:message key="appraisal-salary-increase-hint-range"/> '
+                            + ${increaseRate1MinVal} + ' - ' + ${increaseRate1MaxVal} + ')';
+                    jQuery('.recommended-salary-hint').html(hint);
+                } else if (rating == 2) {
+                    increase = ${increaseRate2Value}; // disable the inputs as well if rating is 2 or 3
+                }
             }
 
-            if (rating == 2 || rating == 3 || (rating == 1 && isSalaryAtHighPoint) || rating == undefined) {
+            // When the rating is 1 or 2, set the increase to 0 if the salary is at or above the control point high.
+            if (isSalaryAtHighPoint && (rating == 1 || rating == 2 || rating == undefined)) {
+                jQuery(".osu-cws input.recommended-salary").val('0');
+                jQuery(".osu-cws .salary-comment").text('<liferay-ui:message key="appraisal-salary-already-high-point"/>');
+                jQuery(".osu-cws input.recommended-salary").attr('disabled','true');
+                jQuery(".osu-cws input.recommended-salary").attr('readonly','readonly');
+            }
+
+            if ((!isSalaryAtHighPoint && (rating == 2 || rating == 3)) || rating == undefined) {
                 if (resetValue) {
                     jQuery(".osu-cws input.recommended-salary").val(increase);
                 }
                 jQuery(".osu-cws input.recommended-salary").attr('disabled','true');
                 jQuery(".osu-cws input.recommended-salary").attr('readonly','readonly');
             }
+
         }
 
         /**
