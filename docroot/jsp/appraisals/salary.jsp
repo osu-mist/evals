@@ -40,7 +40,6 @@
                 <td><fmt:formatDate value="${appraisal.salaryEligibilityDate}" pattern="MM/dd"/></td>
             </tr>
         </tbody>
-        <tbody>
     </table>
     <div class="salary-comment"></div>
 </fieldset>
