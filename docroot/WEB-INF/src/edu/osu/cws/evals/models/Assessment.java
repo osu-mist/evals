@@ -227,6 +227,6 @@ public class Assessment extends Evals implements Comparable<Assessment> {
      * concerned.
      */
     public boolean isNewGoal() {
-        return goalVersion.isRequestUnapproved();
+        return goalVersion.goalReactivationPendingOrApproved();
     }
 }

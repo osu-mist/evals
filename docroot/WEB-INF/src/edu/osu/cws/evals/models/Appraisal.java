@@ -936,7 +936,7 @@ public class Appraisal extends Evals {
      */
     public GoalVersion getUnapprovedGoalsVersion() {
         for (GoalVersion goalVersion : goalVersions) {
-            if (goalVersion.isRequestUnapproved()) {
+            if (goalVersion.goalReactivationPendingOrApproved()) {
                 return goalVersion;
             }
         }

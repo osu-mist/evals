@@ -583,7 +583,7 @@ public class AppraisalsTest {
         appraisal.addGoalVersion(goalVersion1);
 
         GoalVersion goalVersion = appraisal.getUnapprovedGoalsVersion();
-        assert goalVersion == null;
+        assert goalVersion.getId() == 1;
     }
 
     public void shouldReturnOnlyUnapprovedGoals() {
@@ -602,6 +602,6 @@ public class AppraisalsTest {
         appraisal.addGoalVersion(goalVersion2);
 
         GoalVersion goalVersion = appraisal.getUnapprovedGoalsVersion();
-        assert  goalVersion.getId() == 1;
+        assert goalVersion.getId() == 2;
     }
 }

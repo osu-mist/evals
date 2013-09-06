@@ -109,15 +109,6 @@ public class GoalVersion implements Comparable<GoalVersion> {
     }
 
     /**
-     *
-     * @return
-     */
-    public boolean isRequestUnapproved() {
-        return requestApproved == null ||
-                (requestApproved && !areGoalsApproved());
-    }
-
-    /**
      * Returns a sorted list of assessments. The assessment pojo class
      * implements comparable interface which makes this easy. It removes deleted assessments from
      * the list.
@@ -178,6 +169,11 @@ public class GoalVersion implements Comparable<GoalVersion> {
         return goalVersion;
     }
 
+    /**
+     * Whether or not this goal version is new and unapproved.
+     *
+     * @return
+     */
     public boolean goalReactivationPendingOrApproved() {
         boolean approvedGoalReactivation = requestApproved != null && requestApproved;
 

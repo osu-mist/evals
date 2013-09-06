@@ -16,9 +16,7 @@ public class GoalsVersionsTests {
 
     public void shouldBeUnapprovedWhenRequestedIsApprovedButApprovedDateIsNull() {
         GoalVersion goalVersion = new GoalVersion();
-        assert goalVersion.isRequestUnapproved();
-
         goalVersion.setRequestApproved(true);
-        assert !goalVersion.isRequestUnapproved();
+        assert goalVersion.goalReactivationPendingOrApproved();
     }
 }
