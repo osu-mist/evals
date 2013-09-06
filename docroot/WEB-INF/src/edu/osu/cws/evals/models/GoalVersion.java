@@ -170,7 +170,7 @@ public class GoalVersion implements Comparable<GoalVersion> {
     }
 
     /**
-     * Whether or not this goal version is new and unapproved.
+     * Whether or not the reactivation request for this goal version is pending or approved.
      *
      * @return
      */
