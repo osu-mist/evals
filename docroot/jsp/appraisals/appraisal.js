@@ -185,7 +185,28 @@ jQuery(document).ready(function() {
     return assessmentDelete.call(this);
   });
 
-  /**
+    /**
+     * Returns a jquery object that represents the last assessment div to clone when creating a new
+     * goal.
+     *
+     * @return {*}
+     */
+    function getLastAssessment() {
+        return jQuery('.appraisal-criteria fieldset>div:last');
+    }
+
+    /**
+     * Returns the # of assessments/goals currently in the evaluation form. This allows us to
+     * # of the goals in the form.
+     *
+     * @return {*}
+     */
+    function getAssessmentCount() {
+        // There's already an extra di
+        return jQuery('.appraisal-criteria fieldset>div').not('.goals-header').size() + 1;
+    }
+
+    /**
    * Handles adding a new assessment to the DOM. This js method clones the last .appraisal-criteria
    * fieldset in the form. The logic in this function is to update the various classes, names and ids
    * of the various html elements in the .appraisal-criteria fieldset. The various labels, inputs,
@@ -199,9 +220,9 @@ jQuery(document).ready(function() {
    */
   jQuery(".osu-cws #addAssessment").click(function() {
     // clone last assessment in the form for modification
-    var newAssessment = jQuery('.appraisal-criteria fieldset>div:last-child').clone(true);
+    var newAssessment = getLastAssessment().clone(true);
     newAssessment.show(); // last assessment could have been deleted
-    var assessmentCount = jQuery('.appraisal-criteria fieldset>div').size() + 1;
+    var assessmentCount = getAssessmentCount();
 
     // The rest of this function takes care of updating ids, names and classes
 

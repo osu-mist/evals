@@ -134,16 +134,17 @@
                     <c:forEach var="assessment" items="${appraisal.unapprovedGoalsVersion.sortedAssessments}" varStatus="loopStatus">
                         <%@ include file="/jsp/appraisals/assessment.jsp"%>
                     </c:forEach>
-                    <c:if test="${permissionRule.unapprovedGoals == 'e'}">
-                        <ul class="ul-h-nav">
-                            <li><a href="#" class="img-txt add" id="addAssessment">
-                                <liferay-ui:message key="appraisal-assessment-add"/></a>
-                            </li>
-                        </ul>
-                    </c:if>
                 </c:if>
             </c:if>
         </fieldset>
+
+        <c:if test="${permissionRule.unapprovedGoals == 'e'}">
+            <ul class="ul-h-nav">
+                <li><a href="#" class="img-txt add" id="addAssessment">
+                    <liferay-ui:message key="appraisal-assessment-add"/></a>
+                </li>
+            </ul>
+        </c:if>
     </div>
 
 
