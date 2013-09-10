@@ -731,36 +731,83 @@ public class EvalsPDF {
 
 
     /**
-     * Adds each evaluation criteria, goals, employee results and supervisor results based on
-     * the permission rule.
+     * Adds headers and assessments based on goals versions
      *
-     * @throws com.itextpdf.text.DocumentException
+     * @throws
      */
     private void addAssessments() throws Exception {
-        Paragraph sectionText;
-        int i = 0;
+        String goalHeader = "";
+        int approvedCount = 0;
 
-        GoalVersion currentGoalVersion = appraisal.getCurrentGoalVersion();
-        List<Assessment> sortedAssessments = currentGoalVersion.getSortedAssessments();
+        if(StringUtils.containsAny(permRule.getApprovedGoals(), "ev")) {
+            List<GoalVersion> approvedGoalsVersions = appraisal.getApprovedGoalsVersions();
+            for (GoalVersion goalVersion : approvedGoalsVersions){
+                goalHeader = resource.getString("appraisal-goals-approved-on") + " " +
+                        new DateTime(goalVersion.getApprovedDate()).toString(Constants.DATE_FORMAT) + ":";
+                setGoalsHeader(goalHeader);
+                List<Assessment> sortedAssessments = goalVersion.getSortedAssessments();
+                approvedCount = displayAssessments(sortedAssessments, approvedCount);
+            }
+        }
 
-        boolean displayGoals = StringUtils.containsAny(permRule.getApprovedGoals(), "ev");
+        if(StringUtils.containsAny(permRule.getUnapprovedGoals(), "ev")) {
+            GoalVersion unapprovedGoalsVersion = appraisal.getUnapprovedGoalsVersion();
+            if (unapprovedGoalsVersion != null) {
+                goalHeader = resource.getString("appraisal-goals-need-approved");
+                setGoalsHeader(goalHeader);
+                List<Assessment> sortedAssessments = unapprovedGoalsVersion.getSortedAssessments();
+                displayAssessments(sortedAssessments, approvedCount);
+            }
+        }
+    }
+
+    /**
+     * Adds header for one goal version
+     *
+     * @throws Exception
+     */
+    private void setGoalsHeader(String goalHeader) throws Exception {
+        Chunk goalHeaderChunk = new Chunk(goalHeader, FONT_BOLD_12);
+        goalHeaderChunk.setUnderline(1f, -2f);
+        Paragraph goalsHeader = new Paragraph(goalHeaderChunk);
+        goalsHeader.setSpacingBefore(BEFORE_SPACING);
+        document.add(goalsHeader);
+    }
+
+    /**
+     * Adds assessments for one goal version
+     *
+     * @throws Exception
+     */
+    private int displayAssessments(List<Assessment> sortedAssessments, int approvedCount) throws Exception {
+        boolean displayApprovedGoals = StringUtils.containsAny(permRule.getApprovedGoals(), "ev");
+        boolean displayUnapprovedGoals = StringUtils.containsAny(permRule.getUnapprovedGoals(), "ev");
         boolean displayEmployeeResults = StringUtils.containsAny(permRule.getResults(), "ev");
         boolean displaySupervisorResults = StringUtils.containsAny(permRule.getSupervisorResults(), "ev");
 
+        Paragraph sectionText;
+        int unapprovedCount = 0;
+
         for (Assessment assessment : sortedAssessments) {
-            i++;
 
             sectionText = new Paragraph();
             sectionText.setSpacingBefore(BEFORE_SPACING);
             document.add(sectionText);
 
-            if (displayGoals) {
-                String goalLabel = resource.getString("appraisal-goals") + i;
+            if (displayApprovedGoals || displayUnapprovedGoals) {
+                String goalLabel = "";
+                if (!assessment.isNewGoal()) {
+                    approvedCount ++;
+                    goalLabel = resource.getString("appraisal-goals") + approvedCount;
+                } else {
+                    unapprovedCount ++;
+                    goalLabel = resource.getString("appraisal-goals") + unapprovedCount;
+                }
+
                 Chunk goalChunk = new Chunk(goalLabel, FONT_BOLDITALIC_10);
                 goalChunk.setUnderline(1f, -2f);
 
                 Paragraph goalsLabel = new Paragraph(goalChunk);
-                goalsLabel.setSpacingBefore(BEFORE_SPACING);
                 Paragraph goals = new Paragraph(assessment.getGoal(), FONT_10);
                 goals.setIndentationLeft(LEFT_INDENTATION);
                 document.add(goalsLabel);
@@ -769,29 +816,31 @@ public class EvalsPDF {
                 addAssessmentsCriteria(assessment);
             }
 
-            if (displayEmployeeResults) {
-                Paragraph resultsLabel = new Paragraph(resource.getString("appraisal-employee-results"),
-                        FONT_BOLDITALIC_10);
-                Paragraph employeeResult = new Paragraph(assessment.getEmployeeResult(), FONT_10);
-                resultsLabel.setSpacingBefore(BEFORE_SPACING);
-                resultsLabel.setIndentationLeft(LEFT_INDENTATION);
-                employeeResult.setIndentationLeft(LEFT_INDENTATION);
-                document.add(resultsLabel);
-                document.add(employeeResult);
-            }
+            if (!assessment.isNewGoal()) {
+                if (displayEmployeeResults) {
+                    Paragraph resultsLabel = new Paragraph(resource.getString("appraisal-employee-results"),
+                            FONT_BOLDITALIC_10);
+                    Paragraph employeeResult = new Paragraph(assessment.getEmployeeResult(), FONT_10);
+                    resultsLabel.setSpacingBefore(BEFORE_SPACING);
+                    resultsLabel.setIndentationLeft(LEFT_INDENTATION);
+                    employeeResult.setIndentationLeft(LEFT_INDENTATION);
+                    document.add(resultsLabel);
+                    document.add(employeeResult);
+                }
 
-            if (displaySupervisorResults) {
-                Paragraph supervisorResultLbl = new Paragraph(resource.getString("appraisal-result-comments"),
-                        FONT_BOLDITALIC_10);
-                Paragraph supervisorResult = new Paragraph(assessment.getSupervisorResult(), FONT_10);
-                supervisorResultLbl.setSpacingBefore(BEFORE_SPACING);
-                supervisorResultLbl.setIndentationLeft(LEFT_INDENTATION);
-                supervisorResult.setIndentationLeft(LEFT_INDENTATION);
-                document.add(supervisorResultLbl);
-                document.add(supervisorResult);
+                if (displaySupervisorResults) {
+                    Paragraph supervisorResultLbl = new Paragraph(resource.getString("appraisal-result-comments"),
+                            FONT_BOLDITALIC_10);
+                    Paragraph supervisorResult = new Paragraph(assessment.getSupervisorResult(), FONT_10);
+                    supervisorResultLbl.setSpacingBefore(BEFORE_SPACING);
+                    supervisorResultLbl.setIndentationLeft(LEFT_INDENTATION);
+                    supervisorResult.setIndentationLeft(LEFT_INDENTATION);
+                    document.add(supervisorResultLbl);
+                    document.add(supervisorResult);
+                }
             }
-
         }
+        return approvedCount;
     }
 
     /**
