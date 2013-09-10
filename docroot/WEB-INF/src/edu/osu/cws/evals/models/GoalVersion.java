@@ -171,12 +171,24 @@ public class GoalVersion implements Comparable<GoalVersion> {
 
     /**
      * Whether or not the reactivation request for this goal version is pending or approved.
+     * This method returns false if the goals reactivation request was denied or if the
+     * goals reactivation request was approved, and the goals have been approved as well.
      *
      * @return
      */
     public boolean goalReactivationPendingOrApproved() {
-        boolean approvedGoalReactivation = requestDecision != null && requestDecision;
+        if (requestDecision == null) {
+            return true; // request pending approval
+        }
+        if (!requestDecision) {
+            return false; //request denied
+        }
 
-        return approvedGoalReactivation || requestDecision == null;
+        //If we get here, request is approved
+        if (goalsApprovedDate == null) {
+            return true; //request approved but goals are not yet.
+        }
+
+        return false;  //all other cases, either request were denied or goals were approved
     }
 }
