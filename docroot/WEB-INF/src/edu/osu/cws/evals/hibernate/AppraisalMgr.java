@@ -47,7 +47,7 @@ public class AppraisalMgr {
         appraisal.addGoalVersion(goalVersion);
         goalVersion.setCreateDate(new Date());
         // the first goal version is automatically approved
-        goalVersion.setRequestApproved(true);
+        goalVersion.setRequestDecision(true);
 
         if (!type.equals(Appraisal.TYPE_TRIAL) && !type.equals(Appraisal.TYPE_ANNUAL) &&
                 !type.equals(Appraisal.TYPE_INITIAL)) {

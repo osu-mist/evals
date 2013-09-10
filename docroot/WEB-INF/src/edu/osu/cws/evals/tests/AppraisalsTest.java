@@ -111,8 +111,8 @@ public class AppraisalsTest {
         updatedAppraisal.setCloseOutBy(employee);
 
         GoalVersion firstGoalVersion = (GoalVersion) appraisal.getGoalVersions().toArray()[0];
-        firstGoalVersion.setRequestApproved(true);
-        firstGoalVersion.setApprovedDate(new Date());
+        firstGoalVersion.setRequestDecision(true);
+        firstGoalVersion.setGoalsApprovedDate(new Date());
 
         for (Assessment assessment : firstGoalVersion.getAssessments()) {
             assessment.setGoal("foobar");
@@ -154,7 +154,7 @@ public class AppraisalsTest {
         appraisal.setRating(1);
 
         GoalVersion firstGoalVersion = (GoalVersion) appraisal.getGoalVersions().toArray()[0];
-        firstGoalVersion.setRequestApproved(true);
+        firstGoalVersion.setRequestDecision(true);
 
         for (Assessment assessment : firstGoalVersion.getAssessments()) {
             assessment.setEmployeeResult("employee results txt");
@@ -185,7 +185,7 @@ public class AppraisalsTest {
         appraisal1.setEvaluation("evaluation text");
         appraisal1.setRating(1);
         GoalVersion firstGoalVersion = (GoalVersion) appraisal.getGoalVersions().toArray()[0];
-        firstGoalVersion.setRequestApproved(true);
+        firstGoalVersion.setRequestDecision(true);
 
         for (Assessment assessment : firstGoalVersion.getAssessments()) {
             assessment.setGoal("foobar");
@@ -533,17 +533,17 @@ public class AppraisalsTest {
         GoalVersion goalVersion1 = new GoalVersion();
         goalVersion1.setId(1);
         goalVersion1.setCreateDate(new Date());
-        goalVersion1.setApprovedDate(new Date());
+        goalVersion1.setGoalsApprovedDate(new Date());
 
         GoalVersion goalVersion2 = new GoalVersion();
         goalVersion2.setId(2);
         goalVersion2.setCreateDate(new DateTime().minusDays(1).toDate());
-        goalVersion2.setApprovedDate(new Date());
+        goalVersion2.setGoalsApprovedDate(new Date());
 
         GoalVersion goalVersion3 = new GoalVersion();
         goalVersion3.setId(3);
         goalVersion3.setCreateDate(new DateTime().minusDays(2).toDate());
-        goalVersion3.setApprovedDate(new Date());
+        goalVersion3.setGoalsApprovedDate(new Date());
 
         appraisal.addGoalVersion(goalVersion1);
         appraisal.addGoalVersion(goalVersion2);
@@ -560,7 +560,7 @@ public class AppraisalsTest {
         GoalVersion goalVersion1 = new GoalVersion();
         goalVersion1.setId(1);
         goalVersion1.setCreateDate(new Date());
-        goalVersion1.setApprovedDate(new Date());
+        goalVersion1.setGoalsApprovedDate(new Date());
 
         GoalVersion goalVersion2 = new GoalVersion();
         goalVersion2.setId(2);
@@ -579,7 +579,7 @@ public class AppraisalsTest {
         GoalVersion goalVersion1 = new GoalVersion();
         goalVersion1.setId(1);
         goalVersion1.setCreateDate(new Date());
-        goalVersion1.setRequestApproved(true);
+        goalVersion1.setRequestDecision(true);
         appraisal.addGoalVersion(goalVersion1);
 
         GoalVersion goalVersion = appraisal.getUnapprovedGoalsVersion();
@@ -591,12 +591,12 @@ public class AppraisalsTest {
         GoalVersion goalVersion1 = new GoalVersion();
         goalVersion1.setId(1);
         goalVersion1.setCreateDate(new Date());
-        goalVersion1.setRequestApproved(false);
+        goalVersion1.setRequestDecision(false);
 
         GoalVersion goalVersion2 = new GoalVersion();
         goalVersion2.setId(2);
         goalVersion2.setCreateDate(new DateTime().minusDays(1).toDate());
-        goalVersion2.setRequestApproved(true);
+        goalVersion2.setRequestDecision(true);
 
         appraisal.addGoalVersion(goalVersion1);
         appraisal.addGoalVersion(goalVersion2);

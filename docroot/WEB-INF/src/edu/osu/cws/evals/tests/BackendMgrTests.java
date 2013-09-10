@@ -5,10 +5,8 @@ import com.google.inject.Injector;
 import edu.osu.cws.evals.backend.BackendMgr;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
-import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.HibernateUtil;
-import edu.osu.cws.evals.util.MailerInterface;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.joda.time.DateTime;
@@ -292,8 +290,8 @@ public class BackendMgrTests {
         appraisal.addGoalVersion(goalVersion);
         getMgrInstance().timeOutGoalsReactivation(appraisal);
 
-        assert !goalVersion.getRequestApproved();
-        assert goalVersion.getDecisionPidm() == null;
+        assert !goalVersion.getRequestDecision();
+        assert goalVersion.getRequestDecisionPidm() == null;
         assert goalVersion.getTimedOutAt().equals(Appraisal.STATUS_GOALS_REACTIVATION_REQUESTED);
     }
     /**

@@ -7,15 +7,15 @@ public class GoalVersion implements Comparable<GoalVersion> {
 
     private Appraisal appraisal;
 
-    private Integer approverPidm;
+    private Integer goalsApprovedPidm;
 
     private Date createDate;
 
-    private Date approvedDate;
+    private Date goalsApprovedDate;
 
-    private Boolean requestApproved;
+    private Boolean requestDecision;
 
-    private Integer decisionPidm;
+    private Integer requestDecisionPidm;
 
     private String timedOutAt;
 
@@ -39,12 +39,12 @@ public class GoalVersion implements Comparable<GoalVersion> {
         this.appraisal = appraisal;
     }
 
-    public Integer getApproverPidm() {
-        return approverPidm;
+    public Integer getGoalsApprovedPidm() {
+        return goalsApprovedPidm;
     }
 
-    public void setApproverPidm(Integer approverPidm) {
-        this.approverPidm = approverPidm;
+    public void setGoalsApprovedPidm(Integer goalsApprovedPidm) {
+        this.goalsApprovedPidm = goalsApprovedPidm;
     }
 
     public Date getCreateDate() {
@@ -55,28 +55,28 @@ public class GoalVersion implements Comparable<GoalVersion> {
         this.createDate = createDate;
     }
 
-    public Date getApprovedDate() {
-        return approvedDate;
+    public Date getGoalsApprovedDate() {
+        return goalsApprovedDate;
     }
 
-    public void setApprovedDate(Date approvedDate) {
-        this.approvedDate = approvedDate;
+    public void setGoalsApprovedDate(Date goalsApprovedDate) {
+        this.goalsApprovedDate = goalsApprovedDate;
     }
 
-    public Boolean getRequestApproved() {
-        return requestApproved;
+    public Boolean getRequestDecision() {
+        return requestDecision;
     }
 
-    public void setRequestApproved(Boolean requestApproved) {
-        this.requestApproved = requestApproved;
+    public void setRequestDecision(Boolean requestDecision) {
+        this.requestDecision = requestDecision;
     }
 
-    public Integer getDecisionPidm() {
-        return decisionPidm;
+    public Integer getRequestDecisionPidm() {
+        return requestDecisionPidm;
     }
 
-    public void setDecisionPidm(Integer decisionPidm) {
-        this.decisionPidm = decisionPidm;
+    public void setRequestDecisionPidm(Integer requestDecisionPidm) {
+        this.requestDecisionPidm = requestDecisionPidm;
     }
 
     public String getTimedOutAt() {
@@ -105,7 +105,7 @@ public class GoalVersion implements Comparable<GoalVersion> {
      * @return
      */
     public boolean areGoalsApproved() {
-        return approvedDate != null;
+        return goalsApprovedDate != null;
     }
 
     /**
@@ -160,10 +160,10 @@ public class GoalVersion implements Comparable<GoalVersion> {
         GoalVersion goalVersion = new GoalVersion();
         goalVersion.setAppraisal(newAppraisal);
         goalVersion.setCreateDate(new Date());
-        goalVersion.setApproverPidm(trialGoalVersion.getApproverPidm());
-        goalVersion.setApprovedDate(trialGoalVersion.getApprovedDate());
-        goalVersion.setRequestApproved(trialGoalVersion.getRequestApproved());
-        goalVersion.setDecisionPidm(trialGoalVersion.getDecisionPidm());
+        goalVersion.setGoalsApprovedPidm(trialGoalVersion.getGoalsApprovedPidm());
+        goalVersion.setGoalsApprovedDate(trialGoalVersion.getGoalsApprovedDate());
+        goalVersion.setRequestDecision(trialGoalVersion.getRequestDecision());
+        goalVersion.setRequestDecisionPidm(trialGoalVersion.getRequestDecisionPidm());
         goalVersion.setTimedOutAt(trialGoalVersion.getTimedOutAt());
 
         return goalVersion;
@@ -175,8 +175,8 @@ public class GoalVersion implements Comparable<GoalVersion> {
      * @return
      */
     public boolean goalReactivationPendingOrApproved() {
-        boolean approvedGoalReactivation = requestApproved != null && requestApproved;
+        boolean approvedGoalReactivation = requestDecision != null && requestDecision;
 
-        return approvedGoalReactivation || requestApproved == null;
+        return approvedGoalReactivation || requestDecision == null;
     }
 }
