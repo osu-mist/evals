@@ -110,10 +110,11 @@ public class AppraisalsTest {
         updatedAppraisal.setCloseOutDate(new Date());
         updatedAppraisal.setCloseOutBy(employee);
 
-        updatedAppraisal.getCurrentGoalVersion().setRequestApproved(true);
-        updatedAppraisal.getCurrentGoalVersion().setApprovedDate(new Date());
+        GoalVersion firstGoalVersion = (GoalVersion) appraisal.getGoalVersions().toArray()[0];
+        firstGoalVersion.setRequestApproved(true);
+        firstGoalVersion.setApprovedDate(new Date());
 
-        for (Assessment assessment : updatedAppraisal.getCurrentGoalVersion().getAssessments()) {
+        for (Assessment assessment : firstGoalVersion.getAssessments()) {
             assessment.setGoal("foobar");
         }
 
@@ -152,9 +153,10 @@ public class AppraisalsTest {
         appraisal.setEvaluation("evaluation text");
         appraisal.setRating(1);
 
-        appraisal.getCurrentGoalVersion().setRequestApproved(true);
+        GoalVersion firstGoalVersion = (GoalVersion) appraisal.getGoalVersions().toArray()[0];
+        firstGoalVersion.setRequestApproved(true);
 
-        for (Assessment assessment : appraisal.getCurrentGoalVersion().getAssessments()) {
+        for (Assessment assessment : firstGoalVersion.getAssessments()) {
             assessment.setEmployeeResult("employee results txt");
             assessment.setSupervisorResult("supervisor results txt");
         }
@@ -182,9 +184,10 @@ public class AppraisalsTest {
         appraisal1.setResultSubmitDate(new Date());
         appraisal1.setEvaluation("evaluation text");
         appraisal1.setRating(1);
-        appraisal1.getCurrentGoalVersion().setRequestApproved(true);
+        GoalVersion firstGoalVersion = (GoalVersion) appraisal.getGoalVersions().toArray()[0];
+        firstGoalVersion.setRequestApproved(true);
 
-        for (Assessment assessment : appraisal1.getCurrentGoalVersion().getAssessments()) {
+        for (Assessment assessment : firstGoalVersion.getAssessments()) {
             assessment.setGoal("foobar");
             assessment.setEmployeeResult("employee results txt");
             assessment.setSupervisorResult("supervisor results txt");
@@ -196,7 +199,7 @@ public class AppraisalsTest {
         tx = hsession.beginTransaction();
         appraisal1 = (Appraisal) hsession.load(Appraisal.class, appraisalID);
 
-        for (Assessment assessment : appraisal1.getCurrentGoalVersion().getAssessments()) {
+        for (Assessment assessment : firstGoalVersion.getAssessments()) {
             assert assessment.getEmployeeResult() != null :
                     "Appraisal assessments employee result failed to save";
             assert assessment.getSupervisorResult() != null :
@@ -214,11 +217,12 @@ public class AppraisalsTest {
         Appraisal modifiedAppraisal = loadAppraisalAssessments();
 
         // Editing the goals for the first time
-        for (Assessment assessment : modifiedAppraisal.getCurrentGoalVersion().getAssessments()) {
+        GoalVersion firstGoalVersion = (GoalVersion) modifiedAppraisal.getGoalVersions().toArray()[0];
+        for (Assessment assessment : firstGoalVersion.getAssessments()) {
             assessment.setGoal("first edit of goal");
         }
         AppraisalMgr.updateAppraisal(modifiedAppraisal, modifiedAppraisal.getJob().getEmployee());
-        for (Assessment assessment : modifiedAppraisal.getCurrentGoalVersion().getAssessments()) {
+        for (Assessment assessment : firstGoalVersion.getAssessments()) {
             assert assessment.getGoal() != null :
                     "Appraisal assessments goals failed to save";
             assert assessment.getGoalLogs().size() == 1 :
@@ -226,12 +230,12 @@ public class AppraisalsTest {
         }
 
         // Editing the goals for the second time
-        for (Assessment assessment : modifiedAppraisal.getCurrentGoalVersion().getAssessments()) {
+        for (Assessment assessment : firstGoalVersion.getAssessments()) {
             assessment.setGoal("second edit of goal");
         }
         Employee loggedInUser = EmployeeMgr.findByOnid("luf", null);
         AppraisalMgr.updateAppraisal(modifiedAppraisal, loggedInUser);
-        for (Assessment assessment : modifiedAppraisal.getCurrentGoalVersion().getAssessments()) {
+        for (Assessment assessment : firstGoalVersion.getAssessments()) {
             assert assessment.getGoal().equals("second edit of goal") :
                     "Appraisal assessments goals failed to save";
             assert assessment.getGoalLogs().size() == 2 :
@@ -579,7 +583,7 @@ public class AppraisalsTest {
         appraisal.addGoalVersion(goalVersion1);
 
         GoalVersion goalVersion = appraisal.getUnapprovedGoalsVersion();
-        assert goalVersion == null;
+        assert goalVersion.getId() == 1;
     }
 
     public void shouldReturnOnlyUnapprovedGoals() {
@@ -587,6 +591,7 @@ public class AppraisalsTest {
         GoalVersion goalVersion1 = new GoalVersion();
         goalVersion1.setId(1);
         goalVersion1.setCreateDate(new Date());
+        goalVersion1.setRequestApproved(false);
 
         GoalVersion goalVersion2 = new GoalVersion();
         goalVersion2.setId(2);
@@ -596,7 +601,7 @@ public class AppraisalsTest {
         appraisal.addGoalVersion(goalVersion1);
         appraisal.addGoalVersion(goalVersion2);
 
-        GoalVersion goalVersions= appraisal.getUnapprovedGoalsVersion();
-        assert  goalVersions.getId() == 1;
+        GoalVersion goalVersion = appraisal.getUnapprovedGoalsVersion();
+        assert goalVersion.getId() == 2;
     }
 }

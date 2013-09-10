@@ -453,6 +453,27 @@ public class Mailer implements MailerInterface {
     }
 
     /**
+     * Fetch the body for goalsReactivatedTimeout emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String goalsReactivatedTimeoutBody(Appraisal appraisal) throws Exception {
+        return emailBundle.getString("email_goalsReactivatedTimeout_body");
+    }
+
+    /**
+     * Fetch the body for goalsReactivationTimeout emailType
+     *
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String goalsReactivationTimeoutBody(Appraisal appraisal) throws Exception {
+        return emailBundle.getString("email_goalsReactivationTimeout_body");
+    }
+
+    /**
      * Fetch the body for goalsApprovalDue emailType
      * @param appraisal
      * @return

@@ -100,12 +100,12 @@ public class GoalVersion implements Comparable<GoalVersion> {
         assessments.add(assessment);
     }
 
-    public boolean isApproved() {
+    /**
+     * Whether or not the supervisor has approved the goals submitted by the employee.
+     * @return
+     */
+    public boolean areGoalsApproved() {
         return approvedDate != null;
-    }
-
-    public boolean isUnapproved() {
-        return requestApproved != null && !requestApproved && !isApproved();
     }
 
     /**
@@ -169,18 +169,14 @@ public class GoalVersion implements Comparable<GoalVersion> {
         return goalVersion;
     }
 
-    /*
-     * Returns the sequence of the last assessment in the collection.
+    /**
+     * Whether or not the reactivation request for this goal version is pending or approved.
      *
      * @return
      */
-    public Integer getLastSequence() {
-        Integer lastSequence = 0;
-        for (Assessment assessment : assessments) {
-            if (assessment.getSequence() > lastSequence) {
-                lastSequence = assessment.getSequence();
-            }
-        }
-        return lastSequence;
+    public boolean goalReactivationPendingOrApproved() {
+        boolean approvedGoalReactivation = requestApproved != null && requestApproved;
+
+        return approvedGoalReactivation || requestApproved == null;
     }
 }

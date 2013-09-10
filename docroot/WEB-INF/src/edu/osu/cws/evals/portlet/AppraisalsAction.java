@@ -569,9 +569,11 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         // Approve/Deny Goals Reactivation
-        if (permRule.getSubmit().equals("approve-goals-reactivation") ||
-                permRule.getSecondarySubmit().equals("deny-goals-reactivation")) {
-            reactivationGoals(requestMap);
+        if (permRule.getSubmit() != null && permRule.getSecondarySubmit() != null) {
+            if (permRule.getSubmit().equals("approve-goals-reactivation") ||
+                    permRule.getSecondarySubmit().equals("deny-goals-reactivation")) {
+                reactivationGoals(requestMap);
+            }
         }
 
         // If the appraisalStep object has a new status, update the appraisal object

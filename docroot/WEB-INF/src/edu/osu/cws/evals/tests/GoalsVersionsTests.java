@@ -11,14 +11,12 @@ public class GoalsVersionsTests {
     public void shouldBeApprovedWhenApprovedDateIsNotNull() {
         GoalVersion goalVersion = new GoalVersion();
         goalVersion.setApprovedDate(new Date());
-        assert goalVersion.isApproved();
+        assert goalVersion.areGoalsApproved();
     }
 
     public void shouldBeUnapprovedWhenRequestedIsApprovedButApprovedDateIsNull() {
         GoalVersion goalVersion = new GoalVersion();
-        assert goalVersion.isUnapproved();
-
         goalVersion.setRequestApproved(true);
-        assert !goalVersion.isUnapproved();
+        assert goalVersion.goalReactivationPendingOrApproved();
     }
 }
