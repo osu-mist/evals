@@ -895,16 +895,10 @@ public class Appraisal extends Evals {
      * @return
      */
     public GoalVersion getReactivatedGoalVersion() {
-        List<GoalVersion> goalVersionList = new ArrayList<GoalVersion>();
         for (GoalVersion goalVersion : goalVersions) {
             if (!goalVersion.areGoalsApproved() && goalVersion.goalReactivationPendingOrApproved()) {
-                goalVersionList.add(goalVersion);
+                return goalVersion;
             }
-        }
-
-        if (!goalVersionList.isEmpty()) {
-            Collections.sort(goalVersionList);
-            return goalVersionList.get(goalVersionList.size() -1);
         }
 
         return null;

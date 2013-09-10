@@ -44,12 +44,6 @@ public class MockBackendModule extends AbstractModule{
     }
 
     @Provides @Singleton
-    Map<String, AppraisalStep> provideMailStringAppraisalStep() {
-        HibernateUtil.setHibernateConfig(HibernateUtil.TEST_CONFIG, "", "");
-        return new BackendModule().provideMapStringAppraisalStep();
-    }
-
-    @Provides @Singleton
     LoggingInterface provideLoggingInterface() {
         return (LoggingInterface) new MockLogger();
     }
