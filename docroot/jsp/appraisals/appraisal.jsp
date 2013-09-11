@@ -104,7 +104,7 @@
         <portlet:param name="controller" value="AppraisalsAction" />
         </portlet:actionURL>" method="post" name="<portlet:namespace />request_form">
 
-        <input type="hidden" name="id" value="${appraisal.id}"/>
+        <input type="hidden" id="id" name="id" value="${appraisal.id}"/>
         <input type="hidden" id="assessmentCount" name="assessmentCount"
                value="-1"/> <!-- @todo: this needs to be updated -->
         <input type="hidden" id="assessmentSequence" name="assessmentSequence"
@@ -153,7 +153,7 @@
             <fieldset>
                 <h3 class="secret"><liferay-ui:message key="appraisal-goals-legend" /></h3>
                 <legend><liferay-ui:message key="appraisal-goals-legend" /></legend>
-                <label for="<portlet:namespace />.appraisal.goalsComments"><liferay-ui:message key="appraisal-goals-comments" /></label>
+                <label for="<portlet:namespace />appraisal.goalsComments"><liferay-ui:message key="appraisal-goals-comments" /></label>
                 <liferay-ui:input-textarea param="appraisal.goalsComments"
                     defaultValue="${appraisal.goalsComments}" />
             </fieldset>
