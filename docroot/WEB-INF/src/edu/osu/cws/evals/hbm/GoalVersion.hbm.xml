@@ -12,11 +12,11 @@
             </generator>
         </id>
 
-        <property name="approverPidm" type="int" column="APPROVER_PIDM"/>
+        <property name="goalsApproverPidm" type="int" column="GOALS_APPROVER_PIDM"/>
         <property name="createDate" type="date" column="CREATE_DATE"/>
-        <property name="approvedDate" type="date" column="APPROVED_DATE"/>
-        <property name="requestApproved" type="boolean" column="REQUEST_APPROVED"/>
-        <property name="decisionPidm" type="int" column="DECISION_PIDM"/>
+        <property name="goalsApprovedDate" type="date" column="GOALS_APPROVED_DATE"/>
+        <property name="requestDecision" type="boolean" column="REQUEST_DECISION"/>
+        <property name="requestDecisionPidm" type="int" column="REQUEST_DECISION_PIDM"/>
         <property name="timedOutAt" type="string" column="TIMED_OUT_AT"/>
 
 

@@ -614,8 +614,8 @@ public class AppraisalsAction implements ActionInterface {
         if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR) &&
                 appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REACTIVATION_REQUESTED) &&
                 goalReactivationDecision != null && unapprovedGoalsVersion != null) {
-            unapprovedGoalsVersion.setDecisionPidm(loggedInUser.getId());
-            unapprovedGoalsVersion.setRequestApproved(goalReactivationDecision);
+            unapprovedGoalsVersion.setRequestDecisionPidm(loggedInUser.getId());
+            unapprovedGoalsVersion.setRequestDecision(goalReactivationDecision);
             if (goalReactivationDecision) {
                 AppraisalMgr.addAssessmentForGoalsReactivation(unapprovedGoalsVersion, appraisal);
             }
@@ -673,8 +673,8 @@ public class AppraisalsAction implements ActionInterface {
             appraisal.setGoalsSubmitDate(new Date());
         }
         if (requestMap.get("approve-goals") != null) {
-            appraisal.getUnapprovedGoalsVersion().setApprovedDate(new Date());
-            appraisal.getUnapprovedGoalsVersion().setApproverPidm(loggedInUser.getId());
+            appraisal.getUnapprovedGoalsVersion().setGoalsApprovedDate(new Date());
+            appraisal.getUnapprovedGoalsVersion().setGoalsApproverPidm(loggedInUser.getId());
         }
     }
 

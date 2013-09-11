@@ -743,7 +743,7 @@ public class EvalsPDF {
             List<GoalVersion> approvedGoalsVersions = appraisal.getApprovedGoalsVersions();
             for (GoalVersion goalVersion : approvedGoalsVersions){
                 goalHeader = resource.getString("appraisal-goals-approved-on") + " " +
-                        new DateTime(goalVersion.getApprovedDate()).toString(Constants.DATE_FORMAT) + ":";
+                        new DateTime(goalVersion.getGoalsApprovedDate()).toString(Constants.DATE_FORMAT) + ":";
                 setGoalsHeader(goalHeader);
                 List<Assessment> sortedAssessments = goalVersion.getSortedAssessments();
                 approvedCount = displayAssessments(sortedAssessments, approvedCount);

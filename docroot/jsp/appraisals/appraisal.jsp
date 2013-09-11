@@ -118,7 +118,7 @@
                 <c:forEach var="goalsVersion" items="${appraisal.approvedGoalsVersions}" varStatus="loopStatus">
                     <div class="goals-header">
                         <liferay-ui:message key="appraisal-goals-approved-on"/>
-                        <fmt:formatDate value="${goalsVersion.approvedDate}" pattern="MM/dd/yy"/>:
+                        <fmt:formatDate value="${goalsVersion.goalsApprovedDate}" pattern="MM/dd/yy"/>:
                     </div>
                     <c:forEach var="assessment" items="${goalsVersion.sortedAssessments}" varStatus="loopStatus">
                         <%@ include file="/jsp/appraisals/assessment.jsp"%>
