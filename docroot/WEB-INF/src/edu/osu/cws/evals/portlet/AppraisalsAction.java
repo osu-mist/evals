@@ -674,7 +674,7 @@ public class AppraisalsAction implements ActionInterface {
         }
         if (requestMap.get("approve-goals") != null) {
             appraisal.getUnapprovedGoalsVersion().setGoalsApprovedDate(new Date());
-            appraisal.getUnapprovedGoalsVersion().setGoalsApprovedPidm(loggedInUser.getId());
+            appraisal.getUnapprovedGoalsVersion().setGoalsApproverPidm(loggedInUser.getId());
         }
     }
 

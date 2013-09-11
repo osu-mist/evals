@@ -12,7 +12,7 @@
             </generator>
         </id>
 
-        <property name="goalsApprovedPidm" type="int" column="GOALS_APPROVED_PIDM"/>
+        <property name="goalsApproverPidm" type="int" column="GOALS_APPROVER_PIDM"/>
         <property name="createDate" type="date" column="CREATE_DATE"/>
         <property name="goalsApprovedDate" type="date" column="GOALS_APPROVED_DATE"/>
         <property name="requestDecision" type="boolean" column="REQUEST_DECISION"/>

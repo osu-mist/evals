@@ -7,7 +7,7 @@ public class GoalVersion implements Comparable<GoalVersion> {
 
     private Appraisal appraisal;
 
-    private Integer goalsApprovedPidm;
+    private Integer goalsApproverPidm;
 
     private Date createDate;
 
@@ -39,12 +39,12 @@ public class GoalVersion implements Comparable<GoalVersion> {
         this.appraisal = appraisal;
     }
 
-    public Integer getGoalsApprovedPidm() {
-        return goalsApprovedPidm;
+    public Integer getGoalsApproverPidm() {
+        return goalsApproverPidm;
     }
 
-    public void setGoalsApprovedPidm(Integer goalsApprovedPidm) {
-        this.goalsApprovedPidm = goalsApprovedPidm;
+    public void setGoalsApproverPidm(Integer goalsApproverPidm) {
+        this.goalsApproverPidm = goalsApproverPidm;
     }
 
     public Date getCreateDate() {
@@ -160,7 +160,7 @@ public class GoalVersion implements Comparable<GoalVersion> {
         GoalVersion goalVersion = new GoalVersion();
         goalVersion.setAppraisal(newAppraisal);
         goalVersion.setCreateDate(new Date());
-        goalVersion.setGoalsApprovedPidm(trialGoalVersion.getGoalsApprovedPidm());
+        goalVersion.setGoalsApproverPidm(trialGoalVersion.getGoalsApproverPidm());
         goalVersion.setGoalsApprovedDate(trialGoalVersion.getGoalsApprovedDate());
         goalVersion.setRequestDecision(trialGoalVersion.getRequestDecision());
         goalVersion.setRequestDecisionPidm(trialGoalVersion.getRequestDecisionPidm());
