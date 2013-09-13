@@ -1,7 +1,7 @@
 package edu.osu.cws.evals.models;
 
 public class AssessmentCriteria implements Comparable<AssessmentCriteria> {
-    private int id;
+    private Integer id;
 
     private CriterionArea criteriaArea;
     private Assessment assessment;
@@ -9,11 +9,11 @@ public class AssessmentCriteria implements Comparable<AssessmentCriteria> {
 
     public AssessmentCriteria() {}
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

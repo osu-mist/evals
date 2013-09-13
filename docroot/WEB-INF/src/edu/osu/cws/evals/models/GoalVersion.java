@@ -191,4 +191,9 @@ public class GoalVersion implements Comparable<GoalVersion> {
 
         return false;  //all other cases, either request were denied or goals were approved
     }
+
+    public void approveEmployeeGoals(Integer pidm) {
+        setGoalsApprovedDate(new Date());
+        setGoalsApproverPidm(pidm);
+    }
 }

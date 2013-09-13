@@ -1,5 +1,11 @@
 package edu.osu.cws.evals.models;
 
+import org.apache.commons.lang.WordUtils;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 public class PermissionRule extends Evals implements Cloneable {
     private int id;
 
@@ -216,4 +222,23 @@ public class PermissionRule extends Evals implements Cloneable {
     public void setReactivateGoals(String reactivateGoals) {
         this.reactivateGoals = reactivateGoals;
     }
+
+    public Boolean canEdit(String column) throws Exception {
+        return can(column, "e");
+    }
+
+    /**
+     *
+     * @param column        Name of the permission rule columns such as: employeeResult,
+     *                      supervisorResult
+     * @param action        Values within the columns such as: "e" && "v"
+     * @return
+     */
+    public Boolean can(String column, String action) throws Exception {
+        String methodName = "get" + WordUtils.capitalize(column) ;
+        Method permissionMethod = this.getClass().getDeclaredMethod(methodName);
+        String permission = (String) permissionMethod.invoke(this);
+        return permission != null && permission.equals(action);
+    }
+
 }

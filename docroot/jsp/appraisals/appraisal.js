@@ -3,6 +3,12 @@ jQuery(document).ready(function() {
   // Handle acknowledge appraisal rebuttal read by supervisor
   jQuery(".pass-appraisal-rebuttal").hide();
 
+  // There's no way to figure out via js what button was clicked. Add an attribute to track
+  jQuery("#<portlet:namespace />fm input[type=submit]").click(function() {
+    jQuery("input[type=submit]", jQuery(this).parents("form")).removeAttr("clicked");
+    jQuery(this).attr("clicked", "true");
+  });
+
   jQuery("#<portlet:namespace />fm").submit(function() {
     var errors = "";
     if (jQuery("#<portlet:namespace />acknowledge-read-appraisal").length > 0 &&
@@ -21,8 +27,84 @@ jQuery(document).ready(function() {
       return false;
     }
 
+    var json_data = form_to_JSON();
+    var json_text = JSON.stringify(json_data);
+    var extra_data = jQuery('<input type="hidden" name="json_data"/>').val(json_text);
+    jQuery("#<portlet:namespace />fm").append(extra_data);
+
     return true;
   });
+
+  function form_to_JSON() {
+    var portlet_namespace = '<portlet:namespace />';
+    var o = {assessments: {}};
+
+    // assessment data
+    var assessments = jQuery('.appraisal-criteria fieldset>div').not('.goals-header');
+    jQuery.each(assessments, function(index, value) {
+      assessment = assessment_to_JSON(value);
+      o.assessments[assessment.id] = assessment;
+    });
+
+    // appraisal data
+    o.id = jQuery('#id').val();
+
+    // goals comments
+    o.goalsComments = jQuery('#' + portlet_namespace + "appraisal\\.goalsComments").val();
+
+    // evaluation
+    o.evaluation = jQuery('#' + portlet_namespace + "appraisal\\.evaluation").val();
+
+    // rating
+    o.rating = jQuery(".appraisal input[name=" + portlet_namespace + "appraisal.rating]:checked").val();
+
+    // salary recommendation
+    o.salaryRecommendation = jQuery('#' + portlet_namespace + "appraisal\\.salary\\.increase").val();
+
+    // hr review
+    o.review = jQuery('#' + portlet_namespace + "appraisal\\.review").val();
+
+    // employee rebuttal
+    o.rebuttal = jQuery('#' + portlet_namespace + 'appraisal\\.rebuttal').val();
+    // button clicked
+    o.buttonClicked = jQuery("input[type=submit][clicked=true]").attr('name');
+
+    return o;
+  }
+
+  // Converts a single assessment to json
+  function assessment_to_JSON(assessment) {
+    var form_elements = jQuery(assessment).find(':input, textarea');
+    var o = {id: -1, criteria: {}};
+    jQuery.map(form_elements, function(n, i) {
+      if (jQuery(n).is("input[type='checkbox']")) {
+        var fieldName = getName(n.name, true);
+        o.criteria[fieldName] = jQuery(n).is(':checked');
+      } else {
+        var fieldName = getName(n.name, false);
+        // set the id if it's not set
+        if (o.id == -1) {
+            o.id = n.name.split('.').pop()
+        }
+
+        o[fieldName] = jQuery(n).val();
+      }
+      return o;
+    });
+
+    return o;
+  }
+
+  function getName(form_id, want_id) {
+    var pieces = form_id.split('.');
+    var id = pieces.pop() // remove form_id
+
+    if (want_id) {
+      return id;
+    }
+
+    return pieces.pop();
+  }
 
   // Handles validation
   jQuery("#<portlet:namespace />submit-appraisal").click(function(event) {
@@ -263,7 +345,7 @@ jQuery(document).ready(function() {
         // The AssessmentCriteria checkboxes have suffixes. In order to make them unique ids in
         // in the form, we're using multiples of assmentCount starting with assessmentCount
         var checkBoxName = jQuery(element).attr('name').replace(/\.\d+/, '');
-        checkBoxName += "." + (assessmentCount * (index + 1));
+        checkBoxName += "." +  (index + 1);
         jQuery(element).attr('name', checkBoxName);
         jQuery(element).attr('id', checkBoxName);
         jQuery(element).removeAttr('checked');
@@ -272,7 +354,7 @@ jQuery(document).ready(function() {
     // assessment criterias labels
     jQuery.each(newAssessment.find('label'), function(index, element) {
         var checkBoxName = jQuery(element).attr('for').replace(/\.\d+/, '');
-        checkBoxName += "." + (assessmentCount * index);
+        checkBoxName += "." +  index;
         // The first label is the Goals label, the rest should be assessment criterias
         if (index != 0) {
           jQuery(element).attr('for', checkBoxName);
