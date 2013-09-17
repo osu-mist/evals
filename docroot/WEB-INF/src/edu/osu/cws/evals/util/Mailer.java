@@ -469,8 +469,8 @@ public class Mailer implements MailerInterface {
      * @return
      * @throws Exception
      */
-    private String goalsReactivationTimeoutBody(Appraisal appraisal) throws Exception {
-        return emailBundle.getString("email_goalsReactivationTimeout_body");
+    private String goalsReactivationRequestedTimeoutBody(Appraisal appraisal) throws Exception {
+        return emailBundle.getString("email_goalsReactivationRequestedTimeout_body");
     }
 
     /**

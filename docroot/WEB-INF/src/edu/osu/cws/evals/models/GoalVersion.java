@@ -104,7 +104,7 @@ public class GoalVersion implements Comparable<GoalVersion> {
      * Whether or not the supervisor has approved the goals submitted by the employee.
      * @return
      */
-    public boolean areGoalsApproved() {
+    public boolean goalsApproved() {
         return goalsApprovedDate != null;
     }
 
@@ -176,19 +176,17 @@ public class GoalVersion implements Comparable<GoalVersion> {
      *
      * @return
      */
-    public boolean goalReactivationPendingOrApproved() {
+    public boolean inActivatedState() {
         if (requestDecision == null) {
             return true; // request pending approval
         }
-        if (!requestDecision) {
-            return false; //request denied
+
+        if (requestDecision && requestDecisionPidm != null && goalsApprovedDate == null) {
+            //pending goals approval, requestDecisionPidm is there to exclude the first version
+            //of goals created by the cronjob.
+            return true;
         }
 
-        //If we get here, request is approved
-        if (goalsApprovedDate == null) {
-            return true; //request approved but goals are not yet.
-        }
-
-        return false;  //all other cases, either request were denied or goals were approved
+        return false;
     }
 }
