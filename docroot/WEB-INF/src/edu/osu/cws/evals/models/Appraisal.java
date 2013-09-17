@@ -1138,4 +1138,8 @@ public class Appraisal extends Evals {
         }
         return assessmentMap;
     }
+
+    public String getAppointmentType() {
+        return job.getAppointmentType();
+    }
 }
