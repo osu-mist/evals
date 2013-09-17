@@ -25,6 +25,12 @@
         return confirm("<liferay-ui:message key="appraisal-confirm-message" />" + question_suffix);
     }
     jQuery(document).ready(function() {
+        // There's no way to figure out via js what button was clicked. Add an attribute to track
+        jQuery("#<portlet:namespace />fm input[type=submit]").click(function() {
+            jQuery("input[type=submit]", jQuery(this).parents("form")).removeAttr("clicked");
+            jQuery(this).attr("clicked", "true");
+        });
+
         // Handle submit buttons that need confirmation
         jQuery("input.evals-show-confirm").click(function(event) {
             var buttonText = jQuery(this).val();

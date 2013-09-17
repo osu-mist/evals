@@ -556,20 +556,18 @@ public class AppraisalsAction implements ActionInterface {
         }
 
 
-//        // Save the close out reason @todo
+        // Save the close out reason
         if (appraisal.getRole().equals(ActionHelper.ROLE_REVIEWER) ||
                 appraisal.getRole().equals(ActionHelper.ROLE_ADMINISTRATOR )) {
-//            if (requestMap.get("appraisal.closeOutReasonId") != null) {
-//                int closeOutReasonId = Integer.parseInt(requestMap.get("appraisal.closeOutReasonId")[0]);
-//                CloseOutReason reason = CloseOutReasonMgr.get(closeOutReasonId);
-//
-//                appraisal.setCloseOutBy(loggedInUser);
-//                appraisal.setCloseOutDate(new Date());
-//                appraisal.setCloseOutReason(reason);
-//                appraisal.setOriginalStatus(appraisal.getStatus());
-//            }
+            if (jsonData.getCloseOutReasonId() != null) {
+                CloseOutReason reason = CloseOutReasonMgr.get(jsonData.getCloseOutReasonId());
+                appraisal.setCloseOutReason(reason);
+                appraisal.setOriginalStatus(appraisal.getStatus());
+                dates.put("closeOutDate", true);
+                pidm.put("closeOutBy", true);
+            }
         }
-//
+
         // Approve/Deny Goals Reactivation
         if (permRule.getSubmit() != null && permRule.getSecondarySubmit() != null) {
             if (permRule.getSubmit().equals("approve-goals-reactivation") ||
@@ -603,6 +601,10 @@ public class AppraisalsAction implements ActionInterface {
      * @throws Exception
      */
     private void setAssessmentFields() throws Exception {
+        if (jsonData.getAssessments() == null) { // if there are no assessments, exit
+            return;
+        }
+
         // get the criteria we need for adding new goals via js
         Assessment assessment = dbAssessmentsMap.entrySet().iterator().next().getValue();
         List<AssessmentCriteria> sortedAssessmentCriteria = assessment.getSortedAssessmentCriteria();

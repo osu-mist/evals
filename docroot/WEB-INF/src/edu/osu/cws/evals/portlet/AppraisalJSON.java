@@ -17,6 +17,7 @@ public class AppraisalJSON {
     private String rebuttal;
     private String buttonClicked;
     Map<Integer, AssessmentJSON> assessments;
+    private Integer closeOutReasonId;
 
     AppraisalJSON(Integer id, String goalsComments, String evaluation, Integer rating, String salaryRecommendation, String review, String rebuttal, String buttonClicked, Map<Integer, AssessmentJSON> assessments) {
         this.id = id;
@@ -66,4 +67,7 @@ public class AppraisalJSON {
         return assessments;
     }
 
+    public Integer getCloseOutReasonId() {
+        return closeOutReasonId;
+    }
 }

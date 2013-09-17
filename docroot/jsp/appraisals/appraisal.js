@@ -3,12 +3,6 @@ jQuery(document).ready(function() {
   // Handle acknowledge appraisal rebuttal read by supervisor
   jQuery(".pass-appraisal-rebuttal").hide();
 
-  // There's no way to figure out via js what button was clicked. Add an attribute to track
-  jQuery("#<portlet:namespace />fm input[type=submit]").click(function() {
-    jQuery("input[type=submit]", jQuery(this).parents("form")).removeAttr("clicked");
-    jQuery(this).attr("clicked", "true");
-  });
-
   jQuery("#<portlet:namespace />fm").submit(function() {
     var errors = "";
     if (jQuery("#<portlet:namespace />acknowledge-read-appraisal").length > 0 &&
