@@ -1,8 +1,6 @@
 package edu.osu.cws.evals.portlet;
 
 import com.google.gson.Gson;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -29,8 +27,6 @@ import java.util.*;
 
 public class AppraisalsAction implements ActionInterface {
     private ActionHelper actionHelper;
-    private static Log _log = LogFactoryUtil.getLog(AppraisalsAction.class);
-
 
     private HomeAction homeAction;
 
@@ -59,17 +55,6 @@ public class AppraisalsAction implements ActionInterface {
      * assessment within each goal version.
      */
     Map<String, Assessment> dbAssessmentsMap = null;
-
-    //@todo: remove the constructors below since they were for testing!!
-    public AppraisalsAction(PermissionRule permRule, Appraisal appraisal, AppraisalJSON jsonData) {
-        this.permRule = permRule;
-        this.appraisal = appraisal;
-        this.jsonData = jsonData;
-        dbAssessmentsMap = appraisal.getAssessmentMap();
-    }
-
-    public AppraisalsAction() {
-    }
 
     /**
      * Handles displaying a list of pending reviews for a given business center.
@@ -441,7 +426,6 @@ public class AppraisalsAction implements ActionInterface {
 
         // update appraisal & assessment fields based on permission rules
         initializeJSONData(requestMap);
-        _log.error(requestMap.get("json_data")[0]); //@todo: remove me
         setAppraisalFields();
 
         boolean statusChanged = !appraisal.getStatus().equals(beforeUpdateStatus);
@@ -503,7 +487,6 @@ public class AppraisalsAction implements ActionInterface {
         if (requestMap.get("json_data") != null) {
             jsonText = requestMap.get("json_data")[0];
         }
-        _log.error("jsonText = " + jsonText); //@todo: remove
 
         Gson gson = new Gson();
         jsonData = gson.fromJson(jsonText, AppraisalJSON.class);
