@@ -149,8 +149,7 @@ public class PermissionRule extends Evals implements Cloneable {
                 supervisorResults,
                 evaluation,
                 review,
-                employeeResponse,
-                rebuttalRead
+                employeeResponse
         };
 
         if (ArrayUtils.contains(permissionFields, "e")) {
