@@ -611,9 +611,7 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         GoalVersion unapprovedGoalsVersion = appraisal.getUnapprovedGoalsVersion();
-        if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR) &&
-                appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REACTIVATION_REQUESTED) &&
-                goalReactivationDecision != null && unapprovedGoalsVersion != null) {
+        if (goalReactivationDecision != null && unapprovedGoalsVersion != null) {
             unapprovedGoalsVersion.setRequestDecisionPidm(loggedInUser.getId());
             unapprovedGoalsVersion.setRequestDecision(goalReactivationDecision);
             if (goalReactivationDecision) {

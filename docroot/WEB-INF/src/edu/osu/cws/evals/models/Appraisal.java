@@ -896,7 +896,7 @@ public class Appraisal extends Evals {
      */
     public GoalVersion getReactivatedGoalVersion() {
         for (GoalVersion goalVersion : goalVersions) {
-            if (!goalVersion.goalsApproved() && goalVersion.inActivatedState()) {
+            if (goalVersion.inActivatedState()) {
                 return goalVersion;
             }
         }
@@ -913,7 +913,7 @@ public class Appraisal extends Evals {
     public List<GoalVersion> getApprovedGoalsVersions() {
         List<GoalVersion> approvedGoalsVersions = new ArrayList<GoalVersion>();
         for (GoalVersion goalVersion : goalVersions) {
-            if (goalVersion.goalsApproved()) {
+            if (goalVersion.getGoalsApprovedDate() != null) {
                 approvedGoalsVersions.add(goalVersion);
             }
         }

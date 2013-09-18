@@ -101,14 +101,6 @@ public class GoalVersion implements Comparable<GoalVersion> {
     }
 
     /**
-     * Whether or not the supervisor has approved the goals submitted by the employee.
-     * @return
-     */
-    public boolean goalsApproved() {
-        return goalsApprovedDate != null;
-    }
-
-    /**
      * Returns a sorted list of assessments. The assessment pojo class
      * implements comparable interface which makes this easy. It removes deleted assessments from
      * the list.
