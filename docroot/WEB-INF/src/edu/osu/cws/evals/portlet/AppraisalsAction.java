@@ -107,8 +107,10 @@ public class AppraisalsAction implements ActionInterface {
     private void setAppraisalPermissionRule() throws Exception {
         HashMap permissionRules =
                 (HashMap) actionHelper.getPortletContext().getAttribute("permissionRules");
-        permRule =
-                (PermissionRule) permissionRules.get(appraisal.getStatus() + "-" + userRole);
+        String permRuleKey = appraisal.getStatus() + "-" + userRole;
+        permRuleKey = permRuleKey.replace("Overdue", "Due");
+
+        permRule = (PermissionRule) permissionRules.get(permRuleKey);
     }
 
     /**

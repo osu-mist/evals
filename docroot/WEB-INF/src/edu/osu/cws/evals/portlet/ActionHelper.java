@@ -519,6 +519,7 @@ public class ActionHelper {
             //get the status, compose the key "status"-"role"
             String appraisalStatus = appraisal.getStatus();
             String actionKey = appraisalStatus +"-"+role;
+            actionKey = actionKey.replace("Overdue", "Due");
 
             // Get the appropriate permissionrule object from the permissionRuleMap
             PermissionRule rule = (PermissionRule) permissionRuleMap.get(actionKey);
