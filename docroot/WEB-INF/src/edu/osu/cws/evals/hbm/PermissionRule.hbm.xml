@@ -21,7 +21,6 @@
         <property name="review" length="1" column="REVIEW"/>
         <property name="employeeResponse" length="1" column="EMPLOYEE_RESPONSE"/>
         <property name="rebuttalRead" length="1" column="REBUTTAL_READ"/>
-        <property name="saveDraft" length="45" column="SAVE_DRAFT"/>
         <property name="secondarySubmit" length="45" column="SECONDARY_SUBMIT"/>
         <property name="submit" length="45" column="SUBMIT"/>
         <property name="actionRequired" length="45" column="ACTION_REQUIRED"/>
