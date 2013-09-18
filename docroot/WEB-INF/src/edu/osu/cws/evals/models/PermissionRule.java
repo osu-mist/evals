@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.models;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.WordUtils;
 
 import java.lang.reflect.Field;
@@ -30,8 +31,6 @@ public class PermissionRule extends Evals implements Cloneable {
     private String employeeResponse;
 
     private String rebuttalRead;
-
-    private String saveDraft;
 
     private String secondarySubmit;
 
@@ -135,12 +134,30 @@ public class PermissionRule extends Evals implements Cloneable {
         this.review = review;
     }
 
+    /**
+     * If any of the various permission fields contains "e", the permission rule code
+     * will return save-draft so that this button is displayed in the jsp.
+     *
+     * @return
+     */
     public String getSaveDraft() {
-        return saveDraft;
-    }
+        String[] permissionFields = {
+                approvedGoals,
+                unapprovedGoals,
+                goalComments,
+                results,
+                supervisorResults,
+                evaluation,
+                review,
+                employeeResponse,
+                rebuttalRead
+        };
 
-    public void setSaveDraft(String saveDraft) {
-        this.saveDraft = saveDraft;
+        if (ArrayUtils.contains(permissionFields, "e")) {
+            return "save-draft";
+        }
+
+        return null;
     }
 
     public String getEmployeeResponse() {
