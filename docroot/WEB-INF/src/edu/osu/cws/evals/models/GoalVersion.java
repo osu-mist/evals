@@ -101,14 +101,6 @@ public class GoalVersion implements Comparable<GoalVersion> {
     }
 
     /**
-     * Whether or not the supervisor has approved the goals submitted by the employee.
-     * @return
-     */
-    public boolean areGoalsApproved() {
-        return goalsApprovedDate != null;
-    }
-
-    /**
      * Returns a sorted list of assessments. The assessment pojo class
      * implements comparable interface which makes this easy. It removes deleted assessments from
      * the list.
@@ -171,12 +163,22 @@ public class GoalVersion implements Comparable<GoalVersion> {
 
     /**
      * Whether or not the reactivation request for this goal version is pending or approved.
+     * This method returns false if the goals reactivation request was denied or if the
+     * goals reactivation request was approved, and the goals have been approved as well.
      *
      * @return
      */
-    public boolean goalReactivationPendingOrApproved() {
-        boolean approvedGoalReactivation = requestDecision != null && requestDecision;
+    public boolean inActivatedState() {
+        if (requestDecision == null) {
+            return true; // request pending approval
+        }
 
-        return approvedGoalReactivation || requestDecision == null;
+        if (requestDecision && requestDecisionPidm != null && goalsApprovedDate == null) {
+            //pending goals approval, requestDecisionPidm is there to exclude the first version
+            //of goals created by the cronjob.
+            return true;
+        }
+
+        return false;
     }
 }

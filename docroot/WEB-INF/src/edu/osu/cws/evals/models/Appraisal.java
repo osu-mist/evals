@@ -895,16 +895,10 @@ public class Appraisal extends Evals {
      * @return
      */
     public GoalVersion getReactivatedGoalVersion() {
-        List<GoalVersion> goalVersionList = new ArrayList<GoalVersion>();
         for (GoalVersion goalVersion : goalVersions) {
-            if (!goalVersion.areGoalsApproved() && goalVersion.goalReactivationPendingOrApproved()) {
-                goalVersionList.add(goalVersion);
+            if (goalVersion.inActivatedState()) {
+                return goalVersion;
             }
-        }
-
-        if (!goalVersionList.isEmpty()) {
-            Collections.sort(goalVersionList);
-            return goalVersionList.get(goalVersionList.size() -1);
         }
 
         return null;
@@ -919,7 +913,7 @@ public class Appraisal extends Evals {
     public List<GoalVersion> getApprovedGoalsVersions() {
         List<GoalVersion> approvedGoalsVersions = new ArrayList<GoalVersion>();
         for (GoalVersion goalVersion : goalVersions) {
-            if (goalVersion.areGoalsApproved()) {
+            if (goalVersion.getGoalsApprovedDate() != null) {
                 approvedGoalsVersions.add(goalVersion);
             }
         }
@@ -929,14 +923,26 @@ public class Appraisal extends Evals {
     }
 
     /**
-     * Walk through goalVersions and return a single unapproved GoalVersion.
-     * An unapproved GoalVersion has requestApproved set to true and approvedDate set to null
-     * When there isn't an unapproved goals version, the method returns null. According to the
-     * business requirements, there should only be 1 unapproved GoalVersion at a single time.
+     * This returns the goals version whose request has been approved but goals haven't.
      */
     public GoalVersion getUnapprovedGoalsVersion() {
         for (GoalVersion goalVersion : goalVersions) {
-            if (goalVersion.goalReactivationPendingOrApproved()) {
+            boolean reactivateRequestApproved = goalVersion.getRequestDecision() != null
+                    && goalVersion.getRequestDecision();
+            if (reactivateRequestApproved && goalVersion.getGoalsApprovedDate() == null) {
+                return goalVersion;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * This method the goals version that is pending request approval.
+     */
+    public GoalVersion getRequestPendingGoalsVersion() {
+        for (GoalVersion goalVersion : goalVersions) {
+            if (goalVersion.getRequestDecision() == null) {
                 return goalVersion;
             }
         }
@@ -1039,12 +1045,9 @@ public class Appraisal extends Evals {
      */
     public String getNewStatus(Map<String, Configuration> configMap)
             throws Exception {
-
         String newStatus = null;
         String status = getStatus();
         Configuration config = configMap.get(status); //config object of this status
-        Configuration timeoutGoalsReactivationReqConfig = configMap.get("goalsReactivationRequestedExpiration");
-        Configuration timeoutNewGoalsConfig = configMap.get("goalsReactivatedExpiration");
 
         if (status.contains(Appraisal.DUE) && EvalsUtil.isDue(this, config) <= 0) {
             newStatus = status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
@@ -1058,16 +1061,13 @@ public class Appraisal extends Evals {
             if (EvalsUtil.isDue(this, reminderConfig) < 0) {
                 newStatus = Appraisal.STATUS_RESULTS_DUE;
             }
-        }
-
-        // change status by timing out goals reactivation request and employee new goals submit
-        boolean goalReactivationExpired = status.equals(STATUS_GOALS_REACTIVATION_REQUESTED)
-                && EvalsUtil.isDue(this, timeoutGoalsReactivationReqConfig) <= 0;
-        boolean goalReactivatedExpired = status.equals(STATUS_GOALS_REACTIVATED)
-                && EvalsUtil.isDue(this, timeoutNewGoalsConfig) <= 0;
-
-        if (goalReactivationExpired || goalReactivatedExpired) {
-            newStatus = STATUS_GOALS_APPROVED;
+        } else if (status.equals(STATUS_GOALS_REACTIVATION_REQUESTED) ||
+                status.equals(STATUS_GOALS_REACTIVATED)) {
+            config = configMap.get(status + "Expiration");
+            if (EvalsUtil.isDue(this, config) <= 0) {
+                // change status by timing out goals reactivation request and employee new goals submit
+                newStatus = STATUS_GOALS_APPROVED;
+            }
         }
 
         return newStatus;
