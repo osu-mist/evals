@@ -923,14 +923,26 @@ public class Appraisal extends Evals {
     }
 
     /**
-     * Walk through goalVersions and return a single unapproved GoalVersion.
-     * An unapproved GoalVersion has requestApproved set to true and approvedDate set to null
-     * When there isn't an unapproved goals version, the method returns null. According to the
-     * business requirements, there should only be 1 unapproved GoalVersion at a single time.
+     * This returns the goals version whose request has been approved but goals haven't.
      */
     public GoalVersion getUnapprovedGoalsVersion() {
         for (GoalVersion goalVersion : goalVersions) {
-            if (goalVersion.inActivatedState()) {
+            boolean reactivateRequestApproved = goalVersion.getRequestDecision() != null
+                    && goalVersion.getRequestDecision();
+            if (reactivateRequestApproved && goalVersion.getGoalsApprovedDate() == null) {
+                return goalVersion;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * This method the goals version that is pending request approval.
+     */
+    public GoalVersion getRequestPendingGoalsVersion() {
+        for (GoalVersion goalVersion : goalVersions) {
+            if (goalVersion.getRequestDecision() == null) {
                 return goalVersion;
             }
         }

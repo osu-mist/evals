@@ -610,7 +610,7 @@ public class AppraisalsAction implements ActionInterface {
             goalReactivationDecision = false;
         }
 
-        GoalVersion unapprovedGoalsVersion = appraisal.getUnapprovedGoalsVersion();
+        GoalVersion unapprovedGoalsVersion = appraisal.getRequestPendingGoalsVersion();
         if (goalReactivationDecision != null && unapprovedGoalsVersion != null) {
             unapprovedGoalsVersion.setRequestDecisionPidm(loggedInUser.getId());
             unapprovedGoalsVersion.setRequestDecision(goalReactivationDecision);
