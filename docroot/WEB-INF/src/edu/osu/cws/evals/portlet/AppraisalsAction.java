@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.portlet;
 
+import com.google.gson.Gson;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -15,6 +16,7 @@ import edu.osu.cws.evals.util.MailerInterface;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
 
 import javax.portlet.*;
 import java.io.File;
@@ -41,6 +43,18 @@ public class AppraisalsAction implements ActionInterface {
     private PermissionRule permRule = null;
 
     private String userRole;
+
+    /**
+     * Holds the structured json data that we get back from the evaluation form.
+     */
+    private AppraisalJSON jsonData = null;
+
+    /**
+     * Map that contains a map of all the assessments indexed by the assessment id. This makes
+     * it easier to search for an assessment to update. Otherwise, we'd have to search for an
+     * assessment within each goal version.
+     */
+    Map<String, Assessment> dbAssessmentsMap = null;
 
     /**
      * Handles displaying a list of pending reviews for a given business center.
@@ -265,7 +279,7 @@ public class AppraisalsAction implements ActionInterface {
         actionHelper.addToRequestMap("permissionRule", permRule);
         actionHelper.useMaximizedMenu();
 
-        if (appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
+        if (appraisal.getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
             setSalaryValues();
         }
 
@@ -404,7 +418,7 @@ public class AppraisalsAction implements ActionInterface {
      * @param requestMap
      * @throws Exception
      */
-    private void processUpdateRequest(Map requestMap) throws Exception {
+    private void processUpdateRequest(Map<String, String[]> requestMap) throws Exception {
         HashMap appraisalSteps = (HashMap) actionHelper.getPortletContextAttribute("appraisalSteps");
         MailerInterface mailer = (MailerInterface) actionHelper.getPortletContextAttribute("mailer");
 
@@ -413,7 +427,8 @@ public class AppraisalsAction implements ActionInterface {
         Integer oldOverdue = appraisal.getOverdue();
 
         // update appraisal & assessment fields based on permission rules
-        setAppraisalFields(requestMap);
+        initializeJSONData(requestMap);
+        setAppraisalFields();
 
         boolean statusChanged = !appraisal.getStatus().equals(beforeUpdateStatus);
         if (statusChanged) {
@@ -436,21 +451,20 @@ public class AppraisalsAction implements ActionInterface {
         AppraisalMgr.updateAppraisal(appraisal, loggedInUser);
 
         // Send email if needed
-        String appointmentType = appraisal.getJob().getAppointmentType();
         AppraisalStep appraisalStep;
         String employeeResponse = appraisal.getRebuttal();
 
         // If the employee signs and provides a rebuttal, we want to use a different
         // appraisal step so that we can send an email to the reviewer.
-        if (submittedRebuttal(requestMap, employeeResponse)) {
-            String appraisalStepKey = "submit-response-" + appointmentType;
+        if (submittedRebuttal(employeeResponse)) {
+            String appraisalStepKey = "submit-response-" + appraisal.getAppointmentType();
             appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
             // If the appointment type doesn't exist in the table, use "Default" type.
             if (appraisalStep == null) {
                 appraisalStep = (AppraisalStep) appraisalSteps.get("submit-response-Default");
             }
         } else {
-            appraisalStep = getAppraisalStep(requestMap, appointmentType);
+            appraisalStep = getAppraisalStep();
         }
 
         EmailType emailType = null;
@@ -464,109 +478,78 @@ public class AppraisalsAction implements ActionInterface {
     }
 
     /**
-     * Handles updating the appraisal fields in the appraisal and assessment objects.
+     * Takes the request map that we get from the user saving or submitting the evaluation form.
+     * It parses the json data and sets up the structured json data to use. It also initializes
+     * dbAssessmentsMap.
      *
      * @param requestMap
      */
-    private void setAppraisalFields(Map<String, String[]> requestMap) throws Exception {
-        String parameterKey = "";
+    private void initializeJSONData(Map<String, String[]> requestMap) {
+        String jsonText = "{}";
+        if (requestMap.get("json_data") != null) {
+            jsonText = requestMap.get("json_data")[0];
+        }
 
-        // Save Goals
-        if (permRule.getUnapprovedGoals() != null && permRule.getUnapprovedGoals().equals("e")) {
-            updateGoals(requestMap);
+        Gson gson = new Gson();
+        jsonData = gson.fromJson(jsonText, AppraisalJSON.class);
 
+        dbAssessmentsMap = appraisal.getAssessmentMap();
+    }
+
+    /**
+     * Handles updating the appraisal fields in the appraisal and assessment objects.
+     *
+     */
+    public void setAppraisalFields() throws Exception {
+        String newStatus = null;
+        Map<String, Boolean> dates = new HashMap<String, Boolean>();
+        Map<String, Boolean> pidm = new HashMap<String, Boolean>();
+        boolean clickedSubmitButton = jsonData.getButtonClicked().equals(permRule.getSubmit());
+
+        if (permRule.canEdit("goalComments")) { // Save goalComments
+            appraisal.setGoalsComments(jsonData.getGoalsComments());
         }
-        // Save goalComments
-        if (permRule.getGoalComments() != null && permRule.getGoalComments().equals("e")) {
-            if (requestMap.get("appraisal.goalsComments") != null) {
-                appraisal.setGoalsComments(requestMap.get("appraisal.goalsComments")[0]);
-            }
+
+        // updates goals, employee/supervisor results and handle new js goals
+        setAssessmentFields();
+
+        if (jsonData.getButtonClicked().equals("approve-goals")) {
+            appraisal.getUnapprovedGoalsVersion().approveEmployeeGoals(loggedInUser.getId());
         }
-        // Save employee results
-        if (permRule.getResults() != null && permRule.getResults().equals("e")) {
-            for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
-                for (Assessment assessment : goalVersion.getAssessments()) {
-                    String assessmentID = Integer.toString(assessment.getId());
-                    parameterKey = "assessment.employeeResult." + assessmentID;
-                    if (requestMap.get(parameterKey) != null) {
-                        assessment.setEmployeeResult(requestMap.get(parameterKey)[0]);
-                    }
-                }
-            }
-        }
-        // Save Supervisor Results
-        if (permRule.getSupervisorResults() != null && permRule.getSupervisorResults().equals("e")) {
-            for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
-                for (Assessment assessment : goalVersion.getAssessments()) {
-                    String assessmentID = Integer.toString(assessment.getId());
-                    parameterKey = "assessment.supervisorResult." + assessmentID;
-                    if (requestMap.get(parameterKey) != null) {
-                        assessment.setSupervisorResult(requestMap.get(parameterKey)[0]);
-                    }
-                }
-            }
-        }
-        if (requestMap.get("submit-results") != null) {
-            appraisal.setResultSubmitDate(new Date());
-        }
-        // Save evaluation
-        if (permRule.getEvaluation() != null && permRule.getEvaluation().equals("e")) {
-            if (requestMap.get("appraisal.evaluation") != null) {
-                appraisal.setEvaluation(requestMap.get("appraisal.evaluation")[0]);
-            }
-            if (requestMap.get("appraisal.rating") != null) {
-                appraisal.setRating(Integer.parseInt(requestMap.get("appraisal.rating")[0]));
-            }
-            if (requestMap.get(permRule.getSubmit()) != null) {
-                appraisal.setEvaluationSubmitDate(new Date());
-                appraisal.setEvaluator(loggedInUser);
-            }
+
+        if (permRule.canEdit("evaluation")) { // Save evaluation
+            appraisal.setEvaluation(jsonData.getEvaluation());
+            appraisal.setRating(jsonData.getRating());
+            pidm.put("evaluator", clickedSubmitButton);
+            dates.put("evaluationSubmitDate", clickedSubmitButton);
 
             if (appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
-                saveRecommendedIncrease(requestMap);
+                saveRecommendedIncrease(jsonData);
             }
         }
-        // Save review
-        if (permRule.getReview() != null && permRule.getReview().equals("e")) {
-            if (requestMap.get("appraisal.review") != null) {
-                appraisal.setReview(requestMap.get("appraisal.review")[0]);
-            }
-            if (requestMap.get(permRule.getSubmit()) != null) {
-                appraisal.setReviewer(loggedInUser);
-                appraisal.setReviewSubmitDate(new Date());
-            }
+
+        if (permRule.canEdit("review")) { // Save review
+            appraisal.setReview(jsonData.getReview());
+            pidm.put("reviewer", clickedSubmitButton);
+            dates.put("reviewSubmitDate", clickedSubmitButton);
         }
-        if (requestMap.get("sign-appraisal") != null) {
-            appraisal.setEmployeeSignedDate(new Date());
-        }
-        if (requestMap.get("release-appraisal") != null) {
-            appraisal.setReleaseDate(new Date());
-        }
-        // Save employee response
-        if (permRule.getEmployeeResponse() != null && permRule.getEmployeeResponse().equals("e")) {
-            appraisal.setRebuttal(requestMap.get("appraisal.rebuttal")[0]);
+
+        if (permRule.canEdit("employeeResponse")) { // Save employee response
+            appraisal.setRebuttal(jsonData.getRebuttal());
             String employeeResponse = appraisal.getRebuttal();
-            if (submittedRebuttal(requestMap, employeeResponse)) {
-                appraisal.setRebuttalDate(new Date());
-            }
+            dates.put("rebuttalDate", submittedRebuttal(employeeResponse));
         }
-        // Save supervisor rebuttal read
-        if (permRule.getRebuttalRead() != null && permRule.getRebuttalRead().equals("e")
-                && requestMap.get("read-appraisal-rebuttal") != null) {
-            appraisal.setSupervisorRebuttalRead(new Date());
-        }
+
 
         // Save the close out reason
         if (appraisal.getRole().equals(ActionHelper.ROLE_REVIEWER) ||
                 appraisal.getRole().equals(ActionHelper.ROLE_ADMINISTRATOR )) {
-            if (requestMap.get("appraisal.closeOutReasonId") != null) {
-                int closeOutReasonId = Integer.parseInt(requestMap.get("appraisal.closeOutReasonId")[0]);
-                CloseOutReason reason = CloseOutReasonMgr.get(closeOutReasonId);
-
-                appraisal.setCloseOutBy(loggedInUser);
-                appraisal.setCloseOutDate(new Date());
+            if (jsonData.getCloseOutReasonId() != null) {
+                CloseOutReason reason = CloseOutReasonMgr.get(jsonData.getCloseOutReasonId());
                 appraisal.setCloseOutReason(reason);
                 appraisal.setOriginalStatus(appraisal.getStatus());
+                dates.put("closeOutDate", true);
+                pidm.put("closeOutBy", true);
             }
         }
 
@@ -574,14 +557,12 @@ public class AppraisalsAction implements ActionInterface {
         if (permRule.getSubmit() != null && permRule.getSecondarySubmit() != null) {
             if (permRule.getSubmit().equals("approve-goals-reactivation") ||
                     permRule.getSecondarySubmit().equals("deny-goals-reactivation")) {
-                reactivationGoals(requestMap);
+                reactivationGoals(jsonData.getButtonClicked());
             }
         }
 
         // If the appraisalStep object has a new status, update the appraisal object
-        String appointmentType = appraisal.getJob().getAppointmentType();
-        AppraisalStep appraisalStep = getAppraisalStep(requestMap, appointmentType);
-        String newStatus = null;
+        AppraisalStep appraisalStep = getAppraisalStep();
         if (appraisalStep != null) {
             newStatus = appraisalStep.getNewStatus();
         }
@@ -589,26 +570,114 @@ public class AppraisalsAction implements ActionInterface {
         if (newStatus != null && !newStatus.equals(appraisal.getStatus())) {
             appraisal.setStatus(newStatus);
             String employeeResponse = appraisal.getRebuttal();
-            if (submittedRebuttal(requestMap, employeeResponse)) {
+            if (submittedRebuttal(employeeResponse)) {
                 appraisal.setStatus(Appraisal.STATUS_REBUTTAL_READ_DUE);
             }
         }
-        if (appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
-            appraisal.setGoalsRequiredModificationDate(new Date());
+        dates.put("goalsRequiredModificationDate", appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION));
+
+        saveAppraisalMetadata(clickedSubmitButton, dates, pidm);
+    }
+
+    /**
+     * Sets the assessment fields (goal & results) based on the information that the user entered
+     * in the form. It addAssessments to handle adding/deleting of goals.
+     *
+     * @throws Exception
+     */
+    private void setAssessmentFields() throws Exception {
+        if (jsonData.getAssessments() == null) { // if there are no assessments, exit
+            return;
         }
+
+        // get the criteria we need for adding new goals via js
+        Assessment assessment = dbAssessmentsMap.entrySet().iterator().next().getValue();
+        List<AssessmentCriteria> sortedAssessmentCriteria = assessment.getSortedAssessmentCriteria();
+        List<CriterionArea> criterionAreas = new ArrayList<CriterionArea>();
+        for (AssessmentCriteria assessmentCriteria : sortedAssessmentCriteria) {
+            criterionAreas.add(assessmentCriteria.getCriteriaArea());
+        }
+
+        Integer nextSequence = calculateAssessmentSequence(dbAssessmentsMap);
+        for (AssessmentJSON assessmentJSON : jsonData.getAssessments().values())   {
+            assessment = dbAssessmentsMap.get(assessmentJSON.getId().toString());
+
+            if (permRule.canEdit("unapprovedGoals")) { // Save Goals
+                nextSequence = addAssessments(assessmentJSON , assessment,
+                        nextSequence, criterionAreas);
+            }
+
+            if (permRule.canEdit("results")) { // Save employee results
+                assessment.setEmployeeResult(assessmentJSON.getEmployeeResult());
+            }
+
+            if (permRule.canEdit("supervisorResults")) { // Save supervisor results
+                assessment.setSupervisorResult(assessmentJSON.getSupervisorResult());
+            }
+        }
+    }
+
+    /**
+     * Saves metadata information in the Appraisal object. The metadata that we save is either
+     * date values or PIDMs. Instead of calling each one of the setData or setPidm columns
+     * indidivually, we use this method to call them.
+     *
+     * @param clickedSubmitButton
+     * @param dates
+     * @param pidm
+     * @throws Exception
+     */
+    private void saveAppraisalMetadata(boolean clickedSubmitButton, Map<String, Boolean> dates,
+                                       Map<String, Boolean> pidm) throws Exception {
+        dates.put("releaseDate", jsonData.getButtonClicked().equals("release-appraisal"));
+        if (clickedSubmitButton) {
+            dates.put("resultSubmitDate", permRule.canEdit("results"));
+            dates.put("goalsSubmitDate", permRule.canEdit("unapprovedGoals"));
+            dates.put("supervisorRebuttalRead", permRule.canEdit("rebuttalRead"));
+            dates.put("employeeSignedDate", permRule.canEdit("employeeResponse"));
+        }
+
+        for (String fieldName : dates.keySet()) {
+            String methodName = "set" + WordUtils.capitalize(fieldName);
+            Method permissionMethod = appraisal.getClass().getDeclaredMethod(methodName, Date.class);
+            permissionMethod.invoke(appraisal, new Date());
+        }
+
+        for (String fieldName : pidm.keySet()) {
+            String methodName = "set" + WordUtils.capitalize(fieldName);
+            Method permissionMethod = appraisal.getClass().getDeclaredMethod(methodName, Employee.class);
+            permissionMethod.invoke(appraisal, loggedInUser);
+        }
+    }
+
+    /**
+     * Returns the sequence to assign to the next goal added via js.
+     *
+     * @param dbAssessmentsMap
+     * @return
+     */
+    private Integer calculateAssessmentSequence(Map<String, Assessment> dbAssessmentsMap) {
+        Integer nextSequence = 0;
+        for (Map.Entry<String, Assessment> entry : dbAssessmentsMap.entrySet()) {
+            Assessment assessment = entry.getValue();
+            if (assessment.getSequence() > nextSequence) {
+                nextSequence = assessment.getSequence();
+            }
+        }
+        return nextSequence + 1;
     }
 
     /**
      * Handles approving/denying goals reactivation request.
      *
-     * @param requestMap
+     * @param buttonClicked
      * @throws Exception
      */
-    private void reactivationGoals(Map<String, String[]> requestMap) throws Exception {
+    private void reactivationGoals(String buttonClicked) throws Exception {
         Boolean goalReactivationDecision = null;
-        if (requestMap.get("approve-goals-reactivation") != null) {
+        if (buttonClicked.equals("approve-goals-reactivation")) {
             goalReactivationDecision = true;
-        } else if (requestMap.get("deny-goals-reactivation") != null) {
+        } else if (buttonClicked.equals("deny-goals-reactivation")) {
             goalReactivationDecision = false;
         }
 
@@ -622,140 +691,80 @@ public class AppraisalsAction implements ActionInterface {
         }
     }
 
-    /**
-     * Handles updating the goals. Sets the goals, and assessment criteria. Adds/Removes assessments
-     * if the user did so in the html form.
-     *
-     * @param requestMap
-     */
-    private void updateGoals(Map<String, String[]> requestMap) {
-        String parameterKey;
-        // if there isn't an unapproved goals versions exit
-        if (appraisal.getUnapprovedGoalsVersion() == null) {
-            return;
-        }
-
-        // The order is important since we'll append at the end the new assessments
-        List<Assessment> assessments = appraisal.getUnapprovedGoalsVersion().getSortedAssessments();
-        int oldAssessmentTotal = assessments.size();
-        Map<Integer, String> sequenceToFormIndex = addNewAssessments(requestMap, assessments);
-
-
-        int assessmentFormIndex = 0;
-        Collections.sort(assessments);
-        for (Assessment assessment : assessments) {
-            String assessmentID = Integer.toString(assessment.getId());
-
-            // catch any newly added assignments, where the assessmentId is different.
-            assessmentFormIndex++;
-            String formIndex = sequenceToFormIndex.get(assessment.getSequence());
-            if (assessmentFormIndex > oldAssessmentTotal) {
-                // For newly added assessments, the formIndex is used instead of assessment id
-                // formIndex is used since one of the newly added assessments could have been
-                // deleted before the form was submitted.
-                assessmentID = formIndex;
-            }
-            parameterKey = "appraisal.goal." + assessmentID;
-            if (requestMap.get(parameterKey) != null) {
-                assessment.setGoal(requestMap.get(parameterKey)[0]);
-            }
-            updateAssessmentCriteria(requestMap, oldAssessmentTotal, assessmentFormIndex, assessment, formIndex);
-
-            // Save the deleted flag if present
-            parameterKey = "appraisal.assessment.deleted." + assessmentID;
-            String[] deletedFlag = requestMap.get(parameterKey);
-            if (deletedFlag != null && deletedFlag[0].equals("1")) {
-                assessment.setDeleteDate(new Date());
-                assessment.setDeleterPidm(loggedInUser.getId());
-            }
-        }
-        if (requestMap.get("submit-goals") != null) {
-            appraisal.setGoalsSubmitDate(new Date());
-        }
-        if (requestMap.get("approve-goals") != null) {
-            appraisal.getUnapprovedGoalsVersion().setGoalsApprovedDate(new Date());
-            appraisal.getUnapprovedGoalsVersion().setGoalsApproverPidm(loggedInUser.getId());
-        }
-    }
 
     /**
-     * Handles updating the assessment criteria checkboxes.
+     * Updates the goals text and criteria checkboxes that the user entered in the form.
      *
-     * @param requestMap
-     * @param oldAssessmentTotal
-     * @param assessmentFormIndex
+     * @param assessmentJSON
      * @param assessment
-     * @param formIndex
+     * @param deleted
      */
-    private void updateAssessmentCriteria(Map<String, String[]> requestMap, int oldAssessmentTotal,
-                                          int assessmentFormIndex, Assessment assessment, String formIndex) {
-        String parameterKey;// Save the assessment criteria for each assessment.
-        int assessmentCriteriaFormIndex = 0; // used to calculate id of newly added assessment criteria
+    private void updateGoals(AssessmentJSON assessmentJSON, Assessment assessment, Boolean deleted) {
+        if (appraisal.getUnapprovedGoalsVersion() == null) {
+            return; // if there isn't an unapproved goals versions exit
+        }
+
+        if (deleted) { // Save the deleted flag if present
+            assessment.setDeleteDate(new Date());
+            assessment.setDeleterPidm(loggedInUser.getId());
+        }
+
+        // Save goal
+        assessment.setGoal(assessmentJSON.getGoal());
+
+        // Save criteria checkboxes
+        Integer checkboxIndex = 1;
         for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
-            assessmentCriteriaFormIndex++;
-            int suffix = assessmentCriteria.getId();
-            if (assessmentFormIndex > oldAssessmentTotal) {
-                // For newly added assessments, the formIndex is used as the base for
-                // assessment criteria ids.
-                suffix = Integer.parseInt(formIndex) * assessmentCriteriaFormIndex;
+            Integer id = assessmentCriteria.getId();
+            if (id == null) {
+                id = checkboxIndex;
+                checkboxIndex++;
             }
-            parameterKey = "appraisal.assessmentCriteria." + suffix;
-            if (requestMap.get(parameterKey) != null) {
-                assessmentCriteria.setChecked(true);
-            } else {
-                assessmentCriteria.setChecked(false);
-            }
+            LinkedHashMap criteriaMap = (LinkedHashMap) assessmentJSON.getCriteria();
+            boolean checked = (Boolean) criteriaMap.get(id);
+            assessmentCriteria.setChecked(checked);
         }
     }
 
     /**
-     * Handles adding new assessments that were added to an appraisal via JS. The new assessment
-     * objects are saved along with their sequence, creator pidm and date.
+     * Whether the given assessment id is from an assessment added via js. JS added assessments
+     * have an id starting at 1. This id is always less than the id of the appraisal. Assessments
+     * in the db have an id greater than the appraisal id.
      *
-     * @param requestMap
-     * @param assessments               List of original non-deleted assessments
+     * @param assessmentId
      * @return
      */
-    private Map<Integer, String> addNewAssessments(Map<String, String[]> requestMap,
-                                                   List<Assessment> assessments) {
-        String parameterKey;// map used to get the form indexed based on the assessment sequence
-        int oldAssessmentTotal = assessments.size();
-        Map<Integer, String> sequenceToFormIndex = new HashMap<Integer, String>();
+    private boolean isJSAssessment(Integer assessmentId) {
+        return assessmentId < 500 && assessmentId < appraisal.getId();
+    }
 
-        // begin adding new goals!!!
-        Integer numberOfAssessmentsAdded = 0;
-        if (requestMap.get("assessmentCount") != null) {
-            Integer newAssessmentTotal = Integer.parseInt(requestMap.get("assessmentCount")[0]);
-            numberOfAssessmentsAdded = newAssessmentTotal - oldAssessmentTotal;
+
+    /**
+     * Handles adding/deleting goals based on the operations the user performed via js.
+     *
+     * @param jsonAssessment
+     * @param assessment
+     * @param nextSequence
+     * @param criterionAreas
+     * @return
+     */
+    private int addAssessments(AssessmentJSON jsonAssessment, Assessment assessment,
+                               int nextSequence, List<CriterionArea> criterionAreas) {
+        GoalVersion reactivatedGoalVersion = appraisal.getReactivatedGoalVersion();
+        boolean deleted = jsonAssessment.getDeleted().equals("1");
+        boolean jsAssessment = isJSAssessment(jsonAssessment.getId());
+
+        if (jsAssessment && !deleted) { // new assessments added via js
+            // create new assessment object
+            assessment = AppraisalMgr.createNewAssessment(reactivatedGoalVersion, nextSequence ,criterionAreas);
+            nextSequence++;
         }
 
-        if (numberOfAssessmentsAdded > 0) {
-            // get the sequence of the last assessment in the goal version
-            // we'll increment this sequence as we add each new assessment
-            Integer sequence = Integer.parseInt(requestMap.get("assessmentSequence")[0]);
-
-            for (int newId = 1; newId <= numberOfAssessmentsAdded; newId++) {
-                Integer formIndex = newId + oldAssessmentTotal;
-                // check that newly added assignments were not removed afterwards
-                parameterKey = "appraisal.assessment.deleted." + formIndex;
-                String[] deletedFlag = requestMap.get(parameterKey);
-                if (deletedFlag != null && deletedFlag[0].equals("0")) {
-                    sequence++; // only increase sequence when we add an assessment
-                    sequenceToFormIndex.put(sequence, formIndex.toString());
-
-                    List<CriterionArea> criterionAreas = new ArrayList<CriterionArea>();
-                    for (AssessmentCriteria assessmentCriteria : assessments.iterator()
-                            .next().getSortedAssessmentCriteria()) {
-                        criterionAreas.add(assessmentCriteria.getCriteriaArea());
-                    }
-                    Assessment assessment = AppraisalMgr.createNewAssessment(appraisal
-                            .getUnapprovedGoalsVersion(), sequence, criterionAreas);
-                    assessments.add(assessment);
-                }
-            }
+        // only update the goals if the assessment is js and not deleted or it's from the db
+        if ((jsAssessment && !deleted) || !jsAssessment) {
+            updateGoals(jsonAssessment, assessment, deleted);
         }
-        // end adding new goals
-        return sequenceToFormIndex;
+        return nextSequence;
     }
 
     /**
@@ -768,9 +777,9 @@ public class AppraisalsAction implements ActionInterface {
      * The allowed range for rating 1 and fixed value for rating 2 depend on whether or not the
      * current salary is above or below the control point.
      *
-     * @param requestMap
+     * @param jsonData
      */
-    private void saveRecommendedIncrease(Map<String, String[]> requestMap) throws ModelException {
+    private void saveRecommendedIncrease(AppraisalJSON jsonData) throws ModelException {
         // get the salary validation values. They change depending on whether current salary is
         // above or below the midpoint
         Map<String, String> salaryValidationValues = getSalaryValidationValues();
@@ -783,7 +792,7 @@ public class AppraisalsAction implements ActionInterface {
         if (appraisal.getRating() == 1 && request.getParameter("save-draft") == null) {
             // can only specify an increase if the salary is not at the top pay range
             if (salary.getCurrent() < salary.getHigh()) {
-                Double submittedIncrease = Double.parseDouble(requestMap.get("appraisal.salary.increase")[0]);
+                Double submittedIncrease = Double.parseDouble(jsonData.getSalaryRecommendation());
                 if (submittedIncrease >= increaseRate1MinVal && submittedIncrease <= increaseRate1MaxVal) {
                     increaseValue = submittedIncrease;
                 } else {
@@ -801,11 +810,9 @@ public class AppraisalsAction implements ActionInterface {
      * Figures out the appraisal step key for the button that the user pressed when the appraisal
      * form was submitted.
      *
-     * @param requestMap
-     * @param appointmentType
      * @return
      */
-    private AppraisalStep getAppraisalStep(Map requestMap, String appointmentType) {
+    private AppraisalStep getAppraisalStep() {
         HashMap appraisalSteps = (HashMap) actionHelper.getPortletContextAttribute("appraisalSteps");
         AppraisalStep appraisalStep;
         String appraisalStepKey;
@@ -825,8 +832,8 @@ public class AppraisalsAction implements ActionInterface {
         for (String button : appraisalButtons) {
             // If this button is the one the user clicked, use it to look up the
             // appraisalStepKey
-            if (requestMap.get(button) != null) {
-                appraisalStepKey = button + "-" + appointmentType;
+            if (jsonData.getButtonClicked().equals(button)) {
+                appraisalStepKey = button + "-" + appraisal.getAppointmentType();
                 appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
                 // If the appointment type doesn't exist in the table, use "Default" type.
                 if (appraisalStep == null) {
@@ -858,12 +865,11 @@ public class AppraisalsAction implements ActionInterface {
     /**
      * Specifies whether or not the employee submitted a rebuttal when the appraisal was signed.
      *
-     * @param request
      * @param employeeResponse
      * @return
      */
-    private boolean submittedRebuttal(Map<String, String[]> request, String employeeResponse) {
-        return request.get("sign-appraisal") != null &&
+    private boolean submittedRebuttal(String employeeResponse) {
+        return jsonData.getButtonClicked().equals("sign-appraisal") &&
                 employeeResponse != null && !employeeResponse.equals("");
     }
 
@@ -1093,4 +1099,5 @@ public class AppraisalsAction implements ActionInterface {
     public void setErrorHandler(ErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
     }
+
 }

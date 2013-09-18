@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Assessment extends Evals implements Comparable<Assessment> {
 
-    private int id;
+    private Integer id;
 
     private String goal;
 
@@ -54,11 +54,11 @@ public class Assessment extends Evals implements Comparable<Assessment> {
         return new GoalLog();
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

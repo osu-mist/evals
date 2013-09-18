@@ -181,4 +181,9 @@ public class GoalVersion implements Comparable<GoalVersion> {
 
         return false;
     }
+
+    public void approveEmployeeGoals(Integer pidm) {
+        setGoalsApprovedDate(new Date());
+        setGoalsApproverPidm(pidm);
+    }
 }

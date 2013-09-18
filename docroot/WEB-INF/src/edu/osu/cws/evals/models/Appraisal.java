@@ -1132,4 +1132,20 @@ public class Appraisal extends Evals {
 
         return hasMultipleGoalVersions && ArrayUtils.contains(goalsReactivatedStatus, status);
     }
+
+    public Map<String, Assessment> getAssessmentMap() {
+        HashMap<String, Assessment> assessmentMap = new HashMap<String, Assessment>();
+        for (GoalVersion goalVersion : goalVersions) {
+            for (Assessment assessment : goalVersion.getAssessments()) {
+                if (!assessment.isDeleted()) {
+                    assessmentMap.put(assessment.getId().toString(), assessment);
+                }
+            }
+        }
+        return assessmentMap;
+    }
+
+    public String getAppointmentType() {
+        return job.getAppointmentType();
+    }
 }
