@@ -37,11 +37,9 @@
             <fieldset>
                 <legend><span><liferay-ui:message key="appraisal-goals" />${loopStatus.index + 1}</span></legend>
                 <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAssessment.getGoal()) %></p>
-                <c:if test="${goalStatus == 'v'}">
-                    <c:forEach var="assessmentCriteria" items="${assessment.sortedAssessmentCriteria}" varStatus="loopStatus2">
-                        <%@ include file="/jsp/appraisals/assessmentCriteria.jsp"%>
-                    </c:forEach>
-                </c:if>
+                <c:forEach var="assessmentCriteria" items="${assessment.sortedAssessmentCriteria}" varStatus="loopStatus2">
+                    <%@ include file="/jsp/appraisals/assessmentCriteria.jsp"%>
+                </c:forEach>
             </fieldset>
         </c:when>
     </c:choose>

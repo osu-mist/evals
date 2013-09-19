@@ -613,11 +613,13 @@ public class AppraisalsAction implements ActionInterface {
                 }
             }
 
-            if (permRule.canEdit("results")) { // Save employee results
+            // Save employee results
+            if (permRule.canEdit("results") && assessmentJSON.getEmployeeResult() != null) {
                 assessment.setEmployeeResult(assessmentJSON.getEmployeeResult());
             }
 
-            if (permRule.canEdit("supervisorResults")) { // Save supervisor results
+            // Save supervisor results
+            if (permRule.canEdit("supervisorResults") && assessmentJSON.getSupervisorResult() != null) {
                 assessment.setSupervisorResult(assessmentJSON.getSupervisorResult());
             }
         }
@@ -716,7 +718,9 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         // Save goal
-        assessment.setGoal(assessmentJSON.getGoal());
+        if (assessmentJSON.getGoal() != null) {
+            assessment.setGoal(assessmentJSON.getGoal());
+        }
 
         // Save criteria checkboxes
         Integer checkboxIndex = 1;
