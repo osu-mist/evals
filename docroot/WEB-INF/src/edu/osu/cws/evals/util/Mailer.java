@@ -459,18 +459,28 @@ public class Mailer implements MailerInterface {
      * @throws Exception
      */
     private String goalsReactivatedTimeoutBody(Appraisal appraisal) throws Exception {
-        return emailBundle.getString("email_goalsReactivatedTimeout_body");
+        Configuration config = configMap.get("goalsReactivatedExpiration");
+        int daysToSubmit = config.getIntValue();
+        String bodyString = emailBundle.getString("email_goalsReactivatedTimeout_body");
+        return MessageFormat.format(bodyString, daysToSubmit, getJobTitle(appraisal),
+                appraisal.getReviewPeriod());
     }
 
     /**
-     * Fetch the body for goalsReactivationTimeout emailType
+     * Fetch the body for goalsReactivationRequestedTimeout emailType
      *
      * @param appraisal
      * @return
      * @throws Exception
      */
     private String goalsReactivationRequestedTimeoutBody(Appraisal appraisal) throws Exception {
-        return emailBundle.getString("email_goalsReactivationRequestedTimeout_body");
+        String bodyString = emailBundle.getString("email_goalsReactivationRequestedTimeout_body");
+        Configuration config = configMap.get("goalsReactivationRequestedExpiration");
+        int daysToSubmit = config.getIntValue();
+
+        DateTime submitDate = new DateTime(appraisal.getReactivatedGoalVersion().getCreateDate());
+        String requestSubmitDate = submitDate.toString(Constants.DATE_FORMAT);
+        return MessageFormat.format(bodyString, requestSubmitDate, daysToSubmit);
     }
 
     /**
@@ -516,7 +526,8 @@ public class Mailer implements MailerInterface {
      */
     private String goalsReactivatedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsReactivated_body");
-        return MessageFormat.format(bodyString, appraisal.getReviewPeriod());
+        return MessageFormat.format(bodyString, getJobTitle(appraisal),
+                appraisal.getReviewPeriod(), getGoalsExpirationDate(appraisal));
     }
 
     /**
@@ -526,7 +537,15 @@ public class Mailer implements MailerInterface {
      * @throws Exception
      */
     private String goalsReactivationRequestedBody(Appraisal appraisal) throws Exception {
-        return emailBundle.getString("email_goalsReactivationRequested_body");
+        //# {0} = submit date, {1} = employee name, {2} = job title, {3} = review period, {4} = due date
+        String bodyString = emailBundle.getString("email_goalsReactivationRequested_body");
+
+
+        DateTime submitDate = new DateTime(appraisal.getReactivatedGoalVersion().getCreateDate());
+        String requestSubmitDate = submitDate.toString(Constants.DATE_FORMAT);
+
+        return MessageFormat.format(bodyString, requestSubmitDate, getEmployeeName(appraisal),
+                getJobTitle(appraisal), appraisal.getReviewPeriod(), getGoalsExpirationDate(appraisal));
     }
 
     /**
@@ -536,7 +555,8 @@ public class Mailer implements MailerInterface {
      * @throws Exception
      */
     private String goalsReactivationDeniedBody(Appraisal appraisal) throws Exception {
-        return emailBundle.getString("email_goalsReactivationDenied_body");
+        String bodyString = emailBundle.getString("email_goalsReactivationDenied_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
     }
 
     /**
@@ -803,6 +823,21 @@ public class Mailer implements MailerInterface {
         if(status.contains("Overdue")) {
             status = status.replace("Overdue", "Due");
         }
+        Configuration config = configMap.get(status);
+        DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
+        return dueDay.toString(Constants.DATE_FORMAT);
+    }
+
+    /**
+     * Returns a String that represents when the given status is expired for the goals reactivation
+     * workflow.
+     *
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String getGoalsExpirationDate(Appraisal appraisal) throws Exception {
+        String status = appraisal.getStatus() + "Expiration";
         Configuration config = configMap.get(status);
         DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
         return dueDay.toString(Constants.DATE_FORMAT);
