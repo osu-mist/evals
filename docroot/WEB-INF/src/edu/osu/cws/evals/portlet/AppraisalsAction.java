@@ -751,6 +751,12 @@ public class AppraisalsAction implements ActionInterface {
     private int addAssessments(AssessmentJSON jsonAssessment, Assessment assessment,
                                int nextSequence, List<CriterionArea> criterionAreas) {
         GoalVersion reactivatedGoalVersion = appraisal.getReactivatedGoalVersion();
+
+        // If there's no reactivated goal version, we're adding goals to the first goal version
+        if (reactivatedGoalVersion == null) {
+            reactivatedGoalVersion = (GoalVersion) appraisal.getGoalVersions().toArray()[0];
+        }
+
         boolean deleted = jsonAssessment.getDeleted().equals("1");
         boolean jsAssessment = isJSAssessment(jsonAssessment.getId());
 
