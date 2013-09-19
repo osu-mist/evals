@@ -228,6 +228,12 @@ public class Assessment extends Evals implements Comparable<Assessment> {
      */
     public boolean isNewGoal() {
         boolean hasOnlyOriginalGoalVersion = goalVersion.getAppraisal().getGoalVersions().size() == 1;
-        return goalVersion.inActivatedState() || hasOnlyOriginalGoalVersion;
+
+        // treat it as as a new goal for the first version if the goals aren't approved
+        if (hasOnlyOriginalGoalVersion && goalVersion.getGoalsApprovedDate() == null) {
+            return true;
+        }
+
+        return goalVersion.inActivatedState();
     }
 }

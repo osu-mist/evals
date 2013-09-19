@@ -603,8 +603,14 @@ public class AppraisalsAction implements ActionInterface {
             assessment = dbAssessmentsMap.get(assessmentJSON.getId().toString());
 
             if (permRule.canEdit("unapprovedGoals")) { // Save Goals
-                nextSequence = addAssessments(assessmentJSON , assessment,
-                        nextSequence, criterionAreas);
+                Assessment jsAssessment = addAssessments(assessmentJSON , assessment, nextSequence,
+                        criterionAreas);
+
+                // if a new goal was added via js, keep track of it
+                if (jsAssessment != null) {
+                    nextSequence++;
+                    assessment = jsAssessment;
+                }
             }
 
             if (permRule.canEdit("results")) { // Save employee results
@@ -748,7 +754,7 @@ public class AppraisalsAction implements ActionInterface {
      * @param criterionAreas
      * @return
      */
-    private int addAssessments(AssessmentJSON jsonAssessment, Assessment assessment,
+    private Assessment addAssessments(AssessmentJSON jsonAssessment, Assessment assessment,
                                int nextSequence, List<CriterionArea> criterionAreas) {
         GoalVersion reactivatedGoalVersion = appraisal.getReactivatedGoalVersion();
 
@@ -763,14 +769,19 @@ public class AppraisalsAction implements ActionInterface {
         if (jsAssessment && !deleted) { // new assessments added via js
             // create new assessment object
             assessment = AppraisalMgr.createNewAssessment(reactivatedGoalVersion, nextSequence ,criterionAreas);
-            nextSequence++;
         }
 
         // only update the goals if the assessment is js and not deleted or it's from the db
         if ((jsAssessment && !deleted) || !jsAssessment) {
             updateGoals(jsonAssessment, assessment, deleted);
         }
-        return nextSequence;
+
+        // If there was a new assessment/goal added via js, return it.
+        if (jsAssessment && !deleted) {
+            return assessment;
+        }
+
+        return null;
     }
 
     /**
