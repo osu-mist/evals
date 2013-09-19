@@ -3,10 +3,8 @@
     <c:if test="${assessmentCriteria.checked}">
         checked="checked"
     </c:if>
-    <c:if test="${not assessment.newGoal}">
-        <c:if test="${permissionRule.approvedGoals == 'v'}">
-            disabled="disabled"
-        </c:if>
+    <c:if test="${goalStatus == 'v'}">
+        disabled="disabled"
     </c:if>
 />
 <label for="<portlet:namespace />appraisal.assessmentCriteria.${assessmentCriteria.id}">
