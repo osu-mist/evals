@@ -528,6 +528,11 @@ public class ActionHelper {
                 actionRequired = rule.getActionRequired();
             }
             if (actionRequired != null && !actionRequired.equals("")) {
+                // make sure that the action required is overdue if needed
+                if (appraisalStatus.contains("Overdue")) {
+                    actionRequired = actionRequired.replace("-due", "-overdue");
+                }
+
                 // compose a requiredAction object and add it to the outList.
                 anchorParams = new HashMap<String, String>();
                 anchorParams.put("action", "display");
