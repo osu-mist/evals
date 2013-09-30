@@ -112,6 +112,11 @@ public class AppraisalsAction implements ActionInterface {
                 setAppraisalPermissionRule();
                 appraisal.setRole(userRole);
                 appraisal.setPermissionRule(permRule);
+
+                // For the employee role, if it is the status is goals approval due and these are the
+                // original goals, the save draft button shouldn't show up. If the goals are
+                // reactivated, and the status is goals approval due, we display save draft to save
+                // the results for original goals.
                 permRule.setDisableResultsSaveDraft(disableResultsSaveDraft);
             }
         }
