@@ -3,8 +3,6 @@ package edu.osu.cws.evals.models;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.WordUtils;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class PermissionRule extends Evals implements Cloneable {
@@ -47,6 +45,11 @@ public class PermissionRule extends Evals implements Cloneable {
     private String setStatusToResultsDue;
 
     private String reactivateGoals;
+
+    // This is a transient property. It is used because during goals approval due, the save draft
+    // can be either disabled or not for the employee role. Since the permission rule object is
+    // not aware of the appraisal object, the action code must set this property.
+    private Boolean disableResultsSaveDraft = false;
 
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
@@ -141,11 +144,19 @@ public class PermissionRule extends Evals implements Cloneable {
      * @return
      */
     public String getSaveDraft() {
+        String employeeResults = results;
+
+        // We don't allow the save of draft due to employee results if the appraisal action
+        // has disabled it.
+        if (disableResultsSaveDraft != null && disableResultsSaveDraft) {
+            employeeResults = null;
+        }
+
         String[] permissionFields = {
                 approvedGoals,
                 unapprovedGoals,
                 goalComments,
-                results,
+                employeeResults,
                 supervisorResults,
                 evaluation,
                 review,
@@ -237,6 +248,10 @@ public class PermissionRule extends Evals implements Cloneable {
 
     public void setReactivateGoals(String reactivateGoals) {
         this.reactivateGoals = reactivateGoals;
+    }
+
+    public void setDisableResultsSaveDraft(Boolean disableResultsSaveDraft) {
+        this.disableResultsSaveDraft = disableResultsSaveDraft;
     }
 
     public Boolean canEdit(String column) throws Exception {
