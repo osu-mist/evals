@@ -424,7 +424,7 @@ jQuery(document).ready(function() {
    */
   function validateGoals() {
     // get a list of non empty and not-deleted assessments
-    var nonEmptyAssessments = jQuery('.appraisal-criteria fieldset>div').filter(function(index) {
+    var nonEmptyAssessments = jQuery('.appraisal-criteria>fieldset .editable-goals').filter(function(index) {
       if (isAssessmentDeleted.call(this)) { // filter out deleted assessments
         return false;
       }
@@ -440,7 +440,7 @@ jQuery(document).ready(function() {
 
     // validate each assessment to verify that we don't have non-empty goals with no criteria checked or vice-versa
     var validGoals = true;
-    jQuery('.appraisal-criteria fieldset>div').filter(function(index) {
+    jQuery('.appraisal-criteria>fieldset .editable-goals').filter(function(index) {
       if (isAssessmentDeleted.call(this)) { // filter out deleted assessments
         return false;
       }
@@ -463,7 +463,7 @@ jQuery(document).ready(function() {
    * submitted. We clear out the deleted assessments because it's easier to do it via js
    */
   function deleteEmptyAssessments() {
-    jQuery('.appraisal-criteria fieldset>div').filter(function(index) {
+    jQuery('.appraisal-criteria>fieldset .editable-goals').filter(function(index) {
       if (isAssessmentDeleted.call(this)) { // filter out deleted assessments
         return false;
       }
