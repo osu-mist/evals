@@ -949,4 +949,23 @@ public class AppraisalMgr {
         appraisal.addGoalVersion(unApprovedGoalVersion);
         session.save(unApprovedGoalVersion);
     }
+
+    /**
+     * Returns the date time when the unapproved goal version of the given appraisal was created.
+     * This is needed to figure out when the various goals reactivation pieces are due.
+     *
+     * @param appraisalID
+     * @return
+     * @throws Exception
+     */
+    public static DateTime getUnApprovedGoalVersionCreateDate(int appraisalID) throws Exception {
+        Appraisal appraisal = getAppraisal(appraisalID);
+        GoalVersion unapprovedGoalsVersion = appraisal.getUnapprovedGoalsVersion();
+
+        if (unapprovedGoalsVersion != null) {
+            return new DateTime(unapprovedGoalsVersion.getCreateDate());
+        }
+
+        return null;
+    }
 }

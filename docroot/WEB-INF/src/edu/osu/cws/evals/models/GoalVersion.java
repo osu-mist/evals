@@ -129,11 +129,11 @@ public class GoalVersion implements Comparable<GoalVersion> {
         final int AFTER = 1;
 
         if (this.createDate.getTime() > otherGoalVersion.createDate.getTime()) {
-            return BEFORE;
+            return AFTER;
         }
 
         if (this.createDate.getTime() < otherGoalVersion.createDate.getTime()) {
-            return AFTER;
+            return BEFORE;
         }
 
         return EQUAL;
