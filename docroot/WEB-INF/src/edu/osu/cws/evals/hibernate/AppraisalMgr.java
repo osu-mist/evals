@@ -74,8 +74,9 @@ public class AppraisalMgr {
             Session session = HibernateUtil.getCurrentSession();
 
             // Create the assessments & assessment criteria
+            List<CriterionArea> criteriaList = CriteriaMgr.list(job.getAppointmentType());
             addAssessmentToGoalVersion(goalVersion, Constants.BLANK_ASSESSMENTS_IN_NEW_EVALUATION,
-                    appraisal);
+                    criteriaList);
             session.save(appraisal);
         }
 
@@ -87,12 +88,10 @@ public class AppraisalMgr {
      *
      * @param goalVersion
      * @param count
-     * @param appraisal
+     * @param criteriaList
      */
     public static void addAssessmentToGoalVersion(GoalVersion goalVersion, int count,
-                                                   Appraisal appraisal) throws Exception {
-        String appointmentType = appraisal.getJob().getAppointmentType();
-        List<CriterionArea> criteriaList = CriteriaMgr.list(appointmentType);
+                                                  List<CriterionArea> criteriaList) throws Exception {
         for (int i = 1; i <= count; i++) {
             createNewAssessment(goalVersion, i, criteriaList);
         }
@@ -100,7 +99,8 @@ public class AppraisalMgr {
 
     /**
      * Creates assessments and associated objects for a goal version once the goals reactivation
-     * is approved.
+     * is approved. The criteria list associated to the new assessment is the list originally
+     * used when the first goal version was created.
      *
      * @param unapprovedGoalsVersion
      * @param appraisal
@@ -108,8 +108,21 @@ public class AppraisalMgr {
      */
     public static void addAssessmentForGoalsReactivation(GoalVersion unapprovedGoalsVersion,
                                                          Appraisal appraisal) throws Exception {
+        // get the sorted criteria list for the first approved to goal version
+        List<CriterionArea> criteriaList = new ArrayList<CriterionArea>();
+        GoalVersion goalVersion = appraisal.getApprovedGoalsVersions().get(0);
+        if (goalVersion != null && !goalVersion.getAssessments().isEmpty()) {
+            Assessment assessment = (Assessment) goalVersion.getAssessments().toArray()[0];
+            if (assessment != null && !assessment.getAssessmentCriteria().isEmpty()) {
+                for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
+                    criteriaList.add(assessmentCriteria.getCriteriaArea());
+                }
+            }
+        }
+
         addAssessmentToGoalVersion(unapprovedGoalsVersion,
-                Constants.BLANK_ASSESSMENTS_IN_REACTIVATED_GOALS, appraisal);
+                Constants.BLANK_ASSESSMENTS_IN_REACTIVATED_GOALS, criteriaList);
+
 
         Session session = HibernateUtil.getCurrentSession();
         session.save(unapprovedGoalsVersion);
