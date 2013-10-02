@@ -210,12 +210,13 @@ jQuery(document).ready(function() {
     // @todo: need to think about accessibility of delete/add assessments.
 
   /**
-   * Sets the goal delete flag for an assessment and hides the assement from the form.
+   * Sets the goal delete flag for an assessment and hides the assessment from the form.
    * This method is called after the user confirms the deletion by clicking the delete button
    * and internally to remove empty assessments before submitting the form.
    */
   function setGoalDeleteFlag() {
-    var allAssessments = jQuery('.appraisal-criteria>fieldset').children().length - 1;
+    var allAssessments = getEditableGoalsCount();
+    // the code only allows assesments in goals edit mode to be hidden/deleted
     var deletedAssessments = jQuery('.appraisal-criteria>fieldset>div:hidden').length;
     if((allAssessments - deletedAssessments) == 1) {
         alert('<liferay-ui:message key="appraisal-assessment-delete-all"/>');
@@ -272,14 +273,14 @@ jQuery(document).ready(function() {
     }
 
     /**
-     * Returns the # of assessments/goals currently in the evaluation form. This allows us to
-     * # of the goals in the form.
+     * Returns the # of editable assessment goals currently in the evaluation form. This allows us to
+     * # of the goals in the form for adding/deleting goals.
      *
      * @return {*}
      */
-    function getAssessmentCount() {
+    function getEditableGoalsCount() {
         // There's already an extra di
-        return jQuery('.appraisal-criteria fieldset>div').not('.goals-header').size() + 1;
+        return jQuery('.appraisal-criteria>fieldset .editable-goals').length;
     }
 
     /**
@@ -298,12 +299,12 @@ jQuery(document).ready(function() {
     // clone last assessment in the form for modification
     var newAssessment = getLastAssessment().clone(true);
     newAssessment.show(); // last assessment could have been deleted
-    var assessmentCount = getAssessmentCount();
+    var assessmentCount = getEditableGoalsCount() + 1;
 
     // The rest of this function takes care of updating ids, names and classes
 
     // h3 for accessibility
-    newAssessment.attr('class', 'appraisal-assessment-' + assessmentCount);
+    newAssessment.attr('class', 'appraisal-assessment-' + assessmentCount + " editable-goals");
     newAssessment.find('h3.secret').html('<liferay-ui:message key="appraisal-assessment-header"/>' + assessmentCount);
 
     // Delete Assessment Link

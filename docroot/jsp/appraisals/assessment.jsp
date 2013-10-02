@@ -9,13 +9,15 @@
 <c:choose>
     <c:when test="${assessment.newGoal}">
         <c:set var="goalStatus" value="${permissionRule.unapprovedGoals}"/>
+        <c:set var="assessment_class" value="editable-goals"/>
     </c:when>
     <c:otherwise>
         <c:set var="goalStatus" value="${permissionRule.approvedGoals}"/>
+        <c:set var="assessment_class" value=""/>
     </c:otherwise>
 </c:choose>
 
-<div class="appraisal-assessment-${assessment.id}">
+<div class="appraisal-assessment-${assessment.id} ${assessment_class}">
     <h3 class="secret"><liferay-ui:message key="appraisal-assessment-header"/>${loopStatus.index + 1}</h3>
     <c:if test="${goalStatus == 'e'}">
         <a class="delete img-txt assessment-delete delete.id.${assessment.id}"
