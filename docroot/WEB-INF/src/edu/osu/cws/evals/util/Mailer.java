@@ -478,7 +478,8 @@ public class Mailer implements MailerInterface {
         Configuration config = configMap.get("goalsReactivationRequestedExpiration");
         int daysToSubmit = config.getIntValue();
 
-        DateTime submitDate = new DateTime(appraisal.getReactivatedGoalVersion().getCreateDate());
+        GoalVersion lastTimedOutGoalVersion = appraisal.getLastTimedOutGoalVersion(Appraisal.STATUS_GOALS_REACTIVATION_REQUESTED);
+        DateTime submitDate = new DateTime(lastTimedOutGoalVersion.getCreateDate());
         String requestSubmitDate = submitDate.toString(Constants.DATE_FORMAT);
         return MessageFormat.format(bodyString, requestSubmitDate, daysToSubmit);
     }

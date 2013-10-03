@@ -951,6 +951,31 @@ public class Appraisal extends Evals {
     }
 
     /**
+     * Returns the goal version that was most recently timed out at a given status. This is
+     * used when sending emails from the backend.
+     *
+     * @param timedOutStatus
+     * @return
+     */
+    public GoalVersion getLastTimedOutGoalVersion(String timedOutStatus) {
+        List<GoalVersion> timedOutGoalVersions = new ArrayList<GoalVersion>();
+        for (GoalVersion goalVersion : goalVersions) {
+            String timedOutAt = goalVersion.getTimedOutAt();
+            if (timedOutAt != null && timedOutAt.equals(timedOutStatus)) {
+                timedOutGoalVersions.add(goalVersion);
+            }
+        }
+
+        Collections.sort(timedOutGoalVersions);
+        if (timedOutGoalVersions.isEmpty()) {
+            return null;
+        }
+
+        // Return the most recently timed out goal version
+        return timedOutGoalVersions.get(timedOutGoalVersions.size() -1);
+    }
+
+    /**
      * Loads lazy associations
      */
     public void loadLazyAssociations() {
