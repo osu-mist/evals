@@ -981,4 +981,22 @@ public class AppraisalMgr {
 
         return null;
     }
+
+    /**
+     * Returns the date time when the supervisor approved the goals reactivation request.
+     *
+     * @param appraisalID
+     * @return
+     * @throws Exception
+     */
+    public static DateTime getUnapprovedGoalVersionRequestDecDate(int appraisalID) throws Exception {
+        Appraisal appraisal = getAppraisal(appraisalID);
+        GoalVersion unapprovedGoalsVersion = appraisal.getUnapprovedGoalsVersion();
+
+        if (unapprovedGoalsVersion != null) {
+            return new DateTime(unapprovedGoalsVersion.getRequestDecisionDate());
+        }
+
+        return null;
+    }
 }

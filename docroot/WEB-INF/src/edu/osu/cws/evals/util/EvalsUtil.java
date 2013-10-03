@@ -57,6 +57,8 @@ public class EvalsUtil {
             refDate = new DateTime(firstEmail.getSentDate());
         } else if (ref.equals("goal_reactivation_request")) {
             refDate = AppraisalMgr.getPendingRequestGoalVersionCreateDate(appraisal.getId());
+        } else if (ref.equals("goal_reactivation_req_dec")) {
+            refDate = AppraisalMgr.getUnapprovedGoalVersionRequestDecDate(appraisal.getId());
         }
 
         if (refDate == null) //error
