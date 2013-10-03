@@ -13,6 +13,8 @@ public class GoalVersion implements Comparable<GoalVersion> {
 
     private Date goalsApprovedDate;
 
+    private Date requestDecisionDate;
+
     private Boolean requestDecision;
 
     private Integer requestDecisionPidm;
@@ -98,6 +100,14 @@ public class GoalVersion implements Comparable<GoalVersion> {
     public void addAssessment(Assessment assessment) {
         assessment.setGoalVersion(this);
         assessments.add(assessment);
+    }
+
+    public Date getRequestDecisionDate() {
+        return requestDecisionDate;
+    }
+
+    public void setRequestDecisionDate(Date requestDecisionDate) {
+        this.requestDecisionDate = requestDecisionDate;
     }
 
     /**
