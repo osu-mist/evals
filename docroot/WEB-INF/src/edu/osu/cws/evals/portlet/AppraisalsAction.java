@@ -705,6 +705,7 @@ public class AppraisalsAction implements ActionInterface {
         if (goalReactivationDecision != null && unapprovedGoalsVersion != null) {
             unapprovedGoalsVersion.setRequestDecisionPidm(loggedInUser.getId());
             unapprovedGoalsVersion.setRequestDecision(goalReactivationDecision);
+            unapprovedGoalsVersion.setRequestDecisionDate(new Date());
             if (goalReactivationDecision) {
                 AppraisalMgr.addAssessmentForGoalsReactivation(unapprovedGoalsVersion, appraisal);
             }
