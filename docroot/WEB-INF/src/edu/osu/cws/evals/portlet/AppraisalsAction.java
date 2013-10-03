@@ -117,7 +117,9 @@ public class AppraisalsAction implements ActionInterface {
                 // original goals, the save draft button shouldn't show up. If the goals are
                 // reactivated, and the status is goals approval due, we display save draft to save
                 // the results for original goals.
-                permRule.setDisableResultsSaveDraft(disableResultsSaveDraft);
+                if (permRule != null) {
+                    permRule.setDisableResultsSaveDraft(disableResultsSaveDraft);
+                }
             }
         }
     }
