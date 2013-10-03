@@ -971,12 +971,12 @@ public class AppraisalMgr {
      * @return
      * @throws Exception
      */
-    public static DateTime getUnApprovedGoalVersionCreateDate(int appraisalID) throws Exception {
+    public static DateTime getPendingRequestGoalVersionCreateDate(int appraisalID) throws Exception {
         Appraisal appraisal = getAppraisal(appraisalID);
-        GoalVersion unapprovedGoalsVersion = appraisal.getUnapprovedGoalsVersion();
+        GoalVersion pendingRequestGoalVersion = appraisal.getRequestPendingGoalsVersion();
 
-        if (unapprovedGoalsVersion != null) {
-            return new DateTime(unapprovedGoalsVersion.getCreateDate());
+        if (pendingRequestGoalVersion != null) {
+            return new DateTime(pendingRequestGoalVersion.getCreateDate());
         }
 
         return null;
