@@ -56,7 +56,7 @@ public class EvalsUtil {
             Email firstEmail = EmailMgr.getFirstEmail(appraisal.getId(), "jobTerminated");
             refDate = new DateTime(firstEmail.getSentDate());
         } else if (ref.equals("goal_reactivation_request")) {
-            refDate = AppraisalMgr.getPendingRequestGoalVersionCreateDate(appraisal.getId());
+            refDate = new DateTime();
         } else if (ref.equals("goal_reactivation_req_dec")) {
             refDate = AppraisalMgr.getUnapprovedGoalVersionRequestDecDate(appraisal.getId());
         }

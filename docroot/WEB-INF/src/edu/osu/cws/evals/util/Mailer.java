@@ -540,10 +540,8 @@ public class Mailer implements MailerInterface {
         //# {0} = submit date, {1} = employee name, {2} = job title, {3} = review period, {4} = due date
         String bodyString = emailBundle.getString("email_goalsReactivationRequested_body");
 
-
-        DateTime submitDate = new DateTime(appraisal.getReactivatedGoalVersion().getCreateDate());
-        String requestSubmitDate = submitDate.toString(Constants.DATE_FORMAT);
-
+        // Use today as the submit date since this email is sent right after the request is submitted
+        String requestSubmitDate = new DateTime().toString(Constants.DATE_FORMAT);
         return MessageFormat.format(bodyString, requestSubmitDate, getEmployeeName(appraisal),
                 getJobTitle(appraisal), appraisal.getReviewPeriod(), getGoalsExpirationDate(appraisal));
     }

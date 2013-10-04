@@ -1097,21 +1097,20 @@ public class AppraisalsAction implements ActionInterface {
             return errorHandler.handleAccessDenied(request, response);
         }
 
-
         HashMap<String,AppraisalStep> appraisalSteps =
                 (HashMap) actionHelper.getPortletContextAttribute("appraisalSteps");
         AppraisalStep appraisalStep = appraisalSteps.get("request-goals-reactivation-Default");
-
-        // send email to supervisor
-        MailerInterface mailer = (MailerInterface) actionHelper.getPortletContextAttribute("mailer");
-        EmailType emailType = appraisalStep.getEmailType();
-        mailer.sendMail(appraisal, emailType);
 
         // update status
         appraisal.setOriginalStatus(appraisal.getStatus());
         appraisal.setStatus(appraisalStep.getNewStatus());
         AppraisalMgr.updateAppraisalStatus(appraisal);
         SessionMessages.add(request, "appraisal-goals-reactivation-requested");
+
+        // send email to supervisor
+        MailerInterface mailer = (MailerInterface) actionHelper.getPortletContextAttribute("mailer");
+        EmailType emailType = appraisalStep.getEmailType();
+        mailer.sendMail(appraisal, emailType); // relies on status so, we need status set first
 
         // create goalVersion pojo && associate it
         AppraisalMgr.addGoalVersion(appraisal);
