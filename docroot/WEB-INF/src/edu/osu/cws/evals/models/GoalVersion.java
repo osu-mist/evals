@@ -13,6 +13,8 @@ public class GoalVersion implements Comparable<GoalVersion> {
 
     private Date goalsApprovedDate;
 
+    private Date goalsSubmitDate;
+
     private Date requestDecisionDate;
 
     private Boolean requestDecision;
@@ -63,6 +65,14 @@ public class GoalVersion implements Comparable<GoalVersion> {
 
     public void setGoalsApprovedDate(Date goalsApprovedDate) {
         this.goalsApprovedDate = goalsApprovedDate;
+    }
+
+    public Date getGoalsSubmitDate() {
+        return goalsSubmitDate;
+    }
+
+    public void setGoalsSubmitDate(Date goalsSubmitDate) {
+        this.goalsSubmitDate = goalsSubmitDate;
     }
 
     public Boolean getRequestDecision() {
@@ -164,6 +174,7 @@ public class GoalVersion implements Comparable<GoalVersion> {
         goalVersion.setCreateDate(new Date());
         goalVersion.setGoalsApproverPidm(trialGoalVersion.getGoalsApproverPidm());
         goalVersion.setGoalsApprovedDate(trialGoalVersion.getGoalsApprovedDate());
+        goalVersion.setGoalsSubmitDate(trialGoalVersion.getGoalsSubmitDate());
         goalVersion.setRequestDecision(trialGoalVersion.getRequestDecision());
         goalVersion.setRequestDecisionPidm(trialGoalVersion.getRequestDecisionPidm());
         goalVersion.setTimedOutAt(trialGoalVersion.getTimedOutAt());
