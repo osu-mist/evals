@@ -101,7 +101,7 @@ jQuery(document).ready(function() {
   }
 
   // Handles validation
-  jQuery("#<portlet:namespace />submit-appraisal").click(function(event) {
+  jQuery("#<portlet:namespace />fm.appraisalDue").submit(function(event) {
 
     //Supervisor Results and Overall Evaluation cannot be empty when submitting appraisal
     var emptyResults = areResultsEmpty();
