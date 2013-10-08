@@ -98,7 +98,7 @@
     <%@ include file="/jsp/appraisals/info.jsp"%>
 
     <c:if test="${showForm}">
-    <form class="appraisal" id="<portlet:namespace />fm"
+    <form class="appraisal ${appraisal.status}" id="<portlet:namespace />fm"
         action="<portlet:actionURL windowState="<%= WindowState.NORMAL.toString() %>">
         <portlet:param name="action" value="update" />
         <portlet:param name="controller" value="AppraisalsAction" />
