@@ -106,7 +106,7 @@ public class AppraisalsAction implements ActionInterface {
             if(appraisal != null) {
                 userRole = getRole();
                 // Whether or not the save draft permission rule should be disabled for results
-                Boolean disableResultsSaveDraft = appraisal.getGoalVersions().size() > 1 &&
+                Boolean disableResultsSaveDraft = appraisal.getGoalVersions().size() == 1 &&
                         appraisal.getStatus().equals(Appraisal.STATUS_GOALS_APPROVAL_DUE) &&
                         userRole.equals("employee");
                 setAppraisalPermissionRule();
