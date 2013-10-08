@@ -121,7 +121,7 @@ jQuery(document).ready(function() {
     }
 
     // add validation specific to salary increase for IT
-    <c:if test="${appraisal.job.appointmentType == 'Classified IT'}">
+    <c:if test="${appraisal.isSalaryUsed}">
         if(jQuery(".osu-cws input.recommended-salary").val() == '' ||
              jQuery(".osu-cws input.recommended-salary").val() == '0.0'){
             alert('<liferay-ui:message key="appraisal-salary-increase-required"/>');

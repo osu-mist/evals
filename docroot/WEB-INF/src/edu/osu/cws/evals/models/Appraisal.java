@@ -1170,4 +1170,14 @@ public class Appraisal extends Evals {
     public String getAppointmentType() {
         return job.getAppointmentType();
     }
+
+    /**
+     * Whether or not this appraisal object should use the salary increase section.
+     *
+     * @return
+     */
+    public Boolean getIsSalaryUsed() {
+        return getAppointmentType().equals(AppointmentType.CLASSIFIED_IT) &&
+                            type.equals(Appraisal.TYPE_ANNUAL);
+    }
 }

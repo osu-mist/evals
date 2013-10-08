@@ -67,7 +67,7 @@
             </c:if>
         </fieldset>
 
-        <c:if test="${appraisal.job.appointmentType == 'Classified IT' && appraisal.type == 'annual'}">
+        <c:if test="${appraisal.isSalaryUsed}">
             <%@ include file="/jsp/appraisals/salary.jsp"%>
         </c:if>
 

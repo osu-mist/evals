@@ -535,7 +535,7 @@ public class AppraisalsAction implements ActionInterface {
             pidm.put("evaluator", clickedSubmitButton);
             dates.put("evaluationSubmitDate", clickedSubmitButton);
 
-            if (appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
+            if (appraisal.getIsSalaryUsed()) {
                 saveRecommendedIncrease(jsonData);
             }
         }
