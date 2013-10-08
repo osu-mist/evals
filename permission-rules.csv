@@ -40,7 +40,7 @@ id,status,role,approved_goals,unapproved_goals,goal_comments,results,supervisor_
 44114,goalsReactivationRequested,employee,v,,,e,,,,,,,,,y,,,,
 44115,goalsReactivationRequested,supervisor,v,,,,e,,,,,deny-goals-reactivation,approve-goals-reactivation,action-team-goals-reactivation,y,,,,
 6,goalsRequiredModification,employee,v,e,v,e,,,,,,,submit-goals,action-required-goals-required-modification,y,,,,
-7,goalsRequiredModification,supervisor,v,,v,,,,,,,,,action-team-goals-required-modification,y,,,,
+7,goalsRequiredModification,supervisor,v,,v,,e,,,,,,,action-team-goals-required-modification,y,,,,
 81,goalsRequiredModification,upper-supervisor,v,,v,,,,,,,,,,y,,,,
 82,goalsRequiredModification,admin,v,,v,,,,,,,,,,y,y,,,
 83,goalsRequiredModification,reviewer,v,,v,,,,,,,,,,y,y,,,
