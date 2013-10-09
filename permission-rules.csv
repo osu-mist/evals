@@ -53,7 +53,7 @@ id,status,role,approved_goals,unapproved_goals,goal_comments,results,supervisor_
 30,releaseDue,supervisor,v,,,v,e,e,v,,,,release-appraisal,action-required-release-due,y,,,,
 31,releaseDue,reviewer,v,,,v,v,v,v,,,,,,y,y,,,
 88,releaseDue,upper-supervisor,v,,,v,v,,,,,,,,y,,,,
-89,releaseDue,admin,v,,,v,v,,,,,,,,y,y,,,
+89,releaseDue,admin,v,,,v,v,,v,,,,,,y,y,,,
 15,resultsDue,employee,v,,,e,,,,,,,submit-results,action-required-results-due,y,,,,
 16,resultsDue,supervisor,v,,,,e,,,,,,,action-team-results-due,y,,,,
 92,resultsDue,upper-supervisor,v,,,,,,,,,,,,y,,,,
