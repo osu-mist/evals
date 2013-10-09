@@ -13,10 +13,10 @@
         </id>
 
         <property name="goalsApproverPidm" type="int" column="GOALS_APPROVER_PIDM"/>
-        <property name="createDate" type="date" column="CREATE_DATE"/>
-        <property name="goalsApprovedDate" type="date" column="GOALS_APPROVED_DATE"/>
+        <property name="createDate" type="timestamp" column="CREATE_DATE"/>
+        <property name="goalsApprovedDate" type="timestamp" column="GOALS_APPROVED_DATE"/>
         <property name="goalsSubmitDate" type="timestamp" column="GOALS_SUBMIT_DATE"/>
-        <property name="requestDecisionDate" type="date" column="REQUEST_DECISION_DATE"/>
+        <property name="requestDecisionDate" type="timestamp" column="REQUEST_DECISION_DATE"/>
         <property name="requestDecision" type="boolean" column="REQUEST_DECISION"/>
         <property name="requestDecisionPidm" type="int" column="REQUEST_DECISION_PIDM"/>
         <property name="timedOutAt" type="string" column="TIMED_OUT_AT"/>
