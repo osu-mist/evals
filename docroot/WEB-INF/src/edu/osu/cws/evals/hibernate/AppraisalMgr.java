@@ -979,7 +979,9 @@ public class AppraisalMgr {
             return new DateTime(pendingRequestGoalVersion.getCreateDate());
         }
 
-        return null;
+        // If we got here it means that the user just submitted the request and thus the goal
+        // version hasn't been saved to the db. Thus the create date is now.
+        return new DateTime();
     }
 
     /**
