@@ -12,6 +12,7 @@ import org.joda.time.DateTime;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -913,12 +914,11 @@ public class EvalsPDF {
         LineSeparator line = new LineSeparator(1, 100, null, Element.ALIGN_CENTER, -12);
         document.add(line);
 
-        GoalVersion goalVersion = (GoalVersion) appraisal.getGoalVersions().toArray()[0];
-        Assessment assessment = (Assessment) goalVersion.getAssessments().toArray()[0];
+        List<CriterionArea> sortedCriteriaArea = getSortedCriteria();
         PdfPTable criteriaTable = new PdfPTable(41);
         PdfPCell emptyLeftCol = new PdfPCell();
         emptyLeftCol.setBorder(Rectangle.NO_BORDER);
-        emptyLeftCol.setRowspan(assessment.getAssessmentCriteria().size());
+        emptyLeftCol.setRowspan(sortedCriteriaArea.size());
         criteriaTable.addCell(emptyLeftCol);
         criteriaTable.setWidthPercentage(100f);
         PdfPCell cell;
@@ -934,18 +934,39 @@ public class EvalsPDF {
         document.add(criteriaLabel);
 
 
-        for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
-            cell = new PdfPCell(new Paragraph(assessmentCriteria.getCriteriaArea().getName(), FONT_10));
+        for (CriterionArea criterionArea : sortedCriteriaArea) {
+            cell = new PdfPCell(new Paragraph(criterionArea.getName(), FONT_10));
             cell.setColspan(10);
             cell.setBorder(Rectangle.NO_BORDER);
             criteriaTable.addCell(cell);
 
-            cell = new PdfPCell(new Paragraph(assessmentCriteria.getCriteriaArea().getDescription(), FONT_10));
+            cell = new PdfPCell(new Paragraph(criterionArea.getDescription(), FONT_10));
             cell.setColspan(30);
             cell.setBorder(Rectangle.NO_BORDER);
             criteriaTable.addCell(cell);
         }
 
         document.add(criteriaTable);
+    }
+
+    /**
+     * Returns a list of sorted criteria areas to be used when displaying the legend. This method
+     * iterates over the goal versions to find one goal version that has assessments. It then returns
+     * the criteria areas for the first assessment within this goal version.
+     *
+     * @return
+     */
+    private List<CriterionArea> getSortedCriteria() {
+        List<CriterionArea> sortedCriteriaArea = new ArrayList<CriterionArea>();
+        for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
+            if (!goalVersion.getAssessments().isEmpty()) {
+                Assessment assessment = (Assessment) goalVersion.getAssessments().toArray()[0];
+                for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
+                    sortedCriteriaArea.add(assessmentCriteria.getCriteriaArea());
+                }
+                break;
+            }
+        }
+        return sortedCriteriaArea;
     }
 }
