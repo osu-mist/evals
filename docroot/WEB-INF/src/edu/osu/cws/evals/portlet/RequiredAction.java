@@ -55,7 +55,7 @@ public class RequiredAction {
         if (appraisal.getJob() != null && appraisal.getJob().getEmployee() != null) {
             name = appraisal.getJob().getEmployee().getName();
         }
-        int numDays = Math.abs(Days.daysBetween(dueDate, new DateTime()).getDays());
+        int numDays = Math.abs(Days.daysBetween(dueDate, EvalsUtil.getToday()).getDays());
         String jobTitle = appraisal.getJob().getJobTitle();
         String reviewPeriod = appraisal.getReviewPeriod();
         boolean isTeamAction = key.contains("action-team");

@@ -870,7 +870,7 @@ public class Mailer implements MailerInterface {
         String status = appraisal.getStatus();
         Configuration config = configMap.get(status);
         DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
-        return Days.daysBetween(new DateTime(), dueDay).getDays();
+        return Days.daysBetween(EvalsUtil.getToday(), dueDay).getDays();
     }
 
     /**

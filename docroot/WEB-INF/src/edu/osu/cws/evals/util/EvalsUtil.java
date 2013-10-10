@@ -49,7 +49,6 @@ public class EvalsUtil {
             refDate = new DateTime(appraisal.getEndDate());
         } else if (ref.equals("GOALS_REQUIRED_MOD_DATE")) {
             refDate = new DateTime(appraisal.getGoalsRequiredModificationDate());
-            //System.out.println("reference date = " + refDate);
         } else if (ref.equals("employee_signed_date")) {
             refDate = new DateTime(appraisal.getEmployeeSignedDate());
         } else if (ref.equals("firstEmailSentDate")) {
@@ -64,7 +63,7 @@ public class EvalsUtil {
         if (refDate == null) //error
             return null;
 
-        return refDate.plusDays(offset);  //Assumes the offset type is Calendar.DAY_OF_MONTH
+        return refDate.plusDays(offset).withTimeAtStartOfDay();  //Assumes the offset type is Calendar.DAY_OF_MONTH
     }
 
 
@@ -81,7 +80,7 @@ public class EvalsUtil {
      */
     public static int isDue(Appraisal appraisal, Configuration config) throws Exception {
         DateTime dueDate = getDueDate(appraisal, config);
-        return Days.daysBetween(new DateTime(), dueDate).getDays();
+        return Days.daysBetween(getToday(), dueDate).getDays();
     }
 
     /**
@@ -221,7 +220,7 @@ public class EvalsUtil {
 
         if (config != null) {
             DateTime dueDate = EvalsUtil.getDueDate(appraisal, config);
-            return Days.daysBetween(dueDate, new DateTime()).getDays();
+            return Days.daysBetween(dueDate, EvalsUtil.getToday()).getDays();
         }
 
         return 0;
@@ -315,5 +314,9 @@ public class EvalsUtil {
         }
         return new Mailer(resources, hostname, from, linkUrl,  helpLinkUrl, configurationMap,
                 logger, replyTo, testMailToAddress);
+    }
+
+    public static DateTime getToday() {
+        return new DateTime().withTimeAtStartOfDay();
     }
 }
