@@ -529,6 +529,10 @@ public class AppraisalsAction implements ActionInterface {
             appraisal.getUnapprovedGoalsVersion().approveEmployeeGoals(loggedInUser.getId());
         }
 
+        if (jsonData.getButtonClicked().equals("submit-goals")) {
+            appraisal.getUnapprovedGoalsVersion().setGoalsSubmitDate(new Date());
+        }
+
         if (permRule.canEdit("evaluation")) { // Save evaluation
             appraisal.setEvaluation(jsonData.getEvaluation());
             appraisal.setRating(jsonData.getRating());
@@ -588,7 +592,7 @@ public class AppraisalsAction implements ActionInterface {
         }
         dates.put("goalsRequiredModificationDate", appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION));
 
-        saveAppraisalMetadata(clickedSubmitButton, dates, pidm);
+        saveAppraisalMetadata(dates, pidm);
     }
 
     /**
@@ -642,28 +646,34 @@ public class AppraisalsAction implements ActionInterface {
      * date values or PIDMs. Instead of calling each one of the setData or setPidm columns
      * indidivually, we use this method to call them.
      *
-     * @param clickedSubmitButton
      * @param dates
      * @param pidm
      * @throws Exception
      */
-    private void saveAppraisalMetadata(boolean clickedSubmitButton, Map<String, Boolean> dates,
+    private void saveAppraisalMetadata(Map<String, Boolean> dates,
                                        Map<String, Boolean> pidm) throws Exception {
-        dates.put("releaseDate", jsonData.getButtonClicked().equals("release-appraisal"));
-        if (clickedSubmitButton) {
-            dates.put("resultSubmitDate", permRule.canEdit("results"));
-            dates.put("goalsSubmitDate", permRule.canEdit("unapprovedGoals"));
-            dates.put("supervisorRebuttalRead", permRule.canEdit("rebuttalRead"));
-            dates.put("employeeSignedDate", permRule.canEdit("employeeResponse"));
-        }
+        // The pidms and dates fields that are set to true will get set by the for loops below.
+        String buttonClicked = jsonData.getButtonClicked();
+        dates.put("releaseDate", buttonClicked.equals("release-appraisal"));
+        dates.put("resultSubmitDate", permRule.canEdit("results") && buttonClicked.equals("submit-results"));
+        dates.put("supervisorRebuttalRead", permRule.canEdit("rebuttalRead") && buttonClicked.equals("read-appraisal-rebuttal"));
+        dates.put("employeeSignedDate", permRule.canEdit("employeeResponse") && buttonClicked.equals("sign-appraisal"));
 
         for (String fieldName : dates.keySet()) {
+            if (!dates.get(fieldName)) {
+                continue;
+            }
+
             String methodName = "set" + WordUtils.capitalize(fieldName);
             Method permissionMethod = appraisal.getClass().getDeclaredMethod(methodName, Date.class);
             permissionMethod.invoke(appraisal, new Date());
         }
 
         for (String fieldName : pidm.keySet()) {
+            if (!pidm.get(fieldName)) {
+                continue;
+            }
+
             String methodName = "set" + WordUtils.capitalize(fieldName);
             Method permissionMethod = appraisal.getClass().getDeclaredMethod(methodName, Employee.class);
             permissionMethod.invoke(appraisal, loggedInUser);
