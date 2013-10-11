@@ -747,13 +747,13 @@ public class AppraisalsAction implements ActionInterface {
 
         // Save criteria checkboxes
         Integer checkboxIndex = 1;
+        LinkedHashMap criteriaMap = (LinkedHashMap) assessmentJSON.getCriteria();
         for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
             Integer id = assessmentCriteria.getId();
             if (id == null) {
                 id = checkboxIndex;
                 checkboxIndex++;
             }
-            LinkedHashMap criteriaMap = (LinkedHashMap) assessmentJSON.getCriteria();
             boolean checked = (Boolean) criteriaMap.get(id);
             assessmentCriteria.setChecked(checked);
         }

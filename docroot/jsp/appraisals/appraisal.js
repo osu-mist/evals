@@ -283,6 +283,10 @@ jQuery(document).ready(function() {
         return jQuery('.appraisal-criteria>fieldset .editable-goals').length;
     }
 
+    function getCriteriaIdOffset(assessmentCount, newAssessment) {
+        return (assessmentCount * newAssessment.find(':checkbox').size());
+    }
+
     /**
    * Handles adding a new assessment to the DOM. This js method clones the last .appraisal-criteria
    * fieldset in the form. The logic in this function is to update the various classes, names and ids
@@ -340,7 +344,7 @@ jQuery(document).ready(function() {
         // The AssessmentCriteria checkboxes have suffixes. In order to make them unique ids in
         // in the form, we're using multiples of assmentCount starting with assessmentCount
         var checkBoxName = jQuery(element).attr('name').replace(/\.\d+/, '');
-        checkBoxName += "." +  (index + 1);
+        checkBoxName += "." +  (index + getCriteriaIdOffset(assessmentCount, newAssessment));
         jQuery(element).attr('name', checkBoxName);
         jQuery(element).attr('id', checkBoxName);
         jQuery(element).removeAttr('checked');
@@ -349,7 +353,7 @@ jQuery(document).ready(function() {
     // assessment criterias labels
     jQuery.each(newAssessment.find('label'), function(index, element) {
         var checkBoxName = jQuery(element).attr('for').replace(/\.\d+/, '');
-        checkBoxName += "." +  index;
+        checkBoxName += "." +  (index -1 + getCriteriaIdOffset(assessmentCount, newAssessment));
         // The first label is the Goals label, the rest should be assessment criterias
         if (index != 0) {
           jQuery(element).attr('for', checkBoxName);
