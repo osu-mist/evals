@@ -540,9 +540,19 @@ public class Mailer implements MailerInterface {
     private String goalsReactivationRequestedBody(Appraisal appraisal) throws Exception {
         //# {0} = submit date, {1} = employee name, {2} = job title, {3} = review period, {4} = due date
         String bodyString = emailBundle.getString("email_goalsReactivationRequested_body");
+        DateTime submitDate;
+        GoalVersion reactivatedGoalVersion = appraisal.getReactivatedGoalVersion();
+
+        if (reactivatedGoalVersion == null) {
+            // if the reactivated goal version is null it means that it hasn't been saved to the db
+            // and the request has just been submitted by the employee.
+            submitDate = new DateTime();
+        } else {
+            submitDate = new DateTime(reactivatedGoalVersion.getCreateDate());
+        }
+        String requestSubmitDate = submitDate.toString(Constants.DATE_FORMAT);
 
         // Use today as the submit date since this email is sent right after the request is submitted
-        String requestSubmitDate = new DateTime().toString(Constants.DATE_FORMAT);
         return MessageFormat.format(bodyString, requestSubmitDate, getEmployeeName(appraisal),
                 getJobTitle(appraisal), appraisal.getReviewPeriod(), getGoalsExpirationDate(appraisal));
     }
