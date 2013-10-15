@@ -479,7 +479,15 @@ public class Mailer implements MailerInterface {
         int daysToSubmit = config.getIntValue();
 
         GoalVersion lastTimedOutGoalVersion = appraisal.getLastTimedOutGoalVersion(Appraisal.STATUS_GOALS_REACTIVATION_REQUESTED);
-        DateTime submitDate = new DateTime(lastTimedOutGoalVersion.getCreateDate());
+        DateTime submitDate;
+        if (lastTimedOutGoalVersion  == null) {
+            // if the reactivated goal version is null it means that it hasn't been saved to the db
+            // and the request has just been submitted by the employee.
+            submitDate = new DateTime();
+        } else {
+            submitDate = new DateTime(lastTimedOutGoalVersion.getCreateDate());
+        }
+
         String requestSubmitDate = submitDate.toString(Constants.DATE_FORMAT);
         return MessageFormat.format(bodyString, requestSubmitDate, daysToSubmit);
     }
