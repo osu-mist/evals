@@ -17,6 +17,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang.math.NumberUtils;
 
 import javax.portlet.*;
 import java.io.File;
@@ -836,7 +837,13 @@ public class AppraisalsAction implements ActionInterface {
         if (appraisal.getRating() == 1) {
             // can only specify an increase if the salary is not at the top pay range
             if (salary.getCurrent() < salary.getHigh()) {
-                Double submittedIncrease = Double.parseDouble(jsonData.getSalaryRecommendation());
+                String salaryRecommendation = jsonData.getSalaryRecommendation();
+                // Check that the user submitted a valid salary increase
+                if (salaryRecommendation == null || !NumberUtils.isNumber(salaryRecommendation)) {
+                    return;
+                }
+
+                Double submittedIncrease = Double.parseDouble(salaryRecommendation);
                 if (submittedIncrease >= increaseRate1MinVal && submittedIncrease <= increaseRate1MaxVal) {
                     increaseValue = submittedIncrease;
                 } else {
