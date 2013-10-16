@@ -177,13 +177,13 @@
             return '<liferay-ui:message key="appraisal-salary-increase-error-nan"/>';
         }
 
+        // can't give raise if at the top of pay range
+        if (${appraisal.salary.current} >= ${appraisal.salary.high}) {
+            return '';
+        }
+
         switch(rating) {
             case "1":
-                // can't give raise if at the top of pay range
-                if (${appraisal.salary.current} >= ${appraisal.salary.high}) {
-                    return '';
-                }
-
                 if (increase < ${increaseRate1MinVal} || increase > ${increaseRate1MaxVal}) {
                     return '<liferay-ui:message key="appraisal-salary-increase-error-out-of-range"/>';
                 }
