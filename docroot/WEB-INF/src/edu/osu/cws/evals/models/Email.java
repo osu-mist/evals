@@ -1,13 +1,5 @@
 package edu.osu.cws.evals.models;
 
-/**
- * Created by IntelliJ IDEA.
- * User: luf
- * Date: 7/2/11
- * Time: 12:30 PM
- * To change this template use File | Settings | File Templates.
- */
-
 import java.util.Date;
 
 public class Email extends Evals

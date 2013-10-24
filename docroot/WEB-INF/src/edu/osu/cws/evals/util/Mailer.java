@@ -7,34 +7,34 @@ package edu.osu.cws.evals.util;
  * @date: 6/24/11
  */
 
-import java.lang.reflect.Method;
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Map;
-import java.util.HashMap;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmailMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.ReviewerMgr;
 import edu.osu.cws.evals.models.*;
-import edu.osu.cws.util.*;
+import edu.osu.cws.evals.portlet.Constants;
+import edu.osu.cws.util.CWSUtil;
+import edu.osu.cws.util.Logger;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.HtmlEmail;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+
+import javax.mail.MessagingException;
+import java.lang.reflect.Method;
 import java.text.MessageFormat;
+import java.util.*;
 
-public class Mailer {
-
-    private static final String EMAIL_START_DATE = "12/01/2011";
-    private Date emailStartDate;
+public class Mailer implements MailerInterface {
     private ResourceBundle emailBundle;
-	private Mail email;
+    private String hostName;
+    private String from;
     private String linkURL;
     private String helpLinkURL;
-    private String mimeType;
     private Map<String, Configuration> configMap;
-    private String logHost;
-    private Address[] replyTo = new Address[1];
-    private EvalsLogger logger;
+    private String replyTo;
+    private LoggingInterface logger;
+    private String testMailToAddress;
 
     Map<String, String> logFields = new HashMap<String, String>();
 
@@ -42,34 +42,26 @@ public class Mailer {
      * Constructors that sets the object parameters and initializes the email start date.
      *
      * @param resources
-     * @param mail
+     * @param hostName
+     * @param from
      * @param linkURL
      * @param helpLinkURL
-     * @param mimeType
      * @param map
      * @param logger
      * @param replyTo
      */
-    public Mailer(ResourceBundle resources, Mail mail, String linkURL, String helpLinkURL,
-                  String mimeType, Map<String, Configuration> map, EvalsLogger logger, Address replyTo) {
-        this.email = mail;
+    public Mailer(ResourceBundle resources, String hostName, String from, String linkURL,
+                  String helpLinkURL, Map<String, Configuration> map, LoggingInterface logger,
+                  String replyTo, String testMailToAddress) {
         this.emailBundle = resources;
+        this.from = from;
+        this.hostName = hostName;
         this.linkURL = linkURL;
         this.helpLinkURL = helpLinkURL;
-        this.mimeType = mimeType;
         configMap = map;
         this.logger = logger;
-        this.replyTo[0] = replyTo;
-        //@todo make replyTo an address here, take a string in the constructor
-        SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
-        try {
-            emailStartDate = fmt.parse(EMAIL_START_DATE);
-        }catch(Exception e)
-        {
-            //should not get here.
-        }
-        logFields.put("sub-facility","Mailer");
-
+        this.replyTo = replyTo;
+        this.testMailToAddress = testMailToAddress;
     }
 
     /**
@@ -78,73 +70,34 @@ public class Mailer {
      * @param emailType - an EmailType
      * @throws Exception
      */
-    public void sendMail(Appraisal appraisal, EmailType emailType) {
+    public boolean sendMail(Appraisal appraisal, EmailType emailType) {
         String logShortMessage = "";
         String logLongMessage = "";
 
         try {
-            if (beforeEmailStartDate()) //don't send email before email start date
-                return;
-
-            if (!(appraisal.getJob().getStatus().equals("A"))) {
+            if (!appraisal.isEmployeeJobActive()) {
                 logShortMessage = "Email not sent";
                 logLongMessage = "Appraisal " + appraisal.getId() +
                         " not available, job is not active.";
                 logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
-                return;
+                return false;
             }
 
-            Message msg = email.getMessage();
-            String mailTo = emailType.getMailTo();
-            String mailCC = emailType.getCc();
-            String mailBCC = emailType.getBcc();
-            boolean hasRecipients = false;
-
-            if (mailTo != null && !mailTo.equals("")) {
-                Address[] to = getRecipients(mailTo, appraisal);
-                if (to != null && to.length != 0) {
-                    msg.addRecipients(Message.RecipientType.TO, to);
-                    hasRecipients = true;
-                }
+            HtmlEmail email = getHtmlEmail();
+            if (!setEmailRecipients(appraisal, email, emailType)) {
+                return false;
             }
 
-            if (mailCC != null && !mailCC.equals("")) {
-                Address[] cc = getRecipients(mailCC, appraisal);
-                if (cc != null && cc.length != 0) {
-                    msg.addRecipients(Message.RecipientType.CC, cc);
-                    hasRecipients = true;
-                }
-            }
-
-            if (mailBCC != null && !mailBCC.equals("")) {
-                Address[] bcc = getRecipients(mailBCC, appraisal);
-                if (bcc != null && bcc.length != 0) {
-                    msg.addRecipients(Message.RecipientType.BCC, bcc);
-                    hasRecipients = true;
-                }
-            }
-
-            if (!hasRecipients) {
-                return;
-            }
-
-            String addressee = getAddressee(appraisal,mailTo);
-
+            String addressee = getAddressee(appraisal, emailType.getMailTo());
             String body = getBody(appraisal, emailType, addressee);
-
-            msg.setContent(body, mimeType);
-
-            msg.setReplyTo(replyTo);
+            email.setHtmlMsg(body);
 
             String subject = emailBundle.getString( "email_" + emailType.getType() + "_subject");
+            email.setSubject(subject);
+            email.send();
 
-            msg.setSubject(subject);
-            Transport.send(msg);
-
-            Email email = new Email(appraisal.getId(), emailType.getType());
-            EmailMgr.add(email);
-
-            String recipientString = InternetAddress.toString(msg.getAllRecipients());
+            Email evalsEmail = new Email(appraisal.getId(), emailType.getType());
+            EmailMgr.add(evalsEmail);
 
             logShortMessage = emailType.getType() + " email sent for appraisal " + appraisal.getId();
             logLongMessage = "email of type " + emailType.getType() + " sent regarding appraisal " + appraisal.getId();
@@ -152,14 +105,67 @@ public class Mailer {
         } catch (Exception e) {
             try {
                 logShortMessage = "Email not sent";
-                Employee employee = appraisal.getJob().getEmployee();
                 String stackTrace = replaceEmails(CWSUtil.stackTraceString(e), "email address removed");
                 logLongMessage = "Error encountered when sending mail for appraisal = " +
                         appraisal.getId() + "\n" + stackTrace;
                 logger.log(Logger.ERROR,logShortMessage,logLongMessage);
             } catch (Exception logError) { }
+            return false;
         }
+
+        return true;
    }
+
+    /**
+     * Looks at the email type object and sets the cc, bcc and to fields in the email object.
+     * If there were no recipients to add, it returns false.
+     *
+     * @param appraisal
+     * @param email
+     * @param emailType
+     * @return
+     * @throws Exception
+     */
+    private boolean setEmailRecipients(Appraisal appraisal, HtmlEmail email, EmailType emailType)
+            throws Exception {
+        boolean hasRecipients = false;
+        String mailTo = emailType.getMailTo();
+        String mailCC = emailType.getCc();
+        String mailBCC = emailType.getBcc();
+
+        if (mailTo != null && !mailTo.equals("")) {
+            String[] to = getRecipients(mailTo, appraisal);
+            if (to != null && to.length != 0) {
+                email.addTo(to);
+                hasRecipients = true;
+            }
+        }
+
+        if (mailCC != null && !mailCC.equals("")) {
+            String[] cc = getRecipients(mailCC, appraisal);
+            if (cc != null && cc.length != 0) {
+                email.addCc(cc);
+                hasRecipients = true;
+            }
+        }
+
+        if (mailBCC != null && !mailBCC.equals("")) {
+            String[] bcc = getRecipients(mailBCC, appraisal);
+            if (bcc != null && bcc.length != 0) {
+                email.addBcc(bcc);
+                hasRecipients = true;
+            }
+        }
+        return hasRecipients;
+    }
+
+    private HtmlEmail getHtmlEmail() throws EmailException {
+        HtmlEmail email = new HtmlEmail();
+        email.setHostName(hostName);
+        email.setFrom(from);
+        email.addReplyTo(replyTo);
+        return email;
+    }
 
     /**
      * get the recipients of a particular email
@@ -169,93 +175,59 @@ public class Mailer {
      * @throws MessagingException
      *
      */
-    private Address[] getRecipients(String mailTo, Appraisal appraisal) throws Exception {
+    private String[] getRecipients(String mailTo, Appraisal appraisal) throws Exception {
         String[] mailToArray = mailTo.split(",");
-        ArrayList recipients = new ArrayList();
+        ArrayList<String> recipients = new ArrayList<String>();
         String logShortMessage = "";
         String logLongMessage = "";
 
-        int i = 0;
+        // Get the appraisal job and check that it's valid.
+        Job job = appraisal.getJob();
+        if (job == null) {
+            logShortMessage = "Email not sent";
+            logLongMessage = "Job for appraisal " + appraisal.getId() + " is null";
+            logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
+            return null;
+        }
+
+        if(testMailToAddress != null && !testMailToAddress.equals("")){
+           mailToArray[0] = testMailToAddress;
+           return mailToArray;
+        }
+
         for (String recipient : mailToArray) {
-            Job job = appraisal.getJob();
             if (recipient.equals("employee")) {
-                if (job == null) {
-                    logShortMessage = "Employee email not sent";
-                    logLongMessage = "Job for appraisal " + appraisal.getId() + " is null";
-                    logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
-                } else {
-                    String employeeEmail = job.getEmployee().getEmail();
-                    if (employeeEmail == null || employeeEmail.equals("")) {
-                        logNullEmail(job.getEmployee());
-                    } else {
-                        recipients.add(employeeEmail);
-                    }
-                }
+                addToEmailList(job.getEmployee(), recipients);
             }
 
             if (recipient.equals("supervisor")) {
-                if (job == null) {
+                Job supervisorJob = job.getSupervisor();
+                if (supervisorJob == null) {
                     logShortMessage = "Supervisor email not sent";
-                    logLongMessage = "Job for appraisal " + appraisal.getId() + " is null";
+                    logLongMessage = "Supervisor for appraisal " + appraisal.getId() + " is null";
                     logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                 } else {
-                    Job supervisorJob = job.getSupervisor();
-                    if (supervisorJob == null) {
-                        logShortMessage = "Supervisor email not sent";
-                        logLongMessage = "Supervisor for appraisal " + appraisal.getId() + " is null";
-                        logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
-                    } else {
-                        String supervisorEmail = supervisorJob.getEmployee().getEmail();
-                        if (supervisorEmail == null || supervisorEmail.equals("")) {
-                            logNullEmail(supervisorJob.getEmployee());
-                        } else {
-                            recipients.add(supervisorEmail);
-                        }
-                    }
+                    addToEmailList(supervisorJob.getEmployee(), recipients);
                 }
             }
 
             if (recipient.equals("reviewer")) {
-                if (job == null) {
+                String bcName = job.getBusinessCenterName();
+                List<Reviewer> reviewers = ReviewerMgr.getReviewers(bcName);
+                if (reviewers == null) {
                     logShortMessage = "Reviewer email not sent";
-                    logLongMessage = "Job for appraisal " + appraisal.getId() + " is null";
+                    logLongMessage = "No reviewers were found for the business center " +
+                            bcName + " for which appraisal " + appraisal.getId() + " belongs to.";
                     logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                 } else {
-                    String bcName = job.getBusinessCenterName();
-                    List<Reviewer> reviewers = ReviewerMgr.getReviewers(bcName);
-                    if (reviewers == null) {
-                        logShortMessage = "Reviewer email not sent";
-                        logLongMessage = "Reviewers for appraisal " + appraisal.getId() + " is null";
-                        logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
-                    } else {
-                        for (Reviewer reviewer : reviewers) {
-                            String reviewerEmail = reviewer.getEmployee().getEmail();
-                            if (reviewerEmail == null || reviewerEmail.equals("")) {
-                                logNullEmail(reviewer.getEmployee());
-                            } else {
-                                recipients.add(reviewerEmail);
-                            }
-                        }
+                    for (Reviewer reviewer : reviewers) {
+                        addToEmailList(reviewer.getEmployee(), recipients);
                     }
                 }
             }
-
         }
 
-        //For testing purposes. Remove when testing is done.
-        //recipients = new ArrayList();
-        //recipients.add("joan.lu@oregonstate.edu");
-
-        if (recipients.size() == 0) {
-            return null;
-        }
-
-        Address[] recipientsArray = new Address[recipients.size()];
-        for (Object address : recipients) {
-            recipientsArray[i++] = email.stringToAddress((String) address);
-        }
-
-        return recipientsArray;
+        return recipients.isEmpty()? null :  recipients.toArray(new String[recipients.size()]);
     }
 
     /**
@@ -270,6 +242,24 @@ public class Mailer {
         logShortMessage = employee.getId() + " has a blank or null email address";
         logLongMessage = " PIDM = " + employee.getId() +" does not have a valid email address";
         logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
+    }
+
+    /**
+     * Adds an employee's email to an array list. If the email is null or empty string it logs
+     * the data error.
+     *
+     * @param employee      Employee/Reviewer/Supervisor that we're trying to email
+     * @param recipients    List of recipient email addresses
+     * @throws Exception
+     */
+    private void addToEmailList(Employee employee, List<String> recipients)
+            throws Exception {
+        String email = employee.getEmail();
+        if (email == null || email.equals("")) {
+            logNullEmail(employee);
+        } else {
+            recipients.add(email);
+        }
     }
 
     /**
@@ -314,25 +304,20 @@ public class Mailer {
      * @param emailList
      * @throws Exception
      */
-    public void sendSupervisorMail(Employee supervisor,String middleBody,
+    public void sendSupervisorMail(Employee supervisor, String middleBody,
                                    List<Email> emailList) {
-
         try {
-            String bcName = JobMgr.getBusinessCenter(supervisor.getId());
-            if (bcName == null) //supervisor has no job, Error
-            {
-                String shortMsg = "From sendSupervisorMail: supervisor has no active job";
-                String longMsg = "Supervisor PIDM: " + supervisor.getId() +
-                        ", has no active job.";
-                logger.log(Logger.ERROR, shortMsg, longMsg);
+            String bcDescritor = getBCDescriptor(supervisor);
+            if (bcDescritor == null) {
                 return;
             }
 
-            String bcKey = "businesscenter_" + bcName + "_descriptor";
-            String bcDescritor = emailBundle.getString(bcKey);
-
             String supervisorName = supervisor.getConventionName();
             String emailAddress = supervisor.getEmail();
+
+            if(testMailToAddress != null && !testMailToAddress.equals("")){
+                emailAddress = testMailToAddress;
+            }
 
             if (emailAddress == null || emailAddress.equals("")) {
                 logNullEmail(supervisor);
@@ -340,25 +325,19 @@ public class Mailer {
             }
 
             String bodyWrapper = emailBundle.getString("email_body");
-
             String body = MessageFormat.format(bodyWrapper, supervisorName,
                         middleBody, bcDescritor, linkURL, linkURL, helpLinkURL, helpLinkURL);
-            Message msg = email.getMessage();
 
-            Address to = email.stringToAddress(emailAddress);
-            String supervisorSubject = emailBundle.getString("email_supervisor_subject");
-
-            msg.addRecipient(Message.RecipientType.TO, to);
-            msg.setContent(body, mimeType);
-            msg.setSubject(supervisorSubject);
-
-            Transport.send(msg);
+            HtmlEmail email = getHtmlEmail();
+            email.addTo(emailAddress);
+            email.setHtmlMsg(body);
+            email.setSubject(emailBundle.getString("email_supervisor_subject"));
+            email.send();
             EmailMgr.add(emailList);
 
-            for (Email email : emailList) {
-                Integer appraisalId = email.getAppraisalId();
-                String emailType = email.getEmailType();
-                email.getEmailType();
+            for (Email evalsEmail : emailList) {
+                Integer appraisalId = evalsEmail.getAppraisalId();
+                String emailType = evalsEmail.getEmailType();
                 String logStatus = Logger.INFORMATIONAL;
                 String logShortMessage = emailType + " email sent for appraisal " + appraisalId;
                 String logLongMessage = emailType + " mail sent to supervisor with PIDM: " +
@@ -378,6 +357,27 @@ public class Mailer {
     }
 
     /**
+     * Checks that the supervisor job exists and returns the BC descriptor for the
+     * supervisor's job bc.
+     *
+     * @param supervisor
+     * @return
+     * @throws Exception
+     */
+    private String getBCDescriptor(Employee supervisor) throws Exception {
+        String bcName = JobMgr.getBusinessCenter(supervisor.getId());
+        if (bcName == null) { //supervisor has no job, Error
+            String shortMsg = "From sendSupervisorMail: supervisor has no active job";
+            String longMsg = "Supervisor PIDM: " + supervisor.getId() +
+                    ", has no active job.";
+            logger.log(Logger.ERROR, shortMsg, longMsg);
+            return null;
+        }
+
+        return emailBundle.getString("businesscenter_" + bcName + "_descriptor");
+    }
+
+    /**
      * Send email to reviewers of one business center
      * @param emailAddresses
      * @param dueCount
@@ -390,21 +390,20 @@ public class Mailer {
             String msgs = emailBundle.getString("email_reviewDue_body");
             String middleBody = MessageFormat.format(msgs, dueCount, OverDueCount);
             String body = MessageFormat.format(bodyString, middleBody, linkURL, linkURL);
-            Message msg = email.getMessage();
-            String reviewerSubject = emailBundle.getString("email_reviewer_subject");
 
-            Address[] recipients = new Address[emailAddresses.length];
-            int i = 0;
-            for (String recipient : emailAddresses) {
-                if (recipient != null && !recipient.equals("")) {
-                    recipients[i++] = email.stringToAddress(recipient);
+            HtmlEmail email = getHtmlEmail();
+
+            if(testMailToAddress != null && !testMailToAddress.equals("")){
+                for(int i = 0; i < emailAddresses.length; i ++){
+                    emailAddresses[i] = testMailToAddress;
                 }
             }
 
-            msg.addRecipients(Message.RecipientType.TO, recipients);
-            msg.setContent(body, mimeType);
-            msg.setSubject(reviewerSubject);
-            Transport.send(msg);
+            email.addTo(emailAddresses);
+            email.setHtmlMsg(body);
+            email.setSubject(emailBundle.getString("email_reviewer_subject"));
+            email.send();
+
             String longMsg = "Emails sent to: various reviewers";
             logger.log(Logger.INFORMATIONAL, "Reviewer emails sent", longMsg);
         } catch (Exception e) {
@@ -454,6 +453,46 @@ public class Mailer {
     }
 
     /**
+     * Fetch the body for goalsReactivatedTimeout emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String goalsReactivatedTimeoutBody(Appraisal appraisal) throws Exception {
+        Configuration config = configMap.get("goalsReactivatedExpiration");
+        int daysToSubmit = config.getIntValue();
+        String bodyString = emailBundle.getString("email_goalsReactivatedTimeout_body");
+        return MessageFormat.format(bodyString, daysToSubmit, getJobTitle(appraisal),
+                appraisal.getReviewPeriod());
+    }
+
+    /**
+     * Fetch the body for goalsReactivationRequestedTimeout emailType
+     *
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String goalsReactivationRequestedTimeoutBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_goalsReactivationRequestedTimeout_body");
+        Configuration config = configMap.get("goalsReactivationRequestedExpiration");
+        int daysToSubmit = config.getIntValue();
+
+        GoalVersion lastTimedOutGoalVersion = appraisal.getLastTimedOutGoalVersion(Appraisal.STATUS_GOALS_REACTIVATION_REQUESTED);
+        DateTime submitDate;
+        if (lastTimedOutGoalVersion  == null) {
+            // if the reactivated goal version is null it means that it hasn't been saved to the db
+            // and the request has just been submitted by the employee.
+            submitDate = new DateTime();
+        } else {
+            submitDate = new DateTime(lastTimedOutGoalVersion.getCreateDate());
+        }
+
+        String requestSubmitDate = submitDate.toString(Constants.DATE_FORMAT);
+        return MessageFormat.format(bodyString, requestSubmitDate, daysToSubmit);
+    }
+
+    /**
      * Fetch the body for goalsApprovalDue emailType
      * @param appraisal
      * @return
@@ -485,8 +524,7 @@ public class Mailer {
      */
     private String goalsApprovedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsApproved_body");
-        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(),
-                getDueDate(appraisal));
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
     }
 
     /**
@@ -497,7 +535,45 @@ public class Mailer {
      */
     private String goalsReactivatedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsReactivated_body");
-        return MessageFormat.format(bodyString, appraisal.getReviewPeriod(), getDueDate(appraisal));
+        return MessageFormat.format(bodyString, getJobTitle(appraisal),
+                appraisal.getReviewPeriod(), getGoalsExpirationDate(appraisal));
+    }
+
+    /**
+     * Fetch the body for a goalsReactivationRequested emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String goalsReactivationRequestedBody(Appraisal appraisal) throws Exception {
+        //# {0} = submit date, {1} = employee name, {2} = job title, {3} = review period, {4} = due date
+        String bodyString = emailBundle.getString("email_goalsReactivationRequested_body");
+        DateTime submitDate;
+        GoalVersion reactivatedGoalVersion = appraisal.getReactivatedGoalVersion();
+
+        if (reactivatedGoalVersion == null) {
+            // if the reactivated goal version is null it means that it hasn't been saved to the db
+            // and the request has just been submitted by the employee.
+            submitDate = new DateTime();
+        } else {
+            submitDate = new DateTime(reactivatedGoalVersion.getCreateDate());
+        }
+        String requestSubmitDate = submitDate.toString(Constants.DATE_FORMAT);
+
+        // Use today as the submit date since this email is sent right after the request is submitted
+        return MessageFormat.format(bodyString, requestSubmitDate, getEmployeeName(appraisal),
+                getJobTitle(appraisal), appraisal.getReviewPeriod(), getGoalsExpirationDate(appraisal));
+    }
+
+    /**
+     * Fetch the body for a goalsReactivationRequested emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String goalsReactivationDeniedBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_goalsReactivationDenied_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
     }
 
     /**
@@ -546,6 +622,16 @@ public class Mailer {
         String bodyString = emailBundle.getString("email_appraisalOverdue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
                 appraisal.getReviewPeriod(), getDueDate(appraisal));
+    }
+
+    /**
+     * Fetch the warning for appraisalOverdue emailType
+     * @return
+     * @throws Exception
+     */
+    public String getAppraisalOverdueITWarning() throws Exception {
+        // extra message for classified IT as required by bargaining agreement
+        return emailBundle.getString("email_appraisalOverdue_IT_body");
     }
 
     /**
@@ -695,6 +781,23 @@ public class Mailer {
     }
 
     /**
+     * Fetch the body for closed emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String classifiedITNoIncreaseBody(Appraisal appraisal) throws Exception {
+        Configuration config = configMap.get("IT-increase-withhold-warn2-days");
+        int daysToNotifyEmployee = config.getIntValue();
+
+        Employee employee = appraisal.getJob().getEmployee();
+        String employeeName = employee.getConventionName();
+        String bodyString = emailBundle.getString("email_classifiedITNoIncrease_body");
+        String sed = new DateTime(appraisal.getSalaryEligibilityDate()).toString("MM/dd");
+        return MessageFormat.format(bodyString, employeeName, sed, daysToNotifyEmployee);
+    }
+
+    /**
      * Fetch the business center descriptor
      * @param appraisal
      * @return
@@ -716,15 +819,6 @@ public class Mailer {
     }
 
     /**
-     * Fetch the signature of the job for a specific appraisal
-     * @param appraisal
-     * @return
-     */
-    private String getJobSignature(Appraisal appraisal) {
-        return (appraisal.getJob().getSignature());
-    }
-
-    /**
      * Fetch the full name of the employee for a particular appraisal
      * @param appraisal
      * @return
@@ -733,17 +827,6 @@ public class Mailer {
         Job job = appraisal.getJob();
         Employee employee = job.getEmployee();
         return employee.getConventionName();
-    }
-
-    /**
-     * Fetch the id/pidm of the employee for a particular appraisal
-     * @param appraisal
-     * @return
-     */
-    private String getEmployeeId(Appraisal appraisal) {
-        Job job = appraisal.getJob();
-        Integer id = job.getEmployee().getId();
-        return id.toString();
     }
 
     /**
@@ -758,8 +841,23 @@ public class Mailer {
             status = status.replace("Overdue", "Due");
         }
         Configuration config = configMap.get(status);
-        Date dueDay = EvalsUtil.getDueDate(appraisal, config);
-        return MessageFormat.format("{0,date,MM/dd/yy}", new Object[]{dueDay});
+        DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
+        return dueDay.toString(Constants.DATE_FORMAT);
+    }
+
+    /**
+     * Returns a String that represents when the given status is expired for the goals reactivation
+     * workflow.
+     *
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String getGoalsExpirationDate(Appraisal appraisal) throws Exception {
+        String status = appraisal.getStatus() + "Expiration";
+        Configuration config = configMap.get(status);
+        DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
+        return dueDay.toString(Constants.DATE_FORMAT);
     }
 
     /**
@@ -771,8 +869,8 @@ public class Mailer {
     private int getDaysRemaining(Appraisal appraisal) throws Exception {
         String status = appraisal.getStatus();
         Configuration config = configMap.get(status);
-        Date dueDay = EvalsUtil.getDueDate(appraisal, config);
-        return CWSUtil.getRemainDays(dueDay);
+        DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
+        return Days.daysBetween(new DateTime(), dueDay).getDays();
     }
 
     /**
@@ -783,22 +881,16 @@ public class Mailer {
      * @throws Exception
      */
     private String getAddressee(Appraisal appraisal, String mailTo) throws Exception {
-        if (mailTo.indexOf("employee") > -1) {
+        if (mailTo.contains("employee")) {
             return appraisal.getJob().getEmployee().getConventionName();
         }
-        if (mailTo.indexOf("supervisor") > -1) {
+        if (mailTo.contains("supervisor")) {
             return appraisal.getJob().getSupervisor().getEmployee().getConventionName();
         }
-        if (mailTo.indexOf("reviewer") > -1) {
+        if (mailTo.contains("reviewer")) {
             return "Reviewer";
         }
         return "";
-    }
-
-    private boolean beforeEmailStartDate()
-    {
-        Date today = new Date();
-        return today.before(emailStartDate);
     }
 
     /**

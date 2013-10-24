@@ -7,9 +7,8 @@ import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Employee;
-import edu.osu.cws.evals.models.Notice;
 import edu.osu.cws.util.CWSUtil;
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -19,10 +18,9 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 public class HomeAction implements ActionInterface {
-    private ActionHelper actionHelper = new ActionHelper();
+    private ActionHelper actionHelper;
+
     private static Log _log = LogFactoryUtil.getLog(HomeAction.class);
-
-
     /**
      * Takes care of grabbing all the information needed to display the home view sections
      * (req. actionHelper, my appraisals, my team, reviews and admins) and sets the information
@@ -35,51 +33,50 @@ public class HomeAction implements ActionInterface {
      */
     public String display(PortletRequest request, PortletResponse response) throws Exception {
         Map Notices = (Map)actionHelper.getPortletContextAttribute("Notices");
-        actionHelper.addToRequestMap("homePageNotice", Notices.get("Homepage Notice"), request);
-        Employee employee = actionHelper.getLoggedOnUser(request);
-        int employeeId = employee.getId();
-        String homeJSP = getHomeJSP(request);
-        CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
-        boolean isAdmin = actionHelper.isLoggedInUserAdmin(request);
-        boolean isReviewer = actionHelper.isLoggedInUserReviewer(request);
+        actionHelper.addToRequestMap("homePageNotice", Notices.get("Homepage Notice"));
+        String homeJSP = getHomeJSP();
+        PropertiesConfiguration config = actionHelper.getEvalsConfig();
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        boolean isReviewer = actionHelper.getReviewer() != null;
 
         // specify menu type, help links and yellow box to display in home view
-        actionHelper.useNormalMenu(request);
-        helpLinks(request);
-        actionHelper.addToRequestMap("alertMsg", true, request);
-        actionHelper.addToRequestMap("isHome", true, request);
+        actionHelper.useNormalMenu();
+        helpLinks();
+        actionHelper.addToRequestMap("alertMsg", true);
+        actionHelper.addToRequestMap("isHome", true);
 
-        actionHelper.setupMyActiveAppraisals(request, employeeId);
-        actionHelper.setupMyTeamActiveAppraisals(request, employeeId);
-        ArrayList<Appraisal> myActiveAppraisals = (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myActiveAppraisals",request);
+        actionHelper.setupMyActiveAppraisals();
+        actionHelper.setupMyTeamActiveAppraisals();
+        ArrayList<Appraisal> myActiveAppraisals =
+                (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myActiveAppraisals");
         ArrayList<Appraisal> myTeamsActiveAppraisals  =
-                (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myTeamsActiveAppraisals",request);
+                (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myTeamsActiveAppraisals");
 
         boolean hasAppraisals = (myActiveAppraisals != null && !myActiveAppraisals.isEmpty()) ||
                 (myTeamsActiveAppraisals != null && !myTeamsActiveAppraisals.isEmpty());
 
         if (!isAdmin && !isReviewer && !hasAppraisals) {
-            actionHelper.addToRequestMap("hasNoEvalsAccess", true,request);
+            actionHelper.addToRequestMap("hasNoEvalsAccess", true);
         }
 
-        actionHelper.setRequiredActions(request);
+        actionHelper.setRequiredActions();
         if (homeJSP.equals(Constants.JSP_HOME_REVIEWER)) {
             int maxResults = config.getInt("reviewer.home.pending.max");
-            ArrayList<Appraisal> appraisals = actionHelper.getReviewsForLoggedInUser(request, maxResults);
-            actionHelper.addToRequestMap("appraisals", appraisals,request);
+            ArrayList<Appraisal> appraisals = actionHelper.getReviewsForLoggedInUser(maxResults);
+            actionHelper.addToRequestMap("appraisals", appraisals);
         }
         return homeJSP;
     }
 
     public String displayMyInformation(PortletRequest request, PortletResponse response) throws Exception {
         PortletSession session = request.getPortletSession(true);
-        actionHelper.useNormalMenu(request);
-        Employee employee = actionHelper.getLoggedOnUser(request);
+        actionHelper.useNormalMenu();
+        Employee employee = actionHelper.getLoggedOnUser();
         if(!employee.getLoadJobs()){
             employee.setJobs(EmployeeMgr.findJobs(employee.getId()));
             employee.setLoadJobs(true);
         }
-        actionHelper.addToRequestMap("employee", employee,request);
+        actionHelper.addToRequestMap("employee", employee);
         session.setAttribute("loggedOnUser", employee);
         return Constants.JSP_MY_INFO;
     }
@@ -87,11 +84,10 @@ public class HomeAction implements ActionInterface {
     /**
      * Set up the attribute in the request object that contains an array of helpful links
      *
-     * @param request
      */
-    private void helpLinks(PortletRequest request) {
-        CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
-        actionHelper.addToRequestMap("helpLinks", config.getStringArray("helpfulLinks"),request);
+    private void helpLinks() {
+        PropertiesConfiguration config = actionHelper.getEvalsConfig();
+        actionHelper.addToRequestMap("helpLinks", config.getString("helpfulLinks"));
     }
 
     /**
@@ -106,7 +102,7 @@ public class HomeAction implements ActionInterface {
     public String demoResetAppraisal(PortletRequest request, PortletResponse response) throws Exception {
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isDemo()) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             return display(request, response);
         }
 
@@ -114,7 +110,7 @@ public class HomeAction implements ActionInterface {
         String status = ParamUtil.getString(request, "status");
 
         if (id == 0 || status == null || status.equals("")) {
-            actionHelper.addErrorsToRequest(request, resource.getString("appraisal-cannot-reset"));
+            actionHelper.addErrorsToRequest(resource.getString("appraisal-cannot-reset"));
         }
 
         try {
@@ -147,7 +143,7 @@ public class HomeAction implements ActionInterface {
     public String demoSwitchUser(PortletRequest request, PortletResponse response) throws Exception {
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         if (!actionHelper.isDemo()) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+            actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             return display(request, response);
         }
 
@@ -162,7 +158,7 @@ public class HomeAction implements ActionInterface {
         session.setAttribute("loggedOnUser", employee);
         session.removeAttribute(ActionHelper.ALL_MY_ACTIVE_APPRAISALS);
         session.removeAttribute(ActionHelper.MY_TEAMS_ACTIVE_APPRAISALS);
-        actionHelper.setUpUserPermissionInSession(request, true);
+        actionHelper.setUpUserPermission(true);
 
         return display(request, response);
     }
@@ -174,30 +170,31 @@ public class HomeAction implements ActionInterface {
      * view that file. If the user doesn't have access to that view, it
      * returns the default home-jsp.
      *
-     * @param request
      * @return
      * @throws Exception
      */
-    private String getHomeJSP(PortletRequest request) throws Exception {
+    private String getHomeJSP() throws Exception {
         String homeJsp = Constants.JSP_HOME;
-        String currentRole = actionHelper.getCurrentRole(request);
+        String currentRole = actionHelper.getCurrentRole();
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
+        boolean isReviewer = actionHelper.getReviewer() != null;
+        boolean isAdmin = actionHelper.getAdmin() != null;
 
         if (currentRole.equals(ActionHelper.ROLE_ADMINISTRATOR)) {
-            if (!actionHelper.isLoggedInUserAdmin(request)) {
-                actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+            if (!isAdmin) {
+                actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             } else {
                 homeJsp = Constants.JSP_HOME_ADMIN;
             }
         } else if (currentRole.equals(ActionHelper.ROLE_REVIEWER)) {
-            if (!actionHelper.isLoggedInUserReviewer(request)) {
-                actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+            if (!isReviewer) {
+                actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             } else {
                 homeJsp = Constants.JSP_HOME_REVIEWER;
             }
         } else if (currentRole.equals(ActionHelper.ROLE_SUPERVISOR)) {
-            if (!actionHelper.isLoggedInUserSupervisor(request)) {
-                actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+            if (!actionHelper.isLoggedInUserSupervisor()) {
+                actionHelper.addErrorsToRequest(resource.getString("access-denied"));
             } else {
                 homeJsp = Constants.JSP_HOME_SUPERVISOR;
             }
@@ -211,6 +208,10 @@ public class HomeAction implements ActionInterface {
     }
 
     public void setHomeAction(HomeAction homeAction) {
+        // we do nothing in this method.
+    }
+
+    public void setErrorHandler(ErrorHandler errorHandler) {
         // we do nothing in this method.
     }
 }

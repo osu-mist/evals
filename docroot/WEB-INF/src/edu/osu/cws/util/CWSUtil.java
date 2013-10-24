@@ -4,6 +4,8 @@ import edu.osu.cws.evals.portlet.Constants;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -17,170 +19,57 @@ import java.net.*;
 /**
  *
  */
-public class CWSUtil
-{
-    /**
-     * Adds to or subtracts from date the offset amount of time, and return if the
-     * resulting time is in the past or the future.
-     * @param date: reference point
-     * @param offset: offset from reference point
-     *                positive Number means addition, negative means subtraction.
-     * @param offsetType:  Calendar.MONTH or Calendar.DAY_OF_MONTH
-     * @return true if the resulting date is on or after the current time, false otherwise.
-     */
-   public static boolean isOnOrAfterNow(Date date, int offset, int offsetType)
-    {
-	    Calendar cal = Calendar.getInstance();
-	    cal.setTime(date);
+public class CWSUtil {
 
-	    if ((offsetType != Calendar.MONTH) && (offsetType != Calendar.DAY_OF_MONTH))
-            //invalid offsetType
-		    return false;
-
-		cal.add(offsetType, offset);
-        Calendar today = Calendar.getInstance();
-        if (cal.equals(today))
-            return true;
-        return (cal.after(today));
-    }
 
     /**
      *
-     * @param cal
-     * @return true is the time represented by cal is on or after the current time.
-     */
-    public static boolean isOnOrAfterNow(Calendar cal)
-    {
-  	    Calendar today = Calendar.getInstance();
-        if (cal.equals(today))
-            return true;
-        return cal.after(today);
-    }
-
-    /**
-     *
-     * @param d1
-     * @param d2
-     * @return the number of days between the 2 date object.
-     *          positive if d1 is after d2, negative number otherwise.
-     *          At the beginning we have to truncate the Date object to
-     *          exclude the times to get the correct betweenDays
-     */
-    public static int daysBetween(Date d1, Date d2)   throws Exception
-    {
-        d1 = DateUtils.truncate(d1,Calendar.DAY_OF_MONTH);
-        d2 = DateUtils.truncate(d2,Calendar.DAY_OF_MONTH);
-        return (int) ((d1.getTime() - d2.getTime()) / (1000 * 60 * 60 * 24));
-    }
-
-    /**
-     *
-     * @param start: start of the period
-     * @param end: end of the period
-     * @param target: The date in question
+     * @param start: (DateTime) start of the period
+     * @param end: (DateTime) end of the period
+     * @param target: (DateTime) The date in question
      * @return true is target is the same as start or end, or target is between start and end.  False otherwise.
      */
-    public static boolean isWithinPeriod(Date start, Date end, Date target)
-    {
+    public static boolean isWithinPeriod(DateTime start, DateTime end, DateTime target) {
+        return target.equals(start) || target.equals(end) ||
+                (target.isAfter(start) && target.isBefore(end));
 
-        if (target.equals(start) || target.equals(end))   //on the boundary
-            return true;
-
-        return (target.after(start) && target.before(end));
     }
 
     /**
      *
-     * @param start
-     * @param end
+     * @param start     DateTime object
+     * @param end       DateTime object
      * @return true is the current time is between start and end, false otherwise.
      */
-    public static boolean isWithinPeriod(Date start, Date end)
-    {
-        Date now = new Date();
-        return isWithinPeriod(start, end, now);
+    public static boolean isWithinPeriod(DateTime start, DateTime end) {
+        return isWithinPeriod(start, end, new DateTime());
     }
-
-
-    /**
-     * @param startDate: reference point
-     * @param offset: amount of time from reference point, positive or negative
-     * @param offsetType, either Calendar.MONTH or Calendar.DAY_OF_MONTH
-     * @return a new date by adding offset to startDate
-     */
-   public static Date getNewDate(Date startDate, int offset, int offsetType)
-   {
-      if ((offsetType != Calendar.MONTH) && (offsetType != Calendar.DAY_OF_MONTH))
-          //invalid input
-          return null;
-
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(startDate);
-      cal.add(offsetType, offset);
-      return cal.getTime();
-   }
 
     /**
      *
-     * @param date: reference point
-     * @return if date is the first date of the month, return the input date
+     * @param dt: reference point
+     * @return (DateTime) if date is the first date of the month, return the input date
      * else return the first day of next month
      */
-   public static Date getFirstDayOfMonth(Date date)
-   {
-       Calendar cal = Calendar.getInstance();
-       cal.setTime(date);
-       if (cal.get(Calendar.DAY_OF_MONTH) != 1)
-       {
-            cal.add(Calendar.MONTH, 1);
-            cal.set(Calendar.DAY_OF_MONTH, 1);
+   public static DateTime getFirstDayOfMonth(DateTime dt) {
+       if (dt.getDayOfMonth() != 1) {
+           dt = dt.plusMonths(1).withDayOfMonth(1);
        }
-       return cal.getTime();
+       return dt;
    }
 
-
     /**
+     * Null safe way to convert Joda Datetime to Date.
      *
-     * @param dueDate
-     * @return Number of day between today and dueDate.
-     * Positive indicates dueDate is in the future
-     * Negative indicates dueDate is in the past (overdue)
-     */
-   public static int getRemainDays(Date dueDate) throws Exception
-   {
-	    return CWSUtil.daysBetween(dueDate, new Date());
-   }
-
-
-    /**
-     *
-     * @param str: the string to be converted to array
-     * @param delimiter: delimiter to use for splitting the string
-     * @return:
-     */
-    public static String[] stringToArray(String str, String delimiter)
-    {
-       if (str == null)
-           return null;
-
-       StringTokenizer st = new StringTokenizer(str, delimiter);
-       String[] tokens = new String[st.countTokens()];
-       int index = 0;
-
-      while (st.hasMoreTokens()) {
-         tokens[index++] = st.nextToken().trim();
-      }
-       return  tokens;
-    }
-
-    /**
-     * Calls   stringToArray(String str, String delimiter) assuming space as the delimiter
-     * @param str
+     * @param dt    DateTime object
      * @return
      */
-    public static String[] stringToArray(String str)
-    {
-        return  stringToArray(str, " ");
+    public static Date toDate(DateTime dt) {
+        if (dt == null) {
+            return null;
+        }
+
+        return dt.toDate();
     }
 
     /**
@@ -269,4 +158,16 @@ public class CWSUtil
     public static boolean validateOrgCode(String orgCode) {
         return StringUtils.isNumeric(orgCode) && orgCode.length() == Constants.MAX_ORG_CODE_DIGITS;
     }
+
+    /**
+     * Formats a given amount into a currency string.
+     *
+     * @param amount
+     * @return
+     */
+    public static String formatCurrency(Double amount) {
+        NumberFormat fmt = NumberFormat.getCurrencyInstance();
+        return fmt.format(amount);
+    }
+
 }

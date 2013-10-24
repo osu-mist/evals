@@ -7,12 +7,13 @@ import edu.osu.cws.evals.models.Configuration;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import java.util.ArrayList;
-import java.util.ResourceBundle;
 
 public class ConfigurationsAction implements ActionInterface {
-    private ActionHelper actionHelper = new ActionHelper();
+    private ActionHelper actionHelper;
 
     private HomeAction homeAction;
+
+    private ErrorHandler errorHandler;
     
     /**
      * Handles listing the configuration parameters.
@@ -23,17 +24,16 @@ public class ConfigurationsAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         actionHelper.refreshContextCache();
         ArrayList<Configuration> configurations = (ArrayList<Configuration>)
                 actionHelper.getPortletContextAttribute("configurationsList");
-        actionHelper.addToRequestMap("configurations", configurations,request);
-        actionHelper.useMaximizedMenu(request);
+        actionHelper.addToRequestMap("configurations", configurations);
+        actionHelper.useMaximizedMenu();
 
         return Constants.JSP_CONFIGURATION_LIST;
     }
@@ -48,10 +48,9 @@ public class ConfigurationsAction implements ActionInterface {
      */
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         int id = ParamUtil.getInteger(request, "id");
@@ -59,9 +58,9 @@ public class ConfigurationsAction implements ActionInterface {
 
         if (id != 0) {
             try {
-                ConfigurationMgr configurationMgr = new ConfigurationMgr();
-                configurationMgr.edit(id, value);
-                actionHelper.setEvalsConfiguration(true);
+                ConfigurationMgr.edit(id, value);
+                actionHelper.updateContextTimestamp();
+                actionHelper.setAdminPortletData();
             } catch (Exception e) {
                 return e.getMessage();
             }
@@ -76,5 +75,9 @@ public class ConfigurationsAction implements ActionInterface {
 
     public void setHomeAction(HomeAction homeAction) {
         this.homeAction = homeAction;
+    }
+
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
     }
 }

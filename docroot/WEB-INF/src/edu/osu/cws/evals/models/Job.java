@@ -3,16 +3,14 @@
  */
 package edu.osu.cws.evals.models;
 
+import edu.osu.cws.util.CWSUtil;
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+
 import java.io.Serializable;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
-import edu.osu.cws.evals.hibernate.AppraisalMgr;
-import edu.osu.cws.evals.util.EvalsUtil;
-import edu.osu.cws.util.CWSUtil;
-import org.apache.commons.lang.StringUtils;
 
 public class Job extends Evals implements Serializable {
     private int id;
@@ -60,6 +58,12 @@ public class Job extends Evals implements Serializable {
     private int annualInd;
 
     private Date evalDate;
+
+    private Double salaryLow;
+    private Double salaryMidpoint;
+    private Double salaryHigh;
+    private Double salaryCurrent;
+    private String salaryGrpCode;
 
     private Set appraisals = new HashSet();
 
@@ -342,15 +346,60 @@ public class Job extends Evals implements Serializable {
         this.appraisals = appraisals;
     }
 
+    public Double getSalaryLow() {
+        return salaryLow;
+    }
+
+    public void setSalaryLow(Double salaryLow) {
+        this.salaryLow = salaryLow;
+    }
+
+    public Double getSalaryMidpoint() {
+        return salaryMidpoint;
+    }
+
+    public void setSalaryMidpoint(Double salaryMidpoint) {
+        this.salaryMidpoint = salaryMidpoint;
+    }
+
+    public Double getSalaryHigh() {
+        return salaryHigh;
+    }
+
+    public void setSalaryHigh(Double salaryHigh) {
+        this.salaryHigh = salaryHigh;
+    }
+
+    public Double getSalaryCurrent() {
+        return salaryCurrent;
+    }
+
+    public void setSalaryCurrent(Double salaryCurrent) {
+        this.salaryCurrent = salaryCurrent;
+    }
+
+    public String getSalaryGrpCode() {
+        return salaryGrpCode;
+    }
+
+    public void setSalaryGrpCode(String salaryGrpCode) {
+        this.salaryGrpCode = salaryGrpCode;
+    }
+
     /**
      * Trial start date doed not need to be the first date of the month.
-     * @return  start date of the trial appraisal period.
+     * @return  (DateTime) start date of the trial appraisal period.
      */
-    public Date getTrialStartDate()
+    public DateTime getTrialStartDate()
     {
+        if (trialInd == 0) {
+            return null; //No trial appraisal for this job
+        }
+
        if (evalDate != null)
-           return evalDate;
-        return beginDate;
+           return new DateTime(evalDate);
+
+        return new DateTime(beginDate);
     }
 
 
@@ -361,117 +410,80 @@ public class Job extends Evals implements Serializable {
      */
     public boolean withinTrialPeriod()
     {
-       	if (trialInd == 0)
-	        return false;
+        if (trialInd == 0)
+            return false;
 
-        Date startDate = getTrialStartDate();
-        Date trialEndDate = getEndEvalDate(startDate, "trial");
-	    return CWSUtil.isWithinPeriod(beginDate, trialEndDate);
+        DateTime startDate = getTrialStartDate();
+        if (startDate == null) { // check if doesn't require a trial eval.
+            return false;
+        }
+
+        DateTime trialEndDate = getEndEvalDate(startDate, "trial");
+        return CWSUtil.isWithinPeriod(startDate, trialEndDate);
     }
 
     /**
      *
-     * @return start date of appraisal period of the current year.
+     * @return (DateTime) start date of appraisal period of the current year.
      * This day may be in the past of the future.
      * @throws Exception
      */
-    public Calendar getNewAnnualStartDate() throws Exception {
-        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        Calendar cal = Calendar.getInstance();
-        Date initialStartDAte = getInitialEvalStartDate(); //starting point Jan 1st 2011
+    public DateTime getNewAnnualStartDate() throws Exception {
+        DateTime newStartDate = getInitialEvalStartDate();
 
-        cal.setTime(initialStartDAte);
-
-        // Verify that this is not the first annual appraisal and that annualInd is 18
-        // if (isn't 1st evaluation && annualInd == 18) {
-        boolean firstAnnualStartDate = isFirstAnnualStartDate();
-        if (!firstAnnualStartDate && annualInd == 18) {
-            int month = 6 + cal.get(Calendar.MONTH);
-            cal.set(Calendar.MONTH, month);
+        if (!isWithinInitialPeriod()) {
+            newStartDate = newStartDate.plusMonths(annualInd);
+            newStartDate = newStartDate.withYear(new DateTime().getYear());
         }
 
-        // If this is the first annual evaluation and the indicator is 18, use initial date for year
-        if (firstAnnualStartDate && annualInd == 18) {
-            cal.setTime(initialStartDAte);
-        } else {
-            cal.set(Calendar.YEAR, currentYear);
-        }
-
-        return cal;
+        return newStartDate;
     }
 
     /**
-     * Checks whether or not Date() - right now is within the first annual evaluation. This
+     * Checks whether or not DateTime() - right now is within the first annual evaluation. This
      * is used to figure out if when getNewAnnualStartDate is called and annual_ind = 18,
      * whether we are in the first review period or the 2nd one.
      *
      * @return
      * @throws Exception
      */
-    private boolean isFirstAnnualStartDate() throws Exception {
+    private boolean isWithinInitialPeriod() throws Exception {
         // Calculate the end date of the 1st annual evaluation
-        Calendar initialEvalStartDate = Calendar.getInstance();
-        Date initialStartDate = getInitialEvalStartDate();
-        initialEvalStartDate.setTime(initialStartDate);
-        initialEvalStartDate.add(Calendar.MONTH, annualInd);
-        Date initialEvalStartCal = initialEvalStartDate.getTime();
+        DateTime initialStartDate = getInitialEvalStartDate();
+        DateTime endFirstEval = initialStartDate.plusMonths(annualInd);
 
-        long now = new Date().getTime();
-        long beginFirstEval = initialStartDate.getTime();
-        long endFirstEval = initialEvalStartCal.getTime();
-
-        // Check if we are within the evaluation period of the first annual evaluation
-        if (now >= beginFirstEval && now <= endFirstEval) {
-            // Check if the first annual evaluation has not been created
-            if (!AppraisalMgr.AnnualExists(this, initialStartDate)) {
-                // Check if the first annual evaluation should be created
-                if (now < initialStartDate.getTime()) {
-                    return false;
-                }
-                if (EvalsUtil.beforeEvalsTime(this, initialStartDate, Appraisal.TYPE_ANNUAL)) {
-                    return false;
-                }
-
-                return true;
-            }
-
-        }
-
-        return false;
+        return !initialStartDate.isAfterNow() && endFirstEval.isAfterNow();
     }
 
-    public Date getAnnualStartDateBasedOnJobBeginDate(int year)
+    public DateTime getAnnualStartDateBasedOnJobBeginDate(int year)
     {
-        Calendar mycal = Calendar.getInstance();
-        mycal.setTime(beginDate);
-        mycal.set(Calendar.YEAR, year);
-        return (CWSUtil.getFirstDayOfMonth(mycal.getTime()));
+        DateTime dt = new DateTime(beginDate).withYear(year);
+        return CWSUtil.getFirstDayOfMonth(dt);
     }
 
     /**
      *
-     * @return a Date object representing the start date of the initial annual appraisal period
+     * @return a DateTime object representing the start date of the initial annual appraisal period
      */
-    public Date getInitialEvalStartDate()
+    public DateTime getInitialEvalStartDate()
     {
-        Date myDate;
+        DateTime dt;
         if (evalDate != null)
-            myDate = evalDate;
+            dt = new DateTime(evalDate);
         else
-            myDate = beginDate;
-        return(CWSUtil.getFirstDayOfMonth(myDate));
+            dt = new DateTime(beginDate);
+
+        return CWSUtil.getFirstDayOfMonth(dt);
     }
 
     /**
      *
-     * @param startDate
+     * @param startDate     DateTime object
      * @param type: trial, or annual
      * @return
      */
-    public Date getEndEvalDate(Date startDate, String type)
+    public DateTime getEndEvalDate(DateTime startDate, String type)
     {
-      Calendar endCal = Calendar.getInstance();
-        endCal.setTime(startDate);
       int interval = 0;
       if (type.equalsIgnoreCase("trial"))
         interval = trialInd;
@@ -483,26 +495,7 @@ public class Job extends Evals implements Serializable {
       if (interval == 0) //No evaluation needed
         return null;
 
-      endCal.add(Calendar.MONTH, interval);
-      endCal.add(Calendar.DAY_OF_MONTH, -1);
-      return endCal.getTime();
-
-    }
-
-
-    /**
-     * @date
-     * @return true if target is withing the initial appraisal period
-     */
-    public boolean withinInitialPeriod(Date target)
-    {
-        if (annualInd == 0)  //Not doing annual evaluation
-            return false;
-
-        Calendar cal = Calendar.getInstance();
-        Date startDate = getInitialEvalStartDate();
-        Date endDate = getEndEvalDate(startDate, "initial");
-        return CWSUtil.isWithinPeriod(startDate, cal.getTime(), target);
+        return startDate.plusMonths(interval).minusDays(1);
     }
 
     public String getSignature()
@@ -540,6 +533,27 @@ public class Job extends Evals implements Serializable {
 
     public String getIdKey() {
         return getEmployee().getId() + "_" + positionNumber + "_" + suffix;
+    }
+
+    /**
+     * Returns a new Salary based on the current salary data in the Job. Only appointment
+     * type allowed to return salary information is Classified IT.
+     *
+     * @return
+     */
+    public Salary getSalary() {
+        if (!appointmentType.equals(AppointmentType.CLASSIFIED_IT)) {
+            return null;
+        }
+
+        Salary salary = new Salary();
+        salary.setCurrent(this.salaryCurrent);
+        salary.setHigh(this.salaryHigh);
+        salary.setLow(this.salaryLow);
+        salary.setMidPoint(this.salaryMidpoint);
+        salary.setSgrpCode(this.salaryGrpCode);
+
+        return salary;
     }
 }
 

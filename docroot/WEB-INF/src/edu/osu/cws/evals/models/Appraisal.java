@@ -1,31 +1,14 @@
 package edu.osu.cws.evals.models;
 
+import edu.osu.cws.evals.util.EvalsUtil;
+import edu.osu.cws.util.CWSUtil;
+import org.apache.commons.lang.ArrayUtils;
+import org.joda.time.DateTime;
+
 import java.text.MessageFormat;
 import java.util.*;
 
 public class Appraisal extends Evals {
-    private static final String jobRequired =
-            "Please provide a valid job";
-
-    /**
-     * Validation error message for signature is public because the appraisal.jsp
-     * needs to access this static variable in order to do js validation
-     */
-    public static final String signatureRequired =
-            "Please click the box to acknowledge that you have read the appraisal";
-
-    public static final String rebuttalReadRequired =
-            "Please click the box to acknowledge that you have read the rebuttal";
-
-    /**
-     * Validation error message for rating is public because the appraisal.jsp
-     * needs to access this static variable in order to do js validation
-     */
-    public static final String ratingRequired =
-            "Please select a rating.";
-
-    public static final String invalidType =
-            "Appraisal type can only be: annual or trial. Please provide a valid type.";
 
     public static final String TYPE_ANNUAL = "annual";
 
@@ -45,6 +28,7 @@ public class Appraisal extends Evals {
     public static final String STATUS_GOALS_DUE = "goalsDue";
     public static final String STATUS_GOALS_OVERDUE = "goalsOverdue";
     public static final String STATUS_GOALS_REACTIVATED = "goalsReactivated";
+    public static final String STATUS_GOALS_REACTIVATION_REQUESTED = "goalsReactivationRequested";
     public static final String STATUS_GOALS_REQUIRED_MODIFICATION = "goalsRequiredModification";
     public static final String STATUS_REBUTTAL_READ_DUE = "rebuttalReadDue";
     public static final String STATUS_REBUTTAL_READ_OVERDUE = "rebuttalReadOverdue";
@@ -178,7 +162,9 @@ public class Appraisal extends Evals {
 
     private Integer overdue;
 
-    private Set<Assessment> assessments = new HashSet<Assessment>();
+    private Set<GoalVersion> goalVersions = new HashSet<GoalVersion>();
+
+    private Set<Salary> salaries = new HashSet<Salary>();
 
     private Integer goalsOverdue;
 
@@ -201,6 +187,8 @@ public class Appraisal extends Evals {
      * regards to this appraisal.
      */
     private String role;
+
+    private PermissionRule permissionRule;
 
     private ArrayList<String> statusHiddenFromEmployee = new ArrayList<String>();
 
@@ -402,40 +390,6 @@ public class Appraisal extends Evals {
         setJob(appraisal.getJob());
     }
 
-    public boolean validateJob() {
-        ArrayList<String> jobErrors = new ArrayList<String>();
-
-        // If there were any previous validation errors remove them
-        this.errors.remove("job");
-
-        if (this.job == null || this.job.getEmployee() == null || this.job.getEmployee().getId() == 0) {
-            jobErrors.add(jobRequired);
-        }
-
-        if (jobErrors.size() > 0) {
-            this.errors.put("job", jobErrors);
-            return false;
-        }
-        return true;
-    }
-
-    public boolean validateType() {
-        ArrayList<String> typeErrors = new ArrayList<String>();
-
-        // If there were any previous validation errors remove them
-        this.errors.remove("type");
-
-        if (this.type == null || (!this.type.equals(TYPE_ANNUAL) && !this.type.equals(TYPE_TRIAL))) {
-            typeErrors.add(invalidType);
-        }
-
-        if (typeErrors.size() > 0) {
-            this.errors.put("type", typeErrors);
-            return false;
-        }
-        return true;
-    }
-
     /**
      * Uses the start date and end date to generate the review period.
      *
@@ -451,18 +405,6 @@ public class Appraisal extends Evals {
 
         return MessageFormat.format("{0,date,MM/dd/yy} - {1,date,MM/dd/yy}",
                 new Object[]{getStartDate(), getEndDate()});
-    }
-
-    /**
-     * Returns a sorted list of assessments. The assessment pojo class
-     * implements comparable interface which makes this easy.
-     *
-     * @return
-     */
-    public List getSortedAssessments() {
-        List sortedAssessments = new ArrayList(assessments);
-        Collections.sort(sortedAssessments);
-        return sortedAssessments;
     }
 
     /**
@@ -784,17 +726,12 @@ public class Appraisal extends Evals {
         this.closeOutReason = closeOutReason;
     }
 
-    public Set<Assessment> getAssessments() {
-        return assessments;
+    public Set<GoalVersion> getGoalVersions() {
+        return goalVersions;
     }
 
-    public void setAssessments(Set<Assessment> assessments) {
-        this.assessments = assessments;
-    }
-
-    public void addAssessment(Assessment assessment) {
-        assessment.setAppraisal(this);
-        this.assessments.add(assessment);
+    public void setGoalVersions(Set<GoalVersion> goalVersions) {
+        this.goalVersions = goalVersions;
     }
 
     public Employee getReopenedBy() {
@@ -901,6 +838,27 @@ public class Appraisal extends Evals {
         this.rebuttalReadOverdue = rebuttalReadOverdue;
     }
 
+    public void addGoalVersion(GoalVersion goalVersion) {
+        goalVersion.setAppraisal(this);
+        goalVersions.add(goalVersion);
+    }
+
+    public Set<Salary> getSalaries() {
+        return salaries;
+    }
+
+    public void setSalaries(Set<Salary> salaries) {
+        this.salaries = salaries;
+    }
+
+    public Salary getSalary() {
+        if (salaries.isEmpty()) {
+            return null;
+        }
+
+        // There should only be 1 object, return it
+        return salaries.iterator().next();
+    }
     /**
      * Role of the logged in user for this appraisal. This is used
      * in the getViewStatus() method.
@@ -908,7 +866,7 @@ public class Appraisal extends Evals {
      * @return
      */
     public String getRole() {
-        if (role == null) {
+        if(role == null) {
             role = "";
         }
         return role;
@@ -916,5 +874,310 @@ public class Appraisal extends Evals {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public PermissionRule getPermissionRule() {
+        return permissionRule;
+    }
+
+    public void setPermissionRule(PermissionRule permissionRule) {
+        this.permissionRule = permissionRule;
+    }
+
+    public boolean isEmployeeJobActive() {
+        return getJob().getStatus().equalsIgnoreCase("A");
+    }
+
+    /**
+     * Return the most recently created goal version where the goals haven't been approved by the
+     * supervisor and the goals reactivation request hasn't been denied.
+     *
+     * @return
+     */
+    public GoalVersion getReactivatedGoalVersion() {
+        for (GoalVersion goalVersion : goalVersions) {
+            if (goalVersion.inActivatedState()) {
+                return goalVersion;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Walk through goalVersions and return the ones that are approved sorted by approvedDate asc.
+     * An approved GoalVersion has approvedDate not set to null.
+     * When there are no approved GoalVersions, return an empty list.
+     * @return
+     */
+    public List<GoalVersion> getApprovedGoalsVersions() {
+        List<GoalVersion> approvedGoalsVersions = new ArrayList<GoalVersion>();
+        for (GoalVersion goalVersion : goalVersions) {
+            if (goalVersion.getGoalsApprovedDate() != null) {
+                approvedGoalsVersions.add(goalVersion);
+            }
+        }
+
+        Collections.sort(approvedGoalsVersions);
+        return approvedGoalsVersions;
+    }
+
+    /**
+     * This returns the goals version whose request has been approved but goals haven't.
+     */
+    public GoalVersion getUnapprovedGoalsVersion() {
+        for (GoalVersion goalVersion : goalVersions) {
+            boolean reactivateRequestApproved = goalVersion.getRequestDecision() != null
+                    && goalVersion.getRequestDecision();
+            if (reactivateRequestApproved && goalVersion.getGoalsApprovedDate() == null) {
+                return goalVersion;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * This method the goals version that is pending request approval.
+     */
+    public GoalVersion getRequestPendingGoalsVersion() {
+        for (GoalVersion goalVersion : goalVersions) {
+            if (goalVersion.getRequestDecision() == null) {
+                return goalVersion;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the goal version that was most recently timed out at a given status. This is
+     * used when sending emails from the backend.
+     *
+     * @param timedOutStatus
+     * @return
+     */
+    public GoalVersion getLastTimedOutGoalVersion(String timedOutStatus) {
+        List<GoalVersion> timedOutGoalVersions = new ArrayList<GoalVersion>();
+        for (GoalVersion goalVersion : goalVersions) {
+            String timedOutAt = goalVersion.getTimedOutAt();
+            if (timedOutAt != null && timedOutAt.equals(timedOutStatus)) {
+                timedOutGoalVersions.add(goalVersion);
+            }
+        }
+
+        Collections.sort(timedOutGoalVersions);
+        if (timedOutGoalVersions.isEmpty()) {
+            return null;
+        }
+
+        // Return the most recently timed out goal version
+        return timedOutGoalVersions.get(timedOutGoalVersions.size() -1);
+    }
+
+    /**
+     * Loads lazy associations
+     */
+    public void loadLazyAssociations() {
+        job.toString();
+        Job supervisor = job.getSupervisor();
+        if (supervisor != null && supervisor.getEmployee() != null) {
+            supervisor.getEmployee().toString();
+        }
+        if (job.getEmployee() != null) {
+            job.getEmployee().toString();
+        }
+        if (getCloseOutReason() != null) {
+            getCloseOutReason().getReason();
+        }
+
+        // iterate over goalVersions to load data
+        for (GoalVersion goalVersion : goalVersions) {
+            for (Assessment assessment : goalVersion.getSortedAssessments()) {
+                for (AssessmentCriteria assessmentCriteria : assessment.getAssessmentCriteria()) {
+                    assessmentCriteria.getCriteriaArea().getName();
+                }
+            }
+        }
+
+        // load salary if available. This applies only to IT
+        if (this.getSalary() != null) {
+            this.getSalary().toString();
+        }
+    }
+
+    /**
+     * Returns a new Appraisal pojo with the properties copied over from the trialAppraisal. It
+     * also calls the copyPropertiesFromTrial method recursively over the associations.
+     *
+     * @param trialAppraisal
+     * @return
+     */
+    public static Appraisal createFirstAnnual(Appraisal trialAppraisal) {
+        Appraisal appraisal = new Appraisal();
+        appraisal.setType(Appraisal.TYPE_ANNUAL);
+        appraisal.setJob(trialAppraisal.getJob());
+        appraisal.setCreateDate(new Date());
+        appraisal.setStartDate(trialAppraisal.getJob().getInitialEvalStartDate().toDate());
+        appraisal.setRating(0);
+
+        // set the status. The cron job will update the status if needed
+        appraisal.setStatus(Appraisal.STATUS_GOALS_APPROVED);
+
+        // calculate & set the end date
+        DateTime startDate = new DateTime(appraisal.getStartDate());
+        DateTime endDate = appraisal.getJob().getEndEvalDate(startDate, Appraisal.TYPE_INITIAL);
+        appraisal.setEndDate(CWSUtil.toDate(endDate));
+
+        // copy over goal version
+        for (GoalVersion trialGoalVersion : trialAppraisal.getApprovedGoalsVersions()) {
+            GoalVersion goalVersion = GoalVersion.copyPropertiesFromTrial(trialGoalVersion, appraisal);
+            appraisal.addGoalVersion(goalVersion);
+
+            // copy assessment objects
+            for (Assessment oldAssessment: trialGoalVersion.getAssessments()) {
+                Assessment newAssessment = Assessment.copyPropertiesFromTrial(oldAssessment);
+                goalVersion.addAssessment(newAssessment);
+            }
+        }
+
+        return appraisal;
+    }
+
+    /*
+     * Calculates the overdue value for the appraisal object and updates the value in the object.
+     * It does not update the db.
+     *
+     * @param configurationMap
+     * @throws Exception
+     */
+    public void updateOverdue(Map<String, Configuration> configurationMap)
+            throws Exception {
+        overdue = EvalsUtil.getOverdue(this, configurationMap);
+    }
+
+    /**
+     * Calculates what should be the new status of a given appraisal. It looks at the
+     * configuration values to see whether the status is due or overdue.
+     * @todo: handle: STATUS_GOALS_REACTIVATED in next release
+     *
+     * @param configMap
+     * @return
+     * @throws Exception
+     */
+    public String getNewStatus(Map<String, Configuration> configMap)
+            throws Exception {
+        String newStatus = null;
+        String status = getStatus();
+        Configuration config = configMap.get(status); //config object of this status
+
+        if (status.contains(Appraisal.DUE) && EvalsUtil.isDue(this, config) <= 0) {
+            newStatus = status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
+        } else if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)
+                && isGoalsReqModOverDue(configMap) && !areGoalsReactivated()) {
+            //goalsRequiredModification is not overdue.
+            newStatus = Appraisal.STATUS_GOALS_OVERDUE;
+        } else if (status.equals(Appraisal.STATUS_GOALS_APPROVED)) {
+            //Need to check to see if it's time to change the status to results due
+            Configuration reminderConfig = configMap.get("firstResultDueReminder");
+            if (EvalsUtil.isDue(this, reminderConfig) < 0) {
+                newStatus = Appraisal.STATUS_RESULTS_DUE;
+            }
+        } else if (status.equals(STATUS_GOALS_REACTIVATION_REQUESTED) ||
+                status.equals(STATUS_GOALS_REACTIVATED)) {
+            config = configMap.get(status + "Expiration");
+            if (EvalsUtil.isDue(this, config) <= 0) {
+                // change status by timing out goals reactivation request and employee new goals submit
+                newStatus = STATUS_GOALS_APPROVED;
+            }
+        }
+
+        return newStatus;
+    }
+
+    /**
+     * If goals are not due yet, then no
+     * If goals are due, check to see if goalsRequiredModification is overdue
+     * Goals modifications due date is a configuration parameter which
+     * defines how many days after requiredModification is submitted before they are due.
+     * If goals modification is over due, then yes.
+     *
+     * @param configMap
+     * @return true if both goals are overdue and goalsRequiredModification is overdue. Otherwise false.
+     * @throws Exception
+     */
+    private boolean isGoalsReqModOverDue(Map<String, Configuration> configMap)
+            throws Exception {
+
+        Configuration goalsDueConfig = configMap.get(Appraisal.STATUS_GOALS_DUE); //this config exists
+
+        if (EvalsUtil.isDue(this, goalsDueConfig) <= 0) { //goals due or overdue
+            System.out.println(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION + ", goals overdue");
+            //goals is due or overdue.  Is goalsRequiredModification overdue?
+            Configuration modConfig = configMap.get("goalsRequiredModification");
+
+            if (EvalsUtil.isDue(this, modConfig) < 0) {  // requiredModification is over due.
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns a Date object which contains the salary eligibility date for the
+     * given appraisal.
+     *
+     * @return
+     */
+    public Date getSalaryEligibilityDate() {
+        DateTime sed = new DateTime(this.startDate);
+        sed.withYear(new DateTime().getYear());
+
+        return sed.toDate();
+    }
+
+    /**
+     * Figure out if the appraisal is currently in goals reactivated loop.
+     * Basically if we are not in approvalDue status or later and there's more than 1
+     * goal version.
+     */
+    private boolean areGoalsReactivated() {
+        boolean hasMultipleGoalVersions = goalVersions.size() > 1;
+
+        String[] goalsReactivatedStatus = {
+            "goalsApprovalDue",
+            "goalsApprovalOverdue",
+            "goalsReactivated",
+            "goalsReactivationRequested"
+        };
+
+        return hasMultipleGoalVersions && ArrayUtils.contains(goalsReactivatedStatus, status);
+    }
+
+    public Map<String, Assessment> getAssessmentMap() {
+        HashMap<String, Assessment> assessmentMap = new HashMap<String, Assessment>();
+        for (GoalVersion goalVersion : goalVersions) {
+            for (Assessment assessment : goalVersion.getAssessments()) {
+                if (!assessment.isDeleted()) {
+                    assessmentMap.put(assessment.getId().toString(), assessment);
+                }
+            }
+        }
+        return assessmentMap;
+    }
+
+    public String getAppointmentType() {
+        return job.getAppointmentType();
+    }
+
+    /**
+     * Whether or not this appraisal object should use the salary increase section.
+     *
+     * @return
+     */
+    public Boolean getIsSalaryUsed() {
+        return getAppointmentType().equals(AppointmentType.CLASSIFIED_IT) &&
+                            type.equals(Appraisal.TYPE_ANNUAL);
     }
 }

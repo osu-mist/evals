@@ -13,7 +13,6 @@
         <property name="createDate" type="timestamp" column="CREATE_DATE"/>
         <property name="modifiedDate" type="timestamp" column="MODIFIED_DATE"/>
         <property name="isMaster" type="boolean" column="IS_MASTER"/>
-        <property name="scope" column="SCOPE"/>
 
         <many-to-one name="employee" class="edu.osu.cws.evals.models.Employee"
                      column="EMPLOYEE_PIDM"

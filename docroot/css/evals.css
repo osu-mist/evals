@@ -42,153 +42,81 @@
     margin:0.5em 1em;
 }
 
-.appraisal-criteria .instructions {
-    font-weight: bold;
-    font-size: 110%;
-}
-
 .appraisal-criteria .pass-form-text {
     color: #555;
 }
 
-/* Top Menu */
-#pass-top-menu {
-    padding-bottom: 27px;
+.appraisal-criteria div div {
+  margin: 0 1.5em 0 5.5em;
+}
+
+.appraisal-criteria textarea {
+    width: 100% !important;
+}
+
+.appraisal-criteria fieldset {
+  padding-top: 1em;
+}
+
+.appraisal-criteria div {
+  margin-bottom: 2em;
+}
+
+.appraisal-criteria fieldset label {
+  float: left;
+  width: 5em;
+  font-size: 90%;
+}
+
+.appraisal-criteria fieldset a.delete {
+  float: right;
+  margin-right: 0.5em;
+}
+
+.appraisal-criteria fieldset fieldset {
+    margin-left: 5.5em;
+    min-height: 3.5em;
+    padding-top: 0.5em;
+}
+
+.appraisal-criteria fieldset fieldset label {
+  float: none;
+}
+
+.appraisal-criteria fieldset fieldset legend {
+    float: left;
     position: relative;
-    z-index: 1;
-    border: 1px solid #ccc;
-    margin-bottom: 10px;
+    padding: 0 !important;
+    margin-left: -1em !important;
 }
 
-#pass-top-menu.action-menu-wrapper ul {
-    background: #FFF;
-    border-bottom: 1px solid #ccc;
+.appraisal-criteria fieldset fieldset legend span {
+    position: absolute;
+    top: 0;
+    left: -6em;
 }
 
-#pass-top-menu .portlet-action-menu ul {
-  	-moz-box-shadow: 0 0 3px #666;
-  	-webkit-box-shadow:  0 0 3px #666;
-  	box-shadow: 0 1px 3px #666;
+.ie .appraisal-criteria fieldset fieldset legend span {
+    top: 1em;
 }
 
-#pass-top-menu .portlet-action-menu {
-  height: 28px;
+.appraisal-criteria .assessment-criteria {
+    margin: 0 0 0 6em;
 }
 
-.osu-cws .portlet-action-menu li:hover ul,
-.osu-cws .portlet-action-menu li.sfHover ul {
-	  left: 0;
-	  top: 28px;
+.appraisal-criteria .assessment-criteria label {
+  float: none;
 }
 
-.osu-cws #pass-top-menu .portlet-action-menu li.pass-roles:hover ul,
-.osu-cws #pass-top-menu .portlet-action-menu li.pass-roles.sfHover ul {
-	  right: 0;
-	  left: auto;
+.appraisal-criteria .assessment-criteria label span {
+  color: #C34500;
+  text-decoration: underline;
 }
 
-#pass-top-menu .portlet-action-menu li:hover, 
-#pass-top-menu .portlet-action-menu li.sfHover,
-#pass-top-menu .portlet-action-menu a:focus, 
-#pass-top-menu .portlet-action-menu a:hover,
-#pass-top-menu .portlet-action-menu a:active {
-    background: none repeat scroll 0 0 #FFF;
-    text-decoration: none;
-}
-
-.ie7 #pass-top-menu.action-menu-wrapper ul.portlet-action-menu,
-.ie7 #pass-top-menu.action-menu-wrapper {
-  min-width: 261px;
-}
-
-#pass-top-menu ul.portlet-action-menu ul {
-    width: 14.8em;
-    overflow: hidden;
-}
-
-#pass-top-menu .portlet-action-menu li {
-    background: #fff;
-    float: left;
-    border-right: 1px solid #CCC;
-}
-
-#pass-top-menu .portlet-action-menu li li {
-    float: none;
-    width: auto;
-}
-
-#pass-top-menu .portlet-action-menu li li+li {
-    border-top: 1px solid #ccc;
-    border-right: 0;
-}
-
-#pass-top-menu .portlet-action-menu a:hover,
-#pass-top-menu .portlet-action-menu a:active,
-#pass-top-menu .portlet-action-menu a:focus,
-#pass-top-menu .portlet-action-menu a.active {
-    border-bottom: 3px solid #d85a1a;
-}
-
-#pass-top-menu .portlet-action-menu li.pass-roles {
-    float: right;
-    border-right: 0;
-    border-left: 1px solid #ccc;
-}
-
-#pass-top-menu ul.portlet-action-menu li.pass-roles ul {
-    width: 8em;
-    top: auto;
-    left: -999em;
-}
-
-.ie #pass-top-menu ul.portlet-action-menu ul {
-    border: 1px solid #ccc;
-}
-
-#pass-top-menu .portlet-action-menu a {
-  white-space: normal; /* overwrites, so long names can break to next line down */
-}
-  
-#pass-top-menu ul.portlet-action-menu li a {
-    color: #686868;
-    padding: 8px 6px 4px;
-    font-size: 13px;
-    display: block;
-    border-bottom: 3px solid transparent;
-}
-
-#pass-top-menu ul.portlet-action-menu li li a { 
-    font-size: 12px;
-}
-
-/* Roles - pass menu */
-#pass-top-menu li.pass-roles em {
-    display: inline-block;
-    float: left;
-    color: #686868;
-    font-weight: bold;
-    margin: 8px 3px;
-    font-style: normal;
-}
-
-#pass-top-menu select {
-  min-width: 90px;
-  float: right;
-  margin: 4px 4px;
-  padding: 1px;
-}
-
-.ie7 #pass-top-menu select {
-  position: absolute;
-  right: 0;
-  top: 4px;
-  margin: 0;
-  padding: 0;
-}
-
-.ie7 #pass-top-menu li.pass-roles em {
-  margin-right: 99px;
-  float: right;
+/* used for salary table */
+.osu-cws input.recommended-salary {
+    min-width: 3em !important;
+    width: 3em !important;
 }
 
 .role-description {
@@ -220,6 +148,10 @@
 .ie7 #column-3 .portlet,
 .ie7 #layout-column_column-3 .portlet-content-bottom {
   min-width: 300px;
+}
+
+.salary-comment {
+    font-weight: bold;
 }
 
 /* Appraisal Search */
@@ -459,11 +391,22 @@ tr.ui-state-highlight {
     margin: 1em 0 0 0;
 }
 
-#pass-top-menu ul.portlet-action-menu li.reports ul {
+.portlet-top-menu ul.portlet-action-menu li.reports ul {
   width: 8em;
 }
 
 /** Generic OSU CSS **/
 .osu-cws-clear-both {
     clear: both;
+}
+
+/** Header for goals **/
+.osu-cws .goals-header {
+    border-bottom: solid 1px #ccc;
+    height: 20px;
+    font-size: 12px;
+    padding-top: .3em;
+    padding-left: 1em;
+    font-weight: bold;
+    margin-right: 12px;
 }

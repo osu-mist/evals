@@ -3,22 +3,23 @@ package edu.osu.cws.evals.portlet;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.NoticeMgr;
 import edu.osu.cws.evals.models.Employee;
-import edu.osu.cws.evals.models.Notice;
 import edu.osu.cws.evals.models.ModelException;
+import edu.osu.cws.evals.models.Notice;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.ResourceBundle;
 
 public class NoticeAction implements ActionInterface {
 
     private ActionHelper actionHelper;
 
     private HomeAction homeAction;
+
+    private ErrorHandler errorHandler;
+
     /**
      * Handles listing the notice.
      *
@@ -29,15 +30,14 @@ public class NoticeAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         ArrayList<Notice> noticeList = NoticeMgr.list();
-        actionHelper.addToRequestMap("noticeList", noticeList, request);
-        actionHelper.useMaximizedMenu(request);
+        actionHelper.addToRequestMap("noticeList", noticeList);
+        actionHelper.useMaximizedMenu();
 
         return Constants.JSP_NOTICE_LIST;
     }
@@ -53,10 +53,9 @@ public class NoticeAction implements ActionInterface {
      */
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
         Notice notice = new Notice();
         try {
@@ -65,7 +64,7 @@ public class NoticeAction implements ActionInterface {
                 notice = NoticeMgr.get(ancestorId);
             } else {
                 String text = ParamUtil.getString(request, "text");
-                Employee loggedOnUser = actionHelper.getLoggedOnUser(request);
+                Employee loggedOnUser = actionHelper.getLoggedOnUser();
                 notice.setAncestorID(ancestorId);
                 notice.setCreator(loggedOnUser);
                 notice.setCreateDate(new Date());
@@ -75,22 +74,20 @@ public class NoticeAction implements ActionInterface {
                 //if the current notice is a yellowBoxMessage and it is changed, update it into
                 //portletContext so the other loggedInUser can see it.
                 if(noticeChange){
-                    actionHelper.setNotices(true);
+                    actionHelper.updateContextTimestamp();
+                    actionHelper.setAdminPortletData();
                 }
                 return list(request, response);
             }
         } catch (ModelException e) {
-            actionHelper.addErrorsToRequest(request, e.getMessage());
+            actionHelper.addErrorsToRequest(e.getMessage());
         }
 
-        actionHelper.addToRequestMap("notice", notice, request);
-        actionHelper.useMaximizedMenu(request);
+        actionHelper.addToRequestMap("notice", notice);
+        actionHelper.useMaximizedMenu();
 
         return Constants.JSP_NOTICE_EDIT;
     }
-
-
-
 
     public void setActionHelper(ActionHelper actionHelper) {
         this.actionHelper = actionHelper;
@@ -100,5 +97,8 @@ public class NoticeAction implements ActionInterface {
         this.homeAction = homeAction;
     }
 
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
+    }
 }
 

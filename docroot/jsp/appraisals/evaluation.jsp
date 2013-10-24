@@ -55,7 +55,7 @@
                 <label for="<portlet:namespace />appraisal.rating-3"><liferay-ui:message key="appraisal-rating-3" /></label><br />
               
 
-              
+            <c:if test="${appraisal.job.appointmentType == 'Classified'}">
                 <input type="radio" name="<portlet:namespace />appraisal.rating" value="4" id="<portlet:namespace />appraisal.rating-4"
                 <c:if test="${appraisal.rating == 4}">
                     checked="checked"
@@ -64,7 +64,12 @@
                     disabled="disabled"
                 </c:if> />
                 <label for="<portlet:namespace />appraisal.rating-4"><liferay-ui:message key="appraisal-rating-4" /></label>
-              
+            </c:if>
         </fieldset>
+
+        <c:if test="${appraisal.isSalaryUsed}">
+            <%@ include file="/jsp/appraisals/salary.jsp"%>
+        </c:if>
+
     </fieldset>
 </div><!-- end evaluation -->

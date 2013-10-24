@@ -13,7 +13,9 @@ import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
-import javax.portlet.*;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
+import javax.portlet.PortletSession;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -62,6 +64,7 @@ public class ReportsAction implements ActionInterface {
 
     private ActionHelper actionHelper;
     private HomeAction homeAction;
+    private ErrorHandler errorHandler;
 
     /**
      * Map used to store drilldown, and search options used to fetch
@@ -146,7 +149,7 @@ public class ReportsAction implements ActionInterface {
 
         processReport(request, response);
         setupDataForJSP(request);
-        actionHelper.useMaximizedMenu(request);
+        actionHelper.useMaximizedMenu();
 
         // Save session values only if we didn't throw an exception before we got here.
         session.setAttribute(BREADCRUMB_LIST, breadcrumbList);
@@ -171,7 +174,7 @@ public class ReportsAction implements ActionInterface {
             displaySearchResults = search(searchTerm, request);
         }
 
-        setIsMyReport(request);
+        setIsMyReport();
         breadcrumbList = getBreadcrumbs();
         // set the bc name using the scope value of the 2nd breadcrumb if applicable
         if (!displaySearchResults && paramMap.get(Constants.BC_NAME) == null) {
@@ -179,13 +182,13 @@ public class ReportsAction implements ActionInterface {
         }
 
         if (!canViewReport(request)) {
-            accessDeniedReset(request);
+            accessDeniedReset();
             displaySearchResults = false;
         }
 
         if (!displaySearchResults) {
             if (getScope().equals(SCOPE_SUPERVISOR)) {
-                rightPaneData(request);
+                rightPaneData();
             }
 
             // Check if we are viewing a supervisor report of a mere employee
@@ -199,7 +202,7 @@ public class ReportsAction implements ActionInterface {
             if (displayAppraisalSearchList) { // display appraisal list of single employee
                 searchResults = new ArrayList<Job>();
                 searchResults.add(currentSupervisorJob); // add single employee as the result
-                isAppraisalSearch = activeAppraisalList(request, response);
+                isAppraisalSearch = activeAppraisalList();
                 if (!isAppraisalSearch) { //employee had no evaluations
                     String prevSearchTerm = ParamUtil.getString(request, "prevSearchTerm");
                     if (!StringUtils.isEmpty(prevSearchTerm)) { // go back to previous search
@@ -226,9 +229,8 @@ public class ReportsAction implements ActionInterface {
      * Resets the paramMap values to the default report and sets the message of
      * access denied to the user.
      *
-     * @param request
      */
-    private void accessDeniedReset(PortletRequest request) {
+    private void accessDeniedReset() {
         paramMap.put(SCOPE, DEFAULT_SCOPE);
         paramMap.put(SCOPE_VALUE, DEFAULT_SCOPE_VALUE);
         breadcrumbList = new ArrayList<Breadcrumb>();
@@ -237,99 +239,100 @@ public class ReportsAction implements ActionInterface {
         paramMap.put(REPORT, REPORT_DEFAULT);
         searchResults.clear();
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
+        actionHelper.addErrorsToRequest(resource.getString("access-denied"));
     }
 
     private void setupDataForJSP(PortletRequest request) throws Exception {
         boolean showDrillDownMenu = false;
         String searchTerm = getSearchTerm();
         boolean displaySearchResultsPage = displaySearchResultsPage();
+        boolean isReviewer = actionHelper.getReviewer() != null;
+        boolean isAdmin = actionHelper.getAdmin() != null;
 
         if (isAppraisalSearch) { // display search result of employee appraisals
-            actionHelper.addToRequestMap("listAppraisals", listAppraisals,request);
-            actionHelper.addToRequestMap("isAppraisalSearch", isAppraisalSearch,request);
+            actionHelper.addToRequestMap("listAppraisals", listAppraisals);
+            actionHelper.addToRequestMap("isAppraisalSearch", isAppraisalSearch);
         } else if (!displaySearchResultsPage) { // regular active report
             // chart related data
-            actionHelper.addToRequestMap("chartData", chartData,request);
-            actionHelper.addToRequestMap("tableData", tableData,request);
-            actionHelper.addToRequestMap("drillDownData", drillDownData,request);
-            actionHelper.addToRequestMap("listAppraisals", listAppraisals,request);
+            actionHelper.addToRequestMap("chartData", chartData);
+            actionHelper.addToRequestMap("tableData", tableData);
+            actionHelper.addToRequestMap("drillDownData", drillDownData);
+            actionHelper.addToRequestMap("listAppraisals", listAppraisals);
 
             // parameter related data
             String scope = getScope();
             String scopeValue = getScopeValue();
-            actionHelper.addToRequestMap("scope", scope,request);
-            actionHelper.addToRequestMap("scopeValue", scopeValue,request);
-            actionHelper.addToRequestMap("report", paramMap.get(REPORT),request);
-            actionHelper.addToRequestMap("reportTitle", ReportMgr.getReportTitle(paramMap),request);
-            actionHelper.addToRequestMap("reportHeader", ReportMgr.getReportHeader(paramMap),request);
-            actionHelper.addToRequestMap("chartType", getChartType(request),request);
+            actionHelper.addToRequestMap("scope", scope);
+            actionHelper.addToRequestMap("scopeValue", scopeValue);
+            actionHelper.addToRequestMap("report", paramMap.get(REPORT));
+            actionHelper.addToRequestMap("reportTitle", ReportMgr.getReportTitle(paramMap));
+            actionHelper.addToRequestMap("reportHeader", ReportMgr.getReportHeader(paramMap));
+            actionHelper.addToRequestMap("chartType", getChartType(request));
             if (scope.equals(SCOPE_ORG_CODE)) {
                 enableByUnitReports = false;
             }
-            actionHelper.addToRequestMap("enableByUnitReports", enableByUnitReports,request);
+            actionHelper.addToRequestMap("enableByUnitReports", enableByUnitReports);
 
             if (scope.equals(SCOPE_SUPERVISOR)) {
                 // right pane data: supervisor appraisals and supervisor team
-                actionHelper.addToRequestMap("myActiveAppraisals", supervisorAppraisals,request);
-                actionHelper.addToRequestMap("myTeamsActiveAppraisals", supervisorTeamAppraisal,request);
-                actionHelper.addToRequestMap("myTeamsActiveClassifiedITAppraisals", supervisorClassfiedITAppraisals, request);
-                actionHelper.addToRequestMap("isMyReport", isMyReport,request);
+                actionHelper.addToRequestMap("myActiveAppraisals", supervisorAppraisals);
+                actionHelper.addToRequestMap("myTeamsActiveAppraisals", supervisorTeamAppraisal);
+                actionHelper.addToRequestMap("myTeamsActiveClassifiedITAppraisals", supervisorClassfiedITAppraisals);
+                actionHelper.addToRequestMap("isMyReport", isMyReport);
             }
 
             // breadcrumb and drill down data
             String nextScope = nextScopeInDrillDown(scope);
-            actionHelper.addToRequestMap("nextScope", nextScope,request);
+            actionHelper.addToRequestMap("nextScope", nextScope);
 
             boolean allowAllDrillDown = false;
-            if (actionHelper.isLoggedInUserAdmin(request)) {
+            if (isAdmin) {
                 allowAllDrillDown = true;
             }
-            actionHelper.addToRequestMap("allowAllDrillDown", allowAllDrillDown,request);
+            actionHelper.addToRequestMap("allowAllDrillDown", allowAllDrillDown);
 
             String reviewerBCName = "";
-            if (actionHelper.isLoggedInUserReviewer(request)) {
-                int employeeID = actionHelper.getLoggedOnUser(request).getId();
-                reviewerBCName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
+            if (isReviewer) {
+                reviewerBCName = actionHelper.getReviewer().getBusinessCenterName();
             }
-            actionHelper.addToRequestMap("reviewerBCName", reviewerBCName,request);
+            actionHelper.addToRequestMap("reviewerBCName", reviewerBCName);
 
             showDrillDownMenu = showDrillDownMenu(allowAllDrillDown, reviewerBCName);
 
-            actionHelper.addToRequestMap("chartDataScopeMap", chartDataScopeMap(),request);
+            actionHelper.addToRequestMap("chartDataScopeMap", chartDataScopeMap());
 
             if (currentSupervisorJob != null) {
                 String currentSupervisorName = currentSupervisorJob.getEmployee().getName();
-                actionHelper.addToRequestMap("currentSupervisorName", currentSupervisorName,request);
+                actionHelper.addToRequestMap("currentSupervisorName", currentSupervisorName);
             }
         } else { // displaying search results - multiple jobs
-            actionHelper.addToRequestMap("searchResults", searchResults,request);
+            actionHelper.addToRequestMap("searchResults", searchResults);
         }
 
-        actionHelper.addToRequestMap("now", new Date(),request);
-        actionHelper.addToRequestMap("searchTerm", searchTerm,request);
-        actionHelper.addToRequestMap("breadcrumbList", breadcrumbList,request);
-        actionHelper.addToRequestMap("requestBreadcrumbs", getRequestBreadcrumbs(),request);
+        actionHelper.addToRequestMap("now", new Date());
+        actionHelper.addToRequestMap("searchTerm", searchTerm);
+        actionHelper.addToRequestMap("breadcrumbList", breadcrumbList);
+        actionHelper.addToRequestMap("requestBreadcrumbs", getRequestBreadcrumbs());
 
-        actionHelper.addToRequestMap("showDrillDownMenu", showDrillDownMenu,request);
-        actionHelper.addToRequestMap("searchView", displaySearchResultsPage,request);
+        actionHelper.addToRequestMap("showDrillDownMenu", showDrillDownMenu);
+        actionHelper.addToRequestMap("searchView", displaySearchResultsPage);
 
         // Error String messages used by search js
         ResourceBundle resource = (ResourceBundle) actionHelper
                 .getPortletContextAttribute("resourceBundle");
         actionHelper.addToRequestMap("searchJsErrorDefault",
-                resource.getString("report-search-js-validation-default"),request);
+                resource.getString("report-search-js-validation-default"));
         actionHelper.addToRequestMap("searchJsErrorSupervisor",
-                resource.getString("report-search-js-validation-supervisor"),request);
+                resource.getString("report-search-js-validation-supervisor"));
 
         // My Report data
-        showMyReportLink(request);
+        showMyReportLink();
 
         // list of breadcrumbs used when the request only needs OSU as the breadcrumbs
         List<Breadcrumb> crumbListWithRootOnly = new ArrayList<Breadcrumb>();
         crumbListWithRootOnly.add(rootBreadcrumb);
         String breadcrumbsWithRootOnly = gson.toJson(crumbListWithRootOnly);
-        actionHelper.addToRequestMap("breadcrumbsWithRootOnly", breadcrumbsWithRootOnly,request);
+        actionHelper.addToRequestMap("breadcrumbsWithRootOnly", breadcrumbsWithRootOnly);
     }
 
     private String nextScopeInDrillDown(String currentScope) {
@@ -388,10 +391,9 @@ public class ReportsAction implements ActionInterface {
      * Fetches from the db the data needed for the right pane for supervisors:
      * my evaluations and myTeam evaluations.
      *
-     * @param request
      * @throws Exception
      */
-    private void rightPaneData(PortletRequest request) throws Exception {
+    private void rightPaneData() throws Exception {
         int supervisorLevelPidm = currentSupervisorJob.getEmployee().getId();
         String supervisorLevelPosno = currentSupervisorJob.getPositionNumber();
         String supervisorLevelSuffix = currentSupervisorJob.getSuffix();
@@ -408,12 +410,10 @@ public class ReportsAction implements ActionInterface {
      * search result employee. If the employee doesn't have any appraisals, we show an error
      * message to the user telling them about this.
      *
-     * @param request
-     * @param response
      * @return
      * @throws Exception
      */
-    private boolean activeAppraisalList(PortletRequest request, PortletResponse response)
+    private boolean activeAppraisalList()
             throws Exception {
         listAppraisals = AppraisalMgr.getEmployeeAppraisalList(searchResults);
 
@@ -423,7 +423,7 @@ public class ReportsAction implements ActionInterface {
                     .getPortletContextAttribute("resourceBundle");
 
             String errorMsg = resource.getString("report-search-no-results-no-evals");
-            actionHelper.addErrorsToRequest(request, errorMsg);
+            actionHelper.addErrorsToRequest(errorMsg);
             return false;
         }
 
@@ -727,6 +727,10 @@ public class ReportsAction implements ActionInterface {
         this.homeAction = homeAction;
     }
 
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
+    }
+
     /**
      * Checks the permissions of the logged in user to determine if they can view
      * the current report they are requesting.
@@ -736,7 +740,8 @@ public class ReportsAction implements ActionInterface {
      * @throws Exception
      */
     public boolean canViewReport(PortletRequest request) throws Exception {
-        if (actionHelper.isLoggedInUserAdmin(request)) {
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (isAdmin) {
             return true;
         }
 
@@ -744,10 +749,10 @@ public class ReportsAction implements ActionInterface {
             return true;
         }
 
-        int employeeID = actionHelper.getLoggedOnUser(request).getId();
+        int employeeID = actionHelper.getLoggedOnUser().getId();
         boolean supervisorReport = getScope().equals(SCOPE_SUPERVISOR);
-        boolean isReviewer = actionHelper.isLoggedInUserReviewer(request);
-        boolean isSupervisor = actionHelper.isLoggedInUserSupervisor(request);
+        boolean isReviewer = actionHelper.getReviewer() != null;
+        boolean isSupervisor = actionHelper.isLoggedInUserSupervisor();
         String searchTerm = getSearchTerm();
 
         // Search permission checks
@@ -763,7 +768,7 @@ public class ReportsAction implements ActionInterface {
         }
 
         if (isReviewer) {
-            String bcName = actionHelper.getReviewer(employeeID).getBusinessCenterName();
+            String bcName = actionHelper.getReviewer().getBusinessCenterName();
 
             // the bc reviewer can drill down the report if supervisor is in his bc
             if (supervisorReport && currentSupervisorJob.getBusinessCenterName().equals(bcName)) {
@@ -789,22 +794,21 @@ public class ReportsAction implements ActionInterface {
         // Check supervisor report to see if it's the current user's report or in her
         // supervising chain
         if (supervisorReport) {
-            JobMgr jobMgr = new JobMgr();
 
             if (isMyReport) {
                 return true;
             }
 
-            if (jobMgr.isUpperSupervisor(currentSupervisorJob, employeeID)) {
+            if (JobMgr.isUpperSupervisor(currentSupervisorJob, employeeID)) {
                 return true;
             }
         }
         return false;
     }
 
-    private void setIsMyReport(PortletRequest request) throws Exception {
+    private void setIsMyReport() throws Exception {
         if (getScope().equals(SCOPE_SUPERVISOR)) {
-            int employeeID = actionHelper.getLoggedOnUser(request).getId();
+            int employeeID = actionHelper.getLoggedOnUser().getId();
             isMyReport = currentSupervisorJob.getEmployee().getId() == employeeID;
         }
     }
@@ -839,37 +843,38 @@ public class ReportsAction implements ActionInterface {
      * Whether or not the my report link should be displayed. It also passes to the jsp
      * the needed values to generate the my report links.
      *
-     * @param request
      * @return
      * @throws Exception
      */
-    private void showMyReportLink(PortletRequest request) throws Exception {
+    private void showMyReportLink() throws Exception {
         boolean showMyReportLink = false;
+        Employee loggedInUser = actionHelper.getLoggedOnUser();
+        boolean isReviewer = actionHelper.getReviewer() != null;
+        boolean isAdmin = actionHelper.getAdmin() != null;
 
-        if (actionHelper.isLoggedInUserSupervisor(request)) {
+        if (actionHelper.isLoggedInUserSupervisor()) {
             // We make the assumption that a person has only 1 supervising job
-            Employee loggedInUser = actionHelper.getLoggedOnUser(request);
             Job supervisorJob = JobMgr.getSupervisingJob(loggedInUser.getId());
             String supervisorJobTitle = supervisorJob.getJobTitle();
             String myReportSupervisorKey = supervisorJob.getEmployee().getId() + "_" +
                     supervisorJob.getPositionNumber() + "_" + supervisorJob.getSuffix();
 
             showMyReportLink = true;
-            actionHelper.addToRequestMap("supervisorJobTitle", supervisorJobTitle,request);
-            actionHelper.addToRequestMap("myReportSupervisorKey", myReportSupervisorKey,request);
+            actionHelper.addToRequestMap("supervisorJobTitle", supervisorJobTitle);
+            actionHelper.addToRequestMap("myReportSupervisorKey", myReportSupervisorKey);
         }
 
-        if (actionHelper.isLoggedInUserReviewer(request)) {
-            String myReportBcName = actionHelper.getBusinessCenterForLoggedInReviewer(request);
+        if (isReviewer) {
+            String myReportBcName = actionHelper.getReviewer().getBusinessCenterName();
             showMyReportLink = true;
-            actionHelper.addToRequestMap("myReportBcName", myReportBcName,request);
+            actionHelper.addToRequestMap("myReportBcName", myReportBcName);
         }
 
-        if (actionHelper.isLoggedInUserAdmin(request)) {
+        if (isAdmin) {
             showMyReportLink = true;
         }
 
-        actionHelper.addToRequestMap("showMyReportLink", showMyReportLink,request);
+        actionHelper.addToRequestMap("showMyReportLink", showMyReportLink);
     }
 
     /**
@@ -922,10 +927,12 @@ public class ReportsAction implements ActionInterface {
         boolean noSearchResults = false; // the user query didn't match any jobs/employee
         String noSearchResultMsg = ""; // msg to display the user when there were no results
         boolean tooManyResults = false;
+        Employee loggedInUser = actionHelper.getLoggedOnUser();
+        boolean isReviewer = actionHelper.getReviewer() != null;
+        boolean isAdmin = actionHelper.getAdmin() != null;
 
-        if (actionHelper.isLoggedInUserReviewer(request) &&
-                !actionHelper.isLoggedInUserAdmin(request)) {
-            bcName = actionHelper.getBusinessCenterForLoggedInReviewer(request);
+        if (isReviewer && !isAdmin) {
+            bcName = actionHelper.getReviewer().getBusinessCenterName();
             userType = "reviewer";
         }
         if (CWSUtil.validateOrgCode(searchTerm)) {
@@ -948,8 +955,7 @@ public class ReportsAction implements ActionInterface {
             }
 
             int supervisorPidm = 0;
-            if (actionHelper.isLoggedInUserSupervisor(request)) {
-                Employee loggedInUser = actionHelper.getLoggedOnUser(request);
+            if (actionHelper.isLoggedInUserSupervisor()) {
                 supervisorPidm = loggedInUser.getId();
                 userType = "supervisor";
             }
@@ -972,7 +978,7 @@ public class ReportsAction implements ActionInterface {
                         String scopeValue = currentSupervisorJob.getIdKey();
 
                         paramMap.put(SCOPE, SCOPE_SUPERVISOR);
-                        paramMap.put(SCOPE_VALUE, scopeValue.toString());
+                        paramMap.put(SCOPE_VALUE, scopeValue);
                         return false;
                     default:
                         return true;
@@ -988,9 +994,9 @@ public class ReportsAction implements ActionInterface {
             if (searchType.equals("orgCode")) {
                 noSearchResult += searchType + "-" + userType;
             } else {
-                if (actionHelper.isLoggedInUserAdmin(request)) {
+                if (isAdmin) {
                     noSearchResult = "appraisal-search-no-results-admin";
-                } else if (actionHelper.isLoggedInUserReviewer(request)) {
+                } else if (isReviewer) {
                     noSearchResult = "appraisal-search-no-results-reviewer";
                 } else {
                     noSearchResult = "appraisal-search-no-results-supervisor";
@@ -1002,7 +1008,7 @@ public class ReportsAction implements ActionInterface {
 
         // Set a message if there were no results or too many
         if (noSearchResults || tooManyResults) {
-            actionHelper.addErrorsToRequest(request, noSearchResultMsg);
+            actionHelper.addErrorsToRequest(noSearchResultMsg);
         }
 
         switchRequestBreadcrumbsWithSession(request);

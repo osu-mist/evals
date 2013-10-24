@@ -3,6 +3,7 @@ package edu.osu.cws.evals.models;
 import java.util.Date;
 
 public class CloseOutReason extends Evals {
+
     private int id;
 
     private String reason;
@@ -12,8 +13,6 @@ public class CloseOutReason extends Evals {
     private Date createDate;
 
     private Date deleteDate;
-
-    public static final String validReasonRequired = "Please enter a valid close out reason";
 
     public CloseOutReason() { }
 

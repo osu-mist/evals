@@ -2,8 +2,11 @@ package edu.osu.cws.evals.hibernate;
 
 import edu.osu.cws.evals.models.Notice;
 import edu.osu.cws.evals.util.HibernateUtil;
-import java.util.*;
 import org.hibernate.Session;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class NoticeMgr {
@@ -15,7 +18,9 @@ public class NoticeMgr {
      */
     public static Notice get(int ancestorID) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return (Notice)session.getNamedQuery("notice.singleNoticeByAncestorID").setInteger("ancestorID", ancestorID).uniqueResult();
+        return (Notice)session.getNamedQuery("notice.singleNoticeByAncestorID")
+                .setInteger("ancestorID", ancestorID)
+                .uniqueResult();
     }
 
     /**
@@ -24,10 +29,9 @@ public class NoticeMgr {
      * @throws Exception
      */
     public static Map getNotices() throws Exception {
-        ArrayList<Notice> notices = list();
         Map noticeMap = new HashMap();
-        for (int i = 0; i < notices.size(); i++) {
-            noticeMap.put(notices.get(i).getName(), notices.get(i));
+        for (Notice notice : list()) {
+            noticeMap.put(notice.getName(), notice);
         }
         return noticeMap;
     }
@@ -39,8 +43,8 @@ public class NoticeMgr {
      */
     public static ArrayList<Notice> list() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        ArrayList<Notice> noticeList = (ArrayList<Notice>)session.getNamedQuery("notice.noticeList").list();
-        return noticeList;
+        return (ArrayList<Notice>)session.getNamedQuery("notice.noticeList")
+                .list();
     }
 
     /**
@@ -54,10 +58,8 @@ public class NoticeMgr {
         Session session = HibernateUtil.getCurrentSession();
         String textToUpdate = upDatedNotice.getText();
         Notice notice = get(upDatedNotice.getAncestorID());
-        int textHash;
-        if(notice.getText() == null) {
-            textHash = 0;
-        } else {
+        int textHash = 0;
+        if(notice.getText() != null) {
             textHash = notice.getText().hashCode();
         }
         int updateTextHash = textToUpdate.hashCode();

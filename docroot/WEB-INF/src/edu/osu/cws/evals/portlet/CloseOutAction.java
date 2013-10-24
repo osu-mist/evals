@@ -11,12 +11,13 @@ import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import java.util.ArrayList;
-import java.util.ResourceBundle;
 
 public class CloseOutAction implements ActionInterface {
     private ActionHelper actionHelper;
 
     private HomeAction homeAction;
+
+    private ErrorHandler errorHandler;
 
     /**
      * Handles listing the close out reasons.
@@ -28,15 +29,14 @@ public class CloseOutAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         ArrayList<CloseOutReason> reasonsList = CloseOutReasonMgr.list(false);
-        actionHelper.addToRequestMap("reasonsList", reasonsList,request);
-        actionHelper.useMaximizedMenu(request);
+        actionHelper.addToRequestMap("reasonsList", reasonsList);
+        actionHelper.useMaximizedMenu();
 
         return Constants.JSP_CLOSEOUT_REASON_LIST;
     }
@@ -51,18 +51,17 @@ public class CloseOutAction implements ActionInterface {
      */
     public String add(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         String reason = ParamUtil.getString(request, "reason");
         try {
-            CloseOutReasonMgr.add(reason, actionHelper.getLoggedOnUser(request));
+            CloseOutReasonMgr.add(reason, actionHelper.getLoggedOnUser());
             SessionMessages.add(request, "closeout-reason-added");
         } catch (ModelException e) {
-            actionHelper.addErrorsToRequest(request, e.getMessage());
+            actionHelper.addErrorsToRequest(e.getMessage());
         } catch (Exception e) {
             throw e;
         }
@@ -80,10 +79,9 @@ public class CloseOutAction implements ActionInterface {
      */
     public String delete(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         int id = ParamUtil.getInteger(request, "id");
@@ -92,7 +90,7 @@ public class CloseOutAction implements ActionInterface {
             // If the user clicks on the delete link the first time, use confirm page
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
                 CloseOutReason reason = CloseOutReasonMgr.get(id);
-                actionHelper.addToRequestMap("reason", reason,request);
+                actionHelper.addToRequestMap("reason", reason);
                 return Constants.JSP_CLOSEOUT_REASON_DELETE;
             }
 
@@ -104,7 +102,7 @@ public class CloseOutAction implements ActionInterface {
             CloseOutReasonMgr.delete(id);
             SessionMessages.add(request, "closeout-reason-deleted");
         } catch (ModelException e) {
-            actionHelper.addErrorsToRequest(request, e.getMessage());
+            actionHelper.addErrorsToRequest(e.getMessage());
         }
         return list(request, response);
     }
@@ -115,5 +113,9 @@ public class CloseOutAction implements ActionInterface {
 
     public void setHomeAction(HomeAction homeAction) {
         this.homeAction = homeAction;
+    }
+
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
     }
 }

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping auto-import="false" >
+
+    <class name="edu.osu.cws.evals.models.GoalVersion" table="goals_versions"
+           dynamic-insert="true"
+           dynamic-update="true">
+        <id name="id" type="int" column="ID">
+            <generator class="native">
+                <param name="sequence">pass_seq</param>
+            </generator>
+        </id>
+
+        <property name="goalsApproverPidm" type="int" column="GOALS_APPROVER_PIDM"/>
+        <property name="createDate" type="timestamp" column="CREATE_DATE"/>
+        <property name="goalsApprovedDate" type="timestamp" column="GOALS_APPROVED_DATE"/>
+        <property name="goalsSubmitDate" type="timestamp" column="GOALS_SUBMIT_DATE"/>
+        <property name="requestDecisionDate" type="timestamp" column="REQUEST_DECISION_DATE"/>
+        <property name="requestDecision" type="boolean" column="REQUEST_DECISION"/>
+        <property name="requestDecisionPidm" type="int" column="REQUEST_DECISION_PIDM"/>
+        <property name="timedOutAt" type="string" column="TIMED_OUT_AT"/>
+
+
+
+        <many-to-one name="appraisal" class="edu.osu.cws.evals.models.Appraisal"
+                     column="APPRAISAL_ID"
+                     not-null="true" />
+
+        <set name="assessments" inverse="true" batch-size="30" cascade="all">
+            <key column="GOAL_VERSION_ID"/>
+            <one-to-many class="edu.osu.cws.evals.models.Assessment"/>
+        </set>
+
+    </class>
+
+</hibernate-mapping>

@@ -1,17 +1,14 @@
 /**
  * POJO to interact with criteria_areas table. It also contains a method to
- * validate the name and sequence fields.
+ * validate the name, appointmentType and description.
  */
 
 package edu.osu.cws.evals.models;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 public class CriterionArea extends Evals {
-
 
     private int id = 0;
 
@@ -19,9 +16,7 @@ public class CriterionArea extends Evals {
 
     private String appointmentType;
 
-    private CriterionArea originalID;
-
-    private int sequence;
+    private CriterionArea ancestorID;
 
     private Date createDate;
 
@@ -31,32 +26,7 @@ public class CriterionArea extends Evals {
 
     private Employee deleter;
 
-    private Set details = new HashSet();
-
-    /**
-     * Validation error message for name is public because the add.jsp
-     * needs to access this static variable in order to do js validation
-     */
-    public static final String nameRequired =
-            "Please enter an area name for the evaluation criteria";
-
-    /**
-     * Validation error message for Sequence
-     */
-    private static final String sequenceRequired =
-            "Please provide a sequence for the evaluation criteria";
-
-    /**
-     * Validation error message for Sequence
-     */
-    private static final String sequenceInvalid =
-            "Evaluation criteria sequence should be greater than 1";
-
-    /**
-     * Validation error message for Sequence
-     */
-    private static final String appointmentTypeRequired =
-            "Please select an appointment type";
+    private String description;
 
     public CriterionArea() { }
 
@@ -71,34 +41,11 @@ public class CriterionArea extends Evals {
         // If there were any previous validation errors remove them.
         this.errors.remove("name");
         if (this.name == null || this.name.equals("")) {
-            nameErrors.add(nameRequired);
+            nameErrors.add(bundle.getString("criteria-nameRequired"));
         }
 
         if (nameErrors.size() > 0) {
             this.errors.put("name", nameErrors);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Method called by util Hibernate classes to validate the sequence.
-     *
-     * @return errors
-     */
-    public boolean validateSequence() {
-        ArrayList<String> sequenceErrors = new ArrayList<String>();
-
-        // If there were any previous validation errors remove them.
-        this.errors.remove("sequence");
-        if (this.sequence == 0) {
-            sequenceErrors.add(sequenceRequired);
-        } else if (this.sequence < 1) {
-            sequenceErrors.add(sequenceInvalid);
-        }
-
-        if (sequenceErrors.size() > 0) {
-            this.errors.put("sequence", sequenceErrors);
             return false;
         }
         return true;
@@ -116,9 +63,9 @@ public class CriterionArea extends Evals {
         // If there were any previous validation errors remove them.
         this.errors.remove("appointmentType");
         if (this.appointmentType == null) {
-            appointmentErrors.add(appointmentTypeRequired);
+            appointmentErrors.add(bundle.getString("criteria-appointmentTypeRequired"));
         } else if (this.appointmentType.equals("")) {
-            appointmentErrors.add(appointmentTypeRequired);
+            appointmentErrors.add(bundle.getString("criteria-appointmentTypeRequired"));
         }
 
         if (appointmentErrors.size() > 0) {
@@ -128,15 +75,6 @@ public class CriterionArea extends Evals {
         return true;
     }
 
-    /**
-     * Returns the most recent criterion_detail. The sorting is done by the
-     * db using the createDate field.
-     *
-     * @return  The most recently created CriterionDetail for the CriterionArea
-     */
-    public CriterionDetail getCurrentDetail() {
-        return (CriterionDetail) details.toArray()[0];
-    }
 
     public int getId() {
         return id;
@@ -162,20 +100,12 @@ public class CriterionArea extends Evals {
         this.appointmentType = appointmentType;
     }
 
-    public CriterionArea getOriginalID() {
-        return originalID;
+    public CriterionArea getAncestorID() {
+        return ancestorID;
     }
 
-    public void setOriginalID(CriterionArea originalID) {
-        this.originalID = originalID;
-    }
-
-    public int getSequence() {
-        return sequence;
-    }
-
-    public void setSequence(int sequence) {
-        this.sequence = sequence;
+    public void setAncestorID(CriterionArea ancestorID) {
+        this.ancestorID = ancestorID;
     }
 
     public Date getCreateDate() {
@@ -210,23 +140,12 @@ public class CriterionArea extends Evals {
         this.deleter = deleter;
     }
 
-    public Set getDetails() {
-        return details;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDetails(Set details) {
-        this.details = details;
-    }
-
-    /**
-     * This method is not needed by hibernate, but it is a helper method used to add CriterionDetail
-     * to the details HashSet.
-     *
-     * @param detail
-     */
-    public void addDetails(CriterionDetail detail) {
-        detail.setAreaID(this);
-        this.details.add(detail);
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 }

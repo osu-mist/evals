@@ -1,23 +1,25 @@
 package edu.osu.cws.evals.tests;
 
-import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @Test
 public class JobsTest {
     Job job = new Job();
-    JobMgr jobMgr = new JobMgr();
     Transaction tx;
 
     @BeforeMethod
@@ -35,48 +37,23 @@ public class JobsTest {
 
     public void shouldFindUppserSupervisor() throws ModelException {
         Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
         job = (Job) session.load(Job.class, new Job(new Employee(787812), "1234", "00"));
-        tx.commit();
         int pidm = 990871;
 
-        assert jobMgr.isUpperSupervisor(job, pidm) : "failed to find detect upper supervisor";
+        assert JobMgr.isUpperSupervisor(job, pidm) : "failed to find detect upper supervisor";
     }
 
     public void shouldNotFindUpperSupervisorForTopSupervisor() throws ModelException {
         Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
         job = (Job) session.load(Job.class, new Job(new Employee(990871), "1234", "00"));
-        tx.commit();
         int pidm = 990871;
 
-        assert !jobMgr.isUpperSupervisor(job, pidm) : "should not have found an upper supervisor";
+        assert !JobMgr.isUpperSupervisor(job, pidm) : "should not have found an upper supervisor";
     }
 
     public void shouldCorrectlyDetectEmployeeSupervisor() throws Exception {
         assert JobMgr.isSupervisor(990871, null) : "isSupervisor() should count employees correctly";
-        assert !JobMgr.isSupervisor(12345, null) : "isSupervisor() should not count inactive employees";
-    }
-
-
-    /**
-     * Tests that the jobs view is not empty.
-     * Before you run this test method make sure that the beforeMethod in this class is commented out.
-     */
-    public void shouldHaveJobsInView() throws Exception {
-        List<Job> results = jobMgr.list();
-        int i = 0;
-
-        // place a breakpoint below if you want to step through the records to make sure
-        // we are getting data from the view
-        for (Job job : results) {
-            assert job != null;
-            i++;
-            if (i >= 5) {
-                break;
-            }
-        }
-        assert results.size() > 0 : "The list of employees should not be empty";
+        assert !JobMgr.isSupervisor(56199, null) : "isSupervisor() should not count inactive employees";
     }
 
 
@@ -86,7 +63,9 @@ public class JobsTest {
     }
 
     public void listShortNotTerminatedJobsShouldOnlyIncludePidmAndPosNoAndSuffix() throws Exception {
-        List<Job> jobs = JobMgr.listShortNotTerminatedJobs(AppointmentType.CLASSIFIED);
+        ArrayList<String> appointmentTypes = new ArrayList<String>();
+        Collections.addAll(appointmentTypes, new String[] {AppointmentType.CLASSIFIED});
+        List<Job> jobs = JobMgr.listShortNotTerminatedJobs(appointmentTypes);
         assert jobs.size() != 0 : "Missing jobs from list";
         for (Job job : jobs) {
             assert job.getEmployee().getId() != 0 : "Missing required property";
@@ -94,6 +73,60 @@ public class JobsTest {
             assert job.getSuffix() != null : "Missing required property";
             assert !job.getStatus().equals("T");
             assert job.getAppointmentType().equals(AppointmentType.CLASSIFIED);
+        }
+    }
+
+    public void listShortNotTerminatedJobsShouldFilterByAppointmentType() throws Exception {
+        ArrayList<String> appointmentTypes = new ArrayList<String>();
+        Collections.addAll(appointmentTypes, new String[] {AppointmentType.CLASSIFIED_IT});
+
+        // Try getting only Classified IT
+        List<Job> jobs = JobMgr.listShortNotTerminatedJobs(appointmentTypes);
+        assert jobs.size() != 0 : "Missing jobs from list";
+        for (Job job : jobs) {
+            assert job.getAppointmentType().equals(AppointmentType.CLASSIFIED_IT);
+        }
+
+        // Try getting only Classified
+        appointmentTypes = new ArrayList<String>();
+        Collections.addAll(appointmentTypes, new String[] {AppointmentType.CLASSIFIED});
+        jobs = JobMgr.listShortNotTerminatedJobs(appointmentTypes);
+        assert jobs.size() != 0 : "Missing jobs from list";
+        for (Job job : jobs) {
+            assert job.getAppointmentType().equals(AppointmentType.CLASSIFIED);
+        }
+
+        // Try getting both appointment types
+        appointmentTypes = new ArrayList<String>();
+        Collections.addAll(appointmentTypes, new String[]
+                {AppointmentType.CLASSIFIED, AppointmentType.CLASSIFIED_IT});
+        jobs = JobMgr.listShortNotTerminatedJobs(appointmentTypes);
+        assert jobs.size() != 0 : "Missing jobs from list";
+        int classifiedJobCount = 0;
+        int classifiedITJobCount = 0;
+        for (Job job : jobs) {
+            if (job.getAppointmentType().equals(AppointmentType.CLASSIFIED)) {
+                classifiedJobCount++;
+            }
+            if (job.getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
+                classifiedITJobCount++;
+            }
+        }
+
+        assert classifiedITJobCount > 0 : "Should have fetched some jobs";
+        assert classifiedJobCount > 0 : "Should have fetched some jobs";
+    }
+
+    public void listShortNotTerminatedJobsShouldOnlyInclude00SuffixAndNonFutureBeginDate() throws Exception {
+        ArrayList<String> appointmentTypes = new ArrayList<String>();
+        Collections.addAll(appointmentTypes, new String[] {AppointmentType.CLASSIFIED});
+
+        List<Job> jobs = JobMgr.listShortNotTerminatedJobs(appointmentTypes);
+        assert jobs.size() != 0 : "Missing jobs from list";
+        for (Job job : jobs) {
+            job = JobMgr.getJob(job.getEmployee().getId(), job.getPositionNumber(), job.getSuffix());
+            assert job.getSuffix().equals("00") : "Only jobs with suffix '00' will be created";
+            assert job.getBeginDate().compareTo(new Date()) <= 0 : "Jobs with future begin date will not be created";
         }
     }
 
@@ -111,13 +144,13 @@ public class JobsTest {
     }
 
     public void getJobsShouldReturnJobs() throws Exception {
-        assert JobMgr.getJobs(56198).size() == 2;
+        assert JobMgr.getJobs(56198).size() == 1;
         assert JobMgr.getJobs(111).size() == 0;
         assert JobMgr.getJobs(12345).size() == 3;
     }
 
     public void shouldReturnBusinessCenter() throws Exception {
-        assert jobMgr.getBusinessCenter(56198).equals("UABC");
+        assert JobMgr.getBusinessCenter(56198).equals("UABC");
     }
 
     public void shouldReturnCorrectNewAnnualStartDateIfFirstLasted18Months() throws Exception {
@@ -132,49 +165,45 @@ public class JobsTest {
         cal.set(Calendar.MONTH, Calendar.JUNE);
         cal.set(Calendar.DAY_OF_MONTH, 1);
 
-        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, Calendar.JUNE,
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, DateTimeConstants.JUNE,
                 Calendar.getInstance().get(Calendar.YEAR)-1);
 
         cal.set(Calendar.YEAR, cal.get(Calendar.YEAR)-4);
-        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, Calendar.DECEMBER,
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, DateTimeConstants.DECEMBER,
                 Calendar.getInstance().get(Calendar.YEAR));
         cal.set(Calendar.YEAR, cal.get(Calendar.YEAR)-3);
-        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, Calendar.DECEMBER,
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, DateTimeConstants.DECEMBER,
                 Calendar.getInstance().get(Calendar.YEAR));
         cal.set(Calendar.YEAR, cal.get(Calendar.YEAR)-2);
-        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, Calendar.DECEMBER,
+        assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, DateTimeConstants.DECEMBER,
                 Calendar.getInstance().get(Calendar.YEAR));
     }
 
     private void assertCorrectNewAnnualStartDateForAnnualInd18(Job job, Calendar cal, int month,
                                                                int year) throws Exception {
         job.setBeginDate(cal.getTime());
-        Calendar newStartDate = job.getNewAnnualStartDate();
+        DateTime newStartDate = job.getNewAnnualStartDate();
 
-        assert newStartDate.get(Calendar.YEAR) == year;
-        assert newStartDate.get(Calendar.MONTH) == month;
-        assert newStartDate.get(Calendar.DAY_OF_MONTH) == 1;
+        assert newStartDate.getYear() == year;
+        assert newStartDate.getMonthOfYear() == month;
+        assert newStartDate.getDayOfMonth() == 1;
     }
 
     public void shouldReturnCorrectNewAnnualStartDateForFirstAnnualIfAnnualIndIs18Case2()
             throws Exception {
-        Calendar cal = Calendar.getInstance();
         Job job = new Job();
         job.setAnnualInd(18);
         job.setEmployee(new Employee(12345));
         job.setPositionNumber("C1234");
         job.setSuffix("00");
 
-        cal.set(Calendar.MONTH, Calendar.DECEMBER);
-        cal.set(Calendar.DAY_OF_MONTH, 4);
-        cal.set(Calendar.YEAR, 2010);
+        DateTime dateTime = new DateTime().minusYears(1).withMonthOfYear(DateTimeConstants.DECEMBER).withDayOfMonth(4);
+        job.setBeginDate(dateTime.toDate());
+        DateTime newStartDate = job.getNewAnnualStartDate();
 
-        job.setBeginDate(cal.getTime());
-        Calendar newStartDate = job.getNewAnnualStartDate();
-
-        assert newStartDate.get(Calendar.YEAR) == 2011;
-        assert newStartDate.get(Calendar.MONTH) == Calendar.JANUARY;
-        assert newStartDate.get(Calendar.DAY_OF_MONTH) == 1;
+        assert newStartDate.getYear() == new DateTime().getYear();
+        assert newStartDate.getMonthOfYear() == DateTimeConstants.JANUARY;
+        assert newStartDate.getDayOfMonth() == 1;
     }
 
     public void shouldParseJobFromString() {
@@ -184,14 +213,12 @@ public class JobsTest {
         assert null == Job.getJobFromString("1234_dfd_");
 
         Job job = Job.getJobFromString("1234_C12345_00");
-        assert job.getId() == 1234;
+        assert job.getEmployee().getId() == 1234;
         assert job.getPositionNumber().equals("C12345");
         assert job.getSuffix().equals("00");
     }
 
     public void shouldReturnNullWhenEmployeeHasNoSupervisorJob() {
-        Session session = HibernateUtil.getCurrentSession();
-        Transaction tx = session.beginTransaction();
         assert null == JobMgr.getSupervisingJob(0);
         assert null == JobMgr.getSupervisingJob(-13435);
 
@@ -202,8 +229,6 @@ public class JobsTest {
         assert supervisingJob.getEmployee().getId() == 12345;
         assert supervisingJob.getPositionNumber().equals("1234");
         assert supervisingJob.getSuffix().equals("00");
-
-        tx.commit();
     }
 
     public void searchShouldAcceptOsuid() throws Exception {
@@ -241,12 +266,12 @@ public class JobsTest {
         assert jobs.size() == 0;
 
         jobs = JobMgr.findByName("Jo", null, 0);
-        assert jobs.size() == 2;
+        assert jobs.size() == 4;
     }
 
     public void searchByNameShouldAcceptLastNameOnly() throws Exception {
         List<Job> jobs = JobMgr.findByName("Cedeno", null, 0);
-        assert jobs.size() == 1;
+        assert jobs.size() == 3;
 
         jobs = JobMgr.findByName("Bond", null, 0);
         assert jobs.size() == 0;
@@ -276,5 +301,21 @@ public class JobsTest {
     public void shouldFindOrgCodeAsBC() throws Exception {
         assert JobMgr.findOrgCode("654321", "UABC") == true;
         assert JobMgr.findOrgCode("654321", "AABC") == false;
+    }
+
+    public void getSalaryShouldReturnSalaryObjectForITAppointmentTypes() throws Exception {
+        Job job = JobMgr.getJob(74589, "85392", "00");
+        Salary salary = job.getSalary();
+        assert salary.getCurrent() == 2500;
+        assert salary.getHigh() == 4000;
+        assert salary.getLow() == 2000;
+        assert salary.getMidPoint() == 3000;
+        assert salary.getSgrpCode().equals("123456");
+    }
+
+    public void getSalaryShouldReturnNullForNonITAppointmentTypes() throws Exception {
+        Job job = new Job();
+        job.setAppointmentType(AppointmentType.CLASSIFIED);
+        assert job.getSalary() == null : "We only support Classified IT when getting salary info";
     }
 }

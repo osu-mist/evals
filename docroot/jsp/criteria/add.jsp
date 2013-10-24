@@ -1,7 +1,7 @@
 <%@ include file="/jsp/init.jsp" %>
 
 <jsp:useBean id="criterionArea" class="edu.osu.cws.evals.models.CriterionArea" scope="request" />
-<jsp:useBean id="criterionDetail" class="edu.osu.cws.evals.models.CriterionDetail" scope="request" />
+
 <c:set var="action" value="add" scope="request"/>
 <c:set var="titleKey" value="criteria-add-classified" scope="request"/>
 <c:if test="${criterionArea.id != 0}">
@@ -29,7 +29,7 @@ List appointmentTypes = (List) renderRequest.getAttribute("appointmentTypes");
             <input type="text" id="<portlet:namespace />name" name="<portlet:namespace />name" value="${criterionArea.name}" />
            
             <label for="<portlet:namespace />description"><liferay-ui:message key="description" /></label>
-            <liferay-ui:input-textarea param="description" defaultValue="${criterionDetail.description}"/>
+            <liferay-ui:input-textarea param="description" defaultValue="${criterionArea.description}"/>
     
             <c:if test="${action == 'add'}">
               <label for="<portlet:namespace />appointmentTypeID"><liferay-ui:message key="appointment-type" /></label>
@@ -62,10 +62,10 @@ jQuery(document).ready(function() {
   jQuery("#<portlet:namespace />fm").submit(function() {
     var errors = "";
     if (jQuery("#<portlet:namespace />name").val() == "") {
-      errors = "<li><%= CriterionArea.nameRequired %></li>";
+      errors = "<li><%= bundle.getString("criteria-nameRequired") %></li>";
     }
     if (jQuery("#<portlet:namespace />description").val() == "") {
-      errors += "<li><%= CriterionDetail.descriptionRequired %></li>"
+      errors += "<li><%= bundle.getString("criteria-descriptionRequired") %></li>";
     }
     if (errors != "") {
       jQuery("#<portlet:namespace />flash").html(

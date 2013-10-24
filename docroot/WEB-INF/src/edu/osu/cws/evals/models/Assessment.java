@@ -1,19 +1,12 @@
 package edu.osu.cws.evals.models;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Assessment extends Evals implements Comparable<Assessment> {
-    private int id;
 
-    private Appraisal appraisal;
-
-    private CriterionDetail criterionDetail;
+    private Integer id;
 
     private String goal;
-
-    private String newGoals;
 
     private String employeeResult;
 
@@ -23,7 +16,23 @@ public class Assessment extends Evals implements Comparable<Assessment> {
 
     private Date modifiedDate;
 
+    private GoalVersion goalVersion;
+
+    /**
+     * The sequence represents the order in which the objects are displayed in the evaluation form.
+     * The sequence numbers should be unique for all assessments that belong to a single goal version.
+     * In other words, some sequence #s will correspond to deleted assessments that are not displayed
+     * to the user.
+     */
+    private int sequence;
+
+    private Integer deleterPidm;
+
+    private Date deleteDate;
+
     private Set<GoalLog> goalLogs = new HashSet<GoalLog>();
+
+    private Set<AssessmentCriteria> assessmentCriteria = new HashSet<AssessmentCriteria>();
 
     public Assessment() { }
 
@@ -45,28 +54,20 @@ public class Assessment extends Evals implements Comparable<Assessment> {
         return new GoalLog();
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Appraisal getAppraisal() {
-        return appraisal;
+    public int getSequence() {
+        return sequence;
     }
 
-    public void setAppraisal(Appraisal appraisal) {
-        this.appraisal = appraisal;
-    }
-
-    public CriterionDetail getCriterionDetail() {
-        return criterionDetail;
-    }
-
-    public void setCriterionDetail(CriterionDetail criterionDetail) {
-        this.criterionDetail = criterionDetail;
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 
     public String getGoal() {
@@ -75,14 +76,6 @@ public class Assessment extends Evals implements Comparable<Assessment> {
 
     public void setGoal(String goal) {
         this.goal = goal;
-    }
-
-    public String getNewGoals() {
-        return newGoals;
-    }
-
-    public void setNewGoals(String newGoals) {
-        this.newGoals = newGoals;
     }
 
     public String getEmployeeResult() {
@@ -117,6 +110,22 @@ public class Assessment extends Evals implements Comparable<Assessment> {
         this.modifiedDate = modifiedDate;
     }
 
+    public Integer getDeleterPidm() {
+        return deleterPidm;
+    }
+
+    public void setDeleterPidm(Integer deleterPidm) {
+        this.deleterPidm = deleterPidm;
+    }
+
+    public Date getDeleteDate() {
+        return deleteDate;
+    }
+
+    public void setDeleteDate(Date deleteDate) {
+        this.deleteDate = deleteDate;
+    }
+
     public Set<GoalLog> getGoalLogs() {
         return goalLogs;
     }
@@ -130,25 +139,101 @@ public class Assessment extends Evals implements Comparable<Assessment> {
         this.goalLogs.add(goalLog);
     }
 
+    public GoalVersion getGoalVersion() {
+        return goalVersion;
+    }
+
+    public void setGoalVersion(GoalVersion goalVersion) {
+        this.goalVersion = goalVersion;
+    }
+
+    public Set<AssessmentCriteria> getAssessmentCriteria() {
+        return assessmentCriteria;
+    }
+
+    public void setAssessmentCriteria(Set<AssessmentCriteria> assessmentCriteria) {
+        this.assessmentCriteria = assessmentCriteria;
+    }
+
+    public void addAssessmentCriteria(AssessmentCriteria assessmentCriterion) {
+        assessmentCriterion.setAssessment(this);
+        assessmentCriteria.add(assessmentCriterion);
+    }
+
     public int compareTo(Assessment otherAssessment) {
         final int BEFORE = -1;
         final int EQUAL = 0;
         final int AFTER = 1;
 
-        if (this == otherAssessment) {
-            return EQUAL;
-        }
-
-        if (this.getCriterionDetail().getAreaID().getSequence() <
-                otherAssessment.getCriterionDetail().getAreaID().getSequence()) {
+        if (this.sequence < otherAssessment.sequence) {
             return BEFORE;
         }
 
-        if (this.getCriterionDetail().getAreaID().getSequence() >
-                otherAssessment.getCriterionDetail().getAreaID().getSequence()) {
+        if (this.sequence > otherAssessment.sequence) {
             return AFTER;
         }
 
         return EQUAL;
+    }
+
+    /**
+     * Returns a sorted list of AssessmentCriteria by the name of CriteriaArea.name.
+     *
+     * @return
+     */
+    public List<AssessmentCriteria> getSortedAssessmentCriteria() {
+        List<AssessmentCriteria> sortedAssessmentCriteria = new ArrayList(assessmentCriteria);
+        Collections.sort(sortedAssessmentCriteria);
+        return sortedAssessmentCriteria;
+    }
+
+    /**
+     * Whether or not the Assessment has been deleted.
+     *
+     * @return
+     */
+    public Boolean isDeleted() {
+        return deleterPidm != null && deleteDate != null;
+    }
+
+    /**
+     * Returns a new Assessment object with the trialAssessment properties set as well as the
+     * goalVersion association setup.
+     *
+     * @param trialAssessment
+     * @return
+     */
+    public static Assessment copyPropertiesFromTrial(Assessment trialAssessment) {
+        Assessment newAssessment = new Assessment();
+        newAssessment.setGoal(trialAssessment.getGoal());
+        newAssessment.setCreateDate(new Date());
+        newAssessment.setEmployeeResult(trialAssessment.getEmployeeResult());
+        newAssessment.setSupervisorResult(trialAssessment.getSupervisorResult());
+        newAssessment.setModifiedDate(new Date());
+        newAssessment.setSequence(trialAssessment.getSequence());
+
+        // copy assessment criteria objects for this new assessment
+        for (AssessmentCriteria trialAssessmentCriteria : trialAssessment.getAssessmentCriteria()) {
+            AssessmentCriteria newAssessmentCriteria =
+                    AssessmentCriteria.copyPropertiesFromTrial(trialAssessmentCriteria);
+            newAssessment.addAssessmentCriteria(newAssessmentCriteria);
+        }
+
+        return newAssessment;
+    }
+
+    /**
+     * Whether or not this assessment should be considered a new goal as far as permission rules are
+     * concerned.
+     */
+    public boolean isNewGoal() {
+        boolean hasOnlyOriginalGoalVersion = goalVersion.getAppraisal().getGoalVersions().size() == 1;
+
+        // treat it as as a new goal for the first version if the goals aren't approved
+        if (hasOnlyOriginalGoalVersion && goalVersion.getGoalsApprovedDate() == null) {
+            return true;
+        }
+
+        return goalVersion.inActivatedState();
     }
 }

@@ -3,6 +3,10 @@ package edu.osu.cws.evals.tests;
 import edu.osu.cws.evals.hibernate.ReviewerMgr;
 import edu.osu.cws.evals.models.ModelException;
 import edu.osu.cws.evals.models.Reviewer;
+import edu.osu.cws.evals.util.HibernateUtil;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -12,7 +16,8 @@ import java.util.List;
 
 @Test
 public class ReviewersTest {
-    ReviewerMgr reviewerMgr = new ReviewerMgr();
+
+    Transaction tx;
 
     /**
      * This setup method is run before this class gets executed in order to
@@ -24,18 +29,26 @@ public class ReviewersTest {
     public void setUp() throws Exception {
         DBUnit dbunit = new DBUnit();
         dbunit.seedDatabase();
+        Session session = HibernateUtil.getCurrentSession();
+        tx = session.beginTransaction();
+    }
+
+    @AfterMethod
+    public void tearDown() throws Exception {
+        tx.commit();
     }
 
     @Test(groups = {"unittest"})
     public void shouldListReviewers() throws Exception {
-        HashMap reviewersList = reviewerMgr.mapByEmployeeId();
+        HashMap reviewersList = ReviewerMgr.mapByEmployeeId();
         assert reviewersList.size() == 3 : "Invalid list of reviewers";
         assert reviewersList.containsKey(787812) : "Missing reviewer from list";
         assert reviewersList.containsKey(8712359) : "Missing reviewer from list";
     }
 
+    @Test
     public void shouldListSortedReviewersByBusinessCenterAndThenByLastName() throws Exception {
-        ArrayList<Reviewer> reviewers = (ArrayList<Reviewer>) reviewerMgr.list();
+        ArrayList<Reviewer> reviewers = (ArrayList<Reviewer>) ReviewerMgr.list();
         assert reviewers.get(0).getBusinessCenterName().equals("AABC") : "Incorrect sorting by BC";
         assert reviewers.get(0).getEmployee().getId() == 8712359 : "Incorrect sorting by name";
 
@@ -47,38 +60,42 @@ public class ReviewersTest {
 
     }
 
+    @Test
     public void shouldDeleteReviewer() throws Exception {
-        ArrayList<Reviewer> oldReviewersList = (ArrayList<Reviewer>) reviewerMgr.list();
-        reviewerMgr.delete(1);
-        ArrayList<Reviewer> newReviewerList = (ArrayList<Reviewer>) reviewerMgr.list();
+        ArrayList<Reviewer> oldReviewersList = (ArrayList<Reviewer>) ReviewerMgr.list();
+        ReviewerMgr.delete(1);
+        ArrayList<Reviewer> newReviewerList = (ArrayList<Reviewer>) ReviewerMgr.list();
 
         assert oldReviewersList.size() == newReviewerList.size() + 1;
     }
 
     @Test(expectedExceptions = {ModelException.class})
     public void shouldNotAddReviewerWhoIsNotActive() throws Exception {
-        reviewerMgr.add("testing", "UABC");
+        ReviewerMgr.add("testing", "UABC");
     }
 
     @Test(expectedExceptions = {ModelException.class})
     public void shouldNotAddReviewerWhoIsAlreadyReviewerForThatBusinessCenter() throws Exception {
-        reviewerMgr.add("barlowc3", "AABC");
+        ReviewerMgr.add("barlowc3", "AABC");
     }
 
+    @Test
     public void shouldAddReviewerWhoIsAReviewerForDifferentBusinessCenter() throws Exception {
-        ArrayList<Reviewer> oldReviewersList = (ArrayList<Reviewer>) reviewerMgr.list();
-        reviewerMgr.add("barlowc3", "UABC");
-        ArrayList<Reviewer> newReviewerList = (ArrayList<Reviewer>) reviewerMgr.list();
+        ArrayList<Reviewer> oldReviewersList = (ArrayList<Reviewer>) ReviewerMgr.list();
+        ReviewerMgr.add("barlowc3", "UABC");
+        ArrayList<Reviewer> newReviewerList = (ArrayList<Reviewer>) ReviewerMgr.list();
         assert oldReviewersList.size() == newReviewerList.size() - 1;
     }
 
+    @Test
     public void shouldAddReviewer() throws Exception {
-        ArrayList<Reviewer> oldReviewersList = (ArrayList<Reviewer>) reviewerMgr.list();
-        reviewerMgr.add("cedenoj", "UABC");
-        ArrayList<Reviewer> newReviewerList = (ArrayList<Reviewer>) reviewerMgr.list();
+        ArrayList<Reviewer> oldReviewersList = (ArrayList<Reviewer>) ReviewerMgr.list();
+        ReviewerMgr.add("cedenoj", "UABC");
+        ArrayList<Reviewer> newReviewerList = (ArrayList<Reviewer>) ReviewerMgr.list();
         assert oldReviewersList.size() == newReviewerList.size() - 1;
     }
 
+    @Test
     public void shouldListReviewersByBC() throws Exception {
         List<Reviewer> results = ReviewerMgr.getReviewers("UABC");
 

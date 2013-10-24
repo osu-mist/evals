@@ -1,10 +1,11 @@
+<%@ page import="edu.osu.cws.evals.portlet.Constants" %>
 <%@ include file="/jsp/init.jsp"%>
 <% Appraisal formAppraisal = (Appraisal) renderRequest.getAttribute("appraisal"); %>
 
 <jsp:useBean id="appraisal" class="edu.osu.cws.evals.models.Appraisal" scope="request" />
 <jsp:useBean id="permissionRule" class="edu.osu.cws.evals.models.PermissionRule" scope="request" />
 <c:set var="showForm" scope="request"
-       value="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}"/>
+       value="${not empty permissionRule.saveDraft || not empty permissionRule.secondarySubmit || not empty permissionRule.submit}"/>
 <portlet:resourceURL var="downloadPDFURL" id="downloadPDF" escapeXml="false">
     <portlet:param name="id" value="${appraisal.id}"/>
     <portlet:param name="controller" value="AppraisalsAction"/>
@@ -24,27 +25,33 @@
     <portlet:param name="action" value="setStatusToResultsDue"/>
     <portlet:param name="controller" value="AppraisalsAction"/>
 </portlet:actionURL>
+<portlet:actionURL var="requestGoalsReactivation" escapeXml="false">
+    <portlet:param name="id" value="${appraisal.id}"/>
+    <portlet:param name="action" value="requestGoalsReactivation"/>
+    <portlet:param name="controller" value="AppraisalsAction"/>
+</portlet:actionURL>
+
 
 <div id="pass-appraisal-form" class="osu-cws">
 
-<c:if test="${showForm}">
+<c:if test="${showForm and !empty appraisalNotice.text}">
     <span class="portlet-msg-alert">
     <c:out value = "${appraisalNotice.text}"/>
+
     </span>
 </c:if>
 
-    <h2><liferay-ui:message key="appraisal-classified-title" />: <liferay-ui:message key="${appraisal.viewStatus}" /></h2>
-    <liferay-ui:success key="draft-saved" message="draft-saved" />
-    <liferay-ui:success key="appraisal-sent-to-nolij-success" message="appraisal-sent-to-nolij-success" />
-    <liferay-ui:success key="appraisal-set-status-success" message="appraisal-set-status-success" />
+    <h2><c:out value = "${appraisal.job.appointmentType} "/><liferay-ui:message key="appraisal-title" />: <liferay-ui:message key="${appraisal.viewStatus}" /></h2>
 
     <ul class="actions">
-        <li><liferay-ui:icon
-            image="../document_library/pdf"
-            url="<%=renderResponse.encodeURL(downloadPDFURL.toString())%>"
-            label="true"
-            message="appraisal-download-pdf"
-        /></li>
+        <c:if test="${not empty displayDownloadPdf}">
+            <li><liferay-ui:icon
+                image="../document_library/pdf"
+                url="<%=renderResponse.encodeURL(downloadPDFURL.toString())%>"
+                label="true"
+                message="appraisal-download-pdf"
+            /></li>
+        </c:if>
         <c:if test="${not empty displayResendNolij}">
             <li><liferay-ui:icon
                 image="copy"
@@ -72,32 +79,81 @@
                 toolTip="appraisal-move-to-results-due"
             /></li>
         </c:if>
+        <c:if test="${not empty displayReactivateGoals}">
+            <li><liferay-ui:icon
+                image="copy"
+                url="<%=renderResponse.encodeURL(requestGoalsReactivation.toString())%>"
+                label="true"
+                message="appraisal-request-goals-reactivation"
+                cssClass="evals-show-confirm"
+            /></li>
+        </c:if>
     </ul>
+
+    <liferay-ui:success key="draft-saved" message="draft-saved" />
+    <liferay-ui:success key="appraisal-goals-reactivation-requested" message="appraisal-goals-reactivation-requested" />
+    <liferay-ui:success key="appraisal-sent-to-nolij-success" message="appraisal-sent-to-nolij-success" />
+    <liferay-ui:success key="appraisal-set-status-success" message="appraisal-set-status-success" />
 
     <%@ include file="/jsp/appraisals/info.jsp"%>
 
     <c:if test="${showForm}">
-    <form class="appraisal" id="<portlet:namespace />fm"
+    <form class="appraisal ${appraisal.status}" id="<portlet:namespace />fm"
         action="<portlet:actionURL windowState="<%= WindowState.NORMAL.toString() %>">
         <portlet:param name="action" value="update" />
         <portlet:param name="controller" value="AppraisalsAction" />
         </portlet:actionURL>" method="post" name="<portlet:namespace />request_form">
 
-        <input type="hidden" name="id" value="${appraisal.id}"/>
+        <input type="hidden" id="id" name="id" value="${appraisal.id}"/>
+        <input type="hidden" id="assessmentCount" name="assessmentCount"
+               value="-1"/> <!-- @todo: this needs to be updated -->
+        <input type="hidden" id="assessmentSequence" name="assessmentSequence"
+               value="-1"/> <!-- @todo: this needs to be updated -->
     </c:if>
 
     <div class="appraisal-criteria">
-    <c:forEach var="assessment" items="${appraisal.sortedAssessments}" varStatus="loopStatus">
-        <%@ include file="/jsp/appraisals/criteria.jsp"%>
-    </c:forEach>
+        <fieldset>
+            <legend><liferay-ui:message key="appraisal-details"/></legend>
+            <c:if test="${not empty appraisal.approvedGoalsVersions}">
+                <c:forEach var="goalsVersion" items="${appraisal.approvedGoalsVersions}" varStatus="loopStatus">
+                    <div class="goals-header">
+                        <liferay-ui:message key="appraisal-goals-approved-on"/>
+                        <fmt:formatDate value="${goalsVersion.goalsApprovedDate}" pattern="MM/dd/yy"/>:
+                    </div>
+                    <c:forEach var="assessment" items="${goalsVersion.sortedAssessments}" varStatus="loopStatus">
+                        <%@ include file="/jsp/appraisals/assessment.jsp"%>
+                    </c:forEach>
+                </c:forEach>
+            </c:if>
+
+            <c:if test="${not empty appraisal.unapprovedGoalsVersion}">
+                <c:if test="${permissionRule.unapprovedGoals == 'e' || permissionRule.unapprovedGoals == 'v'}">
+                    <div class="goals-header">
+                        <liferay-ui:message key="appraisal-goals-need-approved"/>
+                    </div>
+                    <c:forEach var="assessment" items="${appraisal.unapprovedGoalsVersion.sortedAssessments}" varStatus="loopStatus">
+                        <%@ include file="/jsp/appraisals/assessment.jsp"%>
+                    </c:forEach>
+                </c:if>
+            </c:if>
+        </fieldset>
+
+        <c:if test="${permissionRule.unapprovedGoals == 'e'}">
+            <ul class="ul-h-nav">
+                <li><a href="#" class="img-txt add" id="addAssessment">
+                    <liferay-ui:message key="appraisal-assessment-add"/></a>
+                </li>
+            </ul>
+        </c:if>
     </div>
+
 
     <c:choose>
         <c:when test="${permissionRule.goalComments == 'e'}">
             <fieldset>
                 <h3 class="secret"><liferay-ui:message key="appraisal-goals-legend" /></h3>
                 <legend><liferay-ui:message key="appraisal-goals-legend" /></legend>
-                <label for="<portlet:namespace />.appraisal.goalsComments"><liferay-ui:message key="appraisal-goals-comments" /></label>
+                <label for="<portlet:namespace />appraisal.goalsComments"><liferay-ui:message key="appraisal-goals-comments" /></label>
                 <liferay-ui:input-textarea param="appraisal.goalsComments"
                     defaultValue="${appraisal.goalsComments}" />
             </fieldset>
@@ -145,7 +201,7 @@
                     </p>
                 </fieldset>
           </c:if>
-            
+
             <c:choose>
                 <c:when test="${permissionRule.employeeResponse == 'e'}">
                     <c:if test="${empty appraisal.rebuttal}">
@@ -196,9 +252,9 @@
         <input name="${permissionRule.saveDraft}" type="submit" value="<liferay-ui:message key="${permissionRule.saveDraft}" />">
         </c:if>
 
-        <c:if test="${not empty permissionRule.requireModification}">
-        <input name="${permissionRule.requireModification}" class="evals-show-confirm"
-               type="submit" value="<liferay-ui:message key="${permissionRule.requireModification}" />">
+        <c:if test="${not empty permissionRule.secondarySubmit}">
+        <input name="${permissionRule.secondarySubmit}" class="evals-show-confirm"
+               type="submit" value="<liferay-ui:message key="${permissionRule.secondarySubmit}" />">
         </c:if>
 
         <c:if test="${not empty permissionRule.submit}">
@@ -207,74 +263,12 @@
         value="<liferay-ui:message key="${permissionRule.submit}" />">
         </c:if>
 
-        <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.requireModification || not empty permissionRule.submit}">
+        <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.secondarySubmit || not empty permissionRule.submit}">
         </form>
     </div><!-- end pass-actions-->
 
     <script type="text/javascript">
-    jQuery(document).ready(function() {
-
-      // Handle acknowledge appraisal rebuttal read by supervisor
-      jQuery(".pass-appraisal-rebuttal").hide();
-
-      jQuery("#<portlet:namespace />fm").submit(function() {
-        var errors = "";
-        if (jQuery("#<portlet:namespace />acknowledge-read-appraisal").length > 0 &&
-                !jQuery("#<portlet:namespace />acknowledge-read-appraisal").is(':checked')) {
-          errors = "<li><%= Appraisal.signatureRequired %></li>";
-          alert("<%= Appraisal.signatureRequired %>");
-        }
-        if (jQuery("#<portlet:namespace />appraisal-readRebuttal").length > 0 && !jQuery("#<portlet:namespace />appraisal-readRebuttal").is(':checked')) {
-          errors = "<li><%= Appraisal.rebuttalReadRequired %></li>";
-          alert("<%= Appraisal.rebuttalReadRequired %>");
-        }
-        if (errors != "") {
-          jQuery("#<portlet:namespace />flash").html(
-            '<span class="portlet-msg-error"><ul>'+errors+'</ul></span>'
-          );
-          return false;
-        }
-
-        return true;
-      });
-
-      // Handle validation of rating
-      jQuery("#<portlet:namespace />submit-appraisal").click(function() {
-        var errors = "";
-        if (jQuery("input[name=submit-appraisal]").length > 0 &&
-              jQuery("input[name=<portlet:namespace />appraisal.rating]:checked",
-                "#<portlet:namespace />fm").val() == undefined) {
-          errors = "<li><%= Appraisal.ratingRequired %></li>";
-          alert("<%= Appraisal.ratingRequired %>");
-        }
-
-        if (errors != "") {
-          jQuery("#<portlet:namespace />flash").html(
-            '<span class="portlet-msg-error"><ul>'+errors+'</ul></span>'
-          );
-          return false;
-        }
-
-        return true;
-      });
-
-
-      // Handle rebuttal show/hide
-      jQuery("#<portlet:namespace />show-rebuttal").click(function() {
-          jQuery("#<portlet:namespace />show-rebuttal").hide();
-          jQuery(".pass-appraisal-rebuttal").show();
-          jQuery('textarea').autogrow();
-          return false;
-      });
-      
-
-      // Using jQuery plugin to expand textareas as you type
-      <c:if test="${appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_DUE%>' && appraisal.viewStatus != '<%= Appraisal.STATUS_SIGNATURE_OVERDUE%>' ||  not empty appraisal.rebuttal}">
-        jQuery('textarea').autogrow();
-      </c:if>
-      
-      
-    });
+        <%@ include file="/jsp/appraisals/appraisal.js"%>
     </script>
     </c:if>
 
@@ -282,5 +276,6 @@
     <%@ include file="/jsp/appraisals/demoSettings.jsp"%>
 
 </c:if>
+
 </div><!-- end appraisal -->
 <%@ include file="/jsp/footer.jsp" %>

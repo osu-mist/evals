@@ -5,7 +5,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppointmentTypeMgr;
 import edu.osu.cws.evals.hibernate.CriteriaMgr;
 import edu.osu.cws.evals.models.CriterionArea;
-import edu.osu.cws.evals.models.CriterionDetail;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.ModelException;
 
@@ -14,13 +13,14 @@ import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import java.util.List;
-import java.util.ResourceBundle;
 
 public class CriteriaAreasAction implements ActionInterface {
     
     private ActionHelper actionHelper;
 
     private HomeAction homeAction;
+
+    private ErrorHandler errorHandler;
 
     /**
      * Takes the request object and passes the employeeType to the hibernate util class.
@@ -33,26 +33,19 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
-
-        String appointmentType = ParamUtil.getString(request, "appointmentType",
-                CriteriaMgr.DEFAULT_APPOINTMENT_TYPE);
 
         try {
-            List<CriterionArea> criterionList = new CriteriaMgr().list(appointmentType);
-            for (CriterionArea criteria : criterionList) {
-                criteria.getCurrentDetail().toString();
-            }
-            actionHelper.addToRequestMap("criteria", criterionList,request);
+            List<CriterionArea> criterionList = CriteriaMgr.listAll();
+            actionHelper.addToRequestMap("criteria", criterionList);
         } catch (ModelException e) {
-            actionHelper.addErrorsToRequest(request, e.getMessage());
+            actionHelper.addErrorsToRequest(e.getMessage());
         }
 
-        actionHelper.useMaximizedMenu(request);
+        actionHelper.useMaximizedMenu();
         return Constants.JSP_CRITERIA_LIST;
     }
 
@@ -67,19 +60,16 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String add(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        Employee loggedOnUser = actionHelper.getLoggedOnUser();
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
-        CriteriaMgr criteriaMgrArea = new CriteriaMgr();
         CriterionArea criterionArea = new CriterionArea();
-        CriterionDetail criterionDetail = new CriterionDetail();
-        Employee loggedOnUser = actionHelper.getLoggedOnUser(request);
 
         // Fetch list of appointment types to use in add form
-        actionHelper.addToRequestMap("appointmentTypes", new AppointmentTypeMgr().list(),request);
+        actionHelper.addToRequestMap("appointmentTypes", AppointmentTypeMgr.list());
 
         // When the criterionAreaId == null means that the user clicks on the Add Criteria
         // link. Otherwise the form was submitted
@@ -91,21 +81,20 @@ public class CriteriaAreasAction implements ActionInterface {
 
             criterionArea.setName(name);
             criterionArea.setAppointmentType(appointmentType);
-            criterionDetail.setDescription(description);
+            criterionArea.setDescription(description);
 
             try {
-                if (criteriaMgrArea.add(criterionArea, criterionDetail, loggedOnUser)) {
+                if (CriteriaMgr.add(criterionArea, loggedOnUser)) {
                     SessionMessages.add(request, "criteria-saved");
                     return list(request, response);
                 }
             } catch (ModelException e) {
-                actionHelper.addErrorsToRequest(request, e.getMessage());
+                actionHelper.addErrorsToRequest(e.getMessage());
             }
         }
 
-        actionHelper.addToRequestMap("criterionArea", criterionArea,request);
-        actionHelper.addToRequestMap("criterionDetail", criterionDetail,request);
-        actionHelper.useMaximizedMenu(request);
+        actionHelper.addToRequestMap("criterionArea", criterionArea);
+        actionHelper.useMaximizedMenu();
 
         return Constants.JSP_CRITERIA_ADD;
 
@@ -122,34 +111,28 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String edit(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
-        CriteriaMgr criteriaMgr = new CriteriaMgr();
         CriterionArea criterionArea = new CriterionArea();
-        CriterionDetail criterionDetail = new CriterionDetail();
+
         try {
             int criterionAreaId = ParamUtil.getInteger(request, "criterionAreaId");
             if (request instanceof RenderRequest) {
-                criterionArea = criteriaMgr.get(criterionAreaId);
-                if (criterionArea != null) {
-                    criterionDetail = criterionArea.getCurrentDetail();
-                }
+                criterionArea = CriteriaMgr.get(criterionAreaId);
             } else {
-                Employee loggedOnUser = actionHelper.getLoggedOnUser(request);
-                criteriaMgr.edit(request.getParameterMap(), criterionAreaId, loggedOnUser);
+                Employee loggedOnUser = actionHelper.getLoggedOnUser();
+                CriteriaMgr.edit(request.getParameterMap(), criterionAreaId, loggedOnUser);
                 return list(request, response);
             }
         } catch (ModelException e) {
-            actionHelper.addErrorsToRequest(request, e.getMessage());
+            actionHelper.addErrorsToRequest(e.getMessage());
         }
 
-        actionHelper.addToRequestMap("criterionArea", criterionArea,request);
-        actionHelper.addToRequestMap("criterionDetail", criterionDetail,request);
-        actionHelper.useMaximizedMenu(request);
+        actionHelper.addToRequestMap("criterionArea", criterionArea);
+        actionHelper.useMaximizedMenu();
 
         return Constants.JSP_CRITERIA_ADD;
     }
@@ -157,7 +140,7 @@ public class CriteriaAreasAction implements ActionInterface {
     /**
      * Handles deleting an evaluation criteria. If the request a regular http request, it
      * displays a confirm page. Once the user confirms the deletion, the criteria is deleted,
-     * the sequence is updated and the list of criteria is displayed again. If the request is
+     * and the list of criteria is displayed again. If the request is
      * AJAX, we remove the evaluation criteria.
      *
      * @param request
@@ -167,21 +150,19 @@ public class CriteriaAreasAction implements ActionInterface {
      */
     public String delete(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         int criteriaID = ParamUtil.getInteger(request, "id");
-        CriteriaMgr criteriaMgrArea = new CriteriaMgr();
         try {
-            Employee loggedOnUser = actionHelper.getLoggedOnUser(request);
+            Employee loggedOnUser = actionHelper.getLoggedOnUser();
 
             // If the user clicks on the delete link the first time, use confirm page
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
-                CriterionArea criterion = criteriaMgrArea.get(criteriaID);
-                actionHelper.addToRequestMap("criterion", criterion,request);
+                CriterionArea criterion = CriteriaMgr.get(criteriaID);
+                actionHelper.addToRequestMap("criterion", criterion);
                 return Constants.JSP_CRITERIA_DELETE;
             }
 
@@ -189,50 +170,20 @@ public class CriteriaAreasAction implements ActionInterface {
             if (!ParamUtil.getString(request, "cancel").equals("")) {
                 return list(request, response);
             }
-            criteriaMgrArea.delete(criteriaID, loggedOnUser);
+            CriteriaMgr.delete(criteriaID, loggedOnUser);
             SessionMessages.add(request, "criteria-deleted");
         } catch (ModelException e) {
-            actionHelper.addErrorsToRequest(request, e.getMessage());
-            if (actionHelper.isAJAX(request, response)) {
+            actionHelper.addErrorsToRequest(e.getMessage());
+            if (actionHelper.isAJAX()) {
                 return e.getMessage();
             }
         }
 
-        if (actionHelper.isAJAX(request, response)) {
+        if (actionHelper.isAJAX()) {
             return "success";
         }
 
         return list(request, response);
-    }
-
-    /**
-     * This method is called via AJAX when the sequence of an evaluation criteria is updated.
-     *
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
-     */
-    public String updateSequence(PortletRequest request, PortletResponse response) throws Exception {
-        // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
-        }
-
-        int id = ParamUtil.getInteger(request, "id");
-        int sequence = ParamUtil.getInteger(request, "sequence");
-        CriteriaMgr criteriaMgrArea = new CriteriaMgr();
-
-        try {
-            Employee loggedOnUser = actionHelper.getLoggedOnUser(request);
-            criteriaMgrArea.updateSequence(id, sequence);
-        } catch (ModelException e) {
-            return e.getMessage();
-        }
-
-        return "success";
     }
 
     public void setActionHelper(ActionHelper actionHelper) {
@@ -241,5 +192,9 @@ public class CriteriaAreasAction implements ActionInterface {
 
     public void setHomeAction(HomeAction homeAction) {
         this.homeAction = homeAction;
+    }
+
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
     }
 }

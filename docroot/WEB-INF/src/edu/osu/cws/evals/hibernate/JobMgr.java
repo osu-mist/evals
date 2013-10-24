@@ -15,6 +15,7 @@ import org.hibernate.Session;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 public class JobMgr {
 
@@ -38,7 +39,7 @@ public class JobMgr {
      * @return boolean
      * @throws edu.osu.cws.evals.models.ModelException
      */
-    public boolean isUpperSupervisor(Job job, int pidm) throws ModelException {
+    public static boolean isUpperSupervisor(Job job, int pidm) throws ModelException {
         Job supervisorJob = job.getSupervisor();
 
         // Iterate over the supervising chain. If the supervisor has no employee associated
@@ -94,19 +95,7 @@ public class JobMgr {
     //@todo: Where do you use this method.  This is a very expensive operation.
     public List<Job> list() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return this.list(session);
-    }
-
-    /**
-     * Retrieves a list of Jobs from the database.
-     *
-     * @param session
-     * @return
-     * @throws Exception
-     */
-    private List<Job> list(Session session) throws Exception {
-        List<Job> result = session.createQuery("from edu.osu.cws.evals.models.Job").list();
-        return result;
+        return session.createQuery("from edu.osu.cws.evals.models.Job").list();
     }
 
     /**
@@ -116,10 +105,9 @@ public class JobMgr {
      * @return a list of not terminated jobs of businessType.
      */
     public static List<Job> listNotTerminatedJobs(String appointmentType) throws Exception {
-        List<Job> jobs = new ArrayList<Job>();
         Session session = HibernateUtil.getCurrentSession();
 
-        jobs = session.createQuery("from edu.osu.cws.evals.models.Job job " +
+        List<Job> jobs = session.createQuery("from edu.osu.cws.evals.models.Job job " +
                 "where job.status != 'T' and job.appointmentType = :appointmentType")
                 .setString("appointmentType", appointmentType)
                 .list();
@@ -127,20 +115,26 @@ public class JobMgr {
     }
 
     /**
+     * Gets a list of jobs that are not terminated (status != T) that match the provided
+     * appointment types. The job objects only have a few properties populated: pidm,
+     * position number, suffi, job status and appointment type.
      *
-     * @param appointmentType
+     * @param appointmentTypes  ArrayList of different appointment types to fetch jobs for.
      * @return
      * @throws Exception
      */
-    public static List<Job> listShortNotTerminatedJobs(String appointmentType) throws Exception {
+    public static List<Job> listShortNotTerminatedJobs(ArrayList<String> appointmentTypes) throws Exception {
         List<Job> jobs;
         Session session = HibernateUtil.getCurrentSession();
 
         String query = "select new edu.osu.cws.evals.models.Job(employee.id, positionNumber, suffix, " +
                 "status, appointmentType) from edu.osu.cws.evals.models.Job job " +
-                "where job.status != 'T' and job.appointmentType = :appointmentType";
+                "where job.status != 'T' and job.appointmentType in (:appointmentTypes) " +
+                "and job.beginDate <= :currentDate and job.suffix = '00'";
+
         jobs = session.createQuery(query)
-                .setString("appointmentType", appointmentType)
+                .setParameterList("appointmentTypes", appointmentTypes)
+                .setDate("currentDate", new Date())
                 .list();
         return jobs;
     }
@@ -278,7 +272,7 @@ public class JobMgr {
         BigDecimal result = (BigDecimal) query.uniqueResult();
 
         int supervisorCount = Integer.parseInt(result.toString());
-       return supervisorCount < 1;
+        return supervisorCount < 1;
     }
 
     /**

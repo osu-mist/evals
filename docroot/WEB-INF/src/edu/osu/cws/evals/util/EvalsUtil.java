@@ -1,29 +1,28 @@
 package edu.osu.cws.evals.util;
 
-/**
- * Created by IntelliJ IDEA.
- * User: luf
- * Date: 7/1/11
- * Time: 10:57 AM
- * To change this template use File | Settings | File Templates.
- */
-
+import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmailMgr;
+import edu.osu.cws.evals.models.Appraisal;
+import edu.osu.cws.evals.models.Configuration;
+import edu.osu.cws.evals.models.Email;
+import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.portlet.Constants;
-import edu.osu.cws.util.*;
-
-import java.io.File;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import edu.osu.cws.evals.models.*;
+import edu.osu.cws.util.CWSUtil;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import javax.portlet.PortletContext;
+import java.io.File;
+import java.text.ParseException;
+import java.util.*;
 
 public class EvalsUtil {
-    private static Date evalsStartDate = null;
+    private static DateTime evalsStartDate = null;
 
     /**
      *
@@ -33,7 +32,7 @@ public class EvalsUtil {
      * name of the config should be "goalsDue".
      * @return a Date object presenting the date a certain status is due.
      */
-    public static Date getDueDate(Appraisal appraisal, Configuration config) throws Exception {
+    public static DateTime getDueDate(Appraisal appraisal, Configuration config) throws Exception {
         if (config == null)  //Should not need to do this.
             return null;
 
@@ -41,30 +40,31 @@ public class EvalsUtil {
         if (config.getAction().equals("subtract"))
             offset = offset * (-1);
 
-        Date refDate = appraisal.getStartDate();
-        Calendar dueDay = Calendar.getInstance();
+        DateTime refDate = new DateTime(appraisal.getStartDate());
         String ref = config.getReferencePoint();
 
         //System.out.println("reference point = " + ref);
 
-        if (ref.equals("end"))
-            refDate = appraisal.getEndDate();
-        else if (ref.equals("GOALS_REQUIRED_MOD_DATE"))
-        {
-            refDate = appraisal.getGoalsRequiredModificationDate();
+        if (ref.equals("end")) {
+            refDate = new DateTime(appraisal.getEndDate());
+        } else if (ref.equals("GOALS_REQUIRED_MOD_DATE")) {
+            refDate = new DateTime(appraisal.getGoalsRequiredModificationDate());
             //System.out.println("reference date = " + refDate);
+        } else if (ref.equals("employee_signed_date")) {
+            refDate = new DateTime(appraisal.getEmployeeSignedDate());
+        } else if (ref.equals("firstEmailSentDate")) {
+            Email firstEmail = EmailMgr.getFirstEmail(appraisal.getId(), "jobTerminated");
+            refDate = new DateTime(firstEmail.getSentDate());
+        } else if (ref.equals("goal_reactivation_request")) {
+            refDate = AppraisalMgr.getPendingRequestGoalVersionCreateDate(appraisal.getId());
+        } else if (ref.equals("goal_reactivation_req_dec")) {
+            refDate = AppraisalMgr.getUnapprovedGoalVersionRequestDecDate(appraisal.getId());
         }
-        else if (ref.equals("employee_signed_date"))
-            refDate = appraisal.getEmployeeSignedDate();
-        else if (ref.equals("firstEmailSentDate"))
-            refDate = EmailMgr.getFirstEmail(appraisal.getId(), "jobTerminated").getSentDate();
 
         if (refDate == null) //error
             return null;
 
-        dueDay.setTime(refDate);
-        dueDay.add(Calendar.DAY_OF_MONTH, offset);  //Assumes the offset type is Calendar.DAY_OF_MONTH
-        return dueDay.getTime();
+        return refDate.plusDays(offset);  //Assumes the offset type is Calendar.DAY_OF_MONTH
     }
 
 
@@ -80,9 +80,8 @@ public class EvalsUtil {
      * @return <0 < overdue, 0 due, >0 due day in the future, or not due yet.
      */
     public static int isDue(Appraisal appraisal, Configuration config) throws Exception {
-        Date dueDate = getDueDate(appraisal, config);
-        //System.out.println("due date = " + dueDate);
-        return (CWSUtil.daysBetween(dueDate, new Date()));  //@@@Need to check direction
+        DateTime dueDate = getDueDate(appraisal, config);
+        return Days.daysBetween(new DateTime(), dueDate).getDays();
     }
 
     /**
@@ -94,86 +93,100 @@ public class EvalsUtil {
       * @return  true if need to send another email, false otherwise.
       */
      public static boolean anotherEmail(Email lastEmail, Configuration config) throws Exception {
-         int frequency = config.getIntValue();
-         int daysPassed = CWSUtil.daysBetween(new Date(), lastEmail.getSentDate());
-         return (daysPassed > frequency);
+         DateTime sentDate = new DateTime(lastEmail.getSentDate());
+         int offset = config.getIntValue();
+         return sentDate.plusDays(offset).isBeforeNow();
      }
 
     /**
-     * Formats date object with the standard MM/dd/yy used throughout the application.
+     * This method assumes the existence of the following file: WEB-INF/src/evals.properties
      *
-     * @param date
-     * @return
-     */
-    public static String formatDate(Date date) {
-        return MessageFormat.format("{0,date,MM/dd/yy}",new Object[]{date});
-    }
-
-
-    /**
-     * This method assumes the existence of the following files:
-     *  WEB-INF/src/backend_ecs_dev.properties
-     *  WEB-INF/src/backend_ecs_prod.properties
-     *  WEB-INF/src/ecs_dev.properties
-     *  WEB-INF/src/ecs_prod.properties
-     * @param env:  Only valid values are: "web" from the web environment, "backend" from backend cron.
      * @portletRoot: Root directory of the running portlet
      * @return: name of the configuration file specific to the hosting environment.
-     * If a properties file matches the hostname exists, it returns that.
-     * Else, it figures out if it's the ECS's development or production environment, and returns the appropriate filename.
-     * Else, it returns null.
      */
-    public static String getSpecificConfigFile(String env, String portletRoot)
-    {
-        if (!env.equals("web") && !env.equals("backend")) //invalid
-           return null;
-
+    private static String getPropertyFileName(String portletRoot) {
         String hostname = CWSUtil.getLocalHostname();
         System.out.println("hostname is " + hostname);
+        String filenameHead = portletRoot + Constants.getRootDir();
+        String propertyFileName = filenameHead  + Constants.PROPERTIES_FILENAME;
+        System.out.println("propertyFileName is " + propertyFileName);
 
-        String filenameHead = portletRoot + Constants.ROOT_DIR;
-
-        if (env.equals("backend"))
-            filenameHead = filenameHead + "backend_";
-
-        String specificPropFile = filenameHead + hostname + ".properties";
-        //System.out.println("specificProfFile is " + specificPropFile);
-        File specificFile = new File(specificPropFile);
-        if (specificFile.exists())
-           return specificPropFile;
-
-        //If we get here, the specific config file based on hostname does not exist.
-        //Check for the ECS environment
-        specificPropFile = null;
-        if (hostname.indexOf("ucsadm") > 0) //ECS environment
-        {
-           if (hostname.indexOf("dev.") > 0) //ECS dev env
-              specificPropFile = filenameHead + "ecs_dev"  +  ".properties";
-            else  //production enviornment
-              specificPropFile = filenameHead + "ecs_prod"  +  ".properties";
+        File propertyFile = new File(propertyFileName);
+        if (propertyFile.exists() && propertyFile.canRead()) {
+           return propertyFileName;
         }
 
-        System.out.println("specificPropFile = " + specificPropFile);
-        specificFile = new File(specificPropFile);
-        if (specificFile.exists())
-           return specificPropFile;
         return null;
     }
 
-    public static int daysBeforeAppraisalDue(Job job, Date appraisalStartDate, String appraisalType,
-                                             Map<String, Configuration> configMap) throws Exception{
-        Configuration appraisalDueConfig = configMap.get(Appraisal.STATUS_APPRAISAL_DUE);
-        int offset = appraisalDueConfig.getIntValue();    //number of days before end date of appraisal
+    /**
+     * Returns the evals.properties PropertiesConfiguration object. It figures out if it is
+     * called from the web or backend based on whether or not the portletContext is null or not.
+     *
+     * @param context       PortletContext
+     * @return
+     * @throws Exception
+     */
+    public static PropertiesConfiguration loadEvalsConfig(PortletContext context)
+            throws Exception {
+        // If we have a portletContext object, we are called from the web and need to get the path
+        String portletRoot = "";
+        if (context != null) {
+            portletRoot = context.getRealPath("/");
+        }
 
-        //determine appraisal due date.
-        Date appraisalEndDate = job.getEndEvalDate(appraisalStartDate, appraisalType);
+        // Get the path and name of properties file to load
+        String propertyFile = getPropertyFileName(portletRoot);
+        if (propertyFile != null) {
+            return overWriteDefaultConfigs(new PropertiesConfiguration(propertyFile));
+        }
 
-        Calendar appraisalDueCal = Calendar.getInstance();
-        appraisalDueCal.setTime(appraisalEndDate);
-        appraisalDueCal.add(Calendar.DAY_OF_MONTH, -offset);
-        Date appraisalDueDate = appraisalDueCal.getTime();
-        System.out.println("appraisalDueDate = " + appraisalDueDate);
-        return CWSUtil.daysBetween(appraisalDueDate, new Date());
+        return null;
+    }
+
+    /**
+     * Parses through the properties defined in the configuration file. It tries to find if there
+     * is a host/vm specific property that overwrites the value of each one of the properties. If it
+     * finds a host property that takes precedence, it overwrites the default value with the host
+     * specific one.
+     *
+     * @param config
+     * @return
+     */
+    private static PropertiesConfiguration overWriteDefaultConfigs(PropertiesConfiguration config) {
+        String hostPrefix = EvalsUtil.getPropertyPrefix();
+        for (Iterator keys = config.getKeys(); keys.hasNext();) {
+            String key = keys.next().toString();
+            String hostBasedKey = hostPrefix + "." + key;
+            if (config.containsKey(hostBasedKey)) {
+                config.setProperty(key, config.getString(hostBasedKey));
+            }
+        }
+
+        return config;
+    }
+
+    /**
+     * Returns the property prefix to use when looking for properties overwritten in the
+     * evals.properties file.
+     * It figures out if it's the ECS's development or production environment, and returns either:
+     * "ecs_dev" or "ecs_prod"
+     * Else, it returns the hostname.
+     *
+     * @return String
+     */
+    private static String getPropertyPrefix() {
+        String hostname = CWSUtil.getLocalHostname();
+
+        if (hostname.contains("ucsadm")) { // ECS environment
+            if (hostname.contains("dev.")) { //ECS dev env
+                return "ecs_dev";
+            } else {  //production environment
+                return "ecs_prod";
+            }
+        }
+
+        return  hostname;
     }
 
     /**
@@ -207,8 +220,8 @@ public class EvalsUtil {
         }
 
         if (config != null) {
-            Date dueDate = EvalsUtil.getDueDate(appraisal, config);
-            return -1 * CWSUtil.getRemainDays(dueDate);
+            DateTime dueDate = EvalsUtil.getDueDate(appraisal, config);
+            return Days.daysBetween(dueDate, new DateTime()).getDays();
         }
 
         return 0;
@@ -251,41 +264,56 @@ public class EvalsUtil {
     }
 
     /**
-     * Whether or not the current job and appraisal start date is before evals started
-     * processing evaluations.
-     *
-     * @param job
-     * @param startDate
-     * @param type
-     * @return
-     * @throws ParseException
-     */
-    public static boolean beforeEvalsTime(Job job, Date startDate, String type)
-            throws ParseException {
-        Date appraisalEndDate = job.getEndEvalDate(startDate, type);
-        System.out.print("appraisalEndDate = " + appraisalEndDate);
-        if (appraisalEndDate.before(getEvalsStartDate() )) {
-            System.out.println(", before evalsStartDate.");
-            return true;
-        }
-        System.out.println(".");
-        return false;
-    }
-
-    /**
      * Parses the constant EVALS_START_DATE and stores a date object in evalsStartDate.
      *
-     * @return
+     * @return  DateTime object
      * @throws ParseException
      */
-    public static Date getEvalsStartDate() throws ParseException {
+    public static DateTime getEvalsStartDate() throws ParseException {
         if (evalsStartDate != null) {
             return evalsStartDate;
         } else {
-            SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
-            evalsStartDate = fmt.parse(Constants.EVALS_START_DATE);
+            DateTimeFormatter fmt = DateTimeFormat.forPattern(Constants.DATE_FORMAT_FULL);
+            evalsStartDate = fmt.parseDateTime(Constants.EVALS_START_DATE);
         }
 
         return evalsStartDate;
+    }
+
+    /**
+     * Creates an EvalsLogger instance
+     *
+     * @return EvalsLogger
+     * @throws Exception
+     */
+    public static LoggingInterface createLogger(PropertiesConfiguration config) throws Exception{
+        String serverName = config.getString("log.serverName");
+        String environment = config.getString("log.environment");
+
+        return new EvalsLogger(serverName, environment);
+    }
+
+    /**
+     * Creates an Mailer instance
+     *
+     * @return Mailer
+     * @throws Exception
+     */
+    public static MailerInterface createMailer(PropertiesConfiguration config,
+                                      Map<String, Configuration> configurationMap,
+                                      LoggingInterface logger) throws Exception {
+        ResourceBundle resources = ResourceBundle.getBundle(Constants.EMAIL_BUNDLE_FILE);
+        String hostname = config.getString("mail.hostname");
+        String from = config.getString("mail.fromAddress");
+        String replyTo = config.getString("mail.replyToAddress");
+        String linkUrl = config.getString("mail.linkUrl");
+        String helpLinkUrl = config.getString("helpfulLinks.url");
+        String environment = config.getString("log.environment");
+        String testMailToAddress = null;
+        if (!environment.startsWith("prod")){
+            testMailToAddress = config.getString("mail.testMailToAddress");
+        }
+        return new Mailer(resources, hostname, from, linkUrl,  helpLinkUrl, configurationMap,
+                logger, replyTo, testMailToAddress);
     }
 }

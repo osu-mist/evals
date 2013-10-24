@@ -1,33 +1,62 @@
 package edu.osu.cws.evals.portlet;
 
+import com.google.gson.Gson;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.CloseOutReasonMgr;
-import edu.osu.cws.evals.hibernate.NolijCopies;
+import edu.osu.cws.evals.hibernate.JobMgr;
+import edu.osu.cws.evals.hibernate.NolijCopyMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsPDF;
 import edu.osu.cws.evals.util.HibernateUtil;
-import org.apache.commons.configuration.CompositeConfiguration;
+import edu.osu.cws.evals.util.MailerInterface;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Session;
+import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang.math.NumberUtils;
 
 import javax.portlet.*;
+import java.io.File;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.lang.reflect.Method;
+import java.util.*;
 
 public class AppraisalsAction implements ActionInterface {
     private ActionHelper actionHelper;
 
     private HomeAction homeAction;
-    
+
+    private PortletRequest request;
+
+    private Employee loggedInUser;
+
+    private ResourceBundle resource;
+
+    private ErrorHandler errorHandler;
+
+    private Appraisal appraisal = null;
+
+    private PermissionRule permRule = null;
+
+    private String userRole;
+
+    /**
+     * Holds the structured json data that we get back from the evaluation form.
+     */
+    private AppraisalJSON jsonData = null;
+
+    /**
+     * Map that contains a map of all the assessments indexed by the assessment id. This makes
+     * it easier to search for an assessment to update. Otherwise, we'd have to search for an
+     * assessment within each goal version.
+     */
+    Map<String, Assessment> dbAssessmentsMap = null;
+
     /**
      * Handles displaying a list of pending reviews for a given business center.
      *
@@ -37,19 +66,118 @@ public class AppraisalsAction implements ActionInterface {
      * @throws Exception
      */
     public String reviewList(PortletRequest request, PortletResponse response) throws Exception {
+        initialize(request);
+
         // Check that the logged in user is admin
-        if (!actionHelper.isLoggedInUserReviewer(request)) {
-            ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        boolean isReviewer = actionHelper.getReviewer() != null;
+        if (!isReviewer) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
-        ArrayList<Appraisal> appraisals = actionHelper.getReviewsForLoggedInUser(request, -1);
-        actionHelper.addToRequestMap("appraisals", appraisals,request);
-        actionHelper.addToRequestMap("pageTitle", "pending-reviews",request);
-        actionHelper.useMaximizedMenu(request);
+        ArrayList<Appraisal> appraisals = actionHelper.getReviewsForLoggedInUser(-1);
+        actionHelper.addToRequestMap("appraisals", appraisals);
+        actionHelper.addToRequestMap("pageTitle", "pending-reviews");
+        actionHelper.useMaximizedMenu();
 
         return Constants.JSP_REVIEW_LIST;
+    }
+
+    /**
+     * Initializes some private properties common to many methods.
+     *
+     * @param request
+     * @throws Exception
+     */
+    private void initialize(PortletRequest request) throws Exception {
+        this.request = request;
+        this.resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
+        this.loggedInUser = actionHelper.getLoggedOnUser();
+        initializeAppraisal();
+    }
+
+    /**
+     * Initializes an appraisal.
+     *
+     * @throws Exception
+     */
+    private void initializeAppraisal() throws Exception {
+        int appraisalID = ParamUtil.getInteger(request, "id");
+        if (appraisalID > 0) {
+            appraisal = AppraisalMgr.getAppraisal(appraisalID);
+            if(appraisal != null) {
+                userRole = getRole();
+                // Whether or not the save draft permission rule should be disabled for results
+                Boolean disableResultsSaveDraft = appraisal.getGoalVersions().size() == 1 &&
+                        appraisal.getStatus().equals(Appraisal.STATUS_GOALS_APPROVAL_DUE) &&
+                        userRole.equals("employee");
+                setAppraisalPermissionRule();
+                appraisal.setRole(userRole);
+                appraisal.setPermissionRule(permRule);
+
+                // For the employee role, if it is the status is goals approval due and these are the
+                // original goals, the save draft button shouldn't show up. If the goals are
+                // reactivated, and the status is goals approval due, we display save draft to save
+                // the results for original goals.
+                if (permRule != null) {
+                    permRule.setDisableResultsSaveDraft(disableResultsSaveDraft);
+                }
+            }
+        }
+    }
+
+    /**
+     * Figures out the current user role in the appraisal and returns the respective permission
+     * rule for that user role and action in the appraisal.
+     *
+     * @throws Exception
+     */
+    private void setAppraisalPermissionRule() throws Exception {
+        HashMap permissionRules =
+                (HashMap) actionHelper.getPortletContext().getAttribute("permissionRules");
+        String permRuleKey = appraisal.getStatus() + "-" + userRole;
+        permRuleKey = permRuleKey.replace("Overdue", "Due");
+
+        permRule = (PermissionRule) permissionRules.get(permRuleKey);
+    }
+
+    /**
+     * Returns the role (employee, supervisor, immediate supervisor or reviewer) of
+     * the given appraisal.
+     * Return empty string if the pidm does not have any role on the appraisal.
+     *
+     * @return role
+     * @throws Exception
+     */
+    public String getRole() throws Exception {
+        int pidm = loggedInUser.getId();
+
+        if (pidm == appraisal.getJob().getEmployee().getId()) {
+            return ActionHelper.ROLE_EMPLOYEE;
+        }
+
+        Job supervisor = appraisal.getJob().getSupervisor();
+        if (supervisor != null && pidm == supervisor.getEmployee().getId()) {
+            return ActionHelper.ROLE_SUPERVISOR;
+        }
+
+        Reviewer reviewer  = actionHelper.getReviewer();
+        if (reviewer != null)
+        {
+            String bcName  = appraisal.getJob().getBusinessCenterName();
+            if (bcName.equals(reviewer.getBusinessCenterName())) {
+                return ActionHelper.ROLE_REVIEWER;
+            }
+        }
+
+        if (JobMgr.isUpperSupervisor(appraisal.getJob(), pidm)) {
+            return ActionHelper.ROLE_UPPER_SUPERVISOR;
+        }
+
+        if (actionHelper.getAdmin() != null) {
+            return ActionHelper.ROLE_ADMINISTRATOR;
+        }
+
+        return "";
     }
 
     /**
@@ -61,54 +189,50 @@ public class AppraisalsAction implements ActionInterface {
      * @throws Exception
      */
     public String search(PortletRequest request, PortletResponse response) throws Exception {
+        initialize(request);
         List<Appraisal> appraisals = new ArrayList<Appraisal>();
-        actionHelper.addToRequestMap("pageTitle", "search-results",request);
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-
-        boolean isAdmin = actionHelper.isLoggedInUserAdmin(request);
-        boolean isReviewer = actionHelper.isLoggedInUserReviewer(request);
+        actionHelper.addToRequestMap("pageTitle", "search-results");
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        boolean isReviewer = actionHelper.getReviewer() != null;
 
         // If a supervisor is also a reviewer, the people he/she supervises will be in the
         // business center he/she is a reviewer of. Because reviewer has broader permissions
         // than supervisor, we will use the reviewer's permission to do search.
-        boolean isSupervisor = !isReviewer && actionHelper.isLoggedInUserSupervisor(request);
+        boolean isSupervisor = !isReviewer && actionHelper.isLoggedInUserSupervisor();
 
         if (!isAdmin && !isReviewer && !isSupervisor)  {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            ((ActionResponse) response).setWindowState(WindowState.NORMAL);
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
-        int pidm = actionHelper.getLoggedOnUser(request).getId();
+        int pidm = loggedInUser.getId();
         String searchTerm = ParamUtil.getString(request, "searchTerm");
         if (StringUtils.isEmpty(searchTerm)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-enter-id"));
+            actionHelper.addErrorsToRequest(resource.getString("appraisal-search-enter-id"));
         } else {
             String bcName = "";
             if (isReviewer) {
-                bcName = actionHelper.getReviewer(pidm).getBusinessCenterName();
+                bcName = actionHelper.getReviewer().getBusinessCenterName();
             }
-            AppraisalMgr appraisalMgr = new AppraisalMgr();
 
             try {
-                appraisals = appraisalMgr.search(searchTerm, pidm, isAdmin, isSupervisor, bcName);
+                appraisals = AppraisalMgr.search(searchTerm, pidm, isSupervisor, bcName);
 
                 if (appraisals.isEmpty()) {
                     if (isAdmin) {
-                        actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-no-results-admin"));
+                        actionHelper.addErrorsToRequest(resource.getString("appraisal-search-no-results-admin"));
                     } else if (isReviewer) {
-                        actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-no-results-reviewer"));
+                        actionHelper.addErrorsToRequest(resource.getString("appraisal-search-no-results-reviewer"));
                     } else {
-                        actionHelper.addErrorsToRequest(request, resource.getString("appraisal-search-no-results-supervisor"));
+                        actionHelper.addErrorsToRequest(resource.getString("appraisal-search-no-results-supervisor"));
                     }
                 }
             } catch (ModelException e) {
-                actionHelper.addErrorsToRequest(request, e.getMessage());
+                actionHelper.addErrorsToRequest(e.getMessage());
             }
         }
 
-        actionHelper.addToRequestMap("appraisals", appraisals,request);
-        actionHelper.useMaximizedMenu(request);
+        actionHelper.addToRequestMap("appraisals", appraisals);
+        actionHelper.useMaximizedMenu();
 
         return Constants.JSP_REVIEW_LIST;
     }
@@ -123,83 +247,96 @@ public class AppraisalsAction implements ActionInterface {
      * @throws Exception
      */
     public String display(PortletRequest request, PortletResponse response) throws Exception {
-        Appraisal appraisal;
-        PermissionRule permRule;
-        Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser(request);
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        int userId = currentlyLoggedOnUser.getId();
-
-        int appraisalID = ParamUtil.getInteger(request, "id");
-        if (appraisalID == 0) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
-        }
-
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
-        actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
-
-        // 1) Get the appraisal and permission rule
-        appraisal = appraisalMgr.getAppraisal(appraisalID);
-        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
+        initialize(request);
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
-        String userRole = appraisalMgr.getRole(appraisal, userId);
-        appraisal.setRole(userRole);
+        actionHelper.setupMyTeamActiveAppraisals();
 
-        actionHelper.setupMyTeamActiveAppraisals(request, userId);
-        if (actionHelper.isLoggedInUserReviewer(request)) {
-            ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(request, -1);
-            actionHelper.addToRequestMap("pendingReviews", reviews, request);
+        // Check permission rules to decide which actions will be displayed
+        if(!userRole.equals(ActionHelper.ROLE_EMPLOYEE)){
+
+            if(permRule.getSendToNolij() != null){
+                ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(-1);
+                actionHelper.addToRequestMap("pendingReviews", reviews);
+                if (appraisal.getEmployeeSignedDate() != null) {
+                    actionHelper.addToRequestMap("displayResendNolij", true);
+                }
+            }
+
+            if(permRule.getCloseOut() != null){
+                actionHelper.addToRequestMap("displayCloseOutAppraisal", true);
+            }
+
+            if(permRule.getSetStatusToResultsDue() != null){
+                actionHelper.addToRequestMap("displaySetAppraisalStatus", true);
+            }
         }
 
-        if (actionHelper.isLoggedInUserReviewer(request) && appraisal.getEmployeeSignedDate() != null &&
-                !appraisal.getRole().equals("employee") && appraisal.getStatus().equals("completed")) {
-            actionHelper.addToRequestMap("displayResendNolij", true, request);
+        if(permRule.getReactivateGoals() != null){
+            actionHelper.addToRequestMap("displayReactivateGoals", true);
         }
-        if ((actionHelper.isLoggedInUserReviewer(request) || actionHelper.isLoggedInUserAdmin(request)) && appraisal.isOpen()
-                && !userRole.equals("employee")) {
-            actionHelper.addToRequestMap("displayCloseOutAppraisal", true, request);
-        }
-        String status = appraisal.getStatus();
-        if ((actionHelper.isLoggedInUserAdmin(request) || actionHelper.isLoggedInUserReviewer(request)) &&
-                status.equals(Appraisal.STATUS_GOALS_APPROVED) && !userRole.equals("employee")) {
-            actionHelper.addToRequestMap("displaySetAppraisalStatus", true, request);
+
+        if(permRule.getDownloadPDF() != null){
+            actionHelper.addToRequestMap("displayDownloadPdf", true);
         }
 
         Map Notices = (Map)actionHelper.getPortletContextAttribute("Notices");
-        actionHelper.addToRequestMap("appraisalNotice", Notices.get("Appraisal Notice"), request);
+        actionHelper.addToRequestMap("appraisalNotice", Notices.get("Appraisal Notice"));
+        appraisal.loadLazyAssociations();
 
-        // Initialze lazy appraisal associations
-        Job job = appraisal.getJob();
-        job.toString();
-        Job supervisor = job.getSupervisor();
-        if (supervisor != null && supervisor.getEmployee() != null) {
-            supervisor.getEmployee().toString();
-        }
-        if (job.getEmployee() != null) {
-            job.getEmployee().toString();
-        }
-        if (appraisal.getCloseOutReason() != null) {
-            appraisal.getCloseOutReason().getReason();
-        }
-        appraisal.getSortedAssessments().size();
-        for (Assessment assessment : appraisal.getAssessments()) {
-            assessment.getCriterionDetail().getAreaID();
-        }
-        // End of initialize lazy appraisal associations
+        actionHelper.addToRequestMap("appraisal", appraisal);
+        actionHelper.addToRequestMap("permissionRule", permRule);
+        actionHelper.useMaximizedMenu();
 
-        actionHelper.addToRequestMap("appraisal", appraisal,request);
-        actionHelper.addToRequestMap("permissionRule", permRule,request);
-        actionHelper.useMaximizedMenu(request);
+        if (appraisal.getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
+            setSalaryValues();
+        }
 
         return Constants.JSP_APPRAISAL;
     }
 
+    /**
+     * Sets for the jsp the salary range values for Classified IT evaluations. The range and fixed
+     * increase values depend on whether or not the current salary is above or below the control
+     * point.
+     */
+    private void setSalaryValues() {
+        Map<String, String> salaryValidationValues = getSalaryValidationValues();
+
+        actionHelper.addToRequestMap("increaseRate2Value", salaryValidationValues.get("increaseRate2Value"));
+        actionHelper.addToRequestMap("increaseRate1MinVal", salaryValidationValues.get("increaseRate1MinVal"));
+        actionHelper.addToRequestMap("increaseRate1MaxVal", salaryValidationValues.get("increaseRate1MaxVal"));
+    }
+
+    /**
+     * Returns a map with the correct salary increase validation values depending on whether or not
+     * the current salary is above or below the midpoint.
+     *
+     * @return
+     */
+    private Map<String, String> getSalaryValidationValues() {
+        Map<String, String> salaryValidationValues = new HashMap<String, String>();
+        String aboveOrBelow = "below";
+        if (appraisal.getSalary().getCurrent() > appraisal.getSalary().getMidPoint()) {
+            aboveOrBelow = "above";
+        }
+
+        Map<String, Configuration> configurationMap =
+                (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
+        String increaseRate2Value = configurationMap.get("IT-increase-rate2-" + aboveOrBelow + "-control-value").getValue();
+        String increaseRate1MinVal = configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-min-value").getValue();
+        String increaseRate1MaxVal= configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-max-value").getValue();
+
+        salaryValidationValues.put("increaseRate2Value", increaseRate2Value);
+        salaryValidationValues.put("increaseRate1MinVal", increaseRate1MinVal);
+        salaryValidationValues.put("increaseRate1MaxVal", increaseRate1MaxVal);
+
+        return salaryValidationValues;
+    }
 
     /**
      * Handles updating the appraisal form.
@@ -210,52 +347,30 @@ public class AppraisalsAction implements ActionInterface {
      * @throws Exception
      */
     public String update(PortletRequest request, PortletResponse response) throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
-        CompositeConfiguration config;
-        int id = ParamUtil.getInteger(request, "id", 0);
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (id == 0) {
-            actionHelper.addErrorsToRequest(request, resource.getString("appraisal-no-found"));
-            return homeAction.display(request, response);
-        }
-
-        Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser(request);
-        actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
-        Appraisal appraisal = (Appraisal) session.get(Appraisal.class, id);
-        PermissionRule permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
+        initialize(request);
+        boolean isReviewer = actionHelper.getReviewer() != null;
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
-            SessionErrors.add(request, "You do  not have permission to view the appraisal");
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
+        PropertiesConfiguration config;
         try {
-            appraisalMgr.processUpdateRequest(request.getParameterMap(), appraisal, permRule);
+            processUpdateRequest(request.getParameterMap());
 
             String signAppraisal = ParamUtil.getString(request, "sign-appraisal");
             if (signAppraisal != null && !signAppraisal.equals("")) {
-                config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
+                config = actionHelper.getEvalsConfig();
                 String nolijDir = config.getString("pdf.nolijDir");
                 String env = config.getString("pdf.env");
-                createNolijPDF(appraisal, nolijDir, env, appraisalMgr);
+                GeneratePDF(appraisal, nolijDir, env, true);
             }
 
-
-            // Creates the first annual appraisal if needed
-            Map<String, Configuration> configurationMap =
-                    (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
-            Configuration resultsDueConfig = configurationMap.get(Appraisal.STATUS_RESULTS_DUE);
-            String action = "";
-            if (signAppraisal != null && !signAppraisal.equals("")) {
-                action = "sign-appraisal";
-            }
-
-            if (appraisal.getRole().equals("supervisor")) {
-                actionHelper.setupMyTeamActiveAppraisals(request, currentlyLoggedOnUser.getId());
-            } else if (appraisal.getRole().equals("employee")) {
-                actionHelper.setupMyActiveAppraisals(request, currentlyLoggedOnUser.getId());
+            if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR)) {
+                actionHelper.setupMyTeamActiveAppraisals();
+            } else if (appraisal.getRole().equals(ActionHelper.ROLE_EMPLOYEE)) {
+                actionHelper.setupMyActiveAppraisals();
             }
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
@@ -269,41 +384,546 @@ public class AppraisalsAction implements ActionInterface {
             if (response instanceof ActionResponse) {
                 ((ActionResponse) response).setWindowState(WindowState.MAXIMIZED);
             }
+
+            // remove the object from session so that display picks up new assessment associations
+            HibernateUtil.getCurrentSession().flush();
+            HibernateUtil.getCurrentSession().clear();
             return display(request, response);
         }
 
         String status = appraisal.getStatus();
         String[] afterReviewStatus = {Appraisal.STATUS_RELEASE_DUE, Appraisal.STATUS_RELEASE_OVERDUE,
                 Appraisal.STATUS_CLOSED};
-        if (ArrayUtils.contains(afterReviewStatus, status)
-                && actionHelper.isLoggedInUserReviewer(request)) {
-            actionHelper.removeReviewAppraisalInSession(request, appraisal);
+        if (ArrayUtils.contains(afterReviewStatus, status) && isReviewer) {
+            removeReviewAppraisalInSession();
         } else {
-            updateAppraisalInSession(request, appraisal);
+            updateAppraisalInSession();
         }
 
         return homeAction.display(request, response);
     }
 
-    private void createNolijPDF(Appraisal appraisal, String dirName, String env,
-                                AppraisalMgr appraisalMgr) throws Exception {
-        // 1) Compose a file name
-        CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
-        String filename = EvalsPDF.getNolijFileName(appraisal, dirName, env);
+    /**
+     * Handles removing an appraisal from the reviewList stored in session. This method is called
+     * by the AppraisalsAction.update method after a reviewer submits a review.
+     *
+     * @throws Exception
+     */
+    private void removeReviewAppraisalInSession() throws Exception {
+        List<Appraisal> reviewList = actionHelper.getReviewsForLoggedInUser(-1);
+        List<Appraisal> tempList = new ArrayList<Appraisal>();
+        tempList.addAll(reviewList);
+        for (Appraisal appraisalInSession: tempList) {
+            if (appraisalInSession.getId() == appraisal.getId()) {
+                reviewList.remove(appraisalInSession);
+                break;
+            }
+        }
 
-        // 2) Grab the permissionRule
-        PermissionRule permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
-
-        // 2) Create PDF
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-
-        String rootDir = actionHelper.getPortletContext().getRealPath("/");
-        EvalsPDF.createPDF(appraisal, permRule, filename, resource, rootDir);
-
-        // 3) Insert a record into the nolij_copies table
-        String onlyFilename = filename.replaceFirst(dirName, "");
-        NolijCopies.add(appraisal.getId(), onlyFilename);
+        PortletSession session = request.getPortletSession(true);
+        session.setAttribute("reviewList", reviewList);
     }
+
+    /**
+     * Processes the processAction request (Map) and tries to save the appraisal. This method
+     * moves the appraisal to the next appraisal step and sends any emails if necessary.
+     *
+     * @param requestMap
+     * @throws Exception
+     */
+    private void processUpdateRequest(Map<String, String[]> requestMap) throws Exception {
+        HashMap appraisalSteps = (HashMap) actionHelper.getPortletContextAttribute("appraisalSteps");
+        MailerInterface mailer = (MailerInterface) actionHelper.getPortletContextAttribute("mailer");
+
+        // set the overdue value before updating the status
+        String beforeUpdateStatus = appraisal.getStatus();
+        Integer oldOverdue = appraisal.getOverdue();
+
+        // update appraisal & assessment fields based on permission rules
+        initializeJSONData(requestMap);
+        setAppraisalFields();
+
+        boolean statusChanged = !appraisal.getStatus().equals(beforeUpdateStatus);
+        if (statusChanged) {
+            // Using the old status value call setStatusOverdue()
+            String overdueMethod = StringUtils.capitalize(beforeUpdateStatus);
+            overdueMethod = "set" + overdueMethod.replace("Due", "Overdue");
+            try {
+                // call setStageOverdue method
+                Method controllerMethod = appraisal.getClass()
+                        .getDeclaredMethod(overdueMethod, Integer.class);
+                controllerMethod.invoke(appraisal, oldOverdue);
+            } catch (NoSuchMethodException e) {
+                // don't do anything since some methods might not exist.
+            }
+
+            appraisal.setOverdue(-999);
+        }
+
+        // save changes to db
+        AppraisalMgr.updateAppraisal(appraisal, loggedInUser);
+
+        // Send email if needed
+        AppraisalStep appraisalStep;
+        String employeeResponse = appraisal.getRebuttal();
+
+        // If the employee signs and provides a rebuttal, we want to use a different
+        // appraisal step so that we can send an email to the reviewer.
+        if (submittedRebuttal(employeeResponse)) {
+            String appraisalStepKey = "submit-response-" + appraisal.getAppointmentType();
+            appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
+            // If the appointment type doesn't exist in the table, use "Default" type.
+            if (appraisalStep == null) {
+                appraisalStep = (AppraisalStep) appraisalSteps.get("submit-response-Default");
+            }
+        } else {
+            appraisalStep = getAppraisalStep();
+        }
+
+        EmailType emailType = null;
+        if (appraisalStep != null) {
+            emailType = appraisalStep.getEmailType();
+        }
+
+        if (emailType != null) {
+            mailer.sendMail(appraisal, emailType);
+        }
+    }
+
+    /**
+     * Takes the request map that we get from the user saving or submitting the evaluation form.
+     * It parses the json data and sets up the structured json data to use. It also initializes
+     * dbAssessmentsMap.
+     *
+     * @param requestMap
+     */
+    private void initializeJSONData(Map<String, String[]> requestMap) {
+        String jsonText = "{}";
+        if (requestMap.get("json_data") != null) {
+            jsonText = requestMap.get("json_data")[0];
+        }
+
+        Gson gson = new Gson();
+        jsonData = gson.fromJson(jsonText, AppraisalJSON.class);
+
+        dbAssessmentsMap = appraisal.getAssessmentMap();
+    }
+
+    /**
+     * Handles updating the appraisal fields in the appraisal and assessment objects.
+     *
+     */
+    public void setAppraisalFields() throws Exception {
+        String newStatus = null;
+        Map<String, Boolean> dates = new HashMap<String, Boolean>();
+        Map<String, Boolean> pidm = new HashMap<String, Boolean>();
+        boolean clickedSubmitButton = jsonData.getButtonClicked().equals(permRule.getSubmit());
+
+        if (permRule.canEdit("goalComments")) { // Save goalComments
+            appraisal.setGoalsComments(jsonData.getGoalsComments());
+        }
+
+        // updates goals, employee/supervisor results and handle new js goals
+        setAssessmentFields();
+
+        if (jsonData.getButtonClicked().equals("approve-goals")) {
+            appraisal.getUnapprovedGoalsVersion().approveEmployeeGoals(loggedInUser.getId());
+        }
+
+        if (jsonData.getButtonClicked().equals("submit-goals")) {
+            appraisal.getUnapprovedGoalsVersion().setGoalsSubmitDate(new Date());
+        }
+
+        if (permRule.canEdit("evaluation")) { // Save evaluation
+            appraisal.setEvaluation(jsonData.getEvaluation());
+            appraisal.setRating(jsonData.getRating());
+            pidm.put("evaluator", clickedSubmitButton);
+            dates.put("evaluationSubmitDate", clickedSubmitButton);
+
+            if (appraisal.getIsSalaryUsed()) {
+                saveRecommendedIncrease(jsonData);
+            }
+        }
+
+        if (permRule.canEdit("review")) { // Save review
+            appraisal.setReview(jsonData.getReview());
+            pidm.put("reviewer", clickedSubmitButton);
+            dates.put("reviewSubmitDate", clickedSubmitButton);
+        }
+
+        if (permRule.canEdit("employeeResponse")) { // Save employee response
+            appraisal.setRebuttal(jsonData.getRebuttal());
+            String employeeResponse = appraisal.getRebuttal();
+            dates.put("rebuttalDate", submittedRebuttal(employeeResponse));
+        }
+
+
+        // Save the close out reason
+        if (appraisal.getRole().equals(ActionHelper.ROLE_REVIEWER) ||
+                appraisal.getRole().equals(ActionHelper.ROLE_ADMINISTRATOR )) {
+            if (jsonData.getCloseOutReasonId() != null) {
+                CloseOutReason reason = CloseOutReasonMgr.get(jsonData.getCloseOutReasonId());
+                appraisal.setCloseOutReason(reason);
+                appraisal.setOriginalStatus(appraisal.getStatus());
+                dates.put("closeOutDate", true);
+                pidm.put("closeOutBy", true);
+            }
+        }
+
+        // Approve/Deny Goals Reactivation
+        if (permRule.getSubmit() != null && permRule.getSecondarySubmit() != null) {
+            if (permRule.getSubmit().equals("approve-goals-reactivation") ||
+                    permRule.getSecondarySubmit().equals("deny-goals-reactivation")) {
+                reactivationGoals(jsonData.getButtonClicked());
+            }
+        }
+
+        // If the appraisalStep object has a new status, update the appraisal object
+        AppraisalStep appraisalStep = getAppraisalStep();
+        if (appraisalStep != null) {
+            newStatus = appraisalStep.getNewStatus();
+        }
+
+        if (newStatus != null && !newStatus.equals(appraisal.getStatus())) {
+            appraisal.setStatus(newStatus);
+            String employeeResponse = appraisal.getRebuttal();
+            if (submittedRebuttal(employeeResponse)) {
+                appraisal.setStatus(Appraisal.STATUS_REBUTTAL_READ_DUE);
+            }
+        }
+        dates.put("goalsRequiredModificationDate", appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION));
+
+        saveAppraisalMetadata(dates, pidm);
+    }
+
+    /**
+     * Sets the assessment fields (goal & results) based on the information that the user entered
+     * in the form. It addAssessments to handle adding/deleting of goals.
+     *
+     * @throws Exception
+     */
+    private void setAssessmentFields() throws Exception {
+        if (jsonData.getAssessments() == null) { // if there are no assessments, exit
+            return;
+        }
+
+        // get the criteria we need for adding new goals via js
+        Assessment assessment = dbAssessmentsMap.entrySet().iterator().next().getValue();
+        List<AssessmentCriteria> sortedAssessmentCriteria = assessment.getSortedAssessmentCriteria();
+        List<CriterionArea> criterionAreas = new ArrayList<CriterionArea>();
+        for (AssessmentCriteria assessmentCriteria : sortedAssessmentCriteria) {
+            criterionAreas.add(assessmentCriteria.getCriteriaArea());
+        }
+
+        Integer nextSequence = calculateAssessmentSequence(dbAssessmentsMap);
+        for (AssessmentJSON assessmentJSON : jsonData.getAssessments().values())   {
+            assessment = dbAssessmentsMap.get(assessmentJSON.getId().toString());
+
+            if (permRule.canEdit("unapprovedGoals")) { // Save Goals
+                Assessment jsAssessment = addAssessments(assessmentJSON , assessment, nextSequence,
+                        criterionAreas);
+
+                // if a new goal was added via js, keep track of it
+                if (jsAssessment != null) {
+                    nextSequence++;
+                    assessment = jsAssessment;
+                }
+            }
+
+            // Save employee results
+            if (permRule.canEdit("results") && assessmentJSON.getEmployeeResult() != null) {
+                assessment.setEmployeeResult(assessmentJSON.getEmployeeResult());
+            }
+
+            // Save supervisor results
+            if (permRule.canEdit("supervisorResults") && assessmentJSON.getSupervisorResult() != null) {
+                assessment.setSupervisorResult(assessmentJSON.getSupervisorResult());
+            }
+        }
+    }
+
+    /**
+     * Saves metadata information in the Appraisal object. The metadata that we save is either
+     * date values or PIDMs. Instead of calling each one of the setData or setPidm columns
+     * indidivually, we use this method to call them.
+     *
+     * @param dates
+     * @param pidm
+     * @throws Exception
+     */
+    private void saveAppraisalMetadata(Map<String, Boolean> dates,
+                                       Map<String, Boolean> pidm) throws Exception {
+        // The pidms and dates fields that are set to true will get set by the for loops below.
+        String buttonClicked = jsonData.getButtonClicked();
+        dates.put("releaseDate", buttonClicked.equals("release-appraisal"));
+        dates.put("resultSubmitDate", permRule.canEdit("results") && buttonClicked.equals("submit-results"));
+        dates.put("supervisorRebuttalRead", permRule.canEdit("rebuttalRead") && buttonClicked.equals("read-appraisal-rebuttal"));
+        dates.put("employeeSignedDate", permRule.canEdit("employeeResponse") && buttonClicked.equals("sign-appraisal"));
+
+        for (String fieldName : dates.keySet()) {
+            if (!dates.get(fieldName)) {
+                continue;
+            }
+
+            String methodName = "set" + WordUtils.capitalize(fieldName);
+            Method permissionMethod = appraisal.getClass().getDeclaredMethod(methodName, Date.class);
+            permissionMethod.invoke(appraisal, new Date());
+        }
+
+        for (String fieldName : pidm.keySet()) {
+            if (!pidm.get(fieldName)) {
+                continue;
+            }
+
+            String methodName = "set" + WordUtils.capitalize(fieldName);
+            Method permissionMethod = appraisal.getClass().getDeclaredMethod(methodName, Employee.class);
+            permissionMethod.invoke(appraisal, loggedInUser);
+        }
+    }
+
+    /**
+     * Returns the sequence to assign to the next goal added via js.
+     *
+     * @param dbAssessmentsMap
+     * @return
+     */
+    private Integer calculateAssessmentSequence(Map<String, Assessment> dbAssessmentsMap) {
+        Integer nextSequence = 0;
+        for (Map.Entry<String, Assessment> entry : dbAssessmentsMap.entrySet()) {
+            Assessment assessment = entry.getValue();
+            if (assessment.getSequence() > nextSequence) {
+                nextSequence = assessment.getSequence();
+            }
+        }
+        return nextSequence + 1;
+    }
+
+    /**
+     * Handles approving/denying goals reactivation request.
+     *
+     * @param buttonClicked
+     * @throws Exception
+     */
+    private void reactivationGoals(String buttonClicked) throws Exception {
+        Boolean goalReactivationDecision = null;
+        if (buttonClicked.equals("approve-goals-reactivation")) {
+            goalReactivationDecision = true;
+        } else if (buttonClicked.equals("deny-goals-reactivation")) {
+            goalReactivationDecision = false;
+        }
+
+        GoalVersion unapprovedGoalsVersion = appraisal.getRequestPendingGoalsVersion();
+        if (goalReactivationDecision != null && unapprovedGoalsVersion != null) {
+            unapprovedGoalsVersion.setRequestDecisionPidm(loggedInUser.getId());
+            unapprovedGoalsVersion.setRequestDecision(goalReactivationDecision);
+            unapprovedGoalsVersion.setRequestDecisionDate(new Date());
+            if (goalReactivationDecision) {
+                AppraisalMgr.addAssessmentForGoalsReactivation(unapprovedGoalsVersion, appraisal);
+            }
+        }
+    }
+
+
+    /**
+     * Updates the goals text and criteria checkboxes that the user entered in the form.
+     *
+     * @param assessmentJSON
+     * @param assessment
+     * @param deleted
+     */
+    private void updateGoals(AssessmentJSON assessmentJSON, Assessment assessment, Boolean deleted) {
+        if (appraisal.getUnapprovedGoalsVersion() == null) {
+            return; // if there isn't an unapproved goals versions exit
+        }
+
+        if (deleted) { // Save the deleted flag if present
+            assessment.setDeleteDate(new Date());
+            assessment.setDeleterPidm(loggedInUser.getId());
+        }
+
+        // Save goal
+        if (assessmentJSON.getGoal() != null) {
+            assessment.setGoal(assessmentJSON.getGoal());
+        }
+
+        // Save criteria checkboxes
+        Integer checkboxIndex = 1;
+        LinkedHashMap criteriaMap = (LinkedHashMap) assessmentJSON.getCriteria();
+        for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
+            Integer id = assessmentCriteria.getId();
+            if (id == null) {
+                id = checkboxIndex;
+                checkboxIndex++;
+            }
+            boolean checked = (Boolean) criteriaMap.get(id);
+            assessmentCriteria.setChecked(checked);
+        }
+    }
+
+    /**
+     * Whether the given assessment id is from an assessment added via js. JS added assessments
+     * have an id starting at 1. This id is always less than the id of the appraisal. Assessments
+     * in the db have an id greater than the appraisal id.
+     *
+     * @param assessmentId
+     * @return
+     */
+    private boolean isJSAssessment(Integer assessmentId) {
+        return assessmentId < 500 && assessmentId < appraisal.getId();
+    }
+
+
+    /**
+     * Handles adding/deleting goals based on the operations the user performed via js.
+     *
+     * @param jsonAssessment
+     * @param assessment
+     * @param nextSequence
+     * @param criterionAreas
+     * @return
+     */
+    private Assessment addAssessments(AssessmentJSON jsonAssessment, Assessment assessment,
+                               int nextSequence, List<CriterionArea> criterionAreas) {
+        GoalVersion reactivatedGoalVersion = appraisal.getReactivatedGoalVersion();
+
+        // If there's no reactivated goal version, we're adding goals to the first goal version
+        if (reactivatedGoalVersion == null) {
+            reactivatedGoalVersion = (GoalVersion) appraisal.getGoalVersions().toArray()[0];
+        }
+
+        boolean deleted = jsonAssessment.getDeleted().equals("1");
+        boolean jsAssessment = isJSAssessment(jsonAssessment.getId());
+
+        if (jsAssessment && !deleted) { // new assessments added via js
+            // create new assessment object
+            assessment = AppraisalMgr.createNewAssessment(reactivatedGoalVersion, nextSequence ,criterionAreas);
+        }
+
+        // only update the goals if the assessment is js and not deleted or it's from the db
+        if ((jsAssessment && !deleted) || !jsAssessment) {
+            updateGoals(jsonAssessment, assessment, deleted);
+        }
+
+        // If there was a new assessment/goal added via js, return it.
+        if (jsAssessment && !deleted) {
+            return assessment;
+        }
+
+        return null;
+    }
+
+    /**
+     * Saves the rating on the salary object based on the rating the user selected:
+     * Rating 1 -   the user can specify a value within a range (min & max values are in configuration
+     *              table. If the current salary is at the top of the pay range, the increase is set to 0.
+     * Rating 2 -   the increase is set automatically by a configuration value
+     * Rating 3 -   the increase is set to 0
+     *
+     * The allowed range for rating 1 and fixed value for rating 2 depend on whether or not the
+     * current salary is above or below the control point.
+     *
+     * @param jsonData
+     */
+    private void saveRecommendedIncrease(AppraisalJSON jsonData) throws ModelException {
+        // get the salary validation values. They change depending on whether current salary is
+        // above or below the midpoint
+        Map<String, String> salaryValidationValues = getSalaryValidationValues();
+        Double increaseRate2Value = Double.parseDouble(salaryValidationValues.get("increaseRate2Value"));
+        Double increaseRate1MinVal = Double.parseDouble(salaryValidationValues.get("increaseRate1MinVal"));
+        Double increaseRate1MaxVal= Double.parseDouble(salaryValidationValues.get("increaseRate1MaxVal"));
+
+        Salary salary = appraisal.getSalary();
+        Double increaseValue = 0d;
+        if (appraisal.getRating() == 1) {
+            // can only specify an increase if the salary is not at the top pay range
+            if (salary.getCurrent() < salary.getHigh()) {
+                String salaryRecommendation = jsonData.getSalaryRecommendation();
+                // Check that the user submitted a valid salary increase
+                if (salaryRecommendation == null || !NumberUtils.isNumber(salaryRecommendation)) {
+                    return;
+                }
+
+                Double submittedIncrease = Double.parseDouble(salaryRecommendation);
+                if (submittedIncrease >= increaseRate1MinVal && submittedIncrease <= increaseRate1MaxVal) {
+                    increaseValue = submittedIncrease;
+                } else {
+                    throw new ModelException(resource.getString("appraisal-salary-increase-error-invalid-change"));
+                }
+            }
+        } else if (appraisal.getRating() == 2) {
+            increaseValue = increaseRate2Value;
+        }
+
+        salary.setIncrease(increaseValue);
+    }
+
+    /**
+     * Figures out the appraisal step key for the button that the user pressed when the appraisal
+     * form was submitted.
+     *
+     * @return
+     */
+    private AppraisalStep getAppraisalStep() {
+        HashMap appraisalSteps = (HashMap) actionHelper.getPortletContextAttribute("appraisalSteps");
+        AppraisalStep appraisalStep;
+        String appraisalStepKey;
+        ArrayList<String> appraisalButtons = new ArrayList<String>();
+        if (permRule.getSaveDraft() != null) {
+            appraisalButtons.add(permRule.getSaveDraft());
+        }
+        if (permRule.getSecondarySubmit() != null) {
+            appraisalButtons.add(permRule.getSecondarySubmit());
+        }
+        if (permRule.getSubmit() != null) {
+            appraisalButtons.add(permRule.getSubmit());
+        }
+        // close out button
+        appraisalButtons.add("close-appraisal");
+
+        for (String button : appraisalButtons) {
+            // If this button is the one the user clicked, use it to look up the
+            // appraisalStepKey
+            if (jsonData.getButtonClicked().equals(button)) {
+                appraisalStepKey = button + "-" + appraisal.getAppointmentType();
+                appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
+                // If the appointment type doesn't exist in the table, use "Default" type.
+                if (appraisalStep == null) {
+                    return (AppraisalStep) appraisalSteps.get(button + "-" + "Default");
+                }
+                return appraisalStep;
+            }
+        }
+
+        return null;
+    }
+
+    private String GeneratePDF(Appraisal appraisal, String dirName, String env,
+                               boolean  insertRecordIntoTable) throws Exception {
+        // Create PDF
+        String rootDir = actionHelper.getPortletContext().getRealPath("/");
+        EvalsPDF PdfGenerator = new EvalsPDF(rootDir, appraisal, resource, dirName, env);
+        String filename = PdfGenerator.createPDF();
+
+        // Insert a record into the nolij_copies table
+        if (insertRecordIntoTable) {
+            String onlyFilename = filename.replaceFirst(dirName, "");
+            NolijCopyMgr.add(appraisal.getId(), onlyFilename);
+        }
+
+        return filename;
+    }
+
+    /**
+     * Specifies whether or not the employee submitted a rebuttal when the appraisal was signed.
+     *
+     * @param employeeResponse
+     * @return
+     */
+    private boolean submittedRebuttal(String employeeResponse) {
+        return jsonData.getButtonClicked().equals("sign-appraisal") &&
+                employeeResponse != null && !employeeResponse.equals("");
+    }
+
 
     /**
      * Allows the end user to download a PDF copy of the appraisal
@@ -314,43 +934,21 @@ public class AppraisalsAction implements ActionInterface {
      * @throws Exception
      */
     public String downloadPDF(PortletRequest request, PortletResponse response) throws Exception {
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
-        Appraisal appraisal;
-        PermissionRule permRule;
-
-        int appraisalID = ParamUtil.getInteger(request, "id");
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (appraisalID == 0) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
-        }
-        Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser(request);
-        actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
-
-        // 1) Get the appraisal and permission rule
-        appraisal = appraisalMgr.getAppraisal(appraisalID);
-        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
+        initialize(request);
 
         // Check to see if the logged in user has permission to access the appraisal
         if (permRule == null) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
-        int userId = currentlyLoggedOnUser.getId();
-        String userRole = appraisalMgr.getRole(appraisal, userId);
-        appraisal.setRole(userRole);
-
         // 2) Compose a file name
-        CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
+        PropertiesConfiguration config = actionHelper.getEvalsConfig();
         String tmpDir = config.getString("pdf.tmpDir");
-        String filename = EvalsPDF.getNolijFileName(appraisal, tmpDir, "dev2");
 
-        // 3) Create PDF
-        String rootDir = actionHelper.getPortletContext().getRealPath("/");
-        EvalsPDF.createPDF(appraisal, permRule, filename, resource, rootDir);
+        // 2) Create PDF
+        String filename = GeneratePDF(appraisal, tmpDir, "dev2", false);
 
-        // 4) Read the PDF file and provide to the user as attachment
+        // 3) Read the PDF file and provide to the user as attachment
         if (response instanceof ResourceResponse) {
             String title = appraisal.getJob().getJobTitle().replace(" ", "_");
             String employeeName = appraisal.getJob().getEmployee().getName().replace(" ", "_");
@@ -375,10 +973,10 @@ public class AppraisalsAction implements ActionInterface {
             in.close();
             out.close();
 
-            // 5) Delete the temp PDF file generated
-            EvalsPDF.deletePDF(filename);
+            // 4) Delete the temp PDF file generated
+            File pdfFile = new File(filename);
+            pdfFile.delete();
         }
-
         return null;
     }
 
@@ -386,18 +984,15 @@ public class AppraisalsAction implements ActionInterface {
      * This method updates the status of the appraisal in myTeam or myStatus to reflect the
      * changes from the update method.
      *
-     * @param request       PortletRequest
-     * @param appraisal     appraisal to update in session
      * @throws Exception
      */
-    public void updateAppraisalInSession(PortletRequest request, Appraisal appraisal) throws Exception {
+    private void updateAppraisalInSession() throws Exception {
         List<Appraisal>  appraisals;
-        Employee loggedOnUser = actionHelper.getLoggedOnUser(request);
-        int employeeId = loggedOnUser.getId();
+
         if (appraisal.getRole().equals("employee")) {
-            appraisals = actionHelper.getMyActiveAppraisals(request, employeeId);
+            appraisals = actionHelper.getMyActiveAppraisals();
         } else if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR)) {
-            appraisals = actionHelper.getMyTeamActiveAppraisals(request, employeeId);
+            appraisals = actionHelper.getMyTeamActiveAppraisals();
         } else {
             return;
         }
@@ -410,7 +1005,7 @@ public class AppraisalsAction implements ActionInterface {
         }
     }
 
-        /**
+    /**
      * Sends the appraisal to NOLIJ. This is only allowed to reviewers and does not check whether or not
      * the appraisal has been sent to nolij before. It calls createNolijPDF to do the work.
      *
@@ -420,48 +1015,31 @@ public class AppraisalsAction implements ActionInterface {
      * @throws Exception
      */
     public String resendAppraisalToNolij(PortletRequest request, PortletResponse response) throws Exception {
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
-        Appraisal appraisal;
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
+        initialize(request);
 
-        int appraisalID = ParamUtil.getInteger(request, "id");
-        if (appraisalID == 0) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
-        }
-        Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser(request);
-        actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
-
-        // 1) Get the appraisal and permission rule
-        appraisal = appraisalMgr.getAppraisal(appraisalID);
-        appraisal.setRole(appraisalMgr.getRole(appraisal, currentlyLoggedOnUser.getId()));
-
+        boolean isReviewer = actionHelper.getReviewer() != null;
         // Permission checks
-        if (!actionHelper.isLoggedInUserReviewer(request)
+        if (!isReviewer
                 || appraisal.getEmployeeSignedDate() == null
                 || appraisal.getRole().equals("employee")
                 || !appraisal.getStatus().equals("completed"))
         {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
-        int userId = currentlyLoggedOnUser.getId();
-        String userRole = appraisalMgr.getRole(appraisal, userId);
-        appraisal.setRole(userRole);
+        actionHelper.addToRequestMap("id", appraisal.getId());
 
-        actionHelper.addToRequestMap("id", appraisal.getId(),request);
-        if (!actionHelper.isLoggedInUserReviewer(request)) {
+        if (!isReviewer) {
             String errorMsg = resource.getString("appraisal-resend-permission-denied");
-            actionHelper.addErrorsToRequest(request, errorMsg);
+            actionHelper.addErrorsToRequest(errorMsg);
             return display(request, response);
         }
 
         // If there is a problem, createNolijPDF will throw an exception
-        CompositeConfiguration config = (CompositeConfiguration) actionHelper.getPortletContextAttribute("environmentProp");
+        PropertiesConfiguration config = actionHelper.getEvalsConfig();
         String nolijDir = config.getString("pdf.nolijDir");
         String env = config.getString("pdf.env");
-        createNolijPDF(appraisal, nolijDir, env, appraisalMgr);
+        GeneratePDF(appraisal, nolijDir, env, true);
 
         SessionMessages.add(request, "appraisal-sent-to-nolij-success");
 
@@ -478,39 +1056,21 @@ public class AppraisalsAction implements ActionInterface {
      * @throws Exception
      */
     public String closeOutAppraisal(PortletRequest request, PortletResponse response) throws Exception {
-        Appraisal appraisal;
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
-        PermissionRule permRule;
-        Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser(request);
-        int userId = currentlyLoggedOnUser.getId();
-
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        int appraisalID = ParamUtil.getInteger(request, "id");
-        if (appraisalID == 0) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
-        }
-
-        actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
-
-        // 1) Get the appraisal, permission rule and userRole
-        appraisal = appraisalMgr.getAppraisal(appraisalID);
-        permRule = appraisalMgr.getAppraisalPermissionRule(appraisal);
-        String userRole = appraisalMgr.getRole(appraisal, userId);
+        initialize(request);
 
         // Check to see if the logged in user has permission to access the appraisal
-        boolean isAdminOrReviewer = userRole.equals("admin") || userRole.equals("reviewer");
+        boolean isAdminOrReviewer = userRole.equals(ActionHelper.ROLE_ADMINISTRATOR )
+                || userRole.equals(ActionHelper.ROLE_REVIEWER);
         if (permRule == null || !isAdminOrReviewer) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         List<CloseOutReason> reasonList = CloseOutReasonMgr.list(false);
         appraisal.getJob().getEmployee().toString();
 
-        actionHelper.addToRequestMap("reasonsList", reasonList,request);
-        actionHelper.addToRequestMap("appraisal", appraisal,request);
-        actionHelper.useMaximizedMenu(request);
+        actionHelper.addToRequestMap("reasonsList", reasonList);
+        actionHelper.addToRequestMap("appraisal", appraisal);
+        actionHelper.useMaximizedMenu();
 
         return Constants.JSP_APPRAISAL_CLOSEOUT;
     }
@@ -523,28 +1083,13 @@ public class AppraisalsAction implements ActionInterface {
      * @return
      * @throws Exception
      */
-    public String setStatusToResultsDue(PortletRequest request, PortletResponse response) throws Exception {
-        Appraisal appraisal;
-        AppraisalMgr appraisalMgr = new AppraisalMgr();
-        Employee currentlyLoggedOnUser = actionHelper.getLoggedOnUser(request);
-        int userId = currentlyLoggedOnUser.getId();
+    public String setStatusToResultsDue(PortletRequest request, PortletResponse response)
+            throws Exception {
+        initialize(request);
 
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        int appraisalID = ParamUtil.getInteger(request, "id");
-        if (appraisalID == 0) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
-        }
-
-        actionHelper.setAppraisalMgrParameters(currentlyLoggedOnUser, appraisalMgr);
-
-        // 1) Get the appraisal and role
-        appraisal = appraisalMgr.getAppraisal(appraisalID);
-        String userRole = appraisalMgr.getRole(appraisal, userId);
-        appraisal.setRole(userRole);
-        if (!userRole.equals("admin") && !userRole.equals(ActionHelper.ROLE_REVIEWER)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        if (!userRole.equals(ActionHelper.ROLE_ADMINISTRATOR ) &&
+                !userRole.equals(ActionHelper.ROLE_REVIEWER)) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         if (request instanceof ActionRequest && response instanceof ActionResponse) {
@@ -558,6 +1103,41 @@ public class AppraisalsAction implements ActionInterface {
         return homeAction.display(request, response);
     }
 
+    public String requestGoalsReactivation(PortletRequest request, PortletResponse response)
+            throws Exception{
+        initialize(request);
+
+        // Check to see if the logged in user has permission to access the appraisal
+        // Check that user making request is employee & status is goals approved
+        if (permRule == null || !userRole.equals(ActionHelper.ROLE_EMPLOYEE) ||
+                !appraisal.getStatus().equals(Appraisal.STATUS_GOALS_APPROVED)) {
+            return errorHandler.handleAccessDenied(request, response);
+        }
+
+        HashMap<String,AppraisalStep> appraisalSteps =
+                (HashMap) actionHelper.getPortletContextAttribute("appraisalSteps");
+        AppraisalStep appraisalStep = appraisalSteps.get("request-goals-reactivation-Default");
+
+        // update status
+        appraisal.setOriginalStatus(appraisal.getStatus());
+        appraisal.setStatus(appraisalStep.getNewStatus());
+        AppraisalMgr.updateAppraisalStatus(appraisal);
+        SessionMessages.add(request, "appraisal-goals-reactivation-requested");
+
+        // send email to supervisor
+        MailerInterface mailer = (MailerInterface) actionHelper.getPortletContextAttribute("mailer");
+        EmailType emailType = appraisalStep.getEmailType();
+        mailer.sendMail(appraisal, emailType); // relies on status so, we need status set first
+
+        // create goalVersion pojo && associate it
+        AppraisalMgr.addGoalVersion(appraisal);
+
+        // update status of cached appraisal object
+        updateAppraisalInSession();
+
+        return display(request, response);
+    }
+
     public void setActionHelper(ActionHelper actionHelper) {
         this.actionHelper = actionHelper;
     }
@@ -565,4 +1145,9 @@ public class AppraisalsAction implements ActionInterface {
     public void setHomeAction(HomeAction homeAction) {
         this.homeAction = homeAction;
     }
+
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
+    }
+
 }

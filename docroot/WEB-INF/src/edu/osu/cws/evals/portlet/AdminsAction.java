@@ -11,13 +11,14 @@ import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import java.util.ArrayList;
-import java.util.ResourceBundle;
 
 public class AdminsAction implements ActionInterface {
     
     private ActionHelper actionHelper;
     
     private HomeAction homeAction;
+
+    private ErrorHandler errorHandler;
 
     /**
      * Handles listing the admin users. It only performs error checking. The list of
@@ -31,17 +32,17 @@ public class AdminsAction implements ActionInterface {
      */
     public String list(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        boolean isAdmin = actionHelper.getAdmin() != null;
+        if (!isAdmin) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         actionHelper.refreshContextCache();
-        ArrayList<Admin> adminsList = (ArrayList<Admin>) actionHelper.getPortletContextAttribute("adminsList");
-        actionHelper.addToRequestMap("isMaster", actionHelper.isLoggedInUserMasterAdmin(request),request);
-        actionHelper.addToRequestMap("adminsList", adminsList,request);
-        actionHelper.useMaximizedMenu(request);
+        ArrayList<Admin> adminsList =
+                (ArrayList<Admin>) actionHelper.getPortletContextAttribute("adminsList");
+        actionHelper.addToRequestMap("isMaster", actionHelper.isLoggedInUserMasterAdmin());
+        actionHelper.addToRequestMap("adminsList", adminsList);
+        actionHelper.useMaximizedMenu();
 
         return Constants.JSP_ADMIN_LIST;
     }
@@ -56,22 +57,20 @@ public class AdminsAction implements ActionInterface {
      */
     public String add(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserMasterAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        if (!actionHelper.isLoggedInUserMasterAdmin()) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         String onid = ParamUtil.getString(request, "onid");
         String isMaster = ParamUtil.getString(request, "isAdmin");
-        AdminMgr adminMgr = new AdminMgr();
 
         try {
-            adminMgr.add(onid,  isMaster, actionHelper.getLoggedOnUser(request));
-            actionHelper.setEvalsAdmins(true);
+            AdminMgr.add(onid, isMaster, actionHelper.getLoggedOnUser());
+            actionHelper.updateContextTimestamp();
+            actionHelper.setAdminPortletData();
             SessionMessages.add(request, "admin-added");
         } catch (ModelException e) {
-            actionHelper.addErrorsToRequest(request, e.getMessage());
+            actionHelper.addErrorsToRequest(e.getMessage());
         } catch (Exception e) {
             throw e;
         }
@@ -89,23 +88,20 @@ public class AdminsAction implements ActionInterface {
      */
     public String delete(PortletRequest request, PortletResponse response) throws Exception {
         // Check that the logged in user is admin
-        ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
-        if (!actionHelper.isLoggedInUserMasterAdmin(request)) {
-            actionHelper.addErrorsToRequest(request, resource.getString("access-denied"));
-            return homeAction.display(request, response);
+        if (!actionHelper.isLoggedInUserMasterAdmin()) {
+            return errorHandler.handleAccessDenied(request, response);
         }
 
         int id = ParamUtil.getInteger(request, "id");
-        AdminMgr adminMgr = new AdminMgr();
-        try {
 
+        try {
             // If the user clicks on the delete link the first time, use confirm page
             if (request instanceof RenderRequest && response instanceof RenderResponse) {
-                Admin admin = adminMgr.get(id);
+                Admin admin = AdminMgr.get(id);
                 if (admin.getEmployee() != null) { // initialize name due to lazy-loading
                     admin.getEmployee().getName();
                 }
-                actionHelper.addToRequestMap("admin", admin,request);
+                actionHelper.addToRequestMap("admin", admin);
                 return Constants.JSP_ADMIN_DELETE;
             }
 
@@ -114,11 +110,12 @@ public class AdminsAction implements ActionInterface {
                 return list(request, response);
             }
 
-            adminMgr.delete(id);
-            actionHelper.setEvalsAdmins(true);
+            AdminMgr.delete(id);
+            actionHelper.updateContextTimestamp();
+            actionHelper.setAdminPortletData();
             SessionMessages.add(request, "admin-deleted");
         } catch (ModelException e) {
-            actionHelper.addErrorsToRequest(request, e.getMessage());
+            actionHelper.addErrorsToRequest(e.getMessage());
         }
 
         return list(request, response);
@@ -131,5 +128,9 @@ public class AdminsAction implements ActionInterface {
 
     public void setHomeAction(HomeAction homeAction) {
         this.homeAction = homeAction;
+    }
+
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
     }
 }

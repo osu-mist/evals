@@ -1,32 +1,21 @@
 package edu.osu.cws.evals.hibernate;
 
 import edu.osu.cws.evals.models.*;
-import edu.osu.cws.evals.portlet.ActionHelper;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
-import edu.osu.cws.evals.util.Mailer;
+import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.StandardBasicTypes;
+import org.joda.time.DateTime;
 
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.HashMap;
-import java.util.Iterator;
 
 public class AppraisalMgr {
-    //Need to change this back to 11/01/2011 after testing.
-    private static final String FULL_GOALS_DATE = "11/01/2011";
-
 
     // used to sort the list of evaluations displayed during searches
     private static final String LIST_ORDER = " order by job.employee.lastName, " +
@@ -41,46 +30,24 @@ public class AppraisalMgr {
             "'closed') ";
 
 
-    private static Date fullGoalsDate;
-    private Employee loggedInUser;
-
-    private Appraisal appraisal = new Appraisal();
-    private CriteriaMgr criteriaMgr = new CriteriaMgr();
-    private JobMgr jobMgr = new JobMgr();
-    private EmployeeMgr employeeMgr = new EmployeeMgr();
-    private HashMap appraisalSteps;
-    private HashMap permissionRules;
-    private HashMap<Integer, Admin> admins = new HashMap<Integer, Admin>();
-    private HashMap<Integer, Reviewer> reviewers = new HashMap<Integer, Reviewer>();
-    private Mailer mailer;
-    Map<String, Configuration> configurationMap;
-
-    public AppraisalMgr() {
-        SimpleDateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
-        try {
-            fullGoalsDate = fmt.parse(FULL_GOALS_DATE);
-        } catch (Exception e) {
-            //Should not get here
-        }
-    }
-
     /**
      * This method creates an appraisal for the given job by calling the Hibernate
      * class. It returns the id of the created appraisal.
      *
      * @param job   Job for this appraisal
      * @param type: trial, annual, initial
-     * @param goalsDueConfig: Configuration object of goalsDue or resultsDue
-     * @param startDate: starting date of appraisal period.
+     * @param startDate: (DateTime) starting date of appraisal period.
      * @return appraisal.id
      * @throws Exception
      */
-    public static Appraisal createAppraisal(Job job, Date startDate, String type,
-                                            Configuration goalsDueConfig) throws Exception {
-        CriteriaMgr criteriaMgr = new CriteriaMgr();
+    public static Appraisal createAppraisal(Job job, DateTime startDate, String type)
+            throws Exception {
         Appraisal appraisal = new Appraisal();
-        CriterionDetail detail;
-        Assessment assessment;
+        GoalVersion goalVersion = new GoalVersion();
+        appraisal.addGoalVersion(goalVersion);
+        goalVersion.setCreateDate(new Date());
+        // the first goal version is automatically approved
+        goalVersion.setRequestDecision(true);
 
         if (!type.equals(Appraisal.TYPE_TRIAL) && !type.equals(Appraisal.TYPE_ANNUAL) &&
                 !type.equals(Appraisal.TYPE_INITIAL)) {
@@ -88,9 +55,10 @@ public class AppraisalMgr {
         }
 
         appraisal.setJob(job);
-        appraisal.setStartDate(startDate);
+        appraisal.setStartDate(startDate.toDate());
         appraisal.setCreateDate(new Date());
         appraisal.setRating(0);
+        appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
 
         // In the db, we only store: annual or trial.
         String dbType = type;
@@ -99,71 +67,67 @@ public class AppraisalMgr {
         }
         appraisal.setType(dbType);
 
-        Date endDate = job.getEndEvalDate(startDate, type);
-        appraisal.setEndDate(endDate);
-
-        createAppraisalStatus(startDate, goalsDueConfig, appraisal);
+        DateTime endDate = job.getEndEvalDate(startDate, type);
+        appraisal.setEndDate(CWSUtil.toDate(endDate));
 
         if (appraisal.validate()) {
-            String appointmentType = job.getAppointmentType();
-            List<CriterionArea> criteriaList = criteriaMgr.list(appointmentType);
             Session session = HibernateUtil.getCurrentSession();
-            session.save(appraisal);///441
 
-            // Create assessment and associate it to appraisal
-            for (CriterionArea criterion : criteriaList) {
-                detail = criterion.getCurrentDetail();
-                assessment = new Assessment();
-                assessment.setCriterionDetail(detail);
-                assessment.setAppraisal(appraisal);
-                assessment.setCreateDate(new Date());
-                assessment.setModifiedDate(new Date());
-                session.save(assessment);
-            }
+            // Create the assessments & assessment criteria
+            List<CriterionArea> criteriaList = CriteriaMgr.list(job.getAppointmentType());
+            addAssessmentToGoalVersion(goalVersion, Constants.BLANK_ASSESSMENTS_IN_NEW_EVALUATION,
+                    criteriaList);
+            session.save(appraisal);
         }
 
         return appraisal;
     }
 
     /**
-     * Sets the status of the appraisal. If the startDate of the appraisal is before Nov 1st, 2011, we set the
-     * status to appraisalDue, else if
+     * Creates a series of new assessments and adds them to a goal version.
      *
-     * @param startDate
-     * @param goalsDueConfig
-     * @param appraisal
-     * @throws Exception
+     * @param goalVersion
+     * @param count
+     * @param criteriaList
      */
-    private static void createAppraisalStatus(Date startDate, Configuration goalsDueConfig,
-                                              Appraisal appraisal) throws Exception {
-        if (startDate.before(fullGoalsDate)) {
-            appraisal.setStatus(Appraisal.STATUS_APPRAISAL_DUE);
-        } else if (EvalsUtil.isDue(appraisal, goalsDueConfig) < 0) {
-            appraisal.setStatus(Appraisal.STATUS_GOALS_OVERDUE);
-        } else {
-            appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
+    public static void addAssessmentToGoalVersion(GoalVersion goalVersion, int count,
+                                                  List<CriterionArea> criteriaList) throws Exception {
+        for (int i = 1; i <= count; i++) {
+            createNewAssessment(goalVersion, i, criteriaList);
         }
     }
 
-
-    public static List<Appraisal>  getActiveAppraisals(Job job)
-    {
-        return new ArrayList();
-    }
-
     /**
-     * creates an appraisal record and returns it
-     * @param job:  the job the appraisal record is created against
-     * @param Type:  possible values are trials, annual and initial.
-     * @             Initial is annual except the length of the period is defined by annual_eval_ind
-     * @return:  the appraisal record created
+     * Creates assessments and associated objects for a goal version once the goals reactivation
+     * is approved. The criteria list associated to the new assessment is the list originally
+     * used when the first goal version was created.
+     *
+     * @param unapprovedGoalsVersion
+     * @param appraisal
      * @throws Exception
      */
-   /* public static Appraisal createAppraisal(Job job, String Type) throws Exception
-    {
-        return new Appraisal();
+    public static void addAssessmentForGoalsReactivation(GoalVersion unapprovedGoalsVersion,
+                                                         Appraisal appraisal) throws Exception {
+        // get the sorted criteria list for the first approved to goal version
+        List<CriterionArea> criteriaList = new ArrayList<CriterionArea>();
+        GoalVersion goalVersion = appraisal.getApprovedGoalsVersions().get(0);
+        if (goalVersion != null && !goalVersion.getAssessments().isEmpty()) {
+            Assessment assessment = (Assessment) goalVersion.getAssessments().toArray()[0];
+            if (assessment != null && !assessment.getAssessmentCriteria().isEmpty()) {
+                for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
+                    criteriaList.add(assessmentCriteria.getCriteriaArea());
+                }
+            }
+        }
+
+        addAssessmentToGoalVersion(unapprovedGoalsVersion,
+                Constants.BLANK_ASSESSMENTS_IN_REACTIVATED_GOALS, criteriaList);
+
+
+        Session session = HibernateUtil.getCurrentSession();
+        session.save(unapprovedGoalsVersion);
     }
-    */
+
 
     /**
      * This method is called upon completion or closure of an trial appraisal to create the
@@ -178,54 +142,16 @@ public class AppraisalMgr {
      * PYVPASJ.annual_eval_ind.
      *
      * @param  trialAppraisal: this is the newly closed or completed trial appraisal
-     * @param resultsDueConfig
      * @return the newly created appraisal
      * @throws Exception
      */
-    public static Appraisal createInitialAppraisalAfterTrial(Appraisal trialAppraisal,
-                                                             Configuration resultsDueConfig) throws Exception {
-        Appraisal appraisal = new Appraisal();
-        appraisal.setType(Appraisal.TYPE_ANNUAL);
-        appraisal.setJob(trialAppraisal.getJob());
-        appraisal.setCreateDate(new Date());
-        Date initialEvalStartDate = appraisal.getJob().getInitialEvalStartDate();
-        appraisal.setStartDate(initialEvalStartDate);
-        appraisal.setGoalsSubmitDate(trialAppraisal.getGoalsSubmitDate());
-        appraisal.setGoalsApprover(trialAppraisal.getGoalsApprover());
-        appraisal.setGoalApprovedDate(trialAppraisal.getGoalApprovedDate());
-        appraisal.setRating(0);
+    public static Appraisal createInitialAppraisalAfterTrial(Appraisal trialAppraisal)
+            throws Exception {
+        // copy appraisal & properties
+        Appraisal appraisal = Appraisal.createFirstAnnual(trialAppraisal);
 
-        Date endDate = appraisal.getJob().getEndEvalDate(appraisal.getStartDate(), Appraisal.TYPE_INITIAL);
-        appraisal.setEndDate(endDate);
-
-        int resultsDue = EvalsUtil.isDue(appraisal, resultsDueConfig);
-        if (appraisal.getStartDate().before(fullGoalsDate)) {
-            appraisal.setStatus(Appraisal.STATUS_APPRAISAL_DUE);
-        } else if (resultsDue == 0) {
-            appraisal.setStatus(Appraisal.STATUS_RESULTS_DUE);
-        } else if (resultsDue < 0) {
-            appraisal.setStatus(Appraisal.STATUS_RESULTS_OVERDUE);
-        } else {
-            appraisal.setStatus(Appraisal.STATUS_GOALS_APPROVED);
-        }
-
-        if (appraisal.validate()) {
-            Session session = HibernateUtil.getCurrentSession();
-            session.save(appraisal);
-
-            Assessment newAssessment;
-            for (Assessment origAssesment: trialAppraisal.getAssessments()) {
-                newAssessment = new Assessment();
-                newAssessment.setCriterionDetail(origAssesment.getCriterionDetail());
-                newAssessment.setGoal(origAssesment.getGoal());
-                newAssessment.setAppraisal(appraisal);
-                newAssessment.setCreateDate(new Date());
-                newAssessment.setEmployeeResult(origAssesment.getEmployeeResult());
-                newAssessment.setSupervisorResult(origAssesment.getSupervisorResult());
-                newAssessment.setModifiedDate(new Date());
-                session.save(newAssessment);
-            }
-        }
+        Session session = HibernateUtil.getCurrentSession();
+        session.save(appraisal);
 
         return appraisal;
     }
@@ -235,144 +161,49 @@ public class AppraisalMgr {
      * modified, a new record is inserted in the assessments_logs table.
      *
      * @param modifiedAppraisal
+     * @param loggedInUser
      * @return
      * @throws ModelException
      */
-    public boolean updateAppraisal(Appraisal modifiedAppraisal) throws ModelException {
+    public static boolean updateAppraisal(Appraisal modifiedAppraisal, Employee loggedInUser)
+            throws ModelException {
         String originalGoalText;
         String updatedGoalTextGoalText;
-        String originalNewGoalText;
-        String updatedNewGoalText;
         GoalLog goalLog;
-
-        // Validate the data first before we try to save anything
-        modifiedAppraisal.validate();
-        for (Assessment assessment : modifiedAppraisal.getAssessments()) {
-            assessment.validate();
-        }
 
         // Try to save the data
         Session session = HibernateUtil.getCurrentSession();
         session.saveOrUpdate(modifiedAppraisal);
 
-        for (Assessment assessment : modifiedAppraisal.getAssessments()) {
-            assessment.setModifiedDate(new Date());
-            session.saveOrUpdate(assessment);  //@todo: joan: Do we need to do this everytime?
+        // save salary object if present
+        if (modifiedAppraisal.getSalary() != null) {
+            session.saveOrUpdate(modifiedAppraisal.getSalary());
+        }
 
-            // Create new assessment log if necessary
-            originalGoalText = assessment.getLastGoalLog(GoalLog.DEFAULT_GOAL_TYPE).getContent();
-            updatedGoalTextGoalText = assessment.getGoal();
-            //@todo: use a hash instead of comparing these two long text fields
-            if (!originalGoalText.equals(updatedGoalTextGoalText) && updatedGoalTextGoalText != null) {
-                goalLog = new GoalLog();
-                goalLog.setCreateDate(new Date());
-                goalLog.setAuthor(loggedInUser);
-                if (updatedGoalTextGoalText.equals("")) {
-                    updatedGoalTextGoalText = "empty";
+        for (GoalVersion goalVersion : modifiedAppraisal.getGoalVersions()) {
+            for (Assessment assessment : goalVersion.getAssessments()) {
+                assessment.setModifiedDate(new Date()); //@todo: need to figure out a better way to set this. It isn't always updated
+                session.saveOrUpdate(assessment);  //@todo: joan: Do we need to do this everytime?
+
+                // Create new assessment log if necessary
+                originalGoalText = assessment.getLastGoalLog(GoalLog.DEFAULT_GOAL_TYPE).getContent();
+                updatedGoalTextGoalText = assessment.getGoal();
+                //@todo: use a hash instead of comparing these two long text fields
+                if (!originalGoalText.equals(updatedGoalTextGoalText)) {
+                    goalLog = new GoalLog();
+                    goalLog.setCreateDate(new Date());
+                    goalLog.setAuthor(loggedInUser);
+                    if (updatedGoalTextGoalText == null || updatedGoalTextGoalText.equals("")) {
+                        updatedGoalTextGoalText = "empty";
+                    }
+                    goalLog.setContent(updatedGoalTextGoalText);
+                    assessment.addAssessmentLog(goalLog);
+                    session.save(goalLog);
                 }
-                goalLog.setContent(updatedGoalTextGoalText);
-                assessment.addAssessmentLog(goalLog);
-                session.save(goalLog);
-            }
 
-
-            originalNewGoalText = assessment.getLastGoalLog(GoalLog.NEW_GOAL_TYPE).getContent();
-            updatedNewGoalText = assessment.getNewGoals();
-            //@todo: use a hash instead of comparing these two long text fields
-            if (!originalNewGoalText.equals(updatedNewGoalText) && updatedNewGoalText != null) {
-                goalLog = new GoalLog();
-                goalLog.setCreateDate(new Date());
-                goalLog.setAuthor(loggedInUser);
-                if (updatedNewGoalText.equals("")) {
-                    updatedNewGoalText = "empty";
-                }
-                goalLog.setContent(updatedNewGoalText);
-                goalLog.setType(GoalLog.NEW_GOAL_TYPE);
-                assessment.addAssessmentLog(goalLog);
-                session.save(goalLog);
             }
         }
         return true;
-    }
-
-
-    /**
-     * Processes the processAction request (Map) and tries to save the appraisal. This method
-     * moves the appraisal to the next appraisal step and sends any emails if necessary.
-     *
-     * @param request
-     * @param appraisal
-     * @param permRule
-     * @throws Exception
-     */
-    public void processUpdateRequest(Map request, Appraisal appraisal, PermissionRule permRule)
-            throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        Configuration resultsDueConfig = configurationMap.get(Appraisal.STATUS_RESULTS_DUE);
-        Job supervisorJob = appraisal.getJob().getSupervisor();
-
-        // set the overdue value before updating the status
-        String beforeUpdateStatus = appraisal.getStatus();
-        // calculate overdue value & set the appraisal.overdue value
-        AppraisalMgr.updateOverdue(appraisal, configurationMap);
-        int oldOverdue = appraisal.getOverdue();
-
-        // update appraisal & assessment fields based on permission rules
-        setAppraisalFields(request, appraisal, permRule);
-
-        boolean statusChanged = !appraisal.getStatus().equals(beforeUpdateStatus);
-        if (statusChanged) {
-            // Using the old status value call setStatusOverdue()
-            String overdueMethod = StringUtils.capitalize(beforeUpdateStatus);
-            overdueMethod = "set" + overdueMethod.replace("Due", "Overdue");
-            try {
-                // call setStageOverdue method
-                Method controllerMethod = appraisal.getClass().getDeclaredMethod(overdueMethod,
-                        Integer.class);
-                controllerMethod.invoke(appraisal, oldOverdue);
-            } catch (NoSuchMethodException e) {
-                // don't do anything since some methods might not exist.
-            }
-
-            // Assign the new status based on configuration values
-            String status = appraisal.getStatus();
-            String newStatus = AppraisalMgr.getNewStatus(status, appraisal, configurationMap);
-            if (newStatus != null) {
-                appraisal.setStatus(newStatus);
-            }
-
-            // If the new status is valid for overdue, refresh the overdue value
-            if (appraisal.getStatus().contains(Appraisal.OVERDUE)) {
-                AppraisalMgr.updateOverdue(appraisal, configurationMap);
-            } else {
-                appraisal.setOverdue(-999);
-            }
-        }
-
-
-        //@todo: validate appraisal
-
-        // save changes to db
-        updateAppraisal(appraisal);
-
-        // Send email if needed
-        String appointmentType = appraisal.getJob().getAppointmentType();
-        AppraisalStep appraisalStep;
-        String employeeResponse = appraisal.getRebuttal();
-
-        // If the employee signs and provides a rebuttal, we want to use a different
-        // appraisal step so that we can send an email to the reviewer.
-        if (submittedRebuttal(request, employeeResponse)) {
-            String appraisalStepKey = "submit-response-" + appointmentType;
-            appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
-        } else {
-            appraisalStep = getAppraisalStepKey(request, appointmentType, permRule);
-        }
-
-        EmailType emailType = appraisalStep.getEmailType();
-        if (emailType != null) {
-            mailer.sendMail(appraisal, emailType);
-        }
     }
 
     /**
@@ -381,16 +212,12 @@ public class AppraisalMgr {
      *  2) The job annual_indicator != 0
      *
      * @param trialAppraisal
-     * @param startDate
-     * @param configurationMap
      * @throws Exception
      * @return appraisal    The first annual appraisal created, null otherwise
      */
-    public static Appraisal createFirstAnnualAppraisal(Appraisal trialAppraisal, Date startDate,
-                                                Map<String, Configuration>  configurationMap)
+    public static Appraisal createFirstAnnualAppraisal(Appraisal trialAppraisal)
             throws Exception {
         Job job = trialAppraisal.getJob();
-        Configuration resultsDueConfig = configurationMap.get(Appraisal.STATUS_RESULTS_DUE);
 
         if (!trialAppraisal.getType().equals(Appraisal.TYPE_TRIAL)) {
             return null;
@@ -398,7 +225,7 @@ public class AppraisalMgr {
         if (job.getAnnualInd() == 0) {
             return null;
         }
-        return AppraisalMgr.createInitialAppraisalAfterTrial(trialAppraisal, resultsDueConfig);
+        return createInitialAppraisalAfterTrial(trialAppraisal);
     }
 
     /**
@@ -407,7 +234,7 @@ public class AppraisalMgr {
      * @param job
      * @return trialAppraisal
      */
-    public static Appraisal getFirstTrialAppraisal(Job job) {
+    public static Appraisal getTrialAppraisal(Job job) {
         Session session = HibernateUtil.getCurrentSession();
 
         Appraisal trialAppraisal = (Appraisal) session.getNamedQuery("appraisal.getTrialAppraisal")
@@ -416,223 +243,6 @@ public class AppraisalMgr {
                 .setString("suffix", job.getSuffix())
                 .uniqueResult();
         return trialAppraisal;
-    }
-
-    /**
-     * Handles updating the appraisal fields in the appraisal and assessment objects.
-     *
-     * @param request
-     * @param appraisal
-     * @param permRule
-     */
-    public void setAppraisalFields(Map<String, String[]> request, Appraisal appraisal, PermissionRule permRule)
-            throws Exception{
-        String parameterKey = "";
-
-        // Save Goals
-        if (permRule.getGoals() != null && permRule.getGoals().equals("e")) {
-            for (Assessment assessment : appraisal.getAssessments()) {
-                String assessmentID = Integer.toString(assessment.getId());
-                parameterKey = "appraisal.goal." + assessmentID;
-                if (request.get(parameterKey) != null) {
-                    assessment.setGoal(request.get(parameterKey)[0]);
-                }
-            }
-            if (request.get("submit-goals") != null) {
-                appraisal.setGoalsSubmitDate(new Date());
-            }
-            if (request.get("approve-goals") != null) {
-                appraisal.setGoalApprovedDate(new Date());
-                appraisal.setGoalsApprover(loggedInUser);
-            }
-        }
-        // Save newGoals
-        if (permRule.getNewGoals() != null && permRule.getNewGoals().equals("e")) {
-            for (Assessment assessment : appraisal.getAssessments()) {
-                String assessmentID = Integer.toString(assessment.getId());
-                parameterKey = "appraisal.newGoal." + assessmentID;
-                assessment.setNewGoals(request.get(parameterKey)[0]);
-            }
-        }
-        // Save goalComments
-        if (permRule.getGoalComments() != null && permRule.getGoalComments().equals("e")) {
-            if (request.get("appraisal.goalsComments") != null) {
-                appraisal.setGoalsComments(request.get("appraisal.goalsComments")[0]);
-            }
-        }
-        // Save employee results
-        if (permRule.getResults() != null && permRule.getResults().equals("e")) {
-            for (Assessment assessment : appraisal.getAssessments()) {
-                String assessmentID = Integer.toString(assessment.getId());
-                parameterKey = "assessment.employeeResult." + assessmentID;
-                if (request.get(parameterKey) != null) {
-                    assessment.setEmployeeResult(request.get(parameterKey)[0]);
-                }
-            }
-        }
-        // Save Supervisor Results
-        if (permRule.getSupervisorResults() != null && permRule.getSupervisorResults().equals("e")) {
-            for (Assessment assessment : appraisal.getAssessments()) {
-                String assessmentID = Integer.toString(assessment.getId());
-                parameterKey = "assessment.supervisorResult." + assessmentID;
-                if (request.get(parameterKey) != null) {
-                    assessment.setSupervisorResult(request.get(parameterKey)[0]);
-                }
-            }
-        }
-        if (request.get("submit-results") != null) {
-            appraisal.setResultSubmitDate(new Date());
-        }
-        // Save evaluation
-        if (permRule.getEvaluation() != null && permRule.getEvaluation().equals("e")) {
-            if (request.get("appraisal.evaluation") != null) {
-                appraisal.setEvaluation(request.get("appraisal.evaluation")[0]);
-            }
-            if (request.get("appraisal.rating") != null) {
-                appraisal.setRating(Integer.parseInt(request.get("appraisal.rating")[0]));
-            }
-            if (request.get(permRule.getSubmit()) != null) {
-                appraisal.setEvaluationSubmitDate(new Date());
-                appraisal.setEvaluator(loggedInUser);
-            }
-        }
-        // Save review
-        if (permRule.getReview() != null && permRule.getReview().equals("e")) {
-            if (request.get("appraisal.review") != null) {
-                appraisal.setReview(request.get("appraisal.review")[0]);
-            }
-            if (request.get(permRule.getSubmit()) != null) {
-                appraisal.setReviewer(loggedInUser);
-                appraisal.setReviewSubmitDate(new Date());
-            }
-        }
-        if (request.get("sign-appraisal") != null) {
-            appraisal.setEmployeeSignedDate(new Date());
-        }
-        if (request.get("release-appraisal") != null) {
-            appraisal.setReleaseDate(new Date());
-        }
-        // Save employee response
-        if (permRule.getEmployeeResponse() != null && permRule.getEmployeeResponse().equals("e")) {
-            appraisal.setRebuttal(request.get("appraisal.rebuttal")[0]);
-            String employeeResponse = appraisal.getRebuttal();
-            if (submittedRebuttal(request, employeeResponse)) {
-                appraisal.setRebuttalDate(new Date());
-            }
-        }
-        // Save supervisor rebuttal read
-        if (permRule.getRebuttalRead() != null && permRule.getRebuttalRead().equals("e")
-                && request.get("read-appraisal-rebuttal") != null) {
-            appraisal.setSupervisorRebuttalRead(new Date());
-        }
-
-        // Save the close out reason
-        if (appraisal.getRole().equals(ActionHelper.ROLE_REVIEWER) || appraisal.getRole().equals("admin")) {
-            if (request.get("appraisal.closeOutReasonId") != null) {
-                int closeOutReasonId = Integer.parseInt(request.get("appraisal.closeOutReasonId")[0]);
-                CloseOutReason reason = CloseOutReasonMgr.get(closeOutReasonId);
-
-                appraisal.setCloseOutBy(loggedInUser);
-                appraisal.setCloseOutDate(new Date());
-                appraisal.setCloseOutReason(reason);
-                appraisal.setOriginalStatus(appraisal.getStatus());
-            }
-        }
-
-        // If the appraisalStep object has a new status, update the appraisal object
-        String appointmentType = appraisal.getJob().getAppointmentType();
-        AppraisalStep appraisalStep = getAppraisalStepKey(request, appointmentType, permRule);
-        String newStatus = appraisalStep.getNewStatus();
-        if (newStatus != null && !newStatus.equals(appraisal.getStatus())) {
-            appraisal.setStatus(newStatus);
-            String employeeResponse = appraisal.getRebuttal();
-            if (submittedRebuttal(request, employeeResponse)) {
-                appraisal.setStatus(Appraisal.STATUS_REBUTTAL_READ_DUE);
-            }
-        }
-        if (appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
-            appraisal.setGoalsRequiredModificationDate(new Date());
-        }
-    }
-
-    /**
-     * Specifies whether or not the employee submitted a rebuttal when the appraisal was signed.
-     *
-     * @param request
-     * @param employeeResponse
-     * @return
-     */
-    private boolean submittedRebuttal(Map<String, String[]> request, String employeeResponse) {
-        return request.get("sign-appraisal") != null &&
-                employeeResponse != null && !employeeResponse.equals("");
-    }
-
-
-    /**
-     * Figures out the appraisal step key for the button that the user pressed when the appraisal
-     * form was submitted.
-     *
-     * @param request
-     * @param appointmentType
-     * @param permRule
-     * @return
-     */
-    private AppraisalStep getAppraisalStepKey(Map request, String appointmentType,
-                                              PermissionRule permRule) {
-        AppraisalStep appraisalStep;
-        String appraisalStepKey;
-        ArrayList<String> appraisalButtons = new ArrayList<String>();
-        if (permRule.getSaveDraft() != null) {
-            appraisalButtons.add(permRule.getSaveDraft());
-        }
-        if (permRule.getRequireModification() != null) {
-            appraisalButtons.add(permRule.getRequireModification());
-        }
-        if (permRule.getSubmit() != null) {
-            appraisalButtons.add(permRule.getSubmit());
-        }
-        // close out button
-        appraisalButtons.add("close-appraisal");
-
-        for (String button : appraisalButtons) {
-            // If this button is the one the user clicked, use it to look up the
-            // appraisalStepKey
-            if (request.get(button) != null) {
-                appraisalStepKey = button + "-" + appointmentType;
-                appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
-                if (appraisalStep != null) {
-                    return appraisalStep;
-                }
-            }
-        }
-
-        return new AppraisalStep();
-    }
-
-
-    /**
-     * Figures out the current user role in the appraisal and returns the respective permission
-     * rule for that user role and action in the appraisal.
-     *
-     * @param appraisal
-     * @return
-     * @throws Exception
-     */
-    public PermissionRule getAppraisalPermissionRule(Appraisal appraisal) throws Exception {
-        String permissionKey = "";
-        String role = getRole(appraisal, loggedInUser.getId());
-        permissionKey = appraisal.getStatus()+"-"+ role;
-
-        PermissionRule originalPermRule = (PermissionRule) permissionRules.get(permissionKey);
-        PermissionRule permissionRule = (PermissionRule) originalPermRule.clone();
-        if (permissionRule != null &&  appraisal.getStartDate().before(fullGoalsDate)) {
-            String debug = "j-startDate=" + appraisal.getStartDate().toString() +
-                    "; fullGoalsDate=" + fullGoalsDate.toString() + "; FULL_GOALS_DATE=" +
-                    FULL_GOALS_DATE;
-            permissionRule.setGoals(debug);
-            permissionRule.setResults(debug);
-        }
-        return permissionRule;
     }
 
     /**
@@ -778,85 +388,17 @@ public class AppraisalMgr {
     }
 
     /**
-     * Returns the role (employee, supervisor, immediate supervisor or reviewer) of the pidm
-     * in the given appraisal. Return empty string if the pidm does not have any role on the
-     * appraisal.
-     *
-     * @param appraisal     appraisal to check role in
-     * @param pidm          pidm of the user to check
-     * @return role
-     * @throws Exception
-     */
-    public String getRole(Appraisal appraisal, int pidm) throws Exception {
-        if (appraisal.getRole() != null && !appraisal.getRole().equals("")) {
-            return appraisal.getRole();
-        }
-
-        Session session = HibernateUtil.getCurrentSession();
-        Job supervisor;
-        if (pidm == appraisal.getJob().getEmployee().getId()) {
-            appraisal.setRole("employee");
-            return appraisal.getRole();
-        }
-
-        supervisor = appraisal.getJob().getSupervisor();
-        if (supervisor != null && pidm == supervisor.getEmployee().getId()) {
-            appraisal.setRole("supervisor");
-            return appraisal.getRole();
-        }
-
-        String query = "from edu.osu.cws.evals.models.Reviewer where " +
-                "businessCenterName = :businessCenterName and employee.id = :pidm " +
-                "and employee.status = 'A'";
-        List reviewerList = session.createQuery(query)
-                .setString("businessCenterName", appraisal.getJob().getBusinessCenterName())
-                .setInteger("pidm", pidm)
-                .list();
-
-        if (reviewerList.size() != 0) {
-            appraisal.setRole("reviewer");
-            return appraisal.getRole();
-        }
-
-        if (jobMgr.isUpperSupervisor(appraisal.getJob(), pidm)) {
-            appraisal.setRole("upper-supervisor");
-            return appraisal.getRole();
-        }
-
-        //@todo: the admin role below needs tests
-        if (admins.containsKey(pidm)) {
-            appraisal.setRole("admin");
-            return appraisal.getRole();
-        }
-
-        return "";
-    }
-
-    /**
-     * This method is just a wrapper for session.get. It returns the appraisal that
-     * matches the id. It also adds the currentSupervisor to the appraisal object.
+     * It returns the appraisal that matches the id.
+     * It also adds the currentSupervisor to the appraisal object.
      *
      * @param id
-     * @return
+     * @return Appraisal
      * @throws Exception
      */
-    public Appraisal getAppraisal(int id) throws Exception {
+    public static Appraisal getAppraisal(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        appraisal = getAppraisal(id, session);
+        Appraisal appraisal = (Appraisal) session.get(Appraisal.class, id);
 
-        return appraisal;
-    }
-
-    /**
-     * This method is just a wrapper for getAppraisal(int id). It performs the hibernate
-     * call to retrieve the appraisal.
-     *
-     * @param id
-     * @param session
-     * @return
-     */
-    private Appraisal getAppraisal(int id, Session session) {
-        appraisal = (Appraisal) session.get(Appraisal.class, id);
         return appraisal;
     }
 
@@ -869,25 +411,10 @@ public class AppraisalMgr {
      * @param maxResults
      * @return
      * @throws Exception
-     */
-    public ArrayList<Appraisal> getReviews(String businessCenterName, int maxResults) throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        return getReviews(businessCenterName, session, maxResults);
-    }
-
-
-    /**
-     * Returns an ArrayList of Appraisal which contain data about appraisals pending
-     * review. This method is used to display a list of pending reviews in the displayReview
-     * actions method. If maxResults > 0, it will limit the number of results.
-     *
-     * @param businessCenterName
-     * @param session
-     * @param maxResults
-     * @return
      */
     //@todo: Joan: don't do anything with job.endDate, that's not reliable.
-    private ArrayList<Appraisal> getReviews(String businessCenterName, Session session, int maxResults) {
+    public static ArrayList<Appraisal> getReviews(String businessCenterName, int maxResults) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
         Query hibernateQuery = session.getNamedQuery("appraisal.getReviews")
                 .setString("bc", businessCenterName);
         //@todo: Joan: can we set the maxResults before querying the database?
@@ -905,14 +432,9 @@ public class AppraisalMgr {
      * @return
      * @throws Exception
      */
-    public int getReviewCount(String businessCenterName) throws Exception {
-        Session session = HibernateUtil.getCurrentSession();
-        return getReviewCount(businessCenterName, session);
-    }
-
-    private int getReviewCount(String businessCenterName, Session session) {
+    public static int getReviewCount(String businessCenterName) throws Exception {
         int reviewCount = 0;
-
+        Session session = HibernateUtil.getCurrentSession();
         List results = session.getNamedQuery("appraisal.reviewCount")
                 .setString("bcName", businessCenterName)
                 .list();
@@ -960,34 +482,6 @@ public class AppraisalMgr {
         return getReviewCountByStatus(bcName, Appraisal.STATUS_REVIEW_OVERDUE);
     }
 
-    public void setLoggedInUser(Employee loggedInUser) {
-        this.loggedInUser = loggedInUser;
-    }
-
-    public void setAppraisalSteps(HashMap appraisalSteps) {
-        this.appraisalSteps = appraisalSteps;
-    }
-
-    public void setPermissionRules(HashMap permissionRules) {
-        this.permissionRules = permissionRules;
-    }
-
-    public void setAdmins(HashMap<Integer, Admin> admins) {
-        this.admins = admins;
-    }
-
-    public void setMailer(Mailer mailer) {
-        this.mailer = mailer;
-    }
-
-    public void setConfigurationMap(Map<String, Configuration> configurationMap) {
-        this.configurationMap = configurationMap;
-    }
-
-    public void setReviewers(HashMap<Integer, Reviewer> reviewers) {
-        this.reviewers = reviewers;
-    }
-
     /**
      * select id from appraisals where status is not completed or closed.
      * @return an array of int containing the appraisalID's of
@@ -1003,12 +497,11 @@ public class AppraisalMgr {
         String query = "select appraisal.id from edu.osu.cws.evals.models.Appraisal appraisal " +
                 "where status not in ('completed', 'closed', 'archived')";
 
-        result =  session.createQuery(query).list();
+        result = session.createQuery(query).list();
         ids = new int[result.size()];
         for (int i = 0; i < result.size(); i++) {
             ids[i] = (Integer) result.get(i);
         }
-
 
         return ids;
     }
@@ -1019,25 +512,22 @@ public class AppraisalMgr {
      * @return  true is a trial appraisal exist for the job, false otherwise
      */
     public static boolean trialAppraisalExists(Job job) throws Exception {
-        Date startDate = job.getTrialStartDate();
-        return appraisalExists(job, startDate,  Appraisal.TYPE_TRIAL);
+        DateTime startDate = job.getTrialStartDate();
+        return startDate != null && appraisalExists(job, startDate, Appraisal.TYPE_TRIAL);
     }
 
     /** select count(*) from appraisals where job.... and startDAte = startDate and type = type
      * @param job: job against which the appraisal was create
-     * @param startDate: start date of appraisal period
+     * @param startDate: (DateTime) start date of appraisal period
      * @param type: "trial" or "annual".
      * @return true if an appraisal exist for job and startDate and type, false otherwise
      */
-    public static boolean appraisalExists(Job job, Date startDate, String type) throws Exception {
+    public static boolean appraisalExists(Job job, DateTime startDate, String type) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(startDate);
-        cal.add(Calendar.MONTH, -6);
-        Date beginDate = cal.getTime();
-        cal.add(Calendar.MONTH, 12);
-        Date endDate = cal.getTime();
+        startDate = startDate.minusMonths(6);
+        Date beginDate = startDate.toDate();
+        Date endDate = startDate.plusMonths(12).toDate();
 
         String query = "select count(*) from edu.osu.cws.evals.models.Appraisal appraisal " +
                 "where appraisal.job.employee.id = :pidm and appraisal.job.positionNumber = :positionNumber " +
@@ -1093,26 +583,23 @@ public class AppraisalMgr {
 
     /**
      * @param job
-     * @param appraisalStartDate
+     * @param appraisalStartDate    DateTime object
      * @return
      * @throws Exception
      */
-    public static boolean AnnualExists(Job job, Date appraisalStartDate) throws Exception
+    public static boolean AnnualExists(Job job, DateTime appraisalStartDate) throws Exception
     {
-        if (AppraisalMgr.appraisalExists(job, appraisalStartDate, Appraisal.TYPE_ANNUAL))
+        if (appraisalExists(job, appraisalStartDate, Appraisal.TYPE_ANNUAL))
             return true;
 
         //If we get here, there is no record for the job for appraisalStartDate
         //It's possible that someone added a value for Pyvpasj_eval_date after we created
         //the previous appraisal, so need to check that.
-        SimpleDateFormat simpleDateformat = new SimpleDateFormat("yyyy");
-        int thisYear = Integer.parseInt(simpleDateformat.format(appraisalStartDate));
-        Date startDateBasedOnJobBeginDate = job.getAnnualStartDateBasedOnJobBeginDate(thisYear);
+        int thisYear = appraisalStartDate.getYear();
+        DateTime startDateBasedOnJobBeginDate = job.getAnnualStartDateBasedOnJobBeginDate(thisYear);
 
-        if (startDateBasedOnJobBeginDate.equals(appraisalStartDate))
-            return false;
-        else
-            return AppraisalMgr.appraisalExists(job, startDateBasedOnJobBeginDate, Appraisal.TYPE_ANNUAL);
+        return !startDateBasedOnJobBeginDate.equals(appraisalStartDate) &&
+                appraisalExists(job, startDateBasedOnJobBeginDate, Appraisal.TYPE_ANNUAL);
     }
 
 
@@ -1141,25 +628,15 @@ public class AppraisalMgr {
      *
      * @param searchTerm    osu id of or name the employee's appraisals we are searching
      * @param pidm          pidm of the logged in user
-     * @param isAdmin
      * @param isSupervisor
      * @param bcName
      * @return
      * @throws Exception
      */
-    public List<Appraisal> search(String searchTerm, int pidm, boolean isAdmin,
-                                  boolean isSupervisor, String bcName) throws Exception {
-        List<Job> jobs;
-
-        if (!isAdmin) {
-            int supervisorPidm = 0;
-            if (isSupervisor) {
-                supervisorPidm = pidm;
-            }
-            jobs = JobMgr.search(searchTerm, bcName, supervisorPidm);
-        } else {
-            jobs = JobMgr.search(searchTerm, "", 0);
-        }
+    public static List<Appraisal> search(String searchTerm, int pidm, boolean isSupervisor,
+                                         String bcName) throws Exception {
+        int supervisorPidm = isSupervisor? pidm : 0;
+        List<Job> jobs = JobMgr.search(searchTerm, bcName,supervisorPidm);
 
         String hql = "select new edu.osu.cws.evals.models.Appraisal ( " +
             "id, job.jobTitle, job.positionNumber, startDate, endDate, type, " +
@@ -1191,7 +668,6 @@ public class AppraisalMgr {
         }
 
         Session session = HibernateUtil.getCurrentSession();
-        List<Appraisal> appraisals = new ArrayList<Appraisal>();
         if (conditions == null) {
             conditions = new ArrayList<String>();
         }
@@ -1225,8 +701,7 @@ public class AppraisalMgr {
 
         List<Appraisal> temp =  (ArrayList<Appraisal>) query.list();
 
-        appraisals = addSupervisorToAppraisals(temp);
-        return appraisals;
+        return addSupervisorToAppraisals(temp);
     }
 
     /**
@@ -1327,7 +802,7 @@ public class AppraisalMgr {
                     .list();
         }
 
-        return AppraisalMgr.addSupervisorToAppraisals(results);
+        return addSupervisorToAppraisals(results);
     }
 
     /**
@@ -1408,21 +883,6 @@ public class AppraisalMgr {
         return ids;
     }
 
-
-    /**
-     * Calculates the overdue value for the appraisal object and updates the value in the object.
-     * It does not update the db.
-     *
-     * @param appraisal
-     * @param configurationMap
-     * @throws Exception
-     */
-    public static void updateOverdue(Appraisal appraisal, Map<String, Configuration> configurationMap)
-            throws Exception {
-        int overdue = EvalsUtil.getOverdue(appraisal, configurationMap);
-        appraisal.setOverdue(overdue);
-    }
-
     /**
      * Saves the overdue value by itself in the appraisal record.
      *
@@ -1437,63 +897,108 @@ public class AppraisalMgr {
     }
 
     /**
-     * Calculates what should be the new status of a given appraisal. It looks at the
-     * configuration values to see whether the status is due or overdue.
-     * @todo: handle: STATUS_GOALS_REACTIVATED in next release
+     * Takes care of creating a new Assessment object with the assessment criterias and sets up
+     * the goal version association.
      *
-     * @param status
-     * @param appraisal
-     * @param configMap
+     * @param goalVersion
+     * @param sequence
+     * @param criterionAreas
      * @return
-     * @throws Exception
      */
-    public static String getNewStatus(String status, Appraisal appraisal,
-                                      Map<String, Configuration> configMap) throws Exception {
-        String newStatus = null;
-        Configuration config = configMap.get(status); //config object of this status
+    public static Assessment createNewAssessment(GoalVersion goalVersion, int sequence,
+                                     List<CriterionArea> criterionAreas) {
+        Session session = HibernateUtil.getCurrentSession();
+        Assessment assessment = new Assessment();
+        goalVersion.addAssessment(assessment);
+        assessment.setCreateDate(new Date());
+        assessment.setModifiedDate(new Date());
+        assessment.setSequence(sequence);
 
-        if (status.contains(Appraisal.DUE) && EvalsUtil.isDue(appraisal, config) <= 0) {
-            newStatus = status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
-        } else if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)
-                &&  isGoalsReqModOverDue(appraisal, configMap)) {
-            //goalsRequiredModification is not overdue.
-            newStatus = Appraisal.STATUS_GOALS_OVERDUE;
-        } else if (status.equals(Appraisal.STATUS_GOALS_APPROVED)) {
-            //Need to check to see if it's time to change the status to results due
-            Configuration reminderConfig = configMap.get("firstResultDueReminder");
-            if (EvalsUtil.isDue(appraisal, reminderConfig) < 0) {
-                newStatus = Appraisal.STATUS_RESULTS_DUE;
-            }
+        Set<AssessmentCriteria> assessmentCriterias = new HashSet<AssessmentCriteria>();
+        for (CriterionArea criterionArea : criterionAreas) {
+            AssessmentCriteria assessmentCriteria = new AssessmentCriteria();
+            assessment.addAssessmentCriteria(assessmentCriteria);
+            assessmentCriteria.setAssessment(assessment);
+            assessmentCriteria.setCriteriaArea(criterionArea);
+            assessmentCriterias.add(assessmentCriteria);
         }
-        return newStatus;
+        assessment.setAssessmentCriteria(assessmentCriterias);
+
+        return assessment;
     }
 
     /**
-     * If goals are not due yet, then no
-     * If goals are due, check to see if goalsRequiredModification is overdue
-     * Goals modifications due date is a configuration parameter which
-     * defines how many days after requiredModification is submitted before they are due.
-     * If goals modification is over due, then yes.
+     * Deletes any existing salary record for a given appraisal if it exists. Then creates & saves
+     * a new salary record for an appraisal.
+     *
      * @param appraisal
-     * @param configMap
-     * @return true if both goals are overdue and goalsRequiredModification is overdue. Otherwise false.
+     * @return
+     */
+    public static Salary createOrUpdateSalary(Appraisal appraisal) {
+        Session session = HibernateUtil.getCurrentSession();
+        // delete salary object if it exists
+        session.getNamedQuery("salary.deleteSalaryForAppraisal")
+                .setInteger("appraisalId", appraisal.getId())
+                .executeUpdate();
+
+        // create new salary object
+        Salary salary = appraisal.getJob().getSalary();
+        salary.setAppraisalId(appraisal.getId());
+        session.save(salary);
+
+        return salary;
+    }
+
+    /**
+     * Creates a new un approved goal version. It doesn't create the associated assessments
+     * since the goal version might not be approved by the supervisor.
+     *
+     * @param appraisal
+     */
+    public static void addGoalVersion(Appraisal appraisal) {
+        Session session = HibernateUtil.getCurrentSession();
+        GoalVersion unApprovedGoalVersion = new GoalVersion();
+        unApprovedGoalVersion.setCreateDate(new Date());
+        appraisal.addGoalVersion(unApprovedGoalVersion);
+        session.save(unApprovedGoalVersion);
+    }
+
+    /**
+     * Returns the date time when the unapproved goal version of the given appraisal was created.
+     * This is needed to figure out when the various goals reactivation pieces are due.
+     *
+     * @param appraisalID
+     * @return
      * @throws Exception
      */
-    private static boolean isGoalsReqModOverDue(Appraisal appraisal,
-                                                Map<String, Configuration> configMap) throws Exception
-    {
-        Configuration goalsDueConfig = configMap.get(Appraisal.STATUS_GOALS_DUE); //this config exists
+    public static DateTime getPendingRequestGoalVersionCreateDate(int appraisalID) throws Exception {
+        Appraisal appraisal = getAppraisal(appraisalID);
+        GoalVersion pendingRequestGoalVersion = appraisal.getRequestPendingGoalsVersion();
 
-        if (EvalsUtil.isDue(appraisal, goalsDueConfig) <= 0) { //goals due or overdue
-            System.out.println(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION + ", goals overdue");
-            //goals is due or overdue.  Is goalsRequiredModification overdue?
-            Configuration modConfig = configMap.get("goalsRequiredModificationDue");
-
-            if (EvalsUtil.isDue(appraisal, modConfig) < 0) {  // requiredModification is over due.
-               return true;
-            }
+        if (pendingRequestGoalVersion != null) {
+            return new DateTime(pendingRequestGoalVersion.getCreateDate());
         }
 
-        return false;
+        // If we got here it means that the user just submitted the request and thus the goal
+        // version hasn't been saved to the db. Thus the create date is now.
+        return new DateTime();
+    }
+
+    /**
+     * Returns the date time when the supervisor approved the goals reactivation request.
+     *
+     * @param appraisalID
+     * @return
+     * @throws Exception
+     */
+    public static DateTime getUnapprovedGoalVersionRequestDecDate(int appraisalID) throws Exception {
+        Appraisal appraisal = getAppraisal(appraisalID);
+        GoalVersion unapprovedGoalsVersion = appraisal.getUnapprovedGoalsVersion();
+
+        if (unapprovedGoalsVersion != null) {
+            return new DateTime(unapprovedGoalsVersion.getRequestDecisionDate());
+        }
+
+        return null;
     }
 }

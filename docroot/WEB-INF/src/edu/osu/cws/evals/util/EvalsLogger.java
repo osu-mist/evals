@@ -11,11 +11,13 @@ package edu.osu.cws.evals.util;
  * All PASS logging should be done by this class, not the native Logger class.
  */
 
+import com.google.inject.Inject;
 import edu.osu.cws.util.Logger;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class EvalsLogger {
+public class EvalsLogger implements LoggingInterface {
 
     private Logger logger;
     private String appName = "CWS-EvalS";
@@ -23,6 +25,7 @@ public class EvalsLogger {
     private Map<String, String> fields = new HashMap<String, String>();
 
 
+    @Inject
     public EvalsLogger(String serverName, String environment)
     {
         logger = new Logger(serverName, appName, environment);

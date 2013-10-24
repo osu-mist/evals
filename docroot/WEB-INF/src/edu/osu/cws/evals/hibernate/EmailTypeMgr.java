@@ -3,19 +3,10 @@ package edu.osu.cws.evals.hibernate;
 import edu.osu.cws.evals.models.EmailType;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
-/**
- * Created by IntelliJ IDEA.
- * User: luf
- * Date: 7/5/11
- * Time: 9:17 AM
- * To change this template use File | Settings | File Templates.
- */
-
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 public class EmailTypeMgr {
 

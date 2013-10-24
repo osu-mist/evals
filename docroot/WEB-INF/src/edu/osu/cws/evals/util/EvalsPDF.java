@@ -2,21 +2,20 @@ package edu.osu.cws.evals.util;
 
 
 import com.itextpdf.text.*;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.LineSeparator;
-import edu.osu.cws.evals.models.Appraisal;
-import edu.osu.cws.evals.models.Assessment;
-import edu.osu.cws.evals.models.Job;
-import edu.osu.cws.evals.models.PermissionRule;
+import edu.osu.cws.evals.models.*;
+import edu.osu.cws.evals.portlet.Constants;
+import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.ResourceBundle;
 
 public class EvalsPDF {
 
@@ -25,6 +24,7 @@ public class EvalsPDF {
     public static final Font FONT_BOLD_12 = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
     public static final Font FONT_BOLD_11 = new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD);
     public static final Font FONT_BOLDITALIC_10 = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLDITALIC);
+    public static final Font FONT_BOLD_10 = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD);
     public static final Font FONT_10 = new Font(Font.FontFamily.HELVETICA, 10);
     public static final Font FONT_ITALIC_10 = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLDITALIC);
     public static final Font FONT_BOLD_14 = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD);
@@ -37,17 +37,41 @@ public class EvalsPDF {
     public static final float LEFT_INDENTATION = 8f;
     public static final float BEFORE_SPACING = 12f;
 
+    private Appraisal appraisal;
+    private ResourceBundle resource;
+    private String dirName;
+    private String environment;
+    private String rootDir;
+    private PermissionRule permRule;
+    private Document document;
+
+    /**
+     * @param rootDir       Root directory where the images and other resources can be found
+     * @param appraisal     Appraisal object
+     * @param resource      ResourceBundle object
+     * @param dirName       the directory PDF files resides.
+     * @param env   either "prod" or "dev2"
+     */
+    public EvalsPDF(String rootDir, Appraisal appraisal, ResourceBundle resource, String dirName, String env) {
+        this.rootDir = rootDir;
+        this.appraisal = appraisal;
+        this.resource = resource;
+        this.dirName = dirName;
+        this.environment = env;
+        this.permRule = appraisal.getPermissionRule();
+        Rectangle pageSize = new Rectangle(612f, 792f);
+        this.document = new Document(pageSize, 50f, 40f, 24f, 24f);
+    }
+
     /**
      * Returns the name of the appraisal nolij pdf file.
      *
-     * @param appraisal
-     * @param dirName       the directory Nolij PDF files resides.
-     * @param environment   either "prod" or "dev2"
      * @return filename     composed of: dirname+prod_pass-[PIDM]_[FISCAL YEAR]_[POSITION NUMBER]-.pdf
      * @throws Exception    If the environment is not valid
+     *
+     * remains public, so the test methods don't break.
      */
-    public static String getNolijFileName(Appraisal appraisal, String dirName, String environment)
-            throws Exception {
+    public String getFileName() throws Exception {
         String filename = "";
 
         if (environment == null || (!environment.equals("prod") && !environment.equals("dev2"))) {
@@ -83,59 +107,54 @@ public class EvalsPDF {
      * Generates a PDF file for the given appraisal using the permission rule. It writes the
      * PDF file to disk.
      *
-     * @param appraisal     Appraisal object
-     * @param rule          PermissionRule object to decide what sections to display
-     * @param filename      Full path and filename used to store the PDF
-     * @param resource      ResourceBundle object
-     * @param rootDir       Root directory where the images and other resources can be found
      * @throws Exception
      */
-    public static void createPDF(Appraisal appraisal, PermissionRule rule, String filename,
-                                 ResourceBundle resource, String rootDir) throws Exception {
+    public String createPDF() throws Exception {
 
         //@todo: escape any text before writing it to the PDF doc??
+        String filename = getFileName();
 
-        Rectangle pageSize = new Rectangle(612f, 792f);
-        Document document = new Document(pageSize, 50f, 40f, 24f, 24f);
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(filename));
+        PdfWriter.getInstance(document, new FileOutputStream(filename));
         document.open();
 
-        document.add(getLetterHead(resource, rootDir));
-        document.add(getInfoTable(appraisal, resource, rule));
-        addAssessments(appraisal, rule, resource, document);
-        addEvaluation(appraisal, rule, resource, document, rootDir);
-        addRebuttal(appraisal, rule, resource, document);
-        if (appraisal.getEmployeeSignedDate() != null) {
-            document.add(getSignatureTable(appraisal, rule, resource, document));
+        document.add(getLetterHead());
+        document.add(getInfoTable());
+
+        addAssessments();
+        if (StringUtils.containsAny(permRule.getEvaluation(), "ev")) {
+            addEvaluation();
         }
+        if (StringUtils.containsAny(permRule.getEmployeeResponse(), "ev") && appraisal.getEmployeeSignedDate() != null) {
+            addEmployeeResponse();
+        }
+        addCriteriaLegend();
         document.close();
+        return filename;
     }
 
     /**
-     * Handles deleting the temporary PDF file that the user downloads
+     * Specifies whether or not the employee rebuttal should be displayed
+     * and add rebuttal
      *
-     * @param filename      Full path and name of temporary PDF file
-     * @return
+     * @throws DocumentException
      */
-    public static boolean deletePDF(String filename) throws Exception {
-        File pdfFile = new File(filename);
-
-        return pdfFile.delete();
+    private void addEmployeeResponse() throws DocumentException {
+        document.add(getSignatureTable());
+        if (appraisal.getRebuttal() != null) {
+            addRebuttal();
+        }
     }
+
 
     /**
      * Returns a PdfPTable object that contains the signature table displayed at the bottom of the
      * appraisal form.
      *
-     * @param appraisal
-     * @param rule
-     * @param resource
-     * @param document
      * @return
      * @throws DocumentException
      */
-    private static PdfPTable getSignatureTable(Appraisal appraisal, PermissionRule rule,
-                                               ResourceBundle resource, Document document) throws DocumentException {
+    private PdfPTable getSignatureTable() throws DocumentException {
+
         int signatureTableMaxCols = 29;
         int signatureTableMaxRows = 7;
         int nameColSpan = 8;
@@ -161,15 +180,17 @@ public class EvalsPDF {
 
         // Begin ROW 1
         Job job = appraisal.getJob();
-        if (dispalyEmployeeRebuttal(rule)) {
-            String employeeName = job.getEmployee().getName();
-            String employeeSignDate = EvalsUtil.formatDate(appraisal.getEmployeeSignedDate());
-            employeeCell.addElement(new Phrase(employeeName, INFO_FONT));
-            employeeDateCell.addElement(new Phrase(employeeSignDate, INFO_FONT));
-        }
+
+        String employeeName = job.getEmployee().getName();
+        DateTime employeeSignedDate = new DateTime(appraisal.getEmployeeSignedDate());
+        String employeeSignDate = employeeSignedDate.toString(Constants.DATE_FORMAT);
+        employeeCell.addElement(new Phrase(employeeName, INFO_FONT));
+        employeeDateCell.addElement(new Phrase(employeeSignDate, INFO_FONT));
+
         if (appraisal.getReleaseDate() != null) {
+            DateTime releaseDate = new DateTime(appraisal.getReleaseDate());
             String supervisorName = job.getSupervisor().getEmployee().getName();
-            String supervisorSignDate = EvalsUtil.formatDate(appraisal.getReleaseDate());
+            String supervisorSignDate = releaseDate.toString(Constants.DATE_FORMAT);
             supervisorCell.addElement(new Phrase(supervisorName, INFO_FONT));
             supervisorDateCell.addElement(new Phrase(supervisorSignDate, INFO_FONT));
         }
@@ -184,7 +205,7 @@ public class EvalsPDF {
         signatureTable.addCell(employeeDateCell);
 
         PdfPCell middlePaddingCell = new PdfPCell();
-        middlePaddingCell.setRowspan(signatureTableMaxRows-2);
+        middlePaddingCell.setRowspan(signatureTableMaxRows - 2);
         middlePaddingCell.setBorder(Rectangle.TOP);
         signatureTable.addCell(middlePaddingCell);
 
@@ -250,7 +271,8 @@ public class EvalsPDF {
         boolean displayReviewer = appraisal.getReleaseDate() != null && appraisal.getReviewSubmitDate() != null;
         if (displayReviewer) {
             String reviewerName = appraisal.getReviewer().getName();
-            String reviewDate = EvalsUtil.formatDate(appraisal.getReviewSubmitDate());
+            DateTime reviewSubmitDate = new DateTime(appraisal.getReviewSubmitDate());
+            String reviewDate = reviewSubmitDate.toString(Constants.DATE_FORMAT);
             reviewerCell.setPhrase(new Phrase(reviewerName, INFO_FONT));
             reviewerDateCell.setPhrase(new Phrase(reviewDate, INFO_FONT));
         }
@@ -288,133 +310,107 @@ public class EvalsPDF {
     /**
      * Takes care of adding the employee rebuttal and supervisor rebuttal read to the pdf document.
      *
-     * @param appraisal
-     * @param rule
-     * @param resource
-     * @param document
      * @throws DocumentException
      */
-    private static void addRebuttal(Appraisal appraisal, PermissionRule rule, ResourceBundle resource,
-                                       Document document) throws DocumentException {
-        boolean displayEmployeeRebuttal = dispalyEmployeeRebuttal(rule);
-        boolean displayRebuttalRead = StringUtils.containsAny(rule.getRebuttalRead(), "ev");
+    private void addRebuttal() throws DocumentException {
+        String rebuttalLblText= resource.getString("appraisal-employee-response").toUpperCase();
+        Paragraph rebuttalLbl = new Paragraph(rebuttalLblText, FONT_BOLD_11);
+        rebuttalLbl.setSpacingBefore(BEFORE_SPACING);
+        document.add(rebuttalLbl);
+        LineSeparator line = new LineSeparator(1, 100, null, Element.ALIGN_CENTER, -2);
+        document.add(line);
 
-        if (displayEmployeeRebuttal && appraisal.getRebuttal() != null) {
-            String rebuttalLblText= resource.getString("appraisal-employee-response").toUpperCase();
-            Paragraph rebuttalLbl = new Paragraph(rebuttalLblText, FONT_BOLD_11);
-            rebuttalLbl.setSpacingBefore(BEFORE_SPACING);
-            document.add(rebuttalLbl);
-            LineSeparator line = new LineSeparator(1, 100, null, Element.ALIGN_CENTER, -2);
-            document.add(line);
-
-            Paragraph rebuttalText = new Paragraph(appraisal.getRebuttal(), FONT_10);
-            rebuttalText.setIndentationLeft(LEFT_INDENTATION);
-            document.add(rebuttalText);
-        }
-    }
-
-    /**
-     * Specifies whether or not the employee rebuttal should be displayed.
-     *
-     * @param rule
-     * @return
-     */
-    private static boolean dispalyEmployeeRebuttal(PermissionRule rule) {
-        return StringUtils.containsAny(rule.getEmployeeResponse(), "ev");
+        Paragraph rebuttalText = new Paragraph(appraisal.getRebuttal(), FONT_10);
+        rebuttalText.setIndentationLeft(LEFT_INDENTATION);
+        document.add(rebuttalText);
     }
 
 
     /**
      * Adds the evaluation section (appraisal + rating) to the PDF document.
      *
-     * @param appraisal
-     * @param rule
-     * @param resource
-     * @param document
-     * @param rootDir   Prefix for img file path
      * @throws DocumentException
      * @throws IOException
      */
-    private static void addEvaluation(Appraisal appraisal, PermissionRule rule, ResourceBundle resource,
-                                      Document document, String rootDir) throws DocumentException, IOException {
-        boolean displayAppraisal = StringUtils.containsAny(rule.getEvaluation(), "ev");
-        if (displayAppraisal) {
-            String appraisalSectionText = resource.getString("appraisal-summary");
-            appraisalSectionText = appraisalSectionText.toUpperCase();
-            Paragraph appraisalSectionLbl = new Paragraph(appraisalSectionText, FONT_BOLD_11);
-            appraisalSectionLbl.setSpacingBefore(BEFORE_SPACING);
-            document.add(appraisalSectionLbl);
-            LineSeparator line = new LineSeparator(1, 100, null, Element.ALIGN_CENTER, -2);
-            document.add(line);
+    private void addEvaluation() throws DocumentException, IOException {
+        String appraisalSectionText = resource.getString("appraisal-summary");
+        appraisalSectionText = appraisalSectionText.toUpperCase();
+        Paragraph appraisalSectionLbl = new Paragraph(appraisalSectionText, FONT_BOLD_11);
+        appraisalSectionLbl.setSpacingBefore(BEFORE_SPACING);
+        document.add(appraisalSectionLbl);
+        LineSeparator line = new LineSeparator(1, 100, null, Element.ALIGN_CENTER, -2);
+        document.add(line);
 
-            Paragraph evaluationLbl = new Paragraph(resource.getString("appraisal-evaluation"), FONT_BOLDITALIC_10);
-            Paragraph evaluationText = new Paragraph(appraisal.getEvaluation(), FONT_10);
-            evaluationLbl.setIndentationLeft(LEFT_INDENTATION);
-            evaluationText.setIndentationLeft(LEFT_INDENTATION);
-            document.add(evaluationLbl);
-            document.add(evaluationText);
+        Paragraph evaluationLbl = new Paragraph(resource.getString("appraisal-evaluation"), FONT_BOLDITALIC_10);
+        Paragraph evaluationText = new Paragraph(appraisal.getEvaluation(), FONT_10);
+        evaluationLbl.setIndentationLeft(LEFT_INDENTATION);
+        evaluationText.setIndentationLeft(LEFT_INDENTATION);
+        document.add(evaluationLbl);
+        document.add(evaluationText);
 
-            Paragraph ratingLbl = new Paragraph(resource.getString("appraisal-select-rating"), FONT_BOLDITALIC_10);
-            ratingLbl.setIndentationLeft(LEFT_INDENTATION);
-            ratingLbl.setSpacingBefore(BEFORE_SPACING);
-            ratingLbl.setSpacingAfter(6f);
-            document.add(ratingLbl);
+        Paragraph ratingLbl = new Paragraph(resource.getString("appraisal-select-rating"), FONT_BOLDITALIC_10);
+        ratingLbl.setIndentationLeft(LEFT_INDENTATION);
+        ratingLbl.setSpacingBefore(BEFORE_SPACING);
+        ratingLbl.setSpacingAfter(6f);
+        document.add(ratingLbl);
 
-            int ratingMaxCols = 30;
-            PdfPTable rating = new PdfPTable(ratingMaxCols);
-            PdfPCell emptyLeftCol = new PdfPCell();
-            emptyLeftCol.setBorder(Rectangle.NO_BORDER);
-            emptyLeftCol.setRowspan(4);
-            rating.addCell(emptyLeftCol);
-            rating.setWidthPercentage(100f);
-            PdfPCell cell;
+        int ratingMaxCols = 30;
+        PdfPTable rating = new PdfPTable(ratingMaxCols);
+        PdfPCell emptyLeftCol = new PdfPCell();
+        emptyLeftCol.setBorder(Rectangle.NO_BORDER);
+        emptyLeftCol.setRowspan(4);
+        rating.addCell(emptyLeftCol);
+        rating.setWidthPercentage(100f);
+        PdfPCell cell;
 
-            // Use an image for the unchecked box
-            Image checkedImg = Image.getInstance(rootDir + IMAGE_CHECKBOX_CHECKED);
-            checkedImg.scaleToFit(10f, 10f);
-            PdfPCell checkedBox = new PdfPCell(checkedImg, false);
-            checkedBox.setColspan(1);
-            checkedBox.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            checkedBox.setBorder(Rectangle.NO_BORDER);
+        // Use an image for the unchecked box
+        Image checkedImg = Image.getInstance(rootDir + IMAGE_CHECKBOX_CHECKED);
+        checkedImg.scaleToFit(10f, 10f);
+        PdfPCell checkedBox = new PdfPCell(checkedImg, false);
+        checkedBox.setColspan(1);
+        checkedBox.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        checkedBox.setBorder(Rectangle.NO_BORDER);
 
-            // Use an image for the checked box.
-            Image uncheckedImg = Image.getInstance(rootDir + IMAGE_CHECKBOX_UNCHECKED);
-            uncheckedImg.scaleToFit(10f, 10f);
-            PdfPCell uncheckedBox = new PdfPCell(uncheckedImg, false);
-            uncheckedBox.setColspan(1);
-            uncheckedBox.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            uncheckedBox.setBorder(Rectangle.NO_BORDER);
+        // Use an image for the checked box.
+        Image uncheckedImg = Image.getInstance(rootDir + IMAGE_CHECKBOX_UNCHECKED);
+        uncheckedImg.scaleToFit(10f, 10f);
+        PdfPCell uncheckedBox = new PdfPCell(uncheckedImg, false);
+        uncheckedBox.setColspan(1);
+        uncheckedBox.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        uncheckedBox.setBorder(Rectangle.NO_BORDER);
 
-            if (appraisal.getRating() != null && appraisal.getRating() == 1) {
-                rating.addCell(checkedBox);
-            } else {
-                rating.addCell(uncheckedBox);
-            }
-            cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-1"), FONT_10));
-            cell.setColspan(ratingMaxCols - 2);
-            cell.setBorder(Rectangle.NO_BORDER);
-            rating.addCell(cell);
+        if (appraisal.getRating() != null && appraisal.getRating() == 1) {
+            rating.addCell(checkedBox);
+        } else {
+            rating.addCell(uncheckedBox);
+        }
+        cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-1"), FONT_10));
+        cell.setColspan(ratingMaxCols - 2);
+        cell.setBorder(Rectangle.NO_BORDER);
+        rating.addCell(cell);
 
-            if (appraisal.getRating() != null && appraisal.getRating() == 2) {
-                rating.addCell(checkedBox);
-            } else {
-                rating.addCell(uncheckedBox);
-            }
-            cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-2"), FONT_10));
-            cell.setColspan(ratingMaxCols - 2);
-            cell.setBorder(Rectangle.NO_BORDER);
-            rating.addCell(cell);
+        if (appraisal.getRating() != null && appraisal.getRating() == 2) {
+            rating.addCell(checkedBox);
+        } else {
+            rating.addCell(uncheckedBox);
+        }
+        cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-2"), FONT_10));
+        cell.setColspan(ratingMaxCols - 2);
+        cell.setBorder(Rectangle.NO_BORDER);
+        rating.addCell(cell);
 
-            if (appraisal.getRating() != null && appraisal.getRating() == 3) {
-                rating.addCell(checkedBox);
-            } else {
-                rating.addCell(uncheckedBox);
-            }
-            cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-3"), FONT_10));
-            cell.setColspan(ratingMaxCols - 2);
-            cell.setBorder(Rectangle.NO_BORDER);
-            rating.addCell(cell);
+        if (appraisal.getRating() != null && appraisal.getRating() == 3) {
+            rating.addCell(checkedBox);
+        } else {
+            rating.addCell(uncheckedBox);
+        }
+        cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-3"), FONT_10));
+        cell.setColspan(ratingMaxCols - 2);
+        cell.setBorder(Rectangle.NO_BORDER);
+        rating.addCell(cell);
 
+        // Classified IT evals don't allow rating 4
+        if (!appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
             if (appraisal.getRating() != null && appraisal.getRating() == 4) {
                 rating.addCell(checkedBox);
             } else {
@@ -424,21 +420,153 @@ public class EvalsPDF {
             cell.setColspan(ratingMaxCols - 2);
             cell.setBorder(Rectangle.NO_BORDER);
             rating.addCell(cell);
-
-            document.add(rating);
         }
+
+        document.add(rating);
+
+        // only Classified IT evals get the salary table
+        if (appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
+            addSalaryTable();
+        }
+    }
+
+    /**
+     * Adds the salary table for IT evaluations.
+     *
+     * @throws DocumentException
+     */
+    private void addSalaryTable() throws DocumentException {
+
+        Paragraph sectionTitle = new Paragraph(resource.getString("appraisal-salary-section-title"),
+                FONT_BOLDITALIC_10);
+        sectionTitle.setIndentationLeft(LEFT_INDENTATION);
+        sectionTitle.setSpacingBefore(BEFORE_SPACING);
+        sectionTitle.setSpacingAfter(6f);
+        document.add(sectionTitle);
+
+        float[] columnWidths = new float[] {20f, 20f, 20f, 20f, 26f, 20f, 26f, 20f};
+        PdfPTable salaryTable = new PdfPTable(columnWidths.length);
+        salaryTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        salaryTable.setWidthPercentage(98.3f);
+        salaryTable.setKeepTogether(true);
+        // specify column widths dynamically since we need varying widths
+        salaryTable.setWidths(columnWidths);
+
+        PdfPCell cell;
+        Phrase phrase;
+
+        // Heading Row
+        phrase = new Phrase(resource.getString("appraisal-salary-current")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        phrase = new Phrase(resource.getString("appraisal-salary-control-point-value")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        phrase = new Phrase(resource.getString("appraisal-salary-control-low")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        phrase = new Phrase(resource.getString("appraisal-salary-control-high")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        phrase = new Phrase(resource.getString("appraisal-salary-control-point")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        phrase = new Phrase(resource.getString("appraisal-salary-recommended-increase") +": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        phrase = new Phrase(resource.getString("appraisal-salary-after-increase")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        phrase = new Phrase(resource.getString("appraisal-salary-eligibility-date")+": ", FONT_BOLD_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        // Data Rows
+        Salary salary = appraisal.getSalary();
+        // Current Salary
+        phrase = new Phrase(CWSUtil.formatCurrency(salary.getCurrent()), FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        // Control Point Value
+        phrase = new Phrase(CWSUtil.formatCurrency(salary.getMidPoint()), FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        // Low Control Point
+        phrase = new Phrase(CWSUtil.formatCurrency(salary.getLow()), FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        // High Control Point
+        phrase = new Phrase(CWSUtil.formatCurrency(salary.getHigh()), FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        // Above/Below Control Point
+        String belowOrAboveOrAt = resource.getString("appraisal-salary-at");
+        if (salary.getCurrent() > salary.getMidPoint()) {
+            belowOrAboveOrAt = resource.getString("appraisal-salary-above");
+        } else if (salary.getCurrent() < salary.getMidPoint()) {
+            belowOrAboveOrAt = resource.getString("appraisal-salary-below");
+        }
+        phrase = new Phrase(belowOrAboveOrAt, FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        // Recommended Increase
+        Double increase = salary.getIncrease();
+        if (increase == null) {
+            increase = 0d;
+        }
+        phrase = new Phrase(increase.toString(), FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        // Salary After Increase
+        Double salaryAfterIncrease = salary.getCurrent() * (1 + increase / 100);
+        phrase = new Phrase(CWSUtil.formatCurrency(salaryAfterIncrease), FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+
+        // Salary Eligibility Date
+        DateTime salaryEligibilityDate = new DateTime(appraisal.getSalaryEligibilityDate());
+        String sed = salaryEligibilityDate.toString("MM/dd");
+        phrase = new Phrase(sed, FONT_10);
+        cell = new PdfPCell(phrase);
+        salaryTable.addCell(cell);
+
+        document.add(salaryTable);
     }
 
     /**
      * Returns a PdfPTable object that contains the appraisal and job summary information.
      *
-     * @param appraisal Appraisal object
-     * @param resource  ResourceBundle object
-     * @param rule      PermissionRule object
      * @return PdfPTable
      */
-    public static PdfPTable getInfoTable(Appraisal appraisal, ResourceBundle resource,
-                                         PermissionRule rule) {
+    public PdfPTable getInfoTable() {
         PdfPTable info = new PdfPTable(4);
         info.setWidthPercentage(100f);
         info.setKeepTogether(true);
@@ -550,7 +678,7 @@ public class EvalsPDF {
         c = new Chunk(resource.getString("appraisal-rating")+": ", INFO_FONT);
         p = new Paragraph(c);
         String rating = "";
-        boolean displayRating = StringUtils.containsAny(rule.getEvaluation(), "ev");
+        boolean displayRating = StringUtils.containsAny(permRule.getEvaluation(), "ev");
         if (appraisal.getRating() != null && displayRating) {
             rating = resource.getString("appraisal-rating-pdf-" + appraisal.getRating());
         }
@@ -567,12 +695,10 @@ public class EvalsPDF {
     /**
      * Returns a table that contains the top header used in the PDF form.
      *
-     * @param resource  ResourceBundle object
-     * @param rootDir   Prefix for img file path
      * @return PdfPTable
      * @throws Exception
      */
-    public static PdfPTable getLetterHead(ResourceBundle resource, String rootDir) throws Exception {
+    public PdfPTable getLetterHead() throws Exception {
         PdfPTable header = new PdfPTable(3);
         header.setWidthPercentage(100f);
         Paragraph paragraph;
@@ -592,7 +718,8 @@ public class EvalsPDF {
         cell.setBorder(Rectangle.NO_BORDER);
         header.addCell(cell);
 
-        paragraph = new Paragraph(resource.getString("classified-employee-appraisal-record"), FONT_BOLD_14);
+        String title = appraisal.getJob().getAppointmentType() + " " + resource.getString("appraisal-title");
+        paragraph = new Paragraph(title, FONT_BOLD_14);
         paragraph.setAlignment(Element.ALIGN_RIGHT);
         cell = new PdfPCell(paragraph);
         cell.setBorder(Rectangle.NO_BORDER);
@@ -605,69 +732,241 @@ public class EvalsPDF {
 
 
     /**
-     * Adds each evaluation criteria, goals, employee results and supervisor results based on
-     * the permission rule.
+     * Adds headers and assessments based on goals versions
      *
-     * @param appraisal
-     * @param rule
-     * @param resource
-     * @param document
-     * @throws DocumentException
+     * @throws
      */
-    private static void addAssessments(Appraisal appraisal, PermissionRule rule, ResourceBundle resource,
-                                       Document document) throws DocumentException {
+    private void addAssessments() throws Exception {
+        String goalHeader = "";
+        int approvedCount = 0;
+
+        if(StringUtils.containsAny(permRule.getApprovedGoals(), "ev")) {
+            List<GoalVersion> approvedGoalsVersions = appraisal.getApprovedGoalsVersions();
+            for (GoalVersion goalVersion : approvedGoalsVersions){
+                goalHeader = resource.getString("appraisal-goals-approved-on") + " " +
+                        new DateTime(goalVersion.getGoalsApprovedDate()).toString(Constants.DATE_FORMAT) + ":";
+                setGoalsHeader(goalHeader);
+                List<Assessment> sortedAssessments = goalVersion.getSortedAssessments();
+                approvedCount = displayAssessments(sortedAssessments, approvedCount);
+            }
+        }
+
+        if(StringUtils.containsAny(permRule.getUnapprovedGoals(), "ev")) {
+            GoalVersion unapprovedGoalsVersion = appraisal.getUnapprovedGoalsVersion();
+            if (unapprovedGoalsVersion != null) {
+                goalHeader = resource.getString("appraisal-goals-need-approved");
+                setGoalsHeader(goalHeader);
+                List<Assessment> sortedAssessments = unapprovedGoalsVersion.getSortedAssessments();
+                displayAssessments(sortedAssessments, approvedCount);
+            }
+        }
+    }
+
+    /**
+     * Adds header for one goal version
+     *
+     * @throws Exception
+     */
+    private void setGoalsHeader(String goalHeader) throws Exception {
+        Chunk goalHeaderChunk = new Chunk(goalHeader, FONT_BOLD_12);
+        goalHeaderChunk.setUnderline(1f, -2f);
+        Paragraph goalsHeader = new Paragraph(goalHeaderChunk);
+        goalsHeader.setSpacingBefore(BEFORE_SPACING);
+        document.add(goalsHeader);
+    }
+
+    /**
+     * Adds assessments for one goal version
+     *
+     * @throws Exception
+     */
+    private int displayAssessments(List<Assessment> sortedAssessments, int approvedCount) throws Exception {
+        boolean displayApprovedGoals = StringUtils.containsAny(permRule.getApprovedGoals(), "ev");
+        boolean displayUnapprovedGoals = StringUtils.containsAny(permRule.getUnapprovedGoals(), "ev");
+        boolean displayEmployeeResults = StringUtils.containsAny(permRule.getResults(), "ev");
+        boolean displaySupervisorResults = StringUtils.containsAny(permRule.getSupervisorResults(), "ev");
+
         Paragraph sectionText;
-        int i = 0;
+        int unapprovedCount = 0;
 
-        for (Assessment assessment : (java.util.List<Assessment>) appraisal.getSortedAssessments()) {
-            i++;
-            String areaText = i + ". " + assessment.getCriterionDetail().getAreaID().getName().toUpperCase() + ":";
-            String descriptionText = " (" + assessment.getCriterionDetail().getDescription() + ")";
+        for (Assessment assessment : sortedAssessments) {
 
-            Chunk area = new Chunk(areaText, FONT_BOLD_12);
-            area.setUnderline(1f, -2f);
-
-            Phrase description = new Phrase(descriptionText, FONT_10);
             sectionText = new Paragraph();
-            sectionText.add(area);
-            sectionText.add(description);
             sectionText.setSpacingBefore(BEFORE_SPACING);
             document.add(sectionText);
 
-            boolean displayGoals = StringUtils.containsAny(rule.getGoals(), "ev");
-            boolean displayEmployeeResults = StringUtils.containsAny(rule.getResults(), "ev");
-            boolean displaySupervisorResults = StringUtils.containsAny(rule.getSupervisorResults(), "ev");
-            if (displayGoals) {
-                Paragraph goalsLabel = new Paragraph(resource.getString("appraisal-goals"), FONT_BOLDITALIC_10);
+            if (displayApprovedGoals || displayUnapprovedGoals) {
+                String goalLabel = "";
+                if (!assessment.isNewGoal()) {
+                    approvedCount ++;
+                    goalLabel = resource.getString("appraisal-goals") + approvedCount;
+                } else {
+                    unapprovedCount ++;
+                    goalLabel = resource.getString("appraisal-goals") + unapprovedCount;
+                }
+
+                Chunk goalChunk = new Chunk(goalLabel, FONT_BOLDITALIC_10);
+                goalChunk.setUnderline(1f, -2f);
+
+                Paragraph goalsLabel = new Paragraph(goalChunk);
                 Paragraph goals = new Paragraph(assessment.getGoal(), FONT_10);
-                goalsLabel.setIndentationLeft(LEFT_INDENTATION);
                 goals.setIndentationLeft(LEFT_INDENTATION);
                 document.add(goalsLabel);
                 document.add(goals);
+
+                addAssessmentsCriteria(assessment);
             }
 
-            if (displayEmployeeResults) {
-                Paragraph resultsLabel = new Paragraph(resource.getString("appraisal-employee-results"),
-                        FONT_BOLDITALIC_10);
-                Paragraph employeeResult = new Paragraph(assessment.getEmployeeResult(), FONT_10);
-                resultsLabel.setSpacingBefore(BEFORE_SPACING);
-                resultsLabel.setIndentationLeft(LEFT_INDENTATION);
-                employeeResult.setIndentationLeft(LEFT_INDENTATION);
-                document.add(resultsLabel);
-                document.add(employeeResult);
-            }
+            if (!assessment.isNewGoal()) {
+                if (displayEmployeeResults) {
+                    Paragraph resultsLabel = new Paragraph(resource.getString("appraisal-employee-results"),
+                            FONT_BOLDITALIC_10);
+                    Paragraph employeeResult = new Paragraph(assessment.getEmployeeResult(), FONT_10);
+                    resultsLabel.setSpacingBefore(BEFORE_SPACING);
+                    resultsLabel.setIndentationLeft(LEFT_INDENTATION);
+                    employeeResult.setIndentationLeft(LEFT_INDENTATION);
+                    document.add(resultsLabel);
+                    document.add(employeeResult);
+                }
 
-            if (displaySupervisorResults) {
-                Paragraph supervisorResultLbl = new Paragraph(resource.getString("appraisal-result-comments"),
-                        FONT_BOLDITALIC_10);
-                Paragraph supervisorResult = new Paragraph(assessment.getSupervisorResult(), FONT_10);
-                supervisorResultLbl.setSpacingBefore(BEFORE_SPACING);
-                supervisorResultLbl.setIndentationLeft(LEFT_INDENTATION);
-                supervisorResult.setIndentationLeft(LEFT_INDENTATION);
-                document.add(supervisorResultLbl);
-                document.add(supervisorResult);
+                if (displaySupervisorResults) {
+                    Paragraph supervisorResultLbl = new Paragraph(resource.getString("appraisal-result-comments"),
+                            FONT_BOLDITALIC_10);
+                    Paragraph supervisorResult = new Paragraph(assessment.getSupervisorResult(), FONT_10);
+                    supervisorResultLbl.setSpacingBefore(BEFORE_SPACING);
+                    supervisorResultLbl.setIndentationLeft(LEFT_INDENTATION);
+                    supervisorResult.setIndentationLeft(LEFT_INDENTATION);
+                    document.add(supervisorResultLbl);
+                    document.add(supervisorResult);
+                }
             }
-
         }
+        return approvedCount;
+    }
+
+    /**
+     * Adds the assessments criteria checkboxes for a single assessment.
+     *
+     * @param assessment
+     * @throws DocumentException
+     * @throws IOException
+     */
+    private void addAssessmentsCriteria(Assessment assessment) throws DocumentException, IOException {
+        int ratingMaxCols = 45;
+        PdfPTable criteriaTable = new PdfPTable(ratingMaxCols);
+        PdfPCell emptyLeftCol = new PdfPCell();
+        emptyLeftCol.setBorder(Rectangle.NO_BORDER);
+        emptyLeftCol.setRowspan(4);
+        criteriaTable.addCell(emptyLeftCol);
+        criteriaTable.setWidthPercentage(100f);
+        PdfPCell cell;
+
+        // Use an image for the unchecked box
+        Image checkedImg = Image.getInstance(rootDir + IMAGE_CHECKBOX_CHECKED);
+        checkedImg.scaleToFit(10f, 10f);
+        PdfPCell checkedBox = new PdfPCell(checkedImg, false);
+        checkedBox.setColspan(1);
+        checkedBox.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        checkedBox.setBorder(Rectangle.NO_BORDER);
+        checkedBox.setPaddingLeft(2f);
+
+        // Use an image for the checked box.
+        Image uncheckedImg = Image.getInstance(rootDir + IMAGE_CHECKBOX_UNCHECKED);
+        uncheckedImg.scaleToFit(10f, 10f);
+        PdfPCell uncheckedBox = new PdfPCell(uncheckedImg, false);
+        uncheckedBox.setColspan(1);
+        uncheckedBox.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        uncheckedBox.setBorder(Rectangle.NO_BORDER);
+        uncheckedBox.setPaddingLeft(2f);
+
+        // empty space
+        Paragraph sectionText = new Paragraph();
+        sectionText.setSpacingBefore(BEFORE_SPACING);
+        document.add(sectionText);
+
+        Paragraph criteriaLabel = new Paragraph(resource.getString("appraisal-selected-criteria"), FONT_BOLDITALIC_10);
+        criteriaLabel.setIndentationLeft(LEFT_INDENTATION);
+        document.add(criteriaLabel);
+
+        for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
+            if (assessmentCriteria.getChecked() != null && assessmentCriteria.getChecked()) {
+                criteriaTable.addCell(checkedBox);
+            } else {
+                criteriaTable.addCell(uncheckedBox);
+            }
+            cell = new PdfPCell(new Paragraph(assessmentCriteria.getCriteriaArea().getName(), FONT_10));
+
+            int colspan = (ratingMaxCols - 5) / 4;
+            cell.setColspan(colspan);
+            cell.setBorder(Rectangle.NO_BORDER);
+            criteriaTable.addCell(cell);
+        }
+
+        document.add(criteriaTable);
+    }
+
+    /**
+     * Adds the criteria area legend.
+     *
+     * @throws DocumentException
+     */
+    private void addCriteriaLegend() throws DocumentException {
+        LineSeparator line = new LineSeparator(1, 100, null, Element.ALIGN_CENTER, -12);
+        document.add(line);
+
+        List<CriterionArea> sortedCriteriaArea = getSortedCriteria();
+        PdfPTable criteriaTable = new PdfPTable(41);
+        PdfPCell emptyLeftCol = new PdfPCell();
+        emptyLeftCol.setBorder(Rectangle.NO_BORDER);
+        emptyLeftCol.setRowspan(sortedCriteriaArea.size());
+        criteriaTable.addCell(emptyLeftCol);
+        criteriaTable.setWidthPercentage(100f);
+        PdfPCell cell;
+
+        // empty space
+        Paragraph sectionText = new Paragraph();
+        sectionText.setSpacingBefore(BEFORE_SPACING);
+        document.add(sectionText);
+
+        Chunk criteriaChunk = new Chunk(resource.getString("appraisal-criteria-legend"), FONT_BOLDITALIC_10);
+        criteriaChunk.setUnderline(1f, -2f);
+        Paragraph criteriaLabel = new Paragraph(criteriaChunk);
+        document.add(criteriaLabel);
+
+
+        for (CriterionArea criterionArea : sortedCriteriaArea) {
+            cell = new PdfPCell(new Paragraph(criterionArea.getName(), FONT_10));
+            cell.setColspan(10);
+            cell.setBorder(Rectangle.NO_BORDER);
+            criteriaTable.addCell(cell);
+
+            cell = new PdfPCell(new Paragraph(criterionArea.getDescription(), FONT_10));
+            cell.setColspan(30);
+            cell.setBorder(Rectangle.NO_BORDER);
+            criteriaTable.addCell(cell);
+        }
+
+        document.add(criteriaTable);
+    }
+
+    /**
+     * Returns a list of sorted criteria areas to be used when displaying the legend. This method
+     * iterates over the goal versions to find one goal version that has assessments. It then returns
+     * the criteria areas for the first assessment within this goal version.
+     *
+     * @return
+     */
+    private List<CriterionArea> getSortedCriteria() {
+        List<CriterionArea> sortedCriteriaArea = new ArrayList<CriterionArea>();
+        for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
+            if (!goalVersion.getAssessments().isEmpty()) {
+                Assessment assessment = (Assessment) goalVersion.getAssessments().toArray()[0];
+                for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
+                    sortedCriteriaArea.add(assessmentCriteria.getCriteriaArea());
+                }
+                break;
+            }
+        }
+        return sortedCriteriaArea;
     }
 }

@@ -1,5 +1,10 @@
 package edu.osu.cws.evals.models;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.WordUtils;
+
+import java.lang.reflect.Method;
+
 public class PermissionRule extends Evals implements Cloneable {
     private int id;
 
@@ -7,9 +12,9 @@ public class PermissionRule extends Evals implements Cloneable {
 
     private String role;
 
-    private String goals;
+    private String approvedGoals;
 
-    private String newGoals;
+    private String unapprovedGoals;
 
     private String goalComments;
 
@@ -25,13 +30,26 @@ public class PermissionRule extends Evals implements Cloneable {
 
     private String rebuttalRead;
 
-    private String saveDraft;
-
-    private String requireModification;
+    private String secondarySubmit;
 
     private String submit;
 
     private String actionRequired;
+
+    private String downloadPDF;
+
+    private String closeOut;
+
+    private String sendToNolij;
+
+    private String setStatusToResultsDue;
+
+    private String reactivateGoals;
+
+    // This is a transient property. It is used because during goals approval due, the save draft
+    // can be either disabled or not for the employee role. Since the permission rule object is
+    // not aware of the appraisal object, the action code must set this property.
+    private Boolean disableResultsSaveDraft = false;
 
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
@@ -63,20 +81,20 @@ public class PermissionRule extends Evals implements Cloneable {
         this.role = role;
     }
 
-    public String getGoals() {
-        return goals;
+    public String getApprovedGoals() {
+        return approvedGoals;
     }
 
-    public void setGoals(String goals) {
-        this.goals = goals;
+    public void setApprovedGoals(String approvedGoals) {
+        this.approvedGoals = approvedGoals;
     }
 
-    public String getNewGoals() {
-        return newGoals;
+    public String getUnapprovedGoals() {
+        return unapprovedGoals;
     }
 
-    public void setNewGoals(String newGoals) {
-        this.newGoals = newGoals;
+    public void setUnapprovedGoals(String unapprovedGoals) {
+        this.unapprovedGoals = unapprovedGoals;
     }
 
     public String getGoalComments() {
@@ -119,12 +137,37 @@ public class PermissionRule extends Evals implements Cloneable {
         this.review = review;
     }
 
+    /**
+     * If any of the various permission fields contains "e", the permission rule code
+     * will return save-draft so that this button is displayed in the jsp.
+     *
+     * @return
+     */
     public String getSaveDraft() {
-        return saveDraft;
-    }
+        String employeeResults = results;
 
-    public void setSaveDraft(String saveDraft) {
-        this.saveDraft = saveDraft;
+        // We don't allow the save of draft due to employee results if the appraisal action
+        // has disabled it.
+        if (disableResultsSaveDraft != null && disableResultsSaveDraft) {
+            employeeResults = null;
+        }
+
+        String[] permissionFields = {
+                approvedGoals,
+                unapprovedGoals,
+                goalComments,
+                employeeResults,
+                supervisorResults,
+                evaluation,
+                review,
+                employeeResponse
+        };
+
+        if (ArrayUtils.contains(permissionFields, "e")) {
+            return "save-draft";
+        }
+
+        return null;
     }
 
     public String getEmployeeResponse() {
@@ -143,12 +186,12 @@ public class PermissionRule extends Evals implements Cloneable {
         this.employeeResponse = employeeResponse;
     }
 
-    public String getRequireModification() {
-        return requireModification;
+    public String getSecondarySubmit() {
+        return secondarySubmit;
     }
 
-    public void setRequireModification(String requireModification) {
-        this.requireModification = requireModification;
+    public void setSecondarySubmit(String secondarySubmit) {
+        this.secondarySubmit = secondarySubmit;
     }
 
     public String getSubmit() {
@@ -166,4 +209,67 @@ public class PermissionRule extends Evals implements Cloneable {
     public void setActionRequired(String actionRequired) {
         this.actionRequired = actionRequired;
     }
+
+    public String getDownloadPDF() {
+        return downloadPDF;
+    }
+
+    public void setDownloadPDF(String downloadPDF) {
+        this.downloadPDF = downloadPDF;
+    }
+
+    public String getCloseOut() {
+        return closeOut;
+    }
+
+    public void setCloseOut(String closeOut) {
+        this.closeOut = closeOut;
+    }
+
+    public String getSendToNolij() {
+        return sendToNolij;
+    }
+
+    public void setSendToNolij(String sendToNolij) {
+        this.sendToNolij = sendToNolij;
+    }
+
+    public String getSetStatusToResultsDue() {
+        return setStatusToResultsDue;
+    }
+
+    public void setSetStatusToResultsDue(String setStatusToResultsDue) {
+        this.setStatusToResultsDue = setStatusToResultsDue;
+    }
+
+    public String getReactivateGoals() {
+        return reactivateGoals;
+    }
+
+    public void setReactivateGoals(String reactivateGoals) {
+        this.reactivateGoals = reactivateGoals;
+    }
+
+    public void setDisableResultsSaveDraft(Boolean disableResultsSaveDraft) {
+        this.disableResultsSaveDraft = disableResultsSaveDraft;
+    }
+
+    public Boolean canEdit(String column) throws Exception {
+        return can(column, "e");
+    }
+
+    /**
+     *
+     * @param column        Name of the permission rule columns such as: employeeResult,
+     *                      supervisorResult
+     * @param action        Values within the columns such as: "e" && "v"
+     * @return
+     */
+    public Boolean can(String column, String action) throws Exception {
+        String methodName = "get" + WordUtils.capitalize(column) ;
+        Method permissionMethod = this.getClass().getDeclaredMethod(methodName);
+        String permission = (String) permissionMethod.invoke(this);
+        return permission != null && permission.equals(action);
+    }
+
 }

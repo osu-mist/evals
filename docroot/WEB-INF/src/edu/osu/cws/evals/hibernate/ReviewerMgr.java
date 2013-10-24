@@ -5,9 +5,7 @@ import edu.osu.cws.evals.models.ModelException;
 import edu.osu.cws.evals.models.Reviewer;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -19,39 +17,26 @@ public class ReviewerMgr {
      *
      * @return ruleMap
      */
-    public HashMap<Integer, Reviewer> mapByEmployeeId() throws Exception {
+    public static HashMap<Integer, Reviewer> mapByEmployeeId() throws Exception {
         HashMap<Integer, Reviewer> reviewers = new HashMap<Integer, Reviewer>();
-        Session session = HibernateUtil.getCurrentSession();
-        for (Reviewer reviewer : this.list(session)) {
+        for (Reviewer reviewer : ReviewerMgr.list()) {
             reviewers.put(reviewer.getEmployee().getId(), reviewer);
         }
         return reviewers;
     }
 
     /**
-     * Uses list(session) method to grab a list of admins.
+     * Grabs a list of reviewers.
      *
      * @throws Exception
      * @return
      */
-    public List<Reviewer> list() throws Exception {
+    public static List<Reviewer> list() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return list(session);
-    }
-
-    /**
-     * Retrieves a list of Reviewer from the database.
-     *
-     * @param session
-     * @return
-     * @throws Exception
-     */
-    private List<Reviewer> list(Session session) throws Exception {
-        List<Reviewer> result = session.createQuery("from edu.osu.cws.evals.models.Reviewer reviewer " +
+        List<Reviewer> results = session.createQuery("from edu.osu.cws.evals.models.Reviewer reviewer " +
                 "order by reviewer.businessCenterName").list();
-        return result;
+        return results;
     }
-
 
     /**
      * Handles deleting a reviewer user. Checks to make sure pojo exists
@@ -61,28 +46,15 @@ public class ReviewerMgr {
      * @return success
      * @throws Exception
      */
-    public boolean delete(int id) throws Exception {
+    public static boolean delete(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        delete(id, session);
-        return true;
-    }
-
-    /**
-     * Handles deleting a reviewer user. Checks to make sure pojo exists
-     * before trying to delete it.
-     *
-     * @param id of admin pojo
-     * @param session
-     * @return success
-     * @throws Exception
-     */
-    private void delete(int id, Session session) throws Exception {
         Reviewer admin = (Reviewer) session.get(Reviewer.class, id);
         if (admin == null) {
             throw new ModelException("Invalid Reviewer ID");
         }
 
         session.delete(admin);
+        return true;
     }
 
     /**
@@ -92,19 +64,8 @@ public class ReviewerMgr {
      * @return
      * @throws Exception
      */
-    public Reviewer get(int id) throws Exception {
+    public static Reviewer get(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return get(id, session);
-    }
-
-    /**
-     * Retrieves a Reviewer object from the db
-     *
-     * @param id
-     * @param session
-     * @return
-     */
-    private Reviewer get(int id, Session session) {
         return (Reviewer) session.get(Reviewer.class, id);
     }
 
@@ -115,19 +76,8 @@ public class ReviewerMgr {
      * @return
      * @throws Exception
      */
-    public List<Reviewer> findByOnid(String onid) throws Exception {
+    public static List<Reviewer> findByOnid(String onid) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return findByOnid(onid, session);
-    }
-
-    /**
-     * Retrieves a reviewer object from the db using the employee id
-     *
-     * @param onid
-     * @param session
-     * @return
-     */
-    private List<Reviewer> findByOnid(String onid, Session session) {
         String query = "from edu.osu.cws.evals.models.Reviewer reviewer where reviewer.employee.onid = :onid " +
                 "and reviewer.businessCenterName = :businessCenterName";
         List<Reviewer> results = (List<Reviewer>) session.createQuery(query)
@@ -145,9 +95,9 @@ public class ReviewerMgr {
      * @return
      * @throws Exception
      */
-    public Reviewer findByOnidAndBC(String onid, String businessCenterName) throws Exception {
+    public static Reviewer findByOnidAndBC(String onid, String businessCenterName) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        return findByOnidBC(onid, businessCenterName, session);
+        return ReviewerMgr.findByOnidBC(onid, businessCenterName, session);
     }
 
     /**
@@ -158,8 +108,9 @@ public class ReviewerMgr {
      * @param session
      * @return
      */
-    private Reviewer findByOnidBC(String onid, String businessCenterName, Session session) {
-        String query = "from edu.osu.cws.evals.models.Reviewer reviewer where reviewer.employee.onid = :onid " +
+    private static Reviewer findByOnidBC(String onid, String businessCenterName, Session session) {
+        String query = "from edu.osu.cws.evals.models.Reviewer reviewer " +
+                "where reviewer.employee.onid = :onid " +
                 "and reviewer.businessCenterName = :businessCenterName";
         List<Reviewer> results = (List<Reviewer>) session.createQuery(query)
                 .setString("onid", onid)
@@ -181,9 +132,8 @@ public class ReviewerMgr {
      * @return
      * @throws Exception
      */
-    public boolean add(String onid, String businessCenterName) throws Exception {
-        EmployeeMgr employeeMgr = new EmployeeMgr();
-        Employee employee = employeeMgr.findByOnid(onid, null);
+    public static boolean add(String onid, String businessCenterName) throws Exception {
+        Employee employee = EmployeeMgr.findByOnid(onid, null);
 
         // Check that the employee object is valid
         if (employee.getStatus() == null || !employee.getStatus().equals("A")) {
@@ -211,7 +161,7 @@ public class ReviewerMgr {
      * @param session
      * @throws Exception
      */
-    private void add(Reviewer reviewer, Session session) throws Exception {
+    private static void add(Reviewer reviewer, Session session) throws Exception {
         reviewer.validate();
         session.save(reviewer);
     }
@@ -225,9 +175,8 @@ public class ReviewerMgr {
      */
     public static List<Reviewer> getReviewers(String bcName) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        List<Reviewer> results = new ArrayList<Reviewer>();
         String query = "from edu.osu.cws.evals.models.Reviewer where businessCenterName = :bcName";
-        results = (List<Reviewer>) session.createQuery(query)
+        List<Reviewer> results = (List<Reviewer>) session.createQuery(query)
                 .setString("bcName", bcName)
                 .list();
         return results;

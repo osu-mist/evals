@@ -3,11 +3,10 @@ package edu.osu.cws.evals.hibernate;
 import edu.osu.cws.evals.models.NolijCopy;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import java.util.Date;
 
-public class NolijCopies {
+public class NolijCopyMgr {
 
     /**
      * Handles adding a new nolij_copy entry to the nolij_copies table.

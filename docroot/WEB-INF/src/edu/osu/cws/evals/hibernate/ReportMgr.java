@@ -1,7 +1,5 @@
 package edu.osu.cws.evals.hibernate;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import edu.osu.cws.evals.models.AppointmentType;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Job;
@@ -14,8 +12,10 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TreeMap;
 
 public class ReportMgr {
 
@@ -173,7 +173,7 @@ public class ReportMgr {
 
         // Fetch direct supervisors so we can get supervising data
         if (scope.equals(ReportsAction.SCOPE_SUPERVISOR)) {
-            sqlQuery = getSupervisorChartSQL(scope, report, sortByCount, directSupervisors.size(),
+            sqlQuery = getSupervisorChartSQL(report, sortByCount, directSupervisors.size(),
                     inLeafSupervisor);
         } else {
             sqlQuery = getChartSQL(scope, report, sortByCount, addBC);
@@ -231,14 +231,13 @@ public class ReportMgr {
     /**
      * Generates the sql needed to fetch the supervisors report.
      *
-     * @param scope
      * @param reportType
      * @param sortByCount
      * @param directSupervisorCount
      * @param inLeafSupervisor
      * @return
      */
-    public static String getSupervisorChartSQL(String scope, String reportType, boolean sortByCount,
+    public static String getSupervisorChartSQL(String reportType, boolean sortByCount,
                                         int directSupervisorCount, boolean inLeafSupervisor) {
         //@todo: need to handle case when directSupervisors is empty
         String startWith = EvalsUtil.getStartWithClause(directSupervisorCount);

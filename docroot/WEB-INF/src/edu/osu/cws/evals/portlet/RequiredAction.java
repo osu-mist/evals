@@ -4,11 +4,10 @@ package edu.osu.cws.evals.portlet;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.util.EvalsUtil;
-import edu.osu.cws.util.CWSUtil;
-import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 
 import java.text.MessageFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
@@ -49,21 +48,22 @@ public class RequiredAction {
 
         String pattern = resource.getString(key);
 
-        Date dueDate = EvalsUtil.getDueDate(appraisal, configuration);
-        String dueOn = EvalsUtil.formatDate(dueDate);
+        DateTime dueDate = EvalsUtil.getDueDate(appraisal, configuration);
+        String dueOn = dueDate.toString(Constants.DATE_FORMAT);
 
         String name = "";
         if (appraisal.getJob() != null && appraisal.getJob().getEmployee() != null) {
             name = appraisal.getJob().getEmployee().getName();
         }
-        int numDays = Math.abs(CWSUtil.getRemainDays(dueDate));
+        int numDays = Math.abs(Days.daysBetween(dueDate, new DateTime()).getDays());
         String jobTitle = appraisal.getJob().getJobTitle();
         String reviewPeriod = appraisal.getReviewPeriod();
         boolean isTeamAction = key.contains("action-team");
 
         if (key.contains("goals-due") || key.contains("goals-overdue") ||
                 key.contains("results-due") || key.contains("results-overdue") ||
-                key.contains("signature-due") || key.contains("signature-overdue")
+                key.contains("signature-due") || key.contains("signature-overdue") ||
+                key.contains("action-team-goals-reactivation")
                 ) {
             pattern = changeKeyIfDueToday(key, numDays, resource);
             if (isTeamAction) {

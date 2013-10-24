@@ -2,25 +2,17 @@ package edu.osu.cws.evals.hibernate;
 
 import edu.osu.cws.evals.models.AppointmentType;
 import edu.osu.cws.evals.models.ClassifiedITObject;
-import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.portlet.Constants;
-import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.joda.time.DateTime;
 
-import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Created with IntelliJ IDEA.
- * User: wanghuay
- * Date: 10/4/12
- * Time: 1:54 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ClassifiedITObjectMgr {
 
 
@@ -32,11 +24,9 @@ public class ClassifiedITObjectMgr {
      */
     public static ArrayList<ClassifiedITObject> getMyClassifiedITAppraisals (Integer pidm)
             throws Exception {
-        Session hibSession = HibernateUtil.getCurrentSession();
-        Criteria criteria = hibSession.createCriteria(Job.class);
+        Session Session = HibernateUtil.getCurrentSession();
+        Criteria criteria = Session.createCriteria(Job.class);
         ArrayList<ClassifiedITObject> myTeamClassifiedITObject = new ArrayList<ClassifiedITObject>();
-        String reviewPeriod = "";
-        String name = "";
         criteria.add(Restrictions.eq("supervisor.employee.id", pidm)).add(Restrictions.eq("status", "A")).
                 add(Restrictions.like("appointmentType", AppointmentType.CLASSIFIED_IT));
         List result = criteria.list();
@@ -47,15 +37,14 @@ public class ClassifiedITObjectMgr {
             Job job = (Job) jResult;
 
             job.setAnnualInd(Constants.ANNUAL_IND);
-            Date startDate, endDate;
-            Calendar startCal = job.getNewAnnualStartDate();
-            if(startCal.after(Calendar.getInstance())) {
-                startCal.add(Calendar.MONTH, -12);
+            DateTime startDate, endDate;
+            startDate = job.getNewAnnualStartDate();
+            if(startDate.isAfterNow()) {
+                startDate = startDate.minusMonths(12);
             }
-            startDate = startCal.getTime();
             endDate = job.getEndEvalDate(startDate, "annual");
-            name = job.getEmployee().getName();
-            reviewPeriod = getReviewPeriod(startDate, endDate);
+            String name = job.getEmployee().getName();
+            String reviewPeriod = getReviewPeriod(startDate, endDate);
             ClassifiedITObject classifiedITObject = new ClassifiedITObject(name, reviewPeriod);
             myTeamClassifiedITObject.add(classifiedITObject);
 
@@ -63,15 +52,15 @@ public class ClassifiedITObjectMgr {
         return myTeamClassifiedITObject;
     }
 
-    public static String getReviewPeriod(Date startDate,Date endDate) {
+    public static String getReviewPeriod(DateTime startDate, DateTime endDate) {
         if (startDate == null) {
-            startDate = new Date();
+            startDate = new DateTime();
         }
         if (endDate == null) {
-            endDate = new Date();
+            endDate = new DateTime();
         }
 
-        return MessageFormat.format("{0,date,MM/dd/yy} - {1,date,MM/dd/yy}",
-                new Object[]{startDate, endDate});
+        return startDate.toString(Constants.DATE_FORMAT) + " - " +
+                endDate.toString(Constants.DATE_FORMAT);
     }
 }

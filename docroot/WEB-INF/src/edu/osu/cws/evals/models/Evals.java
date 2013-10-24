@@ -5,6 +5,8 @@
  */
 package edu.osu.cws.evals.models;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 
@@ -13,10 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import java.util.ResourceBundle;
 
 public class Evals {
 
@@ -24,6 +23,10 @@ public class Evals {
      * HashMap used to store validation error messages.
      */
     protected HashMap errors = new HashMap();
+
+    private static Log _log = LogFactoryUtil.getLog(CriterionArea.class);
+
+    protected static ResourceBundle bundle = ResourceBundle.getBundle("edu.osu.cws.evals.portlet.Language");
 
     public boolean validate() throws ModelException {
         String validateMethodName;
@@ -75,5 +78,4 @@ public class Evals {
         return aggregateErrors;
     }
 
-    private static Log _log = LogFactoryUtil.getLog(CriterionArea.class);
 }
