@@ -932,9 +932,11 @@ public class AppraisalMgr {
      * a new salary record for an appraisal.
      *
      * @param appraisal
+     * @param configurationMap
      * @return
      */
-    public static Salary createOrUpdateSalary(Appraisal appraisal) {
+    public static Salary createOrUpdateSalary(Appraisal appraisal,
+                                              Map<String, Configuration> configurationMap) {
         Session session = HibernateUtil.getCurrentSession();
         // delete salary object if it exists
         session.getNamedQuery("salary.deleteSalaryForAppraisal")
@@ -942,7 +944,23 @@ public class AppraisalMgr {
                 .executeUpdate();
 
         // create new salary object
-        Salary salary = appraisal.getJob().getSalary();
+        Job job = appraisal.getJob();
+        Salary salary = job.getSalary();
+        salary.setAppraisalId(appraisal.getId());
+
+        String aboveOrBelow = "below";
+        if (appraisal.getJob().getSalaryCurrent() > appraisal.getJob().getSalaryMidpoint()) {
+            aboveOrBelow = "above";
+        }
+
+        String increaseRate2Value = configurationMap.get("IT-increase-rate2-" + aboveOrBelow + "-control-value").getValue();
+        String increaseRate1MinVal = configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-min-value").getValue();
+        String increaseRate1MaxVal= configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-max-value").getValue();
+
+        salary.setTwoIncrease(Double.parseDouble(increaseRate2Value));
+        salary.setOneMax(Double.parseDouble(increaseRate1MaxVal));
+        salary.setOneMin(Double.parseDouble(increaseRate1MinVal));
+
         salary.setAppraisalId(appraisal.getId());
         session.save(salary);
 
