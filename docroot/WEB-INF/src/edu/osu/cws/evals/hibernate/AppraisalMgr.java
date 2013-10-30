@@ -937,7 +937,13 @@ public class AppraisalMgr {
      */
     public static Salary createOrUpdateSalary(Appraisal appraisal,
                                               Map<String, Configuration> configurationMap) {
+        // default increase values set to 0 only used if current salary is at or above control high
+        String increaseRate2Value = "0";
+        String increaseRate1MinVal = "0";
+        String increaseRate1MaxVal= "0";
+
         Session session = HibernateUtil.getCurrentSession();
+
         // delete salary object if it exists
         session.getNamedQuery("salary.deleteSalaryForAppraisal")
                 .setInteger("appraisalId", appraisal.getId())
@@ -948,20 +954,24 @@ public class AppraisalMgr {
         Salary salary = job.getSalary();
         salary.setAppraisalId(appraisal.getId());
 
-        String aboveOrBelow = "below";
-        if (appraisal.getJob().getSalaryCurrent() > appraisal.getJob().getSalaryMidpoint()) {
+        String aboveOrBelow = "";
+        if (salary.getCurrent() < salary.getMidPoint()) {
+            aboveOrBelow = "below";
+        } else if (salary.getCurrent() < salary.getHigh()) {
             aboveOrBelow = "above";
         }
 
-        String increaseRate2Value = configurationMap.get("IT-increase-rate2-" + aboveOrBelow + "-control-value").getValue();
-        String increaseRate1MinVal = configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-min-value").getValue();
-        String increaseRate1MaxVal= configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-max-value").getValue();
+        // if aboveOrBelow is blank it means the person is above control point high and they get 0
+        if (!aboveOrBelow.equals("")) {
+            increaseRate2Value = configurationMap.get("IT-increase-rate2-" + aboveOrBelow + "-control-value").getValue();
+            increaseRate1MinVal = configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-min-value").getValue();
+            increaseRate1MaxVal= configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-max-value").getValue();
+        }
 
         salary.setTwoIncrease(Double.parseDouble(increaseRate2Value));
         salary.setOneMax(Double.parseDouble(increaseRate1MaxVal));
         salary.setOneMin(Double.parseDouble(increaseRate1MinVal));
 
-        salary.setAppraisalId(appraisal.getId());
         session.save(salary);
 
         return salary;
