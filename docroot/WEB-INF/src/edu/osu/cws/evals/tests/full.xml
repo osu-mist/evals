@@ -567,6 +567,60 @@
           REFERENCE_POINT=""
           ACTION=""
           />
+  <configurations
+          ID="9"
+          SECTION="classified-it-salary"
+          NAME="IT-increase-rate2-below-control-value"
+          SEQUENCE="1"
+          VALUE="2"
+          REFERENCE_POINT=""
+          ACTION=""
+          />
+  <configurations
+          ID="10"
+          SECTION="classified-it-salary"
+          NAME="IT-increase-rate2-above-control-value"
+          SEQUENCE="2"
+          VALUE="3"
+          REFERENCE_POINT=""
+          ACTION=""
+          />
+  <configurations
+          ID="11"
+          SECTION="classified-it-salary"
+          NAME="IT-increase-rate1-above-control-min-value"
+          SEQUENCE="3"
+          VALUE="4"
+          REFERENCE_POINT=""
+          ACTION=""
+          />
+  <configurations
+          ID="12"
+          SECTION="classified-it-salary"
+          NAME="IT-increase-rate1-below-control-min-value"
+          SEQUENCE="4"
+          VALUE="6"
+          REFERENCE_POINT=""
+          ACTION=""
+          />
+  <configurations
+          ID="13"
+          SECTION="classified-it-salary"
+          NAME="IT-increase-rate1-above-control-max-value"
+          SEQUENCE="5"
+          VALUE="6"
+          REFERENCE_POINT=""
+          ACTION=""
+          />
+  <configurations
+          ID="14"
+          SECTION="classified-it-salary"
+          NAME="IT-increase-rate1-below-control-max-value"
+          SEQUENCE="6"
+          VALUE="9"
+          REFERENCE_POINT=""
+          ACTION=""
+          />
   <salaries
           ID="1"
           APPRAISAL_ID="8"

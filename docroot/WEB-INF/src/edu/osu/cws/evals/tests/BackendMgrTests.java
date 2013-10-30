@@ -75,7 +75,7 @@ public class BackendMgrTests {
         BackendMgr mgr = getMgrInstance();
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
-        Job job = (Job) session.load(Job.class, new Job(new Employee(12467), "1234", "00"));
+        Job job = (Job) session.load(Job.class, new Job(new Employee(12345), "4444", "00"));
 
         Integer currentCount = getEvaluationCount();
         assert mgr.handleTrialCreation(job) : "No trial was present, it should create one";
