@@ -2,6 +2,7 @@ package edu.osu.cws.evals.tests;
 
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -34,7 +35,7 @@ public class AppraisalCreation {
         for (Job job : results) {
             DateTime startDate = job.getNewAnnualStartDate();
             //this create date is far in the future, let's create the one started last year.
-            DateTime newDay = new DateTime().plusDays(30);
+            DateTime newDay = EvalsUtil.getToday().plusDays(30);
             if (startDate.isAfter(newDay)) {
                 startDate = startDate.minusYears(1); //last year
             }

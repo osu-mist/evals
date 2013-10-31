@@ -4,6 +4,7 @@ import edu.osu.cws.evals.models.AppointmentType;
 import edu.osu.cws.evals.models.ClassifiedITObject;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.portlet.Constants;
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -54,10 +55,10 @@ public class ClassifiedITObjectMgr {
 
     public static String getReviewPeriod(DateTime startDate, DateTime endDate) {
         if (startDate == null) {
-            startDate = new DateTime();
+            startDate = EvalsUtil.getToday();
         }
         if (endDate == null) {
-            endDate = new DateTime();
+            endDate = EvalsUtil.getToday();
         }
 
         return startDate.toString(Constants.DATE_FORMAT) + " - " +

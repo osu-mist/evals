@@ -3,6 +3,7 @@
  */
 package edu.osu.cws.evals.models;
 
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -397,9 +398,9 @@ public class Job extends Evals implements Serializable {
         }
 
        if (evalDate != null)
-           return new DateTime(evalDate);
+           return new DateTime(evalDate).withTimeAtStartOfDay();
 
-        return new DateTime(beginDate);
+        return new DateTime(beginDate).withTimeAtStartOfDay();
     }
 
 
@@ -433,7 +434,7 @@ public class Job extends Evals implements Serializable {
 
         if (!isWithinInitialPeriod()) {
             newStartDate = newStartDate.plusMonths(annualInd);
-            newStartDate = newStartDate.withYear(new DateTime().getYear());
+            newStartDate = newStartDate.withYear(EvalsUtil.getToday().getYear());
         }
 
         return newStartDate;
@@ -457,7 +458,7 @@ public class Job extends Evals implements Serializable {
 
     public DateTime getAnnualStartDateBasedOnJobBeginDate(int year)
     {
-        DateTime dt = new DateTime(beginDate).withYear(year);
+        DateTime dt = new DateTime(beginDate).withYear(year).withTimeAtStartOfDay();
         return CWSUtil.getFirstDayOfMonth(dt);
     }
 
@@ -469,9 +470,9 @@ public class Job extends Evals implements Serializable {
     {
         DateTime dt;
         if (evalDate != null)
-            dt = new DateTime(evalDate);
+            dt = new DateTime(evalDate).withTimeAtStartOfDay();
         else
-            dt = new DateTime(beginDate);
+            dt = new DateTime(beginDate).withTimeAtStartOfDay();
 
         return CWSUtil.getFirstDayOfMonth(dt);
     }

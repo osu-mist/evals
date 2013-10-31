@@ -1,6 +1,7 @@
 package edu.osu.cws.util;
 
 import edu.osu.cws.evals.portlet.Constants;
+import edu.osu.cws.evals.util.EvalsUtil;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
@@ -42,7 +43,7 @@ public class CWSUtil {
      * @return true is the current time is between start and end, false otherwise.
      */
     public static boolean isWithinPeriod(DateTime start, DateTime end) {
-        return isWithinPeriod(start, end, new DateTime());
+        return isWithinPeriod(start, end, EvalsUtil.getToday());
     }
 
     /**

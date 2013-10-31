@@ -90,7 +90,7 @@ public class EvalsUtilTest {
         appraisal.setStatus("goalsDue");
 
         HashMap<String, Configuration> configurationMap = new HashMap<String, Configuration>();
-        DateTime startDate = new DateTime().withDayOfMonth(1);
+        DateTime startDate = EvalsUtil.getToday().withDayOfMonth(1);
 
         appraisal.setStartDate(startDate.toDate());
         Configuration config = new Configuration();
@@ -100,7 +100,7 @@ public class EvalsUtilTest {
         config.setAction("add");
         configurationMap.put("goalsDue", config);
         int overdue = EvalsUtil.getOverdue(appraisal, configurationMap);
-        double expectedDays = Days.daysBetween(startDate.plusMonths(1), new DateTime()).getDays();
+        double expectedDays = Days.daysBetween(startDate.plusMonths(1), EvalsUtil.getToday()).getDays();
         assert overdue == expectedDays :
                 "The number of overdue days was " + overdue + " instead of " + expectedDays;
     }
@@ -135,7 +135,7 @@ public class EvalsUtilTest {
         appraisal.setStatus(status);
 
         HashMap<String, Configuration> configurationMap = new HashMap<String, Configuration>();
-        DateTime startDate = new DateTime().minusDays(60);
+        DateTime startDate = EvalsUtil.getToday().minusDays(60);
 
 
         appraisal.setStartDate(startDate.toDate());

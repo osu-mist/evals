@@ -40,21 +40,20 @@ public class EvalsUtil {
         if (config.getAction().equals("subtract"))
             offset = offset * (-1);
 
-        DateTime refDate = new DateTime(appraisal.getStartDate());
+        DateTime refDate = new DateTime(appraisal.getStartDate()).withTimeAtStartOfDay();
         String ref = config.getReferencePoint();
 
         //System.out.println("reference point = " + ref);
 
         if (ref.equals("end")) {
-            refDate = new DateTime(appraisal.getEndDate());
+            refDate = new DateTime(appraisal.getEndDate()).withTimeAtStartOfDay();
         } else if (ref.equals("GOALS_REQUIRED_MOD_DATE")) {
-            refDate = new DateTime(appraisal.getGoalsRequiredModificationDate());
-            //System.out.println("reference date = " + refDate);
+            refDate = new DateTime(appraisal.getGoalsRequiredModificationDate()).withTimeAtStartOfDay();
         } else if (ref.equals("employee_signed_date")) {
-            refDate = new DateTime(appraisal.getEmployeeSignedDate());
+            refDate = new DateTime(appraisal.getEmployeeSignedDate()).withTimeAtStartOfDay();
         } else if (ref.equals("firstEmailSentDate")) {
             Email firstEmail = EmailMgr.getFirstEmail(appraisal.getId(), "jobTerminated");
-            refDate = new DateTime(firstEmail.getSentDate());
+            refDate = new DateTime(firstEmail.getSentDate()).withTimeAtStartOfDay();
         } else if (ref.equals("goal_reactivation_request")) {
             refDate = AppraisalMgr.getPendingRequestGoalVersionCreateDate(appraisal.getId());
         } else if (ref.equals("goal_reactivation_req_dec")) {
@@ -64,7 +63,7 @@ public class EvalsUtil {
         if (refDate == null) //error
             return null;
 
-        return refDate.plusDays(offset);  //Assumes the offset type is Calendar.DAY_OF_MONTH
+        return refDate.plusDays(offset).withTimeAtStartOfDay();  //Assumes the offset type is Calendar.DAY_OF_MONTH
     }
 
 
@@ -81,7 +80,7 @@ public class EvalsUtil {
      */
     public static int isDue(Appraisal appraisal, Configuration config) throws Exception {
         DateTime dueDate = getDueDate(appraisal, config);
-        return Days.daysBetween(new DateTime(), dueDate).getDays();
+        return Days.daysBetween(getToday(), dueDate).getDays();
     }
 
     /**
@@ -93,7 +92,7 @@ public class EvalsUtil {
       * @return  true if need to send another email, false otherwise.
       */
      public static boolean anotherEmail(Email lastEmail, Configuration config) throws Exception {
-         DateTime sentDate = new DateTime(lastEmail.getSentDate());
+         DateTime sentDate = new DateTime(lastEmail.getSentDate()).withTimeAtStartOfDay();
          int offset = config.getIntValue();
          return sentDate.plusDays(offset).isBeforeNow();
      }
@@ -221,7 +220,7 @@ public class EvalsUtil {
 
         if (config != null) {
             DateTime dueDate = EvalsUtil.getDueDate(appraisal, config);
-            return Days.daysBetween(dueDate, new DateTime()).getDays();
+            return Days.daysBetween(dueDate, EvalsUtil.getToday()).getDays();
         }
 
         return 0;
@@ -315,5 +314,9 @@ public class EvalsUtil {
         }
         return new Mailer(resources, hostname, from, linkUrl,  helpLinkUrl, configurationMap,
                 logger, replyTo, testMailToAddress);
+    }
+
+    public static DateTime getToday() {
+        return new DateTime().withTimeAtStartOfDay();
     }
 }

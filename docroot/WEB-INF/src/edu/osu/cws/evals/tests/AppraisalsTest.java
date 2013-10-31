@@ -4,6 +4,7 @@ import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.Constants;
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -55,7 +56,7 @@ public class AppraisalsTest {
      */
     @Test(groups = {"unittest"})
     public void shouldCreateAnAppraisal() throws Exception {
-        assert AppraisalMgr.createAppraisal(job, new DateTime(),  Appraisal.TYPE_ANNUAL).getId() != 0 :
+        assert AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(),  Appraisal.TYPE_ANNUAL).getId() != 0 :
                 "AppraisalMgr.createAppraisal should return id of appraisal";
     }
 
@@ -85,7 +86,7 @@ public class AppraisalsTest {
         Session hsession = HibernateUtil.getCurrentSession();
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
 
-        Appraisal appraisal1 = AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
+        Appraisal appraisal1 = AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(), Appraisal.TYPE_ANNUAL);
         int appraisalID =  appraisal1
                 .getId();
         hsession = HibernateUtil.getCurrentSession();
@@ -140,7 +141,7 @@ public class AppraisalsTest {
         Session hsession = HibernateUtil.getCurrentSession();
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
 
-        Appraisal appraisal =  AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
+        Appraisal appraisal =  AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(), Appraisal.TYPE_ANNUAL);
         Integer appraisalID = appraisal.getId();
         hsession.evict(appraisal);
         appraisal = (Appraisal) hsession.load(Appraisal.class, appraisalID);
@@ -170,7 +171,7 @@ public class AppraisalsTest {
         // Create the appraisal for this test
         Session hsession = HibernateUtil.getCurrentSession();
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
-        Appraisal appraisal1 = AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
+        Appraisal appraisal1 = AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(), Appraisal.TYPE_ANNUAL);
         int appraisalID =  appraisal1
                 .getId();
 
@@ -324,7 +325,7 @@ public class AppraisalsTest {
 
     @Test(groups = {"unittest"})
     public void shouldSetTheStartDateWhenCreatingAppraisal() throws Exception {
-        DateTime today = new DateTime();
+        DateTime today = EvalsUtil.getToday();
         appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_ANNUAL);
         assert appraisal.getStartDate().equals(today.toDate());
     }
@@ -332,7 +333,7 @@ public class AppraisalsTest {
     @Test(groups = {"unittest"},
             expectedExceptions = {ModelException.class})
     public void shouldOnlyCreateTwoTypesOfAppraisals() throws Exception {
-        DateTime today = new DateTime();
+        DateTime today = EvalsUtil.getToday();
         appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_ANNUAL);
         assert appraisal != null;
 
@@ -347,7 +348,7 @@ public class AppraisalsTest {
     @Test(groups = {"unittest"})
     public void shouldUseStartDatePlusNumberOfMonthsInTrialIndToSetTheEndDateForTrialAppraisal()
             throws Exception {
-        DateTime today = new DateTime();
+        DateTime today = EvalsUtil.getToday();
         DateTime endDate = job.getEndEvalDate(today, Appraisal.TYPE_TRIAL);
 
         appraisal = AppraisalMgr.createAppraisal(job, today, Appraisal.TYPE_TRIAL);
@@ -364,7 +365,7 @@ public class AppraisalsTest {
     @Test(groups = {"unittest"})
     public void shouldUseStartDatePlusNumberOfMonthsInAnnualIndToSetTheEndDateForFirstAnnualAppraisal()
             throws Exception {
-        DateTime today = new DateTime();
+        DateTime today = EvalsUtil.getToday();
         job = (Job) session.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         job.setAnnualInd(12);
 
@@ -372,7 +373,7 @@ public class AppraisalsTest {
         assert appraisal.getStartDate().equals(today.toDate()) : "Start date should be set correctly.";
 
         // for some reason I couldn't fetch the job.
-        DateTime expectedStartDate = new DateTime().withYear(2010).withTimeAtStartOfDay()
+        DateTime expectedStartDate = EvalsUtil.getToday().withYear(2010).withTimeAtStartOfDay()
                 .withMonthOfYear(DateTimeConstants.FEBRUARY).withDayOfMonth(1);
         DateTime expectedEndDate = expectedStartDate.plusMonths(12).minusDays(1);
         appraisal = AppraisalMgr.createInitialAppraisalAfterTrial(appraisal);
@@ -392,7 +393,7 @@ public class AppraisalsTest {
     @Test(groups = {"unittest"})
     public void shouldUseTwelveMonthsForAllAnnualAppraisalsAfterTheFirstOne()
             throws Exception {
-        DateTime today = new DateTime();
+        DateTime today = EvalsUtil.getToday();
         job.setAnnualInd(100);
         DateTime endDate = job.getEndEvalDate(today, Appraisal.TYPE_ANNUAL);
 
@@ -429,7 +430,7 @@ public class AppraisalsTest {
     }
 
     public void shouldSaveOverdue() throws Exception {
-        appraisal = AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
+        appraisal = AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(), Appraisal.TYPE_ANNUAL);
         assert appraisal.getOverdue() == null;
         appraisal.setOverdue(7);
         AppraisalMgr.saveOverdue(appraisal);
@@ -504,7 +505,7 @@ public class AppraisalsTest {
         job.setPositionNumber("1234");
         job.setSuffix("00");
 
-        DateTime startDateTime = new DateTime().withTimeAtStartOfDay().withDayOfMonth(14)
+        DateTime startDateTime = EvalsUtil.getToday().withTimeAtStartOfDay().withDayOfMonth(14)
                 .withMonthOfYear(DateTimeConstants.MAY).withYear(2010);
 
         assert AppraisalMgr.appraisalExists(job, startDateTime, "annual");
@@ -537,12 +538,12 @@ public class AppraisalsTest {
 
         GoalVersion goalVersion2 = new GoalVersion();
         goalVersion2.setId(2);
-        goalVersion2.setCreateDate(new DateTime().minusDays(1).toDate());
+        goalVersion2.setCreateDate(EvalsUtil.getToday().minusDays(1).toDate());
         goalVersion2.setGoalsApprovedDate(new Date());
 
         GoalVersion goalVersion3 = new GoalVersion();
         goalVersion3.setId(3);
-        goalVersion3.setCreateDate(new DateTime().minusDays(2).toDate());
+        goalVersion3.setCreateDate(EvalsUtil.getToday().minusDays(2).toDate());
         goalVersion3.setGoalsApprovedDate(new Date());
 
         appraisal.addGoalVersion(goalVersion1);
@@ -564,7 +565,7 @@ public class AppraisalsTest {
 
         GoalVersion goalVersion2 = new GoalVersion();
         goalVersion2.setId(2);
-        goalVersion2.setCreateDate(new DateTime().minusDays(1).toDate());
+        goalVersion2.setCreateDate(EvalsUtil.getToday().minusDays(1).toDate());
 
         appraisal.addGoalVersion(goalVersion1);
         appraisal.addGoalVersion(goalVersion2);
@@ -595,7 +596,7 @@ public class AppraisalsTest {
 
         GoalVersion goalVersion2 = new GoalVersion();
         goalVersion2.setId(2);
-        goalVersion2.setCreateDate(new DateTime().minusDays(1).toDate());
+        goalVersion2.setCreateDate(EvalsUtil.getToday().minusDays(1).toDate());
         goalVersion2.setRequestDecision(true);
 
         appraisal.addGoalVersion(goalVersion1);
