@@ -483,9 +483,9 @@ public class Mailer implements MailerInterface {
         if (lastTimedOutGoalVersion  == null) {
             // if the reactivated goal version is null it means that it hasn't been saved to the db
             // and the request has just been submitted by the employee.
-            submitDate = new DateTime();
+            submitDate = EvalsUtil.getToday();
         } else {
-            submitDate = new DateTime(lastTimedOutGoalVersion.getCreateDate());
+            submitDate = new DateTime(lastTimedOutGoalVersion.getCreateDate()).withTimeAtStartOfDay();
         }
 
         String requestSubmitDate = submitDate.toString(Constants.DATE_FORMAT);
@@ -554,9 +554,9 @@ public class Mailer implements MailerInterface {
         if (reactivatedGoalVersion == null) {
             // if the reactivated goal version is null it means that it hasn't been saved to the db
             // and the request has just been submitted by the employee.
-            submitDate = new DateTime();
+            submitDate = EvalsUtil.getToday();
         } else {
-            submitDate = new DateTime(reactivatedGoalVersion.getCreateDate());
+            submitDate = new DateTime(reactivatedGoalVersion.getCreateDate()).withTimeAtStartOfDay();
         }
         String requestSubmitDate = submitDate.toString(Constants.DATE_FORMAT);
 

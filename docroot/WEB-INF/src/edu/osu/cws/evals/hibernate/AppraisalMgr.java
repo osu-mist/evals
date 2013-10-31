@@ -976,12 +976,12 @@ public class AppraisalMgr {
         GoalVersion pendingRequestGoalVersion = appraisal.getRequestPendingGoalsVersion();
 
         if (pendingRequestGoalVersion != null) {
-            return new DateTime(pendingRequestGoalVersion.getCreateDate());
+            return new DateTime(pendingRequestGoalVersion.getCreateDate()).withTimeAtStartOfDay();
         }
 
         // If we got here it means that the user just submitted the request and thus the goal
         // version hasn't been saved to the db. Thus the create date is now.
-        return new DateTime();
+        return EvalsUtil.getToday();
     }
 
     /**
@@ -996,7 +996,7 @@ public class AppraisalMgr {
         GoalVersion unapprovedGoalsVersion = appraisal.getUnapprovedGoalsVersion();
 
         if (unapprovedGoalsVersion != null) {
-            return new DateTime(unapprovedGoalsVersion.getRequestDecisionDate());
+            return new DateTime(unapprovedGoalsVersion.getRequestDecisionDate()).withTimeAtStartOfDay();
         }
 
         return null;

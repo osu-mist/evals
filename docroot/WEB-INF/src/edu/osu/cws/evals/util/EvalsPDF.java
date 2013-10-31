@@ -182,13 +182,13 @@ public class EvalsPDF {
         Job job = appraisal.getJob();
 
         String employeeName = job.getEmployee().getName();
-        DateTime employeeSignedDate = new DateTime(appraisal.getEmployeeSignedDate());
+        DateTime employeeSignedDate = new DateTime(appraisal.getEmployeeSignedDate()).withTimeAtStartOfDay();
         String employeeSignDate = employeeSignedDate.toString(Constants.DATE_FORMAT);
         employeeCell.addElement(new Phrase(employeeName, INFO_FONT));
         employeeDateCell.addElement(new Phrase(employeeSignDate, INFO_FONT));
 
         if (appraisal.getReleaseDate() != null) {
-            DateTime releaseDate = new DateTime(appraisal.getReleaseDate());
+            DateTime releaseDate = new DateTime(appraisal.getReleaseDate()).withTimeAtStartOfDay();
             String supervisorName = job.getSupervisor().getEmployee().getName();
             String supervisorSignDate = releaseDate.toString(Constants.DATE_FORMAT);
             supervisorCell.addElement(new Phrase(supervisorName, INFO_FONT));
@@ -271,7 +271,7 @@ public class EvalsPDF {
         boolean displayReviewer = appraisal.getReleaseDate() != null && appraisal.getReviewSubmitDate() != null;
         if (displayReviewer) {
             String reviewerName = appraisal.getReviewer().getName();
-            DateTime reviewSubmitDate = new DateTime(appraisal.getReviewSubmitDate());
+            DateTime reviewSubmitDate = new DateTime(appraisal.getReviewSubmitDate()).withTimeAtStartOfDay();
             String reviewDate = reviewSubmitDate.toString(Constants.DATE_FORMAT);
             reviewerCell.setPhrase(new Phrase(reviewerName, INFO_FONT));
             reviewerDateCell.setPhrase(new Phrase(reviewDate, INFO_FONT));
@@ -552,7 +552,7 @@ public class EvalsPDF {
 
 
         // Salary Eligibility Date
-        DateTime salaryEligibilityDate = new DateTime(appraisal.getSalaryEligibilityDate());
+        DateTime salaryEligibilityDate = new DateTime(appraisal.getSalaryEligibilityDate()).withTimeAtStartOfDay();
         String sed = salaryEligibilityDate.toString("MM/dd");
         phrase = new Phrase(sed, FONT_10);
         cell = new PdfPCell(phrase);

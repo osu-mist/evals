@@ -40,20 +40,20 @@ public class EvalsUtil {
         if (config.getAction().equals("subtract"))
             offset = offset * (-1);
 
-        DateTime refDate = new DateTime(appraisal.getStartDate());
+        DateTime refDate = new DateTime(appraisal.getStartDate()).withTimeAtStartOfDay();
         String ref = config.getReferencePoint();
 
         //System.out.println("reference point = " + ref);
 
         if (ref.equals("end")) {
-            refDate = new DateTime(appraisal.getEndDate());
+            refDate = new DateTime(appraisal.getEndDate()).withTimeAtStartOfDay();
         } else if (ref.equals("GOALS_REQUIRED_MOD_DATE")) {
-            refDate = new DateTime(appraisal.getGoalsRequiredModificationDate());
+            refDate = new DateTime(appraisal.getGoalsRequiredModificationDate()).withTimeAtStartOfDay();
         } else if (ref.equals("employee_signed_date")) {
-            refDate = new DateTime(appraisal.getEmployeeSignedDate());
+            refDate = new DateTime(appraisal.getEmployeeSignedDate()).withTimeAtStartOfDay();
         } else if (ref.equals("firstEmailSentDate")) {
             Email firstEmail = EmailMgr.getFirstEmail(appraisal.getId(), "jobTerminated");
-            refDate = new DateTime(firstEmail.getSentDate());
+            refDate = new DateTime(firstEmail.getSentDate()).withTimeAtStartOfDay();
         } else if (ref.equals("goal_reactivation_request")) {
             refDate = AppraisalMgr.getPendingRequestGoalVersionCreateDate(appraisal.getId());
         } else if (ref.equals("goal_reactivation_req_dec")) {
@@ -92,7 +92,7 @@ public class EvalsUtil {
       * @return  true if need to send another email, false otherwise.
       */
      public static boolean anotherEmail(Email lastEmail, Configuration config) throws Exception {
-         DateTime sentDate = new DateTime(lastEmail.getSentDate());
+         DateTime sentDate = new DateTime(lastEmail.getSentDate()).withTimeAtStartOfDay();
          int offset = config.getIntValue();
          return sentDate.plusDays(offset).isBeforeNow();
      }

@@ -1025,7 +1025,7 @@ public class Appraisal extends Evals {
         appraisal.setStatus(Appraisal.STATUS_GOALS_APPROVED);
 
         // calculate & set the end date
-        DateTime startDate = new DateTime(appraisal.getStartDate());
+        DateTime startDate = new DateTime(appraisal.getStartDate()).withTimeAtStartOfDay();
         DateTime endDate = appraisal.getJob().getEndEvalDate(startDate, Appraisal.TYPE_INITIAL);
         appraisal.setEndDate(CWSUtil.toDate(endDate));
 
@@ -1131,8 +1131,8 @@ public class Appraisal extends Evals {
      * @return
      */
     public Date getSalaryEligibilityDate() {
-        DateTime sed = new DateTime(this.startDate);
-        sed.withYear(new DateTime().getYear());
+        DateTime sed = new DateTime(this.startDate).withTimeAtStartOfDay();
+        sed.withYear(EvalsUtil.getToday().getYear());
 
         return sed.toDate();
     }
