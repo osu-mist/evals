@@ -368,7 +368,7 @@ public class EvalsPortlet extends GenericPortlet {
     private void handleEvalsException(Exception e, String shortMessage, String level, PortletRequest request) {
         try {
             Map<String, String> grayLogFields = new HashMap<String, String>();
-            PortletSession session = request.getPortletSession(true);
+            PortletSession session = ActionHelper.getSession(request);
             EvalsLogger logger = getLog();
 
             if (logger != null) {

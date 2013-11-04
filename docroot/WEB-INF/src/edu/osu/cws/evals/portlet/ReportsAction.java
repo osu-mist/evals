@@ -142,7 +142,7 @@ public class ReportsAction implements ActionInterface {
      * @throws Exception
      */
     public String report(PortletRequest request, PortletResponse response) throws Exception {
-        PortletSession session = request.getPortletSession();
+        PortletSession session = ActionHelper.getSession(request);
 
         // parse the various parameters from request and session
         setParamMap(request);
@@ -578,8 +578,8 @@ public class ReportsAction implements ActionInterface {
         return (String) paramMap.get(SEARCH_TERM);
     }
 
-    private String getChartType(PortletRequest request) {
-        PortletSession session = request.getPortletSession();
+    private String getChartType(PortletRequest request) throws Exception {
+        PortletSession session = ActionHelper.getSession(request);
         String chartType = (String) session.getAttribute(CHART_TYPE);
         if (chartType == null || chartType.equals("")) {
             chartType = CHART_TYPE_DEFAULT;
@@ -596,7 +596,7 @@ public class ReportsAction implements ActionInterface {
      * @param request
      */
     private void setParamMap(PortletRequest request) throws Exception {
-        PortletSession session = request.getPortletSession();
+        PortletSession session = ActionHelper.getSession(request);
         HashMap sessionParam = (HashMap) session.getAttribute("paramMap");
         if (sessionParam == null) {
             sessionParam = new HashMap();
@@ -698,14 +698,14 @@ public class ReportsAction implements ActionInterface {
      * @param response
      * @return
      */
-    public String saveChartType(PortletRequest request, PortletResponse response) {
+    public String saveChartType(PortletRequest request, PortletResponse response) throws Exception {
         String chartType = ParamUtil.getString(request, "chartType", CHART_TYPE_DEFAULT);
 
         boolean allowedChartType = chartType.equals(CHART_TYPE_BAR)
                 || chartType.equals(CHART_TYPE_COLUMN) || chartType.equals(CHART_TYPE_DEFAULT);
 
         if (allowedChartType)   {
-            PortletSession session = request.getPortletSession();
+            PortletSession session = ActionHelper.getSession(request);
 
             try {
                 session.setAttribute(CHART_TYPE, chartType);
@@ -1020,8 +1020,8 @@ public class ReportsAction implements ActionInterface {
      *
      * @param request
      */
-    private void switchRequestBreadcrumbsWithSession(PortletRequest request) {
-        PortletSession session = request.getPortletSession();
+    private void switchRequestBreadcrumbsWithSession(PortletRequest request) throws Exception {
+        PortletSession session = ActionHelper.getSession(request);
         List<Breadcrumb> sessCrumbs = (List<Breadcrumb>) session.getAttribute(BREADCRUMB_LIST);
         paramMap.put(BREADCRUMB_LIST, sessCrumbs);
 

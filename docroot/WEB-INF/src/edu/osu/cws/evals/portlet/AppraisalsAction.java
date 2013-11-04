@@ -420,7 +420,7 @@ public class AppraisalsAction implements ActionInterface {
             }
         }
 
-        PortletSession session = request.getPortletSession(true);
+        PortletSession session = ActionHelper.getSession(request);
         session.setAttribute("reviewList", reviewList);
     }
 

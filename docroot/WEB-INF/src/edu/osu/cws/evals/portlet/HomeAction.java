@@ -69,7 +69,7 @@ public class HomeAction implements ActionInterface {
     }
 
     public String displayMyInformation(PortletRequest request, PortletResponse response) throws Exception {
-        PortletSession session = request.getPortletSession(true);
+        PortletSession session = ActionHelper.getSession(request);
         actionHelper.useNormalMenu();
         Employee employee = actionHelper.getLoggedOnUser();
         if(!employee.getLoadJobs()){
@@ -147,7 +147,7 @@ public class HomeAction implements ActionInterface {
             return display(request, response);
         }
 
-        PortletSession session = request.getPortletSession(true);
+        PortletSession session = ActionHelper.getSession(request);
         int employeeID = Integer.parseInt(ParamUtil.getString(request, "employee.id"));
         Employee employee = new Employee();
         try {
