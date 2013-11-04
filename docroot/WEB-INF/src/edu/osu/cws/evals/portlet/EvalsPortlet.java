@@ -81,18 +81,27 @@ public class EvalsPortlet extends GenericPortlet {
      */
 	public void doView(RenderRequest renderRequest, RenderResponse renderResponse)
             throws IOException, PortletException {
+        try {
+            // If processAction's delegate method was called, it set the viewJSP property to some
+            // jsp value, if viewJSP is null, it means processAction was not called and we need to
+            // call delegate
+            if (viewJSP == null) {
+                delegate(renderRequest, renderResponse);
+            }
+            actionHelper.setRequestAttributes(renderRequest);
 
-        // If processAction's delegate method was called, it set the viewJSP property to some
-        // jsp value, if viewJSP is null, it means processAction was not called and we need to
-        // call delegate
-        if (viewJSP == null) {
-            delegate(renderRequest, renderResponse);
+            include(viewJSP, renderRequest, renderResponse);
+            viewJSP = null;
+            actionHelper.removeRequestMap();
+        } catch (Exception e) {
+            try {
+                handleEvalsException(e, "Error in doView", Logger.ERROR, renderRequest);
+            } catch (Exception ex) {
+                // log error to luminis.log if logger object is not reachable
+                _log.error(e);
+                _log.error(ex);
+            }
         }
-        actionHelper.setRequestAttributes(renderRequest);
-
-        include(viewJSP, renderRequest, renderResponse);
-        viewJSP = null;
-        actionHelper.removeRequestMap();
 	}
 
     public void processAction(ActionRequest actionRequest, ActionResponse actionResponse)
