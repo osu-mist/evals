@@ -81,15 +81,15 @@ public class EvalsPortlet extends GenericPortlet {
      */
 	public void doView(RenderRequest renderRequest, RenderResponse renderResponse)
             throws IOException, PortletException {
-        try {
-            // If processAction's delegate method was called, it set the viewJSP property to some
-            // jsp value, if viewJSP is null, it means processAction was not called and we need to
-            // call delegate
-            if (viewJSP == null) {
-                delegate(renderRequest, renderResponse);
-            }
-            actionHelper.setRequestAttributes(renderRequest);
+        // If processAction's delegate method was called, it set the viewJSP property to some
+        // jsp value, if viewJSP is null, it means processAction was not called and we need to
+        // call delegate
+        if (viewJSP == null) {
+            delegate(renderRequest, renderResponse);
+        }
 
+        try {
+            actionHelper.setRequestAttributes(renderRequest);
             include(viewJSP, renderRequest, renderResponse);
             viewJSP = null;
             actionHelper.removeRequestMap();
@@ -101,6 +101,9 @@ public class EvalsPortlet extends GenericPortlet {
                 _log.error(e);
                 _log.error(ex);
             }
+        } finally {
+            include(viewJSP, renderRequest, renderResponse);
+            viewJSP = null;
         }
 	}
 
@@ -368,18 +371,11 @@ public class EvalsPortlet extends GenericPortlet {
     private void handleEvalsException(Exception e, String shortMessage, String level, PortletRequest request) {
         try {
             Map<String, String> grayLogFields = new HashMap<String, String>();
-            PortletSession session = ActionHelper.getSession(request);
             EvalsLogger logger = getLog();
 
             if (logger != null) {
                 String currentURL = PortalUtil.getCurrentURL(request);
-                Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
-                String loggedOnUserId = "";
-                if (loggedOnUser != null) {
-                    loggedOnUserId = ((Integer) loggedOnUser.getId()).toString();
-                }
-
-                grayLogFields.put("logged-in-user", loggedOnUserId);
+                grayLogFields.put("logged-in-user", getLoggedOnUserId(request));
                 grayLogFields.put("currentURL", currentURL);
                 logger.log(level, shortMessage, e, grayLogFields);
             }
@@ -389,6 +385,28 @@ public class EvalsPortlet extends GenericPortlet {
         }
 
         viewJSP = Constants.JSP_ERROR;
+    }
+
+    /**
+     * Returns the logged on user id from session. It checks to make sure that the session
+     * is valid. This method is used by error logging, so it needs to handle session errors.
+     *
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    private String getLoggedOnUserId(PortletRequest request) throws Exception {
+        String loggedOnUserId = "failed-to-get-user-from-session";
+        try {
+            PortletSession session = ActionHelper.getSession(request);
+            Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
+            if (loggedOnUser != null) {
+                loggedOnUserId = ((Integer) loggedOnUser.getId()).toString();
+            }
+        } catch (Exception e) {
+            _log.error(e);
+        }
+        return loggedOnUserId;
     }
 
     protected void include(String path, RenderRequest renderRequest,RenderResponse renderResponse)
