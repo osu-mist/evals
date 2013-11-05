@@ -253,6 +253,12 @@ public class EvalsPortlet extends GenericPortlet {
 
             try {
                 message += loadEnvironmentProperties();
+                // Getting the properties directly from portlet context to avoid action helper
+                // dependency
+                PropertiesConfiguration environmentProp = (PropertiesConfiguration)
+                        getPortletContext().getAttribute("environmentProp");
+                getPortletContext().setAttribute("log", EvalsUtil.createLogger(environmentProp));
+                message += "Created logger object\n";
 
                 hibSession = HibernateUtil.getCurrentSession();
                 Transaction tx = hibSession.beginTransaction();
@@ -260,9 +266,6 @@ public class EvalsPortlet extends GenericPortlet {
                 actionHelper = new ActionHelper(request, null, getPortletContext());
                 actionHelper.updateContextTimestamp();
                 actionHelper.setAdminPortletData();
-                getPortletContext().setAttribute("log",
-                        EvalsUtil.createLogger(actionHelper.getEvalsConfig()));
-                message += "Created logger object\n";
                 createMailer();
                 message += "Mailer setup successfully\n";
                 getPortletContext().setAttribute("permissionRules", PermissionRuleMgr.list());
