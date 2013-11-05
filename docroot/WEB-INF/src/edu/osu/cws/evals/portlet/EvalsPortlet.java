@@ -289,8 +289,12 @@ public class EvalsPortlet extends GenericPortlet {
                 EvalsLogger logger =  getLog();
                 if (logger != null) {
                     logger.log(Logger.ERROR, "Portlet Setup Failed", message);
+                    logger.log(Logger.ERROR, "Exception from portletSetup", e);
+                } else {
+                    _log.error("Portlet Setup Failed " +  message);
+                    _log.error("Exception from portletSetup", e);
+
                 }
-                throw e;
             }
 
         }
@@ -379,6 +383,8 @@ public class EvalsPortlet extends GenericPortlet {
                 grayLogFields.put("logged-in-user", getLoggedOnUserId(request));
                 grayLogFields.put("currentURL", currentURL);
                 logger.log(level, shortMessage, e, grayLogFields);
+            } else {
+                _log.error("EvalS logger method was null", e);
             }
         } catch (Exception exception) {
             _log.error(CWSUtil.stackTraceString(e));
