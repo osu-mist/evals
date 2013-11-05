@@ -90,8 +90,6 @@ public class EvalsPortlet extends GenericPortlet {
 
         try {
             actionHelper.setRequestAttributes(renderRequest);
-            include(viewJSP, renderRequest, renderResponse);
-            viewJSP = null;
             actionHelper.removeRequestMap();
         } catch (Exception e) {
             try {
