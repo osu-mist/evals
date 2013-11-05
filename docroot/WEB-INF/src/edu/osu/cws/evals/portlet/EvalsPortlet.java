@@ -92,13 +92,7 @@ public class EvalsPortlet extends GenericPortlet {
             actionHelper.setRequestAttributes(renderRequest);
             actionHelper.removeRequestMap();
         } catch (Exception e) {
-            try {
-                handleEvalsException(e, "Error in doView", Logger.ERROR, renderRequest);
-            } catch (Exception ex) {
-                // log error to luminis.log if logger object is not reachable
-                _log.error(e);
-                _log.error(ex);
-            }
+            handleEvalsException(e, "Error in doView", Logger.ERROR, renderRequest);
         } finally {
             include(viewJSP, renderRequest, renderResponse);
             viewJSP = null;
