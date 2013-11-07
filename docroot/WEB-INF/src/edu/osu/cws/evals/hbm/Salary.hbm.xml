@@ -19,6 +19,9 @@
         <property name="sgrpCode" length="6" type="string" column="SALARY_SGRP_CODE"/>
         <property name="appraisalId" type="int" column="APPRAISAL_ID"/>
         <property name="increase" type="double" column="SALARY_INCREASE"/>
+        <property name="twoIncrease" type="double" column="TWO_INCREASE"/>
+        <property name="oneMax" type="double" column="ONE_MAX"/>
+        <property name="oneMin" type="double" column="ONE_MIN"/>
 
     </class>
 

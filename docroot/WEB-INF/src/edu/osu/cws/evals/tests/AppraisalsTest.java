@@ -1,6 +1,7 @@
 package edu.osu.cws.evals.tests;
 
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
+import edu.osu.cws.evals.hibernate.ConfigurationMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.Constants;
@@ -440,7 +441,7 @@ public class AppraisalsTest {
 
     public void shouldDeleteExistingSalary() throws Exception {
         appraisal = AppraisalMgr.getAppraisal(8);
-        AppraisalMgr.createOrUpdateSalary(appraisal);
+        AppraisalMgr.createOrUpdateSalary(appraisal, ConfigurationMgr.mapByName());
 
         String getExistingSalary = "from edu.osu.cws.evals.models.Salary where id = 1";
         String getSalary = "from edu.osu.cws.evals.models.Salary where appraisalId = :appraisal_id";
@@ -455,6 +456,9 @@ public class AppraisalsTest {
         assert salary.getHigh() == 4000;
         assert salary.getCurrent() == 2500;
         assert salary.getSgrpCode().equals("123456");
+        assert salary.getTwoIncrease() == 2;
+        assert salary.getOneMin() == 6;
+        assert salary.getOneMax() == 9;
     }
 
     public void shouldCreateFirstAnnualAppraisalIfTrialAppraisalIsClosedOrCompletedOrRebuttalDue() {
@@ -551,9 +555,9 @@ public class AppraisalsTest {
         appraisal.addGoalVersion(goalVersion3);
 
         List<GoalVersion> goalVersions= appraisal.getApprovedGoalsVersions();
-        assert goalVersions.get(0).getId() == 1;
+        assert goalVersions.get(0).getId() == 3;
         assert goalVersions.get(1).getId() == 2;
-        assert goalVersions.get(2).getId() == 3;
+        assert goalVersions.get(2).getId() == 1;
     }
 
     public void shouldReturnOnlyApprovedGoals() {

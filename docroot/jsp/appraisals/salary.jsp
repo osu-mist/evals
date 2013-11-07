@@ -74,7 +74,7 @@
 
              // set the hard coded increase to 0. If the rating is 2 or 1 (and not at top pay range)
              // , we'll change the value
-            var increase = 0;
+            var increase = 0; // default value for rating 3
             var isSalaryAtHighPoint = ${appraisal.salary.current} >= ${appraisal.salary.high};
 
             // If the supervisor rates a 1, we only enable the input box if current salary is not at top range
@@ -97,7 +97,7 @@
 
             // When the rating is 1 or 2, set the increase to 0 if the salary is at or above the control point high.
             if (isSalaryAtHighPoint && (rating == 1 || rating == 2 || rating == undefined)) {
-                jQuery(".osu-cws input.recommended-salary").val('0');
+                jQuery(".osu-cws input.recommended-salary").val('${increaseRate2Value}');
                 jQuery(".osu-cws .salary-comment").text('<liferay-ui:message key="appraisal-salary-already-high-point"/>');
                 jQuery(".osu-cws input.recommended-salary").attr('disabled','true');
                 jQuery(".osu-cws input.recommended-salary").attr('readonly','readonly');
