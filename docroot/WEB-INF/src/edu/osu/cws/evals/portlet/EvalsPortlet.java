@@ -282,8 +282,8 @@ public class EvalsPortlet extends GenericPortlet {
                 }
                 EvalsLogger logger =  getLog();
                 if (logger != null) {
-                    logger.log(Logger.ERROR, "Portlet Setup Failed", message);
-                    logger.log(Logger.ERROR, "Exception from portletSetup", e);
+                    logger.log(Logger.CRITICAL, "Portlet Setup Failed", message);
+                    logger.log(Logger.CRITICAL, "Exception from portletSetup", e);
                 } else {
                     _log.error("Portlet Setup Failed " +  message);
                     _log.error("Exception from portletSetup", e);
