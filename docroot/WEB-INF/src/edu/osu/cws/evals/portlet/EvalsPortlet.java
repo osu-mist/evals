@@ -81,18 +81,22 @@ public class EvalsPortlet extends GenericPortlet {
      */
 	public void doView(RenderRequest renderRequest, RenderResponse renderResponse)
             throws IOException, PortletException {
-
         // If processAction's delegate method was called, it set the viewJSP property to some
         // jsp value, if viewJSP is null, it means processAction was not called and we need to
         // call delegate
         if (viewJSP == null) {
             delegate(renderRequest, renderResponse);
         }
-        actionHelper.setRequestAttributes(renderRequest);
 
-        include(viewJSP, renderRequest, renderResponse);
-        viewJSP = null;
-        actionHelper.removeRequestMap();
+        try {
+            actionHelper.setRequestAttributes(renderRequest);
+            actionHelper.removeRequestMap();
+        } catch (Exception e) {
+            handleException(e, "Error in doView", Logger.ERROR, renderRequest);
+        } finally {
+            include(viewJSP, renderRequest, renderResponse);
+            viewJSP = null;
+        }
 	}
 
     public void processAction(ActionRequest actionRequest, ActionResponse actionResponse)
@@ -141,7 +145,7 @@ public class EvalsPortlet extends GenericPortlet {
                 if (session != null && session.isOpen()) {
                     session.close();
                 }
-                handleEvalsException(e, "Error in serveResource", Logger.ERROR, request);
+                handleException(e, "Error in serveResource", Logger.ERROR, request);
                 result="There was an error performing your request";
             }
         } else {
@@ -203,7 +207,7 @@ public class EvalsPortlet extends GenericPortlet {
             if (hibSession != null && hibSession.isOpen()) {
                 hibSession.close();
             }
-            handleEvalsException(e, action, Logger.ERROR, request);
+            handleException(e, action, Logger.ERROR, request);
         }
     }
 
@@ -243,16 +247,18 @@ public class EvalsPortlet extends GenericPortlet {
 
             try {
                 message += loadEnvironmentProperties();
+                // Getting the properties directly from portlet context to avoid action helper
+                // dependency
+                PropertiesConfiguration environmentProp = (PropertiesConfiguration)
+                        getPortletContext().getAttribute("environmentProp");
+                getPortletContext().setAttribute("log", EvalsUtil.createLogger(environmentProp));
+                message += "Created logger object\n";
 
                 hibSession = HibernateUtil.getCurrentSession();
                 Transaction tx = hibSession.beginTransaction();
 
                 actionHelper = new ActionHelper(request, null, getPortletContext());
-                actionHelper.updateContextTimestamp();
                 actionHelper.setAdminPortletData();
-                getPortletContext().setAttribute("log",
-                        EvalsUtil.createLogger(actionHelper.getEvalsConfig()));
-                message += "Created logger object\n";
                 createMailer();
                 message += "Mailer setup successfully\n";
                 getPortletContext().setAttribute("permissionRules", PermissionRuleMgr.list());
@@ -275,9 +281,13 @@ public class EvalsPortlet extends GenericPortlet {
                 }
                 EvalsLogger logger =  getLog();
                 if (logger != null) {
-                    logger.log(Logger.ERROR, "Portlet Setup Failed", message);
+                    logger.log(Logger.CRITICAL, "Portlet Setup Failed", message);
+                    logger.log(Logger.CRITICAL, "Exception from portletSetup", e);
+                } else {
+                    _log.error("Portlet Setup Failed " +  message);
+                    _log.error("Exception from portletSetup", e);
+
                 }
-                throw e;
             }
 
         }
@@ -356,30 +366,46 @@ public class EvalsPortlet extends GenericPortlet {
      * @param level
      * @param request
      */
-    private void handleEvalsException(Exception e, String shortMessage, String level, PortletRequest request) {
+    private void handleException(Exception e, String shortMessage, String level, PortletRequest request) {
         try {
             Map<String, String> grayLogFields = new HashMap<String, String>();
-            PortletSession session = request.getPortletSession(true);
             EvalsLogger logger = getLog();
 
             if (logger != null) {
                 String currentURL = PortalUtil.getCurrentURL(request);
-                Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
-                String loggedOnUserId = "";
-                if (loggedOnUser != null) {
-                    loggedOnUserId = ((Integer) loggedOnUser.getId()).toString();
-                }
-
-                grayLogFields.put("logged-in-user", loggedOnUserId);
+                grayLogFields.put("logged-in-user", getLoggedOnUserId(request));
                 grayLogFields.put("currentURL", currentURL);
                 logger.log(level, shortMessage, e, grayLogFields);
             }
+            _log.error(shortMessage, e);
         } catch (Exception exception) {
             _log.error(CWSUtil.stackTraceString(e));
             _log.error(CWSUtil.stackTraceString(exception));
         }
 
         viewJSP = Constants.JSP_ERROR;
+    }
+
+    /**
+     * Returns the logged on user id from session. It checks to make sure that the session
+     * is valid. This method is used by error logging, so it needs to handle session errors.
+     *
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    private String getLoggedOnUserId(PortletRequest request) throws Exception {
+        String loggedOnUserId = "failed-to-get-user-from-session";
+        try {
+            PortletSession session = ActionHelper.getSession(request);
+            Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
+            if (loggedOnUser != null) {
+                loggedOnUserId = ((Integer) loggedOnUser.getId()).toString();
+            }
+        } catch (Exception e) {
+            _log.error(e);
+        }
+        return loggedOnUserId;
     }
 
     protected void include(String path, RenderRequest renderRequest,RenderResponse renderResponse)
