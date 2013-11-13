@@ -1,12 +1,15 @@
 package edu.osu.cws.evals.portlet;
 
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.util.PortalUtil;
 import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import javax.portlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -62,6 +65,10 @@ public class ActionHelper {
             throw new Exception("Session is invalid.");
         }
 
+        if (!isHttpSessionValid(request)) {
+            throw new Exception("HttpSession is invalid.");
+        }
+
         return session;
     }
 
@@ -77,10 +84,34 @@ public class ActionHelper {
         PortletSession session = request.getPortletSession(true);
 
         if (!request.isRequestedSessionIdValid()) {
-            throw new Exception("Session is invalid.");
+            throw new Exception("Portlet Session is invalid.");
+        }
+
+        if (!isHttpSessionValid(request)) {
+            throw new Exception("HttpSession is invalid.");
         }
 
         return session;
+    }
+
+    /**
+     * Whether or not the http session associated with the portlet session is valid. This is checked
+     * by calling getCreationTime on the http session. If the http session is invalid calling
+     * getCreationTime throws an exception and we can check using that.
+     *
+     * @param request
+     * @return
+     */
+    private static boolean isHttpSessionValid(PortletRequest request) {
+        try {
+            HttpServletRequest servletRequest = PortalUtil.getHttpServletRequest(request);
+            HttpSession session = servletRequest.getSession(true);
+            // if the session is invalid calling getCreationTime will throw illegal state exception
+            session.getCreationTime();
+        } catch (IllegalStateException e) {
+            return false;
+        }
+        return true;
     }
 
     private void setRequestMap() throws Exception {
