@@ -92,7 +92,7 @@ public class EvalsPortlet extends GenericPortlet {
             actionHelper.setRequestAttributes(renderRequest);
             actionHelper.removeRequestMap();
         } catch (Exception e) {
-            handleEvalsException(e, "Error in doView", Logger.ERROR, renderRequest);
+            handleException(e, "Error in doView", Logger.ERROR, renderRequest);
         } finally {
             include(viewJSP, renderRequest, renderResponse);
             viewJSP = null;
@@ -145,7 +145,7 @@ public class EvalsPortlet extends GenericPortlet {
                 if (session != null && session.isOpen()) {
                     session.close();
                 }
-                handleEvalsException(e, "Error in serveResource", Logger.ERROR, request);
+                handleException(e, "Error in serveResource", Logger.ERROR, request);
                 result="There was an error performing your request";
             }
         } else {
@@ -207,7 +207,7 @@ public class EvalsPortlet extends GenericPortlet {
             if (hibSession != null && hibSession.isOpen()) {
                 hibSession.close();
             }
-            handleEvalsException(e, action, Logger.ERROR, request);
+            handleException(e, action, Logger.ERROR, request);
         }
     }
 
@@ -258,7 +258,6 @@ public class EvalsPortlet extends GenericPortlet {
                 Transaction tx = hibSession.beginTransaction();
 
                 actionHelper = new ActionHelper(request, null, getPortletContext());
-                actionHelper.updateContextTimestamp();
                 actionHelper.setAdminPortletData();
                 createMailer();
                 message += "Mailer setup successfully\n";
@@ -367,7 +366,7 @@ public class EvalsPortlet extends GenericPortlet {
      * @param level
      * @param request
      */
-    private void handleEvalsException(Exception e, String shortMessage, String level, PortletRequest request) {
+    private void handleException(Exception e, String shortMessage, String level, PortletRequest request) {
         try {
             Map<String, String> grayLogFields = new HashMap<String, String>();
             EvalsLogger logger = getLog();
@@ -377,9 +376,8 @@ public class EvalsPortlet extends GenericPortlet {
                 grayLogFields.put("logged-in-user", getLoggedOnUserId(request));
                 grayLogFields.put("currentURL", currentURL);
                 logger.log(level, shortMessage, e, grayLogFields);
-            } else {
-                _log.error("EvalS logger method was null", e);
             }
+            _log.error(shortMessage, e);
         } catch (Exception exception) {
             _log.error(CWSUtil.stackTraceString(e));
             _log.error(CWSUtil.stackTraceString(exception));
