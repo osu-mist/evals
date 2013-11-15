@@ -518,38 +518,6 @@ public class AppraisalsTest {
         assert AppraisalMgr.openTrialAppraisalExists(job);
     }
 
-    @Test
-    /**
-     * Create test case when the job begin date is towards the beginning of the year and review
-     * period is towards the end of the year. This is to test a defect where annual exists was
-     * returning true because it was incorrectly detecting the previous review periods evaluation.
-     */
-    public void shouldDetectCorrectlyIfAnnualExists() throws Exception {
-        Job job = new Job();
-        Employee employee = new Employee();
-        employee.setId(12345);
-        job.setEmployee(employee);
-        job.setPositionNumber("1234");
-        job.setSuffix("00");
-        DateTime appraisalStartDate = new DateTime().withDate(new DateTime().getYear(), 11, 1);
-
-        Appraisal app = AppraisalMgr.createAppraisal(job, appraisalStartDate.minusYears(1), Appraisal.TYPE_ANNUAL);
-
-        // commit result & open transaction again. This is to force the record to be saved so that
-        // the hql query performed by appraisal mgr fetches the newly created record.
-        tx.commit();
-        session = HibernateUtil.getCurrentSession();
-        tx = session.beginTransaction();
-
-        job = (Job) session.load(Job.class, new Job(new Employee(12345), "1234", "00"));
-        DateTime jobBeginDate = new DateTime().withDayOfMonth(1).withMonthOfYear(1);
-        job.setBeginDate(jobBeginDate.toDate());
-
-        System.out.println(app.getStartDate() + " id = " + app.getId());
-
-        assert !AppraisalMgr.AnnualExists(job, appraisalStartDate);
-    }
-
     @Test(groups={"pending"})
     public void shouldReturnArrayOfOpenIDs() throws Exception {
         assert AppraisalMgr.getOpenIDs().length != 0;
