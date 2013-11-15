@@ -1,10 +1,14 @@
 package edu.osu.cws.evals.portlet;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.util.PortalUtil;
 import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
+import edu.osu.cws.evals.util.EvalsLogger;
 import edu.osu.cws.util.CWSUtil;
+import edu.osu.cws.util.Logger;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import javax.portlet.*;
@@ -33,6 +37,8 @@ public class ActionHelper {
     private PortletContext portletContext;
 
     private PortletRequest request;
+
+    private static Log _log = LogFactoryUtil.getLog(ActionHelper.class);
 
     private PortletResponse response;
 
@@ -92,6 +98,41 @@ public class ActionHelper {
         }
 
         return session;
+    }
+
+    /**
+     * Safe method that fetches session attribute. It handles session being invalid.
+     *
+     * @param key
+     * @return
+     */
+    public Object getSessionAttribute(String key) {
+        return getSessionAttribute(request, key, portletContext);
+    }
+
+    /**
+     * Safe method that fetches session attribute. It handles session being invalid.
+     *
+     * @param request           PortletRequest
+     * @param key               Attribute key from session
+     * @return
+     */
+
+    public static Object getSessionAttribute(PortletRequest request, String key,
+                                             PortletContext portletContext) {
+        Object value = null;
+        try {
+            value = getSession(request).getAttribute(key);
+        } catch (Exception e) {
+            EvalsLogger logger = (EvalsLogger) portletContext.getAttribute("log");
+            try {
+                logger.log(Logger.ERROR, "Failed to get session", e);
+            } catch (Exception ex) {
+                _log.error(ex);
+            }
+        }
+
+        return value;
     }
 
     /**

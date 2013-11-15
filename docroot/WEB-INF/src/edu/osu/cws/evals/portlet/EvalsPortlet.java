@@ -22,6 +22,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import javax.portlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
@@ -233,6 +235,7 @@ public class EvalsPortlet extends GenericPortlet {
      */
     private void portletSetup(PortletRequest request) throws Exception {
         Boolean reload = false;
+        Map<String, String> fields = new HashMap<String, String>();
         Date loadDate = (Date) getPortletContext().getAttribute(CONTEXT_LOAD_DATE);
         if(loadDate == null){
             reload = true;
@@ -268,11 +271,13 @@ public class EvalsPortlet extends GenericPortlet {
                 loadResourceBundle();
                 message += "Stored resource bundle Language.properties in portlet context\n";
 
+                // get extra fields to log
+                fields = getExtraLoggingFields(request);
                 tx.commit();
 
                 EvalsLogger logger =  getLog();
                 if (logger != null) {
-                    logger.log(Logger.INFORMATIONAL, "Portlet Setup Success", message);
+                    logger.log(Logger.INFORMATIONAL, "Portlet Setup Success", message, fields);
                 }
                 getPortletContext().setAttribute(CONTEXT_LOAD_DATE, new Date());
             } catch (Exception e) {
@@ -281,16 +286,61 @@ public class EvalsPortlet extends GenericPortlet {
                 }
                 EvalsLogger logger =  getLog();
                 if (logger != null) {
-                    logger.log(Logger.CRITICAL, "Portlet Setup Failed", message);
-                    logger.log(Logger.CRITICAL, "Exception from portletSetup", e);
+                    logger.log(Logger.CRITICAL, "Portlet Setup Failed", message, fields);
+                    logger.log(Logger.CRITICAL, "Exception from portletSetup", e, fields);
                 } else {
                     _log.error("Portlet Setup Failed " +  message);
                     _log.error("Exception from portletSetup", e);
-
                 }
             }
 
         }
+    }
+
+    /**
+     * Returns a map of extra fields to include in the portlet setup graylog entry.
+     *
+     * @param request
+     * @return
+     */
+    private Map<String, String> getExtraLoggingFields(PortletRequest request) {
+        Map<String, String> fields = new HashMap<String, String>();
+        String portletSessionId, isSessionNew, creationTime2;
+        portletSessionId = isSessionNew = creationTime2 = "invalidated-session";
+        HttpServletRequest servletRequest = PortalUtil.getHttpServletRequest(request);
+        HttpSession servletSession = servletRequest.getSession(true);
+
+        Date loadDate = (Date) getPortletContext().getAttribute(CONTEXT_LOAD_DATE);
+        String loadDateString = "";
+        if (loadDate != null) {
+            loadDateString = loadDate.toString();
+        }
+
+        try {
+            PortletSession portletSession = actionHelper.getSession();
+            portletSessionId = portletSession.getId();
+            isSessionNew = ((Boolean) portletSession.isNew()).toString();
+            creationTime2 = ((Long) portletSession.getCreationTime()).toString();
+        } catch (Exception e) {
+            _log.error("Portlet Session invalidated", e);
+        }
+
+        // portlet session info
+        fields.put("is-portlet-session-new", isSessionNew);
+        fields.put("portlet-session-id", portletSessionId);
+        fields.put("portlet-session-create-time", creationTime2);
+        fields.put("portlet-context-load-date", loadDateString);
+
+        // servlet session info
+        fields.put("servlet-session-id", servletSession.getId());
+        Long creationTime = servletSession.getCreationTime();
+        fields.put("servlet-session-create-time", creationTime.toString());
+
+        // misc info
+        fields.put("logged-in-user", getLoggedOnUserId(request));
+        fields.put("current-url", PortalUtil.getCurrentURL(request));
+
+        return fields;
     }
 
     /**
@@ -394,16 +444,12 @@ public class EvalsPortlet extends GenericPortlet {
      * @return
      * @throws Exception
      */
-    private String getLoggedOnUserId(PortletRequest request) throws Exception {
+    private String getLoggedOnUserId(PortletRequest request) {
         String loggedOnUserId = "failed-to-get-user-from-session";
-        try {
-            PortletSession session = ActionHelper.getSession(request);
-            Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
-            if (loggedOnUser != null) {
-                loggedOnUserId = ((Integer) loggedOnUser.getId()).toString();
-            }
-        } catch (Exception e) {
-            _log.error(e);
+        Employee loggedOnUser = (Employee) ActionHelper.getSessionAttribute(request,
+                "loggedOnUser", getPortletContext());
+        if (loggedOnUser != null) {
+            loggedOnUserId = ((Integer) loggedOnUser.getId()).toString();
         }
         return loggedOnUserId;
     }
