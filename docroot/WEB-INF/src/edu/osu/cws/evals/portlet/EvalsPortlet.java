@@ -305,8 +305,8 @@ public class EvalsPortlet extends GenericPortlet {
      */
     private Map<String, String> getExtraLoggingFields(PortletRequest request) {
         Map<String, String> fields = new HashMap<String, String>();
-        String portletSessionId, isSessionNew, creationTime2;
-        portletSessionId = isSessionNew = creationTime2 = "invalidated-session";
+        String portletSessionId, isPortletSessionNew, isServletSessionNew, creationTime2;
+        portletSessionId = isPortletSessionNew = isServletSessionNew = creationTime2 = "invalidated-session";
         HttpServletRequest servletRequest = PortalUtil.getHttpServletRequest(request);
         HttpSession servletSession = servletRequest.getSession(true);
 
@@ -319,14 +319,15 @@ public class EvalsPortlet extends GenericPortlet {
         try {
             PortletSession portletSession = actionHelper.getSession();
             portletSessionId = portletSession.getId();
-            isSessionNew = ((Boolean) portletSession.isNew()).toString();
+            isPortletSessionNew = ((Boolean) portletSession.isNew()).toString();
+            isServletSessionNew = ((Boolean) servletSession.isNew()).toString();
             creationTime2 = ((Long) portletSession.getCreationTime()).toString();
         } catch (Exception e) {
             _log.error("Portlet Session invalidated", e);
         }
 
         // portlet session info
-        fields.put("is-portlet-session-new", isSessionNew);
+        fields.put("is-portlet-session-new", isPortletSessionNew);
         fields.put("portlet-session-id", portletSessionId);
         fields.put("portlet-session-create-time", creationTime2);
         fields.put("portlet-context-load-date", loadDateString);
@@ -335,6 +336,7 @@ public class EvalsPortlet extends GenericPortlet {
         fields.put("servlet-session-id", servletSession.getId());
         Long creationTime = servletSession.getCreationTime();
         fields.put("servlet-session-create-time", creationTime.toString());
+        fields.put("is-servlet-session-new", isServletSessionNew);
 
         // misc info
         fields.put("logged-in-user", getLoggedOnUserId(request));
