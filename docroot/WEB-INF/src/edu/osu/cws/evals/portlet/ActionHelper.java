@@ -103,16 +103,6 @@ public class ActionHelper {
     /**
      * Safe method that fetches session attribute. It handles session being invalid.
      *
-     * @param key
-     * @return
-     */
-    public Object getSessionAttribute(String key) {
-        return getSessionAttribute(request, key, portletContext);
-    }
-
-    /**
-     * Safe method that fetches session attribute. It handles session being invalid.
-     *
      * @param request           PortletRequest
      * @param key               Attribute key from session
      * @return
