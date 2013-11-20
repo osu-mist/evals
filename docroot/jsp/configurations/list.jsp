@@ -63,13 +63,13 @@
                             id="<portlet:namespace/>configValue${configuration.id}" value="${configuration.value}" class="int inline"
                             type="text"/>
                         <input type="submit" value="Save" class="small">
-                        <input type="submit" value="Cancel" class="small" onclick="toggleForm(${configuration.id}); return false;">
+                        <input type="submit" value="Cancel" class="small cancel-edit" rel="${configuration.id}">
                     </form>
                     </div>
                 </td>
                 <td>
-                    <a id="<portlet:namespace/>editAction${configuration.id}"
-                    href="#" onclick="toggleForm(${configuration.id});">
+                    <a id="<portlet:namespace/>editAction${configuration.id}" class="edit-action"
+                    href="#" rel="${configuration.id}" >
                     <liferay-ui:message key="edit"/></a>
                 </td>
             </tr>
@@ -103,10 +103,25 @@
         jQuery("#<portlet:namespace/>displayValue"+settingId).toggle();
         jQuery("#<portlet:namespace/>form"+settingId).toggle();
         jQuery("#<portlet:namespace/>editAction"+settingId).toggle();
-        if (jQuery("#<portlet:namespace/>form"+settingId).is(":visible")) {
-            jQuery("#<portlet:namespace/>configValue"+settingId).focus();
-        }
-        return false;
     }
+
+    function toggleFormEvent(event) {
+        var settingId = jQuery(event.target).attr("rel");
+        toggleForm(settingId);
+        event.preventDefault();
+    }
+
+    function setToggle(index) {
+        jQuery(this).click(toggleFormEvent);
+    }
+
+    function initActions() {
+        jQuery(".edit-action").each(setToggle);
+        jQuery(".cancel-edit").each(setToggle);
+    }
+
+    jQuery(document).ready(initActions);
+
+
 </script>
 <%@ include file="/jsp/footer.jsp" %>
