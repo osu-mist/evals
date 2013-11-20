@@ -36,7 +36,6 @@ public class CloseOutAction implements ActionInterface {
         }
 
         ArrayList<CloseOutReason> reasonsList = CloseOutReasonMgr.list(false);
-        Collections.sort(reasonsList, CloseOutReason.reasonComparator);
         actionHelper.addToRequestMap("reasonsList", reasonsList);
         actionHelper.useMaximizedMenu();
 
