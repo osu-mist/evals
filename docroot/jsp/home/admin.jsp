@@ -35,7 +35,7 @@ noticeListURL.setParameter("controller", "NoticeAction");
     <div id="<portlet:namespace/>accordionMenuPassAdmin" class="accordion-menu">
         <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>passAdmin');">
           <img id="<portlet:namespace/>passAdminImageToggle" src="/cps/images/accordion/accordion_arrow_up.png"/>
-          PASS Administration
+          <liferay-ui:message key="admin-section" />
         </div>
         <div class="accordion-content" id="<portlet:namespace/>passAdmin" style="display: block;">
             <ul class="pass-menu-list">
