@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.models;
 
+import java.util.Comparator;
 import java.util.Date;
 
 public class CloseOutReason extends Evals {
@@ -55,4 +56,12 @@ public class CloseOutReason extends Evals {
     public void setDeleteDate(Date deleteDate) {
         this.deleteDate = deleteDate;
     }
+
+    public static Comparator<CloseOutReason> reasonComparator =
+            new Comparator<CloseOutReason>() {
+                @Override
+                public int compare(CloseOutReason reason, CloseOutReason otherReason) {
+                    return reason.getReason().compareTo(otherReason.getReason());
+                }
+            };
 }
