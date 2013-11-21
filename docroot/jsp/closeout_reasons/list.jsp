@@ -3,8 +3,6 @@
 <c:set var="deleteAction" value="delete"/>
 
 <h2><liferay-ui:message key="closeout-reason-list-title"/></h2>
-<liferay-ui:success key="closeout-reason-added" message="closeout-reason-added" />
-<liferay-ui:success key="closeout-reason-deleted" message="closeout-reason-deleted" />
 
 <ul id="search-parent" class="actions">
     <li id="<portlet:namespace/>reason-add-link">
@@ -34,6 +32,8 @@
   </fieldset>
 </form>
 
+<liferay-ui:success key="closeout-reason-added" message="closeout-reason-added" />
+<liferay-ui:success key="closeout-reason-deleted" message="closeout-reason-deleted" />
 
 <table class="taglib-search-iterator">
     <thead>

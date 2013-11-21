@@ -11,6 +11,7 @@ import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class CloseOutAction implements ActionInterface {
     private ActionHelper actionHelper;

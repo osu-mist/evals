@@ -7,8 +7,6 @@ List criteria = (List) renderRequest.getAttribute("reviewersList");
 %>
 
 <h2><liferay-ui:message key="reviewers-list-title"/></h2>
-<liferay-ui:success key="reviewer-saved" message="reviewer-saved" />
-<liferay-ui:success key="reviewer-deleted" message="reviewer-deleted" />
 
 <ul id="search-parent" class="actions">
     <li id="<portlet:namespace/>reviewer-add-link">
@@ -45,6 +43,9 @@ List criteria = (List) renderRequest.getAttribute("reviewersList");
                   id="<portlet:namespace/>cancel"/>
       </fieldset>
   </form>
+
+<liferay-ui:success key="reviewer-added" message="reviewer-added" />
+<liferay-ui:success key="reviewer-deleted" message="reviewer-deleted" />
 
 <table class="taglib-search-iterator">
     <thead>
