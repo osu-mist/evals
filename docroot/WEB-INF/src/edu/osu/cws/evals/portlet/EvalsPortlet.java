@@ -22,6 +22,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import javax.portlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
@@ -81,18 +83,22 @@ public class EvalsPortlet extends GenericPortlet {
      */
 	public void doView(RenderRequest renderRequest, RenderResponse renderResponse)
             throws IOException, PortletException {
-
         // If processAction's delegate method was called, it set the viewJSP property to some
         // jsp value, if viewJSP is null, it means processAction was not called and we need to
         // call delegate
         if (viewJSP == null) {
             delegate(renderRequest, renderResponse);
         }
-        actionHelper.setRequestAttributes(renderRequest);
 
-        include(viewJSP, renderRequest, renderResponse);
-        viewJSP = null;
-        actionHelper.removeRequestMap();
+        try {
+            actionHelper.setRequestAttributes(renderRequest);
+            actionHelper.removeRequestMap();
+        } catch (Exception e) {
+            handleException(e, "Error in doView", Logger.ERROR, renderRequest);
+        } finally {
+            include(viewJSP, renderRequest, renderResponse);
+            viewJSP = null;
+        }
 	}
 
     public void processAction(ActionRequest actionRequest, ActionResponse actionResponse)
@@ -141,7 +147,7 @@ public class EvalsPortlet extends GenericPortlet {
                 if (session != null && session.isOpen()) {
                     session.close();
                 }
-                handleEvalsException(e, "Error in serveResource", Logger.ERROR, request);
+                handleException(e, "Error in serveResource", Logger.ERROR, request);
                 result="There was an error performing your request";
             }
         } else {
@@ -203,7 +209,7 @@ public class EvalsPortlet extends GenericPortlet {
             if (hibSession != null && hibSession.isOpen()) {
                 hibSession.close();
             }
-            handleEvalsException(e, action, Logger.ERROR, request);
+            handleException(e, action, Logger.ERROR, request);
         }
     }
 
@@ -229,6 +235,7 @@ public class EvalsPortlet extends GenericPortlet {
      */
     private void portletSetup(PortletRequest request) throws Exception {
         Boolean reload = false;
+        Map<String, String> fields = new HashMap<String, String>();
         Date loadDate = (Date) getPortletContext().getAttribute(CONTEXT_LOAD_DATE);
         if(loadDate == null){
             reload = true;
@@ -243,16 +250,18 @@ public class EvalsPortlet extends GenericPortlet {
 
             try {
                 message += loadEnvironmentProperties();
+                // Getting the properties directly from portlet context to avoid action helper
+                // dependency
+                PropertiesConfiguration environmentProp = (PropertiesConfiguration)
+                        getPortletContext().getAttribute("environmentProp");
+                getPortletContext().setAttribute("log", EvalsUtil.createLogger(environmentProp));
+                message += "Created logger object\n";
 
                 hibSession = HibernateUtil.getCurrentSession();
                 Transaction tx = hibSession.beginTransaction();
 
                 actionHelper = new ActionHelper(request, null, getPortletContext());
-                actionHelper.updateContextTimestamp();
                 actionHelper.setAdminPortletData();
-                getPortletContext().setAttribute("log",
-                        EvalsUtil.createLogger(actionHelper.getEvalsConfig()));
-                message += "Created logger object\n";
                 createMailer();
                 message += "Mailer setup successfully\n";
                 getPortletContext().setAttribute("permissionRules", PermissionRuleMgr.list());
@@ -262,11 +271,13 @@ public class EvalsPortlet extends GenericPortlet {
                 loadResourceBundle();
                 message += "Stored resource bundle Language.properties in portlet context\n";
 
+                // get extra fields to log
+                fields = getExtraLoggingFields(request);
                 tx.commit();
 
                 EvalsLogger logger =  getLog();
                 if (logger != null) {
-                    logger.log(Logger.INFORMATIONAL, "Portlet Setup Success", message);
+                    logger.log(Logger.INFORMATIONAL, "Portlet Setup Success", message, fields);
                 }
                 getPortletContext().setAttribute(CONTEXT_LOAD_DATE, new Date());
             } catch (Exception e) {
@@ -275,12 +286,63 @@ public class EvalsPortlet extends GenericPortlet {
                 }
                 EvalsLogger logger =  getLog();
                 if (logger != null) {
-                    logger.log(Logger.ERROR, "Portlet Setup Failed", message);
+                    logger.log(Logger.CRITICAL, "Portlet Setup Failed", message, fields);
+                    logger.log(Logger.CRITICAL, "Exception from portletSetup", e, fields);
+                } else {
+                    _log.error("Portlet Setup Failed " +  message);
+                    _log.error("Exception from portletSetup", e);
                 }
-                throw e;
             }
 
         }
+    }
+
+    /**
+     * Returns a map of extra fields to include in the portlet setup graylog entry.
+     *
+     * @param request
+     * @return
+     */
+    private Map<String, String> getExtraLoggingFields(PortletRequest request) {
+        Map<String, String> fields = new HashMap<String, String>();
+        String portletSessionId, isPortletSessionNew, isServletSessionNew, creationTime2;
+        portletSessionId = isPortletSessionNew = isServletSessionNew = creationTime2 = "invalidated-session";
+        HttpServletRequest servletRequest = PortalUtil.getHttpServletRequest(request);
+        HttpSession servletSession = servletRequest.getSession(true);
+
+        Date loadDate = (Date) getPortletContext().getAttribute(CONTEXT_LOAD_DATE);
+        String loadDateString = "";
+        if (loadDate != null) {
+            loadDateString = loadDate.toString();
+        }
+
+        try {
+            PortletSession portletSession = actionHelper.getSession();
+            portletSessionId = portletSession.getId();
+            isPortletSessionNew = ((Boolean) portletSession.isNew()).toString();
+            isServletSessionNew = ((Boolean) servletSession.isNew()).toString();
+            creationTime2 = ((Long) portletSession.getCreationTime()).toString();
+        } catch (Exception e) {
+            _log.error("Portlet Session invalidated", e);
+        }
+
+        // portlet session info
+        fields.put("is-portlet-session-new", isPortletSessionNew);
+        fields.put("portlet-session-id", portletSessionId);
+        fields.put("portlet-session-create-time", creationTime2);
+        fields.put("portlet-context-load-date", loadDateString);
+
+        // servlet session info
+        fields.put("servlet-session-id", servletSession.getId());
+        Long creationTime = servletSession.getCreationTime();
+        fields.put("servlet-session-create-time", creationTime.toString());
+        fields.put("is-servlet-session-new", isServletSessionNew);
+
+        // misc info
+        fields.put("logged-in-user", getLoggedOnUserId(request));
+        fields.put("current-url", PortalUtil.getCurrentURL(request));
+
+        return fields;
     }
 
     /**
@@ -356,30 +418,42 @@ public class EvalsPortlet extends GenericPortlet {
      * @param level
      * @param request
      */
-    private void handleEvalsException(Exception e, String shortMessage, String level, PortletRequest request) {
+    private void handleException(Exception e, String shortMessage, String level, PortletRequest request) {
         try {
             Map<String, String> grayLogFields = new HashMap<String, String>();
-            PortletSession session = request.getPortletSession(true);
             EvalsLogger logger = getLog();
 
             if (logger != null) {
                 String currentURL = PortalUtil.getCurrentURL(request);
-                Employee loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
-                String loggedOnUserId = "";
-                if (loggedOnUser != null) {
-                    loggedOnUserId = ((Integer) loggedOnUser.getId()).toString();
-                }
-
-                grayLogFields.put("logged-in-user", loggedOnUserId);
+                grayLogFields.put("logged-in-user", getLoggedOnUserId(request));
                 grayLogFields.put("currentURL", currentURL);
                 logger.log(level, shortMessage, e, grayLogFields);
             }
+            _log.error(shortMessage, e);
         } catch (Exception exception) {
             _log.error(CWSUtil.stackTraceString(e));
             _log.error(CWSUtil.stackTraceString(exception));
         }
 
         viewJSP = Constants.JSP_ERROR;
+    }
+
+    /**
+     * Returns the logged on user id from session. It checks to make sure that the session
+     * is valid. This method is used by error logging, so it needs to handle session errors.
+     *
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    private String getLoggedOnUserId(PortletRequest request) {
+        String loggedOnUserId = "failed-to-get-user-from-session";
+        Employee loggedOnUser = (Employee) ActionHelper.getSessionAttribute(request,
+                "loggedOnUser", getPortletContext());
+        if (loggedOnUser != null) {
+            loggedOnUserId = ((Integer) loggedOnUser.getId()).toString();
+        }
+        return loggedOnUserId;
     }
 
     protected void include(String path, RenderRequest renderRequest,RenderResponse renderResponse)

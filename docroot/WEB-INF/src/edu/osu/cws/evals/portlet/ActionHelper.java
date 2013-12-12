@@ -1,12 +1,19 @@
 package edu.osu.cws.evals.portlet;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.util.PortalUtil;
 import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
+import edu.osu.cws.evals.util.EvalsLogger;
 import edu.osu.cws.util.CWSUtil;
+import edu.osu.cws.util.Logger;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import javax.portlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -31,6 +38,8 @@ public class ActionHelper {
 
     private PortletRequest request;
 
+    private static Log _log = LogFactoryUtil.getLog(ActionHelper.class);
+
     private PortletResponse response;
 
     private Employee loggedOnUser;
@@ -49,8 +58,95 @@ public class ActionHelper {
         setLoggedOnUser();
     }
 
-    private void setRequestMap() {
+    /**
+     * Wrapper method to control access to the portlet session.
+     *
+     * @return
+     * @throws Exception
+     */
+    PortletSession getSession() throws Exception {
         PortletSession session = request.getPortletSession(true);
+
+        if (!request.isRequestedSessionIdValid()) {
+            throw new Exception("Session is invalid.");
+        }
+
+        if (!isHttpSessionValid(request)) {
+            throw new Exception("HttpSession is invalid.");
+        }
+
+        return session;
+    }
+
+    /**
+     * Wrapper method to control access to the portlet session. This method is a temporary
+     * solution since we plan on doing some code refactor to only have this class access the
+     * portlet session.
+     *
+     * @return
+     * @throws Exception
+     */
+    public static PortletSession getSession(PortletRequest request) throws Exception {
+        PortletSession session = request.getPortletSession(true);
+
+        if (!request.isRequestedSessionIdValid()) {
+            throw new Exception("Portlet Session is invalid.");
+        }
+
+        if (!isHttpSessionValid(request)) {
+            throw new Exception("HttpSession is invalid.");
+        }
+
+        return session;
+    }
+
+    /**
+     * Safe method that fetches session attribute. It handles session being invalid.
+     *
+     * @param request           PortletRequest
+     * @param key               Attribute key from session
+     * @return
+     */
+
+    public static Object getSessionAttribute(PortletRequest request, String key,
+                                             PortletContext portletContext) {
+        Object value = null;
+        try {
+            value = getSession(request).getAttribute(key);
+        } catch (Exception e) {
+            EvalsLogger logger = (EvalsLogger) portletContext.getAttribute("log");
+            try {
+                logger.log(Logger.ERROR, "Failed to get session", e);
+            } catch (Exception ex) {
+                _log.error(ex);
+            }
+        }
+
+        return value;
+    }
+
+    /**
+     * Whether or not the http session associated with the portlet session is valid. This is checked
+     * by calling getCreationTime on the http session. If the http session is invalid calling
+     * getCreationTime throws an exception and we can check using that.
+     *
+     * @param request
+     * @return
+     */
+    private static boolean isHttpSessionValid(PortletRequest request) {
+        try {
+            HttpServletRequest servletRequest = PortalUtil.getHttpServletRequest(request);
+            HttpSession session = servletRequest.getSession(true);
+            // if the session is invalid calling getCreationTime will throw illegal state exception
+            session.getCreationTime();
+        } catch (IllegalStateException e) {
+            return false;
+        }
+        return true;
+    }
+
+    private void setRequestMap() throws Exception {
+        PortletSession session = getSession();
         requestMap = (HashMap)session.getAttribute(REQUEST_MAP);
         if (requestMap == null) {
             requestMap = new HashMap<String, Object>();
@@ -87,7 +183,7 @@ public class ActionHelper {
      * @throws Exception
      */
     public List<Appraisal> getMyActiveAppraisals() throws Exception {
-        PortletSession session = request.getPortletSession(true);
+        PortletSession session = getSession();
         List<Appraisal> allMyActiveAppraisals;
 
         allMyActiveAppraisals = (ArrayList<Appraisal>) session.getAttribute(ALL_MY_ACTIVE_APPRAISALS);
@@ -120,7 +216,7 @@ public class ActionHelper {
      * @throws Exception
      */
     public ArrayList<Appraisal> getMyTeamActiveAppraisals() throws Exception {
-        PortletSession session = request.getPortletSession(true);
+        PortletSession session = getSession();
 
         ArrayList<Appraisal> myTeamAppraisals;
         myTeamAppraisals = (ArrayList<Appraisal>) session.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
@@ -133,7 +229,7 @@ public class ActionHelper {
     }
 
     public void setUpUserPermission(boolean refresh) throws Exception {
-        PortletSession session = request.getPortletSession(true);
+        PortletSession session = getSession();
 
         Boolean isSupervisor = (Boolean) session.getAttribute("isSupervisor");
 
@@ -228,7 +324,7 @@ public class ActionHelper {
         int toIndex;
         ArrayList<Appraisal> outList = new ArrayList<Appraisal>();
 
-        PortletSession session = request.getPortletSession(true);
+        PortletSession session = getSession();
         reviewList = (ArrayList<Appraisal>) session.getAttribute(REVIEW_LIST);
         session.setAttribute(REVIEW_LIST_MAX_RESULTS, maxResults);
 
@@ -324,7 +420,7 @@ public class ActionHelper {
      */
     private void setLoggedOnUser() throws Exception {
         // try to set it from session
-        PortletSession session = request.getPortletSession(true);
+        PortletSession session = getSession();
         loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
 
         // if not in session, get it from db
@@ -351,8 +447,8 @@ public class ActionHelper {
      *
      * @return username
      */
-    public String getLoggedOnUsername() {
-        PortletSession session = request.getPortletSession(true);
+    public String getLoggedOnUsername() throws Exception {
+        PortletSession session = getSession();
         String usernameSessionKey = "onidUsername";
         String onidUsername = (String) session.getAttribute(usernameSessionKey);
         if (onidUsername == null || onidUsername.equals("")) {
@@ -367,8 +463,8 @@ public class ActionHelper {
             if (Pattern.matches("[0-9]+", screenName)) {
                 PropertiesConfiguration config = getEvalsConfig();
                 String bannerHostname = config.getString("banner.hostname");
-                String luminisHostname = config.getString("luminis.hostname");
-                onidUsername = EmployeeMgr.getOnidUsername(screenName, bannerHostname, luminisHostname);
+                String luminisDbLink = config.getString("luminis.dbLink");
+                onidUsername = EmployeeMgr.getOnidUsername(screenName, bannerHostname, luminisDbLink);
             } else {
                 onidUsername = screenName;
             }
@@ -446,7 +542,7 @@ public class ActionHelper {
      * @throws Exception
      */
     public boolean isLoggedInUserSupervisor() throws Exception {
-        PortletSession session = request.getPortletSession(true);
+        PortletSession session = getSession();
         Boolean isSupervisor = (Boolean) session.getAttribute("isSupervisor");
         if (isSupervisor == null) {
             setUpUserPermission(false);
@@ -604,7 +700,7 @@ public class ActionHelper {
      *
      * @param request
      */
-    public void setRequestAttributes(RenderRequest request) {
+    public void setRequestAttributes(RenderRequest request) throws Exception {
         addToRequestMap("currentRole", getCurrentRole());
 
         for (Map.Entry<String, Object> entry : requestMap.entrySet()) {
@@ -639,8 +735,8 @@ public class ActionHelper {
      *
      * @return
      */
-    public void removeRequestMap(){
-        PortletSession session = request.getPortletSession(true);
+    public void removeRequestMap() throws Exception {
+        PortletSession session = getSession();
         session.removeAttribute(REQUEST_MAP);
     }
 
@@ -650,8 +746,8 @@ public class ActionHelper {
      *
      * @return
      */
-    public String getCurrentRole() {
-        PortletSession session = request.getPortletSession(true);
+    public String getCurrentRole() throws Exception{
+        PortletSession session = getSession();
         String currentRole = ParamUtil.getString(request, "currentRole");
 
         if (currentRole.equals("")) {

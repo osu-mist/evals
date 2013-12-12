@@ -2,6 +2,7 @@ package edu.osu.cws.evals.tests;
 
 import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.models.*;
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -197,11 +198,11 @@ public class JobsTest {
         job.setPositionNumber("C1234");
         job.setSuffix("00");
 
-        DateTime dateTime = new DateTime().minusYears(1).withMonthOfYear(DateTimeConstants.DECEMBER).withDayOfMonth(4);
+        DateTime dateTime = EvalsUtil.getToday().minusYears(1).withMonthOfYear(DateTimeConstants.DECEMBER).withDayOfMonth(4);
         job.setBeginDate(dateTime.toDate());
         DateTime newStartDate = job.getNewAnnualStartDate();
 
-        assert newStartDate.getYear() == new DateTime().getYear();
+        assert newStartDate.getYear() == EvalsUtil.getToday().getYear();
         assert newStartDate.getMonthOfYear() == DateTimeConstants.JANUARY;
         assert newStartDate.getDayOfMonth() == 1;
     }

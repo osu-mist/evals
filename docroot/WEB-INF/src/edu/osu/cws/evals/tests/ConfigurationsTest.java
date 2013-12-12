@@ -38,9 +38,9 @@ public class ConfigurationsTest {
         assert configs.get(1).getId() == 2;
         assert configs.get(2).getId() == 4;
         assert configs.get(3).getId() == 3;
-        assert configs.get(5).getId() == 8;
-        assert configs.get(6).getId() == 7;
-        assert configs.get(7).getId() == 6;
+        assert configs.get(5).getId() == 9;
+        assert configs.get(6).getId() == 10;
+        assert configs.get(7).getId() == 11;
     }
 
     public void shouldProvideMapUsingNameAsKey() throws Exception {
@@ -62,7 +62,7 @@ public class ConfigurationsTest {
     public void shouldThrowErrorWhenConfigurationIsNotFound() throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
-        ConfigurationMgr.edit(10, "should not save because 10 is not a valid id");
+        ConfigurationMgr.edit(50, "should not save because 10 is not a valid id");
         tx.commit();
     }
 

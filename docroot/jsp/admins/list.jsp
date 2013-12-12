@@ -3,8 +3,6 @@
 <c:set var="addAction" value="add"/>
 
 <h2><liferay-ui:message key="admins-list-title"/></h2>
-<liferay-ui:success key="admin-saved" message="admin-saved" />
-<liferay-ui:success key="admin-deleted" message="admin-deleted" />
 
 <c:if test="${isMaster == true}">
     <ul id="search-parent" class="actions">
@@ -43,7 +41,10 @@
              
       </fieldset>
   </form>
-    
+
+<liferay-ui:success key="admin-added" message="admin-added" />
+<liferay-ui:success key="admin-deleted" message="admin-deleted" />
+
 </c:if>
 
 <table class="taglib-search-iterator">

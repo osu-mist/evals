@@ -17,6 +17,12 @@ public class Salary {
 
     private Integer appraisalId;
 
+    private Double twoIncrease;
+
+    private Double oneMax;
+
+    private Double oneMin;
+
     public Integer getId() {
         return id;
     }
@@ -79,5 +85,29 @@ public class Salary {
 
     public void setAppraisalId(Integer appraisalId) {
         this.appraisalId = appraisalId;
+    }
+
+    public Double getTwoIncrease() {
+        return twoIncrease;
+    }
+
+    public void setTwoIncrease(Double twoIncrease) {
+        this.twoIncrease = twoIncrease;
+    }
+
+    public Double getOneMax() {
+        return oneMax;
+    }
+
+    public void setOneMax(Double oneMax) {
+        this.oneMax = oneMax;
+    }
+
+    public Double getOneMin() {
+        return oneMin;
+    }
+
+    public void setOneMin(Double oneMin) {
+        this.oneMin = oneMin;
     }
 }

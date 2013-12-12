@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.models;
 
+import java.util.Comparator;
 import java.util.Date;
 
 public class CloseOutReason extends Evals {

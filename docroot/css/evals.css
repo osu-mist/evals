@@ -119,6 +119,13 @@
     width: 3em !important;
 }
 
+.osu-cws input[type="text"][readonly="readonly"].recommended-salary,
+.osu-cws input[type="text"][disabled="disabled"].recommended-salary,
+.osu-cws input[type="text"][disabled].recommended-salary,
+.osu-cws input[type="text"][readonly="readonly"].recommended-salary:focus {
+    color: #000000;
+}
+
 .role-description {
     background: #686868;
     color: #fff;

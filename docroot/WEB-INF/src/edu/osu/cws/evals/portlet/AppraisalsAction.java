@@ -320,20 +320,11 @@ public class AppraisalsAction implements ActionInterface {
      */
     private Map<String, String> getSalaryValidationValues() {
         Map<String, String> salaryValidationValues = new HashMap<String, String>();
-        String aboveOrBelow = "below";
-        if (appraisal.getSalary().getCurrent() > appraisal.getSalary().getMidPoint()) {
-            aboveOrBelow = "above";
-        }
 
-        Map<String, Configuration> configurationMap =
-                (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
-        String increaseRate2Value = configurationMap.get("IT-increase-rate2-" + aboveOrBelow + "-control-value").getValue();
-        String increaseRate1MinVal = configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-min-value").getValue();
-        String increaseRate1MaxVal= configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-max-value").getValue();
-
-        salaryValidationValues.put("increaseRate2Value", increaseRate2Value);
-        salaryValidationValues.put("increaseRate1MinVal", increaseRate1MinVal);
-        salaryValidationValues.put("increaseRate1MaxVal", increaseRate1MaxVal);
+        Salary salary = appraisal.getSalary();
+        salaryValidationValues.put("increaseRate2Value", salary.getTwoIncrease().toString());
+        salaryValidationValues.put("increaseRate1MinVal", salary.getOneMin().toString());
+        salaryValidationValues.put("increaseRate1MaxVal", salary.getOneMax().toString());
 
         return salaryValidationValues;
     }
@@ -420,7 +411,7 @@ public class AppraisalsAction implements ActionInterface {
             }
         }
 
-        PortletSession session = request.getPortletSession(true);
+        PortletSession session = ActionHelper.getSession(request);
         session.setAttribute("reviewList", reviewList);
     }
 

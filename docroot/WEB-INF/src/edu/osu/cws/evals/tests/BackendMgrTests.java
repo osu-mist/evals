@@ -6,6 +6,7 @@ import edu.osu.cws.evals.backend.BackendMgr;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.models.*;
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -32,7 +33,7 @@ public class BackendMgrTests {
         Job job = (Job) session.load(Job.class, new Job(new Employee(12345), "1234", "00"));
 
         // create appraisal for testing
-        Appraisal appraisal = AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
+        Appraisal appraisal = AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(), Appraisal.TYPE_ANNUAL);
         assert appraisal.getStatus().equals(Appraisal.STATUS_GOALS_DUE);
         tx.commit();
 
@@ -75,7 +76,7 @@ public class BackendMgrTests {
         BackendMgr mgr = getMgrInstance();
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
-        Job job = (Job) session.load(Job.class, new Job(new Employee(12467), "1234", "00"));
+        Job job = (Job) session.load(Job.class, new Job(new Employee(12345), "4444", "00"));
 
         Integer currentCount = getEvaluationCount();
         assert mgr.handleTrialCreation(job) : "No trial was present, it should create one";
@@ -105,7 +106,8 @@ public class BackendMgrTests {
         Job job = (Job) session.load(Job.class, new Job(new Employee(12345), "1234", "00"));
 
         // need to set evalDate and annual ind. so that the exiting open trial eval is created
-        DateTime beginDate = new DateTime(job.getBeginDate()).withYear(new DateTime().getYear());
+        DateTime beginDate = new DateTime(job.getBeginDate()).withYear(EvalsUtil.getToday().getYear())
+                .withTimeAtStartOfDay();
         job.setEvalDate(beginDate.toDate());
         job.setAnnualInd(12);
         DateTime startDate = job.getTrialStartDate();
@@ -125,7 +127,7 @@ public class BackendMgrTests {
         // create an appraisal and set annual indicator
         Job job = (Job) session.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         job.setAnnualInd(12);
-        AppraisalMgr.createAppraisal(job, new DateTime(),  Appraisal.TYPE_ANNUAL);
+        AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(),  Appraisal.TYPE_ANNUAL);
 
         Integer currentCount = getEvaluationCount();
         assert !mgr.handleAnnualCreation(job) : "It shouldn't create one. One already exists";
@@ -158,7 +160,7 @@ public class BackendMgrTests {
         job.setStatus("T"); // set job as terminated
 
         // create appraisal for testing
-        Appraisal appraisal = AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
+        Appraisal appraisal = AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(), Appraisal.TYPE_ANNUAL);
         assert !mgr.sendMail(appraisal);
         tx.commit();
     }
@@ -170,7 +172,7 @@ public class BackendMgrTests {
         Job job = (Job) session.load(Job.class, new Job(new Employee(12345), "1234", "00"));
 
         // create appraisal for testing
-        Appraisal appraisal = AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
+        Appraisal appraisal = AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(), Appraisal.TYPE_ANNUAL);
         MockMailer mockMailer = (MockMailer) mgr.getMailer();
         mockMailer.setSendMailReturnValue(true); // let sendMail return true
         assert mgr.sendMail(appraisal);
@@ -185,7 +187,7 @@ public class BackendMgrTests {
         Job job = (Job) session.load(Job.class, new Job(new Employee(12345), "1234", "00"));
 
         // setup test objects
-        Appraisal appraisal = AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
+        Appraisal appraisal = AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(), Appraisal.TYPE_ANNUAL);
         MockMailer mockMailer = (MockMailer) mgr.getMailer();
         mockMailer.setSendMailReturnValue(false); // let sendMail return false
         Integer errorCalls = mgr.getDataErrorCount();
@@ -203,7 +205,7 @@ public class BackendMgrTests {
         Job job = (Job) session.load(Job.class, new Job(new Employee(12345), "1234", "00"));
 
         // create appraisal for testing
-        Appraisal appraisal = AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
+        Appraisal appraisal = AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(), Appraisal.TYPE_ANNUAL);
         appraisal.setStatus(Appraisal.STATUS_APPRAISAL_DUE);
         MockMailer mockMailer = (MockMailer) mgr.getMailer();
         mockMailer.setSendMailReturnValue(true); // let sendMail return true
@@ -226,7 +228,7 @@ public class BackendMgrTests {
         Job job = (Job) session.load(Job.class, new Job(new Employee(12345), "1234", "00"));
 
         // create appraisal for testing
-        Appraisal appraisal = AppraisalMgr.createAppraisal(job, new DateTime(), Appraisal.TYPE_ANNUAL);
+        Appraisal appraisal = AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(), Appraisal.TYPE_ANNUAL);
         appraisal.setStatus(Appraisal.STATUS_APPRAISAL_DUE);
         appraisal.getJob().setSupervisor(null);
 

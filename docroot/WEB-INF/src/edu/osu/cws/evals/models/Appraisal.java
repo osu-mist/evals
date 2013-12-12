@@ -1025,7 +1025,7 @@ public class Appraisal extends Evals {
         appraisal.setStatus(Appraisal.STATUS_GOALS_APPROVED);
 
         // calculate & set the end date
-        DateTime startDate = new DateTime(appraisal.getStartDate());
+        DateTime startDate = new DateTime(appraisal.getStartDate()).withTimeAtStartOfDay();
         DateTime endDate = appraisal.getJob().getEndEvalDate(startDate, Appraisal.TYPE_INITIAL);
         appraisal.setEndDate(CWSUtil.toDate(endDate));
 
@@ -1131,8 +1131,8 @@ public class Appraisal extends Evals {
      * @return
      */
     public Date getSalaryEligibilityDate() {
-        DateTime sed = new DateTime(this.startDate);
-        sed.withYear(new DateTime().getYear());
+        DateTime sed = new DateTime(this.startDate).withTimeAtStartOfDay();
+        sed.withYear(EvalsUtil.getToday().getYear());
 
         return sed.toDate();
     }
@@ -1177,7 +1177,16 @@ public class Appraisal extends Evals {
      * @return
      */
     public Boolean getIsSalaryUsed() {
-        return getAppointmentType().equals(AppointmentType.CLASSIFIED_IT) &&
-                            type.equals(Appraisal.TYPE_ANNUAL);
+        if (getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
+            if (type.equals(Appraisal.TYPE_ANNUAL)) {
+                // annual IT evals always get salary piece
+                return true;
+            } else if (getJob().getAnnualInd() == 18) {
+                // if the annual ind is 18, the IT trial eval gets salary piece
+                return true;
+            }
+        }
+
+        return false;
     }
 }

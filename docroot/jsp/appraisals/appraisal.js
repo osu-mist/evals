@@ -24,6 +24,7 @@ jQuery(document).ready(function() {
     var json_data = form_to_JSON();
     var json_text = JSON.stringify(json_data);
     var extra_data = jQuery('<input type="hidden" name="json_data"/>').val(json_text);
+    jQuery('input[name=json_data]').remove(); // remove the element if present
     jQuery("#<portlet:namespace />fm").append(extra_data);
 
     return true;
