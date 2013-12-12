@@ -94,6 +94,11 @@
     <liferay-ui:success key="appraisal-goals-reactivation-requested" message="appraisal-goals-reactivation-requested" />
     <liferay-ui:success key="appraisal-sent-to-nolij-success" message="appraisal-sent-to-nolij-success" />
     <liferay-ui:success key="appraisal-set-status-success" message="appraisal-set-status-success" />
+    <c:if test="${appraisal.viewStatus == 'goalsReactivationRequested'}">
+            <span class="portlet-msg-alert">
+                <liferay-ui:message key="appraisal-goals-reactivation-warning"/>
+            </span>
+    </c:if>
 
     <%@ include file="/jsp/appraisals/info.jsp"%>
 
