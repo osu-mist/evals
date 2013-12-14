@@ -10,6 +10,7 @@
     <portlet:param name="id" value="${appraisal.id}"/>
     <portlet:param name="controller" value="AppraisalsAction"/>
 </portlet:resourceURL>
+<portlet:resourceURL var="saveDraftAJAXURL" id="update" escapeXml="false" />
 <portlet:actionURL var="resendAppraisalToNolij" escapeXml="false">
     <portlet:param name="id" value="${appraisal.id}"/>
     <portlet:param name="action" value="resendAppraisalToNolij"/>
@@ -105,6 +106,8 @@
         </portlet:actionURL>" method="post" name="<portlet:namespace />request_form">
 
         <input type="hidden" id="id" name="id" value="${appraisal.id}"/>
+        <input type="hidden" id="<portlet:namespace />autosave_timestamp" name="<portlet:namespace />id"
+               value="0"/>
         <input type="hidden" id="assessmentCount" name="assessmentCount"
                value="-1"/> <!-- @todo: this needs to be updated -->
         <input type="hidden" id="assessmentSequence" name="assessmentSequence"

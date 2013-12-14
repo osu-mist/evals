@@ -342,7 +342,11 @@ public class AppraisalsAction implements ActionInterface {
         boolean isReviewer = actionHelper.getReviewer() != null;
 
         // Check to see if the logged in user has permission to access the appraisal
+        boolean isAjax = actionHelper.isAJAX();
         if (permRule == null) {
+            if (isAjax) {
+                return "fail";
+            }
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -389,6 +393,10 @@ public class AppraisalsAction implements ActionInterface {
             removeReviewAppraisalInSession();
         } else {
             updateAppraisalInSession();
+        }
+
+        if (isAjax) {
+            return "success";
         }
 
         return homeAction.display(request, response);
