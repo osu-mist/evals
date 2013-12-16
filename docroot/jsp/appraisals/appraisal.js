@@ -48,7 +48,9 @@ jQuery(document).ready(function() {
     var lastModified = jQuery('#<portlet:namespace />autosave_timestamp').val();
     var currentTime = new Date().getTime();
     var secondsSinceModified = (currentTime - lastModified) / 1000;
-    return lastModified != 0 && secondsSinceModified >= 60; //@todo: this # of seconds should come from configuration value
+    // auto save frequency from db is in minutes
+    var autoSaveFrequency = ${autoSaveFrequency} * 60;
+    return lastModified != 0 && secondsSinceModified >= autoSaveFrequency;
   }
 
   /**
@@ -58,7 +60,8 @@ jQuery(document).ready(function() {
    * @return
    */
   function auto_save() {
-    setTimeout(auto_save, 10000); //@todo: this value should come from configurations table
+    // check every 30 seconds to see if we need to autosave the data
+    setTimeout(auto_save, 30000);
     if (!should_autosave()) {
       return;
     }
@@ -78,12 +81,16 @@ jQuery(document).ready(function() {
       success: function(msg) {
         if (msg == "success") {
           jQuery("#<portlet:namespace />flash").html(
-              '<span class="portlet-msg-success"><liferay-ui:message key="configurations-updated"/></span>'
+              '<span class="portlet-msg-success"><liferay-ui:message key="draft-saved"/></span>'
           );
         } else {
-          jQuery("#<portlet:namespace />flash").html('<span class="portlet-msg-error"><ul>'+msg+'</ul></span>'
+          jQuery("#<portlet:namespace />flash").html(
+              '<span class="portlet-msg-error"><liferay-ui:message key="draft-save-fail"/></span>'
           );
         }
+        jQuery('#<portlet:namespace />flash').fadeIn('slow');
+        jQuery('#<portlet:namespace />flash').addClass('appraisal-auto-save');
+        setTimeout(function() {jQuery('#<portlet:namespace />flash').fadeOut('slow')}, 30000);
       }
     });
 

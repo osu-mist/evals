@@ -1,0 +1,3 @@
+-- re #23787
+-- add autosave configuration value
+insert into configurations values(pass_seq.nextval, 'configuration', 'autoSaveFrequency', 14, 2, null, null);
