@@ -852,7 +852,7 @@ public class EvalsPDF {
      * @throws IOException
      */
     private void addAssessmentsCriteria(Assessment assessment) throws DocumentException, IOException {
-        int ratingMaxCols = 45;
+        int ratingMaxCols = 41; // 40 is a round # and 1 extra for padding column
         PdfPTable criteriaTable = new PdfPTable(ratingMaxCols);
         PdfPCell emptyLeftCol = new PdfPCell();
         emptyLeftCol.setBorder(Rectangle.NO_BORDER);
@@ -888,6 +888,14 @@ public class EvalsPDF {
         criteriaLabel.setIndentationLeft(LEFT_INDENTATION);
         document.add(criteriaLabel);
 
+        // set default column span to 1/4 of # of columns
+        int criteriaSize = assessment.getAssessmentCriteria().size();
+        int colspan = (ratingMaxCols - 1) / criteriaSize;
+        if (criteriaSize > 4) {
+            colspan = 10;
+        }
+
+
         for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
             if (assessmentCriteria.getChecked() != null && assessmentCriteria.getChecked()) {
                 criteriaTable.addCell(checkedBox);
@@ -896,7 +904,6 @@ public class EvalsPDF {
             }
             cell = new PdfPCell(new Paragraph(assessmentCriteria.getCriteriaArea().getName(), FONT_10));
 
-            int colspan = (ratingMaxCols - 5) / 4;
             cell.setColspan(colspan);
             cell.setBorder(Rectangle.NO_BORDER);
             criteriaTable.addCell(cell);
