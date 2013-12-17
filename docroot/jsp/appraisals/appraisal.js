@@ -3,6 +3,9 @@ jQuery(document).ready(function() {
   // Handle acknowledge appraisal rebuttal read by supervisor
   jQuery(".pass-appraisal-rebuttal").hide();
 
+  // Set the autosave timeout
+  auto_save();
+
   jQuery("#<portlet:namespace />fm").submit(function() {
     var errors = "";
     if (jQuery("#<portlet:namespace />acknowledge-read-appraisal").length > 0 &&
@@ -29,6 +32,71 @@ jQuery(document).ready(function() {
 
     return true;
   });
+
+  jQuery("#<portlet:namespace />fm input, #<portlet:namespace />fm textarea").change(function() {
+    jQuery('#<portlet:namespace />autosave_timestamp').val(new Date().getTime());
+  });
+
+  /**
+   * Whether or not the autosave function should execute.
+   *
+   * The autosave function is executed if the form data has been modified and it has been more than
+   * x number of seconds sitting idle.
+   * @return {Boolean}
+   */
+  function should_autosave() {
+    var lastModified = jQuery('#<portlet:namespace />autosave_timestamp').val();
+    var currentTime = new Date().getTime();
+    var secondsSinceModified = (currentTime - lastModified) / 1000;
+    // auto save frequency from db is in minutes
+    var autoSaveFrequency = ${autoSaveFrequency} * 60;
+    return lastModified != 0 && secondsSinceModified >= autoSaveFrequency;
+  }
+
+  /**
+   * Uses ajax to try and autosave the form data. After a  save, the autosave timeout
+   * flag is reset.
+   *
+   * @return
+   */
+  function auto_save() {
+    // check every 30 seconds to see if we need to autosave the data
+    setTimeout(auto_save, 30000);
+    if (!should_autosave()) {
+      return;
+    }
+
+    var data = {};
+    var json_data = form_to_JSON();
+    json_data.buttonClicked = 'save-draft';
+    data.id = json_data.id;
+    data.json_data = JSON.stringify(json_data);
+    data.controller = "AppraisalsAction";
+    console.log(data);
+
+    jQuery.ajax({
+      type: "POST",
+      url: "<%=renderResponse.encodeURL(saveDraftAJAXURL.toString())%>",
+      data: data,
+      success: function(msg) {
+        if (msg == "success") {
+          jQuery("#<portlet:namespace />flash").html(
+              '<span class="portlet-msg-success"><liferay-ui:message key="draft-saved"/></span>'
+          );
+        } else {
+          jQuery("#<portlet:namespace />flash").html(
+              '<span class="portlet-msg-error"><liferay-ui:message key="draft-save-fail"/></span>'
+          );
+        }
+        jQuery('#<portlet:namespace />flash').fadeIn('slow');
+        jQuery('#<portlet:namespace />flash').addClass('appraisal-auto-save');
+        setTimeout(function() {jQuery('#<portlet:namespace />flash').fadeOut('slow')}, 30000);
+      }
+    });
+
+    // reset autosave timestamp after a save.
+    jQuery('#<portlet:namespace />autosave_timestamp').val(0);
+  }
 
   function form_to_JSON() {
     var portlet_namespace = '<portlet:namespace />';

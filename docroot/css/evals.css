@@ -113,6 +113,14 @@
   text-decoration: underline;
 }
 
+.appraisal-auto-save {
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 98%;
+    z-index: 1000000;
+}
+
 /* used for salary table */
 .osu-cws input.recommended-salary {
     min-width: 3em !important;

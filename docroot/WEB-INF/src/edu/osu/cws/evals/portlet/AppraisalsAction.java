@@ -290,6 +290,9 @@ public class AppraisalsAction implements ActionInterface {
 
         actionHelper.addToRequestMap("appraisal", appraisal);
         actionHelper.addToRequestMap("permissionRule", permRule);
+        Map<String, Configuration> configMap = (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
+        Configuration autoSaveFrequency = configMap.get("autoSaveFrequency");
+        actionHelper.addToRequestMap("autoSaveFrequency", autoSaveFrequency.getValue());
         actionHelper.useMaximizedMenu();
 
         if (appraisal.getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
@@ -342,7 +345,11 @@ public class AppraisalsAction implements ActionInterface {
         boolean isReviewer = actionHelper.getReviewer() != null;
 
         // Check to see if the logged in user has permission to access the appraisal
+        boolean isAjax = actionHelper.isAJAX();
         if (permRule == null) {
+            if (isAjax) {
+                return "fail";
+            }
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -389,6 +396,10 @@ public class AppraisalsAction implements ActionInterface {
             removeReviewAppraisalInSession();
         } else {
             updateAppraisalInSession();
+        }
+
+        if (isAjax) {
+            return "success";
         }
 
         return homeAction.display(request, response);
