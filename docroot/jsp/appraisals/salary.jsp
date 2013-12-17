@@ -33,7 +33,7 @@
                 <td><input type="text" id="<portlet:namespace />appraisal.salary.increase"
                            name="<portlet:namespace />appraisal.salary.increase"
                            value="<c:out value="${appraisal.salary.increase}"/>"
-                           class="recommended-salary" disabled="" readonly="" maxlength="3"/>
+                           class="recommended-salary" disabled="" readonly="" maxlength="4"/>
                     <span class="recommended-salary-hint"></span>
                 </td>
                 <td class="salary-after-increase"></td>
