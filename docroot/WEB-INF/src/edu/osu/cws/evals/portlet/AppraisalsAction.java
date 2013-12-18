@@ -260,8 +260,10 @@ public class AppraisalsAction implements ActionInterface {
         if(!userRole.equals(ActionHelper.ROLE_EMPLOYEE)){
 
             if(permRule.getSendToNolij() != null){
-                ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(-1);
-                actionHelper.addToRequestMap("pendingReviews", reviews);
+                if(!userRole.equals(ActionHelper.ROLE_ADMINISTRATOR)) {
+                    ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(-1);
+                    actionHelper.addToRequestMap("pendingReviews", reviews);
+                }
                 if (appraisal.getEmployeeSignedDate() != null) {
                     actionHelper.addToRequestMap("displayResendNolij", true);
                 }
