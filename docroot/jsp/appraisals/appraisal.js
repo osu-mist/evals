@@ -49,8 +49,7 @@ jQuery(document).ready(function() {
     var currentTime = new Date().getTime();
     var secondsSinceModified = (currentTime - lastModified) / 1000;
     // auto save frequency from db is in minutes
-    var autoSaveFrequency = ${autoSaveFrequency} * 60;
-    return lastModified != 0 && secondsSinceModified >= autoSaveFrequency;
+    return lastModified != 0 && secondsSinceModified >= ${autoSaveFrequency};
   }
 
   /**
@@ -72,7 +71,6 @@ jQuery(document).ready(function() {
     data.id = json_data.id;
     data.json_data = JSON.stringify(json_data);
     data.controller = "AppraisalsAction";
-    console.log(data);
 
     jQuery.ajax({
       type: "POST",
@@ -81,12 +79,10 @@ jQuery(document).ready(function() {
       success: function(msg) {
         if (msg == "success") {
           jQuery("#<portlet:namespace />flash").html(
-              '<span class="portlet-msg-success"><liferay-ui:message key="draft-saved"/></span>'
+              '<span class="portlet-msg-success"><liferay-ui:message key="draft-autosaved"/></span>'
           );
         } else {
-          jQuery("#<portlet:namespace />flash").html(
-              '<span class="portlet-msg-error"><liferay-ui:message key="draft-save-fail"/></span>'
-          );
+          console.log(msg);
         }
         jQuery('#<portlet:namespace />flash').fadeIn('slow');
         jQuery('#<portlet:namespace />flash').addClass('appraisal-auto-save');
