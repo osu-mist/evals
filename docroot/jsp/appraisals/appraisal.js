@@ -346,13 +346,26 @@ jQuery(document).ready(function() {
 
     /**
      * Returns the # of editable assessment goals currently in the evaluation form. This allows us to
-     * # of the goals in the form for adding/deleting goals.
+     * validate that the # of editable goals doesn't fall below a certain threshold.
      *
      * @return {*}
      */
     function getEditableGoalsCount() {
         // There's already an extra di
         return jQuery('.appraisal-criteria>fieldset .editable-goals').length;
+    }
+
+    /**
+     * Returns the total # of goals in the evaluation form both editable and non-editable goals. This is used to
+     * number the goals appropriately.
+     *
+     * @return {Number}
+     */
+    function getTotalGoalCount() {
+        // There's already an extra di
+        return jQuery('.appraisal-criteria>fieldset>div').filter(function() {
+            return jQuery(this).attr('class').indexOf('appraisal-assessment-') >= 0;
+        }).length;
     }
 
     function getCriteriaIdOffset(assessmentCount, newAssessment) {
@@ -375,7 +388,7 @@ jQuery(document).ready(function() {
     // clone last assessment in the form for modification
     var newAssessment = getLastAssessment().clone(true);
     newAssessment.show(); // last assessment could have been deleted
-    var assessmentCount = getEditableGoalsCount() + 1;
+    var assessmentCount = getTotalGoalCount() + 1;
 
     // The rest of this function takes care of updating ids, names and classes
 

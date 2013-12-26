@@ -6,6 +6,7 @@
 <jsp:useBean id="permissionRule" class="edu.osu.cws.evals.models.PermissionRule" scope="request" />
 <c:set var="showForm" scope="request"
        value="${not empty permissionRule.saveDraft || not empty permissionRule.secondarySubmit || not empty permissionRule.submit}"/>
+<c:set var="goalCount" value="1"/>
 <portlet:resourceURL var="downloadPDFURL" id="downloadPDF" escapeXml="false">
     <portlet:param name="id" value="${appraisal.id}"/>
     <portlet:param name="controller" value="AppraisalsAction"/>
@@ -124,12 +125,12 @@
         <fieldset>
             <legend><liferay-ui:message key="appraisal-details"/></legend>
             <c:if test="${not empty appraisal.approvedGoalsVersions}">
-                <c:forEach var="goalsVersion" items="${appraisal.approvedGoalsVersions}" varStatus="loopStatus">
+                <c:forEach var="goalsVersion" items="${appraisal.approvedGoalsVersions}">
                     <div class="goals-header">
                         <liferay-ui:message key="appraisal-goals-approved-on"/>
                         <fmt:formatDate value="${goalsVersion.goalsApprovedDate}" pattern="MM/dd/yy"/>:
                     </div>
-                    <c:forEach var="assessment" items="${goalsVersion.sortedAssessments}" varStatus="loopStatus">
+                    <c:forEach var="assessment" items="${goalsVersion.sortedAssessments}">
                         <%@ include file="/jsp/appraisals/assessment.jsp"%>
                     </c:forEach>
                 </c:forEach>
@@ -140,7 +141,7 @@
                     <div class="goals-header">
                         <liferay-ui:message key="appraisal-goals-need-approved"/>
                     </div>
-                    <c:forEach var="assessment" items="${appraisal.unapprovedGoalsVersion.sortedAssessments}" varStatus="loopStatus">
+                    <c:forEach var="assessment" items="${appraisal.unapprovedGoalsVersion.sortedAssessments}">
                         <%@ include file="/jsp/appraisals/assessment.jsp"%>
                     </c:forEach>
                 </c:if>

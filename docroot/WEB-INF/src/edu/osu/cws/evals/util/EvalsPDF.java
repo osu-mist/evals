@@ -738,7 +738,7 @@ public class EvalsPDF {
      */
     private void addAssessments() throws Exception {
         String goalHeader = "";
-        int approvedCount = 0;
+        int goalCount = 0;
 
         if(StringUtils.containsAny(permRule.getApprovedGoals(), "ev")) {
             List<GoalVersion> approvedGoalsVersions = appraisal.getApprovedGoalsVersions();
@@ -747,7 +747,7 @@ public class EvalsPDF {
                         new DateTime(goalVersion.getGoalsApprovedDate()).toString(Constants.DATE_FORMAT) + ":";
                 setGoalsHeader(goalHeader);
                 List<Assessment> sortedAssessments = goalVersion.getSortedAssessments();
-                approvedCount = displayAssessments(sortedAssessments, approvedCount);
+                goalCount = displayAssessments(sortedAssessments, goalCount);
             }
         }
 
@@ -757,7 +757,7 @@ public class EvalsPDF {
                 goalHeader = resource.getString("appraisal-goals-need-approved");
                 setGoalsHeader(goalHeader);
                 List<Assessment> sortedAssessments = unapprovedGoalsVersion.getSortedAssessments();
-                displayAssessments(sortedAssessments, approvedCount);
+                displayAssessments(sortedAssessments, goalCount);
             }
         }
     }
@@ -780,30 +780,22 @@ public class EvalsPDF {
      *
      * @throws Exception
      */
-    private int displayAssessments(List<Assessment> sortedAssessments, int approvedCount) throws Exception {
+    private int displayAssessments(List<Assessment> sortedAssessments, int goalCount) throws Exception {
         boolean displayApprovedGoals = StringUtils.containsAny(permRule.getApprovedGoals(), "ev");
         boolean displayUnapprovedGoals = StringUtils.containsAny(permRule.getUnapprovedGoals(), "ev");
         boolean displayEmployeeResults = StringUtils.containsAny(permRule.getResults(), "ev");
         boolean displaySupervisorResults = StringUtils.containsAny(permRule.getSupervisorResults(), "ev");
-
         Paragraph sectionText;
-        int unapprovedCount = 0;
 
         for (Assessment assessment : sortedAssessments) {
-
             sectionText = new Paragraph();
             sectionText.setSpacingBefore(BEFORE_SPACING);
             document.add(sectionText);
 
             if (displayApprovedGoals || displayUnapprovedGoals) {
                 String goalLabel = "";
-                if (!assessment.isNewGoal()) {
-                    approvedCount ++;
-                    goalLabel = resource.getString("appraisal-goals") + approvedCount;
-                } else {
-                    unapprovedCount ++;
-                    goalLabel = resource.getString("appraisal-goals") + unapprovedCount;
-                }
+                goalCount ++;
+                goalLabel = resource.getString("appraisal-goals") + goalCount;
 
                 Chunk goalChunk = new Chunk(goalLabel, FONT_BOLDITALIC_10);
                 goalChunk.setUnderline(1f, -2f);
@@ -841,7 +833,7 @@ public class EvalsPDF {
                 }
             }
         }
-        return approvedCount;
+        return goalCount;
     }
 
     /**
