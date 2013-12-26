@@ -113,7 +113,7 @@
         </portlet:actionURL>" method="post" name="<portlet:namespace />request_form">
 
         <input type="hidden" id="id" name="id" value="${appraisal.id}"/>
-        <input type="hidden" id="<portlet:namespace />autosave_timestamp" name="<portlet:namespace />id"
+        <input type="hidden" id="<portlet:namespace />autosave_timestamp" name="<portlet:namespace />autosave_timestamp"
                value="0"/>
         <input type="hidden" id="assessmentCount" name="assessmentCount"
                value="-1"/> <!-- @todo: this needs to be updated -->
