@@ -84,9 +84,13 @@ jQuery(document).ready(function() {
         } else {
           console.log(msg);
         }
-        jQuery('#<portlet:namespace />flash').fadeIn('slow');
-        jQuery('#<portlet:namespace />flash').addClass('appraisal-auto-save');
-        setTimeout(function() {jQuery('#<portlet:namespace />flash').fadeOut('slow')}, 30000);
+
+        // right now this success auto save message shares the same div used to display error messages.
+        // we reset the autosave css class after the message is displayed to not affect other js error messages.
+        jQuery('.portlet-msg-success').fadeIn('slow');
+        jQuery('.portlet-msg-success').parent().addClass('appraisal-auto-save');
+        setTimeout(function() {jQuery('.portlet-msg-success').fadeOut('slow')}, 30000);
+        setTimeout(function() {jQuery('.portlet-msg-success').parent().removeClass('appraisal-auto-save')}, 30000);
       }
     });
 
