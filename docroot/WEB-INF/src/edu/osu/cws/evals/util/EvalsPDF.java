@@ -738,7 +738,7 @@ public class EvalsPDF {
      */
     private void addAssessments() throws Exception {
         String goalHeader = "";
-        int goalCount = 0;
+        int displayedGoalCount = 0;
 
         if(StringUtils.containsAny(permRule.getApprovedGoals(), "ev")) {
             List<GoalVersion> approvedGoalsVersions = appraisal.getApprovedGoalsVersions();
@@ -747,7 +747,7 @@ public class EvalsPDF {
                         new DateTime(goalVersion.getGoalsApprovedDate()).toString(Constants.DATE_FORMAT) + ":";
                 setGoalsHeader(goalHeader);
                 List<Assessment> sortedAssessments = goalVersion.getSortedAssessments();
-                goalCount = displayAssessments(sortedAssessments, goalCount);
+                displayedGoalCount = displayAssessments(sortedAssessments, displayedGoalCount);
             }
         }
 
@@ -757,7 +757,7 @@ public class EvalsPDF {
                 goalHeader = resource.getString("appraisal-goals-need-approved");
                 setGoalsHeader(goalHeader);
                 List<Assessment> sortedAssessments = unapprovedGoalsVersion.getSortedAssessments();
-                displayAssessments(sortedAssessments, goalCount);
+                displayAssessments(sortedAssessments, displayedGoalCount);
             }
         }
     }
@@ -780,9 +780,7 @@ public class EvalsPDF {
      *
      * @throws Exception
      */
-    private int displayAssessments(List<Assessment> sortedAssessments, int goalCount) throws Exception {
-        boolean displayApprovedGoals = StringUtils.containsAny(permRule.getApprovedGoals(), "ev");
-        boolean displayUnapprovedGoals = StringUtils.containsAny(permRule.getUnapprovedGoals(), "ev");
+    private int displayAssessments(List<Assessment> sortedAssessments, int displayedGoalCount) throws Exception {
         boolean displayEmployeeResults = StringUtils.containsAny(permRule.getResults(), "ev");
         boolean displaySupervisorResults = StringUtils.containsAny(permRule.getSupervisorResults(), "ev");
         Paragraph sectionText;
@@ -792,22 +790,19 @@ public class EvalsPDF {
             sectionText.setSpacingBefore(BEFORE_SPACING);
             document.add(sectionText);
 
-            if (displayApprovedGoals || displayUnapprovedGoals) {
-                String goalLabel = "";
-                goalCount ++;
-                goalLabel = resource.getString("appraisal-goals") + goalCount;
+            displayedGoalCount ++;
+            String goalLabel = resource.getString("appraisal-goals") + displayedGoalCount;
 
-                Chunk goalChunk = new Chunk(goalLabel, FONT_BOLDITALIC_10);
-                goalChunk.setUnderline(1f, -2f);
+            Chunk goalChunk = new Chunk(goalLabel, FONT_BOLDITALIC_10);
+            goalChunk.setUnderline(1f, -2f);
 
-                Paragraph goalsLabel = new Paragraph(goalChunk);
-                Paragraph goals = new Paragraph(assessment.getGoal(), FONT_10);
-                goals.setIndentationLeft(LEFT_INDENTATION);
-                document.add(goalsLabel);
-                document.add(goals);
+            Paragraph goalsLabel = new Paragraph(goalChunk);
+            Paragraph goals = new Paragraph(assessment.getGoal(), FONT_10);
+            goals.setIndentationLeft(LEFT_INDENTATION);
+            document.add(goalsLabel);
+            document.add(goals);
 
-                addAssessmentsCriteria(assessment);
-            }
+            addAssessmentsCriteria(assessment);
 
             if (!assessment.isNewGoal()) {
                 if (displayEmployeeResults) {
@@ -833,7 +828,7 @@ public class EvalsPDF {
                 }
             }
         }
-        return goalCount;
+        return displayedGoalCount;
     }
 
     /**
