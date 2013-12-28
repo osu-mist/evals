@@ -127,7 +127,8 @@ public class BackendMgrTests {
         // create an appraisal and set annual indicator
         Job job = (Job) session.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         job.setAnnualInd(12);
-        AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(),  Appraisal.TYPE_ANNUAL);
+        DateTime initialEvalStartDate = job.getInitialEvalStartDate().withYear(new DateTime().getYear());
+        AppraisalMgr.createAppraisal(job, initialEvalStartDate,  Appraisal.TYPE_ANNUAL);
 
         Integer currentCount = getEvaluationCount();
         assert !mgr.handleAnnualCreation(job) : "It shouldn't create one. One already exists";
