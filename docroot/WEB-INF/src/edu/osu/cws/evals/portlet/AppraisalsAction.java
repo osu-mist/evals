@@ -169,12 +169,14 @@ public class AppraisalsAction implements ActionInterface {
             }
         }
 
-        if (JobMgr.isUpperSupervisor(appraisal.getJob(), pidm)) {
-            return ActionHelper.ROLE_UPPER_SUPERVISOR;
-        }
-
+        // check admin role first because there are few admins and some jobs have a missing supervisor in the chain
+        // which causes a NPE
         if (actionHelper.getAdmin() != null) {
             return ActionHelper.ROLE_ADMINISTRATOR;
+        }
+
+        if (JobMgr.isUpperSupervisor(appraisal.getJob(), pidm)) {
+            return ActionHelper.ROLE_UPPER_SUPERVISOR;
         }
 
         return "";
