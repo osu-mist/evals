@@ -15,6 +15,8 @@ public class GoalVersion implements Comparable<GoalVersion> {
 
     private Date goalsSubmitDate;
 
+    private String goalsComments;
+
     private Date requestDecisionDate;
 
     private Boolean requestDecision;
@@ -73,6 +75,14 @@ public class GoalVersion implements Comparable<GoalVersion> {
 
     public void setGoalsSubmitDate(Date goalsSubmitDate) {
         this.goalsSubmitDate = goalsSubmitDate;
+    }
+
+    public String getGoalsComments() {
+        return goalsComments;
+    }
+
+    public void setGoalsComments(String goalsComments) {
+        this.goalsComments = goalsComments;
     }
 
     public Boolean getRequestDecision() {

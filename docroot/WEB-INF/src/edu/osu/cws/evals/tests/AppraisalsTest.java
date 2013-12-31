@@ -99,7 +99,7 @@ public class AppraisalsTest {
 
         updatedAppraisal.setEvaluator(employee);
         updatedAppraisal.setGoalApprovedDate(new Date());
-        updatedAppraisal.setGoalsComments("goal comments data");
+        //updatedAppraisal.setGoalsComments("goal comments data");
         updatedAppraisal.setResultSubmitDate(new Date());
         updatedAppraisal.setEvaluation("evaluation text");
         updatedAppraisal.setRating(1);
@@ -150,7 +150,7 @@ public class AppraisalsTest {
 
         appraisal.setEvaluator(employee);
         appraisal.setGoalApprovedDate(new Date());
-        appraisal.setGoalsComments("goal comments data");
+        //appraisal.setGoalsComments("goal comments data");
         appraisal.setResultSubmitDate(new Date());
         appraisal.setEvaluation("evaluation text");
         appraisal.setRating(1);
@@ -182,7 +182,7 @@ public class AppraisalsTest {
 
         appraisal1.setEvaluator(employee);
         appraisal1.setGoalApprovedDate(new Date());
-        appraisal1.setGoalsComments("goal comments data");
+        //appraisal1.setGoalsComments("goal comments data");
         appraisal1.setResultSubmitDate(new Date());
         appraisal1.setEvaluation("evaluation text");
         appraisal1.setRating(1);

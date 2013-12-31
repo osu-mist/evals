@@ -92,7 +92,6 @@ public class Appraisal extends Evals {
     /**
      * Comments entered by the supervisor regarding the employee's goals
      */
-    private String goalsComments;
 
     private Date goalsRequiredModificationDate;
 
@@ -582,14 +581,6 @@ public class Appraisal extends Evals {
         this.goalsApprover = goalsApprover;
     }
 
-    public String getGoalsComments() {
-        return goalsComments;
-    }
-
-    public void setGoalsComments(String goalsComments) {
-        this.goalsComments = goalsComments;
-    }
-
     public Date getResultSubmitDate() {
         return resultSubmitDate;
     }
@@ -973,6 +964,19 @@ public class Appraisal extends Evals {
 
         // Return the most recently timed out goal version
         return timedOutGoalVersions.get(timedOutGoalVersions.size() -1);
+    }
+
+    public GoalVersion getLatestGoalVersion() {
+        GoalVersion latestVersion = null;
+        for(GoalVersion curVersion : goalVersions) {
+            if(latestVersion == null) {
+                latestVersion = curVersion;
+            }
+            if(latestVersion.compareTo(curVersion) < 1) {
+                latestVersion = curVersion;
+            }
+        }
+        return latestVersion;
     }
 
     /**

@@ -133,6 +133,12 @@
                     <c:forEach var="assessment" items="${goalsVersion.sortedAssessments}">
                         <%@ include file="/jsp/appraisals/assessment.jsp"%>
                     </c:forEach>
+                    <fieldset>
+                        <h3 class="secret"><liferay-ui:message key="appraisal-goals-legend" /></h3>
+                        <legend><span><liferay-ui:message key="appraisal-goals-legend" /></span></legend>
+                        <p><strong><liferay-ui:message key="appraisal-goals-comments" /></strong></p>
+                        <p class="pass-form-text">${goalsVersion.goalsComments}</p>
+                    </fieldset>
                 </c:forEach>
             </c:if>
 
@@ -165,7 +171,7 @@
                 <legend><liferay-ui:message key="appraisal-goals-legend" /></legend>
                 <label for="<portlet:namespace />appraisal.goalsComments"><liferay-ui:message key="appraisal-goals-comments" /></label>
                 <liferay-ui:input-textarea param="appraisal.goalsComments"
-                    defaultValue="${appraisal.goalsComments}" />
+                    defaultValue="${appraisal.latestGoalVersion.goalsComments}" />
             </fieldset>
         </c:when>
         <c:when test="${permissionRule.goalComments == 'v'}">
@@ -173,7 +179,7 @@
                 <h3 class="secret"><liferay-ui:message key="appraisal-goals-legend" /></h3>
                 <legend><liferay-ui:message key="appraisal-goals-legend" /></legend>
                 <p><strong><liferay-ui:message key="appraisal-goals-comments" /></strong></p>
-                <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getGoalsComments()) %></p>
+                <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getLatestGoalVersion().getGoalsComments()) %></p>
             </fieldset>
         </c:when>
     </c:choose>
