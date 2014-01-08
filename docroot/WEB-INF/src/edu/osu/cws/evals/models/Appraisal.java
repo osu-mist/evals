@@ -1142,14 +1142,15 @@ public class Appraisal extends Evals {
      * Basically if we are not in approvalDue status or later and there's more than 1
      * goal version.
      */
-    private boolean areGoalsReactivated() {
+    public boolean areGoalsReactivated() {
         boolean hasMultipleGoalVersions = goalVersions.size() > 1;
 
         String[] goalsReactivatedStatus = {
-            "goalsApprovalDue",
-            "goalsApprovalOverdue",
-            "goalsReactivated",
-            "goalsReactivationRequested"
+            STATUS_GOALS_APPROVAL_DUE,
+            STATUS_GOALS_APPROVAL_OVERDUE,
+            STATUS_GOALS_REACTIVATED,
+            STATUS_GOALS_REACTIVATION_REQUESTED,
+            STATUS_GOALS_REQUIRED_MODIFICATION
         };
 
         return hasMultipleGoalVersions && ArrayUtils.contains(goalsReactivatedStatus, status);
