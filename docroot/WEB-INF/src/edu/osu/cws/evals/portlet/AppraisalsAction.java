@@ -1021,20 +1021,11 @@ public class AppraisalsAction implements ActionInterface {
     public String resendAppraisalToNolij(PortletRequest request, PortletResponse response) throws Exception {
         initialize(request);
 
-        boolean isReviewerOrAdmin = actionHelper.getReviewer() != null
-                                    || actionHelper.getAdmin() != null;
-        // Permission checks
-        if (!isReviewerOrAdmin
-                || appraisal.getEmployeeSignedDate() == null
-                || appraisal.getRole().equals("employee")
-                || !appraisal.getStatus().equals("completed"))
-        {
-            return errorHandler.handleAccessDenied(request, response);
-        }
+        boolean canSendToNolij = permRule.getSendToNolij() != null;
 
         actionHelper.addToRequestMap("id", appraisal.getId());
 
-        if (!isReviewerOrAdmin) {
+        if (!canSendToNolij) {
             String errorMsg = resource.getString("appraisal-resend-permission-denied");
             actionHelper.addErrorsToRequest(errorMsg);
             return display(request, response);
