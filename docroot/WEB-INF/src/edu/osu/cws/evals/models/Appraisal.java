@@ -966,19 +966,6 @@ public class Appraisal extends Evals {
         return timedOutGoalVersions.get(timedOutGoalVersions.size() -1);
     }
 
-    public GoalVersion getLatestGoalVersion() {
-        GoalVersion latestVersion = null;
-        for(GoalVersion curVersion : goalVersions) {
-            if(latestVersion == null) {
-                latestVersion = curVersion;
-            }
-            if(latestVersion.compareTo(curVersion) < 1) {
-                latestVersion = curVersion;
-            }
-        }
-        return latestVersion;
-    }
-
     /**
      * Loads lazy associations
      */

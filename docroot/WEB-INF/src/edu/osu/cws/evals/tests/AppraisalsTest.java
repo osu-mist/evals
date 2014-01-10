@@ -99,7 +99,7 @@ public class AppraisalsTest {
 
         updatedAppraisal.setEvaluator(employee);
         updatedAppraisal.setGoalApprovedDate(new Date());
-        //updatedAppraisal.setGoalsComments("goal comments data");
+        updatedAppraisal.getUnapprovedGoalsVersion().setGoalsComments("goal comments data");
         updatedAppraisal.setResultSubmitDate(new Date());
         updatedAppraisal.setEvaluation("evaluation text");
         updatedAppraisal.setRating(1);
@@ -150,7 +150,7 @@ public class AppraisalsTest {
 
         appraisal.setEvaluator(employee);
         appraisal.setGoalApprovedDate(new Date());
-        //appraisal.setGoalsComments("goal comments data");
+        appraisal.getUnapprovedGoalsVersion().setGoalsComments("goal comments data");
         appraisal.setResultSubmitDate(new Date());
         appraisal.setEvaluation("evaluation text");
         appraisal.setRating(1);
@@ -173,8 +173,7 @@ public class AppraisalsTest {
         Session hsession = HibernateUtil.getCurrentSession();
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         Appraisal appraisal1 = AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(), Appraisal.TYPE_ANNUAL);
-        int appraisalID =  appraisal1
-                .getId();
+        int appraisalID =  appraisal1.getId();
 
         // Grab the freshly created appraisal from the db before we start
         // updating the properties.
@@ -182,7 +181,7 @@ public class AppraisalsTest {
 
         appraisal1.setEvaluator(employee);
         appraisal1.setGoalApprovedDate(new Date());
-        //appraisal1.setGoalsComments("goal comments data");
+        appraisal1.getUnapprovedGoalsVersion().setGoalsComments("goal comments data");
         appraisal1.setResultSubmitDate(new Date());
         appraisal1.setEvaluation("evaluation text");
         appraisal1.setRating(1);
