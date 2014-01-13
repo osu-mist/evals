@@ -524,7 +524,7 @@ public class AppraisalsAction implements ActionInterface {
         boolean clickedSubmitButton = jsonData.getButtonClicked().equals(permRule.getSubmit());
 
         if (permRule.canEdit("goalComments")) { // Save goalComments
-            GoalVersion latestVersion = appraisal.getLatestGoalVersion();
+            GoalVersion latestVersion = appraisal.getUnapprovedGoalsVersion();
             latestVersion.setGoalsComments(jsonData.getGoalsComments());
         }
 
