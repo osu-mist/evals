@@ -1,5 +1,7 @@
 </div> <!-- closes div.osu-cws -->
 
+<div id="accessible-errors" aria-live="assertive" aria-role="alert"></div>
+
 <script type="text/javascript">
     function <portlet:namespace/>toggleContent(id){
         var imgId=id+'ImageToggle';

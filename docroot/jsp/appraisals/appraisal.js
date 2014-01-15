@@ -283,8 +283,6 @@ jQuery(document).ready(function() {
     jQuery('textarea').autogrow();
   </c:if>
 
-    // @todo: need to think about accessibility of delete/add assessments.
-
   /**
    * Sets the goal delete flag for an assessment and hides the assessment from the form.
    * This method is called after the user confirms the deletion by clicking the delete button
@@ -330,6 +328,10 @@ jQuery(document).ready(function() {
     var response = confirm("<liferay-ui:message key="appraisal-assessment-delete-confirm"/>");
     if (response) {
       setGoalDeleteFlag.call(this);
+
+      // First clear out any messages before displaying accessible message
+      jQuery('#accessible-errors').text('');
+      jQuery('#accessible-errors').text('<liferay-ui:message key="appraisal-assessment-deleted"/>');
     }
     return false;
   }
@@ -454,6 +456,10 @@ jQuery(document).ready(function() {
 
     // update # of assessment in form
     jQuery('#assessmentCount').val(assessmentCount);
+
+    // First clear out any messages before displaying accessible message
+    jQuery('#accessible-errors').text('');
+    jQuery('#accessible-errors').text('<liferay-ui:message key="appraisal-assessment-added"/>');
 
     return false;
   });
