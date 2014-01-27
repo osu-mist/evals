@@ -1008,4 +1008,28 @@ public class AppraisalMgr {
 
         return null;
     }
+
+    public static int[] getIdsToArchive(String daysBeforeArchive) {
+        return getIdsToArchive(Integer.getInteger(daysBeforeArchive));
+    }
+
+    public static int[] getIdsToArchive(int daysBeforeArchive) {
+        Session session = HibernateUtil.getCurrentSession();
+        String query =
+                "select new edu.osu.cws.evals.models.Appraisal(" +
+                "id, job.jobTitle, startDate, endDate, status, overdue)" +
+                " from edu.osu.cws.evals.models.Appraisal" +
+                " where" +
+                    " status not like 'archived%'" +
+                    " and endDate + :archiveDays <= current_date";
+        Query hibQuery = session.createQuery(query).setInteger("archiveDays", daysBeforeArchive);
+        ArrayList<Appraisal> result = (ArrayList<Appraisal>) hibQuery.list();
+        int[] idsToArchive = new int[result.size()];
+        for(Appraisal appraisal : result) {
+            idsToArchive[result.indexOf(appraisal)] = appraisal.getId();
+        }
+
+        return idsToArchive;
+    }
+
 }
