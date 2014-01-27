@@ -4,4 +4,3 @@ insert into configurations values(pass_seq.nextval, 'configuration', 'autoSaveFr
 insert into configurations values(pass_seq.nextval, 'configuration', 'daysBeforeArchive', 15, 6, null, null);
 insert into status values('archivedCompleted');
 insert into status values('archivedClosed');
-delete from status s where s.status = 'archived';
