@@ -246,8 +246,10 @@ public class AppraisalMgr {
     }
 
     /**
-     * Returns a list of active appraisals for all the jobs that the current pidm holds. If the
-     * posno and suffix are provided, the evaluations are specific to the job.
+     * Returns a list of appraisals for all the jobs that the current pidm holds. If the
+     * posno and suffix are provided, the evaluations are specific to the job. If onlyActive
+     * is set to true, then it only returns active appraisals, otherwise it returns active
+     * and archived appraisals.
      * The fields that are returned in the appraisal are:
      *      id
      *      Job.jobTitle
@@ -260,15 +262,20 @@ public class AppraisalMgr {
      * @param pidm
      * @param posno
      * @param suffix
+     * @param onlyActive
      */
-    public static ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm, String posno,
-                                                                String suffix) {
+    public static ArrayList<Appraisal> getAllMyAppraisals(int pidm, String posno,
+                                                          String suffix, boolean onlyActive) {
         Session session = HibernateUtil.getCurrentSession();
-        String query = "select new edu.osu.cws.evals.models.Appraisal(id, job.jobTitle, startDate, " +
-                "endDate, status, overdue)" +
-                " from edu.osu.cws.evals.models.Appraisal where " +
-                " job.employee.id = :pidm and status not in ('archived')";
+        String query =
+                "select new edu.osu.cws.evals.models.Appraisal(" +
+                    "id, job.jobTitle, startDate, endDate, status, overdue)" +
+                " from edu.osu.cws.evals.models.Appraisal" +
+                " where job.employee.id = :pidm";
 
+        if (onlyActive) {
+            query += " and status not like 'archived%'";
+        }
         if (posno != null && suffix != null) {
             query += " and job.positionNumber = :posno and job.suffix = :suffix";
         }
@@ -285,6 +292,28 @@ public class AppraisalMgr {
             appraisal.setRole("employee");
         }
         return result;
+    }
+
+    /**
+     * Returns a list of active appraisals for all the jobs that the current pidm holds. If the
+     * posno and suffix are provided, the evaluations are specific to the job. Calls the function
+     * getAllMyAppraisals() and sets onlyActive to true.
+     * The fields that are returned in the appraisal are:
+     *      id
+     *      Job.jobTitle
+     *      startDate
+     *      endDate
+     *      status
+     *      overdue
+     *
+     * @return
+     * @param pidm
+     * @param posno
+     * @param suffix
+     */
+    public static ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm, String posno,
+                                                                String suffix) {
+        return getAllMyAppraisals(pidm, posno, suffix, true);
     }
 
     /**
