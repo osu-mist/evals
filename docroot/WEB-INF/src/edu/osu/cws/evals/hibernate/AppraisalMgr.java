@@ -1049,8 +1049,8 @@ public class AppraisalMgr {
                 "id, job.jobTitle, startDate, endDate, status, overdue)" +
                 " from edu.osu.cws.evals.models.Appraisal" +
                 " where" +
-                    " status not like 'archived%'" +
-                    " and endDate + :archiveDays <= current_date";
+                    " status in ('closed', 'completed')" +
+                    " and endDate + :archiveDays <= current_date"; // Can use create date
         Query hibQuery = session.createQuery(query).setInteger("archiveDays", daysBeforeArchive);
         ArrayList<Appraisal> result = (ArrayList<Appraisal>) hibQuery.list();
         int[] idsToArchive = new int[result.size()];
@@ -1061,15 +1061,25 @@ public class AppraisalMgr {
         return idsToArchive;
     }
 
-    public static int archive(int[] idsToArchive) throws Exception {
+    public static int archive(int[] idsToArchive) {
         Session session = HibernateUtil.getCurrentSession();
 
         int count = 0;
         Appraisal curAppraisal;
         for(int id : idsToArchive) {
-            curAppraisal = getAppraisal(id);
-            curAppraisal.setStatus("archived");
-            session.saveOrUpdate(curAppraisal);
+            try {
+                curAppraisal = getAppraisal(id);
+                String archivedStatus = (curAppraisal.getStatus().equals(Appraisal.STATUS_CLOSED) ?
+                        Appraisal.STATUS_ARCHIVED_CLOSED : Appraisal.STATUS_ARCHIVED_COMPLETED);
+                curAppraisal.setStatus(archivedStatus);
+                session.saveOrUpdate(curAppraisal);
+            }
+            catch(Exception e) {
+                String msg = "error with archiving appraisal with id = " + id;
+                System.out.println(msg);
+                System.out.println(e);
+                count--;
+            }
             count++;
         }
 
