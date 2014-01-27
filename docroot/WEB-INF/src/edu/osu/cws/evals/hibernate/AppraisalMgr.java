@@ -1032,4 +1032,19 @@ public class AppraisalMgr {
         return idsToArchive;
     }
 
+    public static int archive(int[] idsToArchive) throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+
+        int count = 0;
+        Appraisal curAppraisal;
+        for(int id : idsToArchive) {
+            curAppraisal = getAppraisal(id);
+            curAppraisal.setStatus("archived");
+            session.saveOrUpdate(curAppraisal);
+            count++;
+        }
+
+        return count;
+    }
+
 }
