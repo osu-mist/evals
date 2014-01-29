@@ -127,11 +127,17 @@ public class AppraisalsAction implements ActionInterface {
 
     /**
      * Figures out the current user role in the appraisal and returns the respective permission
-     * rule for that user role and action in the appraisal.
+     * rule for that user role and action in the appraisal. If the appraisal's status is like
+     * "archived*" then it will remove the "archived" part of the status.
      *
      * @throws Exception
      */
     private void setAppraisalPermissionRule() throws Exception {
+        String status = appraisal.getStatus();
+        if (status.matches("archived*")) {
+            appraisal.setStatus(status.replace("archived", "").toLowerCase());
+        }
+
         HashMap permissionRules =
                 (HashMap) actionHelper.getPortletContext().getAttribute("permissionRules");
         String permRuleKey = appraisal.getStatus() + "-" + userRole;
