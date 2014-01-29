@@ -17,6 +17,7 @@
         </c:if>
     </div>
     <div class="accordion-content" id="<portlet:namespace/>MyTeam" style="display: block;">
+        <p><liferay-ui:message key="myTeamWarning" /></p>
         <c:if test="${!empty myTeamsActiveAppraisals}">
             <table class="taglib-search-iterator narrow">
                 <thead>
