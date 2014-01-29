@@ -28,7 +28,7 @@ public class ActionHelper {
     public static final String ROLE_SUPERVISOR = "supervisor";
     public static final String ROLE_UPPER_SUPERVISOR = "upper-supervisor";
     public static final String ROLE_SELF = "self";
-    public static final String ALL_MY_ACTIVE_APPRAISALS = "allMyActiveAppraisals";
+    public static final String ALL_MY_APPRAISALS = "allMyAppraisals";
     public static final String MY_TEAMS_ACTIVE_APPRAISALS = "myTeamsActiveAppraisals";
     private static final String REVIEW_LIST = "reviewList";
     private static final String REVIEW_LIST_MAX_RESULTS = "reviewListMaxResults";
@@ -170,9 +170,9 @@ public class ActionHelper {
      *
      * @throws Exception
      */
-    public void setupMyActiveAppraisals() throws Exception {
-        List<Appraisal> allMyActiveAppraisals = getMyActiveAppraisals();
-        addToRequestMap("myActiveAppraisals", allMyActiveAppraisals);
+    public void setupMyAppraisals() throws Exception {
+        List<Appraisal> allMyAppraisals = getMyAppraisals();
+        addToRequestMap("myAppraisals", allMyAppraisals);
     }
 
     /**
@@ -182,17 +182,17 @@ public class ActionHelper {
      * @return
      * @throws Exception
      */
-    public List<Appraisal> getMyActiveAppraisals() throws Exception {
+    public List<Appraisal> getMyAppraisals() throws Exception {
         PortletSession session = getSession();
-        List<Appraisal> allMyActiveAppraisals;
+        List<Appraisal> allMyAppraisals;
 
-        allMyActiveAppraisals = (ArrayList<Appraisal>) session.getAttribute(ALL_MY_ACTIVE_APPRAISALS);
-        if (allMyActiveAppraisals == null) {
-            allMyActiveAppraisals =
-                    AppraisalMgr.getAllMyActiveAppraisals(loggedOnUser.getId(), null, null);
-            session.setAttribute(ALL_MY_ACTIVE_APPRAISALS, allMyActiveAppraisals);
+        allMyAppraisals = (ArrayList<Appraisal>) session.getAttribute(ALL_MY_APPRAISALS);
+        if (allMyAppraisals == null) {
+            allMyAppraisals =
+                    AppraisalMgr.getAllMyAppraisals(loggedOnUser.getId(), null, null, false);
+            session.setAttribute(ALL_MY_APPRAISALS, allMyAppraisals);
         }
-        return allMyActiveAppraisals;
+        return allMyAppraisals;
     }
 
     /**
@@ -563,11 +563,11 @@ public class ActionHelper {
     public void setRequiredActions() throws Exception {
         ArrayList<RequiredAction> employeeRequiredActions;
         ArrayList<RequiredAction> administrativeActions = new ArrayList<RequiredAction>();
-        ArrayList<Appraisal> myActiveAppraisals;
+        ArrayList<Appraisal> myAppraisals;
         ArrayList<Appraisal> mySupervisingAppraisals;
 
-        myActiveAppraisals = (ArrayList<Appraisal>) getFromRequestMap("myActiveAppraisals");
-        employeeRequiredActions = getAppraisalActions(myActiveAppraisals, "employee");
+        myAppraisals = (ArrayList<Appraisal>) getFromRequestMap("myAppraisals");
+        employeeRequiredActions = getAppraisalActions(myAppraisals, "employee");
         addToRequestMap("employeeActions", employeeRequiredActions);
 
         // add supervisor required actions, if user has team's active appraisals

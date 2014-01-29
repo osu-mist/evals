@@ -275,7 +275,7 @@ public class ReportsAction implements ActionInterface {
 
             if (scope.equals(SCOPE_SUPERVISOR)) {
                 // right pane data: supervisor appraisals and supervisor team
-                actionHelper.addToRequestMap("myActiveAppraisals", supervisorAppraisals);
+                actionHelper.addToRequestMap("myAppraisals", supervisorAppraisals);
                 actionHelper.addToRequestMap("myTeamsActiveAppraisals", supervisorTeamAppraisal);
                 actionHelper.addToRequestMap("myTeamsActiveClassifiedITAppraisals", supervisorClassfiedITAppraisals);
                 actionHelper.addToRequestMap("isMyReport", isMyReport);
@@ -399,7 +399,7 @@ public class ReportsAction implements ActionInterface {
         String supervisorLevelSuffix = currentSupervisorJob.getSuffix();
         supervisorTeamAppraisal = AppraisalMgr.getMyTeamsAppraisals(supervisorLevelPidm,
                 true, supervisorLevelPosno, supervisorLevelSuffix);
-        supervisorAppraisals = AppraisalMgr.getAllMyActiveAppraisals(supervisorLevelPidm,
+        supervisorAppraisals = AppraisalMgr.getAllMyAppraisals(supervisorLevelPidm,
                 supervisorLevelPosno, supervisorLevelSuffix);
         supervisorClassfiedITAppraisals = ClassifiedITObjectMgr.getMyClassifiedITAppraisals(supervisorLevelPidm);
     }

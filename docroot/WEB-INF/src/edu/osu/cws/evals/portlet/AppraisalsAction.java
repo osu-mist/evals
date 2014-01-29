@@ -370,7 +370,7 @@ public class AppraisalsAction implements ActionInterface {
             if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR)) {
                 actionHelper.setupMyTeamActiveAppraisals();
             } else if (appraisal.getRole().equals(ActionHelper.ROLE_EMPLOYEE)) {
-                actionHelper.setupMyActiveAppraisals();
+                actionHelper.setupMyAppraisals();
             }
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
@@ -994,7 +994,7 @@ public class AppraisalsAction implements ActionInterface {
         List<Appraisal>  appraisals;
 
         if (appraisal.getRole().equals("employee")) {
-            appraisals = actionHelper.getMyActiveAppraisals();
+            appraisals = actionHelper.getMyAppraisals();
         } else if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR)) {
             appraisals = actionHelper.getMyTeamActiveAppraisals();
         } else {

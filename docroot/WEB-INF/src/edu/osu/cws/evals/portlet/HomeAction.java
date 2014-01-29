@@ -45,14 +45,14 @@ public class HomeAction implements ActionInterface {
         actionHelper.addToRequestMap("alertMsg", true);
         actionHelper.addToRequestMap("isHome", true);
 
-        actionHelper.setupMyActiveAppraisals();
+        actionHelper.setupMyAppraisals();
         actionHelper.setupMyTeamActiveAppraisals();
-        ArrayList<Appraisal> myActiveAppraisals =
-                (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myActiveAppraisals");
+        ArrayList<Appraisal> myAppraisals =
+                (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myAppraisals");
         ArrayList<Appraisal> myTeamsActiveAppraisals  =
                 (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myTeamsActiveAppraisals");
 
-        boolean hasAppraisals = (myActiveAppraisals != null && !myActiveAppraisals.isEmpty()) ||
+        boolean hasAppraisals = (myAppraisals != null && !myAppraisals.isEmpty()) ||
                 (myTeamsActiveAppraisals != null && !myTeamsActiveAppraisals.isEmpty());
 
         if (!isAdmin && !isReviewer && !hasAppraisals) {

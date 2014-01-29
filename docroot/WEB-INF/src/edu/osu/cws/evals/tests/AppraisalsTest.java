@@ -261,6 +261,21 @@ public class AppraisalsTest {
     }
 
     @Test(groups = "unittest")
+    public void shouldFindAllEmployeeAppraisals() throws Exception {
+        int pidm = 12345;
+        ArrayList<Appraisal> myAppraisals = AppraisalMgr.getAllMyAppraisals(pidm,
+                null, null, false);
+        assert myAppraisals.size() == 8 : "Invalid size of appraisals";
+        for (Appraisal ap : myAppraisals) {
+            assert ap.getId() != new Integer(0) : "id should be present in list of appraisals";
+            assert ap.getJob().getJobTitle() != null : "job title should be present in list of appraisals";
+            assert ap.getStartDate() != null : "start date should be present in list of appraisals";
+            assert ap.getEndDate() != null : "end date should be present in list of appraisals";
+            assert ap.getStatus() != null : "status should be present in list of appraisals";
+        }
+    }
+
+    @Test(groups = "unittest")
     public void shouldFindAllTeamActiveAppraisals() throws Exception {
         int pidm = 12467;
         List<Appraisal> teamActiveAppraisals = AppraisalMgr.getMyTeamsAppraisals(pidm, true,
