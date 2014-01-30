@@ -165,7 +165,7 @@
                 <legend><liferay-ui:message key="appraisal-goals-legend" /></legend>
                 <label for="<portlet:namespace />appraisal.goalsComments"><liferay-ui:message key="appraisal-goals-comments" /></label>
                 <liferay-ui:input-textarea param="appraisal.goalsComments"
-                    defaultValue="${appraisal.goalsComments}" />
+                    defaultValue="${appraisal.unapprovedGoalsVersion.goalsComments}" />
             </fieldset>
         </c:when>
         <c:when test="${permissionRule.goalComments == 'v'}">
@@ -173,7 +173,7 @@
                 <h3 class="secret"><liferay-ui:message key="appraisal-goals-legend" /></h3>
                 <legend><liferay-ui:message key="appraisal-goals-legend" /></legend>
                 <p><strong><liferay-ui:message key="appraisal-goals-comments" /></strong></p>
-                <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getGoalsComments()) %></p>
+                <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getUnapprovedGoalsVersion().getGoalsComments()) %></p>
             </fieldset>
         </c:when>
     </c:choose>

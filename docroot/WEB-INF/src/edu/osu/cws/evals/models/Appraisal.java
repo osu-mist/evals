@@ -92,7 +92,6 @@ public class Appraisal extends Evals {
     /**
      * Comments entered by the supervisor regarding the employee's goals
      */
-    private String goalsComments;
 
     private Date goalsRequiredModificationDate;
 
@@ -580,14 +579,6 @@ public class Appraisal extends Evals {
 
     public void setGoalsApprover(Employee goalsApprover) {
         this.goalsApprover = goalsApprover;
-    }
-
-    public String getGoalsComments() {
-        return goalsComments;
-    }
-
-    public void setGoalsComments(String goalsComments) {
-        this.goalsComments = goalsComments;
     }
 
     public Date getResultSubmitDate() {
