@@ -103,7 +103,7 @@
                 appraisals,
                 PYVPASJ
             WHERE
-            appraisals.status not in ('completed', 'archived', 'closed')
+            appraisals.status not in ('completed', 'closed', 'archivedCompleted', 'archivedClosed')
             AND PYVPASJ.PYVPASJ_PIDM = appraisals.job_pidm
             AND PYVPASJ.PYVPASJ_POSN = appraisals.position_number
             AND PYVPASJ.PYVPASJ_SUFF = appraisals.JOB_SUFFIX
@@ -121,7 +121,7 @@
                 appraisals,
                 PYVPASJ
             WHERE
-            appraisals.status not in ('completed', 'archived', 'closed')
+            appraisals.status not in ('completed', 'closed', 'archivedCompleted', 'archivedClosed')
             AND PYVPASJ.PYVPASJ_PIDM = appraisals.job_pidm
             AND PYVPASJ.PYVPASJ_POSN = appraisals.position_number
             AND PYVPASJ.PYVPASJ_SUFF = appraisals.JOB_SUFFIX
@@ -138,7 +138,7 @@
                 appraisals,
                 PYVPASJ
             WHERE
-            appraisals.status not in ('completed', 'archived', 'closed')
+            appraisals.status not in ('completed', 'closed', 'archivedCompleted', 'archivedClosed')
             AND PYVPASJ.PYVPASJ_PIDM = appraisals.job_pidm
             AND PYVPASJ.PYVPASJ_POSN = appraisals.position_number
             AND PYVPASJ.PYVPASJ_SUFF = appraisals.JOB_SUFFIX
@@ -159,7 +159,7 @@
                 PYVPASJ,
                 PYVPASE
             WHERE
-            appraisals.status not in ('completed', 'archived', 'closed')
+            appraisals.status not in ('completed', 'closed', 'archivedCompleted', 'archivedClosed')
             AND PYVPASE.PYVPASE_PIDM = PYVPASJ.PYVPASJ_SUPERVISOR_PIDM
             AND PYVPASJ.PYVPASJ_PIDM = appraisals.job_pidm
             AND PYVPASJ.PYVPASJ_POSN = appraisals.position_number
@@ -181,7 +181,7 @@
             WHERE
                 pyvpasj_status = 'A'
                 AND pyvpasj_pidm = pyvpase_pidm
-                AND appraisals.status not in ('completed', 'archived', 'closed')
+                AND appraisals.status not in ('completed', 'closed', 'archivedCompleted', 'archivedClosed')
                 AND PYVPASE.PYVPASE_PIDM = appraisals.job_pidm
                 AND PYVPASJ.PYVPASJ_POSN = appraisals.position_number
                 AND PYVPASJ.PYVPASJ_SUFF = appraisals.JOB_SUFFIX
