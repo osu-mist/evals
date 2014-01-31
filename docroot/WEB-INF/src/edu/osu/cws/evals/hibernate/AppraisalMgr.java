@@ -6,6 +6,7 @@ import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.util.CWSUtil;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -1045,16 +1046,22 @@ public class AppraisalMgr {
     public static int[] getIdsToArchive(int daysBeforeArchive) {
         Session session = HibernateUtil.getCurrentSession();
         String query =
-                "select new edu.osu.cws.evals.models.Appraisal(id)" +
-                " from edu.osu.cws.evals.models.Appraisal" +
+                "select a.id" +
+                " from edu.osu.cws.evals.models.Appraisal a" +
                 " where" +
-                    " status in ('" + Appraisal.STATUS_CLOSED + "', '" + Appraisal.STATUS_COMPLETED + "')" +
-                    " and endDate + :archiveDays <= current_date"; // Can use create date
-        Query hibQuery = session.createQuery(query).setInteger("archiveDays", daysBeforeArchive);
-        ArrayList<Appraisal> result = (ArrayList<Appraisal>) hibQuery.list();
+                    " a.status in (:statuses)" +
+                    " and a.endDate + :archiveDays <= current_date";
+
+        Query hibQuery = session.createQuery(query);
+        hibQuery.setInteger("archiveDays", daysBeforeArchive);
+        String[] statusesToArchive = new String[]{ Appraisal.STATUS_CLOSED, Appraisal.STAGE_COMPLETED };
+        hibQuery.setParameterList("statuses", statusesToArchive);
+
+        ArrayList<Integer> result = (ArrayList<Integer>) hibQuery.list();
+
         int[] idsToArchive = new int[result.size()];
-        for(Appraisal appraisal : result) {
-            idsToArchive[result.indexOf(appraisal)] = appraisal.getId();
+        for(Integer id : result) {
+            idsToArchive[result.indexOf(id)] = id;
         }
 
         return idsToArchive;
@@ -1062,27 +1069,15 @@ public class AppraisalMgr {
 
     public static int archive(int[] idsToArchive) {
         Session session = HibernateUtil.getCurrentSession();
+        String query =
+                "update edu.osu.cws.evals.models.Appraisal a" +
+                " set a.status = CONCAT('archived', a.status)" +
+                " where a.id in (:idsToArchive)";
 
-        int count = 0;
-        Appraisal curAppraisal;
-        for(int id : idsToArchive) {
-            try {
-                curAppraisal = getAppraisal(id);
-                String archivedStatus = (curAppraisal.getStatus().equals(Appraisal.STATUS_CLOSED) ?
-                        Appraisal.STATUS_ARCHIVED_CLOSED : Appraisal.STATUS_ARCHIVED_COMPLETED);
-                curAppraisal.setStatus(archivedStatus);
-                session.saveOrUpdate(curAppraisal);
-            }
-            catch(Exception e) {
-                String msg = "error with archiving appraisal with id = " + id;
-                System.out.println(msg);
-                System.out.println(e);
-                count--;
-            }
-            count++;
-        }
+        Query hibQuery = session.createQuery(query);
+        hibQuery.setParameterList("idsToArchive", ArrayUtils.toObject(idsToArchive));
 
-        return count;
+        return hibQuery.executeUpdate();;
     }
 
 }
