@@ -1045,11 +1045,10 @@ public class AppraisalMgr {
     public static int[] getIdsToArchive(int daysBeforeArchive) {
         Session session = HibernateUtil.getCurrentSession();
         String query =
-                "select new edu.osu.cws.evals.models.Appraisal(" +
-                "id, job.jobTitle, startDate, endDate, status, overdue)" +
+                "select new edu.osu.cws.evals.models.Appraisal(id)" +
                 " from edu.osu.cws.evals.models.Appraisal" +
                 " where" +
-                    " status in ('closed', 'completed')" +
+                    " status in ('" + Appraisal.STATUS_CLOSED + "', '" + Appraisal.STATUS_COMPLETED + "')" +
                     " and endDate + :archiveDays <= current_date"; // Can use create date
         Query hibQuery = session.createQuery(query).setInteger("archiveDays", daysBeforeArchive);
         ArrayList<Appraisal> result = (ArrayList<Appraisal>) hibQuery.list();

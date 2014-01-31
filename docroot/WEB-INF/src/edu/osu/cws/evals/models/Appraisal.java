@@ -194,6 +194,10 @@ public class Appraisal extends Evals {
 
     public Appraisal() { }
 
+    public Appraisal(int id) {
+        this.id = id;
+    }
+
     /**
      * Constructor used by AppraisalMgr to fetch only a limited set of attributes. Used to
      * display information in my status section and supervisor report (evaluations of current
