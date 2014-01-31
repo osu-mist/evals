@@ -22,7 +22,7 @@ public class ReportMgr {
     public static final String STAGE = "stage";
     public static final String UNIT = "unit";
     public static final String ACTIVE_STATUS_SQL = "appraisals.status not in " +
-            "('completed', 'archived', 'closed')";
+            "('completed', 'closed', 'archivedCompleted', 'archivedClosed')";
     public static final int WAY_OVERDUE_DAYS = 30;
 
     /**
@@ -426,7 +426,8 @@ public class ReportMgr {
             String status = appraisal.getStatus();
             if (!status.equals(Appraisal.STATUS_COMPLETED) &&
                     !status.equals(Appraisal.STATUS_CLOSED) &&
-                    !status.equals(Appraisal.STATUS_ARCHIVED)) {
+                    !status.equals(Appraisal.STATUS_ARCHIVED_COMPLETED) &&
+                    !status.equals(Appraisal.STATUS_ARCHIVED_CLOSED)) {
 
                 boolean addAppraisal = true;
 
