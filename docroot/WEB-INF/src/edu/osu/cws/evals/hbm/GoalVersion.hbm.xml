@@ -16,6 +16,7 @@
         <property name="createDate" type="timestamp" column="CREATE_DATE"/>
         <property name="goalsApprovedDate" type="timestamp" column="GOALS_APPROVED_DATE"/>
         <property name="goalsSubmitDate" type="timestamp" column="GOALS_SUBMIT_DATE"/>
+        <property name="goalsRequiredModificationDate" type="timestamp" column="GOALS_REQUIRED_MOD_DATE"/>
         <property name="goalsComments" type="text" column="GOALS_COMMENTS"/>
         <property name="requestDecisionDate" type="timestamp" column="REQUEST_DECISION_DATE"/>
         <property name="requestDecision" type="boolean" column="REQUEST_DECISION"/>

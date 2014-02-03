@@ -89,20 +89,6 @@ public class Appraisal extends Evals {
 
     private Employee goalsApprover;
 
-    /**
-     * Comments entered by the supervisor regarding the employee's goals
-     */
-
-    private Date goalsRequiredModificationDate;
-
-    public void setGoalsRequiredModificationDate(Date goalsRequiredModificationDate) {
-        this.goalsRequiredModificationDate = goalsRequiredModificationDate;
-    }
-
-    public Date getGoalsRequiredModificationDate() {
-        return goalsRequiredModificationDate;
-    }
-
     private Date resultSubmitDate;
 
     /**
@@ -233,14 +219,13 @@ public class Appraisal extends Evals {
      * @param startDate
      * @param endDate
      * @param status
-     * @param goalsRequiredModificationDate
      * @param employeeSignedDate
      * @param employeeId
      * @param overdue
      */
     public Appraisal(int id, String jobTitle, String lastName, String firstName, String appointmentType,
-                     Date startDate, Date endDate, String status, Date goalsRequiredModificationDate,
-                     Date employeeSignedDate, int employeeId, Integer overdue) {
+                     Date startDate, Date endDate, String status, Date employeeSignedDate,
+                     int employeeId, Integer overdue) {
         Employee employee = new Employee();
         employee.setId(employeeId);
         employee.setLastName(lastName);
@@ -254,7 +239,6 @@ public class Appraisal extends Evals {
         this.job.setAppointmentType(appointmentType);
         this.job.setEmployee(employee);
         this.employeeSignedDate = employeeSignedDate;
-        this.goalsRequiredModificationDate = goalsRequiredModificationDate;
 
         if (overdue == null) {
             this.overdue = -999;

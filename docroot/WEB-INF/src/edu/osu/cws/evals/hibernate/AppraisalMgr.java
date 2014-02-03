@@ -351,13 +351,13 @@ public class AppraisalMgr {
             Date startDate = (Date) aResult[3];
             Date endDate = (Date) aResult[4];
             String status = (String) aResult[5];
-            Date goalsReqModDate = (Date) aResult[6];
+            /*Date goalsReqModDate = (Date) aResult[6];*/ // change
             Date employeeSignDate = (Date) aResult[7];
             Integer employeePidm = (Integer) aResult[8];
             Integer overdue = (Integer) aResult[9];
 
             appraisal = new Appraisal(id, jobTitle, null, null, appointmentType,
-                    startDate, endDate, status, goalsReqModDate, employeeSignDate, employeePidm,
+                    startDate, endDate, status, /*goalsReqModDate*/, employeeSignDate, employeePidm,     // change
                     overdue);
             appraisals.add(appraisal);
             pidms.add(employeePidm);
