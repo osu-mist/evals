@@ -18,7 +18,8 @@ public class Appraisal extends Evals {
 
     public static final String STATUS_APPRAISAL_DUE = "appraisalDue";
     public static final String STATUS_APPRAISAL_OVERDUE = "appraisalOverdue";
-    public static final String STATUS_ARCHIVED = "archived";
+    public static final String STATUS_ARCHIVED_CLOSED = "archivedClosed";
+    public static final String STATUS_ARCHIVED_COMPLETED = "archivedCompleted";
     public static final String STATUS_BACK_ORIG_STATUS = "backToOriginalStatus";
     public static final String STATUS_CLOSED = "closed";
     public static final String STATUS_COMPLETED = "completed";
@@ -462,7 +463,8 @@ public class Appraisal extends Evals {
     public boolean isOpen() {
         String viewStatus = getViewStatus();
         return !status.equals(STATUS_CLOSED) && !viewStatus.equals(STATUS_COMPLETED)
-                && !status.equals(STATUS_ARCHIVED);
+                && !status.equals(STATUS_ARCHIVED_CLOSED)
+                && !status.equals(STATUS_ARCHIVED_COMPLETED);
     }
 
 
