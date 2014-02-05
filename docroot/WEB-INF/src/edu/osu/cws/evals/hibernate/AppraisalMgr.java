@@ -1071,13 +1071,16 @@ public class AppraisalMgr {
         Session session = HibernateUtil.getCurrentSession();
         String query =
                 "update edu.osu.cws.evals.models.Appraisal a" +
-                " set a.status = CONCAT('archived', a.status)" +
+                " set a.status = " +
+                        "'archived'" +
+                        "||UPPER(SUBSTRING(a.status, 1, 1))" +
+                        "||SUBSTRING(a.status, 2, LENGTH(a.status) - 1)" +
                 " where a.id in (:idsToArchive)";
 
         Query hibQuery = session.createQuery(query);
         hibQuery.setParameterList("idsToArchive", ArrayUtils.toObject(idsToArchive));
 
-        return hibQuery.executeUpdate();;
+        return hibQuery.executeUpdate();
     }
 
 }
