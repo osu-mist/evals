@@ -6,9 +6,11 @@ import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.util.CWSUtil;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.type.StandardBasicTypes;
 import org.joda.time.DateTime;
 
@@ -246,8 +248,10 @@ public class AppraisalMgr {
     }
 
     /**
-     * Returns a list of active appraisals for all the jobs that the current pidm holds. If the
-     * posno and suffix are provided, the evaluations are specific to the job.
+     * Returns a list of appraisals for all the jobs that the current pidm holds. If the
+     * posno and suffix are provided, the evaluations are specific to the job. If onlyActive
+     * is set to true, then it only returns active appraisals, otherwise it returns active
+     * and archived appraisals.
      * The fields that are returned in the appraisal are:
      *      id
      *      Job.jobTitle
@@ -260,15 +264,20 @@ public class AppraisalMgr {
      * @param pidm
      * @param posno
      * @param suffix
+     * @param onlyActive
      */
-    public static ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm, String posno,
-                                                                String suffix) {
+    public static ArrayList<Appraisal> getAllMyAppraisals(int pidm, String posno,
+                                                          String suffix, boolean onlyActive) {
         Session session = HibernateUtil.getCurrentSession();
-        String query = "select new edu.osu.cws.evals.models.Appraisal(id, job.jobTitle, startDate, " +
-                "endDate, status, overdue)" +
-                " from edu.osu.cws.evals.models.Appraisal where " +
-                " job.employee.id = :pidm and status not in ('archived')";
+        String query =
+                "select new edu.osu.cws.evals.models.Appraisal(" +
+                    "id, job.jobTitle, startDate, endDate, status, overdue)" +
+                " from edu.osu.cws.evals.models.Appraisal" +
+                " where job.employee.id = :pidm";
 
+        if (onlyActive) {
+            query += " and status not like 'archived%'";
+        }
         if (posno != null && suffix != null) {
             query += " and job.positionNumber = :posno and job.suffix = :suffix";
         }
@@ -285,6 +294,28 @@ public class AppraisalMgr {
             appraisal.setRole("employee");
         }
         return result;
+    }
+
+    /**
+     * Returns a list of active appraisals for all the jobs that the current pidm holds. If the
+     * posno and suffix are provided, the evaluations are specific to the job. Calls the function
+     * getAllMyAppraisals() and sets onlyActive to true.
+     * The fields that are returned in the appraisal are:
+     *      id
+     *      Job.jobTitle
+     *      startDate
+     *      endDate
+     *      status
+     *      overdue
+     *
+     * @return
+     * @param pidm
+     * @param posno
+     * @param suffix
+     */
+    public static ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm, String posno,
+                                                                String suffix) {
+        return getAllMyAppraisals(pidm, posno, suffix, true);
     }
 
     /**
@@ -1008,4 +1039,49 @@ public class AppraisalMgr {
 
         return null;
     }
+
+    public static int[] getIdsToArchive(int daysBeforeArchive) {
+        Session session = HibernateUtil.getCurrentSession();
+        String query =
+                "select a.id" +
+                " from edu.osu.cws.evals.models.Appraisal a" +
+                " where" +
+                    " a.status in (:statuses)" +
+                    " and a.endDate + :archiveDays <= current_date";
+
+        Transaction tx = session.beginTransaction();
+        Query hibQuery = session.createQuery(query);
+        hibQuery.setInteger("archiveDays", daysBeforeArchive);
+        String[] statusesToArchive = new String[]{ Appraisal.STATUS_CLOSED, Appraisal.STATUS_COMPLETED };
+        hibQuery.setParameterList("statuses", statusesToArchive);
+
+        ArrayList<Integer> result = (ArrayList<Integer>) hibQuery.list();
+        tx.commit();
+
+        int[] idsToArchive = new int[result.size()];
+        for(Integer id : result) {
+            idsToArchive[result.indexOf(id)] = id;
+        }
+        return idsToArchive;
+    }
+
+    public static int archive(int[] idsToArchive) {
+        Session session = HibernateUtil.getCurrentSession();
+        String query =
+                "update edu.osu.cws.evals.models.Appraisal a" +
+                " set a.status = " +
+                        "'archived'" +
+                        "||UPPER(SUBSTRING(a.status, 1, 1))" +
+                        "||SUBSTRING(a.status, 2, LENGTH(a.status) - 1)" +
+                " where a.id in (:idsToArchive)";
+
+        Transaction tx = session.beginTransaction();
+        Query hibQuery = session.createQuery(query);
+        hibQuery.setParameterList("idsToArchive", ArrayUtils.toObject(idsToArchive));
+        int numUpdated = hibQuery.executeUpdate();
+        tx.commit();
+
+        return numUpdated;
+    }
+
 }
