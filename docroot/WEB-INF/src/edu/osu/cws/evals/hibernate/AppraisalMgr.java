@@ -1040,10 +1040,6 @@ public class AppraisalMgr {
         return null;
     }
 
-    public static int[] getIdsToArchive(String daysBeforeArchive) {
-        return getIdsToArchive(Integer.parseInt(daysBeforeArchive));
-    }
-
     public static int[] getIdsToArchive(int daysBeforeArchive) {
         Session session = HibernateUtil.getCurrentSession();
         String query =
