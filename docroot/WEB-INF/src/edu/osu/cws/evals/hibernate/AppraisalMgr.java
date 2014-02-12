@@ -10,6 +10,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.type.StandardBasicTypes;
 import org.joda.time.DateTime;
 
@@ -1040,7 +1041,7 @@ public class AppraisalMgr {
     }
 
     public static int[] getIdsToArchive(String daysBeforeArchive) {
-        return getIdsToArchive(Integer.getInteger(daysBeforeArchive));
+        return getIdsToArchive(Integer.parseInt(daysBeforeArchive));
     }
 
     public static int[] getIdsToArchive(int daysBeforeArchive) {
@@ -1052,18 +1053,19 @@ public class AppraisalMgr {
                     " a.status in (:statuses)" +
                     " and a.endDate + :archiveDays <= current_date";
 
+        Transaction tx = session.beginTransaction();
         Query hibQuery = session.createQuery(query);
         hibQuery.setInteger("archiveDays", daysBeforeArchive);
-        String[] statusesToArchive = new String[]{ Appraisal.STATUS_CLOSED, Appraisal.STAGE_COMPLETED };
+        String[] statusesToArchive = new String[]{ Appraisal.STATUS_CLOSED, Appraisal.STATUS_COMPLETED };
         hibQuery.setParameterList("statuses", statusesToArchive);
 
         ArrayList<Integer> result = (ArrayList<Integer>) hibQuery.list();
+        tx.commit();
 
         int[] idsToArchive = new int[result.size()];
         for(Integer id : result) {
             idsToArchive[result.indexOf(id)] = id;
         }
-
         return idsToArchive;
     }
 
@@ -1077,10 +1079,13 @@ public class AppraisalMgr {
                         "||SUBSTRING(a.status, 2, LENGTH(a.status) - 1)" +
                 " where a.id in (:idsToArchive)";
 
+        Transaction tx = session.beginTransaction();
         Query hibQuery = session.createQuery(query);
         hibQuery.setParameterList("idsToArchive", ArrayUtils.toObject(idsToArchive));
+        int numUpdated = hibQuery.executeUpdate();
+        tx.commit();
 
-        return hibQuery.executeUpdate();
+        return numUpdated;
     }
 
 }
