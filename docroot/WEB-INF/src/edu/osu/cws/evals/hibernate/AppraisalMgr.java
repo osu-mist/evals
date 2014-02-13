@@ -349,7 +349,7 @@ public class AppraisalMgr {
         }
 
         if (onlyActive) {
-            query += "AND status NOT IN ('archived') ";
+            query += "AND status NOT LIKE 'archived%' ";
         }
 
         Query hibQuery = session.createSQLQuery(query)

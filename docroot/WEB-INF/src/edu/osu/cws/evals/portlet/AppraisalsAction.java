@@ -134,13 +134,13 @@ public class AppraisalsAction implements ActionInterface {
      */
     private void setAppraisalPermissionRule() throws Exception {
         String status = appraisal.getStatus();
-        if (status.matches("archived*")) {
-            appraisal.setStatus(status.replace("archived", "").toLowerCase());
+        if (status.contains("archived")) {
+            status = status.replace("archived", "").toLowerCase();
         }
 
         HashMap permissionRules =
                 (HashMap) actionHelper.getPortletContext().getAttribute("permissionRules");
-        String permRuleKey = appraisal.getStatus() + "-" + userRole;
+        String permRuleKey = status + "-" + userRole;
         permRuleKey = permRuleKey.replace("Overdue", "Due");
 
         permRule = (PermissionRule) permissionRules.get(permRuleKey);
