@@ -156,7 +156,7 @@ public class HomeAction implements ActionInterface {
             _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
         }
         session.setAttribute("loggedOnUser", employee);
-        session.removeAttribute(ActionHelper.ALL_MY_ACTIVE_APPRAISALS);
+        session.removeAttribute(ActionHelper.ALL_MY_APPRAISALS);
         session.removeAttribute(ActionHelper.MY_TEAMS_ACTIVE_APPRAISALS);
         actionHelper.setUpUserPermission(true);
 

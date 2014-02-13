@@ -400,7 +400,7 @@ public class ReportsAction implements ActionInterface {
         supervisorTeamAppraisal = AppraisalMgr.getMyTeamsAppraisals(supervisorLevelPidm,
                 true, supervisorLevelPosno, supervisorLevelSuffix);
         supervisorAppraisals = AppraisalMgr.getAllMyAppraisals(supervisorLevelPidm,
-                supervisorLevelPosno, supervisorLevelSuffix);
+                supervisorLevelPosno, supervisorLevelSuffix, true);
         supervisorClassfiedITAppraisals = ClassifiedITObjectMgr.getMyClassifiedITAppraisals(supervisorLevelPidm);
     }
 
