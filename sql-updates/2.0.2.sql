@@ -6,3 +6,4 @@ insert into configurations values(pass_seq.nextval, 'configuration', 'daysBefore
 insert into status values('archivedCompleted');
 insert into status values('archivedClosed');
 delete from status where status = 'archived';
+alter table goals_version add(goals_required_mod_date date);
