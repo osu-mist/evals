@@ -845,24 +845,26 @@ public class AppraisalsAction implements ActionInterface {
 
         Salary salary = appraisal.getSalary();
         Double increaseValue = 0d;
-        if (appraisal.getRating() == 1) {
-            // can only specify an increase if the salary is not at the top pay range
-            if (salary.getCurrent() < salary.getHigh()) {
-                String salaryRecommendation = jsonData.getSalaryRecommendation();
-                // Check that the user submitted a valid salary increase
-                if (salaryRecommendation == null || !NumberUtils.isNumber(salaryRecommendation)) {
-                    return;
-                }
+        if (appraisal.getRating() != null) {
+            if (appraisal.getRating() == 1) {
+                // can only specify an increase if the salary is not at the top pay range
+                if (salary.getCurrent() < salary.getHigh()) {
+                    String salaryRecommendation = jsonData.getSalaryRecommendation();
+                    // Check that the user submitted a valid salary increase
+                    if (salaryRecommendation == null || !NumberUtils.isNumber(salaryRecommendation)) {
+                        return;
+                    }
 
-                Double submittedIncrease = Double.parseDouble(salaryRecommendation);
-                if (submittedIncrease >= increaseRate1MinVal && submittedIncrease <= increaseRate1MaxVal) {
-                    increaseValue = submittedIncrease;
-                } else {
-                    throw new ModelException(resource.getString("appraisal-salary-increase-error-invalid-change"));
+                    Double submittedIncrease = Double.parseDouble(salaryRecommendation);
+                    if (submittedIncrease >= increaseRate1MinVal && submittedIncrease <= increaseRate1MaxVal) {
+                        increaseValue = submittedIncrease;
+                    } else {
+                        throw new ModelException(resource.getString("appraisal-salary-increase-error-invalid-change"));
+                    }
                 }
+            } else if (appraisal.getRating() == 2) {
+                increaseValue = increaseRate2Value;
             }
-        } else if (appraisal.getRating() == 2) {
-            increaseValue = increaseRate2Value;
         }
 
         salary.setIncrease(increaseValue);
