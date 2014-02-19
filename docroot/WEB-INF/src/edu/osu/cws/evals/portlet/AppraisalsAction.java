@@ -268,8 +268,10 @@ public class AppraisalsAction implements ActionInterface {
         if(!userRole.equals(ActionHelper.ROLE_EMPLOYEE)){
 
             if(permRule.getSendToNolij() != null){
-                ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(-1);
-                actionHelper.addToRequestMap("pendingReviews", reviews);
+                if(!userRole.equals(ActionHelper.ROLE_ADMINISTRATOR)) {
+                    ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(-1);
+                    actionHelper.addToRequestMap("pendingReviews", reviews);
+                }
                 if (appraisal.getEmployeeSignedDate() != null) {
                     actionHelper.addToRequestMap("displayResendNolij", true);
                 }
@@ -1033,19 +1035,11 @@ public class AppraisalsAction implements ActionInterface {
     public String resendAppraisalToNolij(PortletRequest request, PortletResponse response) throws Exception {
         initialize(request);
 
-        boolean isReviewer = actionHelper.getReviewer() != null;
-        // Permission checks
-        if (!isReviewer
-                || appraisal.getEmployeeSignedDate() == null
-                || appraisal.getRole().equals("employee")
-                || !appraisal.getStatus().equals("completed"))
-        {
-            return errorHandler.handleAccessDenied(request, response);
-        }
+        boolean canSendToNolij = (permRule.getSendToNolij() == null ? false : permRule.getSendToNolij().equals("y"));
 
         actionHelper.addToRequestMap("id", appraisal.getId());
 
-        if (!isReviewer) {
+        if (!canSendToNolij) {
             String errorMsg = resource.getString("appraisal-resend-permission-denied");
             actionHelper.addErrorsToRequest(errorMsg);
             return display(request, response);
