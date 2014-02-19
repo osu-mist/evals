@@ -48,7 +48,7 @@ public class EvalsUtil {
         if (ref.equals("end")) {
             refDate = new DateTime(appraisal.getEndDate()).withTimeAtStartOfDay();
         } else if (ref.equals("GOALS_REQUIRED_MOD_DATE")) {
-            refDate = new DateTime(appraisal.getGoalsRequiredModificationDate()).withTimeAtStartOfDay();
+            refDate = new DateTime(appraisal.getUnapprovedGoalsVersion().getGoalsRequiredModificationDate()).withTimeAtStartOfDay();
         } else if (ref.equals("employee_signed_date")) {
             refDate = new DateTime(appraisal.getEmployeeSignedDate()).withTimeAtStartOfDay();
         } else if (ref.equals("firstEmailSentDate")) {

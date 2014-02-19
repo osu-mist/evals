@@ -336,20 +336,31 @@ public class AppraisalMgr {
         List<Integer> pidms = new ArrayList<Integer>();
         Session session = HibernateUtil.getCurrentSession();
 
-        String query = "select ap.ID, jobs.PYVPASJ_DESC, jobs.PYVPASJ_APPOINTMENT_TYPE, " +
-                "ap.START_DATE, ap.END_DATE, ap.STATUS, ap.GOALS_REQUIRED_MOD_DATE, " +
-                "ap.EMPLOYEE_SIGNED_DATE, jobs.PYVPASJ_PIDM, ap.OVERDUE " +
+        String query =
+                "SELECT" +
+                    " ap.ID," +
+                    " jobs.PYVPASJ_DESC," +
+                    " jobs.PYVPASJ_APPOINTMENT_TYPE," +
+                    " ap.START_DATE," +
+                    " ap.END_DATE," +
+                    " ap.STATUS," +
+                    " ap.EMPLOYEE_SIGNED_DATE," +
+                    " jobs.PYVPASJ_PIDM," +
+                    " ap.OVERDUE " +
                 "FROM appraisals ap, PYVPASJ jobs " +
-                "WHERE ap.JOB_PIDM=jobs.PYVPASJ_PIDM AND ap.POSITION_NUMBER=jobs.PYVPASJ_POSN " +
-                "AND ap.JOB_SUFFIX=jobs.PYVPASJ_SUFF AND jobs.PYVPASJ_SUPERVISOR_PIDM=:pidm ";
+                "WHERE" +
+                    " ap.JOB_PIDM=jobs.PYVPASJ_PIDM" +
+                    " AND ap.POSITION_NUMBER=jobs.PYVPASJ_POSN" +
+                    " AND ap.JOB_SUFFIX=jobs.PYVPASJ_SUFF" +
+                    " AND jobs.PYVPASJ_SUPERVISOR_PIDM=:pidm";
 
         if (!StringUtils.isEmpty(posno) && !StringUtils.isEmpty(suffix)) {
-            query += "AND jobs.PYVPASJ_SUPERVISOR_POSN=:posno " +
-                    "AND jobs.PYVPASJ_SUPERVISOR_SUFF = :suffix ";
+            query += " AND jobs.PYVPASJ_SUPERVISOR_POSN=:posno" +
+                    " AND jobs.PYVPASJ_SUPERVISOR_SUFF = :suffix";
         }
 
         if (onlyActive) {
-            query += "AND status NOT LIKE 'archived%' ";
+            query += " AND status NOT LIKE 'archived%' ";
         }
 
         Query hibQuery = session.createSQLQuery(query)
@@ -359,7 +370,6 @@ public class AppraisalMgr {
                 .addScalar("START_DATE", StandardBasicTypes.DATE)
                 .addScalar("END_DATE", StandardBasicTypes.DATE)
                 .addScalar("STATUS", StandardBasicTypes.STRING)
-                .addScalar("GOALS_REQUIRED_MOD_DATE", StandardBasicTypes.DATE)
                 .addScalar("EMPLOYEE_SIGNED_DATE", StandardBasicTypes.DATE)
                 .addScalar("PYVPASJ_PIDM", StandardBasicTypes.INTEGER)
                 .addScalar("OVERDUE", StandardBasicTypes.INTEGER)
@@ -382,13 +392,12 @@ public class AppraisalMgr {
             Date startDate = (Date) aResult[3];
             Date endDate = (Date) aResult[4];
             String status = (String) aResult[5];
-            Date goalsReqModDate = (Date) aResult[6];
-            Date employeeSignDate = (Date) aResult[7];
-            Integer employeePidm = (Integer) aResult[8];
-            Integer overdue = (Integer) aResult[9];
+            Date employeeSignDate = (Date) aResult[6];
+            Integer employeePidm = (Integer) aResult[7];
+            Integer overdue = (Integer) aResult[8];
 
             appraisal = new Appraisal(id, jobTitle, null, null, appointmentType,
-                    startDate, endDate, status, goalsReqModDate, employeeSignDate, employeePidm,
+                    startDate, endDate, status, employeeSignDate, employeePidm,
                     overdue);
             appraisals.add(appraisal);
             pidms.add(employeePidm);

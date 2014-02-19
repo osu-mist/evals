@@ -16,7 +16,6 @@
         <property name="endDate" type="date" column="END_DATE"/>
         <property name="goalsSubmitDate" type="timestamp" column="GOALS_SUBMIT_DATE"/>
         <property name="goalApprovedDate" type="timestamp" column="GOALS_APPROVED_DATE"/>
-        <property name="goalsRequiredModificationDate" type="timestamp" column="GOALS_REQUIRED_MOD_DATE"/>
         <property name="resultSubmitDate" type="timestamp" column="RESULT_SUBMIT_DATE"/>
         <property name="evaluation" type="text" column="EVALUATION"/>
         <property name="evaluationSubmitDate" type="timestamp" column="EVALUATION_SUBMIT_DATE"/>

@@ -602,7 +602,10 @@ public class AppraisalsAction implements ActionInterface {
                 appraisal.setStatus(Appraisal.STATUS_REBUTTAL_READ_DUE);
             }
         }
-        dates.put("goalsRequiredModificationDate", appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION));
+
+        if(appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
+            appraisal.getUnapprovedGoalsVersion().setGoalsRequiredModificationDate(new Date());
+        }
 
         saveAppraisalMetadata(dates, pidm);
     }
