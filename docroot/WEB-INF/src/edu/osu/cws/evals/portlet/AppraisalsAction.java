@@ -1021,7 +1021,7 @@ public class AppraisalsAction implements ActionInterface {
     public String resendAppraisalToNolij(PortletRequest request, PortletResponse response) throws Exception {
         initialize(request);
 
-        boolean canSendToNolij = permRule.getSendToNolij().equals("y");
+        boolean canSendToNolij = (permRule.getSendToNolij() == null ? false : permRule.getSendToNolij().equals("y"));
 
         actionHelper.addToRequestMap("id", appraisal.getId());
 
