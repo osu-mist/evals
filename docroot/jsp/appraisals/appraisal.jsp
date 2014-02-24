@@ -258,8 +258,11 @@
 
     <br />
     <div class="pass-actions">
-        <c:if test="${not empty permissionRule.saveDraft}">
+        <c:if test="${not empty permissionRule.saveDraft}"> <!-- && not empty appraisal.approvedGoalsVersions-->
+        <c:if test="${not appraisal.status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION) ||
+        (appraisal.status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION) && not empty appraisal.approvedGoalsVersions)}">
         <input name="${permissionRule.saveDraft}" type="submit" value="<liferay-ui:message key="${permissionRule.saveDraft}" />">
+        </c:if>
         </c:if>
 
         <c:if test="${not empty permissionRule.secondarySubmit}">
