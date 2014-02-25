@@ -106,23 +106,45 @@ public class AppraisalsAction implements ActionInterface {
             appraisal = AppraisalMgr.getAppraisal(appraisalID);
             if(appraisal != null) {
                 userRole = getRole();
-                // Whether or not the save draft permission rule should be disabled for results
-                Boolean disableResultsSaveDraft = appraisal.getGoalVersions().size() == 1 &&
-                        appraisal.getStatus().equals(Appraisal.STATUS_GOALS_APPROVAL_DUE) &&
-                        userRole.equals("employee");
                 setAppraisalPermissionRule();
                 appraisal.setRole(userRole);
                 appraisal.setPermissionRule(permRule);
-
-                // For the employee role, if it is the status is goals approval due and these are the
-                // original goals, the save draft button shouldn't show up. If the goals are
-                // reactivated, and the status is goals approval due, we display save draft to save
-                // the results for original goals.
-                if (permRule != null) {
-                    permRule.setDisableResultsSaveDraft(disableResultsSaveDraft);
-                }
+                checkSaveDraftPermission();
             }
         }
+    }
+
+    /**
+     * Due to how the goals version and the permission rules are setup, the value of save-draft
+     * in the permission rule object is overloaded. In other words sometimes for the goals approval due
+     * and goals required modification the save draft button is displayed or not depending on the role
+     * and the # of goals versions.
+     *
+     * For the supervisor role and goals_required modification status:
+     *      * If the evaluation has only 1 goal version, we don't display save draft button
+     *      * If the evaluation has > 1 goal version, we display save draft button to save original supervisor results
+     *
+     * For the employee role and goals approval due status:
+     *      * If the evaluation has only 1 goal version, we don't display save draft button
+     *      * If the evaluation has > 1 goal version, we display save draft button to save original employee results
+     */
+    private void checkSaveDraftPermission() {
+        if (permRule == null) {
+            return; // if the user doesn't have permission stop here
+        }
+
+        // We only disable the save draft for employee/supervisor if there is only 1 goal version
+        if (appraisal.getGoalVersions().size() == 1) {
+            String status = appraisal.getStatus();
+            if (status.equals(Appraisal.STATUS_GOALS_APPROVAL_DUE) && userRole.equals("employee")) {
+                permRule.setDisableResultsSaveDraft(true);
+            }
+
+            if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION) && userRole.equals("supervisor")) {
+                permRule.setDisableSupervisorResultsSaveDraft(true);
+            }
+        }
+
     }
 
     /**

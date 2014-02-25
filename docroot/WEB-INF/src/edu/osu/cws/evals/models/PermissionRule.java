@@ -51,6 +51,11 @@ public class PermissionRule extends Evals implements Cloneable {
     // not aware of the appraisal object, the action code must set this property.
     private Boolean disableResultsSaveDraft = false;
 
+    // This is a transient property. It is used because during goals required modification, the save draft
+    // can be either disabled or not for the supervisor role. Since the permission rule object is
+    // not aware of the appraisal object, the action code must set this property.
+    private Boolean disableSupervisorResultsSaveDraft = false;
+
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -145,11 +150,16 @@ public class PermissionRule extends Evals implements Cloneable {
      */
     public String getSaveDraft() {
         String employeeResults = results;
+        String supervisorResults = this.supervisorResults;
 
         // We don't allow the save of draft due to employee results if the appraisal action
         // has disabled it.
         if (disableResultsSaveDraft != null && disableResultsSaveDraft) {
             employeeResults = null;
+        }
+
+        if (disableSupervisorResultsSaveDraft != null && disableSupervisorResultsSaveDraft) {
+            supervisorResults = null;
         }
 
         String[] permissionFields = {
@@ -252,6 +262,10 @@ public class PermissionRule extends Evals implements Cloneable {
 
     public void setDisableResultsSaveDraft(Boolean disableResultsSaveDraft) {
         this.disableResultsSaveDraft = disableResultsSaveDraft;
+    }
+
+    public void setDisableSupervisorResultsSaveDraft(Boolean disableSupervisorResultsSaveDraft) {
+        this.disableSupervisorResultsSaveDraft = disableSupervisorResultsSaveDraft;
     }
 
     public Boolean canEdit(String column) throws Exception {
