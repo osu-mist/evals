@@ -7,3 +7,7 @@ insert into status values('archivedCompleted');
 insert into status values('archivedClosed');
 delete from status where status = 'archived';
 alter table goals_versions add(goals_required_mod_date date);
+UPDATE goals_versions 
+SET (GOALS_COMMENTS, GOALS_REQUIRED_MOD_DATE) = (SELECT GOALS_COMMENTS, GOALS_REQUIRED_MOD_DATE
+                                         FROM   appraisals 
+                                         WHERE  appraisals.id = goals_versions.appraisal_id); 
