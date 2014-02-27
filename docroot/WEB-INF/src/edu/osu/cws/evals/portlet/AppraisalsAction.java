@@ -106,21 +106,9 @@ public class AppraisalsAction implements ActionInterface {
             appraisal = AppraisalMgr.getAppraisal(appraisalID);
             if(appraisal != null) {
                 userRole = getRole();
-                // Whether or not the save draft permission rule should be disabled for results
-                Boolean disableResultsSaveDraft = appraisal.getGoalVersions().size() == 1 &&
-                        appraisal.getStatus().equals(Appraisal.STATUS_GOALS_APPROVAL_DUE) &&
-                        userRole.equals("employee");
-                setAppraisalPermissionRule();
+                setPermRule();
                 appraisal.setRole(userRole);
                 appraisal.setPermissionRule(permRule);
-
-                // For the employee role, if it is the status is goals approval due and these are the
-                // original goals, the save draft button shouldn't show up. If the goals are
-                // reactivated, and the status is goals approval due, we display save draft to save
-                // the results for original goals.
-                if (permRule != null) {
-                    permRule.setDisableResultsSaveDraft(disableResultsSaveDraft);
-                }
             }
         }
     }
@@ -132,7 +120,7 @@ public class AppraisalsAction implements ActionInterface {
      *
      * @throws Exception
      */
-    private void setAppraisalPermissionRule() throws Exception {
+    private void setPermRule() throws Exception {
         String status = appraisal.getStatus();
         if (status.contains("archived")) {
             status = status.replace("archived", "").toLowerCase();
@@ -143,7 +131,16 @@ public class AppraisalsAction implements ActionInterface {
         String permRuleKey = status + "-" + userRole;
         permRuleKey = permRuleKey.replace("Overdue", "Due");
 
-        permRule = (PermissionRule) permissionRules.get(permRuleKey);
+        // Get the permission rule from the cache map and clone it. If we modify or set any properties
+        // in the original cached permission rule, the modifications are saved on the cached object.
+        PermissionRule cachedPermissionRule = (PermissionRule) permissionRules.get(permRuleKey);
+        permRule = (PermissionRule) cachedPermissionRule.clone();
+
+        // Disable the employee/supervisor results if we are in the first round of goals (no approved goals yet)
+        if (status.contains("goal") && appraisal.getApprovedGoalsVersions().isEmpty()) {
+            permRule.setResults(null);
+            permRule.setSupervisorResults(null);
+        }
     }
 
     /**
