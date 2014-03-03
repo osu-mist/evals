@@ -68,6 +68,8 @@ public class Job extends Evals implements Serializable {
 
     private Set appraisals = new HashSet();
 
+    private PositionDescription positionDescription;
+
     /**
      * This property holds the job of the current supervisor. If
      * this.supervisor.employee != null, then currentSupervisor holds
@@ -385,6 +387,14 @@ public class Job extends Evals implements Serializable {
 
     public void setSalaryGrpCode(String salaryGrpCode) {
         this.salaryGrpCode = salaryGrpCode;
+    }
+
+    public PositionDescription getPositionDescription() {
+        return positionDescription;
+    }
+
+    public void setPositionDescription(PositionDescription positionDescription) {
+        this.positionDescription = positionDescription;
     }
 
     /**
