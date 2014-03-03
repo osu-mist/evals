@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping auto-import="false" >
+
+    <class name="edu.osu.cws.evals.models.PositionDescription" table="PYVPDES" mutable="false" batch-size="10">
+        <id name="id" column="POSITIONDESCRIPTIONID" type="int"/>
+
+        <property name="positionNumber" column="POSITIONNUMBER"/>
+        <property name="universityId" column="UNIVERSITYID"/>
+        <property name="positionTitle" column="POSITIONTITLE"/>
+        <property name="jobTitle" column="JOBTITLE"/>
+        <property name="department" column="DEPARTMENT"/>
+        <property name="firstName" column="EMPLOYEEFIRSTNAME"/>
+        <property name="lastName" column="EMPLOYEELASTNAME"/>
+        <property name="effectiveDate" column="EFFECTIVEDATE"/>
+        <property name="positionApptPercent" column="POSITIONAPPOINTMENTPERCENT"/>
+        <property name="appointmentBasis" column="APPOINTMENTBASIS"/>
+        <property name="flsaStatus" column="FLSASTATUS"/>
+        <property name="jobLocation" column="JOBLOCATION"/>
+        <property name="positionDescription" column="POSITIONCODEDESCRIPTION"/>
+        <property name="positionSummary" column="POSITIONSUMMARY"/>
+        <property name="decisionMakingGuidelines" column="DECISIONMAKINGGUIDELINES"/>
+        <property name="percLeadWorkSuperDuties" column="PERCLEADWORKSUPERDUTIES"/>
+        <property name="nbrEmplLeadorSupVD" column="NBREMPLLEADORSUPVD"/>
+        <property name="positionDuties" column="POSITIONDUTIES"/>
+        <property name="positionDutiesCont" column="POSITIONDUTIESCONTINUED"/>
+        <property name="addtlreqqualifs" column="ADDTLREQQUALIFS"/>
+        <property name="preferredQualifications" column="PREFERREDQUALIFICATIONS"/>
+        <property name="crimbckgrndandordmvchkrqrd" column="CRIMBCKGRNDANDORDMVCHKRQRD"/>
+        <property name="validDriverLicenseRequired" column="VALIDDRIVERLICENSEREQUIRED"/>
+        <property name="employementCategory" column="EMPLOYMENTCATEGORY"/>
+        <property name="workSchedule" column="WORKSCHEDULE"/>
+        <property name="lastUpdate" type="timestamp" column="LASTUPDATEDATE"/>
+
+        <set name="jobs" batch-size="10">
+            <key column="POSITIONDESCRIPTIONID"/>
+            <one-to-many class="edu.osu.cws.evals.models.PositionDescriptionWork"/>
+        </set>
+
+    </class>
+
+</hibernate-mapping>
+
+
