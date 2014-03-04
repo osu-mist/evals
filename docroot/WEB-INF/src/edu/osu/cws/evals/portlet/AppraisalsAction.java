@@ -88,7 +88,7 @@ public class AppraisalsAction implements ActionInterface {
      * @param request
      * @throws Exception
      */
-    private void initialize(PortletRequest request) throws Exception {
+    public void initialize(PortletRequest request) throws Exception {
         this.request = request;
         this.resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         this.loggedInUser = actionHelper.getLoggedOnUser();
@@ -141,6 +141,14 @@ public class AppraisalsAction implements ActionInterface {
             permRule.setResults(null);
             permRule.setSupervisorResults(null);
         }
+    }
+
+    public PermissionRule getPermRule() {
+        return permRule;
+    }
+
+    public Appraisal getAppraisal() {
+        return appraisal;
     }
 
     /**
