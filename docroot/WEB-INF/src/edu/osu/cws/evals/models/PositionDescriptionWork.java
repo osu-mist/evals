@@ -1,16 +1,18 @@
 package edu.osu.cws.evals.models;
 
 
-public class PositionDescriptionWork {
-    private Integer id;
+import java.io.Serializable;
+
+public class PositionDescriptionWork implements Serializable{
+    private Integer positionDescriptionId;
     private String response;
 
-    public Integer getId() {
-        return id;
+    public Integer getPositionDescriptionId() {
+        return positionDescriptionId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setPositionDescriptionId(Integer positionDescriptionId) {
+        this.positionDescriptionId = positionDescriptionId;
     }
 
     public String getResponse() {

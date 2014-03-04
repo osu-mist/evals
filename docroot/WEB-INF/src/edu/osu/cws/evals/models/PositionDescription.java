@@ -277,4 +277,12 @@ public class PositionDescription {
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
+
+    public Set<PositionDescriptionWork> getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(Set<PositionDescriptionWork> jobs) {
+        this.jobs = jobs;
+    }
 }

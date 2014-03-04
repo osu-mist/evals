@@ -39,6 +39,13 @@
         </set>
 
     </class>
+    <query name="positionDescription.getPD">
+        from edu.osu.cws.evals.models.PositionDescription
+        where
+        universityId = :osuid and
+        positionNumber = :posno
+
+    </query>
 
 </hibernate-mapping>
 
