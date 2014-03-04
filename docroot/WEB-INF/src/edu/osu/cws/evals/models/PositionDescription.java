@@ -38,19 +38,19 @@ public class PositionDescription {
 
     private String decisionMakingGuidelines;
 
-    private String percLeadWorkSuperDuties;
+    private String percentOfTimeLeadWork;
 
-    private String nbrEmplLeadorSupVD;
+    private String numberOfEmployeesSupervised;
 
     private String positionDuties;
 
     private String positionDutiesCont;
 
-    private String addtlreqqualifs;
+    private String minimumQualifications;
 
     private String preferredQualifications;
 
-    private String crimbckgrndandordmvchkrqrd;
+    private String securitySensitivePosition;
 
     private String validDriverLicenseRequired;
 
@@ -60,7 +60,7 @@ public class PositionDescription {
 
     private Date lastUpdate;
 
-    private Set<PositionDescriptionWork> jobs = new HashSet<PositionDescriptionWork>();
+    private Set<PositionDescriptionWork> leadWorkResponsibilities = new HashSet<PositionDescriptionWork>();
 
     public Integer getId() {
         return id;
@@ -190,20 +190,20 @@ public class PositionDescription {
         this.decisionMakingGuidelines = decisionMakingGuidelines;
     }
 
-    public String getPercLeadWorkSuperDuties() {
-        return percLeadWorkSuperDuties;
+    public String getPercentOfTimeLeadWork() {
+        return percentOfTimeLeadWork;
     }
 
-    public void setPercLeadWorkSuperDuties(String percLeadWorkSuperDuties) {
-        this.percLeadWorkSuperDuties = percLeadWorkSuperDuties;
+    public void setPercentOfTimeLeadWork(String percentOfTimeLeadWork) {
+        this.percentOfTimeLeadWork = percentOfTimeLeadWork;
     }
 
-    public String getNbrEmplLeadorSupVD() {
-        return nbrEmplLeadorSupVD;
+    public String getNumberOfEmployeesSupervised() {
+        return numberOfEmployeesSupervised;
     }
 
-    public void setNbrEmplLeadorSupVD(String nbrEmplLeadorSupVD) {
-        this.nbrEmplLeadorSupVD = nbrEmplLeadorSupVD;
+    public void setNumberOfEmployeesSupervised(String numberOfEmployeesSupervised) {
+        this.numberOfEmployeesSupervised = numberOfEmployeesSupervised;
     }
 
     public String getPositionDuties() {
@@ -222,12 +222,12 @@ public class PositionDescription {
         this.positionDutiesCont = positionDutiesCont;
     }
 
-    public String getAddtlreqqualifs() {
-        return addtlreqqualifs;
+    public String getMinimumQualifications() {
+        return minimumQualifications;
     }
 
-    public void setAddtlreqqualifs(String addtlreqqualifs) {
-        this.addtlreqqualifs = addtlreqqualifs;
+    public void setMinimumQualifications(String minimumQualifications) {
+        this.minimumQualifications = minimumQualifications;
     }
 
     public String getPreferredQualifications() {
@@ -238,12 +238,12 @@ public class PositionDescription {
         this.preferredQualifications = preferredQualifications;
     }
 
-    public String getCrimbckgrndandordmvchkrqrd() {
-        return crimbckgrndandordmvchkrqrd;
+    public String getSecuritySensitivePosition() {
+        return securitySensitivePosition;
     }
 
-    public void setCrimbckgrndandordmvchkrqrd(String crimbckgrndandordmvchkrqrd) {
-        this.crimbckgrndandordmvchkrqrd = crimbckgrndandordmvchkrqrd;
+    public void setSecuritySensitivePosition(String securitySensitivePosition) {
+        this.securitySensitivePosition = securitySensitivePosition;
     }
 
     public String getValidDriverLicenseRequired() {
@@ -278,11 +278,11 @@ public class PositionDescription {
         this.lastUpdate = lastUpdate;
     }
 
-    public Set<PositionDescriptionWork> getJobs() {
-        return jobs;
+    public Set<PositionDescriptionWork> getLeadWorkResponsibilities() {
+        return leadWorkResponsibilities;
     }
 
-    public void setJobs(Set<PositionDescriptionWork> jobs) {
-        this.jobs = jobs;
+    public void setLeadWorkResponsibilities(Set<PositionDescriptionWork> leadWorkResponsibilities) {
+        this.leadWorkResponsibilities = leadWorkResponsibilities;
     }
 }

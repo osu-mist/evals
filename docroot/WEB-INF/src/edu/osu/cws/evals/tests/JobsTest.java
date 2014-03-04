@@ -329,7 +329,7 @@ public class JobsTest {
         PositionDescription pd1 = JobMgr.getPositionDescription(job);
         assert pd1.getId() == 1;
         assert pd1.getPositionTitle().equals("PD1");
-        assert pd1.getJobs().size() == 2;
+        assert pd1.getLeadWorkResponsibilities().size() == 2;
 
         Employee employee1 = new Employee(12467);
         employee1.setOsuid("931421234");
@@ -339,6 +339,6 @@ public class JobsTest {
         PositionDescription pd2 = JobMgr.getPositionDescription(job);
         assert pd2.getId() == 2;
         assert pd2.getPositionTitle().equals("PD2");
-        assert pd2.getJobs().size() == 1;
+        assert pd2.getLeadWorkResponsibilities().size() == 1;
     }
 }
