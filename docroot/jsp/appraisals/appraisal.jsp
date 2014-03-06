@@ -96,12 +96,12 @@
             /></li>
         </c:if>
         <c:if test="${appraisal.isOpen}">
-            <li><liferay-ui:icon
-                    image="copy"
-                    url="<%=renderResponse.encodeURL(viewPositionDescription.toString())%>"
-                    label="true"
-                    message="appraisal-position-description"
-            /></li>
+            <li>
+                <span><a href="<%=renderResponse.encodeURL(viewPositionDescription.toString())%>" target="_blank">
+                <img class="icon" src="/LP5-corp-theme/images/common/copy.png" alt="<liferay-ui:message key="view-position-description"/>"></a>
+                <a href="<%=renderResponse.encodeURL(viewPositionDescription.toString())%>" target="_blank"><liferay-ui:message key="view-position-description"/></a>
+                </span>
+            </li>
         </c:if>
     </ul>
 
