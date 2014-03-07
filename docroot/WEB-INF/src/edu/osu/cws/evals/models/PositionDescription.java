@@ -54,7 +54,7 @@ public class PositionDescription {
 
     private String validDriverLicenseRequired;
 
-    private String employementCategory;
+    private String employmentCategory;
 
     private String workSchedule;
 
@@ -254,12 +254,12 @@ public class PositionDescription {
         this.validDriverLicenseRequired = validDriverLicenseRequired;
     }
 
-    public String getEmployementCategory() {
-        return employementCategory;
+    public String getEmploymentCategory() {
+        return employmentCategory;
     }
 
-    public void setEmployementCategory(String employementCategory) {
-        this.employementCategory = employementCategory;
+    public void setEmploymentCategory(String employmentCategory) {
+        this.employmentCategory = employmentCategory;
     }
 
     public String getWorkSchedule() {

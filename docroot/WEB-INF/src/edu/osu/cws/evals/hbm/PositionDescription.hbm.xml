@@ -29,7 +29,7 @@
         <property name="preferredQualifications" column="PREFERREDQUALIFICATIONS"/>
         <property name="securitySensitivePosition" column="CRIMBCKGRNDANDORDMVCHKRQRD"/>
         <property name="validDriverLicenseRequired" column="VALIDDRIVERLICENSEREQUIRED"/>
-        <property name="employementCategory" column="EMPLOYMENTCATEGORY"/>
+        <property name="employmentCategory" column="EMPLOYMENTCATEGORY"/>
         <property name="workSchedule" column="WORKSCHEDULE"/>
         <property name="lastUpdate" type="timestamp" column="LASTUPDATEDATE"/>
 
