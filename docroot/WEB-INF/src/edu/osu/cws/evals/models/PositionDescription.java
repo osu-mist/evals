@@ -60,7 +60,7 @@ public class PositionDescription {
 
     private Date lastUpdate;
 
-    private Set<PositionDescriptionWork> leadWorkResponsibilities = new HashSet<PositionDescriptionWork>();
+    private Set<LeadResponsibility> leadWorkResponsibilities = new HashSet<LeadResponsibility>();
 
     public Integer getId() {
         return id;
@@ -278,11 +278,11 @@ public class PositionDescription {
         this.lastUpdate = lastUpdate;
     }
 
-    public Set<PositionDescriptionWork> getLeadWorkResponsibilities() {
+    public Set<LeadResponsibility> getLeadWorkResponsibilities() {
         return leadWorkResponsibilities;
     }
 
-    public void setLeadWorkResponsibilities(Set<PositionDescriptionWork> leadWorkResponsibilities) {
+    public void setLeadWorkResponsibilities(Set<LeadResponsibility> leadWorkResponsibilities) {
         this.leadWorkResponsibilities = leadWorkResponsibilities;
     }
 }

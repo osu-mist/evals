@@ -3,7 +3,7 @@ package edu.osu.cws.evals.models;
 
 import java.io.Serializable;
 
-public class PositionDescriptionWork implements Serializable{
+public class LeadResponsibility implements Serializable{
     private Integer positionDescriptionId;
     private String response;
 

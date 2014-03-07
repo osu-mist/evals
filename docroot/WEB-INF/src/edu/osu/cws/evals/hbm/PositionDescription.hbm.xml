@@ -35,7 +35,7 @@
 
         <set name="leadWorkResponsibilities" batch-size="10">
             <key column="POSITIONDESCRIPTIONID"/>
-            <one-to-many class="edu.osu.cws.evals.models.PositionDescriptionWork"/>
+            <one-to-many class="edu.osu.cws.evals.models.LeadResponsibility"/>
         </set>
 
     </class>
