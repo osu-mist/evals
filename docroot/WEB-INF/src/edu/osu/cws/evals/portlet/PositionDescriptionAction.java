@@ -3,13 +3,10 @@ package edu.osu.cws.evals.portlet;
 import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.models.PositionDescription;
-import edu.osu.cws.evals.portlet.ActionHelper;
-import edu.osu.cws.evals.portlet.ActionInterface;
-import edu.osu.cws.evals.portlet.ErrorHandler;
-import edu.osu.cws.evals.portlet.HomeAction;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
+import java.util.ResourceBundle;
 
 public class PositionDescriptionAction implements ActionInterface {
     private ActionHelper actionHelper;
@@ -37,7 +34,14 @@ public class PositionDescriptionAction implements ActionInterface {
             }
         }
 
+        if (positionDescription == null) {
+            ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
+            actionHelper.addErrorsToRequest(resource.getString("position-description-no-data"));
+        }
+
         actionHelper.addToRequestMap("positionDescription", positionDescription);
+        actionHelper.useMaximizedMenu();
+
         return Constants.JSP_POSITION_DESCRIPTION;
     }
 

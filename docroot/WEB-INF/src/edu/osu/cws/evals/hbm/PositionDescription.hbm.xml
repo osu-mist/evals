@@ -33,7 +33,7 @@
         <property name="workSchedule" column="WORKSCHEDULE"/>
         <property name="lastUpdate" type="timestamp" column="LASTUPDATEDATE"/>
 
-        <set name="leadWorkResponsibilities" batch-size="10">
+        <set name="leadWorkResponsibilities" batch-size="10" lazy="false">
             <key column="POSITIONDESCRIPTIONID"/>
             <one-to-many class="edu.osu.cws.evals.models.LeadResponsibility"/>
         </set>
