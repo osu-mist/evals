@@ -10,8 +10,6 @@ addURL.setParameter("controller", "CriteriaAreasAction");
 %>
 
 <h2><liferay-ui:message key="Criteria" /></h2>
-<liferay-ui:success key="criteria-saved" message="criteria-saved" />
-<liferay-ui:success key="criteria-deleted" message="criteria-deleted" />
 
 <ul class="actions">
     <li><liferay-ui:icon
@@ -21,6 +19,10 @@ addURL.setParameter("controller", "CriteriaAreasAction");
         message="criteria-add-short"
     /></li>
 </ul>
+
+<liferay-ui:success key="criteria-saved" message="criteria-saved" />
+<liferay-ui:success key="criteria-deleted" message="criteria-deleted" />
+
 <table class="taglib-search-iterator" id="<portlet:namespace/>criteria-list">
     <thead>
         <tr class="portlet-section-header results-header">
