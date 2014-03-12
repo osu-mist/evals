@@ -24,20 +24,20 @@
                     <td><em><liferay-ui:message key="position-title" />:</em>
                         <c:out value="${positionDescription.positionTitle}" />
                     </td>
-                    <td colspan="2"><em><liferay-ui:message key="position-class-code" />:</em>
+                    <td><em><liferay-ui:message key="position-class-code" />:</em>
                         <c:out value="${missingValue}"/>
                     </td>
-                    <td><em><liferay-ui:message key="department" />:</em>
+                    <td colspan="2"><em><liferay-ui:message key="department" />:</em>
                         <c:out value="${positionDescription.department}" />
                     </td>
-                    <td colspan="2"><em><liferay-ui:message key="employee-name" />:</em>
-                        <c:out value="${positionDescription.firstName}" /> <c:out value="${positionDescription.lastName}" />
-                    </td>
-                    <td><em><liferay-ui:message key="effective-date"  />:</em>
-                        <c:out value="${positionDescription.effectiveDate}"/>
+                    <td><em><liferay-ui:message key="job-location"/>:</em>
+                        <c:out value="${positionDescription.jobLocation}"/>
                     </td>
                 </tr>
                 <tr>
+                    <td><em><liferay-ui:message key="employee-name" />:</em>
+                        <c:out value="${positionDescription.firstName}" /> <c:out value="${positionDescription.lastName}" />
+                    </td>
                     <td><em><liferay-ui:message key="position-number"/>:</em>
                         <c:out value="${positionDescription.positionNumber}"/>
                     </td>
@@ -50,14 +50,19 @@
                     <td><em><liferay-ui:message key="flsa-status" />:</em>
                         <c:out value="${positionDescription.flsaStatus}"/>
                     </td>
-                    <td><em><liferay-ui:message key="job-location"/>:</em>
-                        <c:out value="${positionDescription.jobLocation}"/>
+                </tr>
+                <tr>
+                    <td><em><liferay-ui:message key="employment-category"/>:</em>
+                        <c:out value="${positionDescription.employmentCategory}"/>
                     </td>
                     <td><em><liferay-ui:message key="work-schedule"/>:</em>
                         <c:out value="${positionDescription.workSchedule}"/>
                     </td>
-                    <td><em><liferay-ui:message key="employment-category"/>:</em>
-                        <c:out value="${positionDescription.employmentCategory}"/>
+                    <td><em><liferay-ui:message key="effective-date"  />:</em>
+                        <c:out value="${positionDescription.effectiveDate}"/>
+                    </td>
+                    <td colspan="2"><em><liferay-ui:message key="last-update-date"  />:</em>
+                        <fmt:formatDate value="${positionDescription.lastUpdate}" pattern="MM/dd/yy"/>
                     </td>
                 </tr>
                 </tbody>
@@ -130,15 +135,6 @@
         </fieldset>
 
         <fieldset>
-            <legend><liferay-ui:message key="preferred-qualifications"/></legend>
-            <p class="pass-form-text"><%= CWSUtil.escapeHtml(formPositionDescription.getPreferredQualifications())%></p>
-        </fieldset>
-    </fieldset>
-
-    <fieldset>
-        <legend>@todo</legend>
-
-        <fieldset>
             <legend><liferay-ui:message key="security-sensitive-position-question"/></legend>
             <c:out value="${positionDescription.securitySensitivePosition}"/>
         </fieldset>
@@ -158,7 +154,12 @@
             <c:out value="${missingValue}"/>
         </fieldset>
 
+        <fieldset>
+            <legend><liferay-ui:message key="preferred-qualifications"/></legend>
+            <p class="pass-form-text"><%= CWSUtil.escapeHtml(formPositionDescription.getPreferredQualifications())%></p>
+        </fieldset>
     </fieldset>
+
 </c:if>
 
 <%@ include file="/jsp/footer.jsp" %>
