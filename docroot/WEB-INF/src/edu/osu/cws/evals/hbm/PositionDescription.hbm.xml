@@ -42,9 +42,9 @@
     <query name="positionDescription.getPD">
         from edu.osu.cws.evals.models.PositionDescription
         where
-        universityId = :osuid and
-        positionNumber = :posno
-
+            universityId = :osuid and
+            positionNumber = :posno and
+            (trim(positionDuties) != '' or positionDuties is not null)
     </query>
 
 </hibernate-mapping>
