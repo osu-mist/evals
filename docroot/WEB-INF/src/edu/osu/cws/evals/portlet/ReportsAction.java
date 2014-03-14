@@ -274,7 +274,6 @@ public class ReportsAction implements ActionInterface {
                 // right pane data: supervisor appraisals and supervisor team
                 actionHelper.addToRequestMap("myAppraisals", supervisorAppraisals);
                 actionHelper.addToRequestMap("myTeamsActiveAppraisals", supervisorTeamAppraisal);
-                actionHelper.addToRequestMap("myTeamsActiveClassifiedITAppraisals", supervisorClassfiedITAppraisals);
                 actionHelper.addToRequestMap("isMyReport", isMyReport);
             }
 
