@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
-import edu.osu.cws.evals.hibernate.ClassifiedITObjectMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.ReportMgr;
 import edu.osu.cws.evals.models.*;
@@ -47,7 +46,7 @@ public class ReportsAction implements ActionInterface {
     public static final String CHART_TYPE_BAR = "bar";
     public static final String CHART_TYPE_COLUMN = "column";
 
-    public static String[] APPOINTMENT_TYPES = {"Classified"};
+    public static String[] APPOINTMENT_TYPES = {"Classified", "Classified IT"};
     public static String[] DRILL_DOWN_INDEX = {
             DEFAULT_SCOPE,
             SCOPE_BC,
@@ -112,8 +111,6 @@ public class ReportsAction implements ActionInterface {
      * Holds list of appraisals of current supervisor
      */
     private ArrayList<Appraisal> supervisorAppraisals;
-
-    private ArrayList<ClassifiedITObject> supervisorClassfiedITAppraisals;
 
     private boolean inLeafSupervisorReport = false;
 
@@ -277,7 +274,6 @@ public class ReportsAction implements ActionInterface {
                 // right pane data: supervisor appraisals and supervisor team
                 actionHelper.addToRequestMap("myAppraisals", supervisorAppraisals);
                 actionHelper.addToRequestMap("myTeamsActiveAppraisals", supervisorTeamAppraisal);
-                actionHelper.addToRequestMap("myTeamsActiveClassifiedITAppraisals", supervisorClassfiedITAppraisals);
                 actionHelper.addToRequestMap("isMyReport", isMyReport);
             }
 
@@ -401,7 +397,6 @@ public class ReportsAction implements ActionInterface {
                 true, supervisorLevelPosno, supervisorLevelSuffix);
         supervisorAppraisals = AppraisalMgr.getAllMyAppraisals(supervisorLevelPidm,
                 supervisorLevelPosno, supervisorLevelSuffix, true);
-        supervisorClassfiedITAppraisals = ClassifiedITObjectMgr.getMyClassifiedITAppraisals(supervisorLevelPidm);
     }
 
     /**
