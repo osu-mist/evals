@@ -15,6 +15,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.text.*;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.net.*;
 
 /**
@@ -169,6 +171,36 @@ public class CWSUtil {
     public static String formatCurrency(Double amount) {
         NumberFormat fmt = NumberFormat.getCurrencyInstance();
         return fmt.format(amount);
+    }
+
+    /**
+     * Find all matches to the regex pattern "[a-z][A-Z]" and
+     * then insert X number of line breaks ("\n") between the
+     * lowercase character and the uppercase letter.
+     *
+     * @param parseThis: The string to parse.
+     * @param numLineBreaks: The number of line breaks ("\n") to insert.
+     * @return The parsed string.
+     */
+    public static String insertLineBreaks(String parseThis, int numLineBreaks) {
+        Pattern pattern = Pattern.compile("[a-z][A-Z]");
+        Matcher matcher = pattern.matcher(parseThis);
+        String lineBreaks;
+        String replaceString;
+
+        // Set up lineBreaks string (i.e. numLineBreaks * "\n")
+        lineBreaks = ".";
+        for (int i= 0; i < numLineBreaks; i++) {
+            lineBreaks += "\n";
+        }
+
+        // Find all matches and replace them in the original string
+        while (matcher.find()) {
+            replaceString = matcher.group().charAt(0) + lineBreaks + matcher.group().charAt(1);
+            parseThis = parseThis.replace(matcher.group(), replaceString);
+        }
+
+        return parseThis;
     }
 
 }
