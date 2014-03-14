@@ -189,7 +189,7 @@ public class CWSUtil {
         String replaceString;
 
         // Set up lineBreaks string (i.e. numLineBreaks * "\n")
-        lineBreaks = "";
+        lineBreaks = ".";
         for (int i= 0; i < numLineBreaks; i++) {
             lineBreaks += "\n";
         }
