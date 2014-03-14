@@ -47,7 +47,7 @@ public class ReportsAction implements ActionInterface {
     public static final String CHART_TYPE_BAR = "bar";
     public static final String CHART_TYPE_COLUMN = "column";
 
-    public static String[] APPOINTMENT_TYPES = {"Classified"};
+    public static String[] APPOINTMENT_TYPES = {"Classified", "Classified IT"};
     public static String[] DRILL_DOWN_INDEX = {
             DEFAULT_SCOPE,
             SCOPE_BC,
@@ -401,7 +401,6 @@ public class ReportsAction implements ActionInterface {
                 true, supervisorLevelPosno, supervisorLevelSuffix);
         supervisorAppraisals = AppraisalMgr.getAllMyAppraisals(supervisorLevelPidm,
                 supervisorLevelPosno, supervisorLevelSuffix, true);
-        supervisorClassfiedITAppraisals = ClassifiedITObjectMgr.getMyClassifiedITAppraisals(supervisorLevelPidm);
     }
 
     /**
