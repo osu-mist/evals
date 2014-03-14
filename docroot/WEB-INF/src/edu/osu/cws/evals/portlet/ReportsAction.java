@@ -112,8 +112,6 @@ public class ReportsAction implements ActionInterface {
      */
     private ArrayList<Appraisal> supervisorAppraisals;
 
-    private ArrayList<ClassifiedITObject> supervisorClassfiedITAppraisals;
-
     private boolean inLeafSupervisorReport = false;
 
     /**
