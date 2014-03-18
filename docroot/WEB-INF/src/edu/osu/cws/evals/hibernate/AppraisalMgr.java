@@ -882,7 +882,7 @@ public class AppraisalMgr {
                 "appraisals.job_suffix = pyvpasj_suff) ";
         String where = "WHERE pyvpasj_status = 'A' " +
                 "AND PYVPASJ_APPOINTMENT_TYPE in (:appointmentTypes) " +
-                "and appraisals.status not in ('completed', 'archived', 'closed')";
+                "and appraisals.status not in ('completed', 'archivedClosed', 'archivedCompleted', 'closed')";
         String startWith = EvalsUtil.getStartWithClause(directSupervisors.size());
 
         if (!inLeafSupervisor) {

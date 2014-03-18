@@ -1,5 +1,4 @@
 <jsp:useBean id="myTeamsActiveAppraisals" class="java.util.ArrayList" scope="request" />
-<jsp:useBean id="myTeamsActiveClassifiedITAppraisals" class="java.util.ArrayList" scope="request" />
 
 <div id="<portlet:namespace/>accordionMenuMyTeam" class="accordion-menu">
     <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>MyTeam');">
@@ -68,7 +67,4 @@
             </c:choose>
         </c:if>
     </div>
-    <c:if test="${!empty myTeamsActiveClassifiedITAppraisals}">
-        <%@ include file="/jsp/home/myClassifiedIT.jsp" %>
-    </c:if>
 </div>
