@@ -275,6 +275,19 @@ public class JobMgr {
         return supervisorCount < 1;
     }
 
+    public static boolean isProfessionalSupervisor(int pidm) {
+        Session session = HibernateUtil.getCurrentSession();
+        String sql =
+                "SELECT count(*) FROM pyvpasj " +
+                "WHERE pyvpasj_supervisor_pidm = :pidm " +
+                "AND pyvpasj_status <> 'T' " +
+                "AND pyvpasj_appointment_type = 'Professional Faculty'";
+        Query query = session.createSQLQuery(sql).setParameter("pidm", pidm);
+        int result = Integer.parseInt(query.list().get(0).toString());
+
+        return result > 0;
+    }
+
     /**
      * Returns the first superivsing job that the given Employee pidm holds.
      *
