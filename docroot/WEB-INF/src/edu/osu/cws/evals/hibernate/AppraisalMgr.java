@@ -903,6 +903,33 @@ public class AppraisalMgr {
     }
 
     /**
+     * If any of the given jobs have an associated appraisal
+     * then this function returns true, otherwise it returns
+     * false.
+     * @param jobs
+     * @return
+     */
+    public static boolean hasAppraisals(ArrayList<Job> jobs) {
+        Session session = HibernateUtil.getCurrentSession();
+        String sql =
+                "SELECT count(*) " +
+                "FROM pyvpasj j, " +
+                "appraisals ap" +
+                "WHERE j.pyvpasj_pidm = ap.job_pidm AND " +
+                "j.pyvpasj_pidm in (:pidmList)";
+
+        ArrayList<Integer> pidmList = new ArrayList<Integer>();
+        for(Job job : jobs) {
+            pidmList.add(job.getId());
+        }
+
+        Query query = session.createSQLQuery(sql).setParameterList("pidmList", pidmList);
+        int result = Integer.parseInt(query.list().get(0).toString());
+
+        return result > 0;
+    }
+
+    /**
      * Saves the overdue value by itself in the appraisal record.
      *
      * @param appraisal
