@@ -5,19 +5,17 @@ import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
-import edu.osu.cws.evals.hibernate.AppraisalMgr;
-import edu.osu.cws.evals.hibernate.CloseOutReasonMgr;
-import edu.osu.cws.evals.hibernate.JobMgr;
-import edu.osu.cws.evals.hibernate.NolijCopyMgr;
+import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
-import edu.osu.cws.evals.util.EvalsPDF;
-import edu.osu.cws.evals.util.HibernateUtil;
-import edu.osu.cws.evals.util.MailerInterface;
+import edu.osu.cws.evals.util.*;
+import edu.osu.cws.util.CWSUtil;
+import edu.osu.cws.util.Logger;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.joda.time.DateTime;
 
 import javax.portlet.*;
 import java.io.File;
@@ -1143,6 +1141,139 @@ public class AppraisalsAction implements ActionInterface {
         updateAppraisalInSession();
 
         return display(request, response);
+    }
+
+    /**
+     * Displays page for the supervisor to initiate the professional faculty evaluations. A message is displayed
+     * to the supervisor, a list of employees with and without evaluations. The supervisor selects a cycle to start
+     * the evaluations.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String initiateProfessionalFacultyEvals(PortletRequest request, PortletResponse response)
+            throws Exception {
+        initialize(request);
+        List<Job> shortJobsWithEvals = new ArrayList<Job>();
+        List<Job> shortJobsWithOutEvals = new ArrayList<Job>();
+
+        if (!getProfFacultyInitiateData(shortJobsWithEvals, shortJobsWithOutEvals)) {
+            return errorHandler.handleAccessDenied(request, response);
+        }
+
+        actionHelper.addToRequestMap("shortJobsWithEvals", shortJobsWithEvals);
+        actionHelper.addToRequestMap("shortJobsWithOutEvals", shortJobsWithOutEvals);
+        actionHelper.addToRequestMap("months", CWSUtil.getMonthsInYear("MMM"));
+
+        ArrayList<String> years = new ArrayList<String>();
+        for (int i = -1; i <= 1; i++) {
+            years.add(new DateTime().plusYears(i).toString("YYYY"));
+        }
+        actionHelper.addToRequestMap("years", years);
+        return Constants.JSP_INITIATE_PROFESSIONAL_FACULTY;
+    }
+
+    /**
+     * Gathers the professional faculty data employees with and without evaluations. It adds the short objects
+     * with only the needed information to the two lists passed in as parameters.
+     *
+     * @param shortJobsWithEvals
+     * @param shortJobsWithOutEvals
+     * @return
+     * @throws Exception
+     */
+    private Boolean getProfFacultyInitiateData(List<Job> shortJobsWithEvals, List<Job> shortJobsWithOutEvals)
+            throws Exception {
+        List<String> appointmentTypes = new ArrayList<String>();
+        appointmentTypes.add(AppointmentType.PROFESSIONAL_FACULTY);
+
+        Job supervisorJob = JobMgr.getSupervisorJob(loggedInUser);
+        // check that the user holds at least 1 supervising job
+        if (supervisorJob == null) {
+            return false;
+        }
+
+        List<Job> employeeShortJobs = JobMgr.listEmployeesShortJobs(supervisorJob, appointmentTypes);
+        Set<String> jobsWithActiveEvaluations = JobMgr.getJobKeysWithActiveEvaluations(employeeShortJobs);
+
+        // Check that the supervisor has jobs that need to be initiated in EvalS
+        if (employeeShortJobs == null || jobsWithActiveEvaluations.size() == employeeShortJobs.size()) {
+            return false;
+        }
+
+        for (Job shortJob : employeeShortJobs) {
+            if (jobsWithActiveEvaluations.contains(shortJob.getIdKey())) {
+                shortJobsWithEvals.add(shortJob);
+            } else {
+                shortJobsWithOutEvals.add(shortJob);
+            }
+        }
+
+        // If we got here, there was no access denied error
+        return true;
+    }
+
+    /**
+     * Handles processing the cycle information provided by the supervisor and creates the evaluations for
+     * professional faculty employees. It sends an email about the created evaluations and logs the information.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String createProfFacultyEvaluations(PortletRequest request, PortletResponse response) throws Exception {
+        // get form data and user info
+        initialize(request);
+        Integer year = ParamUtil.getInteger(request, "year");
+        Integer month = ParamUtil.getInteger(request, "month");
+        DateTime startDate = new DateTime().withDate(year, month, 1);
+
+        // Logging information
+        EvalsLogger logger = (EvalsLogger) actionHelper.getPortletContextAttribute("log");
+        String loggingMsg = "supervisor.pidm = " + loggedInUser.getId() + ", evaluation cycle = "
+                + startDate.toString(Constants.DATE_FORMAT_FULL);
+
+        // create evaluations
+        List<Appraisal> newAppraisals = AppraisalMgr.createProfessionalFacultyEvals(loggedInUser, startDate);
+        if (newAppraisals == null || newAppraisals.isEmpty()) {
+            actionHelper.addErrorsToRequest(resource.getString("prof-faculty-create-evals-error"));
+            logger.log(Logger.ERROR, "Failed to create professional faculty evaluations", loggingMsg);
+            return initiateProfessionalFacultyEvals(request, response);
+        }
+
+        loggingMsg += "\nEvaluations created for the jobs listed below:";
+        for (Appraisal newAppraisal : newAppraisals) {
+            loggingMsg += "\n" + newAppraisal.getJob().getSignature() + " appraisal id = " + newAppraisal.getId();
+        }
+        logger.log(Logger.INFORMATIONAL, "Initiated professional faculty evaluations", loggingMsg);
+        SessionMessages.add(request, "prof-faculty-create-evals-success");
+
+        notifyEmployeesOfInitiatedEvaluation(newAppraisals);
+
+        // refresh cached list of evaluations in supervisor home view
+        List<Appraisal> appraisals = actionHelper.getMyTeamActiveAppraisals();
+        appraisals.addAll(newAppraisals);
+
+        return homeAction.display(request, response);
+    }
+
+    /**
+     * Sends email to employee to let them know that the evaluation has been created by the supervisor.
+     *
+     * @param appraisals
+     * @throws Exception
+     */
+    private void notifyEmployeesOfInitiatedEvaluation(List<Appraisal> appraisals) throws Exception {
+        MailerInterface mailer = (Mailer) actionHelper.getPortletContextAttribute("mailer");
+        Map<String, EmailType> emailTypeMap = EmailTypeMgr.getMap();
+        EmailType emailType = emailTypeMap.get("initiatedProfessionalFaculty");
+
+        for (Appraisal newAppraisal : appraisals) {
+            mailer.sendMail(newAppraisal, emailType);
+        }
     }
 
     public void setActionHelper(ActionHelper actionHelper) {

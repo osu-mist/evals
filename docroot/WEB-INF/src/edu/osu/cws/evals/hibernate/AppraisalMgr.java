@@ -86,6 +86,45 @@ public class AppraisalMgr {
     }
 
     /**
+     * Creates evaluations for the professional faculty employees that are supervised by the supervisor.
+     * The method gets the list of all the employees and only creates evaluations for the ones that don't have active
+     * evaluations.
+     *
+     * @param supervisor
+     * @param startDate
+     * @return appraisals           List of appraisal objects created
+     * @throws Exception
+     */
+    public static List<Appraisal> createProfessionalFacultyEvals(Employee supervisor, DateTime startDate) throws Exception {
+        List<Appraisal> appraisals = new ArrayList<Appraisal>();
+        List<String> appointmentTypes = new ArrayList<String>();
+        appointmentTypes.add(AppointmentType.PROFESSIONAL_FACULTY);
+
+        Job supervisorJob = JobMgr.getSupervisorJob(supervisor);
+        // check that the user holds at least 1 supervising job
+        if (supervisorJob == null) {
+            return null;
+        }
+
+        List<Job> employeeShortJobs = JobMgr.listEmployeesShortJobs(supervisorJob, appointmentTypes);
+        Set<String> jobsWithActiveEvaluations = JobMgr.getJobKeysWithActiveEvaluations(employeeShortJobs);
+
+        // Check that we have jobs to create evaluations for
+        if (employeeShortJobs == null || jobsWithActiveEvaluations.size() == employeeShortJobs.size()) {
+            return null;
+        }
+
+        for (Job shortJob : employeeShortJobs) {
+            boolean jobHasEvaluation = jobsWithActiveEvaluations.contains(shortJob.getIdKey());
+            if (!jobHasEvaluation) {
+                appraisals.add(createAppraisal(shortJob, startDate, Appraisal.TYPE_ANNUAL));
+            }
+        }
+
+        return appraisals;
+    }
+
+    /**
      * Creates a series of new assessments and adds them to a goal version.
      *
      * @param goalVersion

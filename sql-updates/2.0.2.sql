@@ -11,3 +11,5 @@ UPDATE goals_versions
 SET (GOALS_COMMENTS, GOALS_REQUIRED_MOD_DATE) = (SELECT GOALS_COMMENTS, GOALS_REQUIRED_MOD_DATE
                                          FROM   appraisals 
                                          WHERE  appraisals.id = goals_versions.appraisal_id); 
+
+insert into email_types values ('initiatedProfessionalFaculty', 'employee', null, null);

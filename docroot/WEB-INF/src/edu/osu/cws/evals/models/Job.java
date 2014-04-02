@@ -106,6 +106,33 @@ public class Job extends Evals implements Serializable {
     }
 
     /**
+     * Constructor used by JobMgr.getJob to only fetch the pk fields of the
+     * given job. The status and appointmentType fields are present for testing
+     * purposes.
+     *
+     * @param pidm
+     * @param positionNumber
+     * @param suffix
+     * @param firstName
+     * @param lastName
+     * @param jobTitle
+     */
+    public Job(int pidm, String positionNumber, String suffix, String firstName, String lastName, String jobTitle,
+               String appointmentType, String status) {
+        // create employee pojo
+        this.employee = new Employee();
+        this.employee.setId(pidm);
+        this.employee.setFirstName(firstName);
+        this.employee.setLastName(lastName);
+
+        this.positionNumber = positionNumber;
+        this.suffix = suffix;
+        this.jobTitle = jobTitle;
+        this.appointmentType = appointmentType;
+        this.status = status;
+    }
+
+    /**
      * Implementing equals method needed by Hibernate to use composite-ide
      *
      * @param o

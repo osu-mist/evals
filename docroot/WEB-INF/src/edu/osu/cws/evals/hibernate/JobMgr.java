@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.hibernate;
 
+import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.models.ModelException;
@@ -13,9 +14,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Date;
+import java.util.*;
 
 public class JobMgr {
 
@@ -86,6 +85,22 @@ public class JobMgr {
             employeeCount = Integer.parseInt(results.get(0).toString());
         }
         return employeeCount > 0;
+    }
+
+    /**
+     * Iterates over the jobs that an employee holds and returns the job that is a supervisor
+     *
+     * @param employee
+     * @return
+     * @throws Exception
+     */
+    public static Job getSupervisorJob(Employee employee) throws Exception {
+        for (Job job : (Set<Job>) employee.getJobs()) {
+            if (isSupervisor(employee.getId(), job.getPositionNumber())) {
+                return job;
+            }
+        }
+        return null;
     }
 
     /**
@@ -166,6 +181,57 @@ public class JobMgr {
             job = jobs.get(0);
         }
         return job;
+    }
+
+    /**
+     * Gets a list of jobs that are not terminated (status != T) that match the provided
+     * appointment types. The job objects only have a few properties populated: pidm,
+     * position number, suffi, job status and appointment type.
+     *
+     * @param supervisorJob          The supervisor job to get the list of employees
+     * @param appointmentTypes      ArrayList of different appointment types to fetch jobs for.
+     * @return
+     * @throws Exception
+     */
+    public static List<Job> listEmployeesShortJobs(Job supervisorJob, List<String> appointmentTypes)
+            throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+
+        List<Job> jobs = (List<Job>) session.getNamedQuery("job.directShortJobEmployees")
+                .setInteger("supervisorId", supervisorJob.getEmployee().getId())
+                .setString("supervisorPosno", supervisorJob.getPositionNumber())
+                .setString("supervisorSuffix", supervisorJob.getSuffix())
+                .setParameterList("appointmentTypes", appointmentTypes)
+                .list();
+        return jobs;
+    }
+
+    /**
+     * Returns a list of strings containing job id keys. A job id key is a string in the form of:
+     * pidm_position_number_suffix. The key is calculated by Job.getIdKey(). The list of job keys is from
+     * jobs passed in that contain active evaluations.
+     *
+     * @param jobs
+     * @return
+     * @throws Exception
+     */
+    public static Set<String> getJobKeysWithActiveEvaluations(List<Job> jobs) throws Exception {
+        Set<String> jobsWithEvaluations = new HashSet<String>();
+        if (jobs == null) {
+            return jobsWithEvaluations;
+        }
+
+        Session session = HibernateUtil.getCurrentSession();
+        List<Appraisal> appraisals = (List<Appraisal>) session.getNamedQuery("appraisals.shortAppraisalsByJobs")
+                .setParameterList("jobs", jobs)
+                .list();
+
+        // convert the jobs to job id key. This is for easier comparison in the view layer
+        for (Appraisal appraisal : appraisals) {
+            jobsWithEvaluations.add(appraisal.getJob().getIdKey());
+        }
+
+        return jobsWithEvaluations;
     }
 
     /**

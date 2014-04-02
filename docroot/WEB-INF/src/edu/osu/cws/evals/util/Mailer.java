@@ -798,6 +798,16 @@ public class Mailer implements MailerInterface {
     }
 
     /**
+     * Fetch the body for a particular emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String initiatedProfessionalFacultyBody(Appraisal appraisal) throws Exception {
+        return emailBundle.getString("email_initiatedProfessionalFaculty_body");
+    }
+
+    /**
      * Fetch the business center descriptor
      * @param appraisal
      * @return

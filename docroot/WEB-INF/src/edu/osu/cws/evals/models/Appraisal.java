@@ -338,6 +338,17 @@ public class Appraisal extends Evals {
         }
     }
 
+    public Appraisal(Integer id, Integer pidm, String positionNumber, String suffix) {
+        this.id = id;
+        this.job = new Job();
+        this.job.setPositionNumber(positionNumber);
+        this.job.setSuffix(suffix);
+
+        Employee employee = new Employee();
+        employee.setId(pidm);
+        this.job.setEmployee(employee);
+    }
+
     /**
      * Used to copy an appraisal object. This is used by appraisal search or report list appraisal.
      * This is done so that the jsp files don't complain about missing employee or job records in

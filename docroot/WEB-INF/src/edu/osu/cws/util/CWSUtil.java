@@ -8,13 +8,12 @@ import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
+import javax.print.attribute.HashAttributeSet;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 import java.text.*;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.net.*;
@@ -171,6 +170,20 @@ public class CWSUtil {
     public static String formatCurrency(Double amount) {
         NumberFormat fmt = NumberFormat.getCurrencyInstance();
         return fmt.format(amount);
+    }
+
+    /**
+     * Returns the list of months in a year.
+     *
+     * @param format        String format for months to customize the list of months.
+     * @return
+     */
+    public static List<String> getMonthsInYear(String format) {
+        ArrayList<String> months = new ArrayList<String>();
+        for (int i = 1; i <= 12; i++) {
+            months.add(new DateTime().withMonthOfYear(i).toString(format));
+        }
+        return months;
     }
 
     /**

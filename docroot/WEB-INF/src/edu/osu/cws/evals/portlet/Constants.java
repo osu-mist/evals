@@ -31,6 +31,7 @@ public class Constants {
 
     public static final String JSP_APPRAISAL = "/jsp/appraisals/appraisal.jsp";
     public static final String JSP_REVIEW_LIST = "/jsp/appraisals/reviewList.jsp";
+    public static final String JSP_INITIATE_PROFESSIONAL_FACULTY = "/jsp/appraisals/initiateProfessionalFaculty.jsp";
 
     public static final String JSP_CLOSEOUT_REASON_LIST = "/jsp/closeout_reasons/list.jsp";
     public static final String JSP_CLOSEOUT_REASON_DELETE = "/jsp/closeout_reasons/delete.jsp";

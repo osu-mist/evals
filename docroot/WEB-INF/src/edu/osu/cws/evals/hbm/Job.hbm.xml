@@ -63,4 +63,24 @@
             supervisor.employee.id = :id and
             status = 'A'
     </query>
+    <query name="job.directShortJobEmployees">
+        select new edu.osu.cws.evals.models.Job(
+            employee.id,
+            positionNumber,
+            suffix,
+            employee.firstName,
+            employee.lastName,
+            jobTitle,
+            appointmentType,
+            status
+        )
+        from edu.osu.cws.evals.models.Job job
+        where
+            job.status != 'T' and
+            job.appointmentType in (:appointmentTypes) and
+            job.suffix = '00' and
+            job.supervisor.employee.id = :supervisorId and
+            job.supervisor.positionNumber = :supervisorPosno and
+            job.supervisor.suffix = :supervisorSuffix
+    </query>
 </hibernate-mapping>
