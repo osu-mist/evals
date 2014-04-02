@@ -118,7 +118,7 @@ public class Job extends Evals implements Serializable {
      * @param jobTitle
      */
     public Job(int pidm, String positionNumber, String suffix, String firstName, String lastName, String jobTitle,
-               String appointmentType, String status) {
+               String appointmentType, String status, String businessCenterName) {
         // create employee pojo
         this.employee = new Employee();
         this.employee.setId(pidm);
@@ -130,6 +130,7 @@ public class Job extends Evals implements Serializable {
         this.jobTitle = jobTitle;
         this.appointmentType = appointmentType;
         this.status = status;
+        this.businessCenterName = businessCenterName;
     }
 
     /**

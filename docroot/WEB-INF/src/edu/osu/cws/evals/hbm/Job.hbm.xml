@@ -72,7 +72,8 @@
             employee.lastName,
             jobTitle,
             appointmentType,
-            status
+            status,
+            businessCenterName
         )
         from edu.osu.cws.evals.models.Job job
         where
