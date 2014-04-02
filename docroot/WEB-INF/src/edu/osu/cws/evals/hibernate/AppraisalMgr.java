@@ -912,18 +912,20 @@ public class AppraisalMgr {
     public static boolean hasAppraisals(ArrayList<Job> jobs) {
         Session session = HibernateUtil.getCurrentSession();
         String sql =
-                "SELECT count(*) " +
-                "FROM pyvpasj j, " +
-                "appraisals ap" +
-                "WHERE j.pyvpasj_pidm = ap.job_pidm AND " +
-                "j.pyvpasj_pidm in (:pidmList)";
+                "SELECT " +
+                    "count(*) " +
+                "FROM " +
+                    "appraisals " +
+                "WHERE " +
+                    "1 = 2";
 
-        ArrayList<Integer> pidmList = new ArrayList<Integer>();
         for(Job job : jobs) {
-            pidmList.add(job.getId());
+            sql += " OR (job_pidm = " + job.getEmployee().getId() +
+                       " AND position_number = '" + job.getPositionNumber() + "'" +
+                       " AND job_suffix = '" + job.getSuffix() + "')";
         }
 
-        Query query = session.createSQLQuery(sql).setParameterList("pidmList", pidmList);
+        Query query = session.createSQLQuery(sql);
         int result = Integer.parseInt(query.list().get(0).toString());
 
         return result > 0;
