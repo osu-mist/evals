@@ -190,15 +190,18 @@ public class Appraisal extends Evals {
      * @param startDate
      * @param endDate
      * @param status
+     * @param overdue
+     * @param appointmentType
      */
     public Appraisal(int id, String jobTitle, Date startDate, Date endDate, String status,
-                     Integer overdue) {
+                     Integer overdue, String appointmentType) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
         this.job = new Job();
         this.job.setJobTitle(jobTitle);
+        this.job.setAppointmentType(appointmentType);
 
         if (overdue == null) {
             this.overdue = -999;

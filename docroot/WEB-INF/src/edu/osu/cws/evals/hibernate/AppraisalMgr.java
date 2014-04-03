@@ -271,7 +271,7 @@ public class AppraisalMgr {
         Session session = HibernateUtil.getCurrentSession();
         String query =
                 "select new edu.osu.cws.evals.models.Appraisal(" +
-                    "id, job.jobTitle, startDate, endDate, status, overdue)" +
+                    "id, job.jobTitle, startDate, endDate, status, overdue, job.appointmentType)" +
                 " from edu.osu.cws.evals.models.Appraisal" +
                 " where job.employee.id = :pidm";
 
