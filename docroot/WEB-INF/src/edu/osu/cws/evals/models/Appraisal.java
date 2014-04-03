@@ -338,6 +338,12 @@ public class Appraisal extends Evals {
         }
     }
 
+    public Appraisal(int id, Date startDate, String status) {
+        this.id = id;
+        this.startDate = startDate;
+        this.status = status;
+    }
+
     /**
      * Used to copy an appraisal object. This is used by appraisal search or report list appraisal.
      * This is done so that the jsp files don't complain about missing employee or job records in

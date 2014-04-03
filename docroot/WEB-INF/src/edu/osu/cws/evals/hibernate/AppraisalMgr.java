@@ -1093,4 +1093,24 @@ public class AppraisalMgr {
         return numUpdated;
     }
 
+    /**
+     * Returns the last appraisal (only a id, start/end date and status are loaded) record for a given job.
+     *
+     * @param job
+     * @return
+     */
+    public static Appraisal getLastAppraisalByJob(Job job) {
+        Session session = HibernateUtil.getCurrentSession();
+        List<Appraisal> appraisals = (List<Appraisal>) session.getNamedQuery("appraisal.getLastAppraisalByJob")
+                .setParameter("job", job)
+                .setMaxResults(1)
+                .list();
+
+        if (appraisals.isEmpty()) {
+            return null;
+        }
+
+        return appraisals.get(0);
+    }
+
 }

@@ -223,4 +223,15 @@
         where
             id = :id
     ]]></query>
+    <query name="appraisal.getLastAppraisalByJob"><![CDATA[
+        select new edu.osu.cws.evals.models.Appraisal(
+            id,
+            startDate,
+            status
+        )
+        from edu.osu.cws.evals.models.Appraisal
+        where
+            job = :job
+        order by id
+    ]]></query>
 </hibernate-mapping>
