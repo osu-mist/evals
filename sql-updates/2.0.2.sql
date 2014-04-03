@@ -11,3 +11,10 @@ UPDATE goals_versions
 SET (GOALS_COMMENTS, GOALS_REQUIRED_MOD_DATE) = (SELECT GOALS_COMMENTS, GOALS_REQUIRED_MOD_DATE
                                          FROM   appraisals 
                                          WHERE  appraisals.id = goals_versions.appraisal_id); 
+
+-- Professional Faculty Changes
+insert into appraisal_steps values(pass_seq.nextval, 'submit-appraisal', 'Professional Faculty', 'signatureDue', 'signatureDue');
+alter table permission_rules add (
+    appointment_type VARCHAR2(45 CHAR)
+);
+-- upload the permission_rules data via csv and then set the appointment_type column to not null
