@@ -232,6 +232,6 @@
         from edu.osu.cws.evals.models.Appraisal
         where
             job = :job
-        order by id
+        order by id desc
     ]]></query>
 </hibernate-mapping>
