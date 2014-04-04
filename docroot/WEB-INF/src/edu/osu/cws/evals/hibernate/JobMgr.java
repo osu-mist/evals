@@ -345,19 +345,15 @@ public class JobMgr {
     /**
      * Checks if the employee with the given pidm is a
      * professional supervisor.
+     *
      * @param pidm
      * @return
      */
     public static boolean isProfessionalSupervisor(int pidm) {
         Session session = HibernateUtil.getCurrentSession();
-        String sql =
-                "SELECT count(*) FROM pyvpasj " +
-                "WHERE pyvpasj_supervisor_pidm = :pidm " +
-                "AND pyvpasj_status <> 'T' " +
-                "AND pyvpasj_appointment_type = ':apt_type'";
-        Query query = session.createSQLQuery(sql);
+        Query query = session.getNamedQuery("job.isProfessionalSupervisor");
         query.setParameter("pidm", pidm);
-        query.setParameter("apt_type", AppointmentType.PROFESSIONAL_FACULTY);
+        query.setString("apt_type", AppointmentType.PROFESSIONAL_FACULTY);
         int result = Integer.parseInt(query.list().get(0).toString());
 
         return result > 0;

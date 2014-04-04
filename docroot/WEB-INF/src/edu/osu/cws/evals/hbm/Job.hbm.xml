@@ -84,4 +84,13 @@
             job.supervisor.positionNumber = :supervisorPosno and
             job.supervisor.suffix = :supervisorSuffix
     </query>
+    <query name="job.isProfessionalSupervisor">
+        select
+            count(*)
+        from edu.osu.cws.evals.models.Job job
+        where
+            supervisor.employee.id = :pidm and
+            status != 'T' and
+            appointmentType = :apt_type
+    </query>
 </hibernate-mapping>
