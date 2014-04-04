@@ -1,6 +1,7 @@
 package edu.osu.cws.evals.hibernate;
 
 import edu.osu.cws.evals.models.Appraisal;
+import edu.osu.cws.evals.models.AppointmentType;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.models.ModelException;
@@ -339,6 +340,27 @@ public class JobMgr {
 
         int supervisorCount = Integer.parseInt(result.toString());
         return supervisorCount < 1;
+    }
+
+    /**
+     * Checks if the employee with the given pidm is a
+     * professional supervisor.
+     * @param pidm
+     * @return
+     */
+    public static boolean isProfessionalSupervisor(int pidm) {
+        Session session = HibernateUtil.getCurrentSession();
+        String sql =
+                "SELECT count(*) FROM pyvpasj " +
+                "WHERE pyvpasj_supervisor_pidm = :pidm " +
+                "AND pyvpasj_status <> 'T' " +
+                "AND pyvpasj_appointment_type = ':apt_type'";
+        Query query = session.createSQLQuery(sql);
+        query.setParameter("pidm", pidm);
+        query.setParameter("apt_type", AppointmentType.PROFESSIONAL_FACULTY);
+        int result = Integer.parseInt(query.list().get(0).toString());
+
+        return result > 0;
     }
 
     /**
