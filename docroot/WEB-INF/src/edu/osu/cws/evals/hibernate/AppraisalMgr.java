@@ -945,26 +945,15 @@ public class AppraisalMgr {
      * If any of the given jobs have an associated appraisal
      * then this function returns true, otherwise it returns
      * false.
+     *
      * @param jobs
      * @return
      */
     public static boolean hasAppraisals(ArrayList<Job> jobs) {
         Session session = HibernateUtil.getCurrentSession();
-        String sql =
-                "SELECT " +
-                    "count(*) " +
-                "FROM " +
-                    "appraisals " +
-                "WHERE " +
-                    "1 = 2";
 
-        for(Job job : jobs) {
-            sql += " OR (job_pidm = " + job.getEmployee().getId() +
-                       " AND position_number = '" + job.getPositionNumber() + "'" +
-                       " AND job_suffix = '" + job.getSuffix() + "')";
-        }
-
-        Query query = session.createSQLQuery(sql);
+        Query query = session.getNamedQuery("appraisals.countAppraisalsInJobs")
+                .setParameterList("jobs", jobs);
         int result = Integer.parseInt(query.list().get(0).toString());
 
         return result > 0;
