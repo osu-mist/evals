@@ -636,12 +636,14 @@ public class ActionHelper {
                 String appraisalID = Integer.toString(appraisal.getId());
                 anchorParams.put("id", appraisalID);
                 if (appraisalStatus.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
-                    configuration = configurationMap.get(Appraisal.STATUS_GOALS_DUE);
+                    configuration = ConfigurationMgr.getConfiguration(configurationMap, Appraisal.STATUS_GOALS_DUE,
+                            appraisal.getAppointmentType());
                     // load appraisal again from db so that we get all the properties and can check goals reactivation
                     // because the appraisals in home view load only the minimum amount of data
                     appraisal = AppraisalMgr.getAppraisal(appraisal.getId());
                     if (appraisal.areGoalsReactivated()) {
-                        configuration = configurationMap.get(Appraisal.STATUS_GOALS_REACTIVATED + "Expiration");
+                        configuration = ConfigurationMgr.getConfiguration(configurationMap,
+                                Appraisal.STATUS_GOALS_REACTIVATED + "Expiration", appraisal.getAppointmentType());
                     }
                 } else {
                     if (appraisalStatus.contains("Overdue")) {
@@ -652,7 +654,8 @@ public class ActionHelper {
                             appraisalStatus.equals(Appraisal.STATUS_GOALS_REACTIVATED)) {
                         appraisalStatus += "Expiration";
                     }
-                    configuration = configurationMap.get(appraisalStatus);
+                    configuration = ConfigurationMgr.getConfiguration(configurationMap, appraisalStatus,
+                            appraisal.getAppointmentType());
                 }
 
                 if (configuration == null) {

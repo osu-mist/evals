@@ -16,6 +16,7 @@
         <property name="value" column="VALUE"/>
         <property name="referencePoint" column="REFERENCE_POINT"/>
         <property name="action" column="ACTION"/>
+        <property name="appointmentType" column="appointment_type"/>
     </class>
 
     <sql-query name="configuration.getContextDatetime"><![CDATA[

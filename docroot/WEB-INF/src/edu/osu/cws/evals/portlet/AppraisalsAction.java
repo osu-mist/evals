@@ -5,10 +5,7 @@ import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
-import edu.osu.cws.evals.hibernate.AppraisalMgr;
-import edu.osu.cws.evals.hibernate.CloseOutReasonMgr;
-import edu.osu.cws.evals.hibernate.JobMgr;
-import edu.osu.cws.evals.hibernate.NolijCopyMgr;
+import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsPDF;
 import edu.osu.cws.evals.util.HibernateUtil;
@@ -298,7 +295,8 @@ public class AppraisalsAction implements ActionInterface {
         actionHelper.addToRequestMap("appraisal", appraisal);
         actionHelper.addToRequestMap("permissionRule", permRule);
         Map<String, Configuration> configMap = (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
-        Configuration autoSaveFrequency = configMap.get("autoSaveFrequency");
+        Configuration autoSaveFrequency = ConfigurationMgr.getConfiguration(configMap, "autoSaveFrequency",
+                appraisal.getAppointmentType());
         actionHelper.addToRequestMap("autoSaveFrequency", autoSaveFrequency.getValue());
         actionHelper.useMaximizedMenu();
 

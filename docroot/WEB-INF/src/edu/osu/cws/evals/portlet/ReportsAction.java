@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
+import edu.osu.cws.evals.hibernate.ConfigurationMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.ReportMgr;
 import edu.osu.cws.evals.models.*;
@@ -344,7 +345,7 @@ public class ReportsAction implements ActionInterface {
         List<Job> directEmployees = null;
         Map<String, Configuration> configurationMap =
                 (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
-        Configuration config = configurationMap.get("reportMaxDataForCharts");
+        Configuration config = ConfigurationMgr.getConfiguration(configurationMap, "reportMaxDataForCharts", "");
         int maxDataPoints = Integer.parseInt(config.getValue());
 
         if (getScope().equals(ReportsAction.SCOPE_SUPERVISOR)) {
@@ -481,7 +482,7 @@ public class ReportsAction implements ActionInterface {
         int numberOfEvalRecords = 0;
         Map<String, Configuration> configurationMap =
                 (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
-        Configuration config = configurationMap.get("reportMaxDataForList");
+        Configuration config = ConfigurationMgr.getConfiguration(configurationMap, "reportMaxDataForList", "");
         int maxDataForList = Integer.parseInt(config.getValue());
 
         for (Object[] row : tableData) {

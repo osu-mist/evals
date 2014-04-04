@@ -11,3 +11,9 @@ UPDATE goals_versions
 SET (GOALS_COMMENTS, GOALS_REQUIRED_MOD_DATE) = (SELECT GOALS_COMMENTS, GOALS_REQUIRED_MOD_DATE
                                          FROM   appraisals 
                                          WHERE  appraisals.id = goals_versions.appraisal_id); 
+
+alter table configurations add (
+    appointment_type VARCHAR2(45 CHAR)
+);
+
+update configurations set appointment_type = 'Default';
