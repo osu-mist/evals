@@ -3,6 +3,7 @@ package edu.osu.cws.evals.tests;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.ConfigurationMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
+import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.util.EvalsUtil;
@@ -299,6 +300,22 @@ public class AppraisalsTest {
             assert ap.getJob().getAppointmentType() != null :
                     "appointment type name should be present in list of team appraisals";
         }
+    }
+
+    public void shouldHaveAppraisals() throws Exception {
+        int pidm = 12345;
+        List<Job> jobs = JobMgr.getJobs(pidm);
+        assert AppraisalMgr.hasAppraisals((ArrayList<Job>)jobs);
+
+        jobs.clear();
+        pidm = 74589;
+        jobs = JobMgr.getJobs(pidm);
+        assert AppraisalMgr.hasAppraisals((ArrayList<Job>)jobs);
+
+        jobs.clear();
+        pidm = 8712359;
+        jobs = JobMgr.getJobs(pidm);
+        assert !AppraisalMgr.hasAppraisals((ArrayList<Job>)jobs);
     }
 
     public void shouldOnlyIncludeReviewDueOrReviewPastDueInAppraisalReviewList() throws Exception {
