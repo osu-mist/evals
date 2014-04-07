@@ -8,13 +8,14 @@
     </portlet:actionURL>"
     method="post"/>
 
-    <strong><liferay-ui:message key="logged-in-as"/>: </strong> ${employee.name}
+    <div>
+        <strong><liferay-ui:message key="logged-in-as"/>: </strong> ${employee.name}
+    </div>
 
-    <strong><liferay-ui:message key="switch-user"/>: </strong>
-    <select name="<portlet:namespace />employee.id">
-    <c:forEach var="demoEmployee" items="${employees}">
-    <option value="${demoEmployee.id}">${demoEmployee.name}</option>
-    </c:forEach>
-    </select>
+    <div>
+        <strong><liferay-ui:message key="switch-user"/>: </strong>
+    </div>
+
+    <input name="<portlet:namespace />employee.onid" type="text" value="" />
     <input type="submit" value="<liferay-ui:message key="submit"/>" />
 </form>
