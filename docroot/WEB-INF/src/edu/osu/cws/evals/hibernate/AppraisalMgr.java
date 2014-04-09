@@ -86,6 +86,61 @@ public class AppraisalMgr {
     }
 
     /**
+     * Removes all goalVersions from the given appraisal,
+     * resets the given appraisal to the same state as a
+     * newly created appraisal, and adds a new goalVersion
+     * that has 5 blank assessments.
+     *
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    public static Appraisal resetAppraisal(Appraisal appraisal) throws Exception {
+        DateTime startDate = DateTime.now();
+        String type = Appraisal.TYPE_INITIAL;
+
+        // Delete current goal versions
+        Session session = HibernateUtil.getCurrentSession();
+        Set<GoalVersion> goalVersions = appraisal.getGoalVersions();
+        for(GoalVersion goalVersion: goalVersions) {
+            goalVersions.remove(goalVersion);
+            session.delete(goalVersion);
+        }
+
+        // Add new goalVersion
+        GoalVersion goalVersion = new GoalVersion();
+        appraisal.addGoalVersion(goalVersion);
+        goalVersion.setCreateDate(new Date());
+        // the first goal version is automatically approved
+        goalVersion.setRequestDecision(true);
+
+        appraisal.setStartDate(startDate.toDate());
+        appraisal.setCreateDate(new Date());
+        appraisal.setRating(0);
+        appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
+
+        // In the db, we only store: annual or trial.
+        String dbType = type;
+        if (type.equals(Appraisal.TYPE_INITIAL)) {
+            dbType = Appraisal.TYPE_ANNUAL;
+        }
+        appraisal.setType(dbType);
+
+        DateTime endDate = appraisal.getJob().getEndEvalDate(startDate, type);
+        appraisal.setEndDate(CWSUtil.toDate(endDate));
+
+        if (appraisal.validate()) {
+            // Create the assessments & assessment criteria
+            List<CriterionArea> criteriaList = CriteriaMgr.list(appraisal.getJob().getAppointmentType());
+            addAssessmentToGoalVersion(goalVersion, Constants.BLANK_ASSESSMENTS_IN_NEW_EVALUATION,
+                    criteriaList);
+            session.save(appraisal);
+        }
+
+        return appraisal;
+    }
+
+    /**
      * Creates a series of new assessments and adds them to a goal version.
      *
      * @param goalVersion
