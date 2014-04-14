@@ -35,19 +35,19 @@ public class CWSUtilTest {
 
         /** TEST 1 **/
         unparsedText = "A CatInA Hat";
-        correctText = "A Cat.\nIn.\nA Hat";
+        correctText = "A Cat\nIn\nA Hat";
         assert correctText.equals(CWSUtil.insertLineBreaks(unparsedText, 1));
         /** TEST 2 **/
         unparsedText = "aCatin a hat";
-        correctText = "a.\nCatin a hat";
+        correctText = "a\nCatin a hat";
         assert correctText.equals(CWSUtil.insertLineBreaks(unparsedText, 1));
         /** TEST 3 **/
         unparsedText = "A CatInA Hat";
-        correctText = "A Cat.\n\nIn.\n\nA Hat";
+        correctText = "A Cat\n\nIn\n\nA Hat";
         assert correctText.equals(CWSUtil.insertLineBreaks(unparsedText, 2));
         /** TEST 4 **/
-        unparsedText = "A Cat..\nSitsIn A WonderfulHat.";
-        correctText = "A Cat..\nSits.\nIn A Wonderful.\nHat.";
+        unparsedText = "A Cat.\nSitsIn A WonderfulHat.";
+        correctText = "A Cat.\nSits\nIn A Wonderful\nHat.";
         assert correctText.equals(CWSUtil.insertLineBreaks(unparsedText, 1));
     }
 }
