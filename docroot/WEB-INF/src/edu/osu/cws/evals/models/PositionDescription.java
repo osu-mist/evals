@@ -48,6 +48,8 @@ public class PositionDescription {
 
     private String minimumQualifications;
 
+    private String additionalQualifications;
+
     private String preferredQualifications;
 
     private String securitySensitivePosition;
@@ -59,6 +61,14 @@ public class PositionDescription {
     private String workSchedule;
 
     private Date lastUpdate;
+
+    private String positionTitleCode;
+
+    private String workingConditions;
+
+    private String commitmentNcaaFsb;
+
+    private String diversityInitiative;
 
     private Set<LeadResponsibility> leadWorkResponsibilities = new HashSet<LeadResponsibility>();
 
@@ -284,5 +294,45 @@ public class PositionDescription {
 
     public void setLeadWorkResponsibilities(Set<LeadResponsibility> leadWorkResponsibilities) {
         this.leadWorkResponsibilities = leadWorkResponsibilities;
+    }
+
+    public String getAdditionalQualifications() {
+        return additionalQualifications;
+    }
+
+    public void setAdditionalQualifications(String additionalQualifications) {
+        this.additionalQualifications = additionalQualifications;
+    }
+
+    public String getPositionTitleCode() {
+        return positionTitleCode;
+    }
+
+    public void setPositionTitleCode(String positionTitleCode) {
+        this.positionTitleCode = positionTitleCode;
+    }
+
+    public String getWorkingConditions() {
+        return workingConditions;
+    }
+
+    public void setWorkingConditions(String workingConditions) {
+        this.workingConditions = workingConditions;
+    }
+
+    public String getCommitmentNcaaFsb() {
+        return commitmentNcaaFsb;
+    }
+
+    public void setCommitmentNcaaFsb(String commitmentNcaaFsb) {
+        this.commitmentNcaaFsb = commitmentNcaaFsb;
+    }
+
+    public String getDiversityInitiative() {
+        return diversityInitiative;
+    }
+
+    public void setDiversityInitiative(String diversityInitiative) {
+        this.diversityInitiative = diversityInitiative;
     }
 }

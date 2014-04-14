@@ -1,6 +1,5 @@
 <%@ taglib prefix="lifera-ui" uri="http://java.sun.com/jstl/fmt_rt" %>
 <%@ include file="/jsp/init.jsp" %>
-<c:set var="missingValue" value="VALUE MISSING FROM VIEW???"/>
 <% PositionDescription formPositionDescription = (PositionDescription) renderRequest.getAttribute("positionDescription"); %>
 
 <h2><liferay-ui:message key="appraisal-position-description"/></h2>
@@ -25,7 +24,7 @@
                         <c:out value="${positionDescription.positionTitle}" />
                     </td>
                     <td><em><liferay-ui:message key="position-class-code" />:</em>
-                        <c:out value="${missingValue}"/>
+                        <c:out value="${positionDescription.positionTitleCode}"/>
                     </td>
                     <td colspan="2"><em><liferay-ui:message key="department" />:</em>
                         <c:out value="${positionDescription.department}" />
@@ -92,7 +91,7 @@
 
         <fieldset>
             <legend><liferay-ui:message key="compliance-ncaa-question"/></legend>
-            <c:out value="${missingValue}"/>
+            <p class="pass-form-text"><%= CWSUtil.escapeHtml(formPositionDescription.getCommitmentNcaaFsb())%></p>
         </fieldset>
 
         <fieldset>
@@ -126,12 +125,12 @@
         <legend><liferay-ui:message key="qualifications"/></legend>
         <fieldset>
             <legend><liferay-ui:message key="min-qualifications"/></legend>
-            <c:out value="${missingValue}"/>
+            <p class="pass-form-text"><%= CWSUtil.escapeHtml(formPositionDescription.getMinimumQualifications())%></p>
         </fieldset>
 
         <fieldset>
             <legend><liferay-ui:message key="additional-qualifications"/></legend>
-            <p class="pass-form-text"><%= CWSUtil.escapeHtml(formPositionDescription.getMinimumQualifications())%></p>
+            <p class="pass-form-text"><%= CWSUtil.escapeHtml(formPositionDescription.getAdditionalQualifications())%></p>
         </fieldset>
 
         <fieldset>
@@ -146,12 +145,12 @@
 
         <fieldset>
             <legend><liferay-ui:message key="diversity-initiative"/></legend>
-            <c:out value="${missingValue}"/>
+            <p class="pass-form-text"><%= CWSUtil.escapeHtml(formPositionDescription.getDiversityInitiative())%></p>
         </fieldset>
 
         <fieldset>
             <legend><liferay-ui:message key="working-conditions"/></legend>
-            <c:out value="${missingValue}"/>
+            <p class="pass-form-text"><%= CWSUtil.escapeHtml(formPositionDescription.getWorkingConditions())%></p>
         </fieldset>
 
         <fieldset>
