@@ -5,8 +5,11 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
+import edu.osu.cws.evals.hibernate.JobMgr;
+import edu.osu.cws.evals.models.AppointmentType;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Employee;
+import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
@@ -14,6 +17,7 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletSession;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -59,6 +63,8 @@ public class HomeAction implements ActionInterface {
             actionHelper.addToRequestMap("hasNoEvalsAccess", true);
         }
 
+        actionHelper.addToRequestMap("initiateProfFaculty", displayInitiateProfFacButton());
+
         actionHelper.setRequiredActions();
         if (homeJSP.equals(Constants.JSP_HOME_REVIEWER)) {
             int maxResults = config.getInt("reviewer.home.pending.max");
@@ -66,6 +72,27 @@ public class HomeAction implements ActionInterface {
             actionHelper.addToRequestMap("appraisals", appraisals);
         }
         return homeJSP;
+    }
+
+    /**
+     * Whether or not EvalS should display a button in the home view of the user to let them initiate
+     * the professional faculty evaluations.
+     *
+     * It checks that the user is a supervisor of professional faculty and that at least one of the professional
+     * faculty employees needs an evaluation created.
+     *
+     * @return
+     * @throws Exception
+     */
+    private boolean displayInitiateProfFacButton() throws Exception {
+        List<String> appointmentTypes = new ArrayList<String>();
+        appointmentTypes.add(AppointmentType.PROFESSIONAL_FACULTY);
+
+        Job supervisorJob = JobMgr.getSupervisorJob(actionHelper.getLoggedOnUser());
+
+        ArrayList<Job> employeeShortJobs = (ArrayList<Job>) JobMgr.listEmployeesShortJobs(supervisorJob, appointmentTypes);
+        return JobMgr.isProfessionalSupervisor(actionHelper.getLoggedOnUser().getId()) &&
+                !AppraisalMgr.hasAppraisals(employeeShortJobs);
     }
 
     public String displayMyInformation(PortletRequest request, PortletResponse response) throws Exception {
