@@ -5,10 +5,7 @@ import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
-import edu.osu.cws.evals.hibernate.AppraisalMgr;
-import edu.osu.cws.evals.hibernate.CloseOutReasonMgr;
-import edu.osu.cws.evals.hibernate.JobMgr;
-import edu.osu.cws.evals.hibernate.NolijCopyMgr;
+import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsPDF;
 import edu.osu.cws.evals.util.HibernateUtil;
@@ -126,15 +123,8 @@ public class AppraisalsAction implements ActionInterface {
             status = status.replace("archived", "").toLowerCase();
         }
 
-        HashMap permissionRules =
-                (HashMap) actionHelper.getPortletContext().getAttribute("permissionRules");
-        String permRuleKey = status + "-" + userRole;
-        permRuleKey = permRuleKey.replace("Overdue", "Due");
-
-        // Get the permission rule from the cache map and clone it. If we modify or set any properties
-        // in the original cached permission rule, the modifications are saved on the cached object.
-        PermissionRule cachedPermissionRule = (PermissionRule) permissionRules.get(permRuleKey);
-        permRule = (PermissionRule) cachedPermissionRule.clone();
+        HashMap permissionRules = (HashMap) actionHelper.getPortletContext().getAttribute("permissionRules");
+        permRule = PermissionRuleMgr.getPermissionRule(permissionRules, appraisal, userRole);
 
         // Disable the employee/supervisor results if we are in the first round of goals (no approved goals yet)
         if (status.contains("goal") && appraisal.getApprovedGoalsVersions().isEmpty()) {

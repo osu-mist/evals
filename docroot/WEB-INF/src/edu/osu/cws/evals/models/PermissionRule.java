@@ -46,6 +46,8 @@ public class PermissionRule extends Evals implements Cloneable {
 
     private String reactivateGoals;
 
+    private String appointmentType;
+
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -235,6 +237,14 @@ public class PermissionRule extends Evals implements Cloneable {
 
     public void setReactivateGoals(String reactivateGoals) {
         this.reactivateGoals = reactivateGoals;
+    }
+
+    public String getAppointmentType() {
+        return appointmentType;
+    }
+
+    public void setAppointmentType(String appointmentType) {
+        this.appointmentType = appointmentType;
     }
 
     public Boolean canEdit(String column) throws Exception {

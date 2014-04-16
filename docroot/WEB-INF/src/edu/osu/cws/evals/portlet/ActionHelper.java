@@ -612,19 +612,14 @@ public class ActionHelper {
         HashMap<String, String> anchorParams;
 
         for (Appraisal appraisal : appraisalList) {
-            //get the status, compose the key "status"-"role"
-            String appraisalStatus = appraisal.getStatus();
-            String actionKey = appraisalStatus +"-"+role;
-            actionKey = actionKey.replace("Overdue", "Due");
-
-            // Get the appropriate permissionrule object from the permissionRuleMap
-            PermissionRule rule = (PermissionRule) permissionRuleMap.get(actionKey);
             String actionRequired = "";
+            PermissionRule rule = PermissionRuleMgr.getPermissionRule(permissionRuleMap, appraisal, role);
             if (rule != null) {
                 actionRequired = rule.getActionRequired();
             }
             if (actionRequired != null && !actionRequired.equals("")) {
                 // make sure that the action required is overdue if needed
+                String appraisalStatus = appraisal.getStatus();
                 if (appraisalStatus.contains("Overdue")) {
                     actionRequired = actionRequired.replace("-due", "-overdue");
                 }

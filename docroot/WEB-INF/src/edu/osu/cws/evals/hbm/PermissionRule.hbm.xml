@@ -29,6 +29,7 @@
         <property name="sendToNolij" length="1" column="SEND_TO_NOLIJ"/>
         <property name="setStatusToResultsDue" length="1" column="SET_STATUS_TO_RESULTS_DUE"/>
         <property name="reactivateGoals" length="1" column="REACTIVATE_GOALS"/>
+        <property name="appointmentType" length="45" column="APPOINTMENT_TYPE"/>
     </class>
 
 </hibernate-mapping>

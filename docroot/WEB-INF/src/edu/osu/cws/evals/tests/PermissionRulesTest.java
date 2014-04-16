@@ -1,6 +1,9 @@
 package edu.osu.cws.evals.tests;
 
 import edu.osu.cws.evals.hibernate.PermissionRuleMgr;
+import edu.osu.cws.evals.models.Appraisal;
+import edu.osu.cws.evals.models.Job;
+import edu.osu.cws.evals.models.PermissionRule;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -42,5 +45,54 @@ public class PermissionRulesTest {
         assert rules.size() == 2 :
         "PermissionRuleMgr.list() should find all permission rules";
 
+    }
+
+    public void shouldReturnDefaultPermissionRule() throws Exception {
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        Appraisal appraisal = new Appraisal();
+        appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
+        appraisal.setJob(new Job());
+        appraisal.getJob().setAppointmentType("Classified IT");
+
+        PermissionRule rule = PermissionRuleMgr.getPermissionRule(rules, appraisal, "employee");
+        assert rule.getAppointmentType().equals("Default");
+    }
+
+    public void shouldReturnSpecificPermissionRule() throws Exception {
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        Appraisal appraisal = new Appraisal();
+        appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
+        appraisal.setJob(new Job());
+        appraisal.getJob().setAppointmentType("Professional Faculty");
+
+        PermissionRule rule = PermissionRuleMgr.getPermissionRule(rules, appraisal, "employee");
+        assert rule.getAppointmentType().equals("Professional Faculty");
+    }
+
+    public void shouldReturnNullWhenNoPermRuleIsFound() throws Exception {
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        Appraisal appraisal = new Appraisal();
+        appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
+        appraisal.setJob(new Job());
+        appraisal.getJob().setAppointmentType("Professional Faculty");
+
+        PermissionRule rule = PermissionRuleMgr.getPermissionRule(rules, appraisal, "supervisor");
+        assert rule == null;
+    }
+
+    private HashMap<String, PermissionRule> getTestRuleMap() {
+        HashMap<String, PermissionRule> rules = new HashMap<String, PermissionRule>();
+
+        String key1 = "goalsDue-employee-Default";
+        PermissionRule rule1 = new PermissionRule();
+        rule1.setAppointmentType("Default");
+        rules.put(key1, rule1);
+
+        String key2 = "goalsDue-employee-ProfessionalFaculty";
+        PermissionRule rule2 = new PermissionRule();
+        rule2.setAppointmentType("Professional Faculty");
+        rules.put(key2, rule2);
+
+        return rules;
     }
 }
