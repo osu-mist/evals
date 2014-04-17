@@ -180,6 +180,11 @@ public class JobsTest {
                 Calendar.getInstance().get(Calendar.YEAR));
     }
 
+    public void shouldCorrectlyDetermineIfUserIsAProfessionalSupervisor() {
+        assert JobMgr.isProfessionalSupervisor(56200);
+        assert !JobMgr.isProfessionalSupervisor(12345);
+    }
+
     private void assertCorrectNewAnnualStartDateForAnnualInd18(Job job, Calendar cal, int month,
                                                                int year) throws Exception {
         job.setBeginDate(cal.getTime());

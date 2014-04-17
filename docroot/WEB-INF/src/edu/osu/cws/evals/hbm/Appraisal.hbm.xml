@@ -223,4 +223,12 @@
         where
             id = :id
     ]]></query>
+    <query name="appraisals.countAppraisalsInJobs"><![CDATA[
+        select
+            count(*)
+        from edu.osu.cws.evals.models.Appraisal appraisal
+        where
+            job in (:jobs) and
+            status not in ('closed', 'archivedClosed', 'archivedCompleted')
+    ]]></query>
 </hibernate-mapping>

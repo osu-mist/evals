@@ -37,5 +37,15 @@
                 <p><liferay-ui:message key="no-admin-actions"/></p>
             </c:if>
         </c:if>
+
+        <c:if test="${initiateProfFaculty == 'true'}">
+            <form style="margin:1.5em;" method="post"
+                  action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                        <portlet:param name="action" value="initiateProfessionalFacultyEvals"/>
+                        <portlet:param name="controller" value="AppraisalsAction"/>
+                        </portlet:actionURL>">
+                <input type="submit" value="<liferay-ui:message key="prof-faculty-create-evaluations"/>"/>
+            </form>
+        </c:if>
     </div>
 </div>

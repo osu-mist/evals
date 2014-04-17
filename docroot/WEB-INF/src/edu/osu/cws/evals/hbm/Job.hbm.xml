@@ -63,4 +63,46 @@
             supervisor.employee.id = :id and
             status = 'A'
     </query>
+    <query name="job.directShortJobEmployees">
+        select new edu.osu.cws.evals.models.Job(
+            employee.id,
+            positionNumber,
+            suffix,
+            employee.firstName,
+            employee.lastName,
+            jobTitle,
+            appointmentType,
+            status,
+            businessCenterName
+        )
+        from edu.osu.cws.evals.models.Job job
+        where
+            job.status != 'T' and
+            job.appointmentType in (:appointmentTypes) and
+            job.suffix = '00' and
+            job.supervisor.employee.id = :supervisorId and
+            job.supervisor.positionNumber = :supervisorPosno and
+            job.supervisor.suffix = :supervisorSuffix
+    </query>
+    <query name="job.isProfessionalSupervisor">
+        select
+            count(*)
+        from edu.osu.cws.evals.models.Job job
+        where
+            supervisor.employee.id = :pidm and
+            status != 'T' and
+            appointmentType = :apt_type
+    </query>
+    <query name="job.jobsWithoutActiveEvaluations"><![CDATA[
+        from edu.osu.cws.evals.models.Job
+        where
+            id in (:jobs) and
+            id not in (
+                select job.id
+                from edu.osu.cws.evals.models.Appraisal appraisal
+                where
+                    job in (:jobs) and
+                    status not in ('closed', 'archivedClosed', 'archivedCompleted')
+                )
+    ]]></query>
 </hibernate-mapping>

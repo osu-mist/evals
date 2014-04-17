@@ -106,6 +106,34 @@ public class Job extends Evals implements Serializable {
     }
 
     /**
+     * Constructor used by JobMgr.getJob to only fetch the pk fields of the
+     * given job. The status and appointmentType fields are present for testing
+     * purposes.
+     *
+     * @param pidm
+     * @param positionNumber
+     * @param suffix
+     * @param firstName
+     * @param lastName
+     * @param jobTitle
+     */
+    public Job(int pidm, String positionNumber, String suffix, String firstName, String lastName, String jobTitle,
+               String appointmentType, String status, String businessCenterName) {
+        // create employee pojo
+        this.employee = new Employee();
+        this.employee.setId(pidm);
+        this.employee.setFirstName(firstName);
+        this.employee.setLastName(lastName);
+
+        this.positionNumber = positionNumber;
+        this.suffix = suffix;
+        this.jobTitle = jobTitle;
+        this.appointmentType = appointmentType;
+        this.status = status;
+        this.businessCenterName = businessCenterName;
+    }
+
+    /**
      * Implementing equals method needed by Hibernate to use composite-ide
      *
      * @param o
@@ -118,34 +146,7 @@ public class Job extends Evals implements Serializable {
 
         Job job = (Job) o;
 
-        if (id != job.id) return false;
-        //if (annualInd != null ? !annualInd.equals(job.annualInd) : job.annualInd != null) return false;
-        if (appointmentType != null ? !appointmentType.equals(job.appointmentType) : job.appointmentType != null)
-            return false;
-        if (beginDate != null ? !beginDate.equals(job.beginDate) : job.beginDate != null) return false;
-        if (businessCenterName != null ? !businessCenterName.equals(job.businessCenterName) : job.businessCenterName != null)
-            return false;
-        if (currentSupervisor != null ? !currentSupervisor.equals(job.currentSupervisor) : job.currentSupervisor != null)
-            return false;
-        if (employee != null ? !employee.equals(job.employee) : job.employee != null) return false;
-        if (endDate != null ? !endDate.equals(job.endDate) : job.endDate != null) return false;
-        if (evalDate != null ? !evalDate.equals(job.evalDate) : job.evalDate != null) return false;
-        if (jobEcls != null ? !jobEcls.equals(job.jobEcls) : job.jobEcls != null) return false;
-        if (jobTitle != null ? !jobTitle.equals(job.jobTitle) : job.jobTitle != null) return false;
-        if (orgCodeDescription != null ? !orgCodeDescription.equals(job.orgCodeDescription) : job.orgCodeDescription != null)
-            return false;
-        if (positionClass != null ? !positionClass.equals(job.positionClass) : job.positionClass != null) return false;
-        if (positionNumber != null ? !positionNumber.equals(job.positionNumber) : job.positionNumber != null)
-            return false;
-        if (salaryGrade != null ? !salaryGrade.equals(job.salaryGrade) : job.salaryGrade != null) return false;
-        if (salaryStep != null ? !salaryStep.equals(job.salaryStep) : job.salaryStep != null) return false;
-        if (status != null ? !status.equals(job.status) : job.status != null) return false;
-        if (suffix != null ? !suffix.equals(job.suffix) : job.suffix != null) return false;
-        if (supervisor != null ? !supervisor.equals(job.supervisor) : job.supervisor != null) return false;
-        //if (trialInd != null ? !trialInd.equals(job.trialInd) : job.trialInd != null) return false;
-        if (tsOrgCode != null ? !tsOrgCode.equals(job.tsOrgCode) : job.tsOrgCode != null) return false;
-
-        return true;
+        return id == job.id;
     }
 
     /**
