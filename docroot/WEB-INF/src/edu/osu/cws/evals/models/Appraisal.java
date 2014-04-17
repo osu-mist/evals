@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.models;
 
+import edu.osu.cws.evals.hibernate.ConfigurationMgr;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.ArrayUtils;
@@ -339,6 +340,12 @@ public class Appraisal extends Evals {
         } else {
             this.overdue = overdue;
         }
+    }
+
+    public Appraisal(int id, Date startDate, String status) {
+        this.id = id;
+        this.startDate = startDate;
+        this.status = status;
     }
 
     /**
@@ -1039,7 +1046,6 @@ public class Appraisal extends Evals {
     /**
      * Calculates what should be the new status of a given appraisal. It looks at the
      * configuration values to see whether the status is due or overdue.
-     * @todo: handle: STATUS_GOALS_REACTIVATED in next release
      *
      * @param configMap
      * @return
@@ -1049,7 +1055,9 @@ public class Appraisal extends Evals {
             throws Exception {
         String newStatus = null;
         String status = getStatus();
-        Configuration config = configMap.get(status); //config object of this status
+        //config object of this status
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, status, getAppointmentType());
+
 
         if (status.contains(Appraisal.DUE) && EvalsUtil.isDue(this, config) <= 0) {
             newStatus = status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
@@ -1059,13 +1067,14 @@ public class Appraisal extends Evals {
             newStatus = Appraisal.STATUS_GOALS_OVERDUE;
         } else if (status.equals(Appraisal.STATUS_GOALS_APPROVED)) {
             //Need to check to see if it's time to change the status to results due
-            Configuration reminderConfig = configMap.get("firstResultDueReminder");
+            Configuration reminderConfig = ConfigurationMgr.getConfiguration(configMap, "firstResultDueReminder",
+                    getAppointmentType());
             if (EvalsUtil.isDue(this, reminderConfig) < 0) {
                 newStatus = Appraisal.STATUS_RESULTS_DUE;
             }
         } else if (status.equals(STATUS_GOALS_REACTIVATION_REQUESTED) ||
                 status.equals(STATUS_GOALS_REACTIVATED)) {
-            config = configMap.get(status + "Expiration");
+            config = ConfigurationMgr.getConfiguration(configMap, status + "Expiration", getAppointmentType());
             if (EvalsUtil.isDue(this, config) <= 0) {
                 // change status by timing out goals reactivation request and employee new goals submit
                 newStatus = STATUS_GOALS_APPROVED;
@@ -1089,12 +1098,14 @@ public class Appraisal extends Evals {
     private boolean isGoalsReqModOverDue(Map<String, Configuration> configMap)
             throws Exception {
 
-        Configuration goalsDueConfig = configMap.get(Appraisal.STATUS_GOALS_DUE); //this config exists
+        Configuration goalsDueConfig = ConfigurationMgr.getConfiguration(configMap, Appraisal.STATUS_GOALS_DUE,
+                getAppointmentType()); //this config exists
 
         if (EvalsUtil.isDue(this, goalsDueConfig) <= 0) { //goals due or overdue
             System.out.println(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION + ", goals overdue");
             //goals is due or overdue.  Is goalsRequiredModification overdue?
-            Configuration modConfig = configMap.get("goalsRequiredModification");
+            Configuration modConfig = ConfigurationMgr.getConfiguration(configMap, "goalsRequiredModification",
+                    getAppointmentType());
 
             if (EvalsUtil.isDue(this, modConfig) < 0) {  // requiredModification is over due.
                 return true;

@@ -570,6 +570,7 @@ public class AppraisalMgr {
         int[] ids;
         List result;
         Session session = HibernateUtil.getCurrentSession();
+        //@todo: needs to be fixed
         String query = "select appraisal.id from edu.osu.cws.evals.models.Appraisal appraisal " +
                 "where status not in ('completed', 'closed', 'archived')";
 
@@ -1005,11 +1006,11 @@ public class AppraisalMgr {
      * a new salary record for an appraisal.
      *
      * @param appraisal
-     * @param configurationMap
+     * @param configMap
      * @return
      */
     public static Salary createOrUpdateSalary(Appraisal appraisal,
-                                              Map<String, Configuration> configurationMap) {
+                                              Map<String, Configuration> configMap) {
         // default increase values set to 0 only used if current salary is at or above control high
         String increaseRate2Value = "0";
         String increaseRate1MinVal = "0";
@@ -1036,9 +1037,9 @@ public class AppraisalMgr {
 
         // if aboveOrBelow is blank it means the person is above control point high and they get 0
         if (!aboveOrBelow.equals("")) {
-            increaseRate2Value = configurationMap.get("IT-increase-rate2-" + aboveOrBelow + "-control-value").getValue();
-            increaseRate1MinVal = configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-min-value").getValue();
-            increaseRate1MaxVal= configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-max-value").getValue();
+            increaseRate2Value = configMap.get("IT-increase-rate2-" + aboveOrBelow + "-control-value-Default").getValue();
+            increaseRate1MinVal = configMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-min-value-Default").getValue();
+            increaseRate1MaxVal= configMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-max-value-Default").getValue();
         }
 
         salary.setTwoIncrease(Double.parseDouble(increaseRate2Value));
@@ -1145,6 +1146,26 @@ public class AppraisalMgr {
         tx.commit();
 
         return numUpdated;
+    }
+
+    /**
+     * Returns the last appraisal (only a id, start/end date and status are loaded) record for a given job.
+     *
+     * @param job
+     * @return
+     */
+    public static Appraisal getLastAppraisalByJob(Job job) {
+        Session session = HibernateUtil.getCurrentSession();
+        List<Appraisal> appraisals = (List<Appraisal>) session.getNamedQuery("appraisal.getLastAppraisalByJob")
+                .setParameter("job", job)
+                .setMaxResults(1)
+                .list();
+
+        if (appraisals.isEmpty()) {
+            return null;
+        }
+
+        return appraisals.get(0);
     }
 
 }

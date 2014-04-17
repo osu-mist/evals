@@ -34,6 +34,8 @@ public class Configuration extends Evals {
 
     private String action;
 
+    private String appointmentType;
+
     public Configuration() {
     }
 
@@ -91,6 +93,14 @@ public class Configuration extends Evals {
 
     public void setAction(String action) {
         this.action = action;
+    }
+
+    public String getAppointmentType() {
+        return appointmentType;
+    }
+
+    public void setAppointmentType(String appointmentType) {
+        this.appointmentType = appointmentType;
     }
 
     public int getIntValue() throws  NumberFormatException

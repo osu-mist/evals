@@ -231,4 +231,15 @@
             job in (:jobs) and
             status not in ('closed', 'archivedClosed', 'archivedCompleted')
     ]]></query>
+    <query name="appraisal.getLastAppraisalByJob"><![CDATA[
+        select new edu.osu.cws.evals.models.Appraisal(
+            id,
+            startDate,
+            status
+        )
+        from edu.osu.cws.evals.models.Appraisal
+        where
+            job = :job
+        order by id desc
+    ]]></query>
 </hibernate-mapping>

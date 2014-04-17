@@ -1,6 +1,7 @@
 package edu.osu.cws.evals.util;
 
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
+import edu.osu.cws.evals.hibernate.ConfigurationMgr;
 import edu.osu.cws.evals.hibernate.EmailMgr;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Configuration;
@@ -210,12 +211,13 @@ public class EvalsUtil {
         }
 
         if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
-            config = configurationMap.get(Appraisal.STATUS_GOALS_DUE);
+            config = ConfigurationMgr.getConfiguration(configurationMap, Appraisal.STATUS_GOALS_DUE,
+                    appraisal.getAppointmentType());
         } else {
             if (status.contains("Overdue")) {
                 status = status.replace("Overdue", "Due");
             }
-            config = configurationMap.get(status);
+            config = ConfigurationMgr.getConfiguration(configurationMap, status, appraisal.getAppointmentType());
         }
 
         if (config != null) {

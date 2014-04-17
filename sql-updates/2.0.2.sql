@@ -19,3 +19,8 @@ alter table permission_rules add (
 );
 -- upload the permission_rules data via csv and then set the appointment_type column to not null
 insert into email_types values ('initiatedProfessionalFaculty', 'employee', null, null);
+alter table configurations add (
+    appointment_type VARCHAR2(45 CHAR)
+);
+
+update configurations set appointment_type = 'Default';

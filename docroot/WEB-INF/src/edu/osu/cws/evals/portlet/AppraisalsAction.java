@@ -289,7 +289,8 @@ public class AppraisalsAction implements ActionInterface {
         actionHelper.addToRequestMap("appraisal", appraisal);
         actionHelper.addToRequestMap("permissionRule", permRule);
         Map<String, Configuration> configMap = (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
-        Configuration autoSaveFrequency = configMap.get("autoSaveFrequency");
+        Configuration autoSaveFrequency = ConfigurationMgr.getConfiguration(configMap, "autoSaveFrequency",
+                appraisal.getAppointmentType());
         actionHelper.addToRequestMap("autoSaveFrequency", autoSaveFrequency.getValue());
         actionHelper.useMaximizedMenu();
 
