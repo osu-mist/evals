@@ -89,6 +89,10 @@ public class HomeAction implements ActionInterface {
         appointmentTypes.add(AppointmentType.PROFESSIONAL_FACULTY);
 
         Job supervisorJob = JobMgr.getSupervisorJob(actionHelper.getLoggedOnUser());
+        // if the person is not even a supervisor, don't display the button
+        if (supervisorJob == null) {
+            return false;
+        }
 
         ArrayList<Job> employeeShortJobs = (ArrayList<Job>) JobMgr.listEmployeesShortJobs(supervisorJob, appointmentTypes);
         return JobMgr.isProfessionalSupervisor(actionHelper.getLoggedOnUser().getId()) &&

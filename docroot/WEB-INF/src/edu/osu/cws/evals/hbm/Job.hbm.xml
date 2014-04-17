@@ -93,4 +93,16 @@
             status != 'T' and
             appointmentType = :apt_type
     </query>
+    <query name="job.jobsWithoutActiveEvaluations"><![CDATA[
+        from edu.osu.cws.evals.models.Job
+        where
+            id in (:jobs) and
+            id not in (
+                select job.id
+                from edu.osu.cws.evals.models.Appraisal appraisal
+                where
+                    job in (:jobs) and
+                    status not in ('closed', 'archivedClosed', 'archivedCompleted')
+                )
+    ]]></query>
 </hibernate-mapping>

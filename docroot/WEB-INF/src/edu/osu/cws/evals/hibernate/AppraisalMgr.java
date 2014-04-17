@@ -107,18 +107,15 @@ public class AppraisalMgr {
         }
 
         List<Job> employeeShortJobs = JobMgr.listEmployeesShortJobs(supervisorJob, appointmentTypes);
-        Set<String> jobsWithActiveEvaluations = JobMgr.getJobKeysWithActiveEvaluations(employeeShortJobs);
+        ArrayList<Job> jobsWithoutActiveEvaluations = JobMgr.getJobWithoutActiveEvaluations(employeeShortJobs);
 
         // Check that we have jobs to create evaluations for
-        if (employeeShortJobs == null || jobsWithActiveEvaluations.size() == employeeShortJobs.size()) {
+        if (jobsWithoutActiveEvaluations == null || jobsWithoutActiveEvaluations.isEmpty()) {
             return null;
         }
 
-        for (Job shortJob : employeeShortJobs) {
-            boolean jobHasEvaluation = jobsWithActiveEvaluations.contains(shortJob.getIdKey());
-            if (!jobHasEvaluation) {
-                appraisals.add(createAppraisal(shortJob, startDate, Appraisal.TYPE_ANNUAL));
-            }
+        for (Job shortJob : jobsWithoutActiveEvaluations) {
+            appraisals.add(createAppraisal(shortJob, startDate, Appraisal.TYPE_ANNUAL));
         }
 
         return appraisals;

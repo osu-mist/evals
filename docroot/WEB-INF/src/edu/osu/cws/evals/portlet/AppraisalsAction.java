@@ -1164,7 +1164,7 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         actionHelper.addToRequestMap("shortJobsWithEvals", shortJobsWithEvals);
-        actionHelper.addToRequestMap("shortJobsWithOutEvals", shortJobsWithOutEvals);
+        actionHelper.addToRequestMap("jobsWithoutEvals", shortJobsWithOutEvals);
         actionHelper.addToRequestMap("months", CWSUtil.getMonthsInYear("MMM"));
 
         ArrayList<String> years = new ArrayList<String>();
@@ -1172,12 +1172,17 @@ public class AppraisalsAction implements ActionInterface {
             years.add(new DateTime().plusYears(i).toString("YYYY"));
         }
         actionHelper.addToRequestMap("years", years);
+        actionHelper.useMaximizedMenu();
         return Constants.JSP_INITIATE_PROFESSIONAL_FACULTY;
     }
 
     /**
      * Gathers the professional faculty data employees with and without evaluations. It adds the short objects
-     * with only the needed information to the two lists passed in as parameters.
+     * with only the needed information to the two lists passed in as parameters. This method returns false in
+     * several scenarios: when the user is not a supervisor or when none of the employees are professional faculty
+     * or when the employees don't need their evaluation record created. The reasoning behind returning false is that
+     * the only way this method gets executed is if a supervisor clicked the initiate button or if the user is
+     * trying to hack the url. That's why the calling method uses an access denied error message.
      *
      * @param shortJobsWithEvals
      * @param shortJobsWithOutEvals
@@ -1196,19 +1201,22 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         List<Job> employeeShortJobs = JobMgr.listEmployeesShortJobs(supervisorJob, appointmentTypes);
-        Set<String> jobsWithActiveEvaluations = JobMgr.getJobKeysWithActiveEvaluations(employeeShortJobs);
+        shortJobsWithOutEvals.addAll(JobMgr.getJobWithoutActiveEvaluations(employeeShortJobs));
 
         // Check that the supervisor has jobs that need to be initiated in EvalS
-        if (employeeShortJobs == null || jobsWithActiveEvaluations.size() == employeeShortJobs.size()) {
+        if (shortJobsWithOutEvals == null || shortJobsWithOutEvals.isEmpty()) {
             return false;
         }
 
-        for (Job shortJob : employeeShortJobs) {
-            if (jobsWithActiveEvaluations.contains(shortJob.getIdKey())) {
-                shortJobsWithEvals.add(shortJob);
-            } else {
-                shortJobsWithOutEvals.add(shortJob);
-            }
+        shortJobsWithEvals.addAll(employeeShortJobs);
+        shortJobsWithEvals.removeAll(shortJobsWithOutEvals);
+
+        // iterate over the objects so that we get the employee name to prevent jsp lazy loading exception
+        for (Job job : shortJobsWithEvals) {
+            job.getEmployee().getName();
+        }
+        for (Job job : shortJobsWithOutEvals) {
+            job.getEmployee().getName();
         }
 
         // If we got here, there was no access denied error

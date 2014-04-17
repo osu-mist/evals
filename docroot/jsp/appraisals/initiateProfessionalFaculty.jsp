@@ -8,7 +8,7 @@
 
 <c:if test="${not empty shortJobsWithEvals}">
     <fieldset>
-        <legend><liferay-ui:message key="prof-faculty-create-evals-my-prof-team-without-evals"/></legend>
+        <legend><liferay-ui:message key="prof-faculty-create-evals-my-prof-team-with-evals"/></legend>
 
         <table class="main taglib-search-iterator">
             <thead>
@@ -43,7 +43,7 @@
         </tr>
         </thead>
         <tbody>
-            <c:forEach var="shortJob" items="${shortJobsWithOutEvals}" varStatus="loopStatus">
+            <c:forEach var="shortJob" items="${jobsWithoutEvals}" varStatus="loopStatus">
                 <tr class="${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}">
                     <td><c:out value="${shortJob.employee.name}"/></td>
                     <td><c:out value="${shortJob.positionNumber}"/></td>

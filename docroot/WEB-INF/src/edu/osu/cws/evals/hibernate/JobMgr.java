@@ -208,31 +208,21 @@ public class JobMgr {
     }
 
     /**
-     * Returns a list of strings containing job id keys. A job id key is a string in the form of:
-     * pidm_position_number_suffix. The key is calculated by Job.getIdKey(). The list of job keys is from
-     * jobs passed in that contain active evaluations.
+     * Returns the list of from the list that do not have active evaluations.
      *
      * @param jobs
      * @return
      * @throws Exception
      */
-    public static Set<String> getJobKeysWithActiveEvaluations(List<Job> jobs) throws Exception {
-        Set<String> jobsWithEvaluations = new HashSet<String>();
+    public static ArrayList<Job> getJobWithoutActiveEvaluations(List<Job> jobs) throws Exception {
         if (jobs == null) {
-            return jobsWithEvaluations;
+            return null;
         }
 
         Session session = HibernateUtil.getCurrentSession();
-        List<Appraisal> appraisals = (List<Appraisal>) session.getNamedQuery("appraisals.shortAppraisalsByJobs")
+        return (ArrayList<Job>) session.getNamedQuery("job.jobsWithoutActiveEvaluations")
                 .setParameterList("jobs", jobs)
                 .list();
-
-        // convert the jobs to job id key. This is for easier comparison in the view layer
-        for (Appraisal appraisal : appraisals) {
-            jobsWithEvaluations.add(appraisal.getJob().getIdKey());
-        }
-
-        return jobsWithEvaluations;
     }
 
     /**
