@@ -95,8 +95,9 @@ public class HomeAction implements ActionInterface {
         }
 
         ArrayList<Job> employeeShortJobs = (ArrayList<Job>) JobMgr.listEmployeesShortJobs(supervisorJob, appointmentTypes);
+        ArrayList<Job> jobsWithoutActiveEvaluations = JobMgr.getJobWithoutActiveEvaluations(employeeShortJobs);
         return JobMgr.isProfessionalSupervisor(actionHelper.getLoggedOnUser().getId()) &&
-                !AppraisalMgr.hasAppraisals(employeeShortJobs);
+                !jobsWithoutActiveEvaluations.isEmpty();
     }
 
     public String displayMyInformation(PortletRequest request, PortletResponse response) throws Exception {

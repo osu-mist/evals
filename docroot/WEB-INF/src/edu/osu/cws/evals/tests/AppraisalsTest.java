@@ -302,22 +302,6 @@ public class AppraisalsTest {
         }
     }
 
-    public void shouldHaveAppraisals() throws Exception {
-        int pidm = 12345;
-        List<Job> jobs = JobMgr.getJobs(pidm);
-        assert AppraisalMgr.hasAppraisals((ArrayList<Job>)jobs);
-
-        jobs.clear();
-        pidm = 74589;
-        jobs = JobMgr.getJobs(pidm);
-        assert AppraisalMgr.hasAppraisals((ArrayList<Job>)jobs);
-
-        jobs.clear();
-        pidm = 8712359;
-        jobs = JobMgr.getJobs(pidm);
-        assert !AppraisalMgr.hasAppraisals((ArrayList<Job>)jobs);
-    }
-
     public void shouldOnlyIncludeReviewDueOrReviewPastDueInAppraisalReviewList() throws Exception {
         for (Appraisal appraisal : AppraisalMgr.getReviews("UABC", -1)) {
             assert appraisal.getStatus().equals(Appraisal.STATUS_REVIEW_DUE)
