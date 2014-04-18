@@ -302,7 +302,7 @@ public class AppraisalsAction implements ActionInterface {
         actionHelper.addToRequestMap("autoSaveFrequency", autoSaveFrequency.getValue());
         actionHelper.useMaximizedMenu();
 
-        if (appraisal.getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
+        if (appraisal.getIsSalaryUsed()) {
             setSalaryValues();
         }
 
