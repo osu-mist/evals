@@ -454,7 +454,12 @@ public class Appraisal extends Evals {
         return viewStatus;
     }
 
-    public boolean isOpen() {
+    /**
+     * This method is named as a getter so that it can be called from the jsp view.
+     *
+     * @return
+     */
+    public boolean getIsOpen() {
         String viewStatus = getViewStatus();
         return !status.equals(STATUS_CLOSED) && !viewStatus.equals(STATUS_COMPLETED)
                 && !status.equals(STATUS_ARCHIVED_CLOSED)

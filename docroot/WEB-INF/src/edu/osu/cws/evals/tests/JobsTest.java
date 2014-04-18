@@ -324,4 +324,26 @@ public class JobsTest {
         job.setAppointmentType(AppointmentType.CLASSIFIED);
         assert job.getSalary() == null : "We only support Classified IT when getting salary info";
     }
+
+    public void shouldFetchPositionDescription() throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        Employee employee = new Employee(12345);
+        employee.setOsuid("931421235");
+        job = (Job) session.load(Job.class, new Job(employee, "1234", "00"));
+
+        PositionDescription pd1 = JobMgr.getPositionDescription(job);
+        assert pd1.getId() == 1;
+        assert pd1.getPositionTitle().equals("PD1");
+        assert pd1.getLeadWorkResponsibilities().size() == 2;
+
+        Employee employee1 = new Employee(12467);
+        employee1.setOsuid("931421234");
+        job = (Job) session.load(Job.class, new Job(employee1, "1234", "00"));
+
+        JobMgr.getPositionDescription(job);
+        PositionDescription pd2 = JobMgr.getPositionDescription(job);
+        assert pd2.getId() == 2;
+        assert pd2.getPositionTitle().equals("PD2");
+        assert pd2.getLeadWorkResponsibilities().size() == 1;
+    }
 }

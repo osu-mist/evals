@@ -5,6 +5,7 @@ import edu.osu.cws.evals.models.AppointmentType;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.models.ModelException;
+import edu.osu.cws.evals.models.PositionDescription;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.EvalsUtil;
@@ -630,5 +631,20 @@ public class JobMgr {
 
         // If there were many jobs with this orgCode, then it is considered valid
         return orgCodeCount > 0;
+    }
+
+    /**
+     * Returns the matching position description for the given job. The position description
+     * only matches the employee's osu id, and the job's position #.
+     *
+     * @param job
+     * @return
+     */
+    public static PositionDescription getPositionDescription(Job job) {
+        Session session = HibernateUtil.getCurrentSession();
+        return (PositionDescription) session.getNamedQuery("positionDescription.getPD")
+                .setString("osuid", job.getEmployee().getOsuid())
+                .setString("posno", job.getPositionNumber())
+                .uniqueResult();
     }
 }

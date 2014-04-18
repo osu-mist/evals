@@ -32,6 +32,11 @@
     <portlet:param name="action" value="requestGoalsReactivation"/>
     <portlet:param name="controller" value="AppraisalsAction"/>
 </portlet:actionURL>
+<portlet:actionURL var="viewPositionDescription" escapeXml="false">
+    <portlet:param name="id" value="${appraisal.id}"/>
+    <portlet:param name="action" value="display"/>
+    <portlet:param name="controller" value="PositionDescriptionAction"/>
+</portlet:actionURL>
 
 
 <div id="pass-appraisal-form" class="osu-cws">
@@ -89,6 +94,14 @@
                 message="appraisal-request-goals-reactivation"
                 cssClass="evals-show-confirm"
             /></li>
+        </c:if>
+        <c:if test="${appraisal.isOpen}">
+            <li>
+                <span><a href="<%=renderResponse.encodeURL(viewPositionDescription.toString())%>" target="_blank">
+                <img class="icon" src="/LP5-corp-theme/images/common/copy.png" alt="<liferay-ui:message key="view-position-description"/>"></a>
+                <a href="<%=renderResponse.encodeURL(viewPositionDescription.toString())%>" target="_blank"><liferay-ui:message key="view-position-description"/></a>
+                </span>
+            </li>
         </c:if>
     </ul>
 
