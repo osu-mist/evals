@@ -940,24 +940,6 @@ public class AppraisalMgr {
     }
 
     /**
-     * If any of the given jobs have an associated appraisal
-     * then this function returns true, otherwise it returns
-     * false.
-     *
-     * @param jobs
-     * @return
-     */
-    public static boolean hasAppraisals(ArrayList<Job> jobs) {
-        Session session = HibernateUtil.getCurrentSession();
-
-        Query query = session.getNamedQuery("appraisals.countAppraisalsInJobs")
-                .setParameterList("jobs", jobs);
-        int result = Integer.parseInt(query.list().get(0).toString());
-
-        return result > 0;
-    }
-
-    /**
      * Saves the overdue value by itself in the appraisal record.
      *
      * @param appraisal
