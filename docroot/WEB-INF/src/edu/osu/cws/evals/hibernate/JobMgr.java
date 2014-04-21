@@ -216,7 +216,7 @@ public class JobMgr {
      * @throws Exception
      */
     public static ArrayList<Job> getJobWithoutActiveEvaluations(List<Job> jobs) throws Exception {
-        if (jobs == null) {
+        if (jobs == null || jobs.isEmpty()) {
             return null;
         }
 
