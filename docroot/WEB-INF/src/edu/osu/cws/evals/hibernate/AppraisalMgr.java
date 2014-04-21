@@ -100,13 +100,13 @@ public class AppraisalMgr {
         List<String> appointmentTypes = new ArrayList<String>();
         appointmentTypes.add(AppointmentType.PROFESSIONAL_FACULTY);
 
-        Job supervisorJob = JobMgr.getSupervisorJob(supervisor);
+        List<Job> supervisorJobs = JobMgr.getSupervisorJobs(supervisor);
         // check that the user holds at least 1 supervising job
-        if (supervisorJob == null) {
+        if (supervisorJobs == null || supervisorJobs.isEmpty()) {
             return null;
         }
 
-        List<Job> employeeShortJobs = JobMgr.listEmployeesShortJobs(supervisorJob, appointmentTypes);
+        List<Job> employeeShortJobs = JobMgr.listEmployeesShortJobs(supervisorJobs, appointmentTypes);
         ArrayList<Job> jobsWithoutActiveEvaluations = JobMgr.getJobWithoutActiveEvaluations(employeeShortJobs);
 
         // Check that we have jobs to create evaluations for

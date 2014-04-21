@@ -1196,13 +1196,13 @@ public class AppraisalsAction implements ActionInterface {
         List<String> appointmentTypes = new ArrayList<String>();
         appointmentTypes.add(AppointmentType.PROFESSIONAL_FACULTY);
 
-        Job supervisorJob = JobMgr.getSupervisorJob(loggedInUser);
+        List<Job> supervisorJobs = JobMgr.getSupervisorJobs(loggedInUser);
         // check that the user holds at least 1 supervising job
-        if (supervisorJob == null) {
+        if (supervisorJobs == null || supervisorJobs.isEmpty()) {
             return false;
         }
 
-        List<Job> employeeShortJobs = JobMgr.listEmployeesShortJobs(supervisorJob, appointmentTypes);
+        List<Job> employeeShortJobs = JobMgr.listEmployeesShortJobs(supervisorJobs, appointmentTypes);
         shortJobsWithOutEvals.addAll(JobMgr.getJobWithoutActiveEvaluations(employeeShortJobs));
 
         // Check that the supervisor has jobs that need to be initiated in EvalS
@@ -1216,9 +1216,11 @@ public class AppraisalsAction implements ActionInterface {
         // iterate over the objects so that we get the employee name to prevent jsp lazy loading exception
         for (Job job : shortJobsWithEvals) {
             job.getEmployee().getName();
+            job.getSupervisor().getPositionNumber();
         }
         for (Job job : shortJobsWithOutEvals) {
             job.getEmployee().getName();
+            job.getSupervisor().getPositionNumber();
         }
 
         // If we got here, there was no access denied error
