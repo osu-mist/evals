@@ -96,13 +96,14 @@ public class JobMgr {
      * @return
      * @throws Exception
      */
-    public static Job getSupervisorJob(Employee employee) throws Exception {
+    public static List<Job> getSupervisorJobs(Employee employee) throws Exception {
+        List<Job> supervisingJobs = new ArrayList<Job>();
         for (Job job : (Set<Job>) employee.getJobs()) {
             if (isSupervisor(employee.getId(), job.getPositionNumber())) {
-                return job;
+                 supervisingJobs.add(job);
             }
         }
-        return null;
+        return supervisingJobs;
     }
 
     /**
@@ -190,19 +191,17 @@ public class JobMgr {
      * appointment types. The job objects only have a few properties populated: pidm,
      * position number, suffi, job status and appointment type.
      *
-     * @param supervisorJob          The supervisor job to get the list of employees
+     * @param supervisorJobs          The supervisor jobs to get the list of employees
      * @param appointmentTypes      ArrayList of different appointment types to fetch jobs for.
      * @return
      * @throws Exception
      */
-    public static List<Job> listEmployeesShortJobs(Job supervisorJob, List<String> appointmentTypes)
+    public static List<Job> listEmployeesShortJobs(List<Job> supervisorJobs, List<String> appointmentTypes)
             throws Exception {
         Session session = HibernateUtil.getCurrentSession();
 
         List<Job> jobs = (List<Job>) session.getNamedQuery("job.directShortJobEmployees")
-                .setInteger("supervisorId", supervisorJob.getEmployee().getId())
-                .setString("supervisorPosno", supervisorJob.getPositionNumber())
-                .setString("supervisorSuffix", supervisorJob.getSuffix())
+                .setParameterList("supervisorJobs", supervisorJobs)
                 .setParameterList("appointmentTypes", appointmentTypes)
                 .list();
         return jobs;

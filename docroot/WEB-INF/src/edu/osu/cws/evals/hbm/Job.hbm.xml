@@ -73,16 +73,15 @@
             jobTitle,
             appointmentType,
             status,
-            businessCenterName
+            businessCenterName,
+            supervisor.id.positionNumber
         )
         from edu.osu.cws.evals.models.Job job
         where
             job.status != 'T' and
             job.appointmentType in (:appointmentTypes) and
             job.suffix = '00' and
-            job.supervisor.employee.id = :supervisorId and
-            job.supervisor.positionNumber = :supervisorPosno and
-            job.supervisor.suffix = :supervisorSuffix
+            job.supervisor in (:supervisorJobs)
     </query>
     <query name="job.isProfessionalSupervisor">
         select
