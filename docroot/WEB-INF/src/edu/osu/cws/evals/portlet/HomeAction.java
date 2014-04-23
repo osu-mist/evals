@@ -90,7 +90,7 @@ public class HomeAction implements ActionInterface {
 
         List<Job> supervisorJob = JobMgr.getSupervisorJobs(actionHelper.getLoggedOnUser());
         // if the person is not even a supervisor, don't display the button
-        if (supervisorJob == null) {
+        if (supervisorJob == null || supervisorJob.isEmpty()) {
             return false;
         }
 
