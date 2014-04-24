@@ -105,3 +105,11 @@ id,status,role,approved_goals,unapproved_goals,goal_comments,results,supervisor_
 44187,rebuttalReadDue,masterAdmin,v,,,v,v,v,v,v,,,,,y,,,,,Professional Faculty
 44188,resultsDue,masterAdmin,v,,,,,,,,,,,,y,y,,,,Professional Faculty
 44189,signatureDue,masterAdmin,v,,,v,v,v,v,,,,,,y,y,,,,Professional Faculty
+44190,signatureDue,supervisor,v,,,v,v,v,,,,,,action-team-signature-due,y,,,,,Professional Faculty
+44191,signatureDue,upper-supervisor,v,,,v,v,v,,,,,,,y,,,,,Professional Faculty
+44192,completed,supervisor,v,,,v,v,v,,v,,,,,y,,,,,Professional Faculty
+44193,completed,upper-supervisor,v,,,v,v,v,,v,,,,,y,,,,,Professional Faculty
+44194,closed,supervisor,v,,,v,v,v,,v,,,,,y,,,,,Professional Faculty
+44195,closed,upper-supervisor,v,,,v,v,v,,v,,,,,y,,,,,Professional Faculty
+44196,rebuttalReadDue,supervisor,v,,,v,v,v,,v,e,,read-appraisal-rebuttal,action-required-rebuttal-read-due,y,,,,,Professional Faculty
+44197,rebuttalReadDue,upper-supervisor,v,,,v,v,v,,v,,,,,y,,,,,Professional Faculty
