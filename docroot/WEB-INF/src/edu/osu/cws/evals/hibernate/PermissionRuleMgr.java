@@ -2,6 +2,8 @@ package edu.osu.cws.evals.hibernate;
 
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.PermissionRule;
+import edu.osu.cws.evals.portlet.ActionHelper;
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
 
@@ -62,6 +64,11 @@ public class PermissionRuleMgr {
             // Get the permission rule from the cache map and clone it. If we modify or set any properties
             // in the original cached permission rule, the modifications are saved on the cached object.
             return (PermissionRule) rule.clone();
+        }
+
+        // check if the role was an admin type. If the specific admin role didn't match, check the default "admin" role
+        if (EvalsUtil.isOneOfAdminRoles(role)) {
+            return getPermissionRule(permissionRuleMap, appraisal, ActionHelper.ROLE_ADMINISTRATOR);
         }
 
         return null;

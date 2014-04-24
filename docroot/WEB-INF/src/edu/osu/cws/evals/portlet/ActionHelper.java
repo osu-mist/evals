@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
 public class ActionHelper {
     public static final String ROLE_EMPLOYEE = "employee";
     public static final String ROLE_ADMINISTRATOR = "admin";
+    public static final String ROLE_MASTER_ADMIN = "masterAdmin";
+    public static final String ROLE_SUPER_ADMIN = "superAdmin";
     public static final String ROLE_REVIEWER = "reviewer";
     public static final String ROLE_SUPERVISOR = "supervisor";
     public static final String ROLE_UPPER_SUPERVISOR = "upper-supervisor";

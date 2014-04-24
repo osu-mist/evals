@@ -174,7 +174,10 @@ public class AppraisalsAction implements ActionInterface {
         // check admin role first because there are few admins and some jobs have a missing supervisor in the chain
         // which causes a NPE
         if (actionHelper.getAdmin() != null) {
-            return ActionHelper.ROLE_ADMINISTRATOR;
+            if (actionHelper.isLoggedInUserMasterAdmin()) {
+                return ActionHelper.ROLE_MASTER_ADMIN;
+            }
+            return ActionHelper.ROLE_SUPER_ADMIN;
         }
 
         if (JobMgr.isUpperSupervisor(appraisal.getJob(), pidm)) {
@@ -264,7 +267,7 @@ public class AppraisalsAction implements ActionInterface {
         if(!userRole.equals(ActionHelper.ROLE_EMPLOYEE)){
 
             if(permRule.getSendToNolij() != null){
-                if(!userRole.equals(ActionHelper.ROLE_ADMINISTRATOR)) {
+                if(!isAdminRole()) {
                     ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(-1);
                     actionHelper.addToRequestMap("pendingReviews", reviews);
                 }
@@ -569,8 +572,7 @@ public class AppraisalsAction implements ActionInterface {
 
 
         // Save the close out reason
-        if (appraisal.getRole().equals(ActionHelper.ROLE_REVIEWER) ||
-                appraisal.getRole().equals(ActionHelper.ROLE_ADMINISTRATOR )) {
+        if (appraisal.getRole().equals(ActionHelper.ROLE_REVIEWER) || isAdminRole()) {
             if (jsonData.getCloseOutReasonId() != null) {
                 CloseOutReason reason = CloseOutReasonMgr.get(jsonData.getCloseOutReasonId());
                 appraisal.setCloseOutReason(reason);
@@ -607,6 +609,16 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         saveAppraisalMetadata(dates, pidm);
+    }
+
+    /**
+     * Whether the role of the logged in user is either Master or Super Admin when viewing the appraisal
+     * object.
+     *
+     * @return
+     */
+    private boolean isAdminRole() {
+        return EvalsUtil.isOneOfAdminRoles(userRole);
     }
 
     /**
@@ -1066,8 +1078,7 @@ public class AppraisalsAction implements ActionInterface {
         initialize(request);
 
         // Check to see if the logged in user has permission to access the appraisal
-        boolean isAdminOrReviewer = userRole.equals(ActionHelper.ROLE_ADMINISTRATOR )
-                || userRole.equals(ActionHelper.ROLE_REVIEWER);
+        boolean isAdminOrReviewer = isAdminRole() || userRole.equals(ActionHelper.ROLE_REVIEWER);
         if (permRule == null || !isAdminOrReviewer) {
             return errorHandler.handleAccessDenied(request, response);
         }
@@ -1094,8 +1105,7 @@ public class AppraisalsAction implements ActionInterface {
             throws Exception {
         initialize(request);
 
-        if (!userRole.equals(ActionHelper.ROLE_ADMINISTRATOR ) &&
-                !userRole.equals(ActionHelper.ROLE_REVIEWER)) {
+        if (!isAdminRole() && !userRole.equals(ActionHelper.ROLE_REVIEWER)) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
