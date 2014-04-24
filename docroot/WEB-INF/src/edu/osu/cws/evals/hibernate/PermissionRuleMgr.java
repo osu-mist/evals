@@ -26,7 +26,8 @@ public class PermissionRuleMgr {
                 .createQuery("from edu.osu.cws.evals.models.PermissionRule").list().iterator();
         while (rulesIterator.hasNext()) {
             PermissionRule rule = (PermissionRule) rulesIterator.next();
-            String key = rule.getStatus() + "-" + rule.getRole() + "-" + rule.getAppointmentType();
+            String appointmentType = rule.getAppointmentType().replace(" ", "");
+            String key = rule.getStatus() + "-" + rule.getRole() + "-" + appointmentType;
             ruleMap.put(key, rule);
         }
         return ruleMap;
