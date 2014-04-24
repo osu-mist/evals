@@ -1005,7 +1005,7 @@ public class Appraisal extends Evals {
      * @param trialAppraisal
      * @return
      */
-    public static Appraisal createFirstAnnual(Appraisal trialAppraisal) {
+    public static Appraisal createFirstAnnual(Appraisal trialAppraisal) throws Exception {
         Appraisal appraisal = new Appraisal();
         appraisal.setType(Appraisal.TYPE_ANNUAL);
         appraisal.setJob(trialAppraisal.getJob());
@@ -1015,14 +1015,29 @@ public class Appraisal extends Evals {
 
         // set the status. The cron job will update the status if needed
         appraisal.setStatus(Appraisal.STATUS_GOALS_APPROVED);
+        List<GoalVersion> approvedGoalsVersions = trialAppraisal.getApprovedGoalsVersions();
+        if (approvedGoalsVersions == null || approvedGoalsVersions.isEmpty()) {
+            appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
+        }
 
         // calculate & set the end date
         DateTime startDate = new DateTime(appraisal.getStartDate()).withTimeAtStartOfDay();
         DateTime endDate = appraisal.getJob().getEndEvalDate(startDate, Appraisal.TYPE_INITIAL);
         appraisal.setEndDate(CWSUtil.toDate(endDate));
 
-        // copy over goal version
-        for (GoalVersion trialGoalVersion : trialAppraisal.getApprovedGoalsVersions()) {
+        // get list of goal versions to copy
+        List<GoalVersion> goalVersionsToCopy = new ArrayList<GoalVersion>();
+        for (GoalVersion goalVersion : trialAppraisal.getGoalVersions()) {
+            if (goalVersion != null && goalVersion.getRequestDecision()) {
+                goalVersionsToCopy.add(goalVersion);
+            }
+        }
+
+        if (goalVersionsToCopy == null || goalVersionsToCopy.isEmpty()) {
+            throw new Exception("GoalVersions to copy shouldn't be empty");
+        }
+
+        for (GoalVersion trialGoalVersion : goalVersionsToCopy) {
             GoalVersion goalVersion = GoalVersion.copyPropertiesFromTrial(trialGoalVersion, appraisal);
             appraisal.addGoalVersion(goalVersion);
 
