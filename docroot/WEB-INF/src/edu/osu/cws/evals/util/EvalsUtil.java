@@ -7,6 +7,7 @@ import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.models.Email;
 import edu.osu.cws.evals.models.Job;
+import edu.osu.cws.evals.portlet.ActionHelper;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -320,5 +321,15 @@ public class EvalsUtil {
 
     public static DateTime getToday() {
         return new DateTime().withTimeAtStartOfDay();
+    }
+
+    /**
+     * Checks if the role provided is either of the two admin roles: ActionHelper: ROLE_MASTER_ADMIN ROLE_SUPER_ADMIN
+     *
+     * @param role
+     * @return
+     */
+    public static boolean isOneOfAdminRoles(String role) {
+        return role.equals(ActionHelper.ROLE_MASTER_ADMIN) || role.equals(ActionHelper.ROLE_SUPER_ADMIN);
     }
 }
