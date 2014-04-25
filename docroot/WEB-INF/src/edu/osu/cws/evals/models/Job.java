@@ -150,7 +150,7 @@ public class Job extends Evals implements Serializable {
 
         Job job = (Job) o;
 
-        return id == job.id;
+        return getIdKey().equals(job.getIdKey());
     }
 
     /**
