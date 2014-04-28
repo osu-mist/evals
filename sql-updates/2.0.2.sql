@@ -40,3 +40,7 @@ from configurations where name like '%DueFrequency';
 insert into configurations
 select pass_seq.nextval, section, name, 35 + rownum, value + 5, reference_point, action, 'Professional Faculty'
 from configurations where name like '%Due';
+
+insert into configurations
+select pass_seq.nextval, section, name, 35 + rownum, value + 5, reference_point, action, 'Professional Faculty'
+from configurations where name like '%Reminder';
