@@ -24,3 +24,19 @@ alter table configurations add (
 );
 
 update configurations set appointment_type = 'Default';
+
+-- The -1 configuration value, allows us to disable emails for professional faculty
+-- insert configuration items for professional faculty to prevent overdue emails from being sent
+insert into configurations
+select pass_seq.nextval, section, name, 21 + rownum, '-1', null, null, 'Professional Faculty'
+from configurations where name like '%OverdueFrequency';
+
+-- for any emails that we only want to be sent once, setting the frequency to a high # to prevent multiple emails
+insert into configurations
+select pass_seq.nextval, section, name, 28 + rownum, '200', null, null, 'Professional Faculty'
+from configurations where name like '%DueFrequency';
+
+-- insert different configuration values for professional faculty so they can be changed via the admin gui
+insert into configurations
+select pass_seq.nextval, section, name, 35 + rownum, value + 5, reference_point, action, 'Professional Faculty'
+from configurations where name like '%Due';
