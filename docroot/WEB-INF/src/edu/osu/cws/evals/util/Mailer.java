@@ -7,10 +7,7 @@ package edu.osu.cws.evals.util;
  * @date: 6/24/11
  */
 
-import edu.osu.cws.evals.hibernate.AppraisalMgr;
-import edu.osu.cws.evals.hibernate.EmailMgr;
-import edu.osu.cws.evals.hibernate.JobMgr;
-import edu.osu.cws.evals.hibernate.ReviewerMgr;
+import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.util.CWSUtil;
@@ -459,7 +456,8 @@ public class Mailer implements MailerInterface {
      * @throws Exception
      */
     private String goalsReactivatedTimeoutBody(Appraisal appraisal) throws Exception {
-        Configuration config = configMap.get("goalsReactivatedExpiration");
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, "goalsReactivatedExpiration",
+                appraisal.getAppointmentType());
         int daysToSubmit = config.getIntValue();
         String bodyString = emailBundle.getString("email_goalsReactivatedTimeout_body");
         return MessageFormat.format(bodyString, daysToSubmit, getJobTitle(appraisal),
@@ -475,7 +473,8 @@ public class Mailer implements MailerInterface {
      */
     private String goalsReactivationRequestedTimeoutBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsReactivationRequestedTimeout_body");
-        Configuration config = configMap.get("goalsReactivationRequestedExpiration");
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, "goalsReactivationRequestedExpiration",
+                appraisal.getAppointmentType());
         int daysToSubmit = config.getIntValue();
 
         GoalVersion lastTimedOutGoalVersion = appraisal.getLastTimedOutGoalVersion(Appraisal.STATUS_GOALS_REACTIVATION_REQUESTED);
@@ -787,7 +786,8 @@ public class Mailer implements MailerInterface {
      * @throws Exception
      */
     private String classifiedITNoIncreaseBody(Appraisal appraisal) throws Exception {
-        Configuration config = configMap.get("IT-increase-withhold-warn2-days");
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, "IT-increase-withhold-warn2-days",
+                appraisal.getAppointmentType());
         int daysToNotifyEmployee = config.getIntValue();
 
         Employee employee = appraisal.getJob().getEmployee();
@@ -850,7 +850,7 @@ public class Mailer implements MailerInterface {
         if(status.contains("Overdue")) {
             status = status.replace("Overdue", "Due");
         }
-        Configuration config = configMap.get(status);
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, status, appraisal.getAppointmentType());
         DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
         return dueDay.toString(Constants.DATE_FORMAT);
     }
@@ -865,7 +865,7 @@ public class Mailer implements MailerInterface {
      */
     private String getGoalsExpirationDate(Appraisal appraisal) throws Exception {
         String status = appraisal.getStatus() + "Expiration";
-        Configuration config = configMap.get(status);
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, status, appraisal.getAppointmentType());
         DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
         return dueDay.toString(Constants.DATE_FORMAT);
     }
@@ -878,7 +878,7 @@ public class Mailer implements MailerInterface {
      */
     private int getDaysRemaining(Appraisal appraisal) throws Exception {
         String status = appraisal.getStatus();
-        Configuration config = configMap.get(status);
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, status, appraisal.getAppointmentType());
         DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
         return Days.daysBetween(EvalsUtil.getToday(), dueDay).getDays();
     }
