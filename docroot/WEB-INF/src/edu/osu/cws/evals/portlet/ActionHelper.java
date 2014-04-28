@@ -418,7 +418,7 @@ public class ActionHelper {
      *
      * @throws Exception
      */
-    private void setLoggedOnUser() throws Exception {
+    public void setLoggedOnUser() throws Exception {
         // try to set it from session
         PortletSession session = getSession();
         loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
