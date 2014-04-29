@@ -180,14 +180,15 @@ public class HomeAction implements ActionInterface {
         }
 
         PortletSession session = ActionHelper.getSession(request);
-        int employeeID = Integer.parseInt(ParamUtil.getString(request, "employee.id"));
+        String employeeOnid = ParamUtil.getString(request, "employee.onid");
         Employee employee = new Employee();
         try {
-            employee = EmployeeMgr.findById(employeeID, "employee-with-jobs");
+            employee = EmployeeMgr.findByOnid(employeeOnid, null);
         } catch (Exception e) {
             _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
         }
         session.setAttribute("loggedOnUser", employee);
+        actionHelper.setLoggedOnUser();
         session.removeAttribute(ActionHelper.ALL_MY_APPRAISALS);
         session.removeAttribute(ActionHelper.MY_TEAMS_ACTIVE_APPRAISALS);
         actionHelper.setUpUserPermission(true);
