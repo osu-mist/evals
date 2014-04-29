@@ -1,9 +1,7 @@
 package edu.osu.cws.evals.tests;
 
 import edu.osu.cws.evals.hibernate.EmailMgr;
-import edu.osu.cws.evals.models.Appraisal;
-import edu.osu.cws.evals.models.Configuration;
-import edu.osu.cws.evals.models.Email;
+import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Session;
@@ -66,6 +64,8 @@ public class EvalsUtilTest {
 
     private void testGetOverdueWithOnlyGoalsDueInMap(String status) throws Exception {
         Appraisal appraisal = new Appraisal();
+        appraisal.setJob(new Job());
+        appraisal.getJob().setAppointmentType(AppointmentType.CLASSIFIED);
         appraisal.setStatus(status);
 
         HashMap<String, Configuration> configurationMap = new HashMap<String, Configuration>();
@@ -80,7 +80,7 @@ public class EvalsUtilTest {
         config.setValue("30");
         config.setReferencePoint("start");
         config.setAction("add");
-        configurationMap.put("goalsDue", config);
+        configurationMap.put("goalsDue-Default", config);
         int overdue = EvalsUtil.getOverdue(appraisal, configurationMap);
         assert overdue == 30 : "The number of overdue days was " + overdue + " instead of 30";
     }
@@ -112,6 +112,8 @@ public class EvalsUtilTest {
 
     private void calculateGoalsApprovalOverdueValue(String status) throws Exception {
         Appraisal appraisal = new Appraisal();
+        appraisal.setJob(new Job());
+        appraisal.getJob().setAppointmentType(AppointmentType.CLASSIFIED);
         appraisal.setStatus(status);
 
         HashMap<String, Configuration> configurationMap = new HashMap<String, Configuration>();
@@ -124,7 +126,7 @@ public class EvalsUtilTest {
         config.setValue("45");
         config.setReferencePoint("start");
         config.setAction("add");
-        configurationMap.put("goalsApprovalDue", config);
+        configurationMap.put("goalsApprovalDue-Default", config);
         int overdue = EvalsUtil.getOverdue(appraisal, configurationMap);
         assert overdue == 15 : "The number of overdue days was " + overdue + " instead of 30";
     }

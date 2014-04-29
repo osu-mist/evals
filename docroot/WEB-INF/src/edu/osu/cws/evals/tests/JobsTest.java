@@ -147,7 +147,7 @@ public class JobsTest {
     public void getJobsShouldReturnJobs() throws Exception {
         assert JobMgr.getJobs(56198).size() == 1;
         assert JobMgr.getJobs(111).size() == 0;
-        assert JobMgr.getJobs(12345).size() == 3;
+        assert JobMgr.getJobs(12345).size() == 4;
     }
 
     public void shouldReturnBusinessCenter() throws Exception {
@@ -239,7 +239,7 @@ public class JobsTest {
 
     public void searchShouldAcceptOsuid() throws Exception {
         List<Job> jobs = JobMgr.search("931421235", null, 0);
-        assert jobs.size() == 3;
+        assert jobs.size() == 4;
 
         jobs = JobMgr.search("931421234", null, 0);
         assert jobs.size() == 1;
@@ -272,12 +272,12 @@ public class JobsTest {
         assert jobs.size() == 0;
 
         jobs = JobMgr.findByName("Jo", null, 0);
-        assert jobs.size() == 4;
+        assert jobs.size() == 6;
     }
 
     public void searchByNameShouldAcceptLastNameOnly() throws Exception {
         List<Job> jobs = JobMgr.findByName("Cedeno", null, 0);
-        assert jobs.size() == 3;
+        assert jobs.size() == 4;
 
         jobs = JobMgr.findByName("Bond", null, 0);
         assert jobs.size() == 0;

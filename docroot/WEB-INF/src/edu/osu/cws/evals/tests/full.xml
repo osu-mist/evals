@@ -196,7 +196,7 @@
       PYVPASE_FIRST_NAME="Jess"
       PYVPASE_LAST_NAME="Smith"
       PYVPASE_ID="12345678"
-      PYVPASE_ONID_LOGIN="testing"
+      PYVPASE_ONID_LOGIN="jesstest2"
       PYVPASE_EMAIL="test@orst.edu"
       PYVPASE_EMPL_STATUS="T"/>
   <employees
@@ -204,7 +204,7 @@
       PYVPASE_FIRST_NAME="Jessica"
       PYVPASE_LAST_NAME="Smith"
       PYVPASE_ID="12345677"
-      PYVPASE_ONID_LOGIN="testing"
+      PYVPASE_ONID_LOGIN="jesstest"
       PYVPASE_EMAIL="test@orst.edu"
       PYVPASE_EMPL_STATUS="T"/>
   <employees
@@ -212,7 +212,7 @@
           PYVPASE_FIRST_NAME="Johnny"
           PYVPASE_LAST_NAME="Smith"
           PYVPASE_ID="12345689"
-          PYVPASE_ONID_LOGIN="testing"
+          PYVPASE_ONID_LOGIN="johntest"
           PYVPASE_EMAIL="test@orst.edu"
           PYVPASE_EMPL_STATUS="A"/>
 
@@ -539,8 +539,8 @@
             PYVPASJ_EVAL_DATE="2010-01-30"
             PYVPASJ_ORGN_DESC="testing"/>
 
-  <permission_rules ID="1" STATUS="goalsDue" ROLE="employee" APPROVED_GOALS="e" ACTION_REQUIRED="goalsDue"/>
-  <permission_rules ID="2" STATUS="goalsDue" ROLE="immediate-supervisor" APPROVED_GOALS="e"/>
+  <permission_rules ID="1" STATUS="goalsDue" ROLE="employee" APPROVED_GOALS="e" ACTION_REQUIRED="goalsDue" APPOINTMENT_TYPE="Default"/>
+  <permission_rules ID="2" STATUS="goalsDue" ROLE="immediate-supervisor" APPROVED_GOALS="e" APPOINTMENT_TYPE="Default"/>
   <status/>
   <configurations
           ID="1"
@@ -550,6 +550,7 @@
           VALUE=""
           REFERENCE_POINT=""
           ACTION=""
+          APPOINTMENT_TYPE="Default"
           />
   <configurations
           ID="2"
@@ -559,6 +560,7 @@
           VALUE=""
           REFERENCE_POINT=""
           ACTION=""
+          APPOINTMENT_TYPE="Default"
           />
   <configurations
           ID="3"
@@ -568,6 +570,7 @@
           VALUE=""
           REFERENCE_POINT=""
           ACTION=""
+          APPOINTMENT_TYPE="Default"
           />
   <configurations
           ID="4"
@@ -577,6 +580,7 @@
           VALUE=""
           REFERENCE_POINT=""
           ACTION=""
+          APPOINTMENT_TYPE="Default"
           />
   <configurations
           ID="5"
@@ -586,6 +590,7 @@
           VALUE="30"
           REFERENCE_POINT=""
           ACTION=""
+          APPOINTMENT_TYPE="Default"
           />
   <configurations
           ID="6"
@@ -595,6 +600,7 @@
           VALUE=""
           REFERENCE_POINT=""
           ACTION=""
+          APPOINTMENT_TYPE="Default"
           />
   <configurations
           ID="7"
@@ -604,6 +610,7 @@
           VALUE=""
           REFERENCE_POINT=""
           ACTION=""
+          APPOINTMENT_TYPE="Default"
           />
   <configurations
           ID="8"
@@ -613,6 +620,7 @@
           VALUE=""
           REFERENCE_POINT=""
           ACTION=""
+          APPOINTMENT_TYPE="Default"
           />
   <configurations
           ID="9"
@@ -622,6 +630,7 @@
           VALUE="2"
           REFERENCE_POINT=""
           ACTION=""
+          APPOINTMENT_TYPE="Default"
           />
   <configurations
           ID="10"
@@ -631,6 +640,7 @@
           VALUE="3"
           REFERENCE_POINT=""
           ACTION=""
+          APPOINTMENT_TYPE="Default"
           />
   <configurations
           ID="11"
@@ -640,6 +650,7 @@
           VALUE="4"
           REFERENCE_POINT=""
           ACTION=""
+          APPOINTMENT_TYPE="Default"
           />
   <configurations
           ID="12"
@@ -649,6 +660,7 @@
           VALUE="6"
           REFERENCE_POINT=""
           ACTION=""
+          APPOINTMENT_TYPE="Default"
           />
   <configurations
           ID="13"
@@ -658,6 +670,7 @@
           VALUE="6"
           REFERENCE_POINT=""
           ACTION=""
+          APPOINTMENT_TYPE="Default"
           />
   <configurations
           ID="14"
@@ -667,6 +680,7 @@
           VALUE="9"
           REFERENCE_POINT=""
           ACTION=""
+          APPOINTMENT_TYPE="Default"
           />
   <salaries
           ID="1"
@@ -682,12 +696,14 @@
           POSITIONNUMBER="1234"
           UNIVERSITYID="931421235"
           POSITIONTITLE="PD1"
+          POSITIONDUTIES="Job position duties"
       />
   <pyvpdes
           POSITIONDESCRIPTIONID="2"
           POSITIONNUMBER="1234"
           UNIVERSITYID="931421234"
           POSITIONTITLE="PD2"
+          POSITIONDUTIES="Job position duties"
       />
   <pyvpdlw
           POSITIONDESCRIPTIONID="1"
