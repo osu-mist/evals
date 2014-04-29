@@ -85,26 +85,6 @@ public class EvalsUtilTest {
         assert overdue == 30 : "The number of overdue days was " + overdue + " instead of 30";
     }
 
-    public void testGetOverdueWithGoalsDueInFuture() throws Exception {
-        Appraisal appraisal = new Appraisal();
-        appraisal.setStatus("goalsDue");
-
-        HashMap<String, Configuration> configurationMap = new HashMap<String, Configuration>();
-        DateTime startDate = EvalsUtil.getToday().withDayOfMonth(1);
-
-        appraisal.setStartDate(startDate.toDate());
-        Configuration config = new Configuration();
-        config.setName("goalsDue");
-        config.setValue("30");
-        config.setReferencePoint("start");
-        config.setAction("add");
-        configurationMap.put("goalsDue", config);
-        int overdue = EvalsUtil.getOverdue(appraisal, configurationMap);
-        double expectedDays = Days.daysBetween(startDate.plusMonths(1), EvalsUtil.getToday()).getDays();
-        assert overdue == expectedDays :
-                "The number of overdue days was " + overdue + " instead of " + expectedDays;
-    }
-
     public void shouldCalculateOverdueForGoalsApprovalOverdue() throws Exception {
         calculateGoalsApprovalOverdueValue(Appraisal.STATUS_GOALS_APPROVAL_OVERDUE);
     }
