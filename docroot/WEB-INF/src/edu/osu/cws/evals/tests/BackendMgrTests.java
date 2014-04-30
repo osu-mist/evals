@@ -305,10 +305,10 @@ public class BackendMgrTests {
         appraisal.setJob(new Job());
         appraisal.getJob().setAppointmentType(AppointmentType.CLASSIFIED);
 
-        assert BackendMgr.timeToSendFirstStatusEmail(appraisal, new DateTime());
+        assert !BackendMgr.timeToSendFirstStatusEmail(appraisal, new DateTime());
 
         appraisal.getJob().setAppointmentType(AppointmentType.CLASSIFIED_IT);
-        assert BackendMgr.timeToSendFirstStatusEmail(appraisal, new DateTime());
+        assert !BackendMgr.timeToSendFirstStatusEmail(appraisal, new DateTime());
     }
     
     public void shouldSendProfFacultyEmailsRightAwayForNonInitialEvaluations() throws Exception {
@@ -323,7 +323,7 @@ public class BackendMgrTests {
         appraisal.setJob(job);
 
         // send email right away when it's not the first evaluation
-        assert BackendMgr.timeToSendFirstStatusEmail(appraisal, new DateTime());
+        assert !BackendMgr.timeToSendFirstStatusEmail(appraisal, new DateTime());
     }
 
     public void shouldSendProfFacultyEmailsRightAwayOnceReviewPeriodStarts() throws Exception {
@@ -337,7 +337,7 @@ public class BackendMgrTests {
         appraisal.setJob(job);
 
         // send email right away when it's not the first evaluation
-        assert BackendMgr.timeToSendFirstStatusEmail(appraisal, new DateTime());
+        assert !BackendMgr.timeToSendFirstStatusEmail(appraisal, new DateTime());
     }
 
     /**
