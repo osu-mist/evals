@@ -367,8 +367,7 @@ public class AppraisalsAction implements ActionInterface {
         try {
             processUpdateRequest(request.getParameterMap());
 
-            String signAppraisal = ParamUtil.getString(request, "sign-appraisal");
-            if (signAppraisal != null && !signAppraisal.equals("")) {
+            if (downloadToNolij()) {
                 config = actionHelper.getEvalsConfig();
                 String nolijDir = config.getString("pdf.nolijDir");
                 String env = config.getString("pdf.env");
@@ -413,6 +412,21 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         return homeAction.display(request, response);
+    }
+
+    /**
+     * Whether or not the evaluation should be downloaded for nolij. If the appointment type is not prof. faculty
+     * and the employee signed the evaluation, it is uploaded to nolij.
+     *
+     * @return
+     */
+    private boolean downloadToNolij() {
+        if (appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+            return false;
+        }
+
+        String signAppraisal = ParamUtil.getString(request, "sign-appraisal");
+        return signAppraisal != null && !signAppraisal.equals("");
     }
 
     /**
