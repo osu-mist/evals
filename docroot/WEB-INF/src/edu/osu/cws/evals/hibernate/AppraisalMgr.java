@@ -570,11 +570,18 @@ public class AppraisalMgr {
         int[] ids;
         List result;
         Session session = HibernateUtil.getCurrentSession();
-        //@todo: needs to be fixed
+        String[] statusToExclude = {
+                Appraisal.STATUS_ARCHIVED_CLOSED,
+                Appraisal.STATUS_ARCHIVED_COMPLETED,
+                Appraisal.STATUS_CLOSED,
+                Appraisal.STATUS_COMPLETED
+        };
         String query = "select appraisal.id from edu.osu.cws.evals.models.Appraisal appraisal " +
-                "where status not in ('completed', 'closed', 'archived')";
+                "where status not in (:statusToExclude)";
 
-        result = session.createQuery(query).list();
+        result = session.createQuery(query)
+                .setParameterList("statusToExclude", statusToExclude)
+                .list();
         ids = new int[result.size()];
         for (int i = 0; i < result.size(); i++) {
             ids[i] = (Integer) result.get(i);
