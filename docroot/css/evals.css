@@ -211,6 +211,14 @@ tr.ui-state-highlight {
     display: none;
 }
 
+.osu-cws table {
+    margin: 0 auto !important;
+}
+
+.osu-cws table.main {
+    width: 100% !important;
+}
+
 .osu-cws table.google-visualization-table-table {
   margin: auto;
 }
@@ -424,4 +432,62 @@ tr.ui-state-highlight {
     padding-left: 1em;
     font-weight: bold;
     margin-right: 12px;
+}
+
+
+@media print {
+    .osu-cws h2 {
+        font-size: 2em;
+        border-bottom: none;
+    }
+
+    #banner {
+        display: none;
+    }
+
+    .portlet-top-menu {
+        display: none;
+    }
+
+    .pass-form-text {
+        font-size: 12px;
+    }
+
+    .appraisal-info {
+        margin: 0 auto;
+    }
+
+    .osu-cws .appraisal-info em {
+        margin-left: 0;
+    }
+
+    .portlet-title {
+        display: none;
+    }
+
+    .portlet-msg-alert {
+        border: none !important;
+        padding: 0;
+    }
+
+    .portlet-topper {
+        display: none;
+    }
+
+    .osu-cws table {
+        margin: 0 auto !important;
+    }
+
+    .osu-accordion-header {
+        border: 1px solid #CCCCCC !important;
+        background: none repeat scroll 0 0 #FFFFFF !important;
+    }
+
+    .osu-accordion-header > img {
+        display: none;
+    }
+
+    .osu-cws td {
+        padding: 0 8px !important;
+    }
 }
