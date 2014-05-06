@@ -227,7 +227,7 @@ public class AppraisalsTest {
         appraisal1.setResultSubmitDate(new Date());
         appraisal1.setEvaluation("evaluation text");
         appraisal1.setRating(1);
-        GoalVersion firstGoalVersion = (GoalVersion) appraisal.getGoalVersions().toArray()[0];
+        GoalVersion firstGoalVersion = (GoalVersion) appraisal1.getGoalVersions().toArray()[0];
         firstGoalVersion.setRequestDecision(true);
 
         for (Assessment assessment : firstGoalVersion.getAssessments()) {
