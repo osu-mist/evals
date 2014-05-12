@@ -1,6 +1,7 @@
 package edu.osu.cws.evals.portlet;
 
 
+import edu.osu.cws.evals.models.AppointmentType;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.util.EvalsUtil;
@@ -99,6 +100,10 @@ public class RequiredAction {
         // text value.
         if (anchorText.equals("")) {
             anchorText = resource.getString(key);
+        }
+
+        if(appraisal.getJob().getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+            anchorText = anchorText.replace("rebuttal", "feedback");
         }
     }
 
