@@ -124,7 +124,8 @@ public class HomeAction implements ActionInterface {
 
     /**
      * Handles the user clicking on a link to reset the status of the open appraisal to set the status
-     * to goals-due or results-due.
+     * to goals-due or results-due. If reset to goals-due, this function resets the entire appraisal
+     * to a newly created state.
      *
      * @param request
      * @param response
@@ -146,12 +147,18 @@ public class HomeAction implements ActionInterface {
         }
 
         try {
-            Appraisal appraisal = new Appraisal();
-            appraisal.setId(id);
-            appraisal.setStatus(status);
-            appraisal.setOriginalStatus(status);
+            if(status.equals(Appraisal.STATUS_RESULTS_DUE)) {
+                Appraisal appraisal = new Appraisal();
+                appraisal.setId(id);
+                appraisal.setStatus(status);
+                appraisal.setOriginalStatus(status);
 
-            AppraisalMgr.updateAppraisalStatus(appraisal);
+                AppraisalMgr.updateAppraisalStatus(appraisal);
+            }
+            else if (status.equals(Appraisal.STATUS_GOALS_DUE)) {
+                Appraisal appraisal = AppraisalMgr.getAppraisal(id);
+                AppraisalMgr.resetAppraisal(appraisal);
+            }
         } catch (Exception e) {
             _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
         }

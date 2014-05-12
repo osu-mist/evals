@@ -44,7 +44,46 @@ public class AppraisalMgr {
      */
     public static Appraisal createAppraisal(Job job, DateTime startDate, String type)
             throws Exception {
-        Appraisal appraisal = new Appraisal();
+        Appraisal appraisal = new Appraisal();   //
+        initAppraisal(appraisal, job, startDate, type);
+        return appraisal;
+    }
+
+    /**
+     * Removes all goalVersions from the given appraisal,
+     * resets the given appraisal to the same state as a
+     * newly created appraisal, and adds a new goalVersion
+     * that has 5 blank assessments.
+     *
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    public static Appraisal resetAppraisal(Appraisal appraisal) throws Exception {
+        // Delete current goal versions
+        Session session = HibernateUtil.getCurrentSession();
+        Set<GoalVersion> goalVersions = appraisal.getGoalVersions();
+        for(GoalVersion goalVersion: goalVersions) {
+            goalVersions.remove(goalVersion);
+            session.delete(goalVersion);
+        }
+        initAppraisal(appraisal, appraisal.getJob(), DateTime.now(), Appraisal.TYPE_INITIAL);
+
+        return appraisal;
+    }
+
+    /**
+     * This method will set the given appraisal to an initialized state. Used to reset old
+     * appraisals, and initialize new/uninitialized appraisals.
+     *
+     * @param appraisal
+     * @param job
+     * @param startDate
+     * @param type
+     * @throws Exception
+     */
+    public static void initAppraisal(Appraisal appraisal, Job job, DateTime startDate, String type)
+            throws Exception {
         GoalVersion goalVersion = new GoalVersion();
         appraisal.addGoalVersion(goalVersion);
         goalVersion.setCreateDate(new Date());
@@ -81,8 +120,6 @@ public class AppraisalMgr {
                     criteriaList);
             session.save(appraisal);
         }
-
-        return appraisal;
     }
 
     /**
