@@ -44,3 +44,6 @@ from configurations where name like '%Due';
 insert into configurations
 select pass_seq.nextval, section, name, 35 + rownum, value + 5, reference_point, action, 'Professional Faculty'
 from configurations where name like '%Reminder';
+
+-- ev-115 send goals approval due email via the web gui instead of backend
+update appraisal_steps set email_type = 'goalsApprovalDue' where action = 'submit-goals';
