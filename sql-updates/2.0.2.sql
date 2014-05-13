@@ -44,3 +44,10 @@ from configurations where name like '%Due';
 insert into configurations
 select pass_seq.nextval, section, name, 35 + rownum, value + 5, reference_point, action, 'Professional Faculty'
 from configurations where name like '%Reminder';
+
+-- EV-117
+insert into status values('employeeReviewDue');
+update appraisal_steps set new_status = 'employeeReviewDue', email_type = 'employeeReviewDue' 
+where action = 'submit-appraisal' and appointment_type = 'Professional Faculty';
+insert into appraisal_steps values(pass_seq.nextval, 'submit-review', 'Professional Faculty', 'releaseDue', 'releaseDue');
+insert into email_types values('employeeReviewDue', 'employee', null, null);
