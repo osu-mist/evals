@@ -64,18 +64,6 @@
             status = 'A'
     </query>
     <query name="job.directShortJobEmployees">
-        select new edu.osu.cws.evals.models.Job(
-            employee.id,
-            positionNumber,
-            suffix,
-            employee.firstName,
-            employee.lastName,
-            jobTitle,
-            appointmentType,
-            status,
-            businessCenterName,
-            supervisor.id.positionNumber
-        )
         from edu.osu.cws.evals.models.Job job
         where
             job.status != 'T' and

@@ -1241,6 +1241,7 @@ public class AppraisalsAction implements ActionInterface {
         for (Job job : shortJobsWithEvals) {
             job.getEmployee().getName();
             job.getSupervisor().getPositionNumber();
+            ((Appraisal) job.getAppraisals().iterator().next()).getReviewPeriod();
         }
         for (Job job : shortJobsWithOutEvals) {
             job.getEmployee().getName();

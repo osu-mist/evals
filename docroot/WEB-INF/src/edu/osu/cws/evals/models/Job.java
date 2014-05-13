@@ -108,36 +108,6 @@ public class Job extends Evals implements Serializable {
     }
 
     /**
-     * Constructor used by JobMgr.getJob to only fetch the pk fields of the
-     * given job. The status and appointmentType fields are present for testing
-     * purposes.
-     *
-     * @param pidm
-     * @param positionNumber
-     * @param suffix
-     * @param firstName
-     * @param lastName
-     * @param jobTitle
-     */
-    public Job(int pidm, String positionNumber, String suffix, String firstName, String lastName, String jobTitle,
-               String appointmentType, String status, String businessCenterName, String supervisorPositionNumber) {
-        // create employee pojo
-        this.employee = new Employee();
-        this.employee.setId(pidm);
-        this.employee.setFirstName(firstName);
-        this.employee.setLastName(lastName);
-
-        this.positionNumber = positionNumber;
-        this.suffix = suffix;
-        this.jobTitle = jobTitle;
-        this.appointmentType = appointmentType;
-        this.status = status;
-        this.businessCenterName = businessCenterName;
-        this.supervisor = new Job();
-        this.supervisor.setPositionNumber(supervisorPositionNumber);
-    }
-
-    /**
      * Implementing equals method needed by Hibernate to use composite-ide
      *
      * @param o
@@ -568,6 +538,16 @@ public class Job extends Evals implements Serializable {
         salary.setSgrpCode(this.salaryGrpCode);
 
         return salary;
+    }
+
+    /**
+     * Returns the review period of the job based on the first evaluation. This is used by the
+     * professional faculty initiation page, where the employees usually have 1 or no evaluations.
+     *
+     * @return
+     */
+    public String getReviewPeriod() {
+        return ((Appraisal) getAppraisals().iterator().next()).getReviewPeriod();
     }
 }
 
