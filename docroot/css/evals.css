@@ -211,6 +211,14 @@ tr.ui-state-highlight {
     display: none;
 }
 
+.osu-cws table {
+    margin: 0 auto !important;
+}
+
+.osu-cws table.main {
+    width: 100% !important;
+}
+
 .osu-cws table.google-visualization-table-table {
   margin: auto;
 }
@@ -424,4 +432,89 @@ tr.ui-state-highlight {
     padding-left: 1em;
     font-weight: bold;
     margin-right: 12px;
+}
+
+
+@media print {
+    .osu-accordion-header,
+    .osu-cws fieldset,
+    .osu-cws legend {
+        border: 1px solid #333 !important;
+    }
+
+    .osu-cws td,
+    .osu-cws tfoot,
+    .osu-cws tr+tr {
+        border-color: #333 !important;
+    }
+
+    .appraisal-info,
+    .osu-cws h2,
+    .osu-cws table,
+    .portlet {
+        margin: 0 auto !important;
+    }
+
+    #banner,
+    .osu-accordion-header > img,
+    .portlet-title,
+    .portlet-top-menu,
+    .portlet-topper,
+    .tabs-hide {
+        display: none !important;
+    }
+
+    #wrapper,
+    .osu-accordion-header,
+    .osu-cws,
+    .osu-cws legend,
+    .osu-cws fieldset fieldset,
+    .portlet-left-bottom,
+    .portlet-msg-alert {
+        background: white !important;
+    }
+
+    .portlet-content,
+    .portlet-content-container,
+    .portlet-msg-alert {
+        padding: 0 !important;
+    }
+
+    .osu-cws fieldset fieldset legend,
+    .portlet-msg-alert {
+        border: none !important;
+    }
+
+    .osu-accordion-header,
+    .osu-cws td {
+        color: black !important;
+    }
+
+    .accordion-content {
+        border-left: 1px solid #333 !important;
+        border-right: 1px solid #333 !important;
+        border-bottom: 1px solid #333 !important;
+    }
+
+    .osu-cws {
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+    }
+
+    .osu-cws .appraisal-info em {
+        margin-left: 0 !important;
+    }
+
+    .osu-cws fieldset fieldset legend {
+        padding: 0 0.3em 0 !important;
+    }
+
+    .osu-cws h2 {
+        border-bottom: 2px solid #333 !important;
+        padding-bottom: 3px !important;
+    }
+
+    .osu-cws td {
+        padding: 0 8px !important;
+    }
 }
