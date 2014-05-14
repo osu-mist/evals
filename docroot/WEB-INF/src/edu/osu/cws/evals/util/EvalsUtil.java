@@ -104,6 +104,22 @@ public class EvalsUtil {
     }
 
     /**
+     * Whether or not the current status is passed it's due/expiration date. It relies on calling
+     * isDue.
+     *
+     * @param appraisal
+     * @param config
+     * @return
+     * @throws Exception
+     */
+    public static boolean isOverdue(Appraisal appraisal, Configuration config) throws Exception {
+        if (config == null) {
+            return false;
+        }
+        return isDue(appraisal, config) <= 0;
+    }
+
+    /**
       * Figures out if additional reminder email needs to be sent.
       * @param lastEmail
       * @param config a appropriate configuration object. It's the caller's responsibility to evals in
