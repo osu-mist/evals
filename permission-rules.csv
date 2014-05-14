@@ -113,3 +113,9 @@ id,status,role,approved_goals,unapproved_goals,goal_comments,results,supervisor_
 44195,closed,upper-supervisor,v,,,v,v,v,,v,,,,,y,,,,,Professional Faculty
 44196,rebuttalReadDue,supervisor,v,,,v,v,v,,v,e,,read-appraisal-rebuttal,action-required-rebuttal-read-due,y,,,,,Professional Faculty
 44197,rebuttalReadDue,upper-supervisor,v,,,v,v,v,,v,,,,,y,,,,,Professional Faculty
+44198,employeeReviewDue,employee,v,,,v,v,v,e,,,,submit-review,action-required-employee-review-due,y,,,,,Professional Faculty
+44199,employeeReviewDue,supervisor,v,,,v,v,v,,,,,,action-team-employee-review-due,y,,,,,Professional Faculty
+44200,employeeReviewDue,reviewer,,,,,,,,,,,,,,y,,,,Professional Faculty
+44201,employeeReviewDue,upper-supervisor,v,,,v,v,v,,,,,,,y,,,,,Professional Faculty
+44202,employeeReviewDue,superAdmin,,,,,,,,,,,,,,y,,,,Professional Faculty
+44203,employeeReviewDue,masterAdmin,v,,,v,v,v,,,,,,,y,y,,,,Professional Faculty
