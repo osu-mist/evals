@@ -1074,35 +1074,46 @@ public class Appraisal extends Evals {
      */
     public String getNewStatus(Map<String, Configuration> configMap)
             throws Exception {
-        String newStatus = null;
         String status = getStatus();
         //config object of this status
         Configuration config = ConfigurationMgr.getConfiguration(configMap, status, getAppointmentType());
 
+        HashMap<String, String> nextStatus = new HashMap<String, String>();
+        nextStatus.put(STATUS_GOALS_REACTIVATION_REQUESTED, STATUS_GOALS_APPROVED);
+        nextStatus.put(STATUS_GOALS_REACTIVATED, STATUS_GOALS_APPROVED);
+        nextStatus.put(STATUS_EMPLOYEE_REVIEW_DUE, STATUS_RELEASE_DUE);
+        nextStatus.put(STATUS_GOALS_APPROVED, STATUS_RESULTS_DUE);
+        nextStatus.put(STATUS_GOALS_REQUIRED_MODIFICATION, STATUS_GOALS_OVERDUE);
 
-        if (status.contains(Appraisal.DUE) && EvalsUtil.isDue(this, config) <= 0) {
-            newStatus = status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
-        } else if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)
-                && isGoalsReqModOverDue(configMap) && !areGoalsReactivated()) {
-            //goalsRequiredModification is not overdue.
-            newStatus = Appraisal.STATUS_GOALS_OVERDUE;
-        } else if (status.equals(Appraisal.STATUS_GOALS_APPROVED)) {
-            //Need to check to see if it's time to change the status to results due
-            Configuration reminderConfig = ConfigurationMgr.getConfiguration(configMap, "firstResultDueReminder",
-                    getAppointmentType());
-            if (EvalsUtil.isDue(this, reminderConfig) < 0) {
-                newStatus = Appraisal.STATUS_RESULTS_DUE;
-            }
-        } else if (status.equals(STATUS_GOALS_REACTIVATION_REQUESTED) ||
-                status.equals(STATUS_GOALS_REACTIVATED)) {
-            config = ConfigurationMgr.getConfiguration(configMap, status + "Expiration", getAppointmentType());
-            if (EvalsUtil.isDue(this, config) <= 0) {
-                // change status by timing out goals reactivation request and employee new goals submit
-                newStatus = STATUS_GOALS_APPROVED;
-            }
+        List<String> statusToExpire = new ArrayList<String>();
+        statusToExpire.add(STATUS_GOALS_REACTIVATION_REQUESTED);
+        statusToExpire.add(STATUS_GOALS_REACTIVATED);
+        statusToExpire.add(STATUS_EMPLOYEE_REVIEW_DUE);
+
+        if (status.contains(Appraisal.DUE) && EvalsUtil.isOverdue(this, config)) {
+            return status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
         }
 
-        return newStatus;
+        if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)
+                    && isGoalsReqModOverDue(configMap) && !areGoalsReactivated()) {
+            //goalsRequiredModification is not overdue.
+            return nextStatus.get(status);
+        }
+
+        if (status.equals(Appraisal.STATUS_GOALS_APPROVED)) {
+            // set correct config to check if it's time to change the status to results due
+            config = ConfigurationMgr.getConfiguration(configMap, "firstResultDueReminder",
+                    getAppointmentType());
+        } else if (statusToExpire.contains(status)) {
+            // get configuration to check if the status status needs to be expired
+            config = ConfigurationMgr.getConfiguration(configMap, status + "Expiration", getAppointmentType());
+        }
+
+        if (EvalsUtil.isOverdue(this, config)) {
+            return nextStatus.get(status);
+        }
+
+        return null;
     }
 
     /**
