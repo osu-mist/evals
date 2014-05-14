@@ -59,6 +59,23 @@ public class Appraisal extends Evals {
     public static final String DUE = "Due";
     public static final String OVERDUE = "Overdue";
 
+    private static final Map<String, String> nextStatus;
+    static {
+        Map<String, String> tempMap = new HashMap<String, String>();
+        tempMap.put(STATUS_GOALS_REACTIVATION_REQUESTED, STATUS_GOALS_APPROVED);
+        tempMap.put(STATUS_GOALS_REACTIVATED, STATUS_GOALS_APPROVED);
+        tempMap.put(STATUS_EMPLOYEE_REVIEW_DUE, STATUS_RELEASE_DUE);
+        tempMap.put(STATUS_GOALS_APPROVED, STATUS_RESULTS_DUE);
+        tempMap.put(STATUS_GOALS_REQUIRED_MODIFICATION, STATUS_GOALS_OVERDUE);
+        nextStatus = Collections.unmodifiableMap(tempMap);
+    }
+
+    private static final List<String> statusToExpire = Arrays.asList(
+            STATUS_GOALS_REACTIVATION_REQUESTED,
+            STATUS_GOALS_REACTIVATED,
+            STATUS_EMPLOYEE_REVIEW_DUE
+    );
+
     private int id;
 
     /**
@@ -1077,18 +1094,6 @@ public class Appraisal extends Evals {
         String status = getStatus();
         //config object of this status
         Configuration config = ConfigurationMgr.getConfiguration(configMap, status, getAppointmentType());
-
-        HashMap<String, String> nextStatus = new HashMap<String, String>();
-        nextStatus.put(STATUS_GOALS_REACTIVATION_REQUESTED, STATUS_GOALS_APPROVED);
-        nextStatus.put(STATUS_GOALS_REACTIVATED, STATUS_GOALS_APPROVED);
-        nextStatus.put(STATUS_EMPLOYEE_REVIEW_DUE, STATUS_RELEASE_DUE);
-        nextStatus.put(STATUS_GOALS_APPROVED, STATUS_RESULTS_DUE);
-        nextStatus.put(STATUS_GOALS_REQUIRED_MODIFICATION, STATUS_GOALS_OVERDUE);
-
-        List<String> statusToExpire = new ArrayList<String>();
-        statusToExpire.add(STATUS_GOALS_REACTIVATION_REQUESTED);
-        statusToExpire.add(STATUS_GOALS_REACTIVATED);
-        statusToExpire.add(STATUS_EMPLOYEE_REVIEW_DUE);
 
         if (status.contains(Appraisal.DUE) && EvalsUtil.isOverdue(this, config)) {
             return status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
