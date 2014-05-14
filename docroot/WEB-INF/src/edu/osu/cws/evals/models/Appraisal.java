@@ -43,6 +43,7 @@ public class Appraisal extends Evals {
     public static final String STATUS_SIGNATURE_DUE = "signatureDue";
     public static final String STATUS_SIGNATURE_OVERDUE = "signatureOverdue";
     public static final String STATUS_IN_REVIEW = "inReview";
+    public static final String STATUS_EMPLOYEE_REVIEW_DUE = "employeeReviewDue";
 
     public static final String STAGE_GOALS = "goals";
     public static final String STAGE_RESULTS = "results";

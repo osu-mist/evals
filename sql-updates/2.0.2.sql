@@ -51,3 +51,4 @@ update appraisal_steps set new_status = 'employeeReviewDue', email_type = 'emplo
 where action = 'submit-appraisal' and appointment_type = 'Professional Faculty';
 insert into appraisal_steps values(pass_seq.nextval, 'submit-review', 'Professional Faculty', 'releaseDue', 'releaseDue');
 insert into email_types values('employeeReviewDue', 'employee', null, null);
+insert into configurations values(pass_seq.nextval, 'configuration', 'employeeReviewDueExpiration', 16, '10', 'evaluationSubmitDate', 'add', 'Default');
