@@ -60,6 +60,8 @@ public class EvalsUtil {
             refDate = AppraisalMgr.getPendingRequestGoalVersionCreateDate(appraisal.getId());
         } else if (ref.equals("goal_reactivation_req_dec")) {
             refDate = AppraisalMgr.getUnapprovedGoalVersionRequestDecDate(appraisal.getId());
+        } else if (ref.equals("evaluationSubmitDate")) {
+            refDate = new DateTime(appraisal.getEvaluationSubmitDate());
         }
 
         if (refDate == null) //error
@@ -83,6 +85,22 @@ public class EvalsUtil {
     public static int isDue(Appraisal appraisal, Configuration config) throws Exception {
         DateTime dueDate = getDueDate(appraisal, config);
         return Days.daysBetween(getToday(), dueDate).getDays();
+    }
+
+    /**
+     * Whether or not the current status is passed it's due/expiration date. It relies on calling
+     * isDue.
+     *
+     * @param appraisal
+     * @param config
+     * @return
+     * @throws Exception
+     */
+    public static boolean isOverdue(Appraisal appraisal, Configuration config) throws Exception {
+        if (config == null) {
+            return false;
+        }
+        return isDue(appraisal, config) <= 0;
     }
 
     /**

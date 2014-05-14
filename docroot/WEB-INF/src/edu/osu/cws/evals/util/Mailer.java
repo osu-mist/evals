@@ -661,6 +661,16 @@ public class Mailer implements MailerInterface {
     }
 
     /**
+     * Fetch the body for employeeReviewDue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String employeeReviewDueBody(Appraisal appraisal) throws Exception {
+        return emailBundle.getString("email_employeeReviewDue_body");
+    }
+
+    /**
      * Fetch the body for releaseDue emailType
      * @param appraisal
      * @return

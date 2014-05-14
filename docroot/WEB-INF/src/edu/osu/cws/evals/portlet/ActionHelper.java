@@ -648,7 +648,8 @@ public class ActionHelper {
                     }
 
                     if (appraisalStatus.equals(Appraisal.STATUS_GOALS_REACTIVATION_REQUESTED) ||
-                            appraisalStatus.equals(Appraisal.STATUS_GOALS_REACTIVATED)) {
+                            appraisalStatus.equals(Appraisal.STATUS_GOALS_REACTIVATED) ||
+                            appraisalStatus.equals(Appraisal.STATUS_EMPLOYEE_REVIEW_DUE)) {
                         appraisalStatus += "Expiration";
                     }
                     configuration = ConfigurationMgr.getConfiguration(configurationMap, appraisalStatus,
