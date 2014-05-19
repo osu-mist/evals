@@ -208,6 +208,11 @@ public class BackendMgr {
      * @throws Exception
      */
     private void createProfessionalFacultyAnnual() throws Exception {
+        // If professional faculty is not enabled in EvalS, return immediately
+        if (!EvalsUtil.isProfessionalFacultyEnabled(configMap)) {
+            return;
+        }
+
         Job job = null;
         session = HibernateUtil.getCurrentSession();
         tx = session.beginTransaction();

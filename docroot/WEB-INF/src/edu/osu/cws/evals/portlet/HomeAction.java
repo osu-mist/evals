@@ -6,10 +6,8 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
-import edu.osu.cws.evals.models.AppointmentType;
-import edu.osu.cws.evals.models.Appraisal;
-import edu.osu.cws.evals.models.Employee;
-import edu.osu.cws.evals.models.Job;
+import edu.osu.cws.evals.models.*;
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
@@ -85,6 +83,11 @@ public class HomeAction implements ActionInterface {
      * @throws Exception
      */
     private boolean displayInitiateProfFacButton() throws Exception {
+        Map<String, Configuration> configMap = (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
+        if (!EvalsUtil.isProfessionalFacultyEnabled(configMap)) {
+            return false;
+        }
+
         List<String> appointmentTypes = new ArrayList<String>();
         appointmentTypes.add(AppointmentType.PROFESSIONAL_FACULTY);
 

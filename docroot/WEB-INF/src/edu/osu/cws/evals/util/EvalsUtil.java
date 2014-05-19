@@ -366,4 +366,15 @@ public class EvalsUtil {
     public static boolean isOneOfAdminRoles(String role) {
         return role.equals(ActionHelper.ROLE_MASTER_ADMIN) || role.equals(ActionHelper.ROLE_SUPER_ADMIN);
     }
+
+    /**
+     * Whether or not professional faculty is enabled for EvalS. If the configuration enableProfessionalFaculty value
+     * is set to 1, this function returns true.
+     *
+     * @return
+     */
+    public static boolean isProfessionalFacultyEnabled(Map<String, Configuration> configMap) {
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, "enableProfessionalFaculty", "Default");
+        return config.getValue().equals("1");
+    }
 }
