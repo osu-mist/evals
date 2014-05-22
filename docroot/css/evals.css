@@ -211,6 +211,10 @@ tr.ui-state-highlight {
     display: none;
 }
 
+.appraisal-info.collapses {
+    padding: 2px 8px;
+}
+
 .osu-cws table {
     margin: 0 auto !important;
 }
