@@ -17,6 +17,7 @@
     <portlet:param name="controller" value="AppraisalsAction"/>
 </portlet:resourceURL>
 <portlet:resourceURL var="saveDraftAJAXURL" id="update" escapeXml="false" />
+<portlet:resourceURL var="addGoalAJAXURL" id="addAssessment" escapeXml="false" />
 <portlet:actionURL var="resendAppraisalToNolij" escapeXml="false">
     <portlet:param name="id" value="${appraisal.id}"/>
     <portlet:param name="action" value="resendAppraisalToNolij"/>
