@@ -16,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.joda.time.DateTime;
+import org.hibernate.Session;
 
 import javax.portlet.*;
 import java.io.File;
@@ -637,7 +638,7 @@ public class AppraisalsAction implements ActionInterface {
 
     /**
      * Sets the assessment fields (goal & results) based on the information that the user entered
-     * in the form. It addAssessments to handle adding/deleting of goals.
+     * in the form. It updates all assessments.
      *
      * @throws Exception
      */
@@ -646,37 +647,23 @@ public class AppraisalsAction implements ActionInterface {
             return;
         }
 
-        // get the criteria we need for adding new goals via js
-        Assessment assessment = dbAssessmentsMap.entrySet().iterator().next().getValue();
-        List<AssessmentCriteria> sortedAssessmentCriteria = assessment.getSortedAssessmentCriteria();
-        List<CriterionArea> criterionAreas = new ArrayList<CriterionArea>();
-        for (AssessmentCriteria assessmentCriteria : sortedAssessmentCriteria) {
-            criterionAreas.add(assessmentCriteria.getCriteriaArea());
-        }
-
-        Integer nextSequence = calculateAssessmentSequence(dbAssessmentsMap);
+        Assessment assessment;
         for (AssessmentJSON assessmentJSON : jsonData.getAssessments().values())   {
             assessment = dbAssessmentsMap.get(assessmentJSON.getId().toString());
-
-            if (permRule.canEdit("unapprovedGoals")) { // Save Goals
-                Assessment jsAssessment = addAssessments(assessmentJSON , assessment, nextSequence,
-                        criterionAreas);
-
-                // if a new goal was added via js, keep track of it
-                if (jsAssessment != null) {
-                    nextSequence++;
-                    assessment = jsAssessment;
+            if (assessment != null) {
+                if (permRule.canEdit("unapprovedGoals")) { // Save Goals
+                    updateGoals(assessmentJSON, assessment, assessmentJSON.getDeleted().equals("1"));
                 }
-            }
 
-            // Save employee results
-            if (permRule.canEdit("results") && assessmentJSON.getEmployeeResult() != null) {
-                assessment.setEmployeeResult(assessmentJSON.getEmployeeResult());
-            }
+                // Save employee results
+                if (permRule.canEdit("results") && assessmentJSON.getEmployeeResult() != null) {
+                    assessment.setEmployeeResult(assessmentJSON.getEmployeeResult());
+                }
 
-            // Save supervisor results
-            if (permRule.canEdit("supervisorResults") && assessmentJSON.getSupervisorResult() != null) {
-                assessment.setSupervisorResult(assessmentJSON.getSupervisorResult());
+                // Save supervisor results
+                if (permRule.canEdit("supervisorResults") && assessmentJSON.getSupervisorResult() != null) {
+                    assessment.setSupervisorResult(assessmentJSON.getSupervisorResult());
+                }
             }
         }
     }
@@ -800,56 +787,36 @@ public class AppraisalsAction implements ActionInterface {
     }
 
     /**
-     * Whether the given assessment id is from an assessment added via js. JS added assessments
-     * have an id starting at 1. This id is always less than the id of the appraisal. Assessments
-     * in the db have an id greater than the appraisal id.
-     *
-     * @param assessmentId
+     * Creates a single new assessment and returns its id. Called by an ajax call when a user
+     * clicks on the "Add Goal" button.
+     * @param request
+     * @param response
      * @return
+     * @throws Exception
      */
-    private boolean isJSAssessment(Integer assessmentId) {
-        return assessmentId < 500 && assessmentId < appraisal.getId();
-    }
-
-
-    /**
-     * Handles adding/deleting goals based on the operations the user performed via js.
-     *
-     * @param jsonAssessment
-     * @param assessment
-     * @param nextSequence
-     * @param criterionAreas
-     * @return
-     */
-    private Assessment addAssessments(AssessmentJSON jsonAssessment, Assessment assessment,
-                               int nextSequence, List<CriterionArea> criterionAreas) {
+    public String addAssessment(PortletRequest request, PortletResponse response) throws Exception {
+        initialize(request);
+        initializeJSONData(request.getParameterMap());
+        Session session = HibernateUtil.getCurrentSession();
+        // Get assessmentCriteria
+        Assessment assessment = dbAssessmentsMap.entrySet().iterator().next().getValue();
+        List<AssessmentCriteria> sortedAssessmentCriteria = assessment.getSortedAssessmentCriteria();
+        List<CriterionArea> criterionAreas = new ArrayList<CriterionArea>();
+        for (AssessmentCriteria assessmentCriteria : sortedAssessmentCriteria) {
+            criterionAreas.add(assessmentCriteria.getCriteriaArea());
+        }
+        // Get goalVersion
         GoalVersion reactivatedGoalVersion = appraisal.getReactivatedGoalVersion();
-
-        // If there's no reactivated goal version, we're adding goals to the first goal version
         if (reactivatedGoalVersion == null) {
             reactivatedGoalVersion = (GoalVersion) appraisal.getGoalVersions().toArray()[0];
         }
-
-        boolean deleted = jsonAssessment.getDeleted().equals("1");
-        boolean jsAssessment = isJSAssessment(jsonAssessment.getId());
-
-        if (jsAssessment && !deleted) { // new assessments added via js
-            // create new assessment object
-            assessment = AppraisalMgr.createNewAssessment(reactivatedGoalVersion, nextSequence ,criterionAreas);
-        }
-
-        // only update the goals if the assessment is js and not deleted or it's from the db
-        if ((jsAssessment && !deleted) || !jsAssessment) {
-            updateGoals(jsonAssessment, assessment, deleted);
-        }
-
-        // If there was a new assessment/goal added via js, return it.
-        if (jsAssessment && !deleted) {
-            return assessment;
-        }
-
-        return null;
+        // Create new assessment
+        Integer nextSequence = calculateAssessmentSequence(dbAssessmentsMap);
+        assessment = AppraisalMgr.createNewAssessment(reactivatedGoalVersion, nextSequence, criterionAreas);
+        session.save(assessment);
+        return "{id:" + assessment.getId() + ", status:\"success\"}";
     }
+
 
     /**
      * Saves the rating on the salary object based on the rating the user selected:
