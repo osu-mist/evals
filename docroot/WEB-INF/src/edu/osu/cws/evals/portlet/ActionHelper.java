@@ -792,7 +792,6 @@ public class ActionHelper {
         }
 
         // set Employee  and employees object(s)
-        addToRequestMap("employees", EmployeeMgr.list());
         addToRequestMap("employee", loggedOnUser);
     }
 
