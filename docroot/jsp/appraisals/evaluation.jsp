@@ -24,47 +24,18 @@
             <!-- ><label for="<portlet:namespace />appraisal.rating">
                 <liferay-ui:message key="appraisal-rating-label" />
             </label> -->
-            
-                <input type="radio" name="<portlet:namespace />appraisal.rating" value="1" id="<portlet:namespace />appraisal.rating-1"
-                <c:if test="${appraisal.rating == 1}">
-                    checked="checked"
-                </c:if>
-                <c:if test="${permissionRule.evaluation == 'v'}">
-                    disabled="disabled"
-                </c:if> />
-                <label for="<portlet:namespace />appraisal.rating-1"><liferay-ui:message key="appraisal-rating-1" /></label><br />
-              
 
-              <input type="radio" name="<portlet:namespace />appraisal.rating" value="2" id="<portlet:namespace />appraisal.rating-2"
-                <c:if test="${appraisal.rating == 2}">
+            <c:forEach var="rating" items="${ratings}">
+                <input type="radio" name="<portlet:namespace />appraisal.rating" value="${rating.rate}"
+                       id="<portlet:namespace />appraisal.rating-${rating.rate}"
+                <c:if test="${appraisal.rating == rating.rate}">
                     checked="checked"
                 </c:if>
                 <c:if test="${permissionRule.evaluation == 'v'}">
                     disabled="disabled"
                 </c:if> />
-                <label for="<portlet:namespace />appraisal.rating-2"><liferay-ui:message key="appraisal-rating-2" /></label><br />
-              
-
-             <input type="radio" name="<portlet:namespace />appraisal.rating" value="3" id="<portlet:namespace />appraisal.rating-3"
-                <c:if test="${appraisal.rating == 3}">
-                    checked="checked"
-                </c:if>
-                <c:if test="${permissionRule.evaluation == 'v'}">
-                    disabled="disabled"
-                </c:if> />
-                <label for="<portlet:namespace />appraisal.rating-3"><liferay-ui:message key="appraisal-rating-3" /></label><br />
-              
-
-            <c:if test="${appraisal.job.appointmentType == 'Classified'}">
-                <input type="radio" name="<portlet:namespace />appraisal.rating" value="4" id="<portlet:namespace />appraisal.rating-4"
-                <c:if test="${appraisal.rating == 4}">
-                    checked="checked"
-                </c:if>
-                <c:if test="${permissionRule.evaluation == 'v'}">
-                    disabled="disabled"
-                </c:if> />
-                <label for="<portlet:namespace />appraisal.rating-4"><liferay-ui:message key="appraisal-rating-4" /></label>
-            </c:if>
+                <label for="<portlet:namespace />appraisal.rating-${rating.rate}">${rating.descripting}</label><br />
+            </c:forEach>
         </fieldset>
 
         <c:if test="${appraisal.isSalaryUsed}">

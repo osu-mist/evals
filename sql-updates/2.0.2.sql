@@ -58,3 +58,21 @@ insert into configurations values(pass_seq.nextval, 'configuration', 'employeeRe
 
 -- EV-123: enable/disable prof faculty
 insert into configurations values(pass_seq.nextval, 'configuration', 'enableProfessionalFaculty', 17, 0, 0, null, 'Default');
+
+-- EV-124: add rating table
+CREATE TABLE ratings (
+    ID NUMBER(11) NOT NULL,
+    RATE NUMBER(3) NOT NULL,
+    DESCRIPTION VARCHAR2(512 CHAR),
+    APPOINTMENT_TYPE VARCHAR2(45 CHAR)
+);
+insert into ratings values(1, 1, '1. Makes outstanding contribution in critical areas while meeting all major requirements of the position.', 'Classified');
+insert into ratings values(2, 2, '2. Performs requirements of the position in a satisfactory manner.', 'Classified');
+insert into ratings values(3, 3, '3. Does not meet performance requirements of the position in major or critical areas.', 'Classified');
+insert into ratings values(4, 4, '4. Not rated', 'Classified');
+insert into ratings values(5, 1, '1. Makes outstanding contribution in critical areas while meeting all major requirements of the position.', 'Classified IT');
+insert into ratings values(6, 2, '2. Performs requirements of the position in a satisfactory manner.', 'Classified IT');
+insert into ratings values(7, 3, '3. Does not meet performance requirements of the position in major or critical areas.', 'Classified IT');
+insert into ratings values(8, 1, '1. Makes outstanding contribution in critical areas while meeting all major requirements of the position.', 'Professional Faculty');
+insert into ratings values(9, 5, '2. Performs requirements of the position in a satisfactory manner.', 'Professional Faculty');
+insert into ratings values(10, 7, '3. Does not meet performance requirements of the position in major or critical areas.', 'Professional Faculty');

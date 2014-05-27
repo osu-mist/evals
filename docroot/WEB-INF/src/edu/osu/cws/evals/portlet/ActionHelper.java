@@ -372,7 +372,7 @@ public class ActionHelper {
 
     /**
      * Refreshes the context cache:
-     * admins, reviewers and configuration lists and maps.
+     * admins, reviewers, configurations, notices and ratings lists and maps.
      *
      * @throws Exception
      */
@@ -381,6 +381,7 @@ public class ActionHelper {
         setEvalsReviewers();
         setEvalsConfiguration();
         setNotices();
+        setRatings();
     }
 
     /**
@@ -804,6 +805,18 @@ public class ActionHelper {
     private void setNotices() throws Exception {
         Map notices = NoticeMgr.getNotices();
         portletContext.setAttribute("Notices", notices);
+    }
+
+    /**
+     * fetch the latest ratings from db and store in portlet context.
+     *
+     * @param
+     * @return Text of yellowBox message
+     * @throws Exception
+     */
+    private void setRatings() throws Exception {
+        Map ratings = RatingMgr.mapByAppointmentType();
+        portletContext.setAttribute("ratings", ratings);
     }
 
 }

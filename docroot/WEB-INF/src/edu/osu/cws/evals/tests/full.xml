@@ -701,4 +701,22 @@
           POSITIONDESCRIPTIONID="2"
           RESPONSE="response text 3"
       />
+  <ratings
+          ID="2"
+          RATE="2"
+          DESCRIPTION="You're great"
+          APPOINTMENT_TYPE="Classified"
+      />
+  <ratings
+          ID="1"
+          RATE="1"
+          DESCRIPTION="You're awesome"
+          APPOINTMENT_TYPE="Classified"
+      />
+  <ratings
+          ID="3"
+          RATE="1"
+          DESCRIPTION="You're IT awesome"
+          APPOINTMENT_TYPE="Classified IT"
+      />
 </dataset>
