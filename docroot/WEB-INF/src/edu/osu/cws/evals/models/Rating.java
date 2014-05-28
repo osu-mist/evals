@@ -1,6 +1,6 @@
 package edu.osu.cws.evals.models;
 
-public class Rating extends Evals implements Comparable<Rating> {
+public class Rating extends Evals {
     private Integer id;
 
     private Integer rate;
@@ -44,20 +44,4 @@ public class Rating extends Evals implements Comparable<Rating> {
         this.appointmentType = appointmentType;
     }
 
-    @Override
-    public int compareTo(Rating otherRating) {
-        final int BEFORE = -1;
-        final int EQUAL = 0;
-        final int AFTER = 1;
-
-        if (this.rate > otherRating.rate) {
-            return AFTER;
-        }
-
-        if (this.rate < otherRating.rate) {
-            return BEFORE;
-        }
-
-        return EQUAL;
-    }
 }

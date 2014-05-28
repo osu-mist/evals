@@ -9,7 +9,7 @@ import java.util.*;
 public class RatingMgr {
 
     /**
-     * Returns a hashmap of Configurations using the configuration name as the map key.
+     * Returns a hashmap of List<Rating> using the appointment type as the map key.
      *
      * @return
      * @throws Exception
@@ -29,16 +29,11 @@ public class RatingMgr {
             ratingList.add(rating);
         }
 
-        // sort the ratings for each appointment type
-        for (Map.Entry<String, List<Rating>> entry : ratingsMap.entrySet()) {
-            List<Rating> ratingList = entry.getValue();
-            Collections.sort(ratingList);
-        }
         return ratingsMap;
     }
 
     /**
-     * Grabs a list of configurations.
+     * Grabs a list of all ratings.
      *
      * @throws Exception
      * @return

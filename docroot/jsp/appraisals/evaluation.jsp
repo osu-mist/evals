@@ -34,7 +34,7 @@
                 <c:if test="${permissionRule.evaluation == 'v'}">
                     disabled="disabled"
                 </c:if> />
-                <label for="<portlet:namespace />appraisal.rating-${rating.rate}">${rating.descripting}</label><br />
+                <label for="<portlet:namespace />appraisal.rating-${rating.rate}">${rating.description}</label><br />
             </c:forEach>
         </fieldset>
 
