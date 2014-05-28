@@ -298,6 +298,9 @@ public class AppraisalsAction implements ActionInterface {
         actionHelper.addToRequestMap("appraisalNotice", Notices.get("Appraisal Notice"));
         appraisal.loadLazyAssociations();
 
+        Map<String, List<Rating>> ratingsMap = (HashMap) actionHelper.getPortletContext().getAttribute("ratings");
+        actionHelper.addToRequestMap("ratings", RatingMgr.getRatings(ratingsMap, appraisal.getAppointmentType()));
+
         actionHelper.addToRequestMap("appraisal", appraisal);
         actionHelper.addToRequestMap("permissionRule", permRule);
         Map<String, Configuration> configMap = (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
@@ -909,7 +912,9 @@ public class AppraisalsAction implements ActionInterface {
                                boolean  insertRecordIntoTable) throws Exception {
         // Create PDF
         String rootDir = actionHelper.getPortletContext().getRealPath("/");
-        EvalsPDF PdfGenerator = new EvalsPDF(rootDir, appraisal, resource, dirName, env);
+        Map<String, List<Rating>> ratingsMap = (HashMap) actionHelper.getPortletContext().getAttribute("ratings");
+        List<Rating> ratings = RatingMgr.getRatings(ratingsMap, appraisal.getAppointmentType());
+        EvalsPDF PdfGenerator = new EvalsPDF(rootDir, appraisal, resource, dirName, env, ratings);
         String filename = PdfGenerator.createPDF();
 
         // Insert a record into the nolij_copies table

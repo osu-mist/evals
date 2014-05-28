@@ -44,6 +44,7 @@ public class EvalsPDF {
     private String rootDir;
     private PermissionRule permRule;
     private Document document;
+    private List<Rating> ratings;
 
     /**
      * @param rootDir       Root directory where the images and other resources can be found
@@ -51,14 +52,17 @@ public class EvalsPDF {
      * @param resource      ResourceBundle object
      * @param dirName       the directory PDF files resides.
      * @param env   either "prod" or "dev2"
+     * @param ratings       Sorted list of ratings
      */
-    public EvalsPDF(String rootDir, Appraisal appraisal, ResourceBundle resource, String dirName, String env) {
+    public EvalsPDF(String rootDir, Appraisal appraisal, ResourceBundle resource, String dirName, String env,
+                    List<Rating> ratings) {
         this.rootDir = rootDir;
         this.appraisal = appraisal;
         this.resource = resource;
         this.dirName = dirName;
         this.environment = env;
         this.permRule = appraisal.getPermissionRule();
+        this.ratings = ratings;
         Rectangle pageSize = new Rectangle(612f, 792f);
         this.document = new Document(pageSize, 50f, 40f, 24f, 24f);
     }
@@ -355,12 +359,12 @@ public class EvalsPDF {
         document.add(ratingLbl);
 
         int ratingMaxCols = 30;
-        PdfPTable rating = new PdfPTable(ratingMaxCols);
+        PdfPTable ratingTable = new PdfPTable(ratingMaxCols);
         PdfPCell emptyLeftCol = new PdfPCell();
         emptyLeftCol.setBorder(Rectangle.NO_BORDER);
         emptyLeftCol.setRowspan(4);
-        rating.addCell(emptyLeftCol);
-        rating.setWidthPercentage(100f);
+        ratingTable.addCell(emptyLeftCol);
+        ratingTable.setWidthPercentage(100f);
         PdfPCell cell;
 
         // Use an image for the unchecked box
@@ -379,50 +383,19 @@ public class EvalsPDF {
         uncheckedBox.setVerticalAlignment(Element.ALIGN_MIDDLE);
         uncheckedBox.setBorder(Rectangle.NO_BORDER);
 
-        if (appraisal.getRating() != null && appraisal.getRating() == 1) {
-            rating.addCell(checkedBox);
-        } else {
-            rating.addCell(uncheckedBox);
-        }
-        cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-1"), FONT_10));
-        cell.setColspan(ratingMaxCols - 2);
-        cell.setBorder(Rectangle.NO_BORDER);
-        rating.addCell(cell);
-
-        if (appraisal.getRating() != null && appraisal.getRating() == 2) {
-            rating.addCell(checkedBox);
-        } else {
-            rating.addCell(uncheckedBox);
-        }
-        cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-2"), FONT_10));
-        cell.setColspan(ratingMaxCols - 2);
-        cell.setBorder(Rectangle.NO_BORDER);
-        rating.addCell(cell);
-
-        if (appraisal.getRating() != null && appraisal.getRating() == 3) {
-            rating.addCell(checkedBox);
-        } else {
-            rating.addCell(uncheckedBox);
-        }
-        cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-3"), FONT_10));
-        cell.setColspan(ratingMaxCols - 2);
-        cell.setBorder(Rectangle.NO_BORDER);
-        rating.addCell(cell);
-
-        // Classified IT evals don't allow rating 4
-        if (!appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
-            if (appraisal.getRating() != null && appraisal.getRating() == 4) {
-                rating.addCell(checkedBox);
+        for (Rating rating : ratings) {
+            if (appraisal.getRating() != null && appraisal.getRating().equals(rating.getRate())) {
+                ratingTable.addCell(checkedBox);
             } else {
-                rating.addCell(uncheckedBox);
+                ratingTable.addCell(uncheckedBox);
             }
-            cell = new PdfPCell(new Paragraph(resource.getString("appraisal-rating-4"), FONT_10));
+            cell = new PdfPCell(new Paragraph(rating.getDescription(), FONT_10));
             cell.setColspan(ratingMaxCols - 2);
             cell.setBorder(Rectangle.NO_BORDER);
-            rating.addCell(cell);
+            ratingTable.addCell(cell);
         }
 
-        document.add(rating);
+        document.add(ratingTable);
 
         // only Classified IT evals get the salary table
         if (appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
