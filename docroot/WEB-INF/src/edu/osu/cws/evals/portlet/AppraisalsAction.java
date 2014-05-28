@@ -40,6 +40,8 @@ public class AppraisalsAction implements ActionInterface {
 
     private Appraisal appraisal = null;
 
+    private AppraisalStep appraisalStep = null;
+
     private PermissionRule permRule = null;
 
     private String userRole;
@@ -494,30 +496,31 @@ public class AppraisalsAction implements ActionInterface {
         AppraisalMgr.updateAppraisal(appraisal, loggedInUser);
 
         // Send email if needed
-        AppraisalStep appraisalStep;
-        String employeeResponse = appraisal.getRebuttal();
-
-        // If the employee signs and provides a rebuttal, we want to use a different
-        // appraisal step so that we can send an email to the reviewer.
-        if (submittedRebuttal(employeeResponse)) {
-            String appraisalStepKey = "submit-response-" + appraisal.getAppointmentType();
-            appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
-            // If the appointment type doesn't exist in the table, use "Default" type.
-            if (appraisalStep == null) {
-                appraisalStep = (AppraisalStep) appraisalSteps.get("submit-response-Default");
-            }
-        } else {
-            appraisalStep = getAppraisalStep();
-        }
-
-        EmailType emailType = null;
-        if (appraisalStep != null) {
-            emailType = appraisalStep.getEmailType();
-        }
-
+        EmailType emailType = getEmailType();
         if (emailType != null) {
             mailer.sendMail(appraisal, emailType);
         }
+    }
+
+    /**
+     * Returns the email type to be used. Null if the web interface doesn't need to send the email.
+     *
+     * @return
+     * @throws Exception
+     */
+    private EmailType getEmailType() throws Exception {
+        // the backend is going to send the email
+        if (appraisalStep.getEmailType() == null) {
+            return null;
+        }
+
+        // use the appraisal step email type when the status wasn't changed to *overdue
+        if (appraisal.getStatus().equals(appraisalStep.getNewStatus())) {
+            return appraisalStep.getEmailType();
+        }
+
+        Map<String, EmailType> emailTypeMap = EmailTypeMgr.getMap();
+        return emailTypeMap.get(appraisal.getStatus());
     }
 
     /**
@@ -610,7 +613,6 @@ public class AppraisalsAction implements ActionInterface {
         // Updates the appraisal status if it's needed
         updateStatus();
 
-
         if(appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
             appraisal.getUnapprovedGoalsVersion().setGoalsRequiredModificationDate(new Date());
         }
@@ -629,7 +631,7 @@ public class AppraisalsAction implements ActionInterface {
 
         // If the appraisalStep object has a new status, update the appraisal object
         String newStatus = null;
-        AppraisalStep appraisalStep = getAppraisalStep();
+        setAppraisalStep();
         if (appraisalStep != null) {
             newStatus = appraisalStep.getNewStatus();
         }
@@ -894,22 +896,30 @@ public class AppraisalsAction implements ActionInterface {
      *
      * @return
      */
-    private AppraisalStep getAppraisalStep() {
+    private void setAppraisalStep() {
         HashMap appraisalSteps = (HashMap) actionHelper.getPortletContextAttribute("appraisalSteps");
-        AppraisalStep appraisalStep;
+        String employeeResponse = appraisal.getRebuttal();
         String appraisalStepKey;
-        ArrayList<String> appraisalButtons = new ArrayList<String>();
-        if (permRule.getSaveDraft() != null) {
-            appraisalButtons.add(permRule.getSaveDraft());
+
+        // If the employee submits a comment for the rebuttal, use a different appraisal step
+        if (submittedRebuttal(employeeResponse)) {
+            appraisalStepKey = "submit-response-" + appraisal.getAppointmentType();
+            appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
+            // If the appointment type doesn't exist in the table, use "Default" type.
+            if (appraisalStep == null) {
+                appraisalStep = (AppraisalStep) appraisalSteps.get("submit-response-Default");
+            }
+
+            return;
         }
-        if (permRule.getSecondarySubmit() != null) {
-            appraisalButtons.add(permRule.getSecondarySubmit());
-        }
-        if (permRule.getSubmit() != null) {
-            appraisalButtons.add(permRule.getSubmit());
-        }
-        // close out button
-        appraisalButtons.add("close-appraisal");
+
+        List<String> appraisalButtons = new ArrayList<String>(Arrays.asList(
+                permRule.getSaveDraft(),
+                permRule.getSecondarySubmit(),
+                permRule.getSubmit(),
+                "close-appraisal" // close out button
+        ));
+        appraisalButtons.removeAll(Collections.singleton(null)); // remove any buttons that were null
 
         for (String button : appraisalButtons) {
             // If this button is the one the user clicked, use it to look up the
@@ -919,13 +929,10 @@ public class AppraisalsAction implements ActionInterface {
                 appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
                 // If the appointment type doesn't exist in the table, use "Default" type.
                 if (appraisalStep == null) {
-                    return (AppraisalStep) appraisalSteps.get(button + "-" + "Default");
+                    appraisalStep = (AppraisalStep) appraisalSteps.get(button + "-" + "Default");
                 }
-                return appraisalStep;
             }
         }
-
-        return null;
     }
 
     private String GeneratePDF(Appraisal appraisal, String dirName, String env,
@@ -1139,7 +1146,7 @@ public class AppraisalsAction implements ActionInterface {
 
         HashMap<String,AppraisalStep> appraisalSteps =
                 (HashMap) actionHelper.getPortletContextAttribute("appraisalSteps");
-        AppraisalStep appraisalStep = appraisalSteps.get("request-goals-reactivation-Default");
+        appraisalStep = appraisalSteps.get("request-goals-reactivation-Default");
 
         // update status
         appraisal.setOriginalStatus(appraisal.getStatus());
