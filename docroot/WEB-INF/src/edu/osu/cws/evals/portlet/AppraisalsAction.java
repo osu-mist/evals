@@ -544,7 +544,6 @@ public class AppraisalsAction implements ActionInterface {
      *
      */
     public void setAppraisalFields() throws Exception {
-        String newStatus = null;
         Map<String, Boolean> dates = new HashMap<String, Boolean>();
         Map<String, Boolean> pidm = new HashMap<String, Boolean>();
         boolean clickedSubmitButton = jsonData.getButtonClicked().equals(permRule.getSubmit());
@@ -608,7 +607,28 @@ public class AppraisalsAction implements ActionInterface {
             }
         }
 
+        // Updates the appraisal status if it's needed
+        updateStatus();
+
+
+        if(appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
+            appraisal.getUnapprovedGoalsVersion().setGoalsRequiredModificationDate(new Date());
+        }
+
+        saveAppraisalMetadata(dates, pidm);
+    }
+
+    /**
+     * After the user saved/submitted the appraisal, it checks the appraisal step and appraisal.getNewStatus() to
+     * set the status of the appraisal.
+     *
+     * @throws Exception
+     */
+    private void updateStatus() throws Exception {
+        Map<String, Configuration> configMap = (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
+
         // If the appraisalStep object has a new status, update the appraisal object
+        String newStatus = null;
         AppraisalStep appraisalStep = getAppraisalStep();
         if (appraisalStep != null) {
             newStatus = appraisalStep.getNewStatus();
@@ -616,17 +636,17 @@ public class AppraisalsAction implements ActionInterface {
 
         if (newStatus != null && !newStatus.equals(appraisal.getStatus())) {
             appraisal.setStatus(newStatus);
+            // check if the status needs to be updated
+            newStatus = appraisal.getNewStatus(configMap);
+            if (newStatus != null) {
+                appraisal.setStatus(newStatus);
+            }
+
             String employeeResponse = appraisal.getRebuttal();
             if (submittedRebuttal(employeeResponse)) {
                 appraisal.setStatus(Appraisal.STATUS_REBUTTAL_READ_DUE);
             }
         }
-
-        if(appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
-            appraisal.getUnapprovedGoalsVersion().setGoalsRequiredModificationDate(new Date());
-        }
-
-        saveAppraisalMetadata(dates, pidm);
     }
 
     /**
