@@ -397,16 +397,16 @@ public class AppraisalMgr {
      * employeSignedDate. If the posno and suffix are specific, the team appraisals are
      * specific to that supervising job.
      *
-     * @param pidm          Supervisor's pidm.
+     * @param supervisorPidm          Supervisor's pidm.
      * @param onlyActive    Whether or not to include only the active appraisals
      * @param posno         Supervisor's posno
      * @param suffix        Supervisor's suffix
      * @return List of Appraisal that contains the jobs this employee supervises.
      */
-    public static ArrayList<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive,
+    public static ArrayList<Appraisal> getMyTeamsAppraisals(Integer supervisorPidm, boolean onlyActive,
                                                  String posno, String suffix) {
         ArrayList<Appraisal> appraisals = new ArrayList<Appraisal>();
-        List<Integer> pidms = new ArrayList<Integer>();
+        List<Integer> employeePidms = new ArrayList<Integer>();
         Session session = HibernateUtil.getCurrentSession();
 
         String query =
@@ -430,7 +430,7 @@ public class AppraisalMgr {
             query += " AND status NOT LIKE 'archived%' ";
         }
         query += "WHERE" +
-                " jobs.PYVPASJ_SUPERVISOR_PIDM=:pidm AND " +
+                " jobs.PYVPASJ_SUPERVISOR_PIDM=:supervisorPidm AND " +
                 " jobs.PYVPASJ_APPOINTMENT_TYPE IN ('" +
                 AppointmentType.PROFESSIONAL_FACULTY + "', '" +
                 AppointmentType.CLASSIFIED + "', '" +
@@ -451,7 +451,7 @@ public class AppraisalMgr {
                 .addScalar("EMPLOYEE_SIGNED_DATE", StandardBasicTypes.DATE)
                 .addScalar("PYVPASJ_PIDM", StandardBasicTypes.INTEGER)
                 .addScalar("OVERDUE", StandardBasicTypes.INTEGER)
-                .setInteger("pidm", pidm);
+                .setInteger("supervisorPidm", supervisorPidm);
         if (!StringUtils.isEmpty(posno) && !StringUtils.isEmpty(suffix)) {
             hibQuery.setString("posno", posno).setString("suffix", suffix);
         }
@@ -477,11 +477,11 @@ public class AppraisalMgr {
                     startDate, endDate, status, employeeSignDate, employeePidm,
                     overdue);
             appraisals.add(appraisal);
-            pidms.add(employeePidm);
+            employeePidms.add(employeePidm);
         }
 
         List<Employee> employees = session.getNamedQuery("employee.firstAndLastNameByPidm")
-                .setParameterList("ids", pidms).list();
+                .setParameterList("ids", employeePidms).list();
         HashMap<Integer, Employee> employeeHashMap = new HashMap<Integer, Employee>();
         for (Employee employee : employees) {
             employeeHashMap.put(employee.getId(), employee);
