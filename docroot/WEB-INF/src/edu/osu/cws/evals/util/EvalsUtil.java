@@ -361,4 +361,8 @@ public class EvalsUtil {
         Configuration config = ConfigurationMgr.getConfiguration(configMap, "enableProfessionalFaculty", "Default");
         return config.getValue().equals("1");
     }
+
+    public static boolean isTodayFirstMondayOfMonth() {
+        return true;
+    }
 }

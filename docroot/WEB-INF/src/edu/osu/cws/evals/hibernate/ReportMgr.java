@@ -12,10 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 public class ReportMgr {
 
@@ -595,5 +592,29 @@ public class ReportMgr {
      */
     public static boolean isWayOverdueReport(String reportType) {
         return reportType.contains("WayOverdue");
+    }
+
+    /**
+     * Returns a list of late evaluations. The data returned is a list of object[] since we only needed a few
+     * columns from various tables. It was less code/simpler to do it via sql rather than hql.
+     *
+     * @return List<Object[]>           Late evaluation records
+     */
+    public static List<Object[]> getLateEvaluations() {
+        Session session = HibernateUtil.getCurrentSession();
+        List<String> supportedAppointmentTypes = Arrays.asList(
+                AppointmentType.CLASSIFIED,
+                AppointmentType.CLASSIFIED_IT);
+
+        List<String> ignoredStatus = Arrays.asList(
+                Appraisal.STATUS_COMPLETED,
+                Appraisal.STATUS_CLOSED,
+                Appraisal.STATUS_ARCHIVED_CLOSED,
+                Appraisal.STATUS_ARCHIVED_COMPLETED
+        );
+
+        return session.getNamedQuery("report.reportLateEvaluations")
+                .setParameterList("ignoredStatus", ignoredStatus)
+                .list();
     }
 }

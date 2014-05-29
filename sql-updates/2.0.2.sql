@@ -76,3 +76,14 @@ insert into ratings values(7, 3, '3. Does not meet performance requirements of t
 insert into ratings values(8, 1, '1. Makes outstanding contribution in critical areas while meeting all major requirements of the position.', 'Professional Faculty');
 insert into ratings values(9, 5, '2. Performs requirements of the position in a satisfactory manner.', 'Professional Faculty');
 insert into ratings values(10, 7, '3. Does not meet performance requirements of the position in major or critical areas.', 'Professional Faculty');
+
+-- EV-129: late report
+insert into email_types values ('lateReportAABC', 'reviewer', null, null);
+insert into email_types values ('lateReportAMBC', 'reviewer', null, null);
+insert into email_types values ('lateReportASBC', 'reviewer', null, null);
+insert into email_types values ('lateReportBEBC', 'reviewer', null, null);
+insert into email_types values ('lateReportCCBC', 'reviewer', null, null);
+insert into email_types values ('lateReportFOBC', 'reviewer', null, null);
+insert into email_types values ('lateReportHSBC', 'reviewer', null, null);
+insert into email_types values ('lateReportUABC', 'reviewer', null, null);
+insert into email_types values ('lateReportadmins', 'admins', null, null);

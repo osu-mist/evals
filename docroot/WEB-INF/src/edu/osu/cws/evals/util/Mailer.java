@@ -12,6 +12,7 @@ import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.util.CWSUtil;
 import edu.osu.cws.util.Logger;
+import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.joda.time.DateTime;
@@ -413,6 +414,53 @@ public class Mailer implements MailerInterface {
             } catch (Exception logError) { }
         }
 
+    }
+
+    /**
+     * Sends email to either admin/bc users with attachment of late evaluations csv report.
+     *
+     * @param emailAddresses
+     * @param filePath
+     * @param bcName                    BC name that the report is being sent to.
+     */
+    public void sendLateReport(String[] emailAddresses, String filePath, String bcName) {
+        try {
+            String body = emailBundle.getString("email_lateReport_body");
+            HtmlEmail email = getHtmlEmail();
+
+            if(testMailToAddress != null && !testMailToAddress.equals("")){
+                for(int i = 0; i < emailAddresses.length; i ++) {
+                    emailAddresses[i] = testMailToAddress;
+                }
+            }
+
+            // Create the attachment
+            EmailAttachment attachment = new EmailAttachment();
+            attachment.setPath(filePath);
+            attachment.setDisposition(EmailAttachment.ATTACHMENT);
+            attachment.setDescription("Late Performance Evaluations");
+            attachment.setName("late-performance-evaluations.csv");
+
+            email.attach(attachment);
+            email.addTo(emailAddresses);
+            email.setHtmlMsg(body);
+            email.setSubject(emailBundle.getString("email_lateReport_subject"));
+            email.send();
+
+            String longMsg = "Emails sent to: various reviewers";
+            logger.log(Logger.INFORMATIONAL, "Reviewer emails sent", longMsg);
+
+            Email evalsEmail = new Email(0, "lateReport" + bcName);
+            EmailMgr.add(evalsEmail);
+        } catch (Exception e) {
+            String logLongMessage = "";
+            String shortMessage = "Error in sendLateReport";
+            try {
+                logLongMessage = "Error encountered when sending mail to reviewers" +
+                        "\n" + CWSUtil.stackTraceString(e);
+                logger.log(Logger.ERROR, shortMessage, logLongMessage);
+            } catch (Exception logError) { }
+        }
     }
 
     /**

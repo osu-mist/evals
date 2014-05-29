@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.backend;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import com.google.inject.Inject;
 import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
@@ -13,6 +14,10 @@ import org.hibernate.Transaction;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.*;
 
 public class BackendMgr {
@@ -21,6 +26,7 @@ public class BackendMgr {
     private int updateCount = 0;
     private int followupEmailCount = 0;
     List<String> bcEmailsSent = new ArrayList<String>(); // BCs that we sent emails to
+    List<String> reportEmailsSent = new ArrayList<String>(); // BCs that we sent late report emails to
     private int openCount = 0; // # of open appraisals
     private int archivedCount = 0;
 
@@ -87,6 +93,7 @@ public class BackendMgr {
           archiveAppraisals();
           emailSupervisors();
           emailReviewers();
+         sendLateEvaluationsReport();
        } catch(Exception e)
        {
          if (totalErrorCount >= Constants.MAX_ERROR_COUNT)
@@ -136,6 +143,7 @@ public class BackendMgr {
         System.out.println("Number of followup emails sent: ............" + followupEmailCount);
         System.out.println("Number of supervisor emails sent: .........." + supervisorEmailsSent);
         System.out.println("Email sent to BCs: ........................." + bcEmailsSent);
+        System.out.println("Late Report email sent to BCs: ............." + reportEmailsSent);
         System.out.println("Number of errors occurred:..................." + totalErrorCount);
         System.out.println("Job starting at ............................" + startTime);
         System.out.println("Job exiting at ............................." + exitTime);
@@ -820,7 +828,6 @@ public class BackendMgr {
                 session = HibernateUtil.getCurrentSession();
                 tx = session.beginTransaction();
                 String bcName = bc.getName();
-                String[] emailAddresses;
                 int dueCount = AppraisalMgr.getReviewDueCount(bcName);
                 int overdueCount = AppraisalMgr.getReviewOvedDueCount(bcName);
 
@@ -829,26 +836,12 @@ public class BackendMgr {
                     continue;
                 }
 
-                List<Reviewer> reviewers = ReviewerMgr.getReviewers(bcName);
-
-
-                if (reviewers.size() == 0)
-                {
-                    logDataError("No reviewers in BC: " + bcName);
+                String[] emailAddresses = getReviewersEmails(bcName);
+                if (emailAddresses == null) { // no email addresses for this bc.
                     tx.commit();
                     continue;
                 }
-                else
-                {
-                    emailAddresses = new String[reviewers.size()];
-                    for (int i = 0; i < reviewers.size(); i++)
-                    {
-                        Reviewer reviewer= reviewers.get(i);
-                        emailAddresses[i] = reviewer.getEmployee().getEmail();
-                    }
-                }
-                System.out.println("There are " + emailAddresses.length + " reviewers.");
-                System.out.println("first email address = " + emailAddresses[0] + ". BC name = " + bcName);
+
                 System.out.println("Numbers: " + dueCount + ", " + overdueCount);
                 mailer.sendReviewerMail(emailAddresses, dueCount, overdueCount);
                 tx.commit();
@@ -868,6 +861,54 @@ public class BackendMgr {
                log_error(msg, e);
            }
        }
+    }
+
+    /**
+     * Returns an array with emails for the reviewers of a BC.
+     *
+     * @param bcName
+     * @return
+     * @throws Exception
+     */
+    private String[] getReviewersEmails(String bcName) throws Exception {
+        ArrayList<String> emailAddresses = new ArrayList<String>();
+        List<Reviewer> reviewers = ReviewerMgr.getReviewers(bcName);
+
+        if (reviewers.size() == 0) {
+            logDataError("No reviewers in BC: " + bcName);
+            return null;
+        } else {
+            for (Reviewer reviewer : reviewers) {
+                emailAddresses.add(reviewer.getEmployee().getEmail());
+            }
+        }
+
+        System.out.println("There are " + emailAddresses.size() + " reviewers.");
+        System.out.println("first email address = " + emailAddresses.get(0) + ". BC name = " + bcName);
+        return emailAddresses.toArray(new String[emailAddresses.size()]);
+    }
+
+    /**
+     * Returns an array with emails for all the admin users.
+     *
+     * @return
+     * @throws Exception
+     */
+    private String[] getAdminEmails() throws Exception {
+        ArrayList<String> emailAddresses = new ArrayList<String>();
+        List<Admin> admins = AdminMgr.list();
+        if (admins.size() == 0) {
+            logDataError("No admin users");
+            return null;
+        } else {
+            for (Admin admin : admins) {
+                emailAddresses.add(admin.getEmployee().getEmail());
+            }
+        }
+
+        System.out.println("There are " + emailAddresses.size() + " admins.");
+        System.out.println("first email address = " + emailAddresses.get(0));
+        return emailAddresses.toArray(new String[emailAddresses.size()]);
     }
 
     /**
@@ -989,6 +1030,152 @@ public class BackendMgr {
         // at this point, only the prof. faculty 1st evaluation that whose review cycle hasn't
         // started is the one we block the emails from being sent.
         return true;
+    }
+
+    /**
+     * Sends csv reports of late evaluations that haven't been completed to the various BC and admin users.
+     *
+     * @throws Exception
+     */
+    private void sendLateEvaluationsReport() throws Exception {
+        session = HibernateUtil.getCurrentSession();
+        tx = session.beginTransaction();
+        String bcName = "";
+        List<Object[]> lateEvaluations = ReportMgr.getLateEvaluations();
+        Map<String, String> lateEvalCSVFiles = writeLateEvalsCSVFiles(lateEvaluations);
+        tx.commit();
+
+        for (Map.Entry<String, String> lateBcEvals : lateEvalCSVFiles.entrySet()) {
+            try
+            {
+                bcName = lateBcEvals.getKey();
+                if (checkLateReportFrequency(bcName)) {
+                    //@todo: this method should figure out if we need to send the email again if the cron didn't run properly
+                    return;
+                }
+
+                session = HibernateUtil.getCurrentSession();
+                tx = session.beginTransaction();
+                String filePath = lateBcEvals.getValue();
+                String[] emailAddresses;
+                if (bcName.equals("admins")) {
+                    emailAddresses = getAdminEmails();
+                } else {
+                    emailAddresses = getReviewersEmails(bcName);
+                }
+
+                if (emailAddresses == null) { // no email addresses for the report
+                    tx.commit();
+                    continue;
+                }
+
+                mailer.sendLateReport(emailAddresses, filePath, bcName);
+                tx.commit();
+                System.out.println("Done with report: " + bcName);
+
+                // log the bc names that get emails sent.
+                if (emailAddresses.length != 0 && emailAddresses[0] != null) {
+                    reportEmailsSent.add(bcName);
+                }
+            } catch(Exception e) {
+                if (session != null & session.isOpen())
+                    session.close();
+                String msg = "Error sending late report email to " + bcName;
+                logDataError(msg);
+                errorMsg.append("\n" + msg);
+                log_error(msg, e);
+            }
+        }
+
+        // delete csv reports
+        for (String filePath : lateEvalCSVFiles.values()) {
+            File report = new File(filePath);
+            if (!report.delete()) {
+                logDataError("\n" + "Failed to delete late evaluations report: " + filePath);
+            }
+        }
+    }
+
+    /**
+     * Checks whether or not it is time to send the late evaluation report for this month.
+     *
+     * @param bcName
+     * @return
+     * @throws Exception
+     */
+    private boolean checkLateReportFrequency(String bcName) throws Exception {
+        Email lastEmail = EmailMgr.getLastEmail(0, "lateReport" + bcName);
+        if (lastEmail == null) {
+            return true;
+        }
+
+        DateTime lastEmailSentDate = new DateTime(lastEmail.getSentDate());
+        DateTime firstDayOfMonth = new DateTime().withDayOfMonth(1).withTimeAtStartOfDay();
+        return firstDayOfMonth.isAfter(lastEmailSentDate);
+    }
+
+    /**
+     * Writes to disk the csv files with the list of late evaluations for each bc.
+     *
+     * @param lateEvaluations           List<Object[]> hibernate sql result with late evaluations
+     * @return lateEvalCSVFiles         A map with the path to each one of the csv files generated.
+     * @throws IOException
+     */
+    private Map<String, String> writeLateEvalsCSVFiles(List<Object[]> lateEvaluations) throws IOException {
+        Map<String, String> lateEvalCSVFiles = new HashMap<String, String>();
+        StringWriter stringWriter = new StringWriter();
+        CSVWriter writer = new CSVWriter(stringWriter);
+        String bcName = null;
+        String allLateEvals = "";
+
+        for (Object[] lateEval : lateEvaluations) {
+            // write csv file for late evaluations of a single BC
+            if (bcName != null && !lateEval[10].toString().equals(bcName)) {
+                String filename = Constants.TMP_DIR_REPORT_CSV + bcName + ".csv";
+                PrintWriter out = new PrintWriter(filename);
+                lateEvalCSVFiles.put(bcName, filename);
+                StringBuffer buffer = stringWriter.getBuffer();
+                String bcLateString = buffer.toString();
+                out.print(bcLateString);
+                out.close();
+
+                // save contents of single bc late evals and clear out buffer for next bc
+                allLateEvals += bcLateString;
+                buffer.setLength(0);
+            }
+
+            bcName = lateEval[10].toString();
+            writeLateCSVRow(writer, lateEval);
+        }
+        writer.close();
+
+        // write file with all late evaluations
+        String fileName = Constants.TMP_DIR_REPORT_CSV + "late-evaluations.csv";
+        PrintWriter out = new PrintWriter(fileName);
+        lateEvalCSVFiles.put("admins", fileName);
+        out.print(allLateEvals);
+        out.close();
+
+        return lateEvalCSVFiles;
+    }
+
+    /**
+     * Converts an object array, which contains the late evaluation data into a string array.
+     * It then writes the row into the CSVWriter.
+     *
+     * @param writer            CSVWriter object to write the row into
+     * @param lateEval
+     */
+    private static void writeLateCSVRow(CSVWriter writer, Object[] lateEval) {
+        ArrayList<String> row = new ArrayList<String>();
+        for (Object column : lateEval) {
+            if (column != null) {
+                row.add(column.toString());
+            } else {
+                row.add(null);
+            }
+        }
+        writer.writeNext(row.toArray(new String[row.size()]));
     }
 
 }
