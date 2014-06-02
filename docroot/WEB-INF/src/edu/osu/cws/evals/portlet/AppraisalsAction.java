@@ -1260,29 +1260,11 @@ public class AppraisalsAction implements ActionInterface {
         logger.log(Logger.INFORMATIONAL, "Initiated professional faculty evaluations", loggingMsg);
         SessionMessages.add(request, "prof-faculty-create-evals-success");
 
-        notifyEmployeesOfInitiatedEvaluation(newAppraisals);
-
         // refresh cached list of evaluations in supervisor home view
         List<Appraisal> appraisals = actionHelper.getMyTeamActiveAppraisals();
         appraisals.addAll(newAppraisals);
 
         return homeAction.display(request, response);
-    }
-
-    /**
-     * Sends email to employee to let them know that the evaluation has been created by the supervisor.
-     *
-     * @param appraisals
-     * @throws Exception
-     */
-    private void notifyEmployeesOfInitiatedEvaluation(List<Appraisal> appraisals) throws Exception {
-        MailerInterface mailer = (Mailer) actionHelper.getPortletContextAttribute("mailer");
-        Map<String, EmailType> emailTypeMap = EmailTypeMgr.getMap();
-        EmailType emailType = emailTypeMap.get("initiatedProfessionalFaculty");
-
-        for (Appraisal newAppraisal : appraisals) {
-            mailer.sendMail(newAppraisal, emailType);
-        }
     }
 
     public void setActionHelper(ActionHelper actionHelper) {

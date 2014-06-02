@@ -35,6 +35,11 @@ public class Mailer implements MailerInterface {
 
     Map<String, String> logFields = new HashMap<String, String>();
 
+    private static final List<String> commentTypeEmails = Arrays.asList(
+            "rebuttalReadDue",
+            "rebuttalRead"
+    );
+
     /**
      * Constructors that sets the object parameters and initializes the email start date.
      *
@@ -90,6 +95,10 @@ public class Mailer implements MailerInterface {
             email.setHtmlMsg(body);
 
             String subject = emailBundle.getString( "email_" + emailType.getType() + "_subject");
+            if (commentTypeEmails.contains(emailType.getType())) {
+                subject = MessageFormat.format(subject, getCommentType(appraisal));
+            }
+
             email.setSubject(subject);
             email.send();
 
@@ -112,6 +121,20 @@ public class Mailer implements MailerInterface {
 
         return true;
    }
+
+    /**
+     * Figures out if the email text should say rebuttal or comment based on the appointment type.
+     *
+     * @param appraisal
+     * @return
+     */
+    private String getCommentType(Appraisal appraisal) {
+        String commentType = "rebuttal";
+        if (appraisal.getJob().getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+            commentType = "comment";
+        }
+        return commentType;
+    }
 
     /**
      * Looks at the email type object and sets the cc, bcc and to fields in the email object.
@@ -500,7 +523,7 @@ public class Mailer implements MailerInterface {
     private String goalsApprovalDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsApprovalDue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDueDate(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal),getDaysRemaining(appraisal));
     }
 
     /**
@@ -608,7 +631,7 @@ public class Mailer implements MailerInterface {
     private String appraisalDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_appraisalDue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDueDate(appraisal), getDaysRemaining(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal));
     }
 
     /**
@@ -667,7 +690,9 @@ public class Mailer implements MailerInterface {
      * @throws Exception
      */
     private String employeeReviewDueBody(Appraisal appraisal) throws Exception {
-        return emailBundle.getString("email_employeeReviewDue_body");
+        String bodyString = emailBundle.getString("email_employeeReviewDue_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(),
+                getDueDate(appraisal));
     }
 
     /**
@@ -679,7 +704,7 @@ public class Mailer implements MailerInterface {
     private String releaseDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_releaseDue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod(),getDueDate(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal));
     }
 
     /**
@@ -719,14 +744,16 @@ public class Mailer implements MailerInterface {
     }
 
     /**
-     * Fetch the body for rebuttalReadDue emailType
+     * Fetch the body for rebuttalRead emailType
+     *
      * @param appraisal
      * @return
      * @throws Exception
      */
     private String rebuttalReadBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_rebuttalRead_body");
-        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
+        return MessageFormat.format(bodyString, getCommentType(appraisal), getJobTitle(appraisal),
+                appraisal.getReviewPeriod());
     }
 
     /**
@@ -740,7 +767,7 @@ public class Mailer implements MailerInterface {
         String osuid = appraisal.getJob().getEmployee().getOsuid();
 
         return MessageFormat.format(bodyString, getEmployeeName(appraisal),
-                osuid, getJobTitle(appraisal), appraisal.getReviewPeriod(), getDueDate(appraisal));
+                osuid, getCommentType(appraisal), getJobTitle(appraisal), appraisal.getReviewPeriod(), getDueDate(appraisal));
     }
 
     /**
@@ -768,11 +795,29 @@ public class Mailer implements MailerInterface {
     }
 
     /**
-     * Fetch the body for closed emailType
+     * Fetch the body for completion reminder emailType
+     *
      * @param appraisal
      * @return
      * @throws Exception
      */
+    private String firstCompletionReminderBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_completionReminder_body");
+        int daysAfterEndOfCycle = Math.abs(getDaysRemaining(appraisal));
+        return MessageFormat.format(bodyString, daysAfterEndOfCycle, getEmployeeName(appraisal),
+                getJobTitle(appraisal), appraisal.getReviewPeriod());
+    }
+
+    private String secondCompletionReminderBody(Appraisal appraisal) throws Exception {
+        return firstCompletionReminderBody(appraisal);
+    }
+
+        /**
+         * Fetch the body for closed emailType
+         * @param appraisal
+         * @return
+         * @throws Exception
+         */
     private String closedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_closed_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
@@ -805,16 +850,6 @@ public class Mailer implements MailerInterface {
         String bodyString = emailBundle.getString("email_classifiedITNoIncrease_body");
         String sed = new DateTime(appraisal.getSalaryEligibilityDate()).toString("MM/dd");
         return MessageFormat.format(bodyString, employeeName, sed, daysToNotifyEmployee);
-    }
-
-    /**
-     * Fetch the body for a particular emailType
-     * @param appraisal
-     * @return
-     * @throws Exception
-     */
-    private String initiatedProfessionalFacultyBody(Appraisal appraisal) throws Exception {
-        return emailBundle.getString("email_initiatedProfessionalFaculty_body");
     }
 
     /**

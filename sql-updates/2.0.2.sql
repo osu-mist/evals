@@ -18,7 +18,6 @@ alter table permission_rules add (
     appointment_type VARCHAR2(45 CHAR)
 );
 -- upload the permission_rules data via csv and then set the appointment_type column to not null
-insert into email_types values ('initiatedProfessionalFaculty', 'employee', null, null);
 alter table configurations add (
     appointment_type VARCHAR2(45 CHAR)
 );
@@ -76,3 +75,9 @@ insert into ratings values(7, 3, '3. Does not meet performance requirements of t
 insert into ratings values(8, 1, '1. Makes outstanding contribution in critical areas while meeting all major requirements of the position.', 'Professional Faculty');
 insert into ratings values(9, 5, '2. Performs requirements of the position in a satisfactory manner.', 'Professional Faculty');
 insert into ratings values(10, 7, '3. Does not meet performance requirements of the position in major or critical areas.', 'Professional Faculty');
+
+-- EV-128: completion email reminder
+insert into configurations values(pass_seq.nextval, 'email-notification', 'firstCompletionReminder', '38', '60', 'end', 'subtract', 'Professional Faculty');
+insert into configurations values(pass_seq.nextval, 'email-notification', 'secondCompletionReminder', '39', '60', 'end', 'subtract', 'Professional Faculty');
+insert into email_types values('firstCompletionReminder', 'supervisor', null, null);
+insert into email_types values('secondCompletionReminder', 'supervisor', null, null);
