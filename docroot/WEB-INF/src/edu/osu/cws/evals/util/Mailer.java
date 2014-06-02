@@ -130,6 +130,11 @@ public class Mailer implements MailerInterface {
         String mailCC = emailType.getCc();
         String mailBCC = emailType.getBcc();
 
+        if (appraisal.getAppointmentType().equals(AppointmentType.CLASSIFIED_IT) &&
+                emailType.getType().contains("signature")) {
+            mailCC = "reviewer";
+        }
+
         if (mailTo != null && !mailTo.equals("")) {
             String[] to = getRecipients(mailTo, appraisal);
             if (to != null && to.length != 0) {
