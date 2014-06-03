@@ -317,7 +317,12 @@ public class EvalsPDF {
      * @throws DocumentException
      */
     private void addRebuttal() throws DocumentException {
-        String rebuttalLblText= resource.getString("appraisal-employee-response").toUpperCase();
+        String rebuttalType =  "rebuttal";
+        if (appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+            rebuttalType = "feedback";
+        }
+
+        String rebuttalLblText= resource.getString("appraisal-employee-response-" + rebuttalType).toUpperCase();
         Paragraph rebuttalLbl = new Paragraph(rebuttalLblText, FONT_BOLD_11);
         rebuttalLbl.setSpacingBefore(BEFORE_SPACING);
         document.add(rebuttalLbl);
@@ -653,7 +658,7 @@ public class EvalsPDF {
         String rating = "";
         boolean displayRating = StringUtils.containsAny(permRule.getEvaluation(), "ev");
         if (appraisal.getRating() != null && displayRating) {
-            rating = resource.getString("appraisal-rating-pdf-" + appraisal.getRating());
+            rating = appraisal.getRating().toString();
         }
         c = new Chunk(rating, FONT_BOLD_11);
         p.add(c);

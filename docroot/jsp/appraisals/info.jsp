@@ -42,7 +42,7 @@
                     </td>
                     <td><em><liferay-ui:message key="appraisal-rating"/>:</em>
                         <c:if test="${not empty appraisal.rating and (permissionRule.evaluation == 'v' or permissionRule.evaluation == 'e')}">
-                            <liferay-ui:message key="appraisal-rating-pdf-${appraisal.rating}"/>
+                            <c:out value="${appraisal.rating}" />
                         </c:if>
                     </td>
                 </tr>
