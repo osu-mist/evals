@@ -397,16 +397,16 @@ public class AppraisalMgr {
      * employeSignedDate. If the posno and suffix are specific, the team appraisals are
      * specific to that supervising job.
      *
-     * @param pidm          Supervisor's pidm.
+     * @param supervisorPidm          Supervisor's pidm.
      * @param onlyActive    Whether or not to include only the active appraisals
      * @param posno         Supervisor's posno
      * @param suffix        Supervisor's suffix
      * @return List of Appraisal that contains the jobs this employee supervises.
      */
-    public static ArrayList<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive,
+    public static ArrayList<Appraisal> getMyTeamsAppraisals(Integer supervisorPidm, boolean onlyActive,
                                                  String posno, String suffix) {
         ArrayList<Appraisal> appraisals = new ArrayList<Appraisal>();
-        List<Integer> pidms = new ArrayList<Integer>();
+        List<Integer> employeePidms = new ArrayList<Integer>();
         Session session = HibernateUtil.getCurrentSession();
 
         String query =
@@ -420,20 +420,25 @@ public class AppraisalMgr {
                     " ap.EMPLOYEE_SIGNED_DATE," +
                     " jobs.PYVPASJ_PIDM," +
                     " ap.OVERDUE " +
-                "FROM appraisals ap, PYVPASJ jobs " +
-                "WHERE" +
-                    " ap.JOB_PIDM=jobs.PYVPASJ_PIDM" +
-                    " AND ap.POSITION_NUMBER=jobs.PYVPASJ_POSN" +
-                    " AND ap.JOB_SUFFIX=jobs.PYVPASJ_SUFF" +
-                    " AND jobs.PYVPASJ_SUPERVISOR_PIDM=:pidm";
+                "FROM PYVPASJ jobs " +
+                    "LEFT JOIN appraisals ap " +
+                    "ON jobs.PYVPASJ_PIDM = ap.JOB_PIDM AND " +
+                        "jobs.PYVPASJ_POSN = ap.POSITION_NUMBER AND " +
+                        "jobs.PYVPASJ_SUFF = ap.JOB_SUFFIX ";
+
+        if (onlyActive) {
+            query += " AND status NOT LIKE 'archived%' ";
+        }
+        query += "WHERE" +
+                " jobs.PYVPASJ_SUPERVISOR_PIDM=:supervisorPidm AND " +
+                " jobs.PYVPASJ_APPOINTMENT_TYPE IN ('" +
+                AppointmentType.PROFESSIONAL_FACULTY + "', '" +
+                AppointmentType.CLASSIFIED + "', '" +
+                AppointmentType.CLASSIFIED_IT + "') ";
 
         if (!StringUtils.isEmpty(posno) && !StringUtils.isEmpty(suffix)) {
             query += " AND jobs.PYVPASJ_SUPERVISOR_POSN=:posno" +
                     " AND jobs.PYVPASJ_SUPERVISOR_SUFF = :suffix";
-        }
-
-        if (onlyActive) {
-            query += " AND status NOT LIKE 'archived%' ";
         }
 
         Query hibQuery = session.createSQLQuery(query)
@@ -446,7 +451,7 @@ public class AppraisalMgr {
                 .addScalar("EMPLOYEE_SIGNED_DATE", StandardBasicTypes.DATE)
                 .addScalar("PYVPASJ_PIDM", StandardBasicTypes.INTEGER)
                 .addScalar("OVERDUE", StandardBasicTypes.INTEGER)
-                .setInteger("pidm", pidm);
+                .setInteger("supervisorPidm", supervisorPidm);
         if (!StringUtils.isEmpty(posno) && !StringUtils.isEmpty(suffix)) {
             hibQuery.setString("posno", posno).setString("suffix", suffix);
         }
@@ -458,7 +463,6 @@ public class AppraisalMgr {
 
         // Build list of appraisals from sql results
         for (Object[] aResult : result) {
-           Appraisal appraisal;
             Integer id = (Integer) aResult[0];
             String jobTitle = (String) aResult[1];
             String appointmentType = (String) aResult[2];
@@ -469,15 +473,15 @@ public class AppraisalMgr {
             Integer employeePidm = (Integer) aResult[7];
             Integer overdue = (Integer) aResult[8];
 
-            appraisal = new Appraisal(id, jobTitle, null, null, appointmentType,
+            Appraisal appraisal = new Appraisal(id, jobTitle, null, null, appointmentType,
                     startDate, endDate, status, employeeSignDate, employeePidm,
                     overdue);
             appraisals.add(appraisal);
-            pidms.add(employeePidm);
+            employeePidms.add(employeePidm);
         }
 
         List<Employee> employees = session.getNamedQuery("employee.firstAndLastNameByPidm")
-                .setParameterList("ids", pidms).list();
+                .setParameterList("ids", employeePidms).list();
         HashMap<Integer, Employee> employeeHashMap = new HashMap<Integer, Employee>();
         for (Employee employee : employees) {
             employeeHashMap.put(employee.getId(), employee);

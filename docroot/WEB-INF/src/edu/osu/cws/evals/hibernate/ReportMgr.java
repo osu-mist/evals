@@ -423,6 +423,11 @@ public class ReportMgr {
 
         // Only use the active evaluations
         for (Appraisal appraisal : myTeamAppraisals) {
+            // my team appraisals contains jobs that need evaluations created.
+            if (appraisal.getId() == 0) {
+                continue;
+            }
+
             String status = appraisal.getStatus();
             if (!status.equals(Appraisal.STATUS_COMPLETED) &&
                     !status.equals(Appraisal.STATUS_CLOSED) &&

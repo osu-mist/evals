@@ -40,15 +40,30 @@
                         <c:if test="${empty report}">
                             <td><liferay-ui:message key="${shortAppraisal.job.appointmentType}" /></td>
                         </c:if>
-                        <td>${shortAppraisal.reviewPeriod}</td>
+                        <td>
+                            <c:if test="${shortAppraisal.id != 0}">
+                                ${shortAppraisal.reviewPeriod}
+                            </c:if>
+                        </td>
                         <c:if test="${!empty report}">
                             <td>${shortAppraisal.viewOverdue}</td>
                         </c:if>
-                        <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
-                            <portlet:param name="id" value="${shortAppraisal.id}"/>
-                            <portlet:param  name="action" value="display"/>
-                            <portlet:param  name="controller" value="AppraisalsAction"/>
-                           </portlet:actionURL>"><liferay-ui:message key="${shortAppraisal.viewStatus}" /></a>
+                        <td>
+                            <c:if test="${shortAppraisal.id != 0}">
+                                <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
+                                        <portlet:param name="id" value="${shortAppraisal.id}"/>
+                                        <portlet:param  name="action" value="display"/>
+                                        <portlet:param  name="controller" value="AppraisalsAction"/>
+                                    </portlet:actionURL>"><liferay-ui:message key="${shortAppraisal.viewStatus}" />
+                                </a>
+                            </c:if>
+                            <c:if test="${shortAppraisal.id == 0 && shortAppraisal.appointmentType == 'Professional Faculty'}">
+                                <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                                        <portlet:param name="action" value="initiateProfessionalFacultyEvals"/>
+                                        <portlet:param name="controller" value="AppraisalsAction"/>
+                                    </portlet:actionURL>"><liferay-ui:message key="prof-faculty-create-evaluation-short" />
+                                </a>
+                            </c:if>
                         </td>
                     </tr>
                 </c:forEach>

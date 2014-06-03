@@ -246,14 +246,16 @@ public class Appraisal extends Evals {
      * @param employeeId
      * @param overdue
      */
-    public Appraisal(int id, String jobTitle, String lastName, String firstName, String appointmentType,
+    public Appraisal(Integer id, String jobTitle, String lastName, String firstName, String appointmentType,
                      Date startDate, Date endDate, String status, Date employeeSignedDate,
                      int employeeId, Integer overdue) {
         Employee employee = new Employee();
         employee.setId(employeeId);
         employee.setLastName(lastName);
         employee.setFirstName(firstName);
-        this.id = id;
+        if (id != null) {
+            this.id = id;
+        }
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
