@@ -5,6 +5,8 @@ public class Rating extends Evals {
 
     private Integer rate;
 
+    private String name;
+
     private String description;
 
     private String appointmentType;
@@ -26,6 +28,14 @@ public class Rating extends Evals {
 
     public void setRate(Integer rate) {
         this.rate = rate;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {

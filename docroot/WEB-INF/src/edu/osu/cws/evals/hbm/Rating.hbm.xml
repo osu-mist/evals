@@ -7,6 +7,7 @@
         <id name="id" type="integer" column="ID"/>
 
         <property name="rate" type="integer" column="RATE"/>
+        <property name="name" type="string" column="NAME"/>
         <property name="description" type="string" column="DESCRIPTION"/>
         <property name="appointmentType" type="string" column="APPOINTMENT_TYPE"/>
     </class>
