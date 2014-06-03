@@ -505,6 +505,11 @@ public class AppraisalsAction implements ActionInterface {
     /**
      * Returns the email type to be used. Null if the web interface doesn't need to send the email.
      *
+     * This method checks if the appraisal's status is different than the appraisalStep's newStatus. If
+     * they are different it means that the appraisal record is late and that's why the status was changed.
+     * If the record isOverdue, we return the correct emailType for the new Overdue status since the
+     * emailType from the appraisalStep doesn't apply anymore.
+     *
      * @return
      * @throws Exception
      */
@@ -623,6 +628,11 @@ public class AppraisalsAction implements ActionInterface {
     /**
      * After the user saved/submitted the appraisal, it checks the appraisal step and appraisal.getNewStatus() to
      * set the status of the appraisal.
+     *
+     * This method uses the appraisal step first to set the status, If the status of the appraisal was changed by
+     * the appraisalStep, we then call getNewStatus() to find out if this new status needs to be set to *Overdue or
+     * timed out. This allows the application to later on send the right email instead of sending a Due email when
+     * the record is actually Overdue.
      *
      * @throws Exception
      */
