@@ -14,10 +14,7 @@ import org.hibernate.Transaction;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.*;
 
 public class BackendMgr {
@@ -1152,27 +1149,26 @@ public class BackendMgr {
      */
     private void writeLateEvalsCSVFiles(List<Object[]> lateEvaluations) throws IOException {
         StringWriter stringWriter = new StringWriter();
+        StringWriter adminStringWriter = new StringWriter();
         CSVWriter writer = new CSVWriter(stringWriter);
-        String bcName = null;
+        CSVWriter adminWriter = new CSVWriter(adminStringWriter);
         String headerRow = "\"Appraisal ID\",\"Employee\",\"OSU ID\",\"Position Number\",\"Supervisor\"," +
                 "\"Status\",\"Appointment Type\",\"Start Date\",\"End Date\",\"Overdue Days\"," +
                 "\"Business Center\"\n";
-        String adminLateEvals = headerRow;
 
         for (int i = 0; i < lateEvaluations.size(); i++) {
             Object[] lateEval = lateEvaluations.get(i);
-            bcName = lateEval[10].toString();
-            writeLateCSVRow(writer, lateEval);
+            String bcName = lateEval[10].toString();
+            writeLateCSVRow(writer, adminWriter, lateEval);
 
-            // write csv file for late evaluations of a single BC
+            // Either end of input row, or the next row belongs to a different BC. Need to write the buffer to the
+            // bc file and start anew.
             if (i == lateEvaluations.size() -1 || !bcName.equals(lateEvaluations.get(i + 1)[10].toString())) {
                 // specify filename for the new BC so we can write string buffer to file
                 String filename = getLateReportFilePath(bcName);
                 PrintWriter out = new PrintWriter(filename);
 
                 StringBuffer buffer = stringWriter.getBuffer();
-                adminLateEvals += buffer.toString(); // save data for admin csv which gets written after loop ends
-
                 // write string buffer for the previous bc now that we are processing a different bc
                 buffer.insert(0, headerRow);
                 String bcLateString = buffer.toString();
@@ -1185,11 +1181,13 @@ public class BackendMgr {
         }
         writer.close();
 
-        // write file with all late evaluations
-        String fileName = Constants.TMP_DIR_REPORT_CSV + "admins.csv";
-        PrintWriter out = new PrintWriter(fileName);
-        out.print(adminLateEvals);
-        out.close();
+        // Write the admin file.
+        StringBuffer adminBuffer = adminStringWriter.getBuffer();
+        adminBuffer.insert(0, headerRow); // insert header row for admin
+        PrintWriter adminOut = new PrintWriter(getLateReportFilePath("admins"));
+        adminOut.print(adminBuffer.toString());
+        adminOut.close();
+        adminWriter.close();
     }
 
     private String getLateReportFilePath(String bcName) {
@@ -1201,9 +1199,10 @@ public class BackendMgr {
      * It then writes the row into the CSVWriter.
      *
      * @param writer            CSVWriter object to write the row into
+     * @param adminWriter       CSVWriter object for the admin report
      * @param lateEval
      */
-    private static void writeLateCSVRow(CSVWriter writer, Object[] lateEval) {
+    private static void writeLateCSVRow(CSVWriter writer, CSVWriter adminWriter, Object[] lateEval) {
         ArrayList<String> row = new ArrayList<String>();
         for (Object column : lateEval) {
             if (column != null) {
@@ -1213,6 +1212,7 @@ public class BackendMgr {
             }
         }
         writer.writeNext(row.toArray(new String[row.size()]));
+        adminWriter.writeNext(row.toArray(new String[row.size()]));
     }
 
 }
