@@ -93,7 +93,7 @@ public class BackendMgr {
           archiveAppraisals();
           emailSupervisors();
           emailReviewers();
-         sendLateEvaluationsReport();
+          sendLateEvaluationsReport();
        } catch(Exception e)
        {
          if (totalErrorCount >= Constants.MAX_ERROR_COUNT)
@@ -1040,23 +1040,29 @@ public class BackendMgr {
     private void sendLateEvaluationsReport() throws Exception {
         session = HibernateUtil.getCurrentSession();
         tx = session.beginTransaction();
-        String bcName = "";
-        List<Object[]> lateEvaluations = ReportMgr.getLateEvaluations();
-        Map<String, String> lateEvalCSVFiles = writeLateEvalsCSVFiles(lateEvaluations);
+
+        // If there's no need to send any reports, exit the method
+        List<String> bcNames = bcNamesThatNeedLateReports();
+        if (bcNames.isEmpty()) {
+            return;
+        }
+
+        // get the late evaluation information only for the BCs that need the late report
+        List<Object[]> lateEvaluations = ReportMgr.getLateEvaluations(bcNames);
+        writeLateEvalsCSVFiles(lateEvaluations);
         tx.commit();
 
-        for (Map.Entry<String, String> lateBcEvals : lateEvalCSVFiles.entrySet()) {
-            try
-            {
-                bcName = lateBcEvals.getKey();
-                if (checkLateReportFrequency(bcName)) {
-                    //@todo: this method should figure out if we need to send the email again if the cron didn't run properly
-                    return;
-                }
-
+        for (String bcName : bcNames) {
+            try {
                 session = HibernateUtil.getCurrentSession();
                 tx = session.beginTransaction();
-                String filePath = lateBcEvals.getValue();
+                String filePath = getLateReportFilePath(bcName);
+
+                // check that the report was written successfully before continuing with the BC
+                if (!new File(filePath).exists()) {
+                    continue;
+                }
+
                 String[] emailAddresses;
                 if (bcName.equals("admins")) {
                     emailAddresses = getAdminEmails();
@@ -1077,23 +1083,45 @@ public class BackendMgr {
                 if (emailAddresses.length != 0 && emailAddresses[0] != null) {
                     reportEmailsSent.add(bcName);
                 }
+
+                // delete csv report
+                File report = new File(filePath);
+                if (!report.delete()) {
+                    logDataError("\n" + "Failed to delete late evaluations report: " + filePath);
+                }
             } catch(Exception e) {
-                if (session != null & session.isOpen())
+                if (session != null & session.isOpen()) {
                     session.close();
+                }
+
                 String msg = "Error sending late report email to " + bcName;
                 logDataError(msg);
                 errorMsg.append("\n" + msg);
                 log_error(msg, e);
             }
         }
+    }
 
-        // delete csv reports
-        for (String filePath : lateEvalCSVFiles.values()) {
-            File report = new File(filePath);
-            if (!report.delete()) {
-                logDataError("\n" + "Failed to delete late evaluations report: " + filePath);
+    /**
+     * Checks if there's at least one business center that we need to send a late report to.
+     *
+     * @return
+     * @throws Exception
+     */
+    private List<String> bcNamesThatNeedLateReports() throws Exception {
+        List<String> bcNames = new ArrayList<String>();
+        List<BusinessCenter> businessCenters = BusinessCenterMgr.list();
+        // add a fake bc to check if we need to send report to admin users
+        BusinessCenter admin = new BusinessCenter();
+        admin.setName("admins");
+        businessCenters.add(admin);
+
+        for (BusinessCenter businessCenter : businessCenters) {
+            if (shouldSendLateReportEmail(businessCenter.getName())) {
+                bcNames.add(businessCenter.getName());
             }
         }
+        return bcNames;
     }
 
     /**
@@ -1103,7 +1131,7 @@ public class BackendMgr {
      * @return
      * @throws Exception
      */
-    private boolean checkLateReportFrequency(String bcName) throws Exception {
+    private boolean shouldSendLateReportEmail(String bcName) throws Exception {
         Email lastEmail = EmailMgr.getLastEmail(0, "lateReport" + bcName);
         if (lastEmail == null) {
             return true;
@@ -1115,48 +1143,57 @@ public class BackendMgr {
     }
 
     /**
-     * Writes to disk the csv files with the list of late evaluations for each bc.
+     * Writes to disk the csv files with the list of late evaluations for each bc. Files are written to
+     * Constants.TMP_DIR_REPORT_CSV + bcName + .csv
      *
      * @param lateEvaluations           List<Object[]> hibernate sql result with late evaluations
      * @return lateEvalCSVFiles         A map with the path to each one of the csv files generated.
      * @throws IOException
      */
-    private Map<String, String> writeLateEvalsCSVFiles(List<Object[]> lateEvaluations) throws IOException {
-        Map<String, String> lateEvalCSVFiles = new HashMap<String, String>();
+    private void writeLateEvalsCSVFiles(List<Object[]> lateEvaluations) throws IOException {
         StringWriter stringWriter = new StringWriter();
         CSVWriter writer = new CSVWriter(stringWriter);
         String bcName = null;
-        String allLateEvals = "";
+        String headerRow = "\"Appraisal ID\",\"Employee\",\"OSU ID\",\"Position Number\",\"Supervisor\"," +
+                "\"Status\",\"Appointment Type\",\"Start Date\",\"End Date\",\"Overdue Days\"," +
+                "\"Business Center\"\n";
+        String adminLateEvals = headerRow;
 
-        for (Object[] lateEval : lateEvaluations) {
+        for (int i = 0; i < lateEvaluations.size(); i++) {
+            Object[] lateEval = lateEvaluations.get(i);
+            bcName = lateEval[10].toString();
+            writeLateCSVRow(writer, lateEval);
+
             // write csv file for late evaluations of a single BC
-            if (bcName != null && !lateEval[10].toString().equals(bcName)) {
-                String filename = Constants.TMP_DIR_REPORT_CSV + bcName + ".csv";
+            if (i == lateEvaluations.size() -1 || !bcName.equals(lateEvaluations.get(i + 1)[10].toString())) {
+                // specify filename for the new BC so we can write string buffer to file
+                String filename = getLateReportFilePath(bcName);
                 PrintWriter out = new PrintWriter(filename);
-                lateEvalCSVFiles.put(bcName, filename);
+
                 StringBuffer buffer = stringWriter.getBuffer();
+                adminLateEvals += buffer.toString(); // save data for admin csv which gets written after loop ends
+
+                // write string buffer for the previous bc now that we are processing a different bc
+                buffer.insert(0, headerRow);
                 String bcLateString = buffer.toString();
                 out.print(bcLateString);
                 out.close();
 
-                // save contents of single bc late evals and clear out buffer for next bc
-                allLateEvals += bcLateString;
+                // clear out string buffer so that data string buffer is clean to process next BC's data
                 buffer.setLength(0);
             }
-
-            bcName = lateEval[10].toString();
-            writeLateCSVRow(writer, lateEval);
         }
         writer.close();
 
         // write file with all late evaluations
-        String fileName = Constants.TMP_DIR_REPORT_CSV + "late-evaluations.csv";
+        String fileName = Constants.TMP_DIR_REPORT_CSV + "admins.csv";
         PrintWriter out = new PrintWriter(fileName);
-        lateEvalCSVFiles.put("admins", fileName);
-        out.print(allLateEvals);
+        out.print(adminLateEvals);
         out.close();
+    }
 
-        return lateEvalCSVFiles;
+    private String getLateReportFilePath(String bcName) {
+        return Constants.TMP_DIR_REPORT_CSV + bcName + ".csv";
     }
 
     /**

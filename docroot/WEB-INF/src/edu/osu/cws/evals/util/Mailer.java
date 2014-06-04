@@ -447,8 +447,8 @@ public class Mailer implements MailerInterface {
             email.setSubject(emailBundle.getString("email_lateReport_subject"));
             email.send();
 
-            String longMsg = "Emails sent to: various reviewers";
-            logger.log(Logger.INFORMATIONAL, "Reviewer emails sent", longMsg);
+            String longMsg = "Late report emails sent to: various reviewers";
+            logger.log(Logger.INFORMATIONAL, "Late Report email sent", longMsg);
 
             Email evalsEmail = new Email(0, "lateReport" + bcName);
             EmailMgr.add(evalsEmail);

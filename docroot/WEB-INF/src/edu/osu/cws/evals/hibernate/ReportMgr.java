@@ -598,9 +598,10 @@ public class ReportMgr {
      * Returns a list of late evaluations. The data returned is a list of object[] since we only needed a few
      * columns from various tables. It was less code/simpler to do it via sql rather than hql.
      *
+     * @param bcNames                   List of bc names to get late report data
      * @return List<Object[]>           Late evaluation records
      */
-    public static List<Object[]> getLateEvaluations() {
+    public static List<Object[]> getLateEvaluations(List<String> bcNames) {
         Session session = HibernateUtil.getCurrentSession();
         List<String> supportedAppointmentTypes = Arrays.asList(
                 AppointmentType.CLASSIFIED,
@@ -615,6 +616,7 @@ public class ReportMgr {
 
         return session.getNamedQuery("report.reportLateEvaluations")
                 .setParameterList("ignoredStatus", ignoredStatus)
+                .setParameterList("bcNames", bcNames)
                 .list();
     }
 }
