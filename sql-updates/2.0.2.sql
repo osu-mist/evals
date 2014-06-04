@@ -75,8 +75,8 @@ insert into ratings values(5, 1, '1', 'Makes outstanding contribution in critica
 insert into ratings values(6, 2, '2', 'Performs requirements of the position in a satisfactory manner.', 'Classified IT');
 insert into ratings values(7, 3, '3', 'Does not meet performance requirements of the position in major or critical areas.', 'Classified IT');
 insert into ratings values(8, 1, 'Exceptional Performance', ' - Consistently operates well above expectations', 'Professional Faculty');
-insert into ratings values(9, 3, 'Strong Performance', ' - Fully meets and often exceeds expectations of the position', 'Professional Faculty');
-insert into ratings values(10, 5, 'Satisfactory Performance', ' - Fully meets the expectations for the position', 'Professional Faculty');
-insert into ratings values(11, 7, 'Needs Improvement', ' - Occasionally fails to meet expectations or needs significant improvement in critical areas', 'Professional Faculty');
-insert into ratings values(12, 9, 'Does Not Meet Expectations', ' - Does not meet expectations in multiple key elements of the position', 'Professional Faculty');
-insert into ratings values(13, 11, 'No basis for evaluation / Not rated', '', 'Professional Faculty');
+insert into ratings values(9, 2, 'Strong Performance', ' - Fully meets and often exceeds expectations of the position', 'Professional Faculty');
+insert into ratings values(10, 3, 'Satisfactory Performance', ' - Fully meets the expectations for the position', 'Professional Faculty');
+insert into ratings values(11, 4, 'Needs Improvement', ' - Occasionally fails to meet expectations or needs significant improvement in critical areas', 'Professional Faculty');
+insert into ratings values(12, 5, 'Does Not Meet Expectations', ' - Does not meet expectations in multiple key elements of the position', 'Professional Faculty');
+insert into ratings values(13, 6, 'No basis for evaluation / Not rated', '', 'Professional Faculty');
