@@ -537,6 +537,7 @@ public class BackendMgr {
                     checkFrequencyAndSendMail(appraisal, createForDate, status);
                 }
 
+                sendCompletionReminders(appraisal);
                 tx.commit();
             }catch(Exception e)
             {
@@ -555,6 +556,36 @@ public class BackendMgr {
                 System.out.println(msg);
                 errorMsg.append("\n" + msg);
                 log_error(msg, e);
+            }
+        }
+    }
+
+    /**
+     * Sends completion due reminder emails. It looks at the configuration options first/second CompletionReminder
+     * to determine if it should send it for the appointment type of this evaluation. It checks if it is time to send
+     * the email and if it hasn't sent it yet, it will send it.
+     *
+     * @param appraisal
+     * @throws Exception
+     */
+    private void sendCompletionReminders(Appraisal appraisal) throws Exception {
+        List<String> completionReminders = Arrays.asList(
+                "firstCompletionReminder",
+                "secondCompletionReminder"
+        );
+        for (String reminder : completionReminders) {
+            Configuration config = ConfigurationMgr.getConfiguration(configMap, reminder, appraisal.getAppointmentType());
+            if (config == null) {
+                continue;
+            }
+
+            Email lastEmail = EmailMgr.getLastEmail(appraisal.getId(), reminder);
+            boolean haventSentReminder = lastEmail == null;
+            boolean isTimeToSendReminder = EvalsUtil.isOverdue(appraisal, config);
+            if (isTimeToSendReminder && haventSentReminder) {
+                mailer.sendMail(appraisal, emailTypeMap.get(reminder));
+                // if one reminder is sent exit out since we don't need to send two reminders
+                return;
             }
         }
     }
