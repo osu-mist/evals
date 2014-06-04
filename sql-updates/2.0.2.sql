@@ -63,6 +63,7 @@ insert into configurations values(pass_seq.nextval, 'configuration', 'enableProf
 CREATE TABLE ratings (
     ID NUMBER(11) NOT NULL,
     RATE NUMBER(3) NOT NULL,
+    NAME VARCHAR2(64 CHAR),
     DESCRIPTION VARCHAR2(512 CHAR),
     APPOINTMENT_TYPE VARCHAR2(45 CHAR)
 );

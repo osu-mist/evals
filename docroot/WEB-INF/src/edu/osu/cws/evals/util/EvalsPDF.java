@@ -367,7 +367,7 @@ public class EvalsPDF {
         PdfPTable ratingTable = new PdfPTable(ratingMaxCols);
         PdfPCell emptyLeftCol = new PdfPCell();
         emptyLeftCol.setBorder(Rectangle.NO_BORDER);
-        emptyLeftCol.setRowspan(4);
+        emptyLeftCol.setRowspan(ratings.size());
         ratingTable.addCell(emptyLeftCol);
         ratingTable.setWidthPercentage(100f);
         PdfPCell cell;
@@ -394,7 +394,11 @@ public class EvalsPDF {
             } else {
                 ratingTable.addCell(uncheckedBox);
             }
-            cell = new PdfPCell(new Paragraph(rating.getDescription(), FONT_10));
+            String ratingText = rating.getName();
+            if (rating.getDescription() != null) {
+                ratingText += rating.getDescription();
+            }
+            cell = new PdfPCell(new Paragraph(ratingText, FONT_10));
             cell.setColspan(ratingMaxCols - 2);
             cell.setBorder(Rectangle.NO_BORDER);
             ratingTable.addCell(cell);
@@ -655,12 +659,16 @@ public class EvalsPDF {
 
         c = new Chunk(resource.getString("appraisal-rating")+": ", INFO_FONT);
         p = new Paragraph(c);
-        String rating = "";
+        String ratingText = "";
         boolean displayRating = StringUtils.containsAny(permRule.getEvaluation(), "ev");
         if (appraisal.getRating() != null && displayRating) {
-            rating = appraisal.getRating().toString();
+            for (Rating rating : ratings) {
+                if (appraisal.getRating().equals(rating.getRate())) {
+                    ratingText = rating.getName();
+                }
+            }
         }
-        c = new Chunk(rating, FONT_BOLD_11);
+        c = new Chunk(ratingText, FONT_BOLD_11);
         p.add(c);
         cell = new PdfPCell(p);
         cell.setPaddingLeft(4);
