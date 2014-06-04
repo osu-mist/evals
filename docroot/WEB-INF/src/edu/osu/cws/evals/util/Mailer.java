@@ -130,6 +130,9 @@ public class Mailer implements MailerInterface {
         String mailCC = emailType.getCc();
         String mailBCC = emailType.getBcc();
 
+        // Modifying the CC recipient for the signature emails to include Classified. This was the simplest
+        // solution. Other things to consider in the future is: 1) use a different appraisal step + email type
+        // or 2) allow email_types to have an appointment type column
         if (appraisal.getAppointmentType().equals(AppointmentType.CLASSIFIED_IT) &&
                 emailType.getType().contains("signature")) {
             mailCC = "reviewer";
