@@ -80,6 +80,9 @@ public class Constants {
 
     public static final String PROPERTIES_FILENAME = "evals.properties";
 
+    // Temp directory where the late report csv files are written to
+    public static final String TMP_DIR_REPORT_CSV = "/tmp/";
+
     // Private constants
     private static final String ROOT_DIR = "WEB-INF/src/";
     private static final String DEFAULT_PROPERTIES_FILE = "backend-config.properties";

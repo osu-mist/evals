@@ -85,3 +85,14 @@ insert into configurations values(pass_seq.nextval, 'email-notification', 'first
 insert into configurations values(pass_seq.nextval, 'email-notification', 'secondCompletionReminder', '39', '60', 'end', 'subtract', 'Professional Faculty');
 insert into email_types values('firstCompletionReminder', 'supervisor', null, null);
 insert into email_types values('secondCompletionReminder', 'supervisor', null, null);
+
+-- EV-129: late report
+insert into email_types values ('lateReportAABC', 'reviewer', null, null);
+insert into email_types values ('lateReportAMBC', 'reviewer', null, null);
+insert into email_types values ('lateReportASBC', 'reviewer', null, null);
+insert into email_types values ('lateReportBEBC', 'reviewer', null, null);
+insert into email_types values ('lateReportCCBC', 'reviewer', null, null);
+insert into email_types values ('lateReportFOBC', 'reviewer', null, null);
+insert into email_types values ('lateReportHSBC', 'reviewer', null, null);
+insert into email_types values ('lateReportUABC', 'reviewer', null, null);
+insert into email_types values ('lateReportadmins', 'admins', null, null);
