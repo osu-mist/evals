@@ -154,6 +154,8 @@ public class AppraisalMgr {
         for (Job shortJob : jobsWithoutActiveEvaluations) {
             appraisals.add(createAppraisal(shortJob, startDate, Appraisal.TYPE_ANNUAL));
         }
+        Session session = HibernateUtil.getCurrentSession();
+        session.flush(); // force the records to be persisted in the db so that they can be picked up by home view
 
         return appraisals;
     }

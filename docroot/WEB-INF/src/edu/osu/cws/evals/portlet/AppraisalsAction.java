@@ -1297,9 +1297,9 @@ public class AppraisalsAction implements ActionInterface {
         logger.log(Logger.INFORMATIONAL, "Initiated professional faculty evaluations", loggingMsg);
         SessionMessages.add(request, "prof-faculty-create-evals-success");
 
-        // refresh cached list of evaluations in supervisor home view
-        List<Appraisal> appraisals = actionHelper.getMyTeamActiveAppraisals();
-        appraisals.addAll(newAppraisals);
+        // clear out cached list of evaluations in supervisor home view. display method will re-build cache
+        PortletSession session = ActionHelper.getSession(request);
+        session.removeAttribute(ActionHelper.MY_TEAMS_ACTIVE_APPRAISALS);
 
         return homeAction.display(request, response);
     }
