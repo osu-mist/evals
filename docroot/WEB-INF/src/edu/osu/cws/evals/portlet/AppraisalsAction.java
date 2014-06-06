@@ -515,7 +515,7 @@ public class AppraisalsAction implements ActionInterface {
      */
     private EmailType getEmailType() throws Exception {
         // the backend is going to send the email
-        if (appraisalStep.getEmailType() == null) {
+        if (appraisalStep == null || appraisalStep.getEmailType() == null) {
             return null;
         }
 
