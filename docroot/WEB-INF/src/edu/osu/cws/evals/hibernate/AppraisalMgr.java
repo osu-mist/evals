@@ -433,6 +433,7 @@ public class AppraisalMgr {
         }
         query += "WHERE" +
                 " jobs.PYVPASJ_SUPERVISOR_PIDM=:supervisorPidm AND " +
+                " jobs.PYVPASJ_STATUS != 'T' AND" +
                 " jobs.PYVPASJ_APPOINTMENT_TYPE IN ('" +
                 AppointmentType.PROFESSIONAL_FACULTY + "', '" +
                 AppointmentType.CLASSIFIED + "', '" +
