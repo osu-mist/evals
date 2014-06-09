@@ -614,7 +614,7 @@ public class Mailer implements MailerInterface {
     private String goalsReactivatedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsReactivated_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getGoalsExpirationDate(appraisal));
+                appraisal.getReviewPeriod(), getStatusExpirationDate(appraisal));
     }
 
     /**
@@ -640,7 +640,7 @@ public class Mailer implements MailerInterface {
 
         // Use today as the submit date since this email is sent right after the request is submitted
         return MessageFormat.format(bodyString, requestSubmitDate, getEmployeeName(appraisal),
-                getJobTitle(appraisal), appraisal.getReviewPeriod(), getGoalsExpirationDate(appraisal));
+                getJobTitle(appraisal), appraisal.getReviewPeriod(), getStatusExpirationDate(appraisal));
     }
 
     /**
@@ -748,7 +748,7 @@ public class Mailer implements MailerInterface {
     private String employeeReviewDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_employeeReviewDue_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(),
-                getDueDate(appraisal));
+                getStatusExpirationDate(appraisal));
     }
 
     /**
@@ -958,13 +958,13 @@ public class Mailer implements MailerInterface {
 
     /**
      * Returns a String that represents when the given status is expired for the goals reactivation
-     * workflow.
+     * and employee review due workflow.
      *
      * @param appraisal
      * @return
      * @throws Exception
      */
-    private String getGoalsExpirationDate(Appraisal appraisal) throws Exception {
+    private String getStatusExpirationDate(Appraisal appraisal) throws Exception {
         String status = appraisal.getStatus() + "Expiration";
         Configuration config = ConfigurationMgr.getConfiguration(configMap, status, appraisal.getAppointmentType());
         DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
