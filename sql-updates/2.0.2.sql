@@ -96,3 +96,6 @@ insert into email_types values ('lateReportFOBC', 'reviewer', null, null);
 insert into email_types values ('lateReportHSBC', 'reviewer', null, null);
 insert into email_types values ('lateReportUABC', 'reviewer', null, null);
 insert into email_types values ('lateReportadmins', 'admins', null, null);
+
+-- EV-157: small rating update
+update ratings set description = ' - Occasionally does not meet expectations or needs significant improvement in critical areas' where id = 11 and name = 'Needs Improvement';
