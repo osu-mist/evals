@@ -15,6 +15,7 @@ import edu.osu.cws.util.Logger;
 import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
+import org.apache.xpath.operations.Bool;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
@@ -503,7 +504,7 @@ public class Mailer implements MailerInterface {
     private String goalsDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsDue_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDueDate(appraisal), getDaysRemaining(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal), getDaysRemaining(appraisal, null));
     }
 
     /**
@@ -579,7 +580,7 @@ public class Mailer implements MailerInterface {
     private String goalsApprovalDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsApprovalDue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDueDate(appraisal),getDaysRemaining(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal),getDaysRemaining(appraisal, null));
     }
 
     /**
@@ -663,7 +664,7 @@ public class Mailer implements MailerInterface {
     private String resultsDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_resultsDue_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDueDate(appraisal), getDaysRemaining(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal), getDaysRemaining(appraisal, null));
     }
 
     /**
@@ -748,7 +749,7 @@ public class Mailer implements MailerInterface {
     private String employeeReviewDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_employeeReviewDue_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(),
-                getDueDate(appraisal));
+                getDaysRemaining(appraisal, true));
     }
 
     /**
@@ -859,7 +860,7 @@ public class Mailer implements MailerInterface {
      */
     private String firstCompletionReminderBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_completionReminder_body");
-        int daysAfterEndOfCycle = Math.abs(getDaysRemaining(appraisal));
+        int daysAfterEndOfCycle = Math.abs(getDaysRemaining(appraisal, null));
         return MessageFormat.format(bodyString, daysAfterEndOfCycle, getEmployeeName(appraisal),
                 getJobTitle(appraisal), appraisal.getReviewPeriod());
     }
@@ -972,14 +973,19 @@ public class Mailer implements MailerInterface {
     }
 
     /**
-     * Fetch the days remaining to respond to a particular action
+     * Fetch the days remaining to respond to a particular action or before the action expires.
+     *
      * @param appraisal
+     * @param expirationStatus              Whether or not to use statusExpiration to calculate days remaining
      * @return
      * @throws Exception
      */
-    private int getDaysRemaining(Appraisal appraisal) throws Exception {
-        String status = appraisal.getStatus();
-        Configuration config = ConfigurationMgr.getConfiguration(configMap, status, appraisal.getAppointmentType());
+    private int getDaysRemaining(Appraisal appraisal, Boolean expirationStatus) throws Exception {
+        String name = appraisal.getStatus();
+        if (expirationStatus != null && expirationStatus) {
+            name += "Expiration";
+        }
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, name, appraisal.getAppointmentType());
         DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
         return Days.daysBetween(EvalsUtil.getToday(), dueDay).getDays();
     }
