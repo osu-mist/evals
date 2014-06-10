@@ -54,4 +54,12 @@ public class Rating extends Evals {
         this.appointmentType = appointmentType;
     }
 
+    @Override
+    public String toString() {
+        String output = name;
+        if (description != null) {
+            output += " - " + description;
+        }
+        return output;
+    }
 }

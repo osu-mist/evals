@@ -394,11 +394,8 @@ public class EvalsPDF {
             } else {
                 ratingTable.addCell(uncheckedBox);
             }
-            String ratingText = rating.getName();
-            if (rating.getDescription() != null) {
-                ratingText += rating.getDescription();
-            }
-            cell = new PdfPCell(new Paragraph(ratingText, FONT_10));
+
+            cell = new PdfPCell(new Paragraph(rating.toString(), FONT_10));
             cell.setColspan(ratingMaxCols - 2);
             cell.setBorder(Rectangle.NO_BORDER);
             ratingTable.addCell(cell);
