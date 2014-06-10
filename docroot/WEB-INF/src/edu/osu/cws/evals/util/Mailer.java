@@ -526,7 +526,8 @@ public class Mailer implements MailerInterface {
      */
     private String goalsRequiredModificationBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsRequiredModification_body");
-        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(),
+                getDaysRemaining(appraisal, null));
     }
 
     /**

@@ -555,10 +555,10 @@ public class AppraisalsAction implements ActionInterface {
         Map<String, Boolean> dates = new HashMap<String, Boolean>();
         Map<String, Boolean> pidm = new HashMap<String, Boolean>();
         boolean clickedSubmitButton = jsonData.getButtonClicked().equals(permRule.getSubmit());
+        GoalVersion unapprovedGoalVersion = appraisal.getUnapprovedGoalsVersion();
 
         if (permRule.canEdit("goalComments")) { // Save goalComments
-            GoalVersion latestVersion = appraisal.getUnapprovedGoalsVersion();
-            latestVersion.setGoalsComments(jsonData.getGoalsComments());
+            unapprovedGoalVersion.setGoalsComments(jsonData.getGoalsComments());
         }
 
         // updates goals, employee/supervisor results and handle new js goals
@@ -615,12 +615,12 @@ public class AppraisalsAction implements ActionInterface {
             }
         }
 
+        if (unapprovedGoalVersion != null && jsonData.getButtonClicked().equals("require-goals-modification")) {
+            unapprovedGoalVersion.setGoalsRequiredModificationDate(new Date());
+        }
+
         // Updates the appraisal status if it's needed
         updateStatus();
-
-        if(appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
-            appraisal.getUnapprovedGoalsVersion().setGoalsRequiredModificationDate(new Date());
-        }
 
         saveAppraisalMetadata(dates, pidm);
     }
