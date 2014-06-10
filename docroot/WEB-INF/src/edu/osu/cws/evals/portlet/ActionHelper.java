@@ -7,6 +7,7 @@ import com.liferay.portal.util.PortalUtil;
 import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsLogger;
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
 import edu.osu.cws.util.Logger;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -223,8 +224,17 @@ public class ActionHelper {
         ArrayList<Appraisal> myTeamAppraisals;
         myTeamAppraisals = (ArrayList<Appraisal>) session.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
         if (myTeamAppraisals == null) {
+            Map<String, Configuration> configMap = (Map<String, Configuration>) getPortletContextAttribute("configurations");
+            List<String> appointmentTypes = new ArrayList<String>();
+            appointmentTypes.add(AppointmentType.CLASSIFIED);
+            appointmentTypes.add(AppointmentType.CLASSIFIED_IT);
+
+            if (EvalsUtil.isProfessionalFacultyEnabled(configMap)) {
+                appointmentTypes.add(AppointmentType.PROFESSIONAL_FACULTY);
+            }
+
             myTeamAppraisals =
-                    AppraisalMgr.getMyTeamsAppraisals(loggedOnUser.getId(), true, null, null);
+                    AppraisalMgr.getMyTeamsAppraisals(loggedOnUser.getId(), true, null, null, appointmentTypes);
             session.setAttribute(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals);
         }
         return myTeamAppraisals;

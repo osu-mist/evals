@@ -323,8 +323,12 @@ public class AppraisalsTest {
     @Test(groups = "unittest")
     public void shouldFindAllTeamActiveAppraisals() throws Exception {
         int pidm = 12467;
+        List<String> appointmentTypes = new ArrayList<String>();
+        appointmentTypes.add(AppointmentType.CLASSIFIED);
+        appointmentTypes.add(AppointmentType.CLASSIFIED_IT);
+
         List<Appraisal> teamActiveAppraisals = AppraisalMgr.getMyTeamsAppraisals(pidm, true,
-                null, null);
+                null, null, appointmentTypes);
         assert teamActiveAppraisals.size() == 7 : "Invalid size of team active appraisals";
         for (Appraisal ap : teamActiveAppraisals) {
             assert ap.getId() != 0 :
