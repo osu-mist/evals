@@ -395,7 +395,9 @@ public class ReportsAction implements ActionInterface {
         String supervisorLevelPosno = currentSupervisorJob.getPositionNumber();
         String supervisorLevelSuffix = currentSupervisorJob.getSuffix();
         supervisorTeamAppraisal = AppraisalMgr.getMyTeamsAppraisals(supervisorLevelPidm,
-                true, supervisorLevelPosno, supervisorLevelSuffix);
+                true, supervisorLevelPosno, supervisorLevelSuffix,
+                Arrays.asList(APPOINTMENT_TYPES)
+                );
         supervisorAppraisals = AppraisalMgr.getAllMyAppraisals(supervisorLevelPidm,
                 supervisorLevelPosno, supervisorLevelSuffix, true);
     }

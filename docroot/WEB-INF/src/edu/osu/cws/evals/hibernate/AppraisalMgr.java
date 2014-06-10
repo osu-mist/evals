@@ -403,10 +403,11 @@ public class AppraisalMgr {
      * @param onlyActive    Whether or not to include only the active appraisals
      * @param posno         Supervisor's posno
      * @param suffix        Supervisor's suffix
+     * @param appointmentTypes        List of appointment types to include when fetching jobs
      * @return List of Appraisal that contains the jobs this employee supervises.
      */
     public static ArrayList<Appraisal> getMyTeamsAppraisals(Integer supervisorPidm, boolean onlyActive,
-                                                 String posno, String suffix) {
+                                                 String posno, String suffix, List<String> appointmentTypes) {
         ArrayList<Appraisal> appraisals = new ArrayList<Appraisal>();
         List<Integer> employeePidms = new ArrayList<Integer>();
         Session session = HibernateUtil.getCurrentSession();
@@ -435,9 +436,8 @@ public class AppraisalMgr {
                 " jobs.PYVPASJ_SUPERVISOR_PIDM=:supervisorPidm AND " +
                 " jobs.PYVPASJ_STATUS != 'T' AND" +
                 " jobs.PYVPASJ_APPOINTMENT_TYPE IN ('" +
-                AppointmentType.PROFESSIONAL_FACULTY + "', '" +
-                AppointmentType.CLASSIFIED + "', '" +
-                AppointmentType.CLASSIFIED_IT + "') ";
+                StringUtils.join(appointmentTypes, "', '") + "') ";
+
 
         if (!StringUtils.isEmpty(posno) && !StringUtils.isEmpty(suffix)) {
             query += " AND jobs.PYVPASJ_SUPERVISOR_POSN=:posno" +
