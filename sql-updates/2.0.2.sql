@@ -99,3 +99,11 @@ insert into email_types values ('lateReportadmins', 'admins', null, null);
 
 -- EV-157: small rating update
 update ratings set description = ' - Occasionally does not meet expectations or needs significant improvement in critical areas' where id = 11 and name = 'Needs Improvement';
+
+
+-- EV-159: update rating display
+update ratings set description = 'Consistently operates well above expectations' where id = 8  and name = 'Exceptional Performance';
+update ratings set description = 'Fully meets and often exceeds expectations of the position' where id = 9  and name = 'Strong Performance';
+update ratings set description = 'Fully meets the expectations for the position' where id = 10  and name = 'Satisfactory Performance';
+update ratings set description = 'Occasionally does not meet expectations or needs significant improvement in critical areas' where id = 11 and name = 'Needs Improvement';
+update ratings set description = 'Does not meet expectations in multiple key elements of the position' where id = 12  and name = 'Does Not Meet Expectations';
