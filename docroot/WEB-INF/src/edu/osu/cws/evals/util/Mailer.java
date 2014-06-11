@@ -459,6 +459,7 @@ public class Mailer implements MailerInterface {
         try {
             String body = emailBundle.getString("email_lateReport_body");
             HtmlEmail email = getHtmlEmail();
+            String month = new DateTime().monthOfYear().getAsText();
 
             if(testMailToAddress != null && !testMailToAddress.equals("")){
                 for(int i = 0; i < emailAddresses.length; i ++) {
@@ -471,7 +472,7 @@ public class Mailer implements MailerInterface {
             attachment.setPath(filePath);
             attachment.setDisposition(EmailAttachment.ATTACHMENT);
             attachment.setDescription("Late Performance Evaluations");
-            attachment.setName("late-performance-evaluations.csv");
+            attachment.setName("EvalS-lateReport-" + bcName + "-" + month + ".csv");
 
             email.attach(attachment);
             email.addTo(emailAddresses);

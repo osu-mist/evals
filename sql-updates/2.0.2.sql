@@ -107,3 +107,7 @@ update ratings set description = 'Fully meets and often exceeds expectations of 
 update ratings set description = 'Fully meets the expectations for the position' where id = 10  and name = 'Satisfactory Performance';
 update ratings set description = 'Occasionally does not meet expectations or needs significant improvement in critical areas' where id = 11 and name = 'Needs Improvement';
 update ratings set description = 'Does not meet expectations in multiple key elements of the position' where id = 12  and name = 'Does Not Meet Expectations';
+
+-- EV-161: late report update
+delete from email_types where type = 'lateReportadmins';
+insert into email_types values ('lateReportOHR', 'admins', null, null);
