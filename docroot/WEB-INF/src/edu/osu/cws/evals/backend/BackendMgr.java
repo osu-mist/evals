@@ -1092,7 +1092,7 @@ public class BackendMgr {
                 }
 
                 String[] emailAddresses;
-                if (bcName.equals("admins")) {
+                if (bcName.equals("OHR")) {
                     emailAddresses = getAdminEmails();
                 } else {
                     emailAddresses = getReviewersEmails(bcName);
@@ -1141,7 +1141,7 @@ public class BackendMgr {
         List<BusinessCenter> businessCenters = BusinessCenterMgr.list();
         // add a fake bc to check if we need to send report to admin users
         BusinessCenter admin = new BusinessCenter();
-        admin.setName("admins");
+        admin.setName("OHR");
         businessCenters.add(admin);
 
         for (BusinessCenter businessCenter : businessCenters) {
@@ -1215,7 +1215,7 @@ public class BackendMgr {
         // Write the admin file.
         StringBuffer adminBuffer = adminStringWriter.getBuffer();
         adminBuffer.insert(0, headerRow); // insert header row for admin
-        PrintWriter adminOut = new PrintWriter(getLateReportFilePath("admins"));
+        PrintWriter adminOut = new PrintWriter(getLateReportFilePath("OHR"));
         adminOut.print(adminBuffer.toString());
         adminOut.close();
         adminWriter.close();
