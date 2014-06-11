@@ -1,7 +1,9 @@
 package edu.osu.cws.evals.hibernate;
 
+import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Email;
 import edu.osu.cws.evals.util.HibernateUtil;
+import org.apache.xpath.operations.Bool;
 import org.hibernate.Session;
 
 import java.util.List;
@@ -111,6 +113,23 @@ public class EmailMgr {
             email.validate();
             session.save(email);
         }
+    }
+
+    /**
+     * Returns true if no emails have been sent for the *Due and *Overdue status of the appraisal.
+     *
+     * @param appraisalId
+     * @param status
+     * @return
+     * @throws Exception
+     */
+    public static Boolean haveNotSentDueOrOverdueEmail(int appraisalId, String status) throws Exception {
+        String dueStatus = status.replace(Appraisal.OVERDUE, Appraisal.DUE);
+        Email lastDueEmail = EmailMgr.getLastEmail(appraisalId, dueStatus);
+        Email lastOverDueEmail = EmailMgr.getLastEmail(appraisalId, status);
+
+        // only allow overdue email to be sent if no due or *overdue email has been sent
+        return lastDueEmail == null && lastOverDueEmail == null;
     }
 
 }
