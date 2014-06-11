@@ -452,8 +452,13 @@ public class BackendMgr {
             appraisal = AppraisalMgr.createAppraisal(job, startDate, type);
         }
 
-        if (appraisal != null)
-        {
+        if (appraisal != null) {
+            // update status if needed
+            String newStatus = appraisal.getNewStatus(configMap);
+            if (newStatus != null) {
+                appraisal.setStatus(newStatus);
+            }
+
             // create salary object if needed
             if (appraisal.getIsSalaryUsed()) {
                 AppraisalMgr.createOrUpdateSalary(appraisal, configMap);
