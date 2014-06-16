@@ -1214,11 +1214,13 @@ public class BackendMgr {
 
         // Write the admin file.
         StringBuffer adminBuffer = adminStringWriter.getBuffer();
-        adminBuffer.insert(0, headerRow); // insert header row for admin
-        PrintWriter adminOut = new PrintWriter(getLateReportFilePath("OHR"));
-        adminOut.print(adminBuffer.toString());
-        adminOut.close();
-        adminWriter.close();
+        if (adminBuffer.length() != 0) {
+            adminBuffer.insert(0, headerRow); // insert header row for admin
+            PrintWriter adminOut = new PrintWriter(getLateReportFilePath("OHR"));
+            adminOut.print(adminBuffer.toString());
+            adminOut.close();
+            adminWriter.close();
+        }
     }
 
     private String getLateReportFilePath(String bcName) {
