@@ -9,6 +9,7 @@ import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.w3c.dom.css.Rect;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -822,20 +823,23 @@ public class EvalsPDF {
      * @throws IOException
      */
     private void addAssessmentsCriteria(Assessment assessment) throws DocumentException, IOException {
-        int ratingMaxCols = 41; // 40 is a round # and 1 extra for padding column
+        int ratingMaxCols = 9; //8 is a round # and 1 extra for padding column
         PdfPTable criteriaTable = new PdfPTable(ratingMaxCols);
-        PdfPCell emptyLeftCol = new PdfPCell();
-        emptyLeftCol.setBorder(Rectangle.NO_BORDER);
-        emptyLeftCol.setRowspan(4);
-        criteriaTable.addCell(emptyLeftCol);
         criteriaTable.setWidthPercentage(100f);
+        criteriaTable.setWidths(new int[]{1, 1, 10, 1, 10, 1, 10, 1, 10});
+        criteriaTable.setSpacingBefore(5f);
         PdfPCell cell;
+
+        // Add cell to add padding to the left of the table
+        cell = new PdfPCell();
+        cell.setRowspan(4);
+        cell.setBorder(Rectangle.NO_BORDER);
+        criteriaTable.addCell(cell);
 
         // Use an image for the unchecked box
         Image checkedImg = Image.getInstance(rootDir + IMAGE_CHECKBOX_CHECKED);
         checkedImg.scaleToFit(10f, 10f);
-        PdfPCell checkedBox = new PdfPCell(checkedImg, false);
-        checkedBox.setColspan(1);
+        PdfPCell checkedBox = new PdfPCell(checkedImg);
         checkedBox.setVerticalAlignment(Element.ALIGN_MIDDLE);
         checkedBox.setBorder(Rectangle.NO_BORDER);
         checkedBox.setPaddingLeft(2f);
@@ -843,11 +847,32 @@ public class EvalsPDF {
         // Use an image for the checked box.
         Image uncheckedImg = Image.getInstance(rootDir + IMAGE_CHECKBOX_UNCHECKED);
         uncheckedImg.scaleToFit(10f, 10f);
-        PdfPCell uncheckedBox = new PdfPCell(uncheckedImg, false);
-        uncheckedBox.setColspan(1);
+        PdfPCell uncheckedBox = new PdfPCell(uncheckedImg);
         uncheckedBox.setVerticalAlignment(Element.ALIGN_MIDDLE);
         uncheckedBox.setBorder(Rectangle.NO_BORDER);
         uncheckedBox.setPaddingLeft(2f);
+
+        for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
+            if (assessmentCriteria.getChecked() != null && assessmentCriteria.getChecked()) {
+                criteriaTable.addCell(checkedBox);
+            } else {
+                criteriaTable.addCell(uncheckedBox);
+            }
+            cell = new PdfPCell(new Paragraph(assessmentCriteria.getCriteriaArea().getName(), FONT_10));
+            cell.setBorder(Rectangle.NO_BORDER);
+            criteriaTable.addCell(cell);
+        }
+
+        // Need to complete the last row, otherwise it will not render
+        int criteriaSize = assessment.getAssessmentCriteria().size();
+        if(criteriaSize % 4 != 0) {
+            int numIncompleteCells = 2 * (4 - (criteriaSize % 4));
+            for (int i = 0; i < numIncompleteCells; i++) {
+                cell = new PdfPCell();
+                cell.setBorder(Rectangle.NO_BORDER);
+                criteriaTable.addCell(cell);
+            }
+        }
 
         // empty space
         Paragraph sectionText = new Paragraph();
@@ -857,27 +882,6 @@ public class EvalsPDF {
         Paragraph criteriaLabel = new Paragraph(resource.getString("appraisal-selected-criteria"), FONT_BOLDITALIC_10);
         criteriaLabel.setIndentationLeft(LEFT_INDENTATION);
         document.add(criteriaLabel);
-
-        // set default column span to 1/4 of # of columns
-        int criteriaSize = assessment.getAssessmentCriteria().size();
-        int colspan = (ratingMaxCols - 1) / criteriaSize;
-        if (criteriaSize > 4) {
-            colspan = 10;
-        }
-
-
-        for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
-            if (assessmentCriteria.getChecked() != null && assessmentCriteria.getChecked()) {
-                criteriaTable.addCell(checkedBox);
-            } else {
-                criteriaTable.addCell(uncheckedBox);
-            }
-            cell = new PdfPCell(new Paragraph(assessmentCriteria.getCriteriaArea().getName(), FONT_10));
-
-            cell.setColspan(colspan);
-            cell.setBorder(Rectangle.NO_BORDER);
-            criteriaTable.addCell(cell);
-        }
 
         document.add(criteriaTable);
     }
