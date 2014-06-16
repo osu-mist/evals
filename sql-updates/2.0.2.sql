@@ -111,3 +111,6 @@ update ratings set description = 'Does not meet expectations in multiple key ele
 -- EV-161: late report update
 delete from email_types where type = 'lateReportadmins';
 insert into email_types values ('lateReportOHR', 'admins', null, null);
+
+-- EV-163: employee review due expiration
+insert into email_types values ('employeeReviewExpired', 'supervisor', null, null);

@@ -755,6 +755,19 @@ public class Mailer implements MailerInterface {
     }
 
     /**
+     * Fetch the body for employeeReviewExpired emailType
+     *
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String employeeReviewExpiredBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_employeeReviewExpired_body");
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
+                appraisal.getReviewPeriod(), getDueDate(appraisal, "signatureDue"));
+    }
+
+    /**
      * Fetch the body for releaseDue emailType
      * @param appraisal
      * @return
