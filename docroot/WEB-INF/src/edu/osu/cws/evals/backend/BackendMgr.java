@@ -701,6 +701,7 @@ public class BackendMgr {
 
         String status = appraisal.getStatus();
         boolean newGoalsTimedOut = newStatus.equals(Appraisal.STATUS_GOALS_APPROVED);
+        boolean employeeReviewTimedOut = status.equals(Appraisal.STATUS_EMPLOYEE_REVIEW_DUE);
 
         String shortMsg = "updating appraisal " + appraisal.getId();
         String longMsg = "Set status to " + newStatus + " from " + status + ".";
@@ -711,6 +712,8 @@ public class BackendMgr {
 
         if (newGoalsTimedOut) {
             timeOutGoalsReactivation(appraisal);
+        } else if (employeeReviewTimedOut) {
+            mailer.sendMail(appraisal, emailTypeMap.get("employeeReviewExpired"));
         } else {
             Configuration frequencyConfig = getFrequencyConfig(appraisal);
             if (isEmailFrequencyEnabled(frequencyConfig, appraisal)) {
