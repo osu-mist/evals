@@ -608,7 +608,7 @@ public class BackendMgr {
             throws Exception {
         // Do we need to send additional reminder email?
         Configuration frequencyConfig = getFrequencyConfig(appraisal);
-        if (!isEmailFrequencyEnabled(frequencyConfig)) {   //May need to send followup email
+        if (!isEmailFrequencyEnabled(frequencyConfig, appraisal)) {   //May need to send followup email
             return;
         }
 
@@ -646,12 +646,20 @@ public class BackendMgr {
 
     /**
      * Whether or not the email frequency has been disabled. If the frequency configuration value is set to "-1", it is
-     * considered to be disabled. No follow up emails are sent.
+     * considered to be disabled. No follow up emails are sent. The frequency configuration value of "-1" is ignored if
+     * the current status is *Overdue and no *Due or *Overdue emails have been sent for the evaluation record.
      *
      * @param frequencyConfig
+     * @param appraisal
      * @return
      */
-    private boolean isEmailFrequencyEnabled(Configuration frequencyConfig) {
+    private boolean isEmailFrequencyEnabled(Configuration frequencyConfig, Appraisal appraisal) throws Exception {
+        // If the status is *Overdue, check if the *Due email was sent. This overwrites disabled frequencyConfigs
+        String status = appraisal.getStatus();
+        if (status.contains(Appraisal.OVERDUE) && EmailMgr.haveNotSentDueOrOverdueEmail(appraisal.getId(), status)) {
+            return true;
+        }
+
         return frequencyConfig != null && !frequencyConfig.getValue().equals("-1");
     }
 
@@ -700,7 +708,7 @@ public class BackendMgr {
             timeOutGoalsReactivation(appraisal);
         } else {
             Configuration frequencyConfig = getFrequencyConfig(appraisal);
-            if (isEmailFrequencyEnabled(frequencyConfig)) {
+            if (isEmailFrequencyEnabled(frequencyConfig, appraisal)) {
                 sendMail(appraisal);
             }
         }
