@@ -405,7 +405,7 @@ public class EvalsPDF {
         document.add(ratingTable);
 
         // only Classified IT evals get the salary table
-        if (appraisal.getJob().getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
+        if (appraisal.getIsSalaryUsed()) {
             addSalaryTable();
         }
     }
