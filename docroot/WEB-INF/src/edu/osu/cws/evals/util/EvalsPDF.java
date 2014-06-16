@@ -842,8 +842,7 @@ public class EvalsPDF {
         // Use an image for the unchecked box
         Image checkedImg = Image.getInstance(rootDir + IMAGE_CHECKBOX_CHECKED);
         checkedImg.scaleToFit(10f, 10f);
-        PdfPCell checkedBox = new PdfPCell(checkedImg); //, false
-        checkedBox.setColspan(1);
+        PdfPCell checkedBox = new PdfPCell(checkedImg);
         checkedBox.setVerticalAlignment(Element.ALIGN_MIDDLE);
         checkedBox.setBorder(Rectangle.NO_BORDER);
         checkedBox.setPaddingLeft(2f);
@@ -852,20 +851,17 @@ public class EvalsPDF {
         Image uncheckedImg = Image.getInstance(rootDir + IMAGE_CHECKBOX_UNCHECKED);
         uncheckedImg.scaleToFit(10f, 10f);
         PdfPCell uncheckedBox = new PdfPCell(uncheckedImg);
-        uncheckedBox.setColspan(1);
         uncheckedBox.setVerticalAlignment(Element.ALIGN_MIDDLE);
         uncheckedBox.setBorder(Rectangle.NO_BORDER);
         uncheckedBox.setPaddingLeft(2f);
 
         for (AssessmentCriteria assessmentCriteria : assessment.getSortedAssessmentCriteria()) {
-            if (assessmentCriteria.getChecked()) {
+            if (assessmentCriteria.getChecked() != null && assessmentCriteria.getChecked()) {
                 criteriaTable.addCell(checkedBox);
             } else {
                 criteriaTable.addCell(uncheckedBox);
             }
             cell = new PdfPCell(new Paragraph(assessmentCriteria.getCriteriaArea().getName(), FONT_10));
-
-            cell.setColspan(1);
             cell.setBorder(Rectangle.NO_BORDER);
             criteriaTable.addCell(cell);
         }
