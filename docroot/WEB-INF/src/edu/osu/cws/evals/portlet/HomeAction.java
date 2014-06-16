@@ -122,7 +122,7 @@ public class HomeAction implements ActionInterface {
      */
     private void helpLinks() {
         PropertiesConfiguration config = actionHelper.getEvalsConfig();
-        actionHelper.addToRequestMap("helpLinks", config.getString("helpfulLinks"));
+        actionHelper.addToRequestMap("helpLinks", config.getList("helpfulLinks"));
     }
 
     /**

@@ -93,6 +93,8 @@ public class AppraisalsAction implements ActionInterface {
         this.request = request;
         this.resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         this.loggedInUser = actionHelper.getLoggedOnUser();
+        PropertiesConfiguration config = actionHelper.getEvalsConfig();
+        actionHelper.addToRequestMap("profFacultyMsg", config.getString("profFaculty.maximized.Message"));
         initializeAppraisal();
     }
 
