@@ -468,11 +468,12 @@ public class Mailer implements MailerInterface {
             }
 
             // Create the attachment
+            String filename = "EvalS-lateReport-" + bcName + "-" + month + ".csv";
             EmailAttachment attachment = new EmailAttachment();
             attachment.setPath(filePath);
             attachment.setDisposition(EmailAttachment.ATTACHMENT);
-            attachment.setDescription("Late Performance Evaluations");
-            attachment.setName("EvalS-lateReport-" + bcName + "-" + month + ".csv");
+            attachment.setDescription(filename);
+            attachment.setName(filename);
 
             email.attach(attachment);
             email.addTo(emailAddresses);
