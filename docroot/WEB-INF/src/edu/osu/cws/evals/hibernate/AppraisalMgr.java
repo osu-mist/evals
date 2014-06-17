@@ -504,6 +504,7 @@ public class AppraisalMgr {
             }
         }
 
+        Collections.sort(myTeamAppraisals);
         return myTeamAppraisals;
     }
 

@@ -9,7 +9,7 @@ import org.joda.time.DateTime;
 import java.text.MessageFormat;
 import java.util.*;
 
-public class Appraisal extends Evals {
+public class Appraisal extends Evals implements Comparable<Appraisal> {
 
     public static final String TYPE_ANNUAL = "annual";
 
@@ -1219,5 +1219,37 @@ public class Appraisal extends Evals {
         }
 
         return false;
+    }
+
+    /**
+     * Appraisal objects are sorted first by start date and then employee last name.
+     *
+     * @param otherAppraisal
+     * @return
+     */
+    public int compareTo(Appraisal otherAppraisal) {
+        final int BEFORE = -1;
+        final int EQUAL = 0;
+        final int AFTER = 1;
+
+        Employee employee = this.job.getEmployee();
+        Job otherJob = otherAppraisal.getJob();
+        Employee otherEmployee = otherJob.getEmployee();
+        // Check for nulls
+        if (this.startDate == null || otherAppraisal.getStartDate() == null || this.job == null ||
+                employee == null || employee.getLastName() == null || otherJob != null || otherEmployee == null
+                || otherEmployee.getLastName() == null) {
+            return AFTER;
+        }
+
+        if (this.startDate.getTime()  > otherAppraisal.getStartDate().getTime()) {
+            return AFTER;
+        }
+
+        if (this.startDate.getTime() < otherAppraisal.getStartDate().getTime()) {
+            return BEFORE;
+        }
+
+        return this.getJob().getEmployee().getLastName().compareTo(otherEmployee.getLastName());
     }
 }
