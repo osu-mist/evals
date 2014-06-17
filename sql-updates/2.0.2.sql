@@ -114,3 +114,6 @@ insert into email_types values ('lateReportOHR', 'admins', null, null);
 
 -- EV-163: employee review due expiration
 insert into email_types values ('employeeReviewExpired', 'supervisor', null, null);
+
+-- EV-167: cc employee on employee review expired email
+update email_types set cc = 'employee' where type = 'employeeReviewExpired';
