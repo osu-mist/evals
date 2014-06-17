@@ -253,7 +253,7 @@
         job.PYVPASJ_APPOINTMENT_TYPE as appointment_type,
         TO_CHAR(ap.START_DATE, 'MM/dd/yyyy'),
         TO_CHAR(ap.END_DATE, 'MM/dd/yyyy'),
-        round(current_date - ap.END_DATE),
+        round(current_date - ap.END_DATE) as overdue,
         job.PYVPASJ_BCTR_TITLE as business_center
     from
         appraisals ap,
@@ -274,7 +274,7 @@
         (ap.STATUS not in  (:ignoredStatus)) and
         job.PYVPASJ_BCTR_TITLE in (:bcNames)
     order by
-        job.PYVPASJ_BCTR_TITLE, ap.OVERDUE
+        job.PYVPASJ_BCTR_TITLE, overdue
     ]]></sql-query>
 
 </hibernate-mapping>
