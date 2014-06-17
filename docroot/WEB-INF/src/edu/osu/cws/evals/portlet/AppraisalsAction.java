@@ -207,10 +207,10 @@ public class AppraisalsAction implements ActionInterface {
         boolean isAdmin = actionHelper.getAdmin() != null;
         boolean isReviewer = actionHelper.getReviewer() != null;
 
-        // If a supervisor is also a reviewer, the people he/she supervises will be in the
-        // business center he/she is a reviewer of. Because reviewer has broader permissions
-        // than supervisor, we will use the reviewer's permission to do search.
-        boolean isSupervisor = !isReviewer && actionHelper.isLoggedInUserSupervisor();
+        // If a supervisor is also a reviewer/admin, the people he/she supervises will be in the
+        // business center he/she is a reviewer of. Because reviewer/admin has broader permissions
+        // than supervisor, we will use the reviewer/admin's permission to do search.
+        boolean isSupervisor = !isReviewer && !isAdmin && actionHelper.isLoggedInUserSupervisor();
 
         if (!isAdmin && !isReviewer && !isSupervisor)  {
             return errorHandler.handleAccessDenied(request, response);
