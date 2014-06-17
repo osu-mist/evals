@@ -1277,7 +1277,7 @@ public class AppraisalsAction implements ActionInterface {
         initialize(request);
         Integer year = ParamUtil.getInteger(request, "year");
         Integer month = ParamUtil.getInteger(request, "month");
-        DateTime startDate = new DateTime().withDate(year, month, 1);
+        DateTime startDate = new DateTime().withDate(year, month, 1).withTimeAtStartOfDay();
 
         // Logging information
         EvalsLogger logger = (EvalsLogger) actionHelper.getPortletContextAttribute("log");
