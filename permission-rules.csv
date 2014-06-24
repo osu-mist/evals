@@ -119,3 +119,7 @@ id,status,role,approved_goals,unapproved_goals,goal_comments,results,supervisor_
 44201,employeeReviewDue,upper-supervisor,v,,,v,v,v,,,,,,,y,,,,,Professional Faculty
 44202,employeeReviewDue,superAdmin,,,,,,,,,,,,,,y,,,,Professional Faculty
 44203,employeeReviewDue,masterAdmin,v,,,v,v,v,,,,,,,y,y,,,,Professional Faculty
+44204,releaseDue,employee,v,,,v,,,v,,,,,,y,,,,,Professional Faculty
+44205,releaseDue,reviewer,,,,,,,,,,,,,,y,,,,Professional Faculty
+44206,releaseDue,superAdmin,,,,,,,,,,,,,,y,,,,Professional Faculty
+44207,releaseDue,masterAdmin,v,,,v,,,v,,,,,,y,y,,,,Professional Faculty
