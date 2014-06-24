@@ -78,6 +78,9 @@ jQuery(document).ready(function() {
       data: data,
       success: function(msg) {
         if (msg == "success") {
+          // remove any existing success messages from previous auto-save draft or manually saving draft
+          jQuery('.portlet-msg-success').remove();
+
           jQuery("#<portlet:namespace />flash").html(
               '<span class="portlet-msg-success"><liferay-ui:message key="draft-autosaved"/></span>'
           );
