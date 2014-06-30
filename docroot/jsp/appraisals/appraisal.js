@@ -1,5 +1,14 @@
 jQuery(document).ready(function() {
 
+  // professional faculty start-here animation:
+  jQuery('.evals-prof-faculty-start').siblings().fadeTo("slow", 0.2);
+  setTimeout(function() { endStartAnimation() }, 3000);
+
+  function endStartAnimation() {
+    jQuery('.evals-prof-faculty-start').siblings().fadeTo("slow", 1);
+    setTimeout(function() { jQuery('.evals-prof-faculty-start span.evals-arrow').effect("shake", "fast")}, 1000);
+  }
+
   // Handle acknowledge appraisal rebuttal read by supervisor
   jQuery(".pass-appraisal-rebuttal").hide();
 

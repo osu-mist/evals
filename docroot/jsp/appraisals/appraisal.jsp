@@ -49,13 +49,10 @@
 <c:if test="${showForm and !empty appraisalNotice.text}">
     <span class="portlet-msg-alert">
         <c:out value="${appraisalNotice.text}"/>
-        <c:if test="${appraisal.job.appointmentType == 'Professional Faculty'}">
-            ${profFacultyMsg}
-        </c:if>
     </span>
 </c:if>
-<c:if test="${empty appraisalNotice.text and appraisal.job.appointmentType == 'Professional Faculty'}">
-   <span class="portlet-msg-alert">
+<c:if test="${!empty profFacultyMsg and appraisal.job.appointmentType == 'Professional Faculty'}">
+   <span class="portlet-msg-alert evals-prof-faculty-start">
        ${profFacultyMsg}
    </span>
 </c:if>
