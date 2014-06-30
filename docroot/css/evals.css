@@ -438,6 +438,36 @@ tr.ui-state-highlight {
     margin-right: 12px;
 }
 
+/** Professional faculty start Here message **/
+span.evals-prof-faculty-start {
+    background-image: none;
+    min-height: 2em;
+    background-color: #d9edf7;
+    border: 1px #bce8f1;
+}
+span.evals-prof-faculty-start p {
+    margin: 0.3em 0.3em 0.3em -0.75em;
+    font-size: 1.5em;
+    color: #3a87ad;
+}
+span.evals-prof-faculty-start strong {
+    display: block;
+    width: auto;
+    float: left;
+    color: #3a87ad;
+}
+span.evals-prof-faculty-start a {
+    float: left;
+    margin-left: 0.5em;
+    display: block;
+    color: #3a87ad;
+}
+span.evals-prof-faculty-start span.evals-arrow {
+    font-size: 3em;
+    float: left;
+    margin-top: -0.1em;
+    margin-left: 0.2em;
+}
 
 @media print {
     .osu-accordion-header,
