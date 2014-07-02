@@ -851,7 +851,7 @@ public class AppraisalsAction implements ActionInterface {
         Integer nextSequence = calculateAssessmentSequence(dbAssessmentsMap);
         assessment = AppraisalMgr.createNewAssessment(reactivatedGoalVersion, nextSequence, criterionAreas);
         session.save(assessment);
-        return "{id:" + assessment.getId() + ", status:\"success\"}";
+        return "{\"id\":" + assessment.getId() + ", \"status\":\"success\"}";
     }
 
 
