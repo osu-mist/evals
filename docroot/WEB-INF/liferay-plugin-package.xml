@@ -17,6 +17,6 @@
         <license osi-approved="true">MIT</license>
     </licenses>
     <liferay-versions>
-        <liferay-version>5.2.0+</liferay-version>
+        <liferay-version>6.1.0+</liferay-version>
     </liferay-versions>
 </plugin-package>
