@@ -776,7 +776,11 @@ public class Mailer implements MailerInterface {
      * @throws Exception
      */
     private String releaseDueBody(Appraisal appraisal) throws Exception {
-        String bodyString = emailBundle.getString("email_releaseDue_body");
+        String key = "email_releaseDue_body";
+        if (appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+            key = "email_releaseDueProfFaculty_body";
+        }
+        String bodyString = emailBundle.getString(key);
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
                 appraisal.getReviewPeriod(), getDueDate(appraisal, null));
     }

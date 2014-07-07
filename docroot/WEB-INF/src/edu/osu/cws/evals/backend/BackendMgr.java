@@ -633,6 +633,7 @@ public class BackendMgr {
 
         // commit to db so that future email checks detect email has already been sent.
         tx.commit();
+        session = HibernateUtil.getCurrentSession();
         tx = session.beginTransaction();
 
     }
