@@ -211,6 +211,8 @@ public class Assessment extends Evals implements Comparable<Assessment> {
         newAssessment.setSupervisorResult(trialAssessment.getSupervisorResult());
         newAssessment.setModifiedDate(new Date());
         newAssessment.setSequence(trialAssessment.getSequence());
+        newAssessment.setDeleterPidm(trialAssessment.getDeleterPidm());
+        newAssessment.setDeleteDate(trialAssessment.getDeleteDate());
 
         // copy assessment criteria objects for this new assessment
         for (AssessmentCriteria trialAssessmentCriteria : trialAssessment.getAssessmentCriteria()) {
