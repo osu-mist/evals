@@ -4,11 +4,11 @@ id,status,role,approved_goals,unapproved_goals,goal_comments,results,supervisor_
 53,appraisalDue,upper-supervisor,v,,,v,,,,,,,,,y,,,,,Default
 54,appraisalDue,admin,v,,,v,,,,,,,,,y,y,,,,Default
 55,appraisalDue,reviewer,v,,,v,,,,,,,,,y,y,,,,Default
-50,closed,employee,v,,,v,v,v,,v,,,,,y,,,,,Default
-51,closed,supervisor,v,,,v,v,v,v,v,,,,,y,,,,,Default
-52,closed,reviewer,v,,,v,v,v,v,v,,,,,y,,,,,Default
-59,closed,upper-supervisor,v,,,v,v,v,v,v,,,,,y,,,,,Default
-60,closed,admin,v,,,v,v,v,v,v,,,,,y,,,,,Default
+50,closed,employee,v,,,v,,,,,,,,,y,,,,,Default
+51,closed,supervisor,v,,,,v,,,,,,,,y,,,,,Default
+52,closed,reviewer,v,,,,,,,,,,,,y,,,,,Default
+59,closed,upper-supervisor,v,,,,,,,,,,,,y,,,,,Default
+60,closed,admin,v,,,,,,,,,,,,y,,,,,Default
 47,completed,employee,v,,,v,v,v,,v,,,,,y,,,,,Default
 48,completed,supervisor,v,,,v,v,v,v,v,,,,,y,,,,,Default
 49,completed,reviewer,v,,,v,v,v,v,v,,,,,y,,y,,,Default
@@ -46,14 +46,14 @@ id,status,role,approved_goals,unapproved_goals,goal_comments,results,supervisor_
 83,goalsRequiredModification,reviewer,v,,v,,,,,,,,,,y,y,,,,Default
 41,rebuttalReadDue,employee,v,,,v,v,v,,v,,,,,y,,,,,Default
 42,rebuttalReadDue,supervisor,v,,,v,v,v,,v,e,,read-appraisal-rebuttal,action-required-rebuttal-read-due,y,,,,,Default
-43,rebuttalReadDue,reviewer,v,,,v,v,v,,v,,,,,y,,y,,,Default
+43,rebuttalReadDue,reviewer,v,,,v,v,v,v,v,,,,,y,,y,,,Default
 84,rebuttalReadDue,upper-supervisor,v,,,v,v,v,v,v,,,,,y,,,,,Default
 85,rebuttalReadDue,admin,v,,,v,v,v,v,v,,,,,y,,y,,,Default
 29,releaseDue,employee,v,,,v,,,,,,,,,y,,,,,Default
 30,releaseDue,supervisor,v,,,v,e,e,v,,,,release-appraisal,action-required-release-due,y,,,,,Default
-31,releaseDue,reviewer,v,,,v,v,v,v,,,,,,y,y,,,,Default
-88,releaseDue,upper-supervisor,v,,,v,v,,,,,,,,y,,,,,Default
-89,releaseDue,admin,v,,,v,v,,v,,,,,,y,y,,,,Default
+31,releaseDue,reviewer,v,,,v,,,v,,,,,,y,y,,,,Default
+88,releaseDue,upper-supervisor,v,,,v,,,v,,,,,,y,,,,,Default
+89,releaseDue,admin,v,,,v,,,v,,,,,,y,y,,,,Default
 15,resultsDue,employee,v,,,e,,,,,,,submit-results,action-required-results-due,y,,,,,Default
 16,resultsDue,supervisor,v,,,,e,,,,,,,action-team-results-due,y,,,,,Default
 92,resultsDue,upper-supervisor,v,,,,,,,,,,,,y,,,,,Default
@@ -68,7 +68,7 @@ id,status,role,approved_goals,unapproved_goals,goal_comments,results,supervisor_
 36,signatureDue,supervisor,v,,,v,v,v,v,,,,,action-team-signature-due,y,,,,,Default
 37,signatureDue,reviewer,v,,,v,v,v,v,,,,,,y,y,,,,Default
 102,signatureDue,upper-supervisor,v,,,v,v,v,v,,,,,,y,,,,,Default
-103,signatureDue,admin,v,,,v,v,v,v,,,,,,,y,,,,Default
+103,signatureDue,admin,v,,,v,v,v,v,,,,,,y,y,,,,Default
 44154,appraisalDue,reviewer,,,,,,,,,,,,,,y,,,,Professional Faculty
 44155,appraisalDue,superAdmin,,,,,,,,,,,,,,y,,,,Professional Faculty
 44156,closed,reviewer,,,,,,,,,,,,,,,,,,Professional Faculty
@@ -77,8 +77,8 @@ id,status,role,approved_goals,unapproved_goals,goal_comments,results,supervisor_
 44159,completed,superAdmin,,,,,,,,,,,,,,,,,,Professional Faculty
 44160,goalsApprovalDue,reviewer,,,,,,,,,,,,,,y,,,,Professional Faculty
 44161,goalsApprovalDue,superAdmin,,,,,,,,,,,,,,y,,,,Professional Faculty
-44162,goalsApproved,reviewer,,,,,,,,,,,,,,y,,y,,Professional Faculty
-44163,goalsApproved,superAdmin,,,,,,,,,,,,,,y,,y,,Professional Faculty
+44162,goalsApproved,reviewer,,,,,,,,,,,,,,y,,,,Professional Faculty
+44163,goalsApproved,superAdmin,,,,,,,,,,,,,,y,,,,Professional Faculty
 44164,goalsDue,reviewer,,,,,,,,,,,,,,y,,,,Professional Faculty
 44165,goalsDue,superAdmin,,,,,,,,,,,,,,y,,,,Professional Faculty
 44166,goalsReactivated,reviewer,,,,,,,,,,,,,,y,,y,,Professional Faculty
@@ -94,13 +94,13 @@ id,status,role,approved_goals,unapproved_goals,goal_comments,results,supervisor_
 44176,signatureDue,reviewer,,,,,,,,,,,,,,y,,,,Professional Faculty
 44177,signatureDue,superAdmin,,,,,,,,,,,,,,y,,,,Professional Faculty
 44178,appraisalDue,masterAdmin,v,,,v,,,,,,,,,y,y,,,,Professional Faculty
-44179,closed,masterAdmin,v,,,v,v,v,v,v,,,,,y,,,,,Professional Faculty
+44179,closed,masterAdmin,v,,,,,,,,,,,,,,,,,Professional Faculty
 44180,completed,masterAdmin,v,,,v,v,v,v,v,,,,,y,,,,,Professional Faculty
 44181,goalsApprovalDue,masterAdmin,v,,,,,,,,,,,,y,y,,,,Professional Faculty
 44182,goalsApproved,masterAdmin,v,,,,,,,,,,,,y,y,,y,,Professional Faculty
 44183,goalsDue,masterAdmin,,,,,,,,,,,,,y,y,,,,Professional Faculty
-44184,goalsReactivated,masterAdmin,v,,,,,,,,,,,,y,y,,,,Professional Faculty
-44185,goalsReactivationRequested,masterAdmin,v,,,,,,,,,,,,y,y,,,,Professional Faculty
+44184,goalsReactivated,masterAdmin,v,,,,,,,,,,,,y,y,,y,,Professional Faculty
+44185,goalsReactivationRequested,masterAdmin,v,,,,,,,,,,,,y,y,,y,,Professional Faculty
 44186,goalsRequiredModification,masterAdmin,v,,v,,,,,,,,,,y,y,,,,Professional Faculty
 44187,rebuttalReadDue,masterAdmin,v,,,v,v,v,v,v,,,,,y,,,,,Professional Faculty
 44188,resultsDue,masterAdmin,v,,,,,,,,,,,,y,y,,,,Professional Faculty
