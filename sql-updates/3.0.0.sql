@@ -117,3 +117,6 @@ insert into email_types values ('employeeReviewExpired', 'supervisor', null, nul
 
 -- EV-167: cc employee on employee review expired email
 update email_types set cc = 'employee' where type = 'employeeReviewExpired';
+
+-- EV-188: change Does Not Meet Expectation wording 
+update ratings set description = 'Consistently does not meet expectations in multiple key elements of the position' where id = 12  and name = 'Does Not Meet Expectations';
