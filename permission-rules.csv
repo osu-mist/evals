@@ -77,8 +77,8 @@ id,status,role,approved_goals,unapproved_goals,goal_comments,results,supervisor_
 44159,completed,superAdmin,,,,,,,,,,,,,,,,,,Professional Faculty
 44160,goalsApprovalDue,reviewer,,,,,,,,,,,,,,y,,,,Professional Faculty
 44161,goalsApprovalDue,superAdmin,,,,,,,,,,,,,,y,,,,Professional Faculty
-44162,goalsApproved,reviewer,,,,,,,,,,,,,,y,,,,Professional Faculty
-44163,goalsApproved,superAdmin,,,,,,,,,,,,,,y,,,,Professional Faculty
+44162,goalsApproved,reviewer,,,,,,,,,,,,,,y,,y,,Professional Faculty
+44163,goalsApproved,superAdmin,,,,,,,,,,,,,,y,,y,,Professional Faculty
 44164,goalsDue,reviewer,,,,,,,,,,,,,,y,,,,Professional Faculty
 44165,goalsDue,superAdmin,,,,,,,,,,,,,,y,,,,Professional Faculty
 44166,goalsReactivated,reviewer,,,,,,,,,,,,,,y,,y,,Professional Faculty
