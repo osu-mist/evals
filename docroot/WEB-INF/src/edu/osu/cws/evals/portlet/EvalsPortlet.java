@@ -12,6 +12,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.util.PortalUtil;
 import edu.osu.cws.evals.hibernate.AppraisalStepMgr;
 import edu.osu.cws.evals.hibernate.PermissionRuleMgr;
+import edu.osu.cws.evals.hibernate.RatingMgr;
 import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.util.*;
@@ -268,6 +269,8 @@ public class EvalsPortlet extends GenericPortlet {
                 message += "Stored Permission Rules in portlet context\n";
                 getPortletContext().setAttribute("appraisalSteps", AppraisalStepMgr.list());
                 message += "Stored Appraisal Steps in portlet context\n";
+                getPortletContext().setAttribute("ratings", RatingMgr.mapByAppointmentType());
+                message += "Stored Ratings in portlet context\n";
                 loadResourceBundle();
                 message += "Stored resource bundle Language.properties in portlet context\n";
 

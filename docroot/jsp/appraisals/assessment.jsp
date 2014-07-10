@@ -18,7 +18,7 @@
 </c:choose>
 
 <div class="appraisal-assessment-${assessment.id} ${assessment_class}">
-    <h3 class="secret"><liferay-ui:message key="appraisal-assessment-header"/>${loopStatus.index + 1}</h3>
+    <h3 class="secret"><liferay-ui:message key="appraisal-assessment-header"/>${goalCount}</h3>
     <c:if test="${goalStatus == 'e'}">
         <a class="delete img-txt assessment-delete delete.id.${assessment.id}"
            title="<liferay-ui:message key="appraisal-assessment-delete"/>"
@@ -31,13 +31,13 @@
     <c:choose>
         <c:when test="${goalStatus == 'e'}">
             <label for="<portlet:namespace />appraisal.goal.${assessment.id}"><liferay-ui:message key="appraisal-goals" />
-                    ${loopStatus.index + 1}</label>
+                    ${goalCount}</label>
             <div><liferay-ui:input-textarea param="appraisal.goal.${assessment.id}"
                                             defaultValue="${assessment.goal}" /></div>
         </c:when>
         <c:when test="${goalStatus == 'v'}">
             <fieldset>
-                <legend><span><liferay-ui:message key="appraisal-goals" />${loopStatus.index + 1}</span></legend>
+                <legend><span><liferay-ui:message key="appraisal-goals" />${goalCount}</span></legend>
                 <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAssessment.getGoal()) %></p>
                 <c:forEach var="assessmentCriteria" items="${assessment.sortedAssessmentCriteria}" varStatus="loopStatus2">
                     <%@ include file="/jsp/appraisals/assessmentCriteria.jsp"%>
@@ -85,3 +85,4 @@
     </c:if>
 
 </div>
+<c:set var="goalCount" value="${goalCount + 1}"/>

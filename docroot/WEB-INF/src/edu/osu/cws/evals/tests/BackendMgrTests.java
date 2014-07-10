@@ -14,6 +14,8 @@ import org.joda.time.DateTime;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 @Test
@@ -127,7 +129,8 @@ public class BackendMgrTests {
         // create an appraisal and set annual indicator
         Job job = (Job) session.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         job.setAnnualInd(12);
-        AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(),  Appraisal.TYPE_ANNUAL);
+        DateTime initialEvalStartDate = job.getInitialEvalStartDate().withYear(new DateTime().getYear());
+        AppraisalMgr.createAppraisal(job, initialEvalStartDate,  Appraisal.TYPE_ANNUAL);
 
         Integer currentCount = getEvaluationCount();
         assert !mgr.handleAnnualCreation(job) : "It shouldn't create one. One already exists";
@@ -296,6 +299,47 @@ public class BackendMgrTests {
         assert goalVersion.getRequestDecisionPidm() == null;
         assert goalVersion.getTimedOutAt().equals(Appraisal.STATUS_GOALS_REACTIVATION_REQUESTED);
     }
+
+    public void shouldSendNonProfFacultyEmailsRightAwayDuringUpdate() throws Exception {
+        Appraisal appraisal = new Appraisal();
+        appraisal.setJob(new Job());
+        appraisal.getJob().setAppointmentType(AppointmentType.CLASSIFIED);
+
+        assert !BackendMgr.timeToSendFirstStatusEmail(appraisal, new DateTime());
+
+        appraisal.getJob().setAppointmentType(AppointmentType.CLASSIFIED_IT);
+        assert !BackendMgr.timeToSendFirstStatusEmail(appraisal, new DateTime());
+    }
+    
+    public void shouldSendProfFacultyEmailsRightAwayForNonInitialEvaluations() throws Exception {
+        HashSet<Appraisal> appraisalHashSet = new HashSet<Appraisal>();
+        appraisalHashSet.add(new Appraisal());
+        appraisalHashSet.add(new Appraisal());
+
+        Appraisal appraisal = new Appraisal();
+        Job job = new Job();
+        job.setAppointmentType(AppointmentType.PROFESSIONAL_FACULTY);
+        job.setAppraisals(appraisalHashSet);
+        appraisal.setJob(job);
+
+        // send email right away when it's not the first evaluation
+        assert !BackendMgr.timeToSendFirstStatusEmail(appraisal, new DateTime());
+    }
+
+    public void shouldSendProfFacultyEmailsRightAwayOnceReviewPeriodStarts() throws Exception {
+        HashSet<Appraisal> appraisalHashSet = new HashSet<Appraisal>();
+        Appraisal appraisal = new Appraisal();
+        Date yesterday = new DateTime().minusDays(1).toDate();
+        appraisal.setStartDate(yesterday);
+        Job job = new Job();
+        job.setAppointmentType(AppointmentType.PROFESSIONAL_FACULTY);
+        job.setAppraisals(appraisalHashSet);
+        appraisal.setJob(job);
+
+        // send email right away when it's not the first evaluation
+        assert !BackendMgr.timeToSendFirstStatusEmail(appraisal, new DateTime());
+    }
+
     /**
      * Helper method to return count of evaluations in db
      *

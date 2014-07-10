@@ -6,9 +6,11 @@ import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.evals.util.HibernateUtil;
 import edu.osu.cws.util.CWSUtil;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.type.StandardBasicTypes;
 import org.joda.time.DateTime;
 
@@ -42,7 +44,46 @@ public class AppraisalMgr {
      */
     public static Appraisal createAppraisal(Job job, DateTime startDate, String type)
             throws Exception {
-        Appraisal appraisal = new Appraisal();
+        Appraisal appraisal = new Appraisal();   //
+        initAppraisal(appraisal, job, startDate, type);
+        return appraisal;
+    }
+
+    /**
+     * Removes all goalVersions from the given appraisal,
+     * resets the given appraisal to the same state as a
+     * newly created appraisal, and adds a new goalVersion
+     * that has 5 blank assessments.
+     *
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    public static Appraisal resetAppraisal(Appraisal appraisal) throws Exception {
+        // Delete current goal versions
+        Session session = HibernateUtil.getCurrentSession();
+        Set<GoalVersion> goalVersions = appraisal.getGoalVersions();
+        for(GoalVersion goalVersion: goalVersions) {
+            goalVersions.remove(goalVersion);
+            session.delete(goalVersion);
+        }
+        initAppraisal(appraisal, appraisal.getJob(), DateTime.now(), Appraisal.TYPE_INITIAL);
+
+        return appraisal;
+    }
+
+    /**
+     * This method will set the given appraisal to an initialized state. Used to reset old
+     * appraisals, and initialize new/uninitialized appraisals.
+     *
+     * @param appraisal
+     * @param job
+     * @param startDate
+     * @param type
+     * @throws Exception
+     */
+    public static void initAppraisal(Appraisal appraisal, Job job, DateTime startDate, String type)
+            throws Exception {
         GoalVersion goalVersion = new GoalVersion();
         appraisal.addGoalVersion(goalVersion);
         goalVersion.setCreateDate(new Date());
@@ -79,8 +120,44 @@ public class AppraisalMgr {
                     criteriaList);
             session.save(appraisal);
         }
+    }
 
-        return appraisal;
+    /**
+     * Creates evaluations for the professional faculty employees that are supervised by the supervisor.
+     * The method gets the list of all the employees and only creates evaluations for the ones that don't have active
+     * evaluations.
+     *
+     * @param supervisor
+     * @param startDate
+     * @return appraisals           List of appraisal objects created
+     * @throws Exception
+     */
+    public static List<Appraisal> createProfessionalFacultyEvals(Employee supervisor, DateTime startDate) throws Exception {
+        List<Appraisal> appraisals = new ArrayList<Appraisal>();
+        List<String> appointmentTypes = new ArrayList<String>();
+        appointmentTypes.add(AppointmentType.PROFESSIONAL_FACULTY);
+
+        List<Job> supervisorJobs = JobMgr.getSupervisorJobs(supervisor);
+        // check that the user holds at least 1 supervising job
+        if (supervisorJobs == null || supervisorJobs.isEmpty()) {
+            return null;
+        }
+
+        List<Job> employeeShortJobs = JobMgr.listEmployeesShortJobs(supervisorJobs, appointmentTypes);
+        ArrayList<Job> jobsWithoutActiveEvaluations = JobMgr.getJobWithoutActiveEvaluations(employeeShortJobs);
+
+        // Check that we have jobs to create evaluations for
+        if (jobsWithoutActiveEvaluations == null || jobsWithoutActiveEvaluations.isEmpty()) {
+            return null;
+        }
+
+        for (Job shortJob : jobsWithoutActiveEvaluations) {
+            appraisals.add(createAppraisal(shortJob, startDate, Appraisal.TYPE_ANNUAL));
+        }
+        Session session = HibernateUtil.getCurrentSession();
+        session.flush(); // force the records to be persisted in the db so that they can be picked up by home view
+
+        return appraisals;
     }
 
     /**
@@ -246,8 +323,10 @@ public class AppraisalMgr {
     }
 
     /**
-     * Returns a list of active appraisals for all the jobs that the current pidm holds. If the
-     * posno and suffix are provided, the evaluations are specific to the job.
+     * Returns a list of appraisals for all the jobs that the current pidm holds. If the
+     * posno and suffix are provided, the evaluations are specific to the job. If onlyActive
+     * is set to true, then it only returns active appraisals, otherwise it returns active
+     * and archived appraisals.
      * The fields that are returned in the appraisal are:
      *      id
      *      Job.jobTitle
@@ -260,15 +339,20 @@ public class AppraisalMgr {
      * @param pidm
      * @param posno
      * @param suffix
+     * @param onlyActive
      */
-    public static ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm, String posno,
-                                                                String suffix) {
+    public static ArrayList<Appraisal> getAllMyAppraisals(int pidm, String posno,
+                                                          String suffix, boolean onlyActive) {
         Session session = HibernateUtil.getCurrentSession();
-        String query = "select new edu.osu.cws.evals.models.Appraisal(id, job.jobTitle, startDate, " +
-                "endDate, status, overdue)" +
-                " from edu.osu.cws.evals.models.Appraisal where " +
-                " job.employee.id = :pidm and status not in ('archived')";
+        String query =
+                "select new edu.osu.cws.evals.models.Appraisal(" +
+                    "id, job.jobTitle, startDate, endDate, status, overdue, job.appointmentType)" +
+                " from edu.osu.cws.evals.models.Appraisal" +
+                " where job.employee.id = :pidm";
 
+        if (onlyActive) {
+            query += " and status not like 'archived%'";
+        }
         if (posno != null && suffix != null) {
             query += " and job.positionNumber = :posno and job.suffix = :suffix";
         }
@@ -288,37 +372,76 @@ public class AppraisalMgr {
     }
 
     /**
+     * Returns a list of active appraisals for all the jobs that the current pidm holds. If the
+     * posno and suffix are provided, the evaluations are specific to the job. Calls the function
+     * getAllMyAppraisals() and sets onlyActive to true.
+     * The fields that are returned in the appraisal are:
+     *      id
+     *      Job.jobTitle
+     *      startDate
+     *      endDate
+     *      status
+     *      overdue
+     *
+     * @return
+     * @param pidm
+     * @param posno
+     * @param suffix
+     */
+    public static ArrayList<Appraisal> getAllMyActiveAppraisals(int pidm, String posno,
+                                                                String suffix) {
+        return getAllMyAppraisals(pidm, posno, suffix, true);
+    }
+
+    /**
      * Returns a list of appraisals with limited attributes set: id, job title, employee name,
      * job appointment type, start date, end date, status, goalsRequiredModification and
      * employeSignedDate. If the posno and suffix are specific, the team appraisals are
      * specific to that supervising job.
      *
-     * @param pidm          Supervisor's pidm.
+     * @param supervisorPidm          Supervisor's pidm.
      * @param onlyActive    Whether or not to include only the active appraisals
      * @param posno         Supervisor's posno
      * @param suffix        Supervisor's suffix
+     * @param appointmentTypes        List of appointment types to include when fetching jobs
      * @return List of Appraisal that contains the jobs this employee supervises.
      */
-    public static ArrayList<Appraisal> getMyTeamsAppraisals(Integer pidm, boolean onlyActive,
-                                                 String posno, String suffix) {
+    public static ArrayList<Appraisal> getMyTeamsAppraisals(Integer supervisorPidm, boolean onlyActive,
+                                                 String posno, String suffix, List<String> appointmentTypes) {
         ArrayList<Appraisal> appraisals = new ArrayList<Appraisal>();
-        List<Integer> pidms = new ArrayList<Integer>();
+        List<Integer> employeePidms = new ArrayList<Integer>();
         Session session = HibernateUtil.getCurrentSession();
 
-        String query = "select ap.ID, jobs.PYVPASJ_DESC, jobs.PYVPASJ_APPOINTMENT_TYPE, " +
-                "ap.START_DATE, ap.END_DATE, ap.STATUS, ap.GOALS_REQUIRED_MOD_DATE, " +
-                "ap.EMPLOYEE_SIGNED_DATE, jobs.PYVPASJ_PIDM, ap.OVERDUE " +
-                "FROM appraisals ap, PYVPASJ jobs " +
-                "WHERE ap.JOB_PIDM=jobs.PYVPASJ_PIDM AND ap.POSITION_NUMBER=jobs.PYVPASJ_POSN " +
-                "AND ap.JOB_SUFFIX=jobs.PYVPASJ_SUFF AND jobs.PYVPASJ_SUPERVISOR_PIDM=:pidm ";
-
-        if (!StringUtils.isEmpty(posno) && !StringUtils.isEmpty(suffix)) {
-            query += "AND jobs.PYVPASJ_SUPERVISOR_POSN=:posno " +
-                    "AND jobs.PYVPASJ_SUPERVISOR_SUFF = :suffix ";
-        }
+        String query =
+                "SELECT" +
+                    " ap.ID," +
+                    " jobs.PYVPASJ_DESC," +
+                    " jobs.PYVPASJ_APPOINTMENT_TYPE," +
+                    " ap.START_DATE," +
+                    " ap.END_DATE," +
+                    " ap.STATUS," +
+                    " ap.EMPLOYEE_SIGNED_DATE," +
+                    " jobs.PYVPASJ_PIDM," +
+                    " ap.OVERDUE " +
+                "FROM PYVPASJ jobs " +
+                    "LEFT JOIN appraisals ap " +
+                    "ON jobs.PYVPASJ_PIDM = ap.JOB_PIDM AND " +
+                        "jobs.PYVPASJ_POSN = ap.POSITION_NUMBER AND " +
+                        "jobs.PYVPASJ_SUFF = ap.JOB_SUFFIX ";
 
         if (onlyActive) {
-            query += "AND status NOT IN ('archived') ";
+            query += " AND status NOT LIKE 'archived%' ";
+        }
+        query += "WHERE" +
+                " jobs.PYVPASJ_SUPERVISOR_PIDM=:supervisorPidm AND " +
+                " jobs.PYVPASJ_STATUS != 'T' AND" +
+                " jobs.PYVPASJ_APPOINTMENT_TYPE IN ('" +
+                StringUtils.join(appointmentTypes, "', '") + "') ";
+
+
+        if (!StringUtils.isEmpty(posno) && !StringUtils.isEmpty(suffix)) {
+            query += " AND jobs.PYVPASJ_SUPERVISOR_POSN=:posno" +
+                    " AND jobs.PYVPASJ_SUPERVISOR_SUFF = :suffix";
         }
 
         Query hibQuery = session.createSQLQuery(query)
@@ -328,11 +451,10 @@ public class AppraisalMgr {
                 .addScalar("START_DATE", StandardBasicTypes.DATE)
                 .addScalar("END_DATE", StandardBasicTypes.DATE)
                 .addScalar("STATUS", StandardBasicTypes.STRING)
-                .addScalar("GOALS_REQUIRED_MOD_DATE", StandardBasicTypes.DATE)
                 .addScalar("EMPLOYEE_SIGNED_DATE", StandardBasicTypes.DATE)
                 .addScalar("PYVPASJ_PIDM", StandardBasicTypes.INTEGER)
                 .addScalar("OVERDUE", StandardBasicTypes.INTEGER)
-                .setInteger("pidm", pidm);
+                .setInteger("supervisorPidm", supervisorPidm);
         if (!StringUtils.isEmpty(posno) && !StringUtils.isEmpty(suffix)) {
             hibQuery.setString("posno", posno).setString("suffix", suffix);
         }
@@ -344,27 +466,25 @@ public class AppraisalMgr {
 
         // Build list of appraisals from sql results
         for (Object[] aResult : result) {
-           Appraisal appraisal;
             Integer id = (Integer) aResult[0];
             String jobTitle = (String) aResult[1];
             String appointmentType = (String) aResult[2];
             Date startDate = (Date) aResult[3];
             Date endDate = (Date) aResult[4];
             String status = (String) aResult[5];
-            Date goalsReqModDate = (Date) aResult[6];
-            Date employeeSignDate = (Date) aResult[7];
-            Integer employeePidm = (Integer) aResult[8];
-            Integer overdue = (Integer) aResult[9];
+            Date employeeSignDate = (Date) aResult[6];
+            Integer employeePidm = (Integer) aResult[7];
+            Integer overdue = (Integer) aResult[8];
 
-            appraisal = new Appraisal(id, jobTitle, null, null, appointmentType,
-                    startDate, endDate, status, goalsReqModDate, employeeSignDate, employeePidm,
+            Appraisal appraisal = new Appraisal(id, jobTitle, null, null, appointmentType,
+                    startDate, endDate, status, employeeSignDate, employeePidm,
                     overdue);
             appraisals.add(appraisal);
-            pidms.add(employeePidm);
+            employeePidms.add(employeePidm);
         }
 
         List<Employee> employees = session.getNamedQuery("employee.firstAndLastNameByPidm")
-                .setParameterList("ids", pidms).list();
+                .setParameterList("ids", employeePidms).list();
         HashMap<Integer, Employee> employeeHashMap = new HashMap<Integer, Employee>();
         for (Employee employee : employees) {
             employeeHashMap.put(employee.getId(), employee);
@@ -384,6 +504,7 @@ public class AppraisalMgr {
             }
         }
 
+        Collections.sort(myTeamAppraisals);
         return myTeamAppraisals;
     }
 
@@ -494,10 +615,18 @@ public class AppraisalMgr {
         int[] ids;
         List result;
         Session session = HibernateUtil.getCurrentSession();
+        String[] statusToExclude = {
+                Appraisal.STATUS_ARCHIVED_CLOSED,
+                Appraisal.STATUS_ARCHIVED_COMPLETED,
+                Appraisal.STATUS_CLOSED,
+                Appraisal.STATUS_COMPLETED
+        };
         String query = "select appraisal.id from edu.osu.cws.evals.models.Appraisal appraisal " +
-                "where status not in ('completed', 'closed', 'archived')";
+                "where status not in (:statusToExclude)";
 
-        result = session.createQuery(query).list();
+        result = session.createQuery(query)
+                .setParameterList("statusToExclude", statusToExclude)
+                .list();
         ids = new int[result.size()];
         for (int i = 0; i < result.size(); i++) {
             ids[i] = (Integer) result.get(i);
@@ -842,7 +971,7 @@ public class AppraisalMgr {
                 "appraisals.job_suffix = pyvpasj_suff) ";
         String where = "WHERE pyvpasj_status = 'A' " +
                 "AND PYVPASJ_APPOINTMENT_TYPE in (:appointmentTypes) " +
-                "and appraisals.status not in ('completed', 'archived', 'closed')";
+                "and appraisals.status not in ('completed', 'archivedClosed', 'archivedCompleted', 'closed')";
         String startWith = EvalsUtil.getStartWithClause(directSupervisors.size());
 
         if (!inLeafSupervisor) {
@@ -911,11 +1040,11 @@ public class AppraisalMgr {
      * a new salary record for an appraisal.
      *
      * @param appraisal
-     * @param configurationMap
+     * @param configMap
      * @return
      */
     public static Salary createOrUpdateSalary(Appraisal appraisal,
-                                              Map<String, Configuration> configurationMap) {
+                                              Map<String, Configuration> configMap) {
         // default increase values set to 0 only used if current salary is at or above control high
         String increaseRate2Value = "0";
         String increaseRate1MinVal = "0";
@@ -942,9 +1071,9 @@ public class AppraisalMgr {
 
         // if aboveOrBelow is blank it means the person is above control point high and they get 0
         if (!aboveOrBelow.equals("")) {
-            increaseRate2Value = configurationMap.get("IT-increase-rate2-" + aboveOrBelow + "-control-value").getValue();
-            increaseRate1MinVal = configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-min-value").getValue();
-            increaseRate1MaxVal= configurationMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-max-value").getValue();
+            increaseRate2Value = configMap.get("IT-increase-rate2-" + aboveOrBelow + "-control-value-Default").getValue();
+            increaseRate1MinVal = configMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-min-value-Default").getValue();
+            increaseRate1MaxVal= configMap.get("IT-increase-rate1-" + aboveOrBelow + "-control-max-value-Default").getValue();
         }
 
         salary.setTwoIncrease(Double.parseDouble(increaseRate2Value));
@@ -1008,4 +1137,69 @@ public class AppraisalMgr {
 
         return null;
     }
+
+    public static int[] getIdsToArchive(int daysBeforeArchive) {
+        Session session = HibernateUtil.getCurrentSession();
+        String query =
+                "select a.id" +
+                " from edu.osu.cws.evals.models.Appraisal a" +
+                " where" +
+                    " a.status in (:statuses)" +
+                    " and a.endDate + :archiveDays <= current_date";
+
+        Transaction tx = session.beginTransaction();
+        Query hibQuery = session.createQuery(query);
+        hibQuery.setInteger("archiveDays", daysBeforeArchive);
+        String[] statusesToArchive = new String[]{ Appraisal.STATUS_CLOSED, Appraisal.STATUS_COMPLETED };
+        hibQuery.setParameterList("statuses", statusesToArchive);
+
+        ArrayList<Integer> result = (ArrayList<Integer>) hibQuery.list();
+        tx.commit();
+
+        int[] idsToArchive = new int[result.size()];
+        for(Integer id : result) {
+            idsToArchive[result.indexOf(id)] = id;
+        }
+        return idsToArchive;
+    }
+
+    public static int archive(int[] idsToArchive) {
+        Session session = HibernateUtil.getCurrentSession();
+        String query =
+                "update edu.osu.cws.evals.models.Appraisal a" +
+                " set a.status = " +
+                        "'archived'" +
+                        "||UPPER(SUBSTRING(a.status, 1, 1))" +
+                        "||SUBSTRING(a.status, 2, LENGTH(a.status) - 1)" +
+                " where a.id in (:idsToArchive)";
+
+        Transaction tx = session.beginTransaction();
+        Query hibQuery = session.createQuery(query);
+        hibQuery.setParameterList("idsToArchive", ArrayUtils.toObject(idsToArchive));
+        int numUpdated = hibQuery.executeUpdate();
+        tx.commit();
+
+        return numUpdated;
+    }
+
+    /**
+     * Returns the last appraisal (only a id, start/end date and status are loaded) record for a given job.
+     *
+     * @param job
+     * @return
+     */
+    public static Appraisal getLastAppraisalByJob(Job job) {
+        Session session = HibernateUtil.getCurrentSession();
+        List<Appraisal> appraisals = (List<Appraisal>) session.getNamedQuery("appraisal.getLastAppraisalByJob")
+                .setParameter("job", job)
+                .setMaxResults(1)
+                .list();
+
+        if (appraisals.isEmpty()) {
+            return null;
+        }
+
+        return appraisals.get(0);
+    }
+
 }

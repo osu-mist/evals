@@ -147,7 +147,7 @@ public class JobsTest {
     public void getJobsShouldReturnJobs() throws Exception {
         assert JobMgr.getJobs(56198).size() == 1;
         assert JobMgr.getJobs(111).size() == 0;
-        assert JobMgr.getJobs(12345).size() == 3;
+        assert JobMgr.getJobs(12345).size() == 4;
     }
 
     public void shouldReturnBusinessCenter() throws Exception {
@@ -178,6 +178,11 @@ public class JobsTest {
         cal.set(Calendar.YEAR, cal.get(Calendar.YEAR)-2);
         assertCorrectNewAnnualStartDateForAnnualInd18(job, cal, DateTimeConstants.DECEMBER,
                 Calendar.getInstance().get(Calendar.YEAR));
+    }
+
+    public void shouldCorrectlyDetermineIfUserIsAProfessionalSupervisor() {
+        assert JobMgr.isProfessionalSupervisor(56200);
+        assert !JobMgr.isProfessionalSupervisor(12345);
     }
 
     private void assertCorrectNewAnnualStartDateForAnnualInd18(Job job, Calendar cal, int month,
@@ -234,7 +239,7 @@ public class JobsTest {
 
     public void searchShouldAcceptOsuid() throws Exception {
         List<Job> jobs = JobMgr.search("931421235", null, 0);
-        assert jobs.size() == 3;
+        assert jobs.size() == 4;
 
         jobs = JobMgr.search("931421234", null, 0);
         assert jobs.size() == 1;
@@ -267,12 +272,12 @@ public class JobsTest {
         assert jobs.size() == 0;
 
         jobs = JobMgr.findByName("Jo", null, 0);
-        assert jobs.size() == 4;
+        assert jobs.size() == 6;
     }
 
     public void searchByNameShouldAcceptLastNameOnly() throws Exception {
         List<Job> jobs = JobMgr.findByName("Cedeno", null, 0);
-        assert jobs.size() == 3;
+        assert jobs.size() == 4;
 
         jobs = JobMgr.findByName("Bond", null, 0);
         assert jobs.size() == 0;
@@ -318,5 +323,27 @@ public class JobsTest {
         Job job = new Job();
         job.setAppointmentType(AppointmentType.CLASSIFIED);
         assert job.getSalary() == null : "We only support Classified IT when getting salary info";
+    }
+
+    public void shouldFetchPositionDescription() throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        Employee employee = new Employee(12345);
+        employee.setOsuid("931421235");
+        job = (Job) session.load(Job.class, new Job(employee, "1234", "00"));
+
+        PositionDescription pd1 = JobMgr.getPositionDescription(job);
+        assert pd1.getId() == 1;
+        assert pd1.getPositionTitle().equals("PD1");
+        assert pd1.getLeadWorkResponsibilities().size() == 2;
+
+        Employee employee1 = new Employee(12467);
+        employee1.setOsuid("931421234");
+        job = (Job) session.load(Job.class, new Job(employee1, "1234", "00"));
+
+        JobMgr.getPositionDescription(job);
+        PositionDescription pd2 = JobMgr.getPositionDescription(job);
+        assert pd2.getId() == 2;
+        assert pd2.getPositionTitle().equals("PD2");
+        assert pd2.getLeadWorkResponsibilities().size() == 1;
     }
 }

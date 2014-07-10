@@ -1,8 +1,11 @@
 package edu.osu.cws.evals.hibernate;
 
+import edu.osu.cws.evals.models.Appraisal;
+import edu.osu.cws.evals.models.AppointmentType;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.models.ModelException;
+import edu.osu.cws.evals.models.PositionDescription;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.portlet.ReportsAction;
 import edu.osu.cws.evals.util.EvalsUtil;
@@ -13,9 +16,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Date;
+import java.util.*;
 
 public class JobMgr {
 
@@ -86,6 +87,23 @@ public class JobMgr {
             employeeCount = Integer.parseInt(results.get(0).toString());
         }
         return employeeCount > 0;
+    }
+
+    /**
+     * Iterates over the jobs that an employee holds and returns the job that is a supervisor
+     *
+     * @param employee
+     * @return
+     * @throws Exception
+     */
+    public static List<Job> getSupervisorJobs(Employee employee) throws Exception {
+        List<Job> supervisingJobs = new ArrayList<Job>();
+        for (Job job : (Set<Job>) employee.getJobs()) {
+            if (isSupervisor(employee.getId(), job.getPositionNumber())) {
+                 supervisingJobs.add(job);
+            }
+        }
+        return supervisingJobs;
     }
 
     /**
@@ -166,6 +184,45 @@ public class JobMgr {
             job = jobs.get(0);
         }
         return job;
+    }
+
+    /**
+     * Gets a list of jobs that are not terminated (status != T) that match the provided
+     * appointment types. The job objects only have a few properties populated: pidm,
+     * position number, suffi, job status and appointment type.
+     *
+     * @param supervisorJobs          The supervisor jobs to get the list of employees
+     * @param appointmentTypes      ArrayList of different appointment types to fetch jobs for.
+     * @return
+     * @throws Exception
+     */
+    public static List<Job> listEmployeesShortJobs(List<Job> supervisorJobs, List<String> appointmentTypes)
+            throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+
+        List<Job> jobs = (List<Job>) session.getNamedQuery("job.directShortJobEmployees")
+                .setParameterList("supervisorJobs", supervisorJobs)
+                .setParameterList("appointmentTypes", appointmentTypes)
+                .list();
+        return jobs;
+    }
+
+    /**
+     * Returns the list of from the list that do not have active evaluations.
+     *
+     * @param jobs
+     * @return
+     * @throws Exception
+     */
+    public static ArrayList<Job> getJobWithoutActiveEvaluations(List<Job> jobs) throws Exception {
+        if (jobs == null || jobs.isEmpty()) {
+            return null;
+        }
+
+        Session session = HibernateUtil.getCurrentSession();
+        return (ArrayList<Job>) session.getNamedQuery("job.jobsWithoutActiveEvaluations")
+                .setParameterList("jobs", jobs)
+                .list();
     }
 
     /**
@@ -273,6 +330,23 @@ public class JobMgr {
 
         int supervisorCount = Integer.parseInt(result.toString());
         return supervisorCount < 1;
+    }
+
+    /**
+     * Checks if the employee with the given pidm is a
+     * professional supervisor.
+     *
+     * @param pidm
+     * @return
+     */
+    public static boolean isProfessionalSupervisor(int pidm) {
+        Session session = HibernateUtil.getCurrentSession();
+        Query query = session.getNamedQuery("job.isProfessionalSupervisor");
+        query.setParameter("pidm", pidm);
+        query.setString("apt_type", AppointmentType.PROFESSIONAL_FACULTY);
+        int result = Integer.parseInt(query.list().get(0).toString());
+
+        return result > 0;
     }
 
     /**
@@ -556,5 +630,20 @@ public class JobMgr {
 
         // If there were many jobs with this orgCode, then it is considered valid
         return orgCodeCount > 0;
+    }
+
+    /**
+     * Returns the matching position description for the given job. The position description
+     * only matches the employee's osu id, and the job's position #.
+     *
+     * @param job
+     * @return
+     */
+    public static PositionDescription getPositionDescription(Job job) {
+        Session session = HibernateUtil.getCurrentSession();
+        return (PositionDescription) session.getNamedQuery("positionDescription.getPD")
+                .setString("osuid", job.getEmployee().getOsuid())
+                .setString("posno", job.getPositionNumber())
+                .uniqueResult();
     }
 }

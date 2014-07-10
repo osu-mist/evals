@@ -5,8 +5,9 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
-import edu.osu.cws.evals.models.Appraisal;
-import edu.osu.cws.evals.models.Employee;
+import edu.osu.cws.evals.hibernate.JobMgr;
+import edu.osu.cws.evals.models.*;
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
@@ -14,6 +15,7 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletSession;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -45,19 +47,21 @@ public class HomeAction implements ActionInterface {
         actionHelper.addToRequestMap("alertMsg", true);
         actionHelper.addToRequestMap("isHome", true);
 
-        actionHelper.setupMyActiveAppraisals();
+        actionHelper.setupMyAppraisals();
         actionHelper.setupMyTeamActiveAppraisals();
-        ArrayList<Appraisal> myActiveAppraisals =
-                (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myActiveAppraisals");
+        ArrayList<Appraisal> myAppraisals =
+                (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myAppraisals");
         ArrayList<Appraisal> myTeamsActiveAppraisals  =
                 (ArrayList<Appraisal>) actionHelper.getFromRequestMap("myTeamsActiveAppraisals");
 
-        boolean hasAppraisals = (myActiveAppraisals != null && !myActiveAppraisals.isEmpty()) ||
+        boolean hasAppraisals = (myAppraisals != null && !myAppraisals.isEmpty()) ||
                 (myTeamsActiveAppraisals != null && !myTeamsActiveAppraisals.isEmpty());
 
         if (!isAdmin && !isReviewer && !hasAppraisals) {
             actionHelper.addToRequestMap("hasNoEvalsAccess", true);
         }
+
+        actionHelper.addToRequestMap("initiateProfFaculty", displayInitiateProfFacButton());
 
         actionHelper.setRequiredActions();
         if (homeJSP.equals(Constants.JSP_HOME_REVIEWER)) {
@@ -66,6 +70,37 @@ public class HomeAction implements ActionInterface {
             actionHelper.addToRequestMap("appraisals", appraisals);
         }
         return homeJSP;
+    }
+
+    /**
+     * Whether or not EvalS should display a button in the home view of the user to let them initiate
+     * the professional faculty evaluations.
+     *
+     * It checks that the user is a supervisor of professional faculty and that at least one of the professional
+     * faculty employees needs an evaluation created.
+     *
+     * @return
+     * @throws Exception
+     */
+    private boolean displayInitiateProfFacButton() throws Exception {
+        Map<String, Configuration> configMap = (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
+        if (!EvalsUtil.isProfessionalFacultyEnabled(configMap)) {
+            return false;
+        }
+
+        List<String> appointmentTypes = new ArrayList<String>();
+        appointmentTypes.add(AppointmentType.PROFESSIONAL_FACULTY);
+
+        List<Job> supervisorJob = JobMgr.getSupervisorJobs(actionHelper.getLoggedOnUser());
+        // if the person is not even a supervisor, don't display the button
+        if (supervisorJob == null || supervisorJob.isEmpty()) {
+            return false;
+        }
+
+        ArrayList<Job> employeeShortJobs = (ArrayList<Job>) JobMgr.listEmployeesShortJobs(supervisorJob, appointmentTypes);
+        ArrayList<Job> jobsWithoutActiveEvaluations = JobMgr.getJobWithoutActiveEvaluations(employeeShortJobs);
+        return JobMgr.isProfessionalSupervisor(actionHelper.getLoggedOnUser().getId()) &&
+                jobsWithoutActiveEvaluations != null && !jobsWithoutActiveEvaluations.isEmpty();
     }
 
     public String displayMyInformation(PortletRequest request, PortletResponse response) throws Exception {
@@ -87,12 +122,13 @@ public class HomeAction implements ActionInterface {
      */
     private void helpLinks() {
         PropertiesConfiguration config = actionHelper.getEvalsConfig();
-        actionHelper.addToRequestMap("helpLinks", config.getString("helpfulLinks"));
+        actionHelper.addToRequestMap("helpLinks", config.getList("helpfulLinks"));
     }
 
     /**
      * Handles the user clicking on a link to reset the status of the open appraisal to set the status
-     * to goals-due or results-due.
+     * to goals-due or results-due. If reset to goals-due, this function resets the entire appraisal
+     * to a newly created state.
      *
      * @param request
      * @param response
@@ -114,12 +150,18 @@ public class HomeAction implements ActionInterface {
         }
 
         try {
-            Appraisal appraisal = new Appraisal();
-            appraisal.setId(id);
-            appraisal.setStatus(status);
-            appraisal.setOriginalStatus(status);
+            if(status.equals(Appraisal.STATUS_RESULTS_DUE)) {
+                Appraisal appraisal = new Appraisal();
+                appraisal.setId(id);
+                appraisal.setStatus(status);
+                appraisal.setOriginalStatus(status);
 
-            AppraisalMgr.updateAppraisalStatus(appraisal);
+                AppraisalMgr.updateAppraisalStatus(appraisal);
+            }
+            else if (status.equals(Appraisal.STATUS_GOALS_DUE)) {
+                Appraisal appraisal = AppraisalMgr.getAppraisal(id);
+                AppraisalMgr.resetAppraisal(appraisal);
+            }
         } catch (Exception e) {
             _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
         }
@@ -148,15 +190,16 @@ public class HomeAction implements ActionInterface {
         }
 
         PortletSession session = ActionHelper.getSession(request);
-        int employeeID = Integer.parseInt(ParamUtil.getString(request, "employee.id"));
+        String employeeOnid = ParamUtil.getString(request, "employee.onid");
         Employee employee = new Employee();
         try {
-            employee = EmployeeMgr.findById(employeeID, "employee-with-jobs");
+            employee = EmployeeMgr.findByOnid(employeeOnid, null);
         } catch (Exception e) {
             _log.error("unexpected exception - " + CWSUtil.stackTraceString(e));
         }
         session.setAttribute("loggedOnUser", employee);
-        session.removeAttribute(ActionHelper.ALL_MY_ACTIVE_APPRAISALS);
+        actionHelper.setLoggedOnUser();
+        session.removeAttribute(ActionHelper.ALL_MY_APPRAISALS);
         session.removeAttribute(ActionHelper.MY_TEAMS_ACTIVE_APPRAISALS);
         actionHelper.setUpUserPermission(true);
 

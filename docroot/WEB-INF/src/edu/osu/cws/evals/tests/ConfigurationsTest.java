@@ -49,13 +49,13 @@ public class ConfigurationsTest {
         HashMap<String, Configuration> configs = (HashMap<String, Configuration>) ConfigurationMgr.mapByName();
         tx.commit();
 
-        assert configs.containsKey("configurations-goal-max-char");
-        assert configs.containsKey("configurations-result-max-char");
-        assert configs.containsKey("configurations-goal-min-char");
-        assert configs.containsKey("configurations-result-min-char");
-        assert configs.containsKey("configurations-frequency-terminate-emails");
-        assert configs.containsKey("configurations-employee-result-notifications");
-        assert configs.containsKey("configurations-review-due-notifications");
+        assert configs.containsKey("configurations-goal-max-char-Default");
+        assert configs.containsKey("configurations-result-max-char-Default");
+        assert configs.containsKey("configurations-goal-min-char-Default");
+        assert configs.containsKey("configurations-result-min-char-Default");
+        assert configs.containsKey("configurations-frequency-terminate-emails-Default");
+        assert configs.containsKey("configurations-employee-result-notifications-Default");
+        assert configs.containsKey("configurations-review-due-notifications-Default");
     }
 
     @Test(expectedExceptions = {ModelException.class})

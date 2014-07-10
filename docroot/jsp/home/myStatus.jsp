@@ -1,4 +1,4 @@
-<jsp:useBean id="myActiveAppraisals" class="java.util.ArrayList" scope="request" />
+<jsp:useBean id="myAppraisals" class="java.util.ArrayList" scope="request" />
 
 <div id="<portlet:namespace/>accordionMenuMyStatus" class="accordion-menu">
     <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>MyStatus');">
@@ -13,7 +13,7 @@
         </c:if>
     </div>
     <div class="accordion-content" id="<portlet:namespace/>MyStatus" style="display: block;">
-        <c:if test="${!empty myActiveAppraisals}">
+        <c:if test="${!empty myAppraisals}">
             <table class="main taglib-search-iterator">
                 <thead>
                     <tr class="portlet-section-header results-header">
@@ -26,7 +26,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                <c:forEach var="shortAppraisal" items="${myActiveAppraisals}" varStatus="loopStatus">
+                <c:forEach var="shortAppraisal" items="${myAppraisals}" varStatus="loopStatus">
                     <tr class="${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}"
                     >
                         <td>${shortAppraisal.job.jobTitle}</td>
@@ -47,7 +47,7 @@
                 </tbody>
             </table>
         </c:if>
-        <c:if test="${empty myActiveAppraisals}">
+        <c:if test="${empty myAppraisals}">
             <c:choose>
                 <c:when test="${empty report}">
                     <p><liferay-ui:message key="noActiveAppraisals" /></p>

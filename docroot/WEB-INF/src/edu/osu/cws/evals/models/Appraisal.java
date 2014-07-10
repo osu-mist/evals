@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.models;
 
+import edu.osu.cws.evals.hibernate.ConfigurationMgr;
 import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.ArrayUtils;
@@ -8,7 +9,7 @@ import org.joda.time.DateTime;
 import java.text.MessageFormat;
 import java.util.*;
 
-public class Appraisal extends Evals {
+public class Appraisal extends Evals implements Comparable<Appraisal> {
 
     public static final String TYPE_ANNUAL = "annual";
 
@@ -18,7 +19,8 @@ public class Appraisal extends Evals {
 
     public static final String STATUS_APPRAISAL_DUE = "appraisalDue";
     public static final String STATUS_APPRAISAL_OVERDUE = "appraisalOverdue";
-    public static final String STATUS_ARCHIVED = "archived";
+    public static final String STATUS_ARCHIVED_CLOSED = "archivedClosed";
+    public static final String STATUS_ARCHIVED_COMPLETED = "archivedCompleted";
     public static final String STATUS_BACK_ORIG_STATUS = "backToOriginalStatus";
     public static final String STATUS_CLOSED = "closed";
     public static final String STATUS_COMPLETED = "completed";
@@ -41,6 +43,7 @@ public class Appraisal extends Evals {
     public static final String STATUS_SIGNATURE_DUE = "signatureDue";
     public static final String STATUS_SIGNATURE_OVERDUE = "signatureOverdue";
     public static final String STATUS_IN_REVIEW = "inReview";
+    public static final String STATUS_EMPLOYEE_REVIEW_DUE = "employeeReviewDue";
 
     public static final String STAGE_GOALS = "goals";
     public static final String STAGE_RESULTS = "results";
@@ -55,6 +58,23 @@ public class Appraisal extends Evals {
 
     public static final String DUE = "Due";
     public static final String OVERDUE = "Overdue";
+
+    private static final Map<String, String> nextStatus;
+    static {
+        Map<String, String> tempMap = new HashMap<String, String>();
+        tempMap.put(STATUS_GOALS_REACTIVATION_REQUESTED, STATUS_GOALS_APPROVED);
+        tempMap.put(STATUS_GOALS_REACTIVATED, STATUS_GOALS_APPROVED);
+        tempMap.put(STATUS_EMPLOYEE_REVIEW_DUE, STATUS_RELEASE_DUE);
+        tempMap.put(STATUS_GOALS_APPROVED, STATUS_RESULTS_DUE);
+        tempMap.put(STATUS_GOALS_REQUIRED_MODIFICATION, STATUS_GOALS_OVERDUE);
+        nextStatus = Collections.unmodifiableMap(tempMap);
+    }
+
+    private static final List<String> statusToExpire = Arrays.asList(
+            STATUS_GOALS_REACTIVATION_REQUESTED,
+            STATUS_GOALS_REACTIVATED,
+            STATUS_EMPLOYEE_REVIEW_DUE
+    );
 
     private int id;
 
@@ -88,21 +108,6 @@ public class Appraisal extends Evals {
     private Date goalApprovedDate;
 
     private Employee goalsApprover;
-
-    /**
-     * Comments entered by the supervisor regarding the employee's goals
-     */
-    private String goalsComments;
-
-    private Date goalsRequiredModificationDate;
-
-    public void setGoalsRequiredModificationDate(Date goalsRequiredModificationDate) {
-        this.goalsRequiredModificationDate = goalsRequiredModificationDate;
-    }
-
-    public Date getGoalsRequiredModificationDate() {
-        return goalsRequiredModificationDate;
-    }
 
     private Date resultSubmitDate;
 
@@ -204,15 +209,18 @@ public class Appraisal extends Evals {
      * @param startDate
      * @param endDate
      * @param status
+     * @param overdue
+     * @param appointmentType
      */
     public Appraisal(int id, String jobTitle, Date startDate, Date endDate, String status,
-                     Integer overdue) {
+                     Integer overdue, String appointmentType) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
         this.job = new Job();
         this.job.setJobTitle(jobTitle);
+        this.job.setAppointmentType(appointmentType);
 
         if (overdue == null) {
             this.overdue = -999;
@@ -234,19 +242,20 @@ public class Appraisal extends Evals {
      * @param startDate
      * @param endDate
      * @param status
-     * @param goalsRequiredModificationDate
      * @param employeeSignedDate
      * @param employeeId
      * @param overdue
      */
-    public Appraisal(int id, String jobTitle, String lastName, String firstName, String appointmentType,
-                     Date startDate, Date endDate, String status, Date goalsRequiredModificationDate,
-                     Date employeeSignedDate, int employeeId, Integer overdue) {
+    public Appraisal(Integer id, String jobTitle, String lastName, String firstName, String appointmentType,
+                     Date startDate, Date endDate, String status, Date employeeSignedDate,
+                     int employeeId, Integer overdue) {
         Employee employee = new Employee();
         employee.setId(employeeId);
         employee.setLastName(lastName);
         employee.setFirstName(firstName);
-        this.id = id;
+        if (id != null) {
+            this.id = id;
+        }
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
@@ -255,7 +264,6 @@ public class Appraisal extends Evals {
         this.job.setAppointmentType(appointmentType);
         this.job.setEmployee(employee);
         this.employeeSignedDate = employeeSignedDate;
-        this.goalsRequiredModificationDate = goalsRequiredModificationDate;
 
         if (overdue == null) {
             this.overdue = -999;
@@ -352,6 +360,12 @@ public class Appraisal extends Evals {
         } else {
             this.overdue = overdue;
         }
+    }
+
+    public Appraisal(int id, Date startDate, String status) {
+        this.id = id;
+        this.startDate = startDate;
+        this.status = status;
     }
 
     /**
@@ -460,10 +474,16 @@ public class Appraisal extends Evals {
         return viewStatus;
     }
 
-    public boolean isOpen() {
+    /**
+     * This method is named as a getter so that it can be called from the jsp view.
+     *
+     * @return
+     */
+    public boolean getIsOpen() {
         String viewStatus = getViewStatus();
         return !status.equals(STATUS_CLOSED) && !viewStatus.equals(STATUS_COMPLETED)
-                && !status.equals(STATUS_ARCHIVED);
+                && !status.equals(STATUS_ARCHIVED_CLOSED)
+                && !status.equals(STATUS_ARCHIVED_COMPLETED);
     }
 
 
@@ -580,14 +600,6 @@ public class Appraisal extends Evals {
 
     public void setGoalsApprover(Employee goalsApprover) {
         this.goalsApprover = goalsApprover;
-    }
-
-    public String getGoalsComments() {
-        return goalsComments;
-    }
-
-    public void setGoalsComments(String goalsComments) {
-        this.goalsComments = goalsComments;
     }
 
     public Date getResultSubmitDate() {
@@ -1013,7 +1025,7 @@ public class Appraisal extends Evals {
      * @param trialAppraisal
      * @return
      */
-    public static Appraisal createFirstAnnual(Appraisal trialAppraisal) {
+    public static Appraisal createFirstAnnual(Appraisal trialAppraisal) throws Exception {
         Appraisal appraisal = new Appraisal();
         appraisal.setType(Appraisal.TYPE_ANNUAL);
         appraisal.setJob(trialAppraisal.getJob());
@@ -1023,14 +1035,29 @@ public class Appraisal extends Evals {
 
         // set the status. The cron job will update the status if needed
         appraisal.setStatus(Appraisal.STATUS_GOALS_APPROVED);
+        List<GoalVersion> approvedGoalsVersions = trialAppraisal.getApprovedGoalsVersions();
+        if (approvedGoalsVersions == null || approvedGoalsVersions.isEmpty()) {
+            appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
+        }
 
         // calculate & set the end date
         DateTime startDate = new DateTime(appraisal.getStartDate()).withTimeAtStartOfDay();
         DateTime endDate = appraisal.getJob().getEndEvalDate(startDate, Appraisal.TYPE_INITIAL);
         appraisal.setEndDate(CWSUtil.toDate(endDate));
 
-        // copy over goal version
-        for (GoalVersion trialGoalVersion : trialAppraisal.getApprovedGoalsVersions()) {
+        // get list of goal versions to copy
+        List<GoalVersion> goalVersionsToCopy = new ArrayList<GoalVersion>();
+        for (GoalVersion goalVersion : trialAppraisal.getGoalVersions()) {
+            if (goalVersion != null && goalVersion.getRequestDecision()) {
+                goalVersionsToCopy.add(goalVersion);
+            }
+        }
+
+        if (goalVersionsToCopy == null || goalVersionsToCopy.isEmpty()) {
+            throw new Exception("GoalVersions to copy shouldn't be empty");
+        }
+
+        for (GoalVersion trialGoalVersion : goalVersionsToCopy) {
             GoalVersion goalVersion = GoalVersion.copyPropertiesFromTrial(trialGoalVersion, appraisal);
             appraisal.addGoalVersion(goalVersion);
 
@@ -1059,7 +1086,6 @@ public class Appraisal extends Evals {
     /**
      * Calculates what should be the new status of a given appraisal. It looks at the
      * configuration values to see whether the status is due or overdue.
-     * @todo: handle: STATUS_GOALS_REACTIVATED in next release
      *
      * @param configMap
      * @return
@@ -1067,32 +1093,34 @@ public class Appraisal extends Evals {
      */
     public String getNewStatus(Map<String, Configuration> configMap)
             throws Exception {
-        String newStatus = null;
         String status = getStatus();
-        Configuration config = configMap.get(status); //config object of this status
+        //config object of this status
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, status, getAppointmentType());
 
-        if (status.contains(Appraisal.DUE) && EvalsUtil.isDue(this, config) <= 0) {
-            newStatus = status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
-        } else if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)
-                && isGoalsReqModOverDue(configMap) && !areGoalsReactivated()) {
-            //goalsRequiredModification is not overdue.
-            newStatus = Appraisal.STATUS_GOALS_OVERDUE;
-        } else if (status.equals(Appraisal.STATUS_GOALS_APPROVED)) {
-            //Need to check to see if it's time to change the status to results due
-            Configuration reminderConfig = configMap.get("firstResultDueReminder");
-            if (EvalsUtil.isDue(this, reminderConfig) < 0) {
-                newStatus = Appraisal.STATUS_RESULTS_DUE;
-            }
-        } else if (status.equals(STATUS_GOALS_REACTIVATION_REQUESTED) ||
-                status.equals(STATUS_GOALS_REACTIVATED)) {
-            config = configMap.get(status + "Expiration");
-            if (EvalsUtil.isDue(this, config) <= 0) {
-                // change status by timing out goals reactivation request and employee new goals submit
-                newStatus = STATUS_GOALS_APPROVED;
-            }
+        if (status.contains(Appraisal.DUE) && EvalsUtil.isOverdue(this, config)) {
+            return status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
         }
 
-        return newStatus;
+        if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)
+                    && isGoalsReqModOverDue(configMap) && !areGoalsReactivated()) {
+            //goalsRequiredModification is not overdue.
+            return nextStatus.get(status);
+        }
+
+        if (status.equals(Appraisal.STATUS_GOALS_APPROVED)) {
+            // set correct config to check if it's time to change the status to results due
+            config = ConfigurationMgr.getConfiguration(configMap, "firstResultDueReminder",
+                    getAppointmentType());
+        } else if (statusToExpire.contains(status)) {
+            // get configuration to check if the status status needs to be expired
+            config = ConfigurationMgr.getConfiguration(configMap, status + "Expiration", getAppointmentType());
+        }
+
+        if (EvalsUtil.isOverdue(this, config)) {
+            return nextStatus.get(status);
+        }
+
+        return null;
     }
 
     /**
@@ -1109,12 +1137,14 @@ public class Appraisal extends Evals {
     private boolean isGoalsReqModOverDue(Map<String, Configuration> configMap)
             throws Exception {
 
-        Configuration goalsDueConfig = configMap.get(Appraisal.STATUS_GOALS_DUE); //this config exists
+        Configuration goalsDueConfig = ConfigurationMgr.getConfiguration(configMap, Appraisal.STATUS_GOALS_DUE,
+                getAppointmentType()); //this config exists
 
         if (EvalsUtil.isDue(this, goalsDueConfig) <= 0) { //goals due or overdue
             System.out.println(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION + ", goals overdue");
             //goals is due or overdue.  Is goalsRequiredModification overdue?
-            Configuration modConfig = configMap.get("goalsRequiredModification");
+            Configuration modConfig = ConfigurationMgr.getConfiguration(configMap, "goalsRequiredModification",
+                    getAppointmentType());
 
             if (EvalsUtil.isDue(this, modConfig) < 0) {  // requiredModification is over due.
                 return true;
@@ -1142,14 +1172,15 @@ public class Appraisal extends Evals {
      * Basically if we are not in approvalDue status or later and there's more than 1
      * goal version.
      */
-    private boolean areGoalsReactivated() {
+    public boolean areGoalsReactivated() {
         boolean hasMultipleGoalVersions = goalVersions.size() > 1;
 
         String[] goalsReactivatedStatus = {
-            "goalsApprovalDue",
-            "goalsApprovalOverdue",
-            "goalsReactivated",
-            "goalsReactivationRequested"
+            STATUS_GOALS_APPROVAL_DUE,
+            STATUS_GOALS_APPROVAL_OVERDUE,
+            STATUS_GOALS_REACTIVATED,
+            STATUS_GOALS_REACTIVATION_REQUESTED,
+            STATUS_GOALS_REQUIRED_MODIFICATION
         };
 
         return hasMultipleGoalVersions && ArrayUtils.contains(goalsReactivatedStatus, status);
@@ -1188,5 +1219,37 @@ public class Appraisal extends Evals {
         }
 
         return false;
+    }
+
+    /**
+     * Appraisal objects are sorted first by start date and then employee last name.
+     *
+     * @param otherAppraisal
+     * @return
+     */
+    public int compareTo(Appraisal otherAppraisal) {
+        final int BEFORE = -1;
+        final int EQUAL = 0;
+        final int AFTER = 1;
+
+        Employee employee = this.job.getEmployee();
+        Job otherJob = otherAppraisal.getJob();
+        Employee otherEmployee = otherJob.getEmployee();
+        // Check for nulls
+        if (this.startDate == null || otherAppraisal.getStartDate() == null || this.job == null ||
+                employee == null || employee.getLastName() == null || otherJob != null || otherEmployee == null
+                || otherEmployee.getLastName() == null) {
+            return AFTER;
+        }
+
+        if (this.startDate.getTime()  > otherAppraisal.getStartDate().getTime()) {
+            return AFTER;
+        }
+
+        if (this.startDate.getTime() < otherAppraisal.getStartDate().getTime()) {
+            return BEFORE;
+        }
+
+        return this.getJob().getEmployee().getLastName().compareTo(otherEmployee.getLastName());
     }
 }

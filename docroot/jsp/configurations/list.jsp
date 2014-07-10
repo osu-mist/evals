@@ -41,6 +41,7 @@
                     <thead>
                         <tr class="portlet-section-header results-header">
                             <th><liferay-ui:message key="configurations-setting"/></th>
+                            <th><liferay-ui:message key="appointment-type"/></th>
                             <th><liferay-ui:message key="description"/></th>
                             <th><liferay-ui:message key="value"/></th>
                             <th><liferay-ui:message key="actions"/></th>
@@ -52,6 +53,7 @@
                 id="<portlet:namespace/>users-${configuration.id}"
             >
                 <td><strong><liferay-ui:message key="parameters-${configuration.name}"/></strong></td>
+                <td><c:out value="${configuration.appointmentType}"/></td>
                 <td><liferay-ui:message key="parameters-${configuration.name}-description"/></td>
                 <td>
                     <div id="<portlet:namespace/>displayValue${configuration.id}">${configuration.value}</div>

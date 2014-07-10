@@ -12,17 +12,14 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 public class ReportMgr {
 
     public static final String STAGE = "stage";
     public static final String UNIT = "unit";
     public static final String ACTIVE_STATUS_SQL = "appraisals.status not in " +
-            "('completed', 'archived', 'closed')";
+            "('completed', 'closed', 'archivedCompleted', 'archivedClosed')";
     public static final int WAY_OVERDUE_DAYS = 30;
 
     /**
@@ -423,10 +420,16 @@ public class ReportMgr {
 
         // Only use the active evaluations
         for (Appraisal appraisal : myTeamAppraisals) {
+            // my team appraisals contains jobs that need evaluations created.
+            if (appraisal.getId() == 0) {
+                continue;
+            }
+
             String status = appraisal.getStatus();
             if (!status.equals(Appraisal.STATUS_COMPLETED) &&
                     !status.equals(Appraisal.STATUS_CLOSED) &&
-                    !status.equals(Appraisal.STATUS_ARCHIVED)) {
+                    !status.equals(Appraisal.STATUS_ARCHIVED_COMPLETED) &&
+                    !status.equals(Appraisal.STATUS_ARCHIVED_CLOSED)) {
 
                 boolean addAppraisal = true;
 
@@ -594,5 +597,31 @@ public class ReportMgr {
      */
     public static boolean isWayOverdueReport(String reportType) {
         return reportType.contains("WayOverdue");
+    }
+
+    /**
+     * Returns a list of late evaluations. The data returned is a list of object[] since we only needed a few
+     * columns from various tables. It was less code/simpler to do it via sql rather than hql.
+     *
+     * @param bcNames                   List of bc names to get late report data
+     * @return List<Object[]>           Late evaluation records
+     */
+    public static List<Object[]> getLateEvaluations(List<String> bcNames) {
+        Session session = HibernateUtil.getCurrentSession();
+        List<String> supportedAppointmentTypes = Arrays.asList(
+                AppointmentType.CLASSIFIED,
+                AppointmentType.CLASSIFIED_IT);
+
+        List<String> ignoredStatus = Arrays.asList(
+                Appraisal.STATUS_COMPLETED,
+                Appraisal.STATUS_CLOSED,
+                Appraisal.STATUS_ARCHIVED_CLOSED,
+                Appraisal.STATUS_ARCHIVED_COMPLETED
+        );
+
+        return session.getNamedQuery("report.reportLateEvaluations")
+                .setParameterList("ignoredStatus", ignoredStatus)
+                .setParameterList("bcNames", bcNames)
+                .list();
     }
 }

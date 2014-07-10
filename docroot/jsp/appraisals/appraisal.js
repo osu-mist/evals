@@ -1,7 +1,19 @@
 jQuery(document).ready(function() {
 
+  // professional faculty start-here animation:
+  jQuery('.evals-prof-faculty-start').siblings().fadeTo("slow", 0.2);
+  setTimeout(function() { endStartAnimation() }, 3000);
+
+  function endStartAnimation() {
+    jQuery('.evals-prof-faculty-start').siblings().fadeTo("slow", 1);
+    setTimeout(function() { jQuery('.evals-prof-faculty-start span.evals-arrow').effect("shake", "fast")}, 1000);
+  }
+
   // Handle acknowledge appraisal rebuttal read by supervisor
   jQuery(".pass-appraisal-rebuttal").hide();
+
+  // Set the autosave timeout
+  auto_save();
 
   jQuery("#<portlet:namespace />fm").submit(function() {
     var errors = "";
@@ -29,6 +41,74 @@ jQuery(document).ready(function() {
 
     return true;
   });
+
+  jQuery("#<portlet:namespace />fm input, #<portlet:namespace />fm textarea").change(function() {
+    jQuery('#<portlet:namespace />autosave_timestamp').val(new Date().getTime());
+  });
+
+  /**
+   * Whether or not the autosave function should execute.
+   *
+   * The autosave function is executed if the form data has been modified and it has been more than
+   * x number of seconds sitting idle.
+   * @return {Boolean}
+   */
+  function should_autosave() {
+    var lastModified = jQuery('#<portlet:namespace />autosave_timestamp').val();
+    var currentTime = new Date().getTime();
+    var secondsSinceModified = (currentTime - lastModified) / 1000;
+    // auto save frequency from db is in minutes
+    return lastModified != 0 && secondsSinceModified >= ${autoSaveFrequency};
+  }
+
+  /**
+   * Uses ajax to try and autosave the form data. After a  save, the autosave timeout
+   * flag is reset.
+   *
+   * @return
+   */
+  function auto_save() {
+    // check every 30 seconds to see if we need to autosave the data
+    setTimeout(auto_save, 30000);
+    if (!should_autosave()) {
+      return;
+    }
+
+    var data = {};
+    var json_data = form_to_JSON();
+    json_data.buttonClicked = 'save-draft';
+    data.id = json_data.id;
+    data.json_data = JSON.stringify(json_data);
+    data.controller = "AppraisalsAction";
+
+    jQuery.ajax({
+      type: "POST",
+      url: "<%=renderResponse.encodeURL(saveDraftAJAXURL.toString())%>",
+      data: data,
+      success: function(msg) {
+        if (msg == "success") {
+          // remove any existing success messages from previous auto-save draft or manually saving draft
+          jQuery('.portlet-msg-success').remove();
+
+          jQuery("#<portlet:namespace />flash").html(
+              '<span class="portlet-msg-success"><liferay-ui:message key="draft-autosaved"/></span>'
+          );
+        } else {
+          console.log(msg);
+        }
+
+        // right now this success auto save message shares the same div used to display error messages.
+        // we reset the autosave css class after the message is displayed to not affect other js error messages.
+        jQuery('.portlet-msg-success').fadeIn('slow');
+        jQuery('.portlet-msg-success').parent().addClass('appraisal-auto-save');
+        setTimeout(function() {jQuery('.portlet-msg-success').fadeOut('slow')}, 30000);
+        setTimeout(function() {jQuery('.portlet-msg-success').parent().removeClass('appraisal-auto-save')}, 30000);
+      }
+    });
+
+    // reset autosave timestamp after a save.
+    jQuery('#<portlet:namespace />autosave_timestamp').val(0);
+  }
 
   function form_to_JSON() {
     var portlet_namespace = '<portlet:namespace />';
@@ -215,8 +295,6 @@ jQuery(document).ready(function() {
     jQuery('textarea').autogrow();
   </c:if>
 
-    // @todo: need to think about accessibility of delete/add assessments.
-
   /**
    * Sets the goal delete flag for an assessment and hides the assessment from the form.
    * This method is called after the user confirms the deletion by clicking the delete button
@@ -262,6 +340,10 @@ jQuery(document).ready(function() {
     var response = confirm("<liferay-ui:message key="appraisal-assessment-delete-confirm"/>");
     if (response) {
       setGoalDeleteFlag.call(this);
+
+      // First clear out any messages before displaying accessible message
+      jQuery('#accessible-errors').text('');
+      jQuery('#accessible-errors').text('<liferay-ui:message key="appraisal-assessment-deleted"/>');
     }
     return false;
   }
@@ -270,32 +352,45 @@ jQuery(document).ready(function() {
     return assessmentDelete.call(this);
   });
 
-    /**
-     * Returns a jquery object that represents the last assessment div to clone when creating a new
-     * goal.
-     *
-     * @return {*}
-     */
-    function getLastAssessment() {
-        return jQuery('.appraisal-criteria fieldset>div:last');
-    }
+  /**
+   * Returns a jquery object that represents the last assessment div to clone when creating a new
+   * goal.
+   *
+   * @return {*}
+   */
+  function getLastAssessment() {
+      return jQuery('.appraisal-criteria fieldset>div:last');
+  }
 
-    /**
-     * Returns the # of editable assessment goals currently in the evaluation form. This allows us to
-     * # of the goals in the form for adding/deleting goals.
-     *
-     * @return {*}
-     */
-    function getEditableGoalsCount() {
-        // There's already an extra di
-        return jQuery('.appraisal-criteria>fieldset .editable-goals').length;
-    }
+  /**
+   * Returns the # of editable assessment goals currently in the evaluation form. This allows us to
+   * validate that the # of editable goals doesn't fall below a certain threshold.
+   *
+   * @return {*}
+   */
+  function getEditableGoalsCount() {
+      // There's already an extra di
+      return jQuery('.appraisal-criteria>fieldset .editable-goals').length;
+  }
 
-    function getCriteriaIdOffset(assessmentCount, newAssessment) {
-        return (assessmentCount * newAssessment.find(':checkbox').size());
-    }
+  /**
+   * Returns the total # of goals in the evaluation form both editable and non-editable goals. This is used to
+   * number the goals appropriately.
+   *
+   * @return {Number}
+   */
+  function getTotalGoalCount() {
+      // There's already an extra di
+      return jQuery('.appraisal-criteria>fieldset>div').filter(function() {
+          return jQuery(this).attr('class').indexOf('appraisal-assessment-') >= 0;
+      }).length;
+  }
 
-    /**
+  function getCriteriaIdOffset(assessmentCount, newAssessment) {
+      return (assessmentCount * newAssessment.find(':checkbox').size());
+  }
+
+  /**
    * Handles adding a new assessment to the DOM. This js method clones the last .appraisal-criteria
    * fieldset in the form. The logic in this function is to update the various classes, names and ids
    * of the various html elements in the .appraisal-criteria fieldset. The various labels, inputs,
@@ -306,76 +401,114 @@ jQuery(document).ready(function() {
    * We chose to use js to clone & add an assessment because we didn't find an easy what for an ajax
    * serveResource call to return html from the assessment.jsp. The ajax serveResource calls can return
    * json, but we couldn't figure out how to get the serveResource method to parse a single jsp file.
+   *
+   * This function is called after an ajax call that creates a new assessment and returns the id of the new
+   * assessment. This function uses the returned id to help create the proper html elements.
    */
-  jQuery(".osu-cws #addAssessment").click(function() {
-    // clone last assessment in the form for modification
-    var newAssessment = getLastAssessment().clone(true);
-    newAssessment.show(); // last assessment could have been deleted
-    var assessmentCount = getEditableGoalsCount() + 1;
+  function addGoal(id) {
+      // clone last assessment in the form for modification
+      var newAssessment = getLastAssessment().clone(true);
+      newAssessment.show(); // last assessment could have been deleted
+      var assessmentCount = getTotalGoalCount() + 1;
 
-    // The rest of this function takes care of updating ids, names and classes
+      // The rest of this function takes care of updating ids, names and classes
 
-    // h3 for accessibility
-    newAssessment.attr('class', 'appraisal-assessment-' + assessmentCount + " editable-goals");
-    newAssessment.find('h3.secret').html('<liferay-ui:message key="appraisal-assessment-header"/>' + assessmentCount);
+      // h3 for accessibility
+      newAssessment.attr('class', 'appraisal-assessment-' + id + " editable-goals");
+      newAssessment.find('h3.secret').html('<liferay-ui:message key="appraisal-assessment-header"/>' + id);
 
-    // Delete Assessment Link
-    var removeLinkClass = newAssessment.find('a.delete').attr('class');
-    removeLinkClass = removeLinkClass.replace(/\.\d+/, '') + "." + assessmentCount;
-    newAssessment.find('a.delete').attr('class', removeLinkClass);
+      // Delete Assessment Link
+      var removeLinkClass = newAssessment.find('a.delete').attr('class');
+      removeLinkClass = removeLinkClass.replace(/\.\d+/, '') + "." + id;
+      newAssessment.find('a.delete').attr('class', removeLinkClass);
 
-    // delete flag hidden input
-    var deleteFlagInput = jQuery(newAssessment.find(':input:hidden')[0]);
-    var deleteFlagClass = deleteFlagInput.attr('class').replace(/\d+/, '');
-    deleteFlagClass += assessmentCount;
-    deleteFlagInput.attr('class', deleteFlagClass);
-    var deleteFlagName = deleteFlagInput.attr('name').replace(/\.\d+/, '');
-    deleteFlagName += "." + assessmentCount;
-    deleteFlagInput.attr('name', deleteFlagName);
-    deleteFlagInput.val(0);
+      // delete flag hidden input
+      var deleteFlagInput = jQuery(newAssessment.find(':input:hidden')[0]);
+      var deleteFlagClass = deleteFlagInput.attr('class').replace(/\d+/, '');
+      deleteFlagClass += id;
+      deleteFlagInput.attr('class', deleteFlagClass);
+      var deleteFlagName = deleteFlagInput.attr('name').replace(/\.\d+/, '');
+      deleteFlagName += "." + id;
+      deleteFlagInput.attr('name', deleteFlagName);
+      deleteFlagInput.val(0);
 
-    // goal label + textarea
-    var goalLabelVal = newAssessment.find('label:first').html().replace(/\d+/, '');
-    goalLabelVal += + assessmentCount;
-    jQuery(newAssessment.find('label')[0]).html(goalLabelVal);
-    var goalLabelFor = newAssessment.find('label:first').attr('for').replace(/\.\d+/, '');
-    goalLabelFor += "." + assessmentCount;
-    jQuery(newAssessment.find('label')[0]).attr('for', goalLabelFor);
-    var goalTextAreaId = newAssessment.find('textarea').attr('id').replace(/\.\d+/, '');
-    goalTextAreaId += "." + assessmentCount;
-    newAssessment.find('textarea').attr('id', goalTextAreaId);
-    newAssessment.find('textarea').attr('name', goalTextAreaId);
-    newAssessment.find('textarea').attr('class', ''); // clear any class inputs
+      // goal label + textarea
+      var goalLabelVal = newAssessment.find('label:first').html().replace(/\d+/, '');
+      goalLabelVal += assessmentCount;
+      jQuery(newAssessment.find('label')[0]).html(goalLabelVal);
+      var goalLabelFor = newAssessment.find('label:first').attr('for').replace(/\.\d+/, '');
+      goalLabelFor += "." + id;
+      jQuery(newAssessment.find('label')[0]).attr('for', goalLabelFor);
+      var goalTextAreaId = newAssessment.find('textarea').attr('id').replace(/\.\d+/, '');
+      goalTextAreaId += "." + id;
+      newAssessment.find('textarea').attr('id', goalTextAreaId);
+      newAssessment.find('textarea').attr('name', goalTextAreaId);
+      newAssessment.find('textarea').attr('class', ''); // clear any class inputs
 
-    // assessment criterias checkboxes
-    jQuery.each(newAssessment.find(':checkbox'), function(index, element) {
-        // The AssessmentCriteria checkboxes have suffixes. In order to make them unique ids in
-        // in the form, we're using multiples of assmentCount starting with assessmentCount
-        var checkBoxName = jQuery(element).attr('name').replace(/\.\d+/, '');
-        checkBoxName += "." +  (index + getCriteriaIdOffset(assessmentCount, newAssessment));
-        jQuery(element).attr('name', checkBoxName);
-        jQuery(element).attr('id', checkBoxName);
-        jQuery(element).removeAttr('checked');
-    });
+      // assessment criterias checkboxes
+      jQuery.each(newAssessment.find(':checkbox'), function(index, element) {
+          // The AssessmentCriteria checkboxes have suffixes. In order to make them unique ids in
+          // in the form, we're using multiples of assmentCount starting with assessmentCount
+          var checkBoxName = jQuery(element).attr('name').replace(/\.\d+/, '');
+          checkBoxName += "." +  (index + id + 1);
+          jQuery(element).attr('name', checkBoxName);
+          jQuery(element).attr('id', checkBoxName);
+          jQuery(element).removeAttr('checked');
+      });
 
-    // assessment criterias labels
-    jQuery.each(newAssessment.find('label'), function(index, element) {
-        var checkBoxName = jQuery(element).attr('for').replace(/\.\d+/, '');
-        checkBoxName += "." +  (index -1 + getCriteriaIdOffset(assessmentCount, newAssessment));
-        // The first label is the Goals label, the rest should be assessment criterias
-        if (index != 0) {
-          jQuery(element).attr('for', checkBoxName);
-        }
-    });
+      // assessment criterias labels
+      jQuery.each(newAssessment.find('label'), function(index, element) {
+          var checkBoxName = jQuery(element).attr('for').replace(/\.\d+/, '');
+          checkBoxName += "." +  (index + id);
+          // The first label is the Goals label, the rest should be assessment criterias
+          if (index != 0) {
+              jQuery(element).attr('for', checkBoxName);
+          }
+      });
 
-    newAssessment.appendTo('.appraisal-criteria>fieldset'); // add new assessment to form
-    jQuery('.appraisal-assessment-' + assessmentCount + ' textarea').val(''); // clearing this before appending it didn't work
+      newAssessment.appendTo('.appraisal-criteria>fieldset'); // add new assessment to form
+      jQuery('.appraisal-assessment-' + id + ' textarea').val(''); // clearing this before appending it didn't work
 
-    // update # of assessment in form
-    jQuery('#assessmentCount').val(assessmentCount);
+      // update # of assessment in form
+      jQuery('#assessmentCount').val(assessmentCount);
 
-    return false;
-  });
+      // First clear out any messages before displaying accessible message
+      jQuery('#accessible-errors').text('');
+      jQuery('#accessible-errors').text('<liferay-ui:message key="appraisal-assessment-added"/>');
+
+      return false;
+  }
+
+  /**
+   * Makes an ajax call that creates a new assessment. The return msg should be a json string
+   * that contains the id of the new assessment. Then the assessment id is given to the addGoal()
+   * function which will create the html elements for the new assessment.
+   * @returns false (prevent any further actions occurring due to the element being clicked).
+   */
+  function createAndAddAssessment() {
+        var data = {};
+        var json_data = form_to_JSON();
+        json_data.buttonClicked = 'add-assessment';
+        data.id = json_data.id;
+        data.json_data = JSON.stringify(json_data);
+        data.controller = "AppraisalsAction";
+        jQuery.ajax({
+            type: "POST",
+            url: "<%= renderResponse.encodeURL(addGoalAJAXURL.toString()) %>",
+            data: data,
+            success: function(msg) {
+                var response = jQuery.parseJSON(msg);
+                if (response.status == "success") {
+                    addGoal(response.id);
+                } else {
+                    console.log(response);
+                }
+            }
+        });
+        return false;
+    }
+
+  jQuery(".osu-cws #addAssessment").click(createAndAddAssessment);
 
   /**
    * Whether or not the goals textarea is empty in an assessment.

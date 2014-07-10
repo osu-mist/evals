@@ -3,6 +3,7 @@ package edu.osu.cws.evals.tests;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.ConfigurationMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
+import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.util.EvalsUtil;
@@ -99,7 +100,7 @@ public class AppraisalsTest {
 
         updatedAppraisal.setEvaluator(employee);
         updatedAppraisal.setGoalApprovedDate(new Date());
-        updatedAppraisal.setGoalsComments("goal comments data");
+        updatedAppraisal.getUnapprovedGoalsVersion().setGoalsComments("goal comments data");
         updatedAppraisal.setResultSubmitDate(new Date());
         updatedAppraisal.setEvaluation("evaluation text");
         updatedAppraisal.setRating(1);
@@ -150,7 +151,7 @@ public class AppraisalsTest {
 
         appraisal.setEvaluator(employee);
         appraisal.setGoalApprovedDate(new Date());
-        appraisal.setGoalsComments("goal comments data");
+        appraisal.getUnapprovedGoalsVersion().setGoalsComments("goal comments data");
         appraisal.setResultSubmitDate(new Date());
         appraisal.setEvaluation("evaluation text");
         appraisal.setRating(1);
@@ -173,8 +174,7 @@ public class AppraisalsTest {
         Session hsession = HibernateUtil.getCurrentSession();
         Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
         Appraisal appraisal1 = AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(), Appraisal.TYPE_ANNUAL);
-        int appraisalID =  appraisal1
-                .getId();
+        int appraisalID =  appraisal1.getId();
 
         // Grab the freshly created appraisal from the db before we start
         // updating the properties.
@@ -182,7 +182,7 @@ public class AppraisalsTest {
 
         appraisal1.setEvaluator(employee);
         appraisal1.setGoalApprovedDate(new Date());
-        appraisal1.setGoalsComments("goal comments data");
+        //appraisal1.getUnapprovedGoalsVersion().setGoalsComments("goal comments data");
         appraisal1.setResultSubmitDate(new Date());
         appraisal1.setEvaluation("evaluation text");
         appraisal1.setRating(1);
@@ -206,6 +206,66 @@ public class AppraisalsTest {
                     "Appraisal assessments employee result failed to save";
             assert assessment.getSupervisorResult() != null :
                     "Appraisal assessments supervisor result failed to save";
+        }
+    }
+
+
+    @Test(groups = {"unittest"})
+    public void shouldResetAppraisal() throws Exception {
+        // Create the appraisal for this test
+        Session hsession = HibernateUtil.getCurrentSession();
+        Job job = (Job) hsession.load(Job.class, new Job(new Employee(12345), "1234", "00"));
+        Appraisal appraisal1 = AppraisalMgr.createAppraisal(job, EvalsUtil.getToday(), Appraisal.TYPE_ANNUAL);
+        int appraisalID =  appraisal1.getId();
+
+        // Grab the freshly created appraisal from the db before we start
+        // updating the properties.
+        employee = EmployeeMgr.findByOnid("luf", null);
+
+        appraisal1.setEvaluator(employee);
+        appraisal1.setGoalApprovedDate(new Date());
+        //appraisal1.getUnapprovedGoalsVersion().setGoalsComments("goal comments data");
+        appraisal1.setResultSubmitDate(new Date());
+        appraisal1.setEvaluation("evaluation text");
+        appraisal1.setRating(1);
+        GoalVersion firstGoalVersion = (GoalVersion) appraisal1.getGoalVersions().toArray()[0];
+        firstGoalVersion.setRequestDecision(true);
+
+        for (Assessment assessment : firstGoalVersion.getAssessments()) {
+            assessment.setGoal("foobar");
+            assessment.setEmployeeResult("employee results txt");
+            assessment.setSupervisorResult("supervisor results txt");
+        }
+
+        AppraisalMgr.updateAppraisal(appraisal1, employee);
+
+        hsession.save(appraisal1);
+        tx.commit();
+        hsession = HibernateUtil.getCurrentSession();
+        tx = hsession.beginTransaction();
+        appraisal1 = (Appraisal) hsession.load(Appraisal.class, appraisalID);
+
+        for (Assessment assessment : firstGoalVersion.getAssessments()) {
+            assert assessment.getEmployeeResult() != null :
+                    "Appraisal assessments employee result failed to save";
+            assert assessment.getSupervisorResult() != null :
+                    "Appraisal assessments supervisor result failed to save";
+        }
+
+        // Reset appraisal
+        AppraisalMgr.resetAppraisal(appraisal1);
+        firstGoalVersion = (GoalVersion) appraisal1.getGoalVersions().toArray()[0];
+
+        tx.commit();
+        hsession = HibernateUtil.getCurrentSession();
+        tx = hsession.beginTransaction();
+
+        assert appraisal1.getGoalVersions().size() == 1 : "Appraisal goal versions failed to reset!";
+        for (Assessment assessment : firstGoalVersion.getAssessments()) {
+            assert assessment.getEmployeeResult() == null :
+                    "Appraisal assessments employee result failed to reset!";
+            assert assessment.getSupervisorResult() == null :
+                    "Appraisal assessments supervisor result failed to reset!";
         }
     }
 
@@ -263,8 +323,12 @@ public class AppraisalsTest {
     @Test(groups = "unittest")
     public void shouldFindAllTeamActiveAppraisals() throws Exception {
         int pidm = 12467;
+        List<String> appointmentTypes = new ArrayList<String>();
+        appointmentTypes.add(AppointmentType.CLASSIFIED);
+        appointmentTypes.add(AppointmentType.CLASSIFIED_IT);
+
         List<Appraisal> teamActiveAppraisals = AppraisalMgr.getMyTeamsAppraisals(pidm, true,
-                null, null);
+                null, null, appointmentTypes);
         assert teamActiveAppraisals.size() == 7 : "Invalid size of team active appraisals";
         for (Appraisal ap : teamActiveAppraisals) {
             assert ap.getId() != 0 :

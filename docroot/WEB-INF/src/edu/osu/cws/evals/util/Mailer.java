@@ -7,16 +7,15 @@ package edu.osu.cws.evals.util;
  * @date: 6/24/11
  */
 
-import edu.osu.cws.evals.hibernate.AppraisalMgr;
-import edu.osu.cws.evals.hibernate.EmailMgr;
-import edu.osu.cws.evals.hibernate.JobMgr;
-import edu.osu.cws.evals.hibernate.ReviewerMgr;
+import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.util.CWSUtil;
 import edu.osu.cws.util.Logger;
+import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
+import org.apache.xpath.operations.Bool;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
@@ -37,6 +36,11 @@ public class Mailer implements MailerInterface {
     private String testMailToAddress;
 
     Map<String, String> logFields = new HashMap<String, String>();
+
+    private static final List<String> commentTypeEmails = Arrays.asList(
+            "rebuttalReadDue",
+            "rebuttalRead"
+    );
 
     /**
      * Constructors that sets the object parameters and initializes the email start date.
@@ -93,6 +97,10 @@ public class Mailer implements MailerInterface {
             email.setHtmlMsg(body);
 
             String subject = emailBundle.getString( "email_" + emailType.getType() + "_subject");
+            if (commentTypeEmails.contains(emailType.getType())) {
+                subject = MessageFormat.format(subject, getCommentType(appraisal));
+            }
+
             email.setSubject(subject);
             email.send();
 
@@ -117,6 +125,20 @@ public class Mailer implements MailerInterface {
    }
 
     /**
+     * Figures out if the email text should say rebuttal or comment based on the appointment type.
+     *
+     * @param appraisal
+     * @return
+     */
+    private String getCommentType(Appraisal appraisal) {
+        String commentType = "rebuttal";
+        if (appraisal.getJob().getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+            commentType = "comment";
+        }
+        return commentType;
+    }
+
+    /**
      * Looks at the email type object and sets the cc, bcc and to fields in the email object.
      * If there were no recipients to add, it returns false.
      *
@@ -132,6 +154,14 @@ public class Mailer implements MailerInterface {
         String mailTo = emailType.getMailTo();
         String mailCC = emailType.getCc();
         String mailBCC = emailType.getBcc();
+
+        // Modifying the CC recipient for the signature emails to include Classified. This was the simplest
+        // solution. Other things to consider in the future is: 1) use a different appraisal step + email type
+        // or 2) allow email_types to have an appointment type column
+        if (appraisal.getAppointmentType().equals(AppointmentType.CLASSIFIED_IT) &&
+                emailType.getType().contains("signature")) {
+            mailCC = "reviewer";
+        }
 
         if (mailTo != null && !mailTo.equals("")) {
             String[] to = getRecipients(mailTo, appraisal);
@@ -419,6 +449,55 @@ public class Mailer implements MailerInterface {
     }
 
     /**
+     * Sends email to either admin/bc users with attachment of late evaluations csv report.
+     *
+     * @param emailAddresses
+     * @param filePath
+     * @param bcName                    BC name that the report is being sent to.
+     */
+    public void sendLateReport(String[] emailAddresses, String filePath, String bcName) {
+        try {
+            String body = emailBundle.getString("email_lateReport_body");
+            HtmlEmail email = getHtmlEmail();
+            String month = new DateTime().monthOfYear().getAsText();
+
+            if(testMailToAddress != null && !testMailToAddress.equals("")){
+                for(int i = 0; i < emailAddresses.length; i ++) {
+                    emailAddresses[i] = testMailToAddress;
+                }
+            }
+
+            // Create the attachment
+            String filename = "EvalS-lateReport-" + bcName + "-" + month + ".csv";
+            EmailAttachment attachment = new EmailAttachment();
+            attachment.setPath(filePath);
+            attachment.setDisposition(EmailAttachment.ATTACHMENT);
+            attachment.setDescription(filename);
+            attachment.setName(filename);
+
+            email.attach(attachment);
+            email.addTo(emailAddresses);
+            email.setHtmlMsg(body);
+            email.setSubject(emailBundle.getString("email_lateReport_subject"));
+            email.send();
+
+            String longMsg = "Late report emails sent to: various reviewers";
+            logger.log(Logger.INFORMATIONAL, "Late Report email sent", longMsg);
+
+            Email evalsEmail = new Email(0, "lateReport" + bcName);
+            EmailMgr.add(evalsEmail);
+        } catch (Exception e) {
+            String logLongMessage = "";
+            String shortMessage = "Error in sendLateReport";
+            try {
+                logLongMessage = "Error encountered when sending mail to reviewers" +
+                        "\n" + CWSUtil.stackTraceString(e);
+                logger.log(Logger.ERROR, shortMessage, logLongMessage);
+            } catch (Exception logError) { }
+        }
+    }
+
+    /**
      * Fetch the body for a particular emailType
      * @param appraisal
      * @return
@@ -427,7 +506,7 @@ public class Mailer implements MailerInterface {
     private String goalsDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsDue_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDueDate(appraisal), getDaysRemaining(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal, null), getDaysRemaining(appraisal, null));
     }
 
     /**
@@ -438,7 +517,8 @@ public class Mailer implements MailerInterface {
      */
     private String goalsOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsOverdue_body");
-        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(), getDueDate(appraisal));
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(),
+                getDueDate(appraisal, null));
     }
 
     /**
@@ -449,7 +529,8 @@ public class Mailer implements MailerInterface {
      */
     private String goalsRequiredModificationBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsRequiredModification_body");
-        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(), getDueDate(appraisal));
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(),
+                getDaysRemaining(appraisal, null));
     }
 
     /**
@@ -459,7 +540,8 @@ public class Mailer implements MailerInterface {
      * @throws Exception
      */
     private String goalsReactivatedTimeoutBody(Appraisal appraisal) throws Exception {
-        Configuration config = configMap.get("goalsReactivatedExpiration");
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, "goalsReactivatedExpiration",
+                appraisal.getAppointmentType());
         int daysToSubmit = config.getIntValue();
         String bodyString = emailBundle.getString("email_goalsReactivatedTimeout_body");
         return MessageFormat.format(bodyString, daysToSubmit, getJobTitle(appraisal),
@@ -475,7 +557,8 @@ public class Mailer implements MailerInterface {
      */
     private String goalsReactivationRequestedTimeoutBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsReactivationRequestedTimeout_body");
-        Configuration config = configMap.get("goalsReactivationRequestedExpiration");
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, "goalsReactivationRequestedExpiration",
+                appraisal.getAppointmentType());
         int daysToSubmit = config.getIntValue();
 
         GoalVersion lastTimedOutGoalVersion = appraisal.getLastTimedOutGoalVersion(Appraisal.STATUS_GOALS_REACTIVATION_REQUESTED);
@@ -501,7 +584,7 @@ public class Mailer implements MailerInterface {
     private String goalsApprovalDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsApprovalDue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDueDate(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal, null), getDaysRemaining(appraisal, null));
     }
 
     /**
@@ -513,7 +596,7 @@ public class Mailer implements MailerInterface {
     private String goalsApprovalOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsApprovalOverdue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDueDate(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal, null));
     }
 
     /**
@@ -536,7 +619,7 @@ public class Mailer implements MailerInterface {
     private String goalsReactivatedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsReactivated_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getGoalsExpirationDate(appraisal));
+                appraisal.getReviewPeriod(), getStatusExpirationDate(appraisal));
     }
 
     /**
@@ -562,7 +645,7 @@ public class Mailer implements MailerInterface {
 
         // Use today as the submit date since this email is sent right after the request is submitted
         return MessageFormat.format(bodyString, requestSubmitDate, getEmployeeName(appraisal),
-                getJobTitle(appraisal), appraisal.getReviewPeriod(), getGoalsExpirationDate(appraisal));
+                getJobTitle(appraisal), appraisal.getReviewPeriod(), getStatusExpirationDate(appraisal));
     }
 
     /**
@@ -585,7 +668,7 @@ public class Mailer implements MailerInterface {
     private String resultsDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_resultsDue_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDueDate(appraisal), getDaysRemaining(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal, null), getDaysRemaining(appraisal, null));
     }
 
     /**
@@ -597,7 +680,7 @@ public class Mailer implements MailerInterface {
     private String resultsOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_resultsOverdue_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(),
-                getDueDate(appraisal));
+                getDueDate(appraisal, null));
     }
 
     /**
@@ -609,7 +692,7 @@ public class Mailer implements MailerInterface {
     private String appraisalDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_appraisalDue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDueDate(appraisal), getDaysRemaining(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal, null));
     }
 
     /**
@@ -621,7 +704,7 @@ public class Mailer implements MailerInterface {
     private String appraisalOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_appraisalOverdue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDueDate(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal, null));
     }
 
     /**
@@ -662,15 +745,44 @@ public class Mailer implements MailerInterface {
     }
 
     /**
+     * Fetch the body for employeeReviewDue emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String employeeReviewDueBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_employeeReviewDue_body");
+        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(),
+                getDaysRemaining(appraisal, true));
+    }
+
+    /**
+     * Fetch the body for employeeReviewExpired emailType
+     *
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String employeeReviewExpiredBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_employeeReviewExpired_body");
+        return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
+                appraisal.getReviewPeriod(), getDueDate(appraisal, "signatureDue"));
+    }
+
+    /**
      * Fetch the body for releaseDue emailType
      * @param appraisal
      * @return
      * @throws Exception
      */
     private String releaseDueBody(Appraisal appraisal) throws Exception {
-        String bodyString = emailBundle.getString("email_releaseDue_body");
+        String key = "email_releaseDue_body";
+        if (appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+            key = "email_releaseDueProfFaculty_body";
+        }
+        String bodyString = emailBundle.getString(key);
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod(),getDueDate(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal, null));
     }
 
     /**
@@ -682,7 +794,7 @@ public class Mailer implements MailerInterface {
     private String releaseOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_releaseOverdue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod(),getDueDate(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal, null));
     }
 
     /**
@@ -694,7 +806,7 @@ public class Mailer implements MailerInterface {
     private String signatureDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_signatureDue_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal),appraisal.getReviewPeriod(),
-                getDueDate(appraisal));
+                getDueDate(appraisal, null));
     }
 
     /**
@@ -706,18 +818,20 @@ public class Mailer implements MailerInterface {
     private String signatureOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_signatureOverdue_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal),appraisal.getReviewPeriod(),
-                getDueDate((appraisal)));
+                getDueDate(appraisal, null));
     }
 
     /**
-     * Fetch the body for rebuttalReadDue emailType
+     * Fetch the body for rebuttalRead emailType
+     *
      * @param appraisal
      * @return
      * @throws Exception
      */
     private String rebuttalReadBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_rebuttalRead_body");
-        return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
+        return MessageFormat.format(bodyString, getCommentType(appraisal), getJobTitle(appraisal),
+                appraisal.getReviewPeriod());
     }
 
     /**
@@ -731,7 +845,8 @@ public class Mailer implements MailerInterface {
         String osuid = appraisal.getJob().getEmployee().getOsuid();
 
         return MessageFormat.format(bodyString, getEmployeeName(appraisal),
-                osuid, getJobTitle(appraisal), appraisal.getReviewPeriod(), getDueDate(appraisal));
+                osuid, getCommentType(appraisal), getJobTitle(appraisal), appraisal.getReviewPeriod(),
+                getDueDate(appraisal, null));
     }
 
     /**
@@ -744,7 +859,7 @@ public class Mailer implements MailerInterface {
         String bodyString = emailBundle.getString("email_rebuttalReadOverdue_body");
         String osuid = appraisal.getJob().getEmployee().getOsuid();
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), osuid, getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDueDate(appraisal));
+                appraisal.getReviewPeriod(), getDueDate(appraisal, null));
     }
 
     /**
@@ -759,11 +874,29 @@ public class Mailer implements MailerInterface {
     }
 
     /**
-     * Fetch the body for closed emailType
+     * Fetch the body for completion reminder emailType
+     *
      * @param appraisal
      * @return
      * @throws Exception
      */
+    private String firstCompletionReminderBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_completionReminder_body");
+        int daysAfterEndOfCycle = Math.abs(getDaysRemaining(appraisal, null));
+        return MessageFormat.format(bodyString, daysAfterEndOfCycle, getEmployeeName(appraisal),
+                getJobTitle(appraisal), appraisal.getReviewPeriod());
+    }
+
+    private String secondCompletionReminderBody(Appraisal appraisal) throws Exception {
+        return firstCompletionReminderBody(appraisal);
+    }
+
+        /**
+         * Fetch the body for closed emailType
+         * @param appraisal
+         * @return
+         * @throws Exception
+         */
     private String closedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_closed_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod());
@@ -787,7 +920,8 @@ public class Mailer implements MailerInterface {
      * @throws Exception
      */
     private String classifiedITNoIncreaseBody(Appraisal appraisal) throws Exception {
-        Configuration config = configMap.get("IT-increase-withhold-warn2-days");
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, "IT-increase-withhold-warn2-days",
+                appraisal.getAppointmentType());
         int daysToNotifyEmployee = config.getIntValue();
 
         Employee employee = appraisal.getJob().getEmployee();
@@ -830,45 +964,55 @@ public class Mailer implements MailerInterface {
     }
 
     /**
-     * Fetch the due day
+     * Fetch the due day. If there's a status specified in the parameter, we use it instead of the appraisal's
+     * status.
+     *
      * @param appraisal
+     * @param status                Status to override the appraisal status when checking due date
      * @return
      * @throws Exception
      */
-    private String getDueDate(Appraisal appraisal) throws Exception {
-        String status = appraisal.getStatus();
+    private String getDueDate(Appraisal appraisal, String status) throws Exception {
+        if (status == null) {
+            status = appraisal.getStatus();
+        }
         if(status.contains("Overdue")) {
             status = status.replace("Overdue", "Due");
         }
-        Configuration config = configMap.get(status);
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, status, appraisal.getAppointmentType());
         DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
         return dueDay.toString(Constants.DATE_FORMAT);
     }
 
     /**
      * Returns a String that represents when the given status is expired for the goals reactivation
-     * workflow.
+     * and employee review due workflow.
      *
      * @param appraisal
      * @return
      * @throws Exception
      */
-    private String getGoalsExpirationDate(Appraisal appraisal) throws Exception {
+    private String getStatusExpirationDate(Appraisal appraisal) throws Exception {
         String status = appraisal.getStatus() + "Expiration";
-        Configuration config = configMap.get(status);
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, status, appraisal.getAppointmentType());
         DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
         return dueDay.toString(Constants.DATE_FORMAT);
     }
 
     /**
-     * Fetch the days remaining to respond to a particular action
+     * Fetch the days remaining to respond to a particular action or before the action expires.
+     *
      * @param appraisal
+     * @param expirationStatus              Whether or not to use statusExpiration to calculate days remaining
      * @return
      * @throws Exception
      */
-    private int getDaysRemaining(Appraisal appraisal) throws Exception {
-        String status = appraisal.getStatus();
-        Configuration config = configMap.get(status);
+    private int getDaysRemaining(Appraisal appraisal, Boolean expirationStatus) throws Exception {
+        String name = appraisal.getStatus();
+        if (expirationStatus != null && expirationStatus) {
+            name += "Expiration";
+        }
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, name, appraisal.getAppointmentType());
         DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
         return Days.daysBetween(EvalsUtil.getToday(), dueDay).getDays();
     }

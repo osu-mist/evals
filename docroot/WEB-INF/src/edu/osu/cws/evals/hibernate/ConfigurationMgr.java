@@ -23,9 +23,30 @@ public class ConfigurationMgr {
     public static Map<String, Configuration> mapByName() throws Exception {
         HashMap<String, Configuration> configs = new HashMap<String, Configuration>();
         for (Configuration configuration : ConfigurationMgr.list()) {
-            configs.put(configuration.getName(), configuration);
+            String key = configuration.getName() + "-" + configuration.getAppointmentType().replace(" ", "");
+            configs.put(key, configuration);
         }
         return configs;
+    }
+
+    /**
+     * Returns the configuration object from the map. First it looks for the appointment type specific configuration
+     * using: name-AppointmentType. If that is not present it uses the default one: name-Default.
+     *
+     * @param configs
+     * @param name
+     * @param appointmentType
+     * @return
+     */
+    public static Configuration getConfiguration(Map<String, Configuration> configs, String name,
+                                                 String appointmentType) {
+        String key = name + "-" + appointmentType.replace(" ", "");
+        Configuration configuration = configs.get(key);
+        if (configuration == null) {
+            configuration = configs.get(name + "-Default");
+        }
+
+        return configuration;
     }
 
     /**
@@ -51,16 +72,6 @@ public class ConfigurationMgr {
         configuration.setValue(value);
         session.update(configuration);
         return true;
-    }
-
-    /**
-     * returns a map of all the configurations using the name as the key.
-     * @return
-     */
-    public static Map<String, Configuration> getMap()
-    {
-        Map<String, Configuration> configMap = new HashMap();
-        return configMap;
     }
 
     /**

@@ -17,5 +17,7 @@ public interface MailerInterface {
 
     void sendReviewerMail(String[] emailAddresses, int dueCount, int OverDueCount);
 
+    void sendLateReport(String[] emailAddresses, String filePath, String bcName);
+
     String getAppraisalOverdueITWarning() throws Exception;
 }

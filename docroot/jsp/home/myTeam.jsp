@@ -1,5 +1,4 @@
 <jsp:useBean id="myTeamsActiveAppraisals" class="java.util.ArrayList" scope="request" />
-<jsp:useBean id="myTeamsActiveClassifiedITAppraisals" class="java.util.ArrayList" scope="request" />
 
 <div id="<portlet:namespace/>accordionMenuMyTeam" class="accordion-menu">
     <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>MyTeam');">
@@ -17,6 +16,7 @@
         </c:if>
     </div>
     <div class="accordion-content" id="<portlet:namespace/>MyTeam" style="display: block;">
+        <p><liferay-ui:message key="myTeamWarning" /></p>
         <c:if test="${!empty myTeamsActiveAppraisals}">
             <table class="taglib-search-iterator narrow">
                 <thead>
@@ -40,15 +40,30 @@
                         <c:if test="${empty report}">
                             <td><liferay-ui:message key="${shortAppraisal.job.appointmentType}" /></td>
                         </c:if>
-                        <td>${shortAppraisal.reviewPeriod}</td>
+                        <td>
+                            <c:if test="${shortAppraisal.id != 0}">
+                                ${shortAppraisal.reviewPeriod}
+                            </c:if>
+                        </td>
                         <c:if test="${!empty report}">
                             <td>${shortAppraisal.viewOverdue}</td>
                         </c:if>
-                        <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
-                            <portlet:param name="id" value="${shortAppraisal.id}"/>
-                            <portlet:param  name="action" value="display"/>
-                            <portlet:param  name="controller" value="AppraisalsAction"/>
-                           </portlet:actionURL>"><liferay-ui:message key="${shortAppraisal.viewStatus}" /></a>
+                        <td>
+                            <c:if test="${shortAppraisal.id != 0}">
+                                <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
+                                        <portlet:param name="id" value="${shortAppraisal.id}"/>
+                                        <portlet:param  name="action" value="display"/>
+                                        <portlet:param  name="controller" value="AppraisalsAction"/>
+                                    </portlet:actionURL>"><liferay-ui:message key="${shortAppraisal.viewStatus}" />
+                                </a>
+                            </c:if>
+                            <c:if test="${shortAppraisal.id == 0 && shortAppraisal.appointmentType == 'Professional Faculty'}">
+                                <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+                                        <portlet:param name="action" value="initiateProfessionalFacultyEvals"/>
+                                        <portlet:param name="controller" value="AppraisalsAction"/>
+                                    </portlet:actionURL>"><liferay-ui:message key="prof-faculty-create-evaluation-short" />
+                                </a>
+                            </c:if>
                         </td>
                     </tr>
                 </c:forEach>
@@ -67,7 +82,4 @@
             </c:choose>
         </c:if>
     </div>
-    <c:if test="${!empty myTeamsActiveClassifiedITAppraisals}">
-        <%@ include file="/jsp/home/myClassifiedIT.jsp" %>
-    </c:if>
 </div>

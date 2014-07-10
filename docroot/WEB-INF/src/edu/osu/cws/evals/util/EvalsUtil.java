@@ -1,11 +1,13 @@
 package edu.osu.cws.evals.util;
 
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
+import edu.osu.cws.evals.hibernate.ConfigurationMgr;
 import edu.osu.cws.evals.hibernate.EmailMgr;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.models.Email;
 import edu.osu.cws.evals.models.Job;
+import edu.osu.cws.evals.portlet.ActionHelper;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -48,7 +50,7 @@ public class EvalsUtil {
         if (ref.equals("end")) {
             refDate = new DateTime(appraisal.getEndDate()).withTimeAtStartOfDay();
         } else if (ref.equals("GOALS_REQUIRED_MOD_DATE")) {
-            refDate = new DateTime(appraisal.getGoalsRequiredModificationDate()).withTimeAtStartOfDay();
+            refDate = new DateTime(appraisal.getUnapprovedGoalsVersion().getGoalsRequiredModificationDate()).withTimeAtStartOfDay();
         } else if (ref.equals("employee_signed_date")) {
             refDate = new DateTime(appraisal.getEmployeeSignedDate()).withTimeAtStartOfDay();
         } else if (ref.equals("firstEmailSentDate")) {
@@ -58,6 +60,8 @@ public class EvalsUtil {
             refDate = AppraisalMgr.getPendingRequestGoalVersionCreateDate(appraisal.getId());
         } else if (ref.equals("goal_reactivation_req_dec")) {
             refDate = AppraisalMgr.getUnapprovedGoalVersionRequestDecDate(appraisal.getId());
+        } else if (ref.equals("evaluationSubmitDate")) {
+            refDate = new DateTime(appraisal.getEvaluationSubmitDate());
         }
 
         if (refDate == null) //error
@@ -81,6 +85,22 @@ public class EvalsUtil {
     public static int isDue(Appraisal appraisal, Configuration config) throws Exception {
         DateTime dueDate = getDueDate(appraisal, config);
         return Days.daysBetween(getToday(), dueDate).getDays();
+    }
+
+    /**
+     * Whether or not the current status is passed it's due/expiration date. It relies on calling
+     * isDue.
+     *
+     * @param appraisal
+     * @param config
+     * @return
+     * @throws Exception
+     */
+    public static boolean isOverdue(Appraisal appraisal, Configuration config) throws Exception {
+        if (config == null) {
+            return false;
+        }
+        return isDue(appraisal, config) <= 0;
     }
 
     /**
@@ -210,12 +230,13 @@ public class EvalsUtil {
         }
 
         if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
-            config = configurationMap.get(Appraisal.STATUS_GOALS_DUE);
+            config = ConfigurationMgr.getConfiguration(configurationMap, Appraisal.STATUS_GOALS_DUE,
+                    appraisal.getAppointmentType());
         } else {
             if (status.contains("Overdue")) {
                 status = status.replace("Overdue", "Due");
             }
-            config = configurationMap.get(status);
+            config = ConfigurationMgr.getConfiguration(configurationMap, status, appraisal.getAppointmentType());
         }
 
         if (config != null) {
@@ -318,5 +339,30 @@ public class EvalsUtil {
 
     public static DateTime getToday() {
         return new DateTime().withTimeAtStartOfDay();
+    }
+
+    /**
+     * Checks if the role provided is either of the two admin roles: ActionHelper: ROLE_MASTER_ADMIN ROLE_SUPER_ADMIN
+     *
+     * @param role
+     * @return
+     */
+    public static boolean isOneOfAdminRoles(String role) {
+        return role.equals(ActionHelper.ROLE_MASTER_ADMIN) || role.equals(ActionHelper.ROLE_SUPER_ADMIN);
+    }
+
+    /**
+     * Whether or not professional faculty is enabled for EvalS. If the configuration enableProfessionalFaculty value
+     * is set to 1, this function returns true.
+     *
+     * @return
+     */
+    public static boolean isProfessionalFacultyEnabled(Map<String, Configuration> configMap) {
+        Configuration config = ConfigurationMgr.getConfiguration(configMap, "enableProfessionalFaculty", "Default");
+        return config.getValue().equals("1");
+    }
+
+    public static boolean isTodayFirstMondayOfMonth() {
+        return true;
     }
 }

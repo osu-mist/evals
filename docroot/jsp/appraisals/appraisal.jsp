@@ -6,10 +6,18 @@
 <jsp:useBean id="permissionRule" class="edu.osu.cws.evals.models.PermissionRule" scope="request" />
 <c:set var="showForm" scope="request"
        value="${not empty permissionRule.saveDraft || not empty permissionRule.secondarySubmit || not empty permissionRule.submit}"/>
+<c:set var="goalCount" value="1"/>
+<c:set var="rebuttalType" value="${appraisal.job.appointmentType == 'Professional Faculty' ? 'feedback' : 'rebuttal'}"/>
+<c:set var="submitMsg" value="${permissionRule.submit}"/>
+<c:if test="${submitMsg == 'read-appraisal-rebuttal' && rebuttalType == 'feedback'}">
+    <c:set var="submitMsg" value="read-appraisal-feedback"/>
+</c:if>
 <portlet:resourceURL var="downloadPDFURL" id="downloadPDF" escapeXml="false">
     <portlet:param name="id" value="${appraisal.id}"/>
     <portlet:param name="controller" value="AppraisalsAction"/>
 </portlet:resourceURL>
+<portlet:resourceURL var="saveDraftAJAXURL" id="update" escapeXml="false" />
+<portlet:resourceURL var="addGoalAJAXURL" id="addAssessment" escapeXml="false" />
 <portlet:actionURL var="resendAppraisalToNolij" escapeXml="false">
     <portlet:param name="id" value="${appraisal.id}"/>
     <portlet:param name="action" value="resendAppraisalToNolij"/>
@@ -30,15 +38,23 @@
     <portlet:param name="action" value="requestGoalsReactivation"/>
     <portlet:param name="controller" value="AppraisalsAction"/>
 </portlet:actionURL>
-
+<portlet:actionURL var="viewPositionDescription" escapeXml="false">
+    <portlet:param name="id" value="${appraisal.id}"/>
+    <portlet:param name="action" value="display"/>
+    <portlet:param name="controller" value="PositionDescriptionAction"/>
+</portlet:actionURL>
 
 <div id="pass-appraisal-form" class="osu-cws">
 
 <c:if test="${showForm and !empty appraisalNotice.text}">
     <span class="portlet-msg-alert">
-    <c:out value = "${appraisalNotice.text}"/>
-
+        <c:out value="${appraisalNotice.text}"/>
     </span>
+</c:if>
+<c:if test="${!empty profFacultyMsg and appraisal.job.appointmentType == 'Professional Faculty'}">
+   <span class="portlet-msg-alert evals-prof-faculty-start">
+       ${profFacultyMsg}
+   </span>
 </c:if>
 
     <h2><c:out value = "${appraisal.job.appointmentType} "/><liferay-ui:message key="appraisal-title" />: <liferay-ui:message key="${appraisal.viewStatus}" /></h2>
@@ -88,12 +104,26 @@
                 cssClass="evals-show-confirm"
             /></li>
         </c:if>
+        <c:if test="${appraisal.isOpen}">
+            <li>
+                <span><a href="<%=renderResponse.encodeURL(viewPositionDescription.toString())%>" target="_blank">
+                <img class="icon" src="/LP5-corp-theme/images/common/copy.png" alt="<liferay-ui:message key="view-position-description"/>"></a>
+                <a href="<%=renderResponse.encodeURL(viewPositionDescription.toString())%>" target="_blank"><liferay-ui:message key="view-position-description"/></a>
+                </span>
+            </li>
+        </c:if>
     </ul>
 
     <liferay-ui:success key="draft-saved" message="draft-saved" />
     <liferay-ui:success key="appraisal-goals-reactivation-requested" message="appraisal-goals-reactivation-requested" />
     <liferay-ui:success key="appraisal-sent-to-nolij-success" message="appraisal-sent-to-nolij-success" />
     <liferay-ui:success key="appraisal-set-status-success" message="appraisal-set-status-success" />
+    <c:if test="${permissionRule.status == 'goalsReactivationRequested' && permissionRule.role == 'supervisor'}">
+        <span class="portlet-msg-alert">
+            <liferay-ui:message key="appraisal-goals-reactivation-warning"/>
+        </span>
+    </c:if>
+
 
     <%@ include file="/jsp/appraisals/info.jsp"%>
 
@@ -105,6 +135,8 @@
         </portlet:actionURL>" method="post" name="<portlet:namespace />request_form">
 
         <input type="hidden" id="id" name="id" value="${appraisal.id}"/>
+        <input type="hidden" id="<portlet:namespace />autosave_timestamp" name="<portlet:namespace />autosave_timestamp"
+               value="0"/>
         <input type="hidden" id="assessmentCount" name="assessmentCount"
                value="-1"/> <!-- @todo: this needs to be updated -->
         <input type="hidden" id="assessmentSequence" name="assessmentSequence"
@@ -115,12 +147,12 @@
         <fieldset>
             <legend><liferay-ui:message key="appraisal-details"/></legend>
             <c:if test="${not empty appraisal.approvedGoalsVersions}">
-                <c:forEach var="goalsVersion" items="${appraisal.approvedGoalsVersions}" varStatus="loopStatus">
+                <c:forEach var="goalsVersion" items="${appraisal.approvedGoalsVersions}">
                     <div class="goals-header">
                         <liferay-ui:message key="appraisal-goals-approved-on"/>
                         <fmt:formatDate value="${goalsVersion.goalsApprovedDate}" pattern="MM/dd/yy"/>:
                     </div>
-                    <c:forEach var="assessment" items="${goalsVersion.sortedAssessments}" varStatus="loopStatus">
+                    <c:forEach var="assessment" items="${goalsVersion.sortedAssessments}">
                         <%@ include file="/jsp/appraisals/assessment.jsp"%>
                     </c:forEach>
                 </c:forEach>
@@ -131,7 +163,7 @@
                     <div class="goals-header">
                         <liferay-ui:message key="appraisal-goals-need-approved"/>
                     </div>
-                    <c:forEach var="assessment" items="${appraisal.unapprovedGoalsVersion.sortedAssessments}" varStatus="loopStatus">
+                    <c:forEach var="assessment" items="${appraisal.unapprovedGoalsVersion.sortedAssessments}">
                         <%@ include file="/jsp/appraisals/assessment.jsp"%>
                     </c:forEach>
                 </c:if>
@@ -155,7 +187,7 @@
                 <legend><liferay-ui:message key="appraisal-goals-legend" /></legend>
                 <label for="<portlet:namespace />appraisal.goalsComments"><liferay-ui:message key="appraisal-goals-comments" /></label>
                 <liferay-ui:input-textarea param="appraisal.goalsComments"
-                    defaultValue="${appraisal.goalsComments}" />
+                    defaultValue="${appraisal.unapprovedGoalsVersion.goalsComments}" />
             </fieldset>
         </c:when>
         <c:when test="${permissionRule.goalComments == 'v'}">
@@ -163,7 +195,7 @@
                 <h3 class="secret"><liferay-ui:message key="appraisal-goals-legend" /></h3>
                 <legend><liferay-ui:message key="appraisal-goals-legend" /></legend>
                 <p><strong><liferay-ui:message key="appraisal-goals-comments" /></strong></p>
-                <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getGoalsComments()) %></p>
+                <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getUnapprovedGoalsVersion().getGoalsComments()) %></p>
             </fieldset>
         </c:when>
     </c:choose>
@@ -202,25 +234,26 @@
                 </fieldset>
           </c:if>
 
+
             <c:choose>
                 <c:when test="${permissionRule.employeeResponse == 'e'}">
                     <c:if test="${empty appraisal.rebuttal}">
-                        <br />
-                        <input type="submit" id="<portlet:namespace />show-rebuttal"
-                            value="<liferay-ui:message key="appraisal-want-rebuttal" />" />
-                        <div class="pass-appraisal-rebuttal">
+                            <input type="submit" id="<portlet:namespace />show-rebuttal"
+                                value="<liferay-ui:message key="appraisal-want-${rebuttalType}"/>"/>
+                            <div class="pass-appraisal-rebuttal">
                     </c:if>
-                    <label for="<portlet:namespace />appraisal.rebuttal"><liferay-ui:message key="appraisal-employee-response" /></label>
-                    <liferay-ui:input-textarea param="appraisal.rebuttal"
-                        defaultValue="${appraisal.rebuttal}" />
+                    <label for="<portlet:namespace />appraisal.rebuttal">
+                        <liferay-ui:message key="appraisal-employee-response-${rebuttalType}"/>
+                    </label>
+                    <liferay-ui:input-textarea param="appraisal.rebuttal" defaultValue="${appraisal.rebuttal}"/>
                     <c:if test="${empty appraisal.rebuttal}">
                         </div><!-- end pass-appraisal-rebuttal-->
                     </c:if>
                 </c:when>
                 <c:when test="${permissionRule.employeeResponse == 'v' && not empty appraisal.rebuttal}">
                     <fieldset>
-                        <h4 class="secret"><liferay-ui:message key="appraisal-employee-response" /></h4>
-                        <legend><liferay-ui:message key="appraisal-employee-response" /></legend>
+                        <h4 class="secret"><liferay-ui:message key="appraisal-employee-response-${rebuttalType}" /></h4>
+                        <legend><liferay-ui:message key="appraisal-employee-response-${rebuttalType}" /></legend>
                         <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getRebuttal()) %></p>
                     </fieldset>
                 </c:when>
@@ -230,11 +263,11 @@
                 <c:when test="${permissionRule.rebuttalRead == 'e'}">
                     <input type="checkbox" id="<portlet:namespace />appraisal-readRebuttal">
                         <label for="<portlet:namespace />appraisal-readRebuttal">
-                            <liferay-ui:message key="appraisal-supervisor-ack-read-rebuttal" />
+                            <liferay-ui:message key="appraisal-supervisor-ack-read-${rebuttalType}" />
                         </label>
                 </c:when>
                 <c:when test="${permissionRule.rebuttalRead == 'v' and not empty appraisal.supervisorRebuttalRead}">
-                    <p><strong><liferay-ui:message key="appraisal-supervisor-rebuttal-read" />
+                    <p><strong><liferay-ui:message key="appraisal-supervisor-${rebuttalType}-read" />
                     ${appraisal.job.supervisor.employee.name} on
                     <fmt:formatDate value="${appraisal.supervisorRebuttalRead}" pattern="MM/dd/yy"/> at
                     <fmt:formatDate value="${appraisal.supervisorRebuttalRead}" pattern="h:m a"/>
@@ -246,7 +279,6 @@
         </c:if>
     </div>
 
-    <br />
     <div class="pass-actions">
         <c:if test="${not empty permissionRule.saveDraft}">
         <input name="${permissionRule.saveDraft}" type="submit" value="<liferay-ui:message key="${permissionRule.saveDraft}" />">
@@ -260,7 +292,7 @@
         <c:if test="${not empty permissionRule.submit}">
         <input name="${permissionRule.submit}" class="evals-show-confirm"
                type="submit" id="<portlet:namespace />${permissionRule.submit}"
-        value="<liferay-ui:message key="${permissionRule.submit}" />">
+        value="<liferay-ui:message key="${submitMsg}"/>">
         </c:if>
 
         <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.secondarySubmit || not empty permissionRule.submit}">

@@ -7,6 +7,7 @@ import com.liferay.portal.util.PortalUtil;
 import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsLogger;
+import edu.osu.cws.evals.util.EvalsUtil;
 import edu.osu.cws.util.CWSUtil;
 import edu.osu.cws.util.Logger;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -24,11 +25,13 @@ import java.util.regex.Pattern;
 public class ActionHelper {
     public static final String ROLE_EMPLOYEE = "employee";
     public static final String ROLE_ADMINISTRATOR = "admin";
+    public static final String ROLE_MASTER_ADMIN = "masterAdmin";
+    public static final String ROLE_SUPER_ADMIN = "superAdmin";
     public static final String ROLE_REVIEWER = "reviewer";
     public static final String ROLE_SUPERVISOR = "supervisor";
     public static final String ROLE_UPPER_SUPERVISOR = "upper-supervisor";
     public static final String ROLE_SELF = "self";
-    public static final String ALL_MY_ACTIVE_APPRAISALS = "allMyActiveAppraisals";
+    public static final String ALL_MY_APPRAISALS = "allMyAppraisals";
     public static final String MY_TEAMS_ACTIVE_APPRAISALS = "myTeamsActiveAppraisals";
     private static final String REVIEW_LIST = "reviewList";
     private static final String REVIEW_LIST_MAX_RESULTS = "reviewListMaxResults";
@@ -170,9 +173,9 @@ public class ActionHelper {
      *
      * @throws Exception
      */
-    public void setupMyActiveAppraisals() throws Exception {
-        List<Appraisal> allMyActiveAppraisals = getMyActiveAppraisals();
-        addToRequestMap("myActiveAppraisals", allMyActiveAppraisals);
+    public void setupMyAppraisals() throws Exception {
+        List<Appraisal> allMyAppraisals = getMyAppraisals();
+        addToRequestMap("myAppraisals", allMyAppraisals);
     }
 
     /**
@@ -182,17 +185,17 @@ public class ActionHelper {
      * @return
      * @throws Exception
      */
-    public List<Appraisal> getMyActiveAppraisals() throws Exception {
+    public List<Appraisal> getMyAppraisals() throws Exception {
         PortletSession session = getSession();
-        List<Appraisal> allMyActiveAppraisals;
+        List<Appraisal> allMyAppraisals;
 
-        allMyActiveAppraisals = (ArrayList<Appraisal>) session.getAttribute(ALL_MY_ACTIVE_APPRAISALS);
-        if (allMyActiveAppraisals == null) {
-            allMyActiveAppraisals =
-                    AppraisalMgr.getAllMyActiveAppraisals(loggedOnUser.getId(), null, null);
-            session.setAttribute(ALL_MY_ACTIVE_APPRAISALS, allMyActiveAppraisals);
+        allMyAppraisals = (ArrayList<Appraisal>) session.getAttribute(ALL_MY_APPRAISALS);
+        if (allMyAppraisals == null) {
+            allMyAppraisals =
+                    AppraisalMgr.getAllMyAppraisals(loggedOnUser.getId(), null, null, false);
+            session.setAttribute(ALL_MY_APPRAISALS, allMyAppraisals);
         }
-        return allMyActiveAppraisals;
+        return allMyAppraisals;
     }
 
     /**
@@ -221,8 +224,17 @@ public class ActionHelper {
         ArrayList<Appraisal> myTeamAppraisals;
         myTeamAppraisals = (ArrayList<Appraisal>) session.getAttribute(MY_TEAMS_ACTIVE_APPRAISALS);
         if (myTeamAppraisals == null) {
+            Map<String, Configuration> configMap = (Map<String, Configuration>) getPortletContextAttribute("configurations");
+            List<String> appointmentTypes = new ArrayList<String>();
+            appointmentTypes.add(AppointmentType.CLASSIFIED);
+            appointmentTypes.add(AppointmentType.CLASSIFIED_IT);
+
+            if (EvalsUtil.isProfessionalFacultyEnabled(configMap)) {
+                appointmentTypes.add(AppointmentType.PROFESSIONAL_FACULTY);
+            }
+
             myTeamAppraisals =
-                    AppraisalMgr.getMyTeamsAppraisals(loggedOnUser.getId(), true, null, null);
+                    AppraisalMgr.getMyTeamsAppraisals(loggedOnUser.getId(), true, null, null, appointmentTypes);
             session.setAttribute(MY_TEAMS_ACTIVE_APPRAISALS, myTeamAppraisals);
         }
         return myTeamAppraisals;
@@ -370,7 +382,7 @@ public class ActionHelper {
 
     /**
      * Refreshes the context cache:
-     * admins, reviewers and configuration lists and maps.
+     * admins, reviewers, configurations, notices and ratings lists and maps.
      *
      * @throws Exception
      */
@@ -379,6 +391,7 @@ public class ActionHelper {
         setEvalsReviewers();
         setEvalsConfiguration();
         setNotices();
+        setRatings();
     }
 
     /**
@@ -418,7 +431,7 @@ public class ActionHelper {
      *
      * @throws Exception
      */
-    private void setLoggedOnUser() throws Exception {
+    public void setLoggedOnUser() throws Exception {
         // try to set it from session
         PortletSession session = getSession();
         loggedOnUser = (Employee) session.getAttribute("loggedOnUser");
@@ -563,11 +576,11 @@ public class ActionHelper {
     public void setRequiredActions() throws Exception {
         ArrayList<RequiredAction> employeeRequiredActions;
         ArrayList<RequiredAction> administrativeActions = new ArrayList<RequiredAction>();
-        ArrayList<Appraisal> myActiveAppraisals;
+        ArrayList<Appraisal> myAppraisals;
         ArrayList<Appraisal> mySupervisingAppraisals;
 
-        myActiveAppraisals = (ArrayList<Appraisal>) getFromRequestMap("myActiveAppraisals");
-        employeeRequiredActions = getAppraisalActions(myActiveAppraisals, "employee");
+        myAppraisals = (ArrayList<Appraisal>) getFromRequestMap("myAppraisals");
+        employeeRequiredActions = getAppraisalActions(myAppraisals, "employee");
         addToRequestMap("employeeActions", employeeRequiredActions);
 
         // add supervisor required actions, if user has team's active appraisals
@@ -612,19 +625,14 @@ public class ActionHelper {
         HashMap<String, String> anchorParams;
 
         for (Appraisal appraisal : appraisalList) {
-            //get the status, compose the key "status"-"role"
-            String appraisalStatus = appraisal.getStatus();
-            String actionKey = appraisalStatus +"-"+role;
-            actionKey = actionKey.replace("Overdue", "Due");
-
-            // Get the appropriate permissionrule object from the permissionRuleMap
-            PermissionRule rule = (PermissionRule) permissionRuleMap.get(actionKey);
             String actionRequired = "";
+            PermissionRule rule = PermissionRuleMgr.getPermissionRule(permissionRuleMap, appraisal, role);
             if (rule != null) {
                 actionRequired = rule.getActionRequired();
             }
             if (actionRequired != null && !actionRequired.equals("")) {
                 // make sure that the action required is overdue if needed
+                String appraisalStatus = appraisal.getStatus();
                 if (appraisalStatus.contains("Overdue")) {
                     actionRequired = actionRequired.replace("-due", "-overdue");
                 }
@@ -636,17 +644,28 @@ public class ActionHelper {
                 String appraisalID = Integer.toString(appraisal.getId());
                 anchorParams.put("id", appraisalID);
                 if (appraisalStatus.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)) {
-                    configuration = configurationMap.get(Appraisal.STATUS_GOALS_DUE);
+                    configuration = ConfigurationMgr.getConfiguration(configurationMap, Appraisal.STATUS_GOALS_DUE,
+                            appraisal.getAppointmentType());
+                    // load appraisal again from db so that we get all the properties and can check goals reactivation
+                    // because the appraisals in home view load only the minimum amount of data
+                    appraisal = AppraisalMgr.getAppraisal(appraisal.getId());
+                    if (appraisal.areGoalsReactivated()) {
+                        configuration = ConfigurationMgr.getConfiguration(configurationMap,
+                                Appraisal.STATUS_GOALS_REACTIVATED + "Expiration", appraisal.getAppointmentType());
+                    }
                 } else {
                     if (appraisalStatus.contains("Overdue")) {
                         appraisalStatus = appraisalStatus.replace("Overdue", "Due");
                     }
 
                     if (appraisalStatus.equals(Appraisal.STATUS_GOALS_REACTIVATION_REQUESTED) ||
-                            appraisalStatus.equals(Appraisal.STATUS_GOALS_REACTIVATED)) {
+                            appraisalStatus.equals(Appraisal.STATUS_GOALS_REACTIVATED) ||
+                            appraisalStatus.equals(Appraisal.STATUS_EMPLOYEE_REVIEW_DUE)) {
+                        appraisal = AppraisalMgr.getAppraisal(appraisal.getId());
                         appraisalStatus += "Expiration";
                     }
-                    configuration = configurationMap.get(appraisalStatus);
+                    configuration = ConfigurationMgr.getConfiguration(configurationMap, appraisalStatus,
+                            appraisal.getAppointmentType());
                 }
 
                 if (configuration == null) {
@@ -785,7 +804,6 @@ public class ActionHelper {
         }
 
         // set Employee  and employees object(s)
-        addToRequestMap("employees", EmployeeMgr.list());
         addToRequestMap("employee", loggedOnUser);
     }
 
@@ -798,6 +816,18 @@ public class ActionHelper {
     private void setNotices() throws Exception {
         Map notices = NoticeMgr.getNotices();
         portletContext.setAttribute("Notices", notices);
+    }
+
+    /**
+     * fetch the latest ratings from db and store in portlet context.
+     *
+     * @param
+     * @return Text of yellowBox message
+     * @throws Exception
+     */
+    private void setRatings() throws Exception {
+        Map ratings = RatingMgr.mapByAppointmentType();
+        portletContext.setAttribute("ratings", ratings);
     }
 
 }

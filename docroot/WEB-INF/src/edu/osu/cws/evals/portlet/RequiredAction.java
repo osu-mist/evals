@@ -1,6 +1,7 @@
 package edu.osu.cws.evals.portlet;
 
 
+import edu.osu.cws.evals.models.AppointmentType;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Configuration;
 import edu.osu.cws.evals.util.EvalsUtil;
@@ -63,7 +64,7 @@ public class RequiredAction {
         if (key.contains("goals-due") || key.contains("goals-overdue") ||
                 key.contains("results-due") || key.contains("results-overdue") ||
                 key.contains("signature-due") || key.contains("signature-overdue") ||
-                key.contains("action-team-goals-reactivation")
+                key.contains("action-team-goals-reactivation") || key.contains("employee-review-due")
                 ) {
             pattern = changeKeyIfDueToday(key, numDays, resource);
             if (isTeamAction) {
@@ -99,6 +100,10 @@ public class RequiredAction {
         // text value.
         if (anchorText.equals("")) {
             anchorText = resource.getString(key);
+        }
+
+        if(appraisal.getJob().getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+            anchorText = anchorText.replace("for rebuttal", "employee comments");
         }
     }
 

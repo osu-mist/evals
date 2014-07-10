@@ -5,19 +5,18 @@ import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
-import edu.osu.cws.evals.hibernate.AppraisalMgr;
-import edu.osu.cws.evals.hibernate.CloseOutReasonMgr;
-import edu.osu.cws.evals.hibernate.JobMgr;
-import edu.osu.cws.evals.hibernate.NolijCopyMgr;
+import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
-import edu.osu.cws.evals.util.EvalsPDF;
-import edu.osu.cws.evals.util.HibernateUtil;
-import edu.osu.cws.evals.util.MailerInterface;
+import edu.osu.cws.evals.util.*;
+import edu.osu.cws.util.CWSUtil;
+import edu.osu.cws.util.Logger;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.joda.time.DateTime;
+import org.hibernate.Session;
 
 import javax.portlet.*;
 import java.io.File;
@@ -40,6 +39,8 @@ public class AppraisalsAction implements ActionInterface {
     private ErrorHandler errorHandler;
 
     private Appraisal appraisal = null;
+
+    private AppraisalStep appraisalStep = null;
 
     private PermissionRule permRule = null;
 
@@ -88,10 +89,12 @@ public class AppraisalsAction implements ActionInterface {
      * @param request
      * @throws Exception
      */
-    private void initialize(PortletRequest request) throws Exception {
+    public void initialize(PortletRequest request) throws Exception {
         this.request = request;
         this.resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         this.loggedInUser = actionHelper.getLoggedOnUser();
+        PropertiesConfiguration config = actionHelper.getEvalsConfig();
+        actionHelper.addToRequestMap("profFacultyMsg", config.getString("profFaculty.maximized.Message"));
         initializeAppraisal();
     }
 
@@ -106,38 +109,42 @@ public class AppraisalsAction implements ActionInterface {
             appraisal = AppraisalMgr.getAppraisal(appraisalID);
             if(appraisal != null) {
                 userRole = getRole();
-                // Whether or not the save draft permission rule should be disabled for results
-                Boolean disableResultsSaveDraft = appraisal.getGoalVersions().size() == 1 &&
-                        appraisal.getStatus().equals(Appraisal.STATUS_GOALS_APPROVAL_DUE) &&
-                        userRole.equals("employee");
-                setAppraisalPermissionRule();
+                setPermRule();
                 appraisal.setRole(userRole);
                 appraisal.setPermissionRule(permRule);
-
-                // For the employee role, if it is the status is goals approval due and these are the
-                // original goals, the save draft button shouldn't show up. If the goals are
-                // reactivated, and the status is goals approval due, we display save draft to save
-                // the results for original goals.
-                if (permRule != null) {
-                    permRule.setDisableResultsSaveDraft(disableResultsSaveDraft);
-                }
             }
         }
     }
 
     /**
      * Figures out the current user role in the appraisal and returns the respective permission
-     * rule for that user role and action in the appraisal.
+     * rule for that user role and action in the appraisal. If the appraisal's status is like
+     * "archived*" then it will remove the "archived" part of the status.
      *
      * @throws Exception
      */
-    private void setAppraisalPermissionRule() throws Exception {
-        HashMap permissionRules =
-                (HashMap) actionHelper.getPortletContext().getAttribute("permissionRules");
-        String permRuleKey = appraisal.getStatus() + "-" + userRole;
-        permRuleKey = permRuleKey.replace("Overdue", "Due");
+    private void setPermRule() throws Exception {
+        String status = appraisal.getStatus();
+        if (status.contains("archived")) {
+            status = status.replace("archived", "").toLowerCase();
+        }
 
-        permRule = (PermissionRule) permissionRules.get(permRuleKey);
+        HashMap permissionRules = (HashMap) actionHelper.getPortletContext().getAttribute("permissionRules");
+        permRule = PermissionRuleMgr.getPermissionRule(permissionRules, appraisal, userRole);
+
+        // Disable the employee/supervisor results if we are in the first round of goals (no approved goals yet)
+        if (status.contains("goal") && appraisal.getApprovedGoalsVersions().isEmpty()) {
+            permRule.setResults(null);
+            permRule.setSupervisorResults(null);
+        }
+    }
+
+    public PermissionRule getPermRule() {
+        return permRule;
+    }
+
+    public Appraisal getAppraisal() {
+        return appraisal;
     }
 
     /**
@@ -169,12 +176,17 @@ public class AppraisalsAction implements ActionInterface {
             }
         }
 
-        if (JobMgr.isUpperSupervisor(appraisal.getJob(), pidm)) {
-            return ActionHelper.ROLE_UPPER_SUPERVISOR;
+        // check admin role first because there are few admins and some jobs have a missing supervisor in the chain
+        // which causes a NPE
+        if (actionHelper.getAdmin() != null) {
+            if (actionHelper.isLoggedInUserMasterAdmin()) {
+                return ActionHelper.ROLE_MASTER_ADMIN;
+            }
+            return ActionHelper.ROLE_SUPER_ADMIN;
         }
 
-        if (actionHelper.getAdmin() != null) {
-            return ActionHelper.ROLE_ADMINISTRATOR;
+        if (JobMgr.isUpperSupervisor(appraisal.getJob(), pidm)) {
+            return ActionHelper.ROLE_UPPER_SUPERVISOR;
         }
 
         return "";
@@ -195,10 +207,10 @@ public class AppraisalsAction implements ActionInterface {
         boolean isAdmin = actionHelper.getAdmin() != null;
         boolean isReviewer = actionHelper.getReviewer() != null;
 
-        // If a supervisor is also a reviewer, the people he/she supervises will be in the
-        // business center he/she is a reviewer of. Because reviewer has broader permissions
-        // than supervisor, we will use the reviewer's permission to do search.
-        boolean isSupervisor = !isReviewer && actionHelper.isLoggedInUserSupervisor();
+        // If a supervisor is also a reviewer/admin, the people he/she supervises will be in the
+        // business center he/she is a reviewer of. Because reviewer/admin has broader permissions
+        // than supervisor, we will use the reviewer/admin's permission to do search.
+        boolean isSupervisor = !isReviewer && !isAdmin && actionHelper.isLoggedInUserSupervisor();
 
         if (!isAdmin && !isReviewer && !isSupervisor)  {
             return errorHandler.handleAccessDenied(request, response);
@@ -260,8 +272,10 @@ public class AppraisalsAction implements ActionInterface {
         if(!userRole.equals(ActionHelper.ROLE_EMPLOYEE)){
 
             if(permRule.getSendToNolij() != null){
-                ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(-1);
-                actionHelper.addToRequestMap("pendingReviews", reviews);
+                if(!isAdminRole()) {
+                    ArrayList<Appraisal> reviews = actionHelper.getReviewsForLoggedInUser(-1);
+                    actionHelper.addToRequestMap("pendingReviews", reviews);
+                }
                 if (appraisal.getEmployeeSignedDate() != null) {
                     actionHelper.addToRequestMap("displayResendNolij", true);
                 }
@@ -288,11 +302,18 @@ public class AppraisalsAction implements ActionInterface {
         actionHelper.addToRequestMap("appraisalNotice", Notices.get("Appraisal Notice"));
         appraisal.loadLazyAssociations();
 
+        Map<String, List<Rating>> ratingsMap = (HashMap) actionHelper.getPortletContext().getAttribute("ratings");
+        actionHelper.addToRequestMap("ratings", RatingMgr.getRatings(ratingsMap, appraisal.getAppointmentType()));
+
         actionHelper.addToRequestMap("appraisal", appraisal);
         actionHelper.addToRequestMap("permissionRule", permRule);
+        Map<String, Configuration> configMap = (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
+        Configuration autoSaveFrequency = ConfigurationMgr.getConfiguration(configMap, "autoSaveFrequency",
+                appraisal.getAppointmentType());
+        actionHelper.addToRequestMap("autoSaveFrequency", autoSaveFrequency.getValue());
         actionHelper.useMaximizedMenu();
 
-        if (appraisal.getAppointmentType().equals(AppointmentType.CLASSIFIED_IT)) {
+        if (appraisal.getIsSalaryUsed()) {
             setSalaryValues();
         }
 
@@ -342,7 +363,11 @@ public class AppraisalsAction implements ActionInterface {
         boolean isReviewer = actionHelper.getReviewer() != null;
 
         // Check to see if the logged in user has permission to access the appraisal
+        boolean isAjax = actionHelper.isAJAX();
         if (permRule == null) {
+            if (isAjax) {
+                return "fail";
+            }
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -350,8 +375,7 @@ public class AppraisalsAction implements ActionInterface {
         try {
             processUpdateRequest(request.getParameterMap());
 
-            String signAppraisal = ParamUtil.getString(request, "sign-appraisal");
-            if (signAppraisal != null && !signAppraisal.equals("")) {
+            if (downloadToNolij()) {
                 config = actionHelper.getEvalsConfig();
                 String nolijDir = config.getString("pdf.nolijDir");
                 String env = config.getString("pdf.env");
@@ -361,7 +385,7 @@ public class AppraisalsAction implements ActionInterface {
             if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR)) {
                 actionHelper.setupMyTeamActiveAppraisals();
             } else if (appraisal.getRole().equals(ActionHelper.ROLE_EMPLOYEE)) {
-                actionHelper.setupMyActiveAppraisals();
+                actionHelper.setupMyAppraisals();
             }
         } catch (ModelException e) {
             SessionErrors.add(request, e.getMessage());
@@ -391,7 +415,26 @@ public class AppraisalsAction implements ActionInterface {
             updateAppraisalInSession();
         }
 
+        if (isAjax) {
+            return "success";
+        }
+
         return homeAction.display(request, response);
+    }
+
+    /**
+     * Whether or not the evaluation should be downloaded for nolij. If the appointment type is not prof. faculty
+     * and the employee signed the evaluation, it is uploaded to nolij.
+     *
+     * @return
+     */
+    private boolean downloadToNolij() {
+        if (appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+            return false;
+        }
+
+        String signAppraisal = ParamUtil.getString(request, "sign-appraisal");
+        return signAppraisal != null && !signAppraisal.equals("");
     }
 
     /**
@@ -455,30 +498,36 @@ public class AppraisalsAction implements ActionInterface {
         AppraisalMgr.updateAppraisal(appraisal, loggedInUser);
 
         // Send email if needed
-        AppraisalStep appraisalStep;
-        String employeeResponse = appraisal.getRebuttal();
-
-        // If the employee signs and provides a rebuttal, we want to use a different
-        // appraisal step so that we can send an email to the reviewer.
-        if (submittedRebuttal(employeeResponse)) {
-            String appraisalStepKey = "submit-response-" + appraisal.getAppointmentType();
-            appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
-            // If the appointment type doesn't exist in the table, use "Default" type.
-            if (appraisalStep == null) {
-                appraisalStep = (AppraisalStep) appraisalSteps.get("submit-response-Default");
-            }
-        } else {
-            appraisalStep = getAppraisalStep();
-        }
-
-        EmailType emailType = null;
-        if (appraisalStep != null) {
-            emailType = appraisalStep.getEmailType();
-        }
-
+        EmailType emailType = getEmailType();
         if (emailType != null) {
             mailer.sendMail(appraisal, emailType);
         }
+    }
+
+    /**
+     * Returns the email type to be used. Null if the web interface doesn't need to send the email.
+     *
+     * This method checks if the appraisal's status is different than the appraisalStep's newStatus. If
+     * they are different it means that the appraisal record is late and that's why the status was changed.
+     * If the record isOverdue, we return the correct emailType for the new Overdue status since the
+     * emailType from the appraisalStep doesn't apply anymore.
+     *
+     * @return
+     * @throws Exception
+     */
+    private EmailType getEmailType() throws Exception {
+        // the backend is going to send the email
+        if (appraisalStep == null || appraisalStep.getEmailType() == null) {
+            return null;
+        }
+
+        // use the appraisal step email type when the status wasn't changed to *overdue
+        if (appraisal.getStatus().equals(appraisalStep.getNewStatus())) {
+            return appraisalStep.getEmailType();
+        }
+
+        Map<String, EmailType> emailTypeMap = EmailTypeMgr.getMap();
+        return emailTypeMap.get(appraisal.getStatus());
     }
 
     /**
@@ -505,13 +554,13 @@ public class AppraisalsAction implements ActionInterface {
      *
      */
     public void setAppraisalFields() throws Exception {
-        String newStatus = null;
         Map<String, Boolean> dates = new HashMap<String, Boolean>();
         Map<String, Boolean> pidm = new HashMap<String, Boolean>();
         boolean clickedSubmitButton = jsonData.getButtonClicked().equals(permRule.getSubmit());
+        GoalVersion unapprovedGoalVersion = appraisal.getUnapprovedGoalsVersion();
 
         if (permRule.canEdit("goalComments")) { // Save goalComments
-            appraisal.setGoalsComments(jsonData.getGoalsComments());
+            unapprovedGoalVersion.setGoalsComments(jsonData.getGoalsComments());
         }
 
         // updates goals, employee/supervisor results and handle new js goals
@@ -550,8 +599,7 @@ public class AppraisalsAction implements ActionInterface {
 
 
         // Save the close out reason
-        if (appraisal.getRole().equals(ActionHelper.ROLE_REVIEWER) ||
-                appraisal.getRole().equals(ActionHelper.ROLE_ADMINISTRATOR )) {
+        if (appraisal.getRole().equals(ActionHelper.ROLE_REVIEWER) || isAdminRole()) {
             if (jsonData.getCloseOutReasonId() != null) {
                 CloseOutReason reason = CloseOutReasonMgr.get(jsonData.getCloseOutReasonId());
                 appraisal.setCloseOutReason(reason);
@@ -569,27 +617,65 @@ public class AppraisalsAction implements ActionInterface {
             }
         }
 
+        if (unapprovedGoalVersion != null && jsonData.getButtonClicked().equals("require-goals-modification")) {
+            unapprovedGoalVersion.setGoalsRequiredModificationDate(new Date());
+        }
+
+        // Updates the appraisal status if it's needed
+        updateStatus();
+
+        saveAppraisalMetadata(dates, pidm);
+    }
+
+    /**
+     * After the user saved/submitted the appraisal, it checks the appraisal step and appraisal.getNewStatus() to
+     * set the status of the appraisal.
+     *
+     * This method uses the appraisal step first to set the status, If the status of the appraisal was changed by
+     * the appraisalStep, we then call getNewStatus() to find out if this new status needs to be set to *Overdue or
+     * timed out. This allows the application to later on send the right email instead of sending a Due email when
+     * the record is actually Overdue.
+     *
+     * @throws Exception
+     */
+    private void updateStatus() throws Exception {
+        Map<String, Configuration> configMap = (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
+
         // If the appraisalStep object has a new status, update the appraisal object
-        AppraisalStep appraisalStep = getAppraisalStep();
+        String newStatus = null;
+        setAppraisalStep();
         if (appraisalStep != null) {
             newStatus = appraisalStep.getNewStatus();
         }
 
         if (newStatus != null && !newStatus.equals(appraisal.getStatus())) {
             appraisal.setStatus(newStatus);
+            // check if the status needs to be updated
+            newStatus = appraisal.getNewStatus(configMap);
+            if (newStatus != null) {
+                appraisal.setStatus(newStatus);
+            }
+
             String employeeResponse = appraisal.getRebuttal();
             if (submittedRebuttal(employeeResponse)) {
                 appraisal.setStatus(Appraisal.STATUS_REBUTTAL_READ_DUE);
             }
         }
-        dates.put("goalsRequiredModificationDate", appraisal.getStatus().equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION));
+    }
 
-        saveAppraisalMetadata(dates, pidm);
+    /**
+     * Whether the role of the logged in user is either Master or Super Admin when viewing the appraisal
+     * object.
+     *
+     * @return
+     */
+    private boolean isAdminRole() {
+        return EvalsUtil.isOneOfAdminRoles(userRole);
     }
 
     /**
      * Sets the assessment fields (goal & results) based on the information that the user entered
-     * in the form. It addAssessments to handle adding/deleting of goals.
+     * in the form. It updates all assessments.
      *
      * @throws Exception
      */
@@ -598,37 +684,23 @@ public class AppraisalsAction implements ActionInterface {
             return;
         }
 
-        // get the criteria we need for adding new goals via js
-        Assessment assessment = dbAssessmentsMap.entrySet().iterator().next().getValue();
-        List<AssessmentCriteria> sortedAssessmentCriteria = assessment.getSortedAssessmentCriteria();
-        List<CriterionArea> criterionAreas = new ArrayList<CriterionArea>();
-        for (AssessmentCriteria assessmentCriteria : sortedAssessmentCriteria) {
-            criterionAreas.add(assessmentCriteria.getCriteriaArea());
-        }
-
-        Integer nextSequence = calculateAssessmentSequence(dbAssessmentsMap);
+        Assessment assessment;
         for (AssessmentJSON assessmentJSON : jsonData.getAssessments().values())   {
             assessment = dbAssessmentsMap.get(assessmentJSON.getId().toString());
-
-            if (permRule.canEdit("unapprovedGoals")) { // Save Goals
-                Assessment jsAssessment = addAssessments(assessmentJSON , assessment, nextSequence,
-                        criterionAreas);
-
-                // if a new goal was added via js, keep track of it
-                if (jsAssessment != null) {
-                    nextSequence++;
-                    assessment = jsAssessment;
+            if (assessment != null) {
+                if (permRule.canEdit("unapprovedGoals")) { // Save Goals
+                    updateGoals(assessmentJSON, assessment, assessmentJSON.getDeleted().equals("1"));
                 }
-            }
 
-            // Save employee results
-            if (permRule.canEdit("results") && assessmentJSON.getEmployeeResult() != null) {
-                assessment.setEmployeeResult(assessmentJSON.getEmployeeResult());
-            }
+                // Save employee results
+                if (permRule.canEdit("results") && assessmentJSON.getEmployeeResult() != null) {
+                    assessment.setEmployeeResult(assessmentJSON.getEmployeeResult());
+                }
 
-            // Save supervisor results
-            if (permRule.canEdit("supervisorResults") && assessmentJSON.getSupervisorResult() != null) {
-                assessment.setSupervisorResult(assessmentJSON.getSupervisorResult());
+                // Save supervisor results
+                if (permRule.canEdit("supervisorResults") && assessmentJSON.getSupervisorResult() != null) {
+                    assessment.setSupervisorResult(assessmentJSON.getSupervisorResult());
+                }
             }
         }
     }
@@ -752,56 +824,36 @@ public class AppraisalsAction implements ActionInterface {
     }
 
     /**
-     * Whether the given assessment id is from an assessment added via js. JS added assessments
-     * have an id starting at 1. This id is always less than the id of the appraisal. Assessments
-     * in the db have an id greater than the appraisal id.
-     *
-     * @param assessmentId
+     * Creates a single new assessment and returns its id. Called by an ajax call when a user
+     * clicks on the "Add Goal" button.
+     * @param request
+     * @param response
      * @return
+     * @throws Exception
      */
-    private boolean isJSAssessment(Integer assessmentId) {
-        return assessmentId < 500 && assessmentId < appraisal.getId();
-    }
-
-
-    /**
-     * Handles adding/deleting goals based on the operations the user performed via js.
-     *
-     * @param jsonAssessment
-     * @param assessment
-     * @param nextSequence
-     * @param criterionAreas
-     * @return
-     */
-    private Assessment addAssessments(AssessmentJSON jsonAssessment, Assessment assessment,
-                               int nextSequence, List<CriterionArea> criterionAreas) {
+    public String addAssessment(PortletRequest request, PortletResponse response) throws Exception {
+        initialize(request);
+        initializeJSONData(request.getParameterMap());
+        Session session = HibernateUtil.getCurrentSession();
+        // Get assessmentCriteria
+        Assessment assessment = dbAssessmentsMap.entrySet().iterator().next().getValue();
+        List<AssessmentCriteria> sortedAssessmentCriteria = assessment.getSortedAssessmentCriteria();
+        List<CriterionArea> criterionAreas = new ArrayList<CriterionArea>();
+        for (AssessmentCriteria assessmentCriteria : sortedAssessmentCriteria) {
+            criterionAreas.add(assessmentCriteria.getCriteriaArea());
+        }
+        // Get goalVersion
         GoalVersion reactivatedGoalVersion = appraisal.getReactivatedGoalVersion();
-
-        // If there's no reactivated goal version, we're adding goals to the first goal version
         if (reactivatedGoalVersion == null) {
             reactivatedGoalVersion = (GoalVersion) appraisal.getGoalVersions().toArray()[0];
         }
-
-        boolean deleted = jsonAssessment.getDeleted().equals("1");
-        boolean jsAssessment = isJSAssessment(jsonAssessment.getId());
-
-        if (jsAssessment && !deleted) { // new assessments added via js
-            // create new assessment object
-            assessment = AppraisalMgr.createNewAssessment(reactivatedGoalVersion, nextSequence ,criterionAreas);
-        }
-
-        // only update the goals if the assessment is js and not deleted or it's from the db
-        if ((jsAssessment && !deleted) || !jsAssessment) {
-            updateGoals(jsonAssessment, assessment, deleted);
-        }
-
-        // If there was a new assessment/goal added via js, return it.
-        if (jsAssessment && !deleted) {
-            return assessment;
-        }
-
-        return null;
+        // Create new assessment
+        Integer nextSequence = calculateAssessmentSequence(dbAssessmentsMap);
+        assessment = AppraisalMgr.createNewAssessment(reactivatedGoalVersion, nextSequence, criterionAreas);
+        session.save(assessment);
+        return "{id:" + assessment.getId() + ", status:\"success\"}";
     }
+
 
     /**
      * Saves the rating on the salary object based on the rating the user selected:
@@ -825,24 +877,26 @@ public class AppraisalsAction implements ActionInterface {
 
         Salary salary = appraisal.getSalary();
         Double increaseValue = 0d;
-        if (appraisal.getRating() == 1) {
-            // can only specify an increase if the salary is not at the top pay range
-            if (salary.getCurrent() < salary.getHigh()) {
-                String salaryRecommendation = jsonData.getSalaryRecommendation();
-                // Check that the user submitted a valid salary increase
-                if (salaryRecommendation == null || !NumberUtils.isNumber(salaryRecommendation)) {
-                    return;
-                }
+        if (appraisal.getRating() != null) {
+            if (appraisal.getRating() == 1) {
+                // can only specify an increase if the salary is not at the top pay range
+                if (salary.getCurrent() < salary.getHigh()) {
+                    String salaryRecommendation = jsonData.getSalaryRecommendation();
+                    // Check that the user submitted a valid salary increase
+                    if (salaryRecommendation == null || !NumberUtils.isNumber(salaryRecommendation)) {
+                        return;
+                    }
 
-                Double submittedIncrease = Double.parseDouble(salaryRecommendation);
-                if (submittedIncrease >= increaseRate1MinVal && submittedIncrease <= increaseRate1MaxVal) {
-                    increaseValue = submittedIncrease;
-                } else {
-                    throw new ModelException(resource.getString("appraisal-salary-increase-error-invalid-change"));
+                    Double submittedIncrease = Double.parseDouble(salaryRecommendation);
+                    if (submittedIncrease >= increaseRate1MinVal && submittedIncrease <= increaseRate1MaxVal) {
+                        increaseValue = submittedIncrease;
+                    } else {
+                        throw new ModelException(resource.getString("appraisal-salary-increase-error-invalid-change"));
+                    }
                 }
+            } else if (appraisal.getRating() == 2) {
+                increaseValue = increaseRate2Value;
             }
-        } else if (appraisal.getRating() == 2) {
-            increaseValue = increaseRate2Value;
         }
 
         salary.setIncrease(increaseValue);
@@ -854,22 +908,30 @@ public class AppraisalsAction implements ActionInterface {
      *
      * @return
      */
-    private AppraisalStep getAppraisalStep() {
+    private void setAppraisalStep() {
         HashMap appraisalSteps = (HashMap) actionHelper.getPortletContextAttribute("appraisalSteps");
-        AppraisalStep appraisalStep;
+        String employeeResponse = appraisal.getRebuttal();
         String appraisalStepKey;
-        ArrayList<String> appraisalButtons = new ArrayList<String>();
-        if (permRule.getSaveDraft() != null) {
-            appraisalButtons.add(permRule.getSaveDraft());
+
+        // If the employee submits a comment for the rebuttal, use a different appraisal step
+        if (submittedRebuttal(employeeResponse)) {
+            appraisalStepKey = "submit-response-" + appraisal.getAppointmentType();
+            appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
+            // If the appointment type doesn't exist in the table, use "Default" type.
+            if (appraisalStep == null) {
+                appraisalStep = (AppraisalStep) appraisalSteps.get("submit-response-Default");
+            }
+
+            return;
         }
-        if (permRule.getSecondarySubmit() != null) {
-            appraisalButtons.add(permRule.getSecondarySubmit());
-        }
-        if (permRule.getSubmit() != null) {
-            appraisalButtons.add(permRule.getSubmit());
-        }
-        // close out button
-        appraisalButtons.add("close-appraisal");
+
+        List<String> appraisalButtons = new ArrayList<String>(Arrays.asList(
+                permRule.getSaveDraft(),
+                permRule.getSecondarySubmit(),
+                permRule.getSubmit(),
+                "close-appraisal" // close out button
+        ));
+        appraisalButtons.removeAll(Collections.singleton(null)); // remove any buttons that were null
 
         for (String button : appraisalButtons) {
             // If this button is the one the user clicked, use it to look up the
@@ -879,20 +941,19 @@ public class AppraisalsAction implements ActionInterface {
                 appraisalStep = (AppraisalStep) appraisalSteps.get(appraisalStepKey);
                 // If the appointment type doesn't exist in the table, use "Default" type.
                 if (appraisalStep == null) {
-                    return (AppraisalStep) appraisalSteps.get(button + "-" + "Default");
+                    appraisalStep = (AppraisalStep) appraisalSteps.get(button + "-" + "Default");
                 }
-                return appraisalStep;
             }
         }
-
-        return null;
     }
 
     private String GeneratePDF(Appraisal appraisal, String dirName, String env,
                                boolean  insertRecordIntoTable) throws Exception {
         // Create PDF
         String rootDir = actionHelper.getPortletContext().getRealPath("/");
-        EvalsPDF PdfGenerator = new EvalsPDF(rootDir, appraisal, resource, dirName, env);
+        Map<String, List<Rating>> ratingsMap = (HashMap) actionHelper.getPortletContext().getAttribute("ratings");
+        List<Rating> ratings = RatingMgr.getRatings(ratingsMap, appraisal.getAppointmentType());
+        EvalsPDF PdfGenerator = new EvalsPDF(rootDir, appraisal, resource, dirName, env, ratings);
         String filename = PdfGenerator.createPDF();
 
         // Insert a record into the nolij_copies table
@@ -981,7 +1042,7 @@ public class AppraisalsAction implements ActionInterface {
         List<Appraisal>  appraisals;
 
         if (appraisal.getRole().equals("employee")) {
-            appraisals = actionHelper.getMyActiveAppraisals();
+            appraisals = actionHelper.getMyAppraisals();
         } else if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR)) {
             appraisals = actionHelper.getMyTeamActiveAppraisals();
         } else {
@@ -1008,19 +1069,11 @@ public class AppraisalsAction implements ActionInterface {
     public String resendAppraisalToNolij(PortletRequest request, PortletResponse response) throws Exception {
         initialize(request);
 
-        boolean isReviewer = actionHelper.getReviewer() != null;
-        // Permission checks
-        if (!isReviewer
-                || appraisal.getEmployeeSignedDate() == null
-                || appraisal.getRole().equals("employee")
-                || !appraisal.getStatus().equals("completed"))
-        {
-            return errorHandler.handleAccessDenied(request, response);
-        }
+        boolean canSendToNolij = (permRule.getSendToNolij() == null ? false : permRule.getSendToNolij().equals("y"));
 
         actionHelper.addToRequestMap("id", appraisal.getId());
 
-        if (!isReviewer) {
+        if (!canSendToNolij) {
             String errorMsg = resource.getString("appraisal-resend-permission-denied");
             actionHelper.addErrorsToRequest(errorMsg);
             return display(request, response);
@@ -1050,8 +1103,7 @@ public class AppraisalsAction implements ActionInterface {
         initialize(request);
 
         // Check to see if the logged in user has permission to access the appraisal
-        boolean isAdminOrReviewer = userRole.equals(ActionHelper.ROLE_ADMINISTRATOR )
-                || userRole.equals(ActionHelper.ROLE_REVIEWER);
+        boolean isAdminOrReviewer = isAdminRole() || userRole.equals(ActionHelper.ROLE_REVIEWER);
         if (permRule == null || !isAdminOrReviewer) {
             return errorHandler.handleAccessDenied(request, response);
         }
@@ -1078,8 +1130,7 @@ public class AppraisalsAction implements ActionInterface {
             throws Exception {
         initialize(request);
 
-        if (!userRole.equals(ActionHelper.ROLE_ADMINISTRATOR ) &&
-                !userRole.equals(ActionHelper.ROLE_REVIEWER)) {
+        if (!isAdminRole() && !userRole.equals(ActionHelper.ROLE_REVIEWER)) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -1107,7 +1158,7 @@ public class AppraisalsAction implements ActionInterface {
 
         HashMap<String,AppraisalStep> appraisalSteps =
                 (HashMap) actionHelper.getPortletContextAttribute("appraisalSteps");
-        AppraisalStep appraisalStep = appraisalSteps.get("request-goals-reactivation-Default");
+        appraisalStep = appraisalSteps.get("request-goals-reactivation-Default");
 
         // update status
         appraisal.setOriginalStatus(appraisal.getStatus());
@@ -1127,6 +1178,132 @@ public class AppraisalsAction implements ActionInterface {
         updateAppraisalInSession();
 
         return display(request, response);
+    }
+
+    /**
+     * Displays page for the supervisor to initiate the professional faculty evaluations. A message is displayed
+     * to the supervisor, a list of employees with and without evaluations. The supervisor selects a cycle to start
+     * the evaluations.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String initiateProfessionalFacultyEvals(PortletRequest request, PortletResponse response)
+            throws Exception {
+        initialize(request);
+        List<Job> shortJobsWithEvals = new ArrayList<Job>();
+        List<Job> shortJobsWithOutEvals = new ArrayList<Job>();
+
+        if (!getProfFacultyInitiateData(shortJobsWithEvals, shortJobsWithOutEvals)) {
+            return errorHandler.handleAccessDenied(request, response);
+        }
+
+        actionHelper.addToRequestMap("shortJobsWithEvals", shortJobsWithEvals);
+        actionHelper.addToRequestMap("jobsWithoutEvals", shortJobsWithOutEvals);
+        actionHelper.addToRequestMap("months", CWSUtil.getMonthsInYear("MMM"));
+
+        ArrayList<String> years = new ArrayList<String>();
+        for (int i = -1; i <= 1; i++) {
+            years.add(new DateTime().plusYears(i).toString("YYYY"));
+        }
+        actionHelper.addToRequestMap("years", years);
+        actionHelper.useMaximizedMenu();
+        return Constants.JSP_INITIATE_PROFESSIONAL_FACULTY;
+    }
+
+    /**
+     * Gathers the professional faculty data employees with and without evaluations. It adds the short objects
+     * with only the needed information to the two lists passed in as parameters. This method returns false in
+     * several scenarios: when the user is not a supervisor or when none of the employees are professional faculty
+     * or when the employees don't need their evaluation record created. The reasoning behind returning false is that
+     * the only way this method gets executed is if a supervisor clicked the initiate button or if the user is
+     * trying to hack the url. That's why the calling method uses an access denied error message.
+     *
+     * @param shortJobsWithEvals
+     * @param shortJobsWithOutEvals
+     * @return
+     * @throws Exception
+     */
+    private Boolean getProfFacultyInitiateData(List<Job> shortJobsWithEvals, List<Job> shortJobsWithOutEvals)
+            throws Exception {
+        List<String> appointmentTypes = new ArrayList<String>();
+        appointmentTypes.add(AppointmentType.PROFESSIONAL_FACULTY);
+
+        List<Job> supervisorJobs = JobMgr.getSupervisorJobs(loggedInUser);
+        // check that the user holds at least 1 supervising job
+        if (supervisorJobs == null || supervisorJobs.isEmpty()) {
+            return false;
+        }
+
+        List<Job> employeeShortJobs = JobMgr.listEmployeesShortJobs(supervisorJobs, appointmentTypes);
+        shortJobsWithOutEvals.addAll(JobMgr.getJobWithoutActiveEvaluations(employeeShortJobs));
+
+        // Check that the supervisor has jobs that need to be initiated in EvalS
+        if (shortJobsWithOutEvals == null || shortJobsWithOutEvals.isEmpty()) {
+            return false;
+        }
+
+        shortJobsWithEvals.addAll(employeeShortJobs);
+        shortJobsWithEvals.removeAll(shortJobsWithOutEvals);
+
+        // iterate over the objects so that we get the employee name to prevent jsp lazy loading exception
+        for (Job job : shortJobsWithEvals) {
+            job.getEmployee().getName();
+            job.getSupervisor().getPositionNumber();
+            ((Appraisal) job.getAppraisals().iterator().next()).getReviewPeriod();
+        }
+        for (Job job : shortJobsWithOutEvals) {
+            job.getEmployee().getName();
+            job.getSupervisor().getPositionNumber();
+        }
+
+        // If we got here, there was no access denied error
+        return true;
+    }
+
+    /**
+     * Handles processing the cycle information provided by the supervisor and creates the evaluations for
+     * professional faculty employees. It sends an email about the created evaluations and logs the information.
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String createProfFacultyEvaluations(PortletRequest request, PortletResponse response) throws Exception {
+        // get form data and user info
+        initialize(request);
+        Integer year = ParamUtil.getInteger(request, "year");
+        Integer month = ParamUtil.getInteger(request, "month");
+        DateTime startDate = new DateTime().withDate(year, month, 1).withTimeAtStartOfDay();
+
+        // Logging information
+        EvalsLogger logger = (EvalsLogger) actionHelper.getPortletContextAttribute("log");
+        String loggingMsg = "supervisor.pidm = " + loggedInUser.getId() + ", evaluation cycle = "
+                + startDate.toString(Constants.DATE_FORMAT_FULL);
+
+        // create evaluations
+        List<Appraisal> newAppraisals = AppraisalMgr.createProfessionalFacultyEvals(loggedInUser, startDate);
+        if (newAppraisals == null || newAppraisals.isEmpty()) {
+            actionHelper.addErrorsToRequest(resource.getString("prof-faculty-create-evals-error"));
+            logger.log(Logger.ERROR, "Failed to create professional faculty evaluations", loggingMsg);
+            return initiateProfessionalFacultyEvals(request, response);
+        }
+
+        loggingMsg += "\nEvaluations created for the jobs listed below:";
+        for (Appraisal newAppraisal : newAppraisals) {
+            loggingMsg += "\n" + newAppraisal.getJob().getSignature() + " appraisal id = " + newAppraisal.getId();
+        }
+        logger.log(Logger.INFORMATIONAL, "Initiated professional faculty evaluations", loggingMsg);
+        SessionMessages.add(request, "prof-faculty-create-evals-success");
+
+        // clear out cached list of evaluations in supervisor home view. display method will re-build cache
+        PortletSession session = ActionHelper.getSession(request);
+        session.removeAttribute(ActionHelper.MY_TEAMS_ACTIVE_APPRAISALS);
+
+        return homeAction.display(request, response);
     }
 
     public void setActionHelper(ActionHelper actionHelper) {
