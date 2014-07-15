@@ -275,21 +275,35 @@ public class BackendMgr {
      }
 
     public void archiveAppraisals() throws Exception {
-        Configuration daysBeforeArchive = ConfigurationMgr.getConfiguration(configMap, "daysBeforeArchive", "");
-        int[] idsToArchive = AppraisalMgr.getIdsToArchive(daysBeforeArchive.getIntValue());
-        if(idsToArchive != null && idsToArchive.length > 0) {
-            archivedCount = AppraisalMgr.archive(idsToArchive);
-        }
+        try {
+            Configuration daysBeforeArchive = ConfigurationMgr.getConfiguration(configMap, "daysBeforeArchive", "");
+            int[] idsToArchive = AppraisalMgr.getIdsToArchive(daysBeforeArchive.getIntValue());
+            if (idsToArchive != null && idsToArchive.length > 0) {
+                archivedCount = AppraisalMgr.archive(idsToArchive);
+            }
 
-        // Log archived appraisal ids
-        String msg = "[" + DateTime.now().toString() + "] " +
-                archivedCount + " appraisals archived";
-        if(idsToArchive != null && idsToArchive.length > 0) {
-            msg += " with id in (" +
-                StringUtils.join(ArrayUtils.toObject(idsToArchive), ", ") + ")";
+            // Log archived appraisal ids
+            String msg = "[" + DateTime.now().toString() + "] " +
+                    archivedCount + " appraisals archived";
+            if (idsToArchive != null && idsToArchive.length > 0) {
+                msg += " with id in (" +
+                        StringUtils.join(ArrayUtils.toObject(idsToArchive), ", ") + ")";
+            }
+            System.out.println(msg);
+            logger.log(Logger.INFORMATIONAL, msg, "");
+        } catch (Exception e) {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+            String msg = "Failed to archive evaluations";
+            logDataError(msg);
+            System.out.println(msg);
+            if (errorMsg.length() > 0) {
+                errorMsg.append("\n");
+            }
+            errorMsg.append(msg);
+            log_error(msg, e);
         }
-        System.out.println(msg);
-        logger.log(Logger.INFORMATIONAL, msg, "");
     }
 
 
