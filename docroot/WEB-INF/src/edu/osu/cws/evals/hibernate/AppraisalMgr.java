@@ -1163,7 +1163,7 @@ public class AppraisalMgr {
         return idsToArchive;
     }
 
-    public static int archive(int[] idsToArchive) {
+    public static int archive(int daysBeforeArchive) {
         Session session = HibernateUtil.getCurrentSession();
         String query =
                 "update edu.osu.cws.evals.models.Appraisal a" +
@@ -1171,11 +1171,19 @@ public class AppraisalMgr {
                         "'archived'" +
                         "||UPPER(SUBSTRING(a.status, 1, 1))" +
                         "||SUBSTRING(a.status, 2, LENGTH(a.status) - 1)" +
-                " where a.id in (:idsToArchive)";
+                " where a.id in (" +
+                    "select id" +
+                        " from edu.osu.cws.evals.models.Appraisal " +
+                        " where" +
+                        " status in (:statuses)" +
+                        " and endDate + :archiveDays <= current_date" +
+                    ")";
 
         Transaction tx = session.beginTransaction();
         Query hibQuery = session.createQuery(query);
-        hibQuery.setParameterList("idsToArchive", ArrayUtils.toObject(idsToArchive));
+        hibQuery.setInteger("archiveDays", daysBeforeArchive);
+        String[] statusesToArchive = new String[]{ Appraisal.STATUS_CLOSED, Appraisal.STATUS_COMPLETED };
+        hibQuery.setParameterList("statuses", statusesToArchive);
         int numUpdated = hibQuery.executeUpdate();
         tx.commit();
 

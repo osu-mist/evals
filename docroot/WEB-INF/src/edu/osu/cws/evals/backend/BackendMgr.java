@@ -279,7 +279,7 @@ public class BackendMgr {
             Configuration daysBeforeArchive = ConfigurationMgr.getConfiguration(configMap, "daysBeforeArchive", "");
             int[] idsToArchive = AppraisalMgr.getIdsToArchive(daysBeforeArchive.getIntValue());
             if (idsToArchive != null && idsToArchive.length > 0) {
-                archivedCount = AppraisalMgr.archive(idsToArchive);
+                archivedCount = AppraisalMgr.archive(daysBeforeArchive.getIntValue());
             }
 
             // Log archived appraisal ids
