@@ -149,14 +149,15 @@
   }
 
   function getDrillDownUrl(unitName) {
-    var drillDownURL = '<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-      <portlet:param name="action" value="report"/>
-      <portlet:param name="controller" value="ReportsAction"/>
-      <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
-      <portlet:param name="<%= ReportsAction.REPORT %>" value="${report}"/>
-      <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="unitName"/>
-      <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
-      </portlet:actionURL>';
+      <portlet:actionURL var="drillDownURL" escapeXml="false" windowState="<%= WindowState.MAXIMIZED.toString() %>">
+        <portlet:param name="action" value="report"/>
+        <portlet:param name="controller" value="ReportsAction"/>
+        <portlet:param name="<%= ReportsAction.SCOPE %>" value="${nextScope}"/>
+        <portlet:param name="<%= ReportsAction.REPORT %>" value="${report}"/>
+        <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="unitName"/>
+        <portlet:param name="requestBreadcrumbs" value="${requestBreadcrumbs}"/>
+      </portlet:actionURL>
+    var drillDownURL = '<%=renderResponse.encodeURL(drillDownURL.toString())%>';
     drillDownURL = drillDownURL.replace("unitName", unitName);
 
     return drillDownURL;
