@@ -6,7 +6,7 @@ jQuery(document).ready(function() {
 
   function endStartAnimation() {
     jQuery('.evals-prof-faculty-start').siblings().fadeTo("slow", 1);
-    setTimeout(function() { jQuery('.evals-prof-faculty-start span.evals-arrow').effect("shake", "fast")}, 1000);
+    setTimeout(function() { jQuery('.evals-prof-faculty-start span.evals-arrow').effect("shake", 1000)}, 1000);
   }
 
   // Handle acknowledge appraisal rebuttal read by supervisor
