@@ -51,6 +51,8 @@ public class ActionHelper {
 
     private ResourceBundle bundle;
 
+    public ActionHelper() { }
+
     public ActionHelper(PortletRequest request, PortletResponse response,
                         PortletContext portletContext) throws Exception {
         this.request = request;
@@ -831,6 +833,9 @@ public class ActionHelper {
         portletContext.setAttribute("ratings", ratings);
     }
 
+    public void setPortletContext(PortletContext portletContext) {
+        this.portletContext = portletContext;
+    }
 }
 
 

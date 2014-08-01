@@ -123,7 +123,7 @@ public class AppraisalsAction implements ActionInterface {
      *
      * @throws Exception
      */
-    private void setPermRule() throws Exception {
+    public void setPermRule() throws Exception {
         String status = appraisal.getStatus();
         if (status.contains("archived")) {
             status = status.replace("archived", "").toLowerCase();
@@ -145,6 +145,14 @@ public class AppraisalsAction implements ActionInterface {
 
     public Appraisal getAppraisal() {
         return appraisal;
+    }
+
+    public void setAppraisal(Appraisal appraisal) {
+        this.appraisal = appraisal;
+    }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
     }
 
     /**
