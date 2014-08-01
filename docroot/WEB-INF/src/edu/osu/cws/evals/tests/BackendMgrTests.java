@@ -310,25 +310,11 @@ public class BackendMgrTests {
         appraisal.getJob().setAppointmentType(AppointmentType.CLASSIFIED_IT);
         assert !BackendMgr.timeToSendFirstStatusEmail(appraisal, new DateTime());
     }
-    
-    public void shouldSendProfFacultyEmailsRightAwayForNonInitialEvaluations() throws Exception {
-        HashSet<Appraisal> appraisalHashSet = new HashSet<Appraisal>();
-        appraisalHashSet.add(new Appraisal());
-        appraisalHashSet.add(new Appraisal());
-
-        Appraisal appraisal = new Appraisal();
-        Job job = new Job();
-        job.setAppointmentType(AppointmentType.PROFESSIONAL_FACULTY);
-        job.setAppraisals(appraisalHashSet);
-        appraisal.setJob(job);
-
-        // send email right away when it's not the first evaluation
-        assert !BackendMgr.timeToSendFirstStatusEmail(appraisal, new DateTime());
-    }
 
     public void shouldSendProfFacultyEmailsRightAwayOnceReviewPeriodStarts() throws Exception {
         HashSet<Appraisal> appraisalHashSet = new HashSet<Appraisal>();
         Appraisal appraisal = new Appraisal();
+        appraisal.setStatus(Appraisal.STATUS_GOALS_DUE);
         Date yesterday = new DateTime().minusDays(1).toDate();
         appraisal.setStartDate(yesterday);
         Job job = new Job();
