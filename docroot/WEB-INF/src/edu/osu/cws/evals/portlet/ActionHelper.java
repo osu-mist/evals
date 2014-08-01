@@ -626,7 +626,8 @@ public class ActionHelper {
 
         for (Appraisal appraisal : appraisalList) {
             String actionRequired = "";
-            PermissionRule rule = PermissionRuleMgr.getPermissionRule(permissionRuleMap, appraisal, role);
+            PermissionRule rule = PermissionRuleMgr.getPermissionRule(permissionRuleMap, appraisal, role,
+                    appraisal.getStatus());
             if (rule != null) {
                 actionRequired = rule.getActionRequired();
             }
