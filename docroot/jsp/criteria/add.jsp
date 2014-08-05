@@ -9,6 +9,11 @@
     <c:set var="titleKey" value="criteria-edit" scope="request"/>
 </c:if>
 
+<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>"  var="listCriteria" escapeXml="false">
+    <portlet:param name="action" value="list"/>
+    <portlet:param name="controller" value="CriteriaAreasAction"/>
+</portlet:renderURL>
+
 <%
 List appointmentTypes = (List) renderRequest.getAttribute("appointmentTypes");
 %>
@@ -51,9 +56,7 @@ List appointmentTypes = (List) renderRequest.getAttribute("appointmentTypes");
         
         <input type="submit" value="<liferay-ui:message key="save" />" />
         <input type="button" class="cancel" value="<liferay-ui:message key="cancel" />"
-            onClick="location.href = '<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-            <portlet:param name="action" value="list"/>
-            <portlet:param name="controller" value="CriteriaAreasAction"/></portlet:renderURL>';" />
+            onClick="location.href = '<%=renderResponse.encodeURL(listCriteria.toString())%>';" />
     </form>
 </div>
 
