@@ -720,18 +720,21 @@
   <ratings
           ID="2"
           RATE="2"
+          NAME="great"
           DESCRIPTION="You're great"
           APPOINTMENT_TYPE="Classified"
       />
   <ratings
           ID="1"
           RATE="1"
+          NAME="awesome"
           DESCRIPTION="You're awesome"
           APPOINTMENT_TYPE="Classified"
       />
   <ratings
           ID="3"
           RATE="1"
+          NAME="IT awesome"
           DESCRIPTION="You're IT awesome"
           APPOINTMENT_TYPE="Classified IT"
       />
