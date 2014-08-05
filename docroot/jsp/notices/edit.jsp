@@ -1,5 +1,10 @@
 <%@ include file="/jsp/init.jsp" %>
 
+<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>"  var="listNotices" escapeXml="false">
+    <portlet:param name="action" value="list"/>
+    <portlet:param name="controller" value="NoticeAction"/>
+</portlet:renderURL>
+
 <jsp:useBean id="notice" class="edu.osu.cws.evals.models.Notice" scope="request" />
 
 
@@ -22,9 +27,7 @@
 
     <input type="submit" value="<liferay-ui:message key="save" />" />
     <input type="button" class="cancel" value="<liferay-ui:message key="cancel" />"
-    onClick="location.href = '<portlet:renderURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
-    <portlet:param name="action" value="list"/>
-    <portlet:param name="controller" value="NoticeAction"/></portlet:renderURL>';" />
+    onClick="location.href = '<%=renderResponse.encodeURL(listNotices.toString())%>';" />
     </form>
 </div>
 
