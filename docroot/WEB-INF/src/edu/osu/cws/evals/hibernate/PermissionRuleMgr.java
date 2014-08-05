@@ -50,14 +50,16 @@ public class PermissionRuleMgr {
     public static PermissionRule getPermissionRule(HashMap<String, PermissionRule> permissionRuleMap,
                                                    Appraisal appraisal, String role) throws Exception {
         String status = appraisal.getStatus();
+        //Permission rules for statuses “archivedCompleted” and “archivedClose” are the same as “completed” and
+        // “closed” respectively
         if (status.contains("archived")) {
             status = status.replace("archived", "").toLowerCase();
         }
 
+        // The permission rules of "Overdue" and "Due" are the same. "Overdue" status are not present in the db.
+        status = status.replace("Overdue", "Due");
         String appointmentType = appraisal.getJob().getAppointmentType().replace(" ", "");
         String actionKeyPrefix = status + "-" + role + "-";
-        // The permission rules of "Overdue" and "Due" are the same. "Overdue" status are not present in the db.
-        actionKeyPrefix = actionKeyPrefix.replace("Overdue", "Due");
 
         // First check if there are appointment type specific permission rules. If not, use the default permission rule
         PermissionRule rule = permissionRuleMap.get(actionKeyPrefix + appointmentType);
