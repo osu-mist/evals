@@ -55,7 +55,7 @@ public class PermissionRulesTest {
         appraisal.setJob(new Job());
         appraisal.getJob().setAppointmentType("Classified IT");
 
-        PermissionRule rule = PermissionRuleMgr.getPermissionRule(rules, appraisal, "employee", appraisal.getStatus());
+        PermissionRule rule = PermissionRuleMgr.getPermissionRule(rules, appraisal, "employee");
         assert rule.getAppointmentType().equals("Default");
     }
 
@@ -66,7 +66,7 @@ public class PermissionRulesTest {
         appraisal.setJob(new Job());
         appraisal.getJob().setAppointmentType("Professional Faculty");
 
-        PermissionRule rule = PermissionRuleMgr.getPermissionRule(rules, appraisal, "employee", appraisal.getStatus());
+        PermissionRule rule = PermissionRuleMgr.getPermissionRule(rules, appraisal, "employee");
         assert rule.getAppointmentType().equals("Professional Faculty");
     }
 
@@ -77,7 +77,7 @@ public class PermissionRulesTest {
         appraisal.setJob(new Job());
         appraisal.getJob().setAppointmentType("Professional Faculty");
 
-        PermissionRule rule = PermissionRuleMgr.getPermissionRule(rules, appraisal, "supervisor", appraisal.getStatus());
+        PermissionRule rule = PermissionRuleMgr.getPermissionRule(rules, appraisal, "supervisor");
         assert rule == null;
     }
 

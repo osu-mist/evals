@@ -48,7 +48,12 @@ public class PermissionRuleMgr {
      * @throws Exception
      */
     public static PermissionRule getPermissionRule(HashMap<String, PermissionRule> permissionRuleMap,
-                                                   Appraisal appraisal, String role, String status) throws Exception {
+                                                   Appraisal appraisal, String role) throws Exception {
+        String status = appraisal.getStatus();
+        if (status.contains("archived")) {
+            status = status.replace("archived", "").toLowerCase();
+        }
+
         String appointmentType = appraisal.getJob().getAppointmentType().replace(" ", "");
         String actionKeyPrefix = status + "-" + role + "-";
         // The permission rules of "Overdue" and "Due" are the same. "Overdue" status are not present in the db.
@@ -68,7 +73,7 @@ public class PermissionRuleMgr {
 
         // check if the role was an admin type. If the specific admin role didn't match, check the default "admin" role
         if (EvalsUtil.isOneOfAdminRoles(role)) {
-            return getPermissionRule(permissionRuleMap, appraisal, ActionHelper.ROLE_ADMINISTRATOR, status);
+            return getPermissionRule(permissionRuleMap, appraisal, ActionHelper.ROLE_ADMINISTRATOR);
         }
 
         return null;

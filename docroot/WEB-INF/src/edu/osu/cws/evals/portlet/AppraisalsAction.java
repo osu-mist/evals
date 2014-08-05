@@ -124,16 +124,11 @@ public class AppraisalsAction implements ActionInterface {
      * @throws Exception
      */
     public void setPermRule() throws Exception {
-        String status = appraisal.getStatus();
-        if (status.contains("archived")) {
-            status = status.replace("archived", "").toLowerCase();
-        }
-
         HashMap permissionRules = (HashMap) actionHelper.getPortletContext().getAttribute("permissionRules");
-        permRule = PermissionRuleMgr.getPermissionRule(permissionRules, appraisal, userRole, status);
+        permRule = PermissionRuleMgr.getPermissionRule(permissionRules, appraisal, userRole);
 
         // Disable the employee/supervisor results if we are in the first round of goals (no approved goals yet)
-        if (status.contains("goal") && appraisal.getApprovedGoalsVersions().isEmpty()) {
+        if (appraisal.getStatus().contains("goal") && appraisal.getApprovedGoalsVersions().isEmpty()) {
             permRule.setResults(null);
             permRule.setSupervisorResults(null);
         }
