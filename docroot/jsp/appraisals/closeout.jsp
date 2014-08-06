@@ -46,7 +46,7 @@
 jQuery("#<portlet:namespace />fm").submit(function() {
     var portlet_namespace = '<portlet:namespace />';
     var json_data = { id: ${appraisal.id}};
-    json_data.closeOutReasonId = jQuery("input[name=" + portlet_namespace + "appraisal.closeOutReasonId]:checked").val();
+    json_data.closeOutReasonId = jQuery("input[name=\"" + portlet_namespace + "appraisal.closeOutReasonId\"]:checked").val();
     // button clicked
     json_data.buttonClicked = jQuery("input[type=submit][clicked=true]").attr('name');
 
