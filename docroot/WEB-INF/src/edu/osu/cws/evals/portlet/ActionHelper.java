@@ -51,13 +51,27 @@ public class ActionHelper {
 
     private ResourceBundle bundle;
 
+    // Variable used to disable http/portlet session validation. Only set to false in testing mode
+    private boolean validateSession = true;
+
     public ActionHelper() { }
 
+    /**
+     * Constructor used mostly by EvalSPortlet to create an instance of this class and set the request, response
+     * objects as well as portlet context. If validateSession is false, the session won't be checked for validity.
+     *
+     * @param request                       PortletRequest
+     * @param response                      PortletResponse
+     * @param portletContext                PortletContext
+     * @param validateSession               Whether or not the portlet session should be checked for validity.
+     * @throws Exception
+     */
     public ActionHelper(PortletRequest request, PortletResponse response,
-                        PortletContext portletContext) throws Exception {
+                        PortletContext portletContext, boolean validateSession) throws Exception {
         this.request = request;
         this.response = response;
         this.portletContext = portletContext;
+        this.validateSession = validateSession;
         this.bundle = (ResourceBundle) portletContext.getAttribute("resourceBundle");
         setRequestMap();
         setLoggedOnUser();
@@ -72,12 +86,15 @@ public class ActionHelper {
     PortletSession getSession() throws Exception {
         PortletSession session = request.getPortletSession(true);
 
-        if (!request.isRequestedSessionIdValid()) {
-            throw new Exception("Session is invalid.");
-        }
+        // Only validate session when it's needed
+        if (validateSession) {
+            if (!request.isRequestedSessionIdValid()) {
+                throw new Exception("Session is invalid.");
+            }
 
-        if (!isHttpSessionValid(request)) {
-            throw new Exception("HttpSession is invalid.");
+            if (!isHttpSessionValid(request)) {
+                throw new Exception("HttpSession is invalid.");
+            }
         }
 
         return session;
