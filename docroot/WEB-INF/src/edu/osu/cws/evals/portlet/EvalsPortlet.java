@@ -58,6 +58,8 @@ public class EvalsPortlet extends GenericPortlet {
      */
     private ActionHelper actionHelper;
 
+    private boolean validateSession = true;
+
     public void doDispatch(
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
@@ -120,7 +122,10 @@ public class EvalsPortlet extends GenericPortlet {
         String controllerClass =  ParamUtil.getString(request, "controller", "HomeAction");
         if (resourceID != null && controllerClass != null) {
             try {
-                actionHelper = new ActionHelper(request, response, getPortletContext());
+                session = HibernateUtil.getCurrentSession();
+                Transaction tx = session.beginTransaction();
+
+                actionHelper = new ActionHelper(request, response, getPortletContext(), isValidateSession());
                 controllerClass = "edu.osu.cws.evals.portlet." + controllerClass;
                 ActionInterface controller = (ActionInterface) Class.forName(controllerClass).newInstance();
                 ErrorHandler errorHandler = new ErrorHandler(actionHelper);
@@ -131,8 +136,6 @@ public class EvalsPortlet extends GenericPortlet {
                 homeAction.setErrorHandler(errorHandler);
                 controller.setHomeAction(homeAction);
 
-                session = HibernateUtil.getCurrentSession();
-                Transaction tx = session.beginTransaction();
                 Method controllerMethod = controller.getClass().getDeclaredMethod(
                         resourceID, PortletRequest.class, PortletResponse.class);
 
@@ -178,7 +181,7 @@ public class EvalsPortlet extends GenericPortlet {
             portletSetup(request);
             hibSession = HibernateUtil.getCurrentSession();
             Transaction tx = hibSession.beginTransaction();
-            actionHelper = new ActionHelper(request, response, getPortletContext());
+            actionHelper = new ActionHelper(request, response, getPortletContext(), isValidateSession());
             actionHelper.setUpUserPermission(false);
             if (actionHelper.isDemo()) {
                 actionHelper.setupDemoSwitch();
@@ -261,7 +264,7 @@ public class EvalsPortlet extends GenericPortlet {
                 hibSession = HibernateUtil.getCurrentSession();
                 Transaction tx = hibSession.beginTransaction();
 
-                actionHelper = new ActionHelper(request, null, getPortletContext());
+                actionHelper = new ActionHelper(request, null, getPortletContext(), isValidateSession());
                 actionHelper.setAdminPortletData();
                 createMailer();
                 message += "Mailer setup successfully\n";
@@ -457,6 +460,18 @@ public class EvalsPortlet extends GenericPortlet {
             loggedOnUserId = ((Integer) loggedOnUser.getId()).toString();
         }
         return loggedOnUserId;
+    }
+
+    public boolean isValidateSession() {
+        return validateSession;
+    }
+
+    public void setValidateSession(boolean validateSession) {
+        this.validateSession = validateSession;
+    }
+
+    public ActionHelper getActionHelper() {
+        return actionHelper;
     }
 
     protected void include(String path, RenderRequest renderRequest,RenderResponse renderResponse)
