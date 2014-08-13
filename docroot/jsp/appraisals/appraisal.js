@@ -547,7 +547,7 @@ jQuery(document).ready(function() {
    */
   function isAssessmentDeleted() {
     // find the delete flag hidden input
-    var deleteFlag = jQuery(this).find('input:hidden').filter(function(index) {
+    var deleteFlag = jQuery(this).find('input[type=hidden]').filter(function(index) {
         return jQuery(this).attr('class').indexOf('appraisal-assessment-deleted-') == 0;
     });
     return deleteFlag.val() != 0
