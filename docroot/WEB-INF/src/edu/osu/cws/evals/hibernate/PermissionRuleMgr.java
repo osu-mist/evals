@@ -50,6 +50,7 @@ public class PermissionRuleMgr {
     public static PermissionRule getPermissionRule(HashMap<String, PermissionRule> permissionRuleMap,
                                                    Appraisal appraisal, String role) throws Exception {
         String status = appraisal.getStatus();
+        // Checking for null status, sometimes the appraisal passed in didn't have a status set for some reason
         if (status != null) {
             //Permission rules for statuses “archivedCompleted” and “archivedClose” are the same as “completed” and
             // “closed” respectively
