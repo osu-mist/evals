@@ -81,6 +81,16 @@ public class PermissionRulesTest {
         assert rule == null;
     }
 
+    public void shouldReturnNullWhenStatusIsNotSet() throws Exception {
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        Appraisal appraisal = new Appraisal();
+        appraisal.setJob(new Job());
+        appraisal.getJob().setAppointmentType("Professional Faculty");
+
+        PermissionRule rule = PermissionRuleMgr.getPermissionRule(rules, appraisal, "supervisor");
+        assert rule == null;
+    }
+
     private HashMap<String, PermissionRule> getTestRuleMap() {
         HashMap<String, PermissionRule> rules = new HashMap<String, PermissionRule>();
 
