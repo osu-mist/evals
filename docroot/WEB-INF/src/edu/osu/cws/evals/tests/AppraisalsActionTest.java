@@ -8,6 +8,7 @@ import org.testng.annotations.Test;
 import static org.mockito.Mockito.*;
 
 import javax.portlet.PortletContext;
+import javax.swing.*;
 import java.util.HashMap;
 
 @Test
@@ -72,13 +73,12 @@ public class AppraisalsActionTest {
     }
 
     public void shouldGetCorrectRole() throws Exception {
-        Employee emp = new Employee();
-        Job job = new Job();
-        int id = 59999;
-        emp.setId(id);
-        job.setEmployee(emp);
-        appraisal.setJob(job);
-        appraisalsAction.setLoggedInUser(emp);
+        Employee employee = new Employee();
+        Job employeeJob = new Job();
+        employee.setId(59999);
+        employeeJob.setEmployee(employee);
+        appraisal.setJob(employeeJob);
+        appraisalsAction.setLoggedInUser(employee);
         appraisalsAction.setAppraisal(appraisal);
         assert appraisalsAction.getRole().equals(ActionHelper.ROLE_EMPLOYEE);
     }
@@ -99,5 +99,90 @@ public class AppraisalsActionTest {
         assert appraisalsAction.getRole().equals(ActionHelper.ROLE_SUPERVISOR);
     }
 
+    public void shouldGetCorrectRoleWhenReviewer() throws Exception {
+        ActionHelper mockActionHelper = mock(ActionHelper.class);
+        Employee loggedInUser = new Employee();
+        Employee employee = new Employee();
+        Job employeeJob = new Job();
+        Reviewer reviewer = new Reviewer();
+        reviewer.setBusinessCenterName("ABCD");
+        loggedInUser.setId(58888);
+        employee.setId(59999);
+        employeeJob.setEmployee(employee);
+        employeeJob.setBusinessCenterName("ABCD");
+        appraisal.setJob(employeeJob);
+        appraisalsAction.setLoggedInUser(loggedInUser);
+        appraisalsAction.setAppraisal(appraisal);
+        when(mockActionHelper.getReviewer()).thenReturn(reviewer);
+        appraisalsAction.setActionHelper(mockActionHelper);
+        assert appraisalsAction.getRole().equals(ActionHelper.ROLE_REVIEWER);
+    }
 
+    public void shouldGetCorrectRoleWhenMasterAdmin() throws Exception {
+        ActionHelper mockActionHelper = mock(ActionHelper.class);
+        Employee loggedInUser = new Employee();
+        Employee employee = new Employee();
+        Job employeeJob = new Job();
+        Admin admin = new Admin();
+        admin.setId(58888);
+        loggedInUser.setId(58888);
+        employee.setId(59999);
+        employeeJob.setEmployee(employee);
+        employeeJob.setBusinessCenterName("ABCD");
+        appraisal.setJob(employeeJob);
+        appraisalsAction.setLoggedInUser(loggedInUser);
+        appraisalsAction.setAppraisal(appraisal);
+        when(mockActionHelper.getAdmin()).thenReturn(admin);
+        when(mockActionHelper.isLoggedInUserMasterAdmin()).thenReturn(true);
+        appraisalsAction.setActionHelper(mockActionHelper);
+        assert appraisalsAction.getRole().equals(ActionHelper.ROLE_MASTER_ADMIN);
+    }
+
+    public void shouldGetCorrectRoleWhenSuperAdmin() throws Exception {
+        ActionHelper mockActionHelper = mock(ActionHelper.class);
+        Employee loggedInUser = new Employee();
+        Employee employee = new Employee();
+        Job employeeJob = new Job();
+        Admin admin = new Admin();
+        admin.setId(58888);
+        loggedInUser.setId(58888);
+        employee.setId(59999);
+        employeeJob.setEmployee(employee);
+        employeeJob.setBusinessCenterName("ABCD");
+        appraisal.setJob(employeeJob);
+        appraisalsAction.setLoggedInUser(loggedInUser);
+        appraisalsAction.setAppraisal(appraisal);
+        when(mockActionHelper.getAdmin()).thenReturn(admin);
+        when(mockActionHelper.isLoggedInUserMasterAdmin()).thenReturn(false);
+        appraisalsAction.setActionHelper(mockActionHelper);
+        assert appraisalsAction.getRole().equals(ActionHelper.ROLE_SUPER_ADMIN);
+    }
+
+    public void shouldGetCorrectRoleWhenUpperAdmin() throws Exception {
+        ActionHelper mockActionHelper = mock(ActionHelper.class);
+        Employee loggedInUser = new Employee();
+        Employee supervisor = new Employee();
+        Employee employee = new Employee();
+        Job employeeJob = new Job();
+        Job supervisorJob = new Job();
+        Job upperSupervisorJob = new Job();
+        loggedInUser.setId(58888);
+        loggedInUser.setStatus("A");
+        upperSupervisorJob.setEmployee(loggedInUser);
+        upperSupervisorJob.setStatus("A");
+        supervisor.setId(50000);
+        supervisor.setStatus("T");
+        supervisorJob.setEmployee(supervisor);
+        supervisorJob.setStatus("T");
+        supervisorJob.setSupervisor(upperSupervisorJob);
+        employee.setId(59999);
+        employeeJob.setEmployee(employee);
+        employeeJob.setSupervisor(supervisorJob);
+        appraisal.setJob(employeeJob);
+        appraisalsAction.setLoggedInUser(loggedInUser);
+        appraisalsAction.setAppraisal(appraisal);
+        when(mockActionHelper.getAdmin()).thenReturn(null);
+        appraisalsAction.setActionHelper(mockActionHelper);
+        assert appraisalsAction.getRole().equals(ActionHelper.ROLE_UPPER_SUPERVISOR);
+    }
 }
