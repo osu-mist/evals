@@ -1,9 +1,6 @@
 package edu.osu.cws.evals.tests;
 
-import edu.osu.cws.evals.models.AppointmentType;
-import edu.osu.cws.evals.models.Appraisal;
-import edu.osu.cws.evals.models.Job;
-import edu.osu.cws.evals.models.PermissionRule;
+import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.ActionHelper;
 import edu.osu.cws.evals.portlet.AppraisalsAction;
 import org.testng.annotations.BeforeMethod;
@@ -73,4 +70,34 @@ public class AppraisalsActionTest {
         assert appraisalsAction.getPermRule().getStatus().equals(Appraisal.STATUS_CLOSED);
         assert appraisalsAction.getPermRule().getRole().equals(ActionHelper.ROLE_EMPLOYEE);
     }
+
+    public void shouldGetCorrectRole() throws Exception {
+        Employee emp = new Employee();
+        Job job = new Job();
+        int id = 59999;
+        emp.setId(id);
+        job.setEmployee(emp);
+        appraisal.setJob(job);
+        appraisalsAction.setLoggedInUser(emp);
+        appraisalsAction.setAppraisal(appraisal);
+        assert appraisalsAction.getRole().equals(ActionHelper.ROLE_EMPLOYEE);
+    }
+
+    public void shouldGetCorrectRoleWhenSuperivsor() throws Exception {
+        Employee employee = new Employee();
+        Job employeeJob = new Job();
+        Employee supervisor = new Employee();
+        Job supervisorJob = new Job();
+        supervisor.setId(58888);
+        supervisorJob.setEmployee(supervisor);
+        employee.setId(59999);
+        employeeJob.setEmployee(employee);
+        employeeJob.setSupervisor(supervisorJob);
+        appraisal.setJob(employeeJob);
+        appraisalsAction.setLoggedInUser(supervisor);
+        appraisalsAction.setAppraisal(appraisal);
+        assert appraisalsAction.getRole().equals(ActionHelper.ROLE_SUPERVISOR);
+    }
+
+
 }

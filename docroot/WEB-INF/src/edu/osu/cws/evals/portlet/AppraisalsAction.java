@@ -1309,16 +1309,16 @@ public class AppraisalsAction implements ActionInterface {
         return homeAction.display(request, response);
     }
 
-    public void setActionHelper(ActionHelper actionHelper) {
-        this.actionHelper = actionHelper;
-    }
+    /************************ Getters & Setters ************************/
+    /************************ Getters **********************************/
 
-    public void setHomeAction(HomeAction homeAction) {
-        this.homeAction = homeAction;
-    }
+    /************************ Setters **********************************/
+    public void setActionHelper(ActionHelper actionHelper) { this.actionHelper = actionHelper; }
 
-    public void setErrorHandler(ErrorHandler errorHandler) {
-        this.errorHandler = errorHandler;
-    }
+    public void setHomeAction(HomeAction homeAction) { this.homeAction = homeAction; }
+
+    public void setErrorHandler(ErrorHandler errorHandler) { this.errorHandler = errorHandler; }
+
+    public void setLoggedInUser(Employee loggedInUser) { this.loggedInUser = loggedInUser; }
 
 }
