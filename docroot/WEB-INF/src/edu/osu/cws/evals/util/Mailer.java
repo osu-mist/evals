@@ -96,7 +96,7 @@ public class Mailer implements MailerInterface {
             String body = getBody(appraisal, emailType, addressee);
             email.setHtmlMsg(body);
 
-            String subject = emailBundle.getString( "email_" + emailType.getType() + "_subject");
+            String subject = emailBundle.getString("email_" + emailType.getType() + "_subject");
             if (commentTypeEmails.contains(emailType.getType())) {
                 subject = MessageFormat.format(subject, getCommentType(appraisal));
             }
@@ -122,7 +122,7 @@ public class Mailer implements MailerInterface {
         }
 
         return true;
-   }
+    }
 
     /**
      * Figures out if the email text should say rebuttal or comment based on the appointment type.
@@ -238,6 +238,17 @@ public class Mailer implements MailerInterface {
                     logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
                 } else {
                     addToEmailList(supervisorJob.getEmployee(), recipients);
+                }
+            }
+
+            if(recipient.equals("upper supervisor")) {
+                Job upperSupervisorJob = job.getSupervisor().getSupervisor();
+                if (upperSupervisorJob == null) {
+                    logShortMessage = "Upper Supervisor email not sent";
+                    logLongMessage = "Upper Supervisor for appraisal " + appraisal.getId() + " is null";
+                    logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
+                } else {
+                    addToEmailList(upperSupervisorJob.getEmployee(), recipients);
                 }
             }
 
@@ -810,6 +821,19 @@ public class Mailer implements MailerInterface {
     }
 
     /**
+     * Fetch the body for signatureDueNotRated emailType
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+    private String signatureDueNotRatedBody(Appraisal appraisal) throws Exception {
+        String bodyString = emailBundle.getString("email_signatureDueNotRated_body");
+        return MessageFormat.format(bodyString, appraisal.getJob().getSupervisor().getEmployee().getConventionName(),
+                getEmployeeName(appraisal));
+    }
+
+
+    /**
      * Fetch the body for signatureOverdue emailType
      * @param appraisal
      * @return
@@ -1027,6 +1051,9 @@ public class Mailer implements MailerInterface {
     private String getAddressee(Appraisal appraisal, String mailTo) throws Exception {
         if (mailTo.contains("employee")) {
             return appraisal.getJob().getEmployee().getConventionName();
+        }
+        if (mailTo.contains("upper supervisor")) {
+            return appraisal.getJob().getSupervisor().getSupervisor().getEmployee().getConventionName();
         }
         if (mailTo.contains("supervisor")) {
             return appraisal.getJob().getSupervisor().getEmployee().getConventionName();
