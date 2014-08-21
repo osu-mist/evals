@@ -507,11 +507,11 @@ public class AppraisalsAction implements ActionInterface {
         EmailType emailType = getEmailType();
         if (emailType != null) {
             mailer.sendMail(appraisal, emailType);
-        }
-        if(!appraisal.isRated() && appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)
-                && emailType.getType().equals("signatureDue")) {
-            emailType = emailTypeMap.get("signatureDueNotRated");
-            mailer.sendMail(appraisal, emailType);
+            if(!appraisal.isRated() && appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)
+                    && emailType.getType().equals("signatureDue")) {
+                emailType = emailTypeMap.get("signatureDueNotRated");
+                mailer.sendMail(appraisal, emailType);
+            }
         }
     }
 

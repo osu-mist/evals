@@ -1254,9 +1254,13 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
     }
 
     public boolean isRated() {
+        Integer rating = getRating();
         String aptType = getAppointmentType();
-        boolean classifiedNotRated = aptType.equals(AppointmentType.CLASSIFIED) && getRating() == 4;
-        boolean profFacultyNotRated = aptType.equals(AppointmentType.PROFESSIONAL_FACULTY) && getRating() == 6;
+        if(rating == null) {
+            return false;
+        }
+        boolean classifiedNotRated = aptType.equals(AppointmentType.CLASSIFIED) && rating == 4;
+        boolean profFacultyNotRated = aptType.equals(AppointmentType.PROFESSIONAL_FACULTY) && rating == 6;
         return !(classifiedNotRated || profFacultyNotRated);
     }
 }
