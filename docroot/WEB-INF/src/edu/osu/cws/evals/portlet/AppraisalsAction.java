@@ -134,22 +134,6 @@ public class AppraisalsAction implements ActionInterface {
         }
     }
 
-    public PermissionRule getPermRule() {
-        return permRule;
-    }
-
-    public Appraisal getAppraisal() {
-        return appraisal;
-    }
-
-    public void setAppraisal(Appraisal appraisal) {
-        this.appraisal = appraisal;
-    }
-
-    public void setUserRole(String userRole) {
-        this.userRole = userRole;
-    }
-
     /**
      * Returns the role (employee, supervisor, immediate supervisor or reviewer) of
      * the given appraisal.
@@ -171,8 +155,7 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         Reviewer reviewer  = actionHelper.getReviewer();
-        if (reviewer != null)
-        {
+        if (reviewer != null) {
             String bcName  = appraisal.getJob().getBusinessCenterName();
             if (bcName.equals(reviewer.getBusinessCenterName())) {
                 return ActionHelper.ROLE_REVIEWER;
@@ -1311,14 +1294,61 @@ public class AppraisalsAction implements ActionInterface {
 
     /************************ Getters & Setters ************************/
     /************************ Getters **********************************/
+    public ActionHelper getActionHelper() { return actionHelper; }
+
+    public HomeAction getHomeAction() { return homeAction; }
+
+    public PortletRequest getRequest() { return request; }
+
+    public Employee getLoggedInUser() { return loggedInUser; }
+
+    public ResourceBundle getResource() { return resource; }
+
+    public ErrorHandler getErrorHandler() { return errorHandler; }
+
+    public Appraisal getAppraisal() {
+        return appraisal;
+    }
+
+    public AppraisalStep getAppraisalStep() { return appraisalStep; }
+
+    public PermissionRule getPermRule() {
+        return permRule;
+    }
+
+    public String getUserRole() { return userRole; }
+
+    public AppraisalJSON getJsonData() { return jsonData; }
+
+    public Map<String, Assessment> getDbAssessmentsMap() { return dbAssessmentsMap; }
 
     /************************ Setters **********************************/
     public void setActionHelper(ActionHelper actionHelper) { this.actionHelper = actionHelper; }
 
     public void setHomeAction(HomeAction homeAction) { this.homeAction = homeAction; }
 
-    public void setErrorHandler(ErrorHandler errorHandler) { this.errorHandler = errorHandler; }
+    public void setRequest(PortletRequest request) { this.request = request; }
 
     public void setLoggedInUser(Employee loggedInUser) { this.loggedInUser = loggedInUser; }
+
+    public void setResource(ResourceBundle resource) { this.resource = resource; }
+
+    public void setErrorHandler(ErrorHandler errorHandler) { this.errorHandler = errorHandler; }
+
+    public void setAppraisal(Appraisal appraisal) {
+        this.appraisal = appraisal;
+    }
+
+    public void setAppraisalStep(AppraisalStep appraisalStep) { this.appraisalStep = appraisalStep; }
+
+    public void setPermRule(PermissionRule permRule) { this.permRule = permRule; }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
+    }
+
+    public void setJsonData(AppraisalJSON jsonData) { this.jsonData = jsonData; }
+
+    public void setDbAssessmentsMap(Map<String, Assessment> dbAssessmentsMap) { this.dbAssessmentsMap = dbAssessmentsMap; }
 
 }
