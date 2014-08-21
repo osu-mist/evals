@@ -1252,4 +1252,11 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
 
         return this.getJob().getEmployee().getLastName().compareTo(otherEmployee.getLastName());
     }
+
+    public boolean isRated() {
+        String aptType = getAppointmentType();
+        boolean classifiedNotRated = aptType.equals(AppointmentType.CLASSIFIED) && getRating() == 4;
+        boolean profFacultyNotRated = aptType.equals(AppointmentType.PROFESSIONAL_FACULTY) && getRating() == 6;
+        return !(classifiedNotRated || profFacultyNotRated);
+    }
 }
