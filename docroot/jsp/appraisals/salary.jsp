@@ -48,7 +48,6 @@
     jQuery(document).ready(function() {
         var salary_low = ${appraisal.salary.low};
         var salary_high = ${appraisal.salary.high};
-        var apt_type = '${appraisal.appointmentType}';
         // if a salary increase is present in db, we want to only reset the html properties
         var resetSalaryValue = true;
         // if no salary is saved in db, we want to reset the html and value as well.
@@ -128,13 +127,11 @@
                 increasePercentage = 0;
             }
             var salaryAfterIncrease = ${appraisal.salary.current} * (1 + increasePercentage / 100);
-            if(apt_type == 'Classified IT') {
-                if(salaryAfterIncrease > salary_high) {
-                    salaryAfterIncrease = salary_high;
-                }
-                else if(salaryAfterIncrease < salary_low) {
-                    salaryAfterIncrease = salary_low;
-                }
+            if(salaryAfterIncrease > salary_high) {
+                salaryAfterIncrease = salary_high;
+            }
+            else if(salaryAfterIncrease < salary_low) {
+                salaryAfterIncrease = salary_low;
             }
             salaryAfterIncrease = salaryAfterIncrease.toFixed(2); // round to 2 decimals
 
