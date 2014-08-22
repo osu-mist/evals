@@ -673,4 +673,78 @@ public class AppraisalsTest {
         GoalVersion goalVersion = appraisal.getUnapprovedGoalsVersion();
         assert goalVersion.getId() == 2;
     }
+
+    public void shouldBeRatedForProfessionalFaculty() {
+        appraisal = new Appraisal();
+        Job job = new Job();
+        job.setAppointmentType(AppointmentType.PROFESSIONAL_FACULTY);
+        appraisal.setJob(job);
+
+        appraisal.setRating(new Integer(1));
+        assert appraisal.isRated();
+
+        appraisal.setRating(new Integer(2));
+        assert appraisal.isRated();
+
+        appraisal.setRating(new Integer(3));
+        assert appraisal.isRated();
+
+        appraisal.setRating(new Integer(4));
+        assert appraisal.isRated();
+
+        appraisal.setRating(new Integer(5));
+        assert appraisal.isRated();
+    }
+
+    public void shouldBeRatedForClassifiedIT() {
+        appraisal = new Appraisal();
+        Job job = new Job();
+        job.setAppointmentType(AppointmentType.CLASSIFIED_IT);
+        appraisal.setJob(job);
+
+        appraisal.setRating(new Integer(1));
+        assert appraisal.isRated();
+
+        appraisal.setRating(new Integer(2));
+        assert appraisal.isRated();
+
+        appraisal.setRating(new Integer(3));
+        assert appraisal.isRated();
+    }
+
+    public void shouldBeRatedForClassified() {
+        appraisal = new Appraisal();
+        Job job = new Job();
+        job.setAppointmentType(AppointmentType.CLASSIFIED);
+        appraisal.setJob(job);
+
+        appraisal.setRating(new Integer(1));
+        assert appraisal.isRated();
+
+        appraisal.setRating(new Integer(2));
+        assert appraisal.isRated();
+
+        appraisal.setRating(new Integer(3));
+        assert appraisal.isRated();
+    }
+
+    public void shouldNotBeRatedForProfessionalFaculty() {
+        appraisal = new Appraisal();
+        Job job = new Job();
+        job.setAppointmentType(AppointmentType.PROFESSIONAL_FACULTY);
+        appraisal.setJob(job);
+
+        appraisal.setRating(new Integer(6));
+        assert !appraisal.isRated();
+    }
+
+    public void shouldNotBeRatedForClassifiedIT() {
+        appraisal = new Appraisal();
+        Job job = new Job();
+        job.setAppointmentType(AppointmentType.CLASSIFIED_IT);
+        appraisal.setJob(job);
+
+        appraisal.setRating(new Integer(4));
+        assert !appraisal.isRated();
+    }
 }
