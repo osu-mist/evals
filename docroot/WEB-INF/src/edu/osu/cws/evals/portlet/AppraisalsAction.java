@@ -46,6 +46,8 @@ public class AppraisalsAction implements ActionInterface {
 
     private String userRole;
 
+    private Map<String, EmailType> emailTypeMap;
+
     /**
      * Holds the structured json data that we get back from the evaluation form.
      */
@@ -95,6 +97,7 @@ public class AppraisalsAction implements ActionInterface {
         this.loggedInUser = actionHelper.getLoggedOnUser();
         PropertiesConfiguration config = actionHelper.getEvalsConfig();
         actionHelper.addToRequestMap("profFacultyMsg", config.getString("profFaculty.maximized.Message"));
+        emailTypeMap = EmailTypeMgr.getMap();
         initializeAppraisal();
     }
 
@@ -504,6 +507,11 @@ public class AppraisalsAction implements ActionInterface {
         EmailType emailType = getEmailType();
         if (emailType != null) {
             mailer.sendMail(appraisal, emailType);
+            if(!appraisal.isRated() && appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)
+                    && emailType.getType().equals("signatureDue")) {
+                emailType = emailTypeMap.get("signatureDueNotRated");
+                mailer.sendMail(appraisal, emailType);
+            }
         }
     }
 
@@ -529,7 +537,6 @@ public class AppraisalsAction implements ActionInterface {
             return appraisalStep.getEmailType();
         }
 
-        Map<String, EmailType> emailTypeMap = EmailTypeMgr.getMap();
         return emailTypeMap.get(appraisal.getStatus());
     }
 
