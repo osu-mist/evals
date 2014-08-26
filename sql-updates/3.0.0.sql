@@ -120,10 +120,3 @@ update email_types set cc = 'employee' where type = 'employeeReviewExpired';
 
 -- EV-188: change Does Not Meet Expectation wording 
 update ratings set description = 'Consistently does not meet expectations in multiple key elements of the position' where id = 12  and name = 'Does Not Meet Expectations';
-
--- EV-191: change configurations values/actions
-update configurations set value = 30, action = 'add' where name = 'resultsDue' and appointment_type = 'Professional Faculty';
-update configurations set value = 45, action = 'add' where name = 'appraisalDue' and appointment_type = 'Professional Faculty';
-update configurations set value = 60, action = 'add' where name = 'reviewDue' and appointment_type = 'Professional Faculty';
-update configurations set value = 75, action = 'add' where name = 'releaseDue' and appointment_type = 'Professional Faculty';
-update configurations set value = 90, action = 'add' where name = 'signatureDue' and appointment_type = 'Professional Faculty';
