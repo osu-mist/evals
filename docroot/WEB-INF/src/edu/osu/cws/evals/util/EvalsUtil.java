@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.util;
 
+import com.liferay.portal.kernel.language.LanguageUtil;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.ConfigurationMgr;
 import edu.osu.cws.evals.hibernate.EmailMgr;
@@ -365,4 +366,41 @@ public class EvalsUtil {
     public static boolean isTodayFirstMondayOfMonth() {
         return true;
     }
+
+    /**
+     * Tries to find the most specific message given an array
+     * of levels of specificity. E.g. if messageKeys = {"fruit", "orange", "blood"}
+     * then it will try to find a message for the messageKey = "fruit-orange-blood",
+     * if none is found, then it will try to find a message for messageKey = "fruit-orange",
+     * if none is found, then it will try to find a message for messageKey = "fruit",
+     * if none is found, it will return the most specific messageKey = "fruit-orange-blood".
+     * @param bundle the ResourceBundle of the page.
+     * @param messageKeys the default message key.
+     * @return liferay-ui message found in the language.properties file, or most specific messageKey if non found.
+     */
+    public static String getMessage(ResourceBundle bundle, String messageKeys[]) {
+        String message = getMessageHelper(bundle, messageKeys);
+        if(message.equals(""))
+            message = StringUtils.join(messageKeys, '-');
+        return message;
+    }
+
+    /**
+     * Joins the messageKeys into a single specific messageKey, and
+     * returns the associated message if it exists. If not, then it
+     * removes one layer of specificity (i.e. removes the last element
+     * of messageKeys), and recurses.
+     * @param bundle the ResourceBundle of the page.
+     * @param messageKeys an array of strings that combine to make a messageKey
+     * @return "" is returned if nothing is found, otherwise it returns what it found.
+     */
+    private static String getMessageHelper(ResourceBundle bundle, String messageKeys[]) {
+        if(messageKeys.length == 0)
+            return "";
+        String messageKey = StringUtils.join(messageKeys, '-').replace(' ', '-');
+        if(bundle.containsKey(messageKey))
+            return bundle.getString(messageKey);
+        return getMessageHelper(bundle, Arrays.copyOfRange(messageKeys, 0, messageKeys.length - 1));
+    }
+
 }
