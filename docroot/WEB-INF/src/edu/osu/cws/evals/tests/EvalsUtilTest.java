@@ -121,7 +121,7 @@ public class EvalsUtilTest {
         appraisal.setEndDate(endDate.plusDays(-41).toDate());
 
         assert EvalsUtil.isOverdue(appraisal, config);
-        assert EvalsUtil.isDue(appraisal, config) < 0;
+        assert EvalsUtil.isDue(appraisal, config) == -1;
     }
 
     public void shouldNotBeOverdueWhenDueToday() throws Exception {
@@ -149,7 +149,7 @@ public class EvalsUtilTest {
         appraisal.setEndDate(endDate.plusDays(-39).toDate());
 
         assert !EvalsUtil.isOverdue(appraisal, config);
-        assert EvalsUtil.isDue(appraisal, config) > 0;
+        assert EvalsUtil.isDue(appraisal, config) == 1;
     }
 
     private void calculateGoalsApprovalOverdueValue(String status) throws Exception {
