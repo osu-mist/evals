@@ -380,8 +380,9 @@ public class EvalsUtil {
      */
     public static String getMessage(ResourceBundle bundle, String messageKeys[]) {
         String message = getMessageHelper(bundle, messageKeys);
-        if(message.equals(""))
+        if(message.equals("")) {
             message = StringUtils.join(messageKeys, '-');
+        }
         return message;
     }
 
@@ -395,11 +396,14 @@ public class EvalsUtil {
      * @return "" is returned if nothing is found, otherwise it returns what it found.
      */
     private static String getMessageHelper(ResourceBundle bundle, String messageKeys[]) {
-        if(messageKeys.length == 0)
+        if(messageKeys.length == 0) {
             return "";
+        }
+
         String messageKey = StringUtils.join(messageKeys, '-').replace(' ', '-');
-        if(bundle.containsKey(messageKey))
+        if(bundle.containsKey(messageKey)) {
             return bundle.getString(messageKey);
+        }
         return getMessageHelper(bundle, Arrays.copyOfRange(messageKeys, 0, messageKeys.length - 1));
     }
 
