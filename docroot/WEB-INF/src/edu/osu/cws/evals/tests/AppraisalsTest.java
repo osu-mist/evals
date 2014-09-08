@@ -738,13 +738,4 @@ public class AppraisalsTest {
         assert !appraisal.isRated();
     }
 
-    public void shouldNotBeRatedForClassifiedIT() {
-        appraisal = new Appraisal();
-        Job job = new Job();
-        job.setAppointmentType(AppointmentType.CLASSIFIED_IT);
-        appraisal.setJob(job);
-
-        appraisal.setRating(new Integer(4));
-        assert !appraisal.isRated();
-    }
 }
