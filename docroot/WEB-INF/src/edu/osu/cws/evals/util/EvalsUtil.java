@@ -100,7 +100,7 @@ public class EvalsUtil {
         if (config == null) {
             return false;
         }
-        return isDue(appraisal, config) <= 0;
+        return isDue(appraisal, config) < 0;
     }
 
     /**

@@ -110,6 +110,48 @@ public class EvalsUtilTest {
         assert !EvalsUtil.anotherEmail(lastEmail, config): "it should not need to send a new email";
     }
 
+    public void shouldBeOverdueWhenDueYesterday() throws Exception {
+        Configuration config = new Configuration();
+        config.setValue("40");
+        config.setReferencePoint("end");
+        config.setAction("add");
+
+        Appraisal appraisal = new Appraisal();
+        DateTime endDate = new DateTime();
+        appraisal.setEndDate(endDate.plusDays(-41).toDate());
+
+        assert EvalsUtil.isOverdue(appraisal, config);
+        assert EvalsUtil.isDue(appraisal, config) == -1;
+    }
+
+    public void shouldNotBeOverdueWhenDueToday() throws Exception {
+        Configuration config = new Configuration();
+        config.setValue("40");
+        config.setReferencePoint("end");
+        config.setAction("add");
+
+        Appraisal appraisal = new Appraisal();
+        DateTime endDate = new DateTime();
+        appraisal.setEndDate(endDate.plusDays(-40).toDate());
+
+        assert !EvalsUtil.isOverdue(appraisal, config);
+        assert EvalsUtil.isDue(appraisal, config) == 0;
+    }
+
+    public void shouldNotBeOverdueWhenDueTomorrow() throws Exception {
+        Configuration config = new Configuration();
+        config.setValue("40");
+        config.setReferencePoint("end");
+        config.setAction("add");
+
+        Appraisal appraisal = new Appraisal();
+        DateTime endDate = new DateTime();
+        appraisal.setEndDate(endDate.plusDays(-39).toDate());
+
+        assert !EvalsUtil.isOverdue(appraisal, config);
+        assert EvalsUtil.isDue(appraisal, config) == 1;
+    }
+
     private void calculateGoalsApprovalOverdueValue(String status) throws Exception {
         Appraisal appraisal = new Appraisal();
         appraisal.setJob(new Job());
