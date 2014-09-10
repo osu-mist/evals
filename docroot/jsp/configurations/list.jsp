@@ -1,3 +1,4 @@
+<%@ page import="edu.osu.cws.evals.util.EvalsUtil" %>
 <%@ include file="/jsp/init.jsp"%>
 <c:set var="sectionName" value=""/>
 
@@ -5,6 +6,10 @@
 <div class="separator"></div>
 
 <c:forEach var="configuration" items="${configurations}" varStatus="loopStatus">
+    <% Configuration configuration = (Configuration)pageContext.getAttribute("configuration");
+       String[] configTitleKey = new String[] { "parameters", configuration.getName(), configuration.getAppointmentType().replace(' ', '-').toLowerCase() };
+       String[] configDescKey = new String[] { "parameters", configuration.getName(), "description", configuration.getAppointmentType().replace(' ', '-').toLowerCase() };
+    %>
     <c:if test="${configuration.section != sectionName}">
         <c:if test="${sectionName != ''}">
             </table>
@@ -52,9 +57,9 @@
             <tr class="${loopStatus.index % 2 == 0 ? 'portlet-section-body results-row' : 'portlet-section-alternate results-row alt'}"
                 id="<portlet:namespace/>users-${configuration.id}"
             >
-                <td><strong><liferay-ui:message key="parameters-${configuration.name}"/></strong></td>
+                <td><strong><%= EvalsUtil.getMessage(bundle, configTitleKey) %></strong></td>
                 <td><c:out value="${configuration.appointmentType}"/></td>
-                <td><liferay-ui:message key="parameters-${configuration.name}-description"/></td>
+                <td><%= EvalsUtil.getMessage(bundle, configDescKey) %></td>
                 <td>
                     <div id="<portlet:namespace/>displayValue${configuration.id}">${configuration.value}</div>
                     <div id="<portlet:namespace/>form${configuration.id}" style="display:none;">
