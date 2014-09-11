@@ -9,3 +9,6 @@ update configurations set value = 75, action = 'add' where name = 'releaseDue' a
 update configurations set value = 90, action = 'add' where name = 'signatureDue' and appointment_type = 'Professional Faculty';
 update configurations set value = 0,  action = 'add' where name = 'firstResultDueReminder' and appointment_type = 'Professional Faculty';
 update configurations set value = 15 where name = 'employeeReviewDueExpiration';
+
+-- EV-526: configuration changes
+delete from configurations where name = 'closeDue';
