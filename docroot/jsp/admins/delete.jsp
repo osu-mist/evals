@@ -9,7 +9,7 @@
     <portlet:param name="controller" value="AdminsAction"/>
     </portlet:actionURL>" method="post">
 
-    <p><liferay-ui:message key="admin-delete-confirm"/>: ${admin.employee.name} ?</p>
+    <p><liferay-ui:message key="admin-delete-confirm"/>: ${admin.employee.name}?</p>
 
     <input type="submit" name="delete" value="<liferay-ui:message key="delete" />" />
     <input type="submit" name="cancel" value="<liferay-ui:message key="cancel" />" />
