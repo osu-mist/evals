@@ -125,6 +125,7 @@ public class CriteriaAreasAction implements ActionInterface {
             } else {
                 Employee loggedOnUser = actionHelper.getLoggedOnUser();
                 CriteriaMgr.edit(request.getParameterMap(), criterionAreaId, loggedOnUser);
+                SessionMessages.add(request, "criteria-edit-saved");
                 return list(request, response);
             }
         } catch (ModelException e) {

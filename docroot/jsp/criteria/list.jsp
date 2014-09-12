@@ -20,6 +20,7 @@ addURL.setParameter("controller", "CriteriaAreasAction");
     /></li>
 </ul>
 
+<liferay-ui:success key="criteria-edit-saved" message="criteria-edit-saved" />
 <liferay-ui:success key="criteria-saved" message="criteria-saved" />
 <liferay-ui:success key="criteria-deleted" message="criteria-deleted" />
 
