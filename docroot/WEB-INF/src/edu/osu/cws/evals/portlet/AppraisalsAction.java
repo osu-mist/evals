@@ -655,7 +655,7 @@ public class AppraisalsAction implements ActionInterface {
      *
      * @return
      */
-    private boolean isAdminRole() {
+    public boolean isAdminRole() {
         return EvalsUtil.isOneOfAdminRoles(userRole);
     }
 

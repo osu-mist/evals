@@ -185,4 +185,39 @@ public class AppraisalsActionTest {
         appraisalsAction.setActionHelper(mockActionHelper);
         assert appraisalsAction.getRole().equals(ActionHelper.ROLE_UPPER_SUPERVISOR);
     }
+
+    public void shouldBeAdminRoleWhenMasterAdmin() throws Exception {
+        appraisalsAction.setUserRole(ActionHelper.ROLE_MASTER_ADMIN);
+        assert appraisalsAction.isAdminRole();
+    }
+
+    public void shouldBeAdminRoleWhenSuperAdmin() throws Exception {
+        appraisalsAction.setUserRole(ActionHelper.ROLE_SUPER_ADMIN);
+        assert appraisalsAction.isAdminRole();
+    }
+
+    public void shouldNotBeAdminRoleWhenAdministrator() throws Exception {
+        appraisalsAction.setUserRole(ActionHelper.ROLE_ADMINISTRATOR);
+        assert !appraisalsAction.isAdminRole();
+    }
+
+    public void shouldNotBeAdminRoleWhenSupervisor() throws Exception {
+        appraisalsAction.setUserRole(ActionHelper.ROLE_SUPERVISOR);
+        assert !appraisalsAction.isAdminRole();
+    }
+
+    public void shouldNotBeAdminRoleWhenUpperSupervisor() throws Exception {
+        appraisalsAction.setUserRole(ActionHelper.ROLE_UPPER_SUPERVISOR);
+        assert !appraisalsAction.isAdminRole();
+    }
+
+    public void shouldNotBeAdminRoleWhenReviewer() throws Exception {
+        appraisalsAction.setUserRole(ActionHelper.ROLE_REVIEWER);
+        assert !appraisalsAction.isAdminRole();
+    }
+
+    public void shouldNotBeAdminRoleWhenEmployee() throws Exception {
+        appraisalsAction.setUserRole(ActionHelper.ROLE_EMPLOYEE);
+        assert !appraisalsAction.isAdminRole();
+    }
 }
