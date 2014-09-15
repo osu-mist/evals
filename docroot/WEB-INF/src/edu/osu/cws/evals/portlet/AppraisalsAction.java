@@ -736,7 +736,7 @@ public class AppraisalsAction implements ActionInterface {
      * @param dbAssessmentsMap
      * @return
      */
-    private Integer calculateAssessmentSequence(Map<String, Assessment> dbAssessmentsMap) {
+    public Integer calculateAssessmentSequence(Map<String, Assessment> dbAssessmentsMap) {
         Integer nextSequence = 0;
         for (Map.Entry<String, Assessment> entry : dbAssessmentsMap.entrySet()) {
             Assessment assessment = entry.getValue();

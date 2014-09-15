@@ -10,6 +10,7 @@ import static org.mockito.Mockito.*;
 import javax.portlet.PortletContext;
 import javax.swing.*;
 import java.util.HashMap;
+import java.util.Map;
 
 @Test
 public class AppraisalsActionTest {
@@ -219,5 +220,39 @@ public class AppraisalsActionTest {
     public void shouldNotBeAdminRoleWhenEmployee() throws Exception {
         appraisalsAction.setUserRole(ActionHelper.ROLE_EMPLOYEE);
         assert !appraisalsAction.isAdminRole();
+    }
+
+    public void shouldBeFourWhenLastSequenceIsThree() throws Exception {
+        Map<String, Assessment> dbAssessmentMap = new HashMap<String, Assessment>();
+        Assessment assessment1 = new Assessment();
+        Assessment assessment2 = new Assessment();
+        Assessment assessment3 = new Assessment();
+        assessment1.setSequence(1);
+        assessment2.setSequence(3);
+        assessment3.setSequence(2);
+        dbAssessmentMap.put("test1", assessment1);
+        dbAssessmentMap.put("test2", assessment2);
+        dbAssessmentMap.put("test3", assessment3);
+        assert appraisalsAction.calculateAssessmentSequence(dbAssessmentMap) == 4;
+    }
+
+    public void shouldBeSixWhenLastSequenceIsFive() throws Exception {
+        Map<String, Assessment> dbAssessmentMap = new HashMap<String, Assessment>();
+        Assessment assessment1 = new Assessment();
+        Assessment assessment2 = new Assessment();
+        Assessment assessment3 = new Assessment();
+        Assessment assessment4 = new Assessment();
+        Assessment assessment5 = new Assessment();
+        assessment1.setSequence(1);
+        assessment2.setSequence(3);
+        assessment3.setSequence(2);
+        assessment4.setSequence(4);
+        assessment5.setSequence(5);
+        dbAssessmentMap.put("test1", assessment1);
+        dbAssessmentMap.put("test2", assessment2);
+        dbAssessmentMap.put("test3", assessment3);
+        dbAssessmentMap.put("test4", assessment4);
+        dbAssessmentMap.put("test5", assessment5);
+        assert appraisalsAction.calculateAssessmentSequence(dbAssessmentMap) == 6;
     }
 }
