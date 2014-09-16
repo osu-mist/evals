@@ -325,7 +325,7 @@ public class AppraisalsAction implements ActionInterface {
      *
      * @return
      */
-    private Map<String, String> getSalaryValidationValues() {
+    public Map<String, String> getSalaryValidationValues() {
         Map<String, String> salaryValidationValues = new HashMap<String, String>();
 
         Salary salary = appraisal.getSalary();

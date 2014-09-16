@@ -255,4 +255,19 @@ public class AppraisalsActionTest {
         dbAssessmentMap.put("test5", assessment5);
         assert appraisalsAction.calculateAssessmentSequence(dbAssessmentMap) == 6;
     }
+
+    public void shouldGetCorrectSalaryValues() {
+        Salary salary = new Salary();
+        salary.setTwoIncrease(2.0);
+        salary.setOneMin(1.0);
+        salary.setOneMax(1.5);
+        Appraisal mockedAppraisal = mock(Appraisal.class);
+        when(mockedAppraisal.getSalary()).thenReturn(salary);
+
+        appraisalsAction.setAppraisal(mockedAppraisal);
+        Map<String, String> salaryValidationValues = appraisalsAction.getSalaryValidationValues();
+        assert salaryValidationValues.get("increaseRate2Value").equals("2.0");
+        assert salaryValidationValues.get("increaseRate1MinVal").equals("1.0");
+        assert salaryValidationValues.get("increaseRate1MaxVal").equals("1.5");
+    }
 }
