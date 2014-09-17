@@ -1,6 +1,9 @@
 package edu.osu.cws.evals.tests;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.liferay.portal.kernel.util.ParamUtil;
+import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.hibernate.PermissionRuleMgr;
 import edu.osu.cws.evals.models.*;
@@ -19,7 +22,9 @@ import javax.portlet.PortletContext;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Test
@@ -315,6 +320,12 @@ public class AppraisalsActionTest {
         // Get session and begin a transaction (error without)
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
+        // Get appraisal ids
+        appraisal = AppraisalMgr.getAppraisal(1);
+        ArrayList<Integer> appraisalIds = new ArrayList<Integer>();
+        for(Assessment assessment : appraisal.getAssessmentMap().values()) {
+            appraisalIds.add(assessment.getId());
+        }
         // Mock stuff
         PortletRequest mockedRequest = mock(PortletRequest.class);
         ActionHelper mockedActionHelper = mock(ActionHelper.class);
@@ -331,6 +342,17 @@ public class AppraisalsActionTest {
         // Call addAssessment and commit
         String assessmentResponse = appraisalsAction.addAssessment(mockedRequest, mockedResponse);
         tx.commit();
-        assert assessmentResponse.equals("{id:5, status:\"success\"}");
+        // Get appraisal assessment ids after new assessment added
+        ArrayList<Integer> newAppraisalIds = new ArrayList<Integer>();
+        for(Assessment assessment : appraisal.getAssessmentMap().values()) {
+            newAppraisalIds.add(assessment.getId());
+            System.out.println(assessment.getId());
+        }
+        // Parse json object response
+        JsonParser parser = new JsonParser();
+        JsonObject responseJson = (JsonObject)parser.parse(assessmentResponse);
+        // Assertions
+        assert !appraisalIds.contains(responseJson.get("id"));
+        assert newAppraisalIds.contains((Integer)responseJson.get("id").getAsInt());
     }
 }
