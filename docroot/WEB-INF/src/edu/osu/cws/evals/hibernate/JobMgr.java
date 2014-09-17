@@ -29,7 +29,7 @@ public class JobMgr {
     public static final String SEARCH_JOB_ORDER_BY = " order by pyvpase_last_name, " +
             "pyvpase_first_name ";
     public static final String SEARCH_TOO_MANY_RESULTS = "Your search returned too many results. " +
-            "Pleae refine your search.";
+            "Please refine your search.";
 
     /**
      * Traverses up the supervising chain of the given job and if the given pidm matches

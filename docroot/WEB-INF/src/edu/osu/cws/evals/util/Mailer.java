@@ -15,7 +15,6 @@ import edu.osu.cws.util.Logger;
 import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
-import org.apache.xpath.operations.Bool;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
