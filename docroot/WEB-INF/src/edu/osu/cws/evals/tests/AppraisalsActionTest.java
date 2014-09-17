@@ -17,6 +17,7 @@ import static org.mockito.Mockito.*;
 
 import javax.portlet.PortletContext;
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -306,5 +307,30 @@ public class AppraisalsActionTest {
         assert permRule.getResults() == null;
         assert permRule.getSupervisorResults() == null;
         assert permRule.getStatus().equals("goalsDue");
+    }
+
+    public void shouldAddAssessmentCorrectly() throws Exception {
+        DBUnit dbunit = new DBUnit();
+        dbunit.seedDatabase();
+        // Get session and begin a transaction (error without)
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+        // Mock stuff
+        PortletRequest mockedRequest = mock(PortletRequest.class);
+        ActionHelper mockedActionHelper = mock(ActionHelper.class);
+        PropertiesConfiguration mockedConfig = mock(PropertiesConfiguration.class);
+        PortletResponse mockedResponse = mock(PortletResponse.class);
+        when(mockedConfig.getString("profFaculty.maximized.Message")).thenReturn("null");
+        when(mockedActionHelper.getEvalsConfig()).thenReturn(mockedConfig);
+        when(mockedRequest.getParameter("id")).thenReturn("1");
+        when(mockedActionHelper.getLoggedOnUser()).thenReturn(EmployeeMgr.findByOnid("cedenoj", null));
+        when(mockedPortletContext.getAttribute("permissionRules")).thenReturn(PermissionRuleMgr.list());
+        when(mockedActionHelper.getPortletContext()).thenReturn(mockedPortletContext);
+        when(mockedRequest.getParameterMap()).thenReturn(new HashMap<String, String[]>());
+        appraisalsAction.setActionHelper(mockedActionHelper);
+        // Call addAssessment and commit
+        String assessmentResponse = appraisalsAction.addAssessment(mockedRequest, mockedResponse);
+        tx.commit();
+        assert assessmentResponse.equals("{id:5, status:\"success\"}");
     }
 }
