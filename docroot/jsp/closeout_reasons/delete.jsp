@@ -8,7 +8,7 @@
     <portlet:param name="controller" value="CloseOutAction"/>
     </portlet:actionURL>" method="post">
 
-    <p><liferay-ui:message key="closeout-reason-delete-confirm"/>: "${reason.reason}"?</p>
+    <p><liferay-ui:message key="closeout-reason-delete-confirm"/>: "<c:out value="${reason.reason}"/>"?</p>
 
     <input type="submit" name="delete" value="<liferay-ui:message key="delete" />" />
     <input type="submit" name="cancel" value="<liferay-ui:message key="cancel" />" />
