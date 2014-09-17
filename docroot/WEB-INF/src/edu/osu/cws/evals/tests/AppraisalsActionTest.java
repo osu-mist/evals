@@ -1,13 +1,22 @@
 package edu.osu.cws.evals.tests;
 
+import com.liferay.portal.kernel.util.ParamUtil;
+import edu.osu.cws.evals.hibernate.EmployeeMgr;
+import edu.osu.cws.evals.hibernate.PermissionRuleMgr;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.ActionHelper;
 import edu.osu.cws.evals.portlet.AppraisalsAction;
+import edu.osu.cws.evals.portlet.Constants;
+import edu.osu.cws.evals.util.HibernateUtil;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import static org.mockito.Mockito.*;
 
 import javax.portlet.PortletContext;
+import javax.portlet.PortletRequest;
 import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -269,5 +278,33 @@ public class AppraisalsActionTest {
         assert salaryValidationValues.get("increaseRate2Value").equals("2.0");
         assert salaryValidationValues.get("increaseRate1MinVal").equals("1.0");
         assert salaryValidationValues.get("increaseRate1MaxVal").equals("1.5");
+    }
+
+    public void shouldInitializeCorrectly() throws Exception {
+        DBUnit dbunit = new DBUnit();
+        dbunit.seedDatabase();
+        // Get session and begin a transaction
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+        // Mock stuff
+        PortletRequest mockedRequest = mock(PortletRequest.class);
+        ActionHelper mockedActionHelper = mock(ActionHelper.class);
+        PropertiesConfiguration mockedConfig = mock(PropertiesConfiguration.class);
+        when(mockedConfig.getString("profFaculty.maximized.Message")).thenReturn("null");
+        when(mockedActionHelper.getEvalsConfig()).thenReturn(mockedConfig);
+        when(mockedRequest.getParameter("id")).thenReturn("1");
+        when(mockedActionHelper.getLoggedOnUser()).thenReturn(EmployeeMgr.findByOnid("cedenoj", null));
+        when(mockedPortletContext.getAttribute("permissionRules")).thenReturn(PermissionRuleMgr.list());
+        when(mockedActionHelper.getPortletContext()).thenReturn(mockedPortletContext);
+        appraisalsAction.setActionHelper(mockedActionHelper);
+        // Call initialize and commit
+        appraisalsAction.initialize(mockedRequest);
+        tx.commit();
+        // Assertions
+        PermissionRule permRule = appraisalsAction.getPermRule();
+        assert appraisalsAction.getUserRole().equals(ActionHelper.ROLE_EMPLOYEE);
+        assert permRule.getResults() == null;
+        assert permRule.getSupervisorResults() == null;
+        assert permRule.getStatus().equals("goalsDue");
     }
 }
