@@ -3,7 +3,6 @@ package edu.osu.cws.evals.hibernate;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Email;
 import edu.osu.cws.evals.util.HibernateUtil;
-import org.apache.xpath.operations.Bool;
 import org.hibernate.Session;
 
 import java.util.List;
