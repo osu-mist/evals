@@ -22,3 +22,10 @@ ALTER TABLE appraisals DROP (
     goals_required_mod_date,
     goals_submit_date
 );
+    
+-- EV-529: remove reopen related columsn from appraisals table
+ALTER TABLE appraisals DROP (
+    reopener_pidm,
+    reopen_reason,
+    reopened_date
+);
