@@ -12,3 +12,10 @@ update configurations set value = 15 where name = 'employeeReviewDueExpiration';
 
 -- EV-526: configuration changes
 delete from configurations where name = 'closeDue';
+    
+-- EV-529: remove reopen related columsn from appraisals table
+ALTER TABLE appraisals DROP (
+    reopener_pidm,
+    reopen_reason,
+    reopened_date
+);
