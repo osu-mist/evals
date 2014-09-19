@@ -26,8 +26,6 @@
         <property name="employeeSignedDate" type="timestamp" column="EMPLOYEE_SIGNED_DATE"/>
         <property name="closeOutDate" type="timestamp" column="CLOSEOUT_DATE"/>
         <property name="status" length="32" column="STATUS"/>
-        <property name="reopenedDate" type="timestamp" column="REOPENED_DATE"/>
-        <property name="reopenReason" type="text" column="REOPEN_REASON"/>
         <property name="originalStatus" length="32" column="ORIGINAL_STATUS"/>
         <property name="releaseDate" type="timestamp" column="RELEASE_DATE"/>
         <property name="supervisorRebuttalRead" type="timestamp" column="SUPERVISOR_REBUTTAL_READ"/>
@@ -58,9 +56,6 @@
                      not-null="false"/>
         <many-to-one name="closeOutBy" class="edu.osu.cws.evals.models.Employee"
                      column="CLOSEOUT_PIDM"
-                     not-null="false"/>
-        <many-to-one name="reopenedBy" class="edu.osu.cws.evals.models.Employee"
-                     column="REOPENER_PIDM"
                      not-null="false"/>
         <set name="goalVersions" inverse="true" cascade="all">
             <key column="APPRAISAL_ID"/>

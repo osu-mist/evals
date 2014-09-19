@@ -151,12 +151,6 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
 
     private CloseOutReason closeOutReason;
 
-    private Employee reopenedBy;
-
-    private Date reopenedDate;
-
-    private String reopenReason;
-
     private String originalStatus;
 
     private Integer overdue;
@@ -427,7 +421,7 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
         Date lastModified = createDate;
         Date fieldsToCompare[] = {evaluationSubmitDate, resultSubmitDate, reviewSubmitDate,
                 rebuttalDate, employeeSignedDate, releaseDate, supervisorRebuttalRead,
-                closeOutDate, reopenedDate};
+                closeOutDate};
 
         for (Date appraisalDate : fieldsToCompare) {
             if (appraisalDate != null && appraisalDate.after(lastModified)) {
@@ -714,30 +708,6 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
 
     public void setGoalVersions(Set<GoalVersion> goalVersions) {
         this.goalVersions = goalVersions;
-    }
-
-    public Employee getReopenedBy() {
-        return reopenedBy;
-    }
-
-    public void setReopenedBy(Employee reopenedBy) {
-        this.reopenedBy = reopenedBy;
-    }
-
-    public Date getReopenedDate() {
-        return reopenedDate;
-    }
-
-    public void setReopenedDate(Date reopenedDate) {
-        this.reopenedDate = reopenedDate;
-    }
-
-    public String getReopenReason() {
-        return reopenReason;
-    }
-
-    public void setReopenReason(String reopenReason) {
-        this.reopenReason = reopenReason;
     }
 
     public String getOriginalStatus() {
