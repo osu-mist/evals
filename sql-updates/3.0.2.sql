@@ -12,3 +12,13 @@ update configurations set value = 15 where name = 'employeeReviewDueExpiration';
 
 -- EV-526: configuration changes
 delete from configurations where name = 'closeDue';
+
+-- EV-5: remove multiple columns from appraisals
+ALTER TABLE appraisals DROP (
+    goals_comments,
+    goals_approver_pidm,
+    goals_approved_date,
+    goals_reactivated_date,
+    goals_required_mod_date,
+    goals_submit_date
+);

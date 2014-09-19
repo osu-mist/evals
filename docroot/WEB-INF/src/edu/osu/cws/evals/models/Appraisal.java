@@ -91,8 +91,6 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
      */
     private Date startDate;
 
-    private Date goalsSubmitDate;
-
     /**
      * The end of the date period for the appraisal.
      */
@@ -104,10 +102,6 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
     private Employee evaluator;
 
     private Date evaluationSubmitDate;
-
-    private Date goalApprovedDate;
-
-    private Employee goalsApprover;
 
     private Date resultSubmitDate;
 
@@ -423,17 +417,17 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
 
     /**
      * Compares various date fields of the appraisal object to figure out when was the last modified
-     * date of the appraisal. The fields that are compared are: evaluationSubmitDate, goalsSubmitDate,
-     * goalApprovedDate, resultSubmitDate, reviewSubmitDate, rebuttalDate, employeeSignedDate,
-     * releaseDate, supervisorRebuttalRead, closeOutDate, reopenedDate
+     * date of the appraisal. The fields that are compared are: evaluationSubmitDate, resultSubmitDate,
+     * reviewSubmitDate, rebuttalDate, employeeSignedDate, releaseDate, supervisorRebuttalRead,
+     * closeOutDate, reopenedDate
      *
      * @return lastModified
      */
     public Date getLastModified() {
         Date lastModified = createDate;
-        Date fieldsToCompare[] = {evaluationSubmitDate, goalsSubmitDate, goalApprovedDate,
-                resultSubmitDate, reviewSubmitDate, rebuttalDate, employeeSignedDate,
-                releaseDate, supervisorRebuttalRead, closeOutDate, reopenedDate};
+        Date fieldsToCompare[] = {evaluationSubmitDate, resultSubmitDate, reviewSubmitDate,
+                rebuttalDate, employeeSignedDate, releaseDate, supervisorRebuttalRead,
+                closeOutDate, reopenedDate};
 
         for (Date appraisalDate : fieldsToCompare) {
             if (appraisalDate != null && appraisalDate.after(lastModified)) {
@@ -562,14 +556,6 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
         this.endDate = endDate;
     }
 
-    public Date getGoalsSubmitDate() {
-        return goalsSubmitDate;
-    }
-
-    public void setGoalsSubmitDate(Date goalsSubmitDate) {
-        this.goalsSubmitDate = goalsSubmitDate;
-    }
-
     public Employee getEvaluator() {
         return evaluator;
     }
@@ -584,22 +570,6 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
 
     public void setEvaluationSubmitDate(Date evaluationSubmitDate) {
         this.evaluationSubmitDate = evaluationSubmitDate;
-    }
-
-    public Date getGoalApprovedDate() {
-        return goalApprovedDate;
-    }
-
-    public void setGoalApprovedDate(Date goalApprovedDate) {
-        this.goalApprovedDate = goalApprovedDate;
-    }
-
-    public Employee getGoalsApprover() {
-        return goalsApprover;
-    }
-
-    public void setGoalsApprover(Employee goalsApprover) {
-        this.goalsApprover = goalsApprover;
     }
 
     public Date getResultSubmitDate() {
