@@ -14,8 +14,6 @@
 
         <property name="startDate" type="date" column="START_DATE"/>
         <property name="endDate" type="date" column="END_DATE"/>
-        <property name="goalsSubmitDate" type="timestamp" column="GOALS_SUBMIT_DATE"/>
-        <property name="goalApprovedDate" type="timestamp" column="GOALS_APPROVED_DATE"/>
         <property name="resultSubmitDate" type="timestamp" column="RESULT_SUBMIT_DATE"/>
         <property name="evaluation" type="text" column="EVALUATION"/>
         <property name="evaluationSubmitDate" type="timestamp" column="EVALUATION_SUBMIT_DATE"/>
@@ -51,9 +49,6 @@
         </many-to-one>
         <many-to-one name="closeOutReason" class="edu.osu.cws.evals.models.CloseOutReason"
                      column="CLOSEOUT_REASON_ID"
-                     not-null="false"/>
-        <many-to-one name="goalsApprover" class="edu.osu.cws.evals.models.Employee"
-                     column="GOALS_APPROVER_PIDM"
                      not-null="false"/>
         <many-to-one name="evaluator" class="edu.osu.cws.evals.models.Employee"
                      column="EVALUATOR_PIDM"

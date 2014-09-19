@@ -99,7 +99,6 @@ public class AppraisalsTest {
         updatedAppraisal.setId(appraisalID);
 
         updatedAppraisal.setEvaluator(employee);
-        updatedAppraisal.setGoalApprovedDate(new Date());
         updatedAppraisal.getUnapprovedGoalsVersion().setGoalsComments("goal comments data");
         updatedAppraisal.setResultSubmitDate(new Date());
         updatedAppraisal.setEvaluation("evaluation text");
@@ -150,7 +149,6 @@ public class AppraisalsTest {
         employee = EmployeeMgr.findByOnid("luf", null);
 
         appraisal.setEvaluator(employee);
-        appraisal.setGoalApprovedDate(new Date());
         appraisal.getUnapprovedGoalsVersion().setGoalsComments("goal comments data");
         appraisal.setResultSubmitDate(new Date());
         appraisal.setEvaluation("evaluation text");
@@ -181,7 +179,6 @@ public class AppraisalsTest {
         employee = EmployeeMgr.findByOnid("luf", null);
 
         appraisal1.setEvaluator(employee);
-        appraisal1.setGoalApprovedDate(new Date());
         //appraisal1.getUnapprovedGoalsVersion().setGoalsComments("goal comments data");
         appraisal1.setResultSubmitDate(new Date());
         appraisal1.setEvaluation("evaluation text");
@@ -223,7 +220,6 @@ public class AppraisalsTest {
         employee = EmployeeMgr.findByOnid("luf", null);
 
         appraisal1.setEvaluator(employee);
-        appraisal1.setGoalApprovedDate(new Date());
         //appraisal1.getUnapprovedGoalsVersion().setGoalsComments("goal comments data");
         appraisal1.setResultSubmitDate(new Date());
         appraisal1.setEvaluation("evaluation text");
