@@ -93,7 +93,7 @@
                             + ${increaseRate1MinVal} + ' - ' + ${increaseRate1MaxVal} + ')';
                     jQuery('.recommended-salary-hint').html(hint);
                 } else if (rating == 2) {
-                    increase = ${increaseRate2Value}; // disable the inputs as well if rating is 2 or 3
+                    increase = getIncreaseWithinUpperBound(${increaseRate2Value}); // disable the inputs as well if rating is 2 or 3
                 }
             }
 
@@ -145,7 +145,10 @@
          */
         function setSalaryIncrease() {
             var salaryAfterIncrease = getSalaryAfterIncrease();
+            var increase = jQuery(".osu-cws input.recommended-salary").val();
+
             jQuery('.salary-after-increase').html(salaryAfterIncrease);
+            jQuery('.osu-cws input.recommended-salary').val(getIncreaseWithinUpperBound(increase));
         }
 
         jQuery('.pass-evaluation input:radio').change(function() {
@@ -190,6 +193,14 @@
             return '';
         }
 
+        // If the salary is at the top range, allow increase % to reflect actual increase within salary range
+        var salaryAfterIncrease = ${appraisal.salary.current} * (1 + increase / 100);
+        if(salaryAfterIncrease.toFixed(0) == ${appraisal.salary.high}) {
+            if (increase == getIncreaseWithinUpperBound(increase)) {
+                return '';
+            }
+        }
+
         switch(rating) {
             case "1":
                 if (increase < ${increaseRate1MinVal} || increase > ${increaseRate1MaxVal}) {
@@ -209,5 +220,21 @@
         }
 
         return '';
+    }
+
+    /**
+     * Returns the actual increase percentage that is provided to the employee. This function checks
+     * if the percent increase puts the employee above the salary high, it re-calculates the actual increase
+     * percentage that puts the employee to the salary high value.
+     *
+     * @param increase
+     */
+    function getIncreaseWithinUpperBound(increase) {
+        var salaryAfterIncrease = ${appraisal.salary.current} * (1 + increase / 100);
+        if(salaryAfterIncrease >= ${appraisal.salary.high}) {
+            var actualIncrease = (${appraisal.salary.high} - ${appraisal.salary.current}) / ${appraisal.salary.current};
+            return (actualIncrease * 100).toFixed(2);
+        }
+        return increase;
     }
 </script>
