@@ -144,11 +144,12 @@
          * Sets the salary after increase in the html table.
          */
         function setSalaryIncrease() {
-            var salaryAfterIncrease = getSalaryAfterIncrease();
+            // set % increase first and then re-calculate new salary after increase
             var increase = jQuery(".osu-cws input.recommended-salary").val();
-
-            jQuery('.salary-after-increase').html(salaryAfterIncrease);
             jQuery('.osu-cws input.recommended-salary').val(getIncreaseWithinUpperBound(increase));
+
+            var salaryAfterIncrease = getSalaryAfterIncrease();
+            jQuery('.salary-after-increase').html(salaryAfterIncrease);
         }
 
         jQuery('.pass-evaluation input:radio').change(function() {
