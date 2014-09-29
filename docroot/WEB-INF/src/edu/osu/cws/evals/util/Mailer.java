@@ -828,7 +828,7 @@ public class Mailer implements MailerInterface {
     private String signatureDueNotRatedBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_signatureDueNotRated_body");
         return MessageFormat.format(bodyString, appraisal.getJob().getSupervisor().getEmployee().getConventionName(),
-                getEmployeeName(appraisal));
+                getEmployeeName(appraisal), getJobTitle(appraisal));
     }
 
 
