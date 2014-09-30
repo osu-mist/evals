@@ -121,17 +121,28 @@
          * @return {String}
          */
         function getSalaryAfterIncrease() {
-            // calculate salary after increase
             var increasePercentage = jQuery(".osu-cws input.recommended-salary").val();
             if (!(increasePercentage >= 0 && increasePercentage <= 999)) {
                 increasePercentage = 0;
             }
+
+            // Check if the salary should be set to the high value. We manually check this since the
+            // stored percentage might be rounded down due to the two decimal precision limit
             var salaryAfterIncrease = ${appraisal.salary.current} * (1 + increasePercentage / 100);
-            if(salaryAfterIncrease > salary_high) {
-                salaryAfterIncrease = salary_high;
-            }
-            else if(salaryAfterIncrease < salary_low) {
-                salaryAfterIncrease = salary_low;
+            var salaryAfterRate2 = ${appraisal.salary.current} * (1 + ${increaseRate2Value} / 100);
+            var salaryAfterRate1Min = ${appraisal.salary.current} * (1 + ${increaseRate1MinVal} / 100);
+            if (salaryAfterIncrease >= ${appraisal.salary.high} || salaryAfterRate2 >= ${appraisal.salary.high} ||
+                    salaryAfterRate1Min >= ${appraisal.salary.high}
+                    ) {
+                salaryAfterIncrease =  ${appraisal.salary.high};
+            } else {
+                // calculate salary after increase
+                var salaryAfterIncrease = ${appraisal.salary.current} * (1 + increasePercentage / 100);
+                if (salaryAfterIncrease > salary_high) {
+                    salaryAfterIncrease = salary_high;
+                } else if (salaryAfterIncrease < salary_low) {
+                    salaryAfterIncrease = salary_low;
+                }
             }
             salaryAfterIncrease = salaryAfterIncrease.toFixed(2); // round to 2 decimals
 
