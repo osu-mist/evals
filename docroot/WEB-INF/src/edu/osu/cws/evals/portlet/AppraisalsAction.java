@@ -523,7 +523,7 @@ public class AppraisalsAction implements ActionInterface {
      *
      * @param requestMap
      */
-    private void initializeJSONData(Map<String, String[]> requestMap) {
+    public void initializeJSONData(Map<String, String[]> requestMap) {
         String jsonText = "{}";
         if (requestMap.get("json_data") != null) {
             jsonText = requestMap.get("json_data")[0];
@@ -674,7 +674,8 @@ public class AppraisalsAction implements ActionInterface {
         for (AssessmentJSON assessmentJSON : jsonData.getAssessments().values())   {
             assessment = dbAssessmentsMap.get(assessmentJSON.getId().toString());
             if (assessment != null) {
-                if (permRule.canEdit("unapprovedGoals")) { // Save Goals
+                // Save Goals
+                if (permRule.canEdit("unapprovedGoals")) {
                     updateGoals(assessmentJSON, assessment, assessmentJSON.getDeleted().equals("1"));
                 }
 
@@ -785,7 +786,8 @@ public class AppraisalsAction implements ActionInterface {
             return; // if there isn't an unapproved goals versions exit
         }
 
-        if (deleted) { // Save the deleted flag if present
+        // Save the deleted flag if present
+        if (deleted) {
             assessment.setDeleteDate(new Date());
             assessment.setDeleterPidm(loggedInUser.getId());
         }

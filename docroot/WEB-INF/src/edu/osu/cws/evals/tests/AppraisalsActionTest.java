@@ -7,11 +7,10 @@ import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.hibernate.PermissionRuleMgr;
 import edu.osu.cws.evals.models.*;
-import edu.osu.cws.evals.portlet.ActionHelper;
-import edu.osu.cws.evals.portlet.AppraisalsAction;
-import edu.osu.cws.evals.portlet.Constants;
+import edu.osu.cws.evals.portlet.*;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.testng.annotations.BeforeMethod;
@@ -33,12 +32,16 @@ public class AppraisalsActionTest {
     private Appraisal appraisal;
     private PortletContext mockedPortletContext;
     private AppraisalsAction appraisalsAction;
+    private Map<String, Assessment> dbAssessmentMap;
+    public static final String EMPLOYEE_RESULTS = "Test Employee Results";
+    public static final String SUPERVISOR_RESULTS = "Test Supervisor Results";
 
     @BeforeMethod
     public void setup() {
         appraisal = new Appraisal();
         appraisal.setJob(new Job());
         appraisal.getJob().setAppointmentType(AppointmentType.CLASSIFIED);
+        dbAssessmentMap = new HashMap<String, Assessment>();
 
         mockedPortletContext = mock(PortletContext.class);
         appraisalsAction = new AppraisalsAction();
@@ -320,11 +323,11 @@ public class AppraisalsActionTest {
         // Get session and begin a transaction (error without)
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
-        // Get appraisal ids
+        // Get assessment ids
         appraisal = AppraisalMgr.getAppraisal(1);
-        ArrayList<Integer> appraisalIds = new ArrayList<Integer>();
+        ArrayList<Integer> assessmentIds = new ArrayList<Integer>();
         for(Assessment assessment : appraisal.getAssessmentMap().values()) {
-            appraisalIds.add(assessment.getId());
+            assessmentIds.add(assessment.getId());
         }
         // Mock stuff
         PortletRequest mockedRequest = mock(PortletRequest.class);
@@ -343,16 +346,108 @@ public class AppraisalsActionTest {
         String assessmentResponse = appraisalsAction.addAssessment(mockedRequest, mockedResponse);
         tx.commit();
         // Get appraisal assessment ids after new assessment added
-        ArrayList<Integer> newAppraisalIds = new ArrayList<Integer>();
+        ArrayList<Integer> newAssessmentIds = new ArrayList<Integer>();
         for(Assessment assessment : appraisal.getAssessmentMap().values()) {
-            newAppraisalIds.add(assessment.getId());
-            System.out.println(assessment.getId());
+            newAssessmentIds.add(assessment.getId());
         }
         // Parse json object response
         JsonParser parser = new JsonParser();
         JsonObject responseJson = (JsonObject)parser.parse(assessmentResponse);
         // Assertions
-        assert !appraisalIds.contains(responseJson.get("id"));
-        assert newAppraisalIds.contains((Integer)responseJson.get("id").getAsInt());
+        assert !assessmentIds.contains(responseJson.get("id"));
+        assert newAssessmentIds.contains(responseJson.get("id").getAsInt());
+    }
+
+    // Add new assessment to appraisal
+    // Transform appraisal into JSON object as a String
+    //
+    public void shouldSetAppraisalFieldsCorrectly() throws Exception {
+        DBUnit dbunit = new DBUnit();
+        dbunit.seedDatabase();
+        // Get session and begin a transaction
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+
+        appraisal = AppraisalMgr.getAppraisal(1);
+        Map<String, String[]> requestMap = new HashMap<String, String[]>();
+        requestMap.put("json_data", new String[] {appraisalToJSONString()});
+        // Mock stuff
+        PortletRequest mockedRequest = mock(PortletRequest.class);
+        ActionHelper mockedActionHelper = mock(ActionHelper.class);
+        PropertiesConfiguration mockedConfig = mock(PropertiesConfiguration.class);
+        PermissionRule mockedPermRule = mock(PermissionRule.class);
+        // when
+        when(mockedPermRule.canEdit("unapprovedGoals")).thenReturn(false);
+        when(mockedPermRule.canEdit("results")).thenReturn(true);
+        when(mockedPermRule.canEdit("supervisorResults")).thenReturn(true);
+        when(mockedConfig.getString("profFaculty.maximized.Message")).thenReturn("null");
+        when(mockedActionHelper.getEvalsConfig()).thenReturn(mockedConfig);
+        when(mockedRequest.getParameter("id")).thenReturn("1");
+        when(mockedActionHelper.getLoggedOnUser()).thenReturn(EmployeeMgr.findByOnid("cedenoj", null));
+        when(mockedPortletContext.getAttribute("permissionRules")).thenReturn(PermissionRuleMgr.list());
+        when(mockedActionHelper.getPortletContext()).thenReturn(mockedPortletContext);
+        // add mocks
+        appraisalsAction.setActionHelper(mockedActionHelper);
+        appraisalsAction.setAppraisal(appraisal);
+        // Call initialize and commit
+        appraisalsAction.initializeJSONData(requestMap);
+        System.out.println(appraisalsAction.getDbAssessmentsMap());
+        tx.commit();
+        // Assertions
+
+        assert false;
+    }
+
+    private String appraisalToJSONString() {
+        ArrayList<String> appraisalJSONArray = new ArrayList<String>();
+        appraisalJSONArray.add("id:" + appraisal.getId());
+        appraisalJSONArray.add("goalsComments:\"\"");
+        appraisalJSONArray.add("evaluation:\"\"");
+        appraisalJSONArray.add("rating:" + appraisal.getRating());
+        appraisalJSONArray.add("salaryRecommendation:\"\"");
+        appraisalJSONArray.add("review:\"\"");
+        appraisalJSONArray.add("rebuttal:\"\"");
+        appraisalJSONArray.add("buttonClicked:\"\"");
+        ArrayList<String> appraisalAssessmentsArray = new ArrayList<String>();
+        int count = 0;
+        for(Assessment assessment : appraisal.getAssessmentMap().values()) {
+            String idAsString = assessment.getId().toString();
+            dbAssessmentMap.put(idAsString, assessment);
+            if(count % 3 == 0) {
+                appraisalAssessmentsArray.add(idAsString + ":" +
+                        assessmentToJSONString(assessment, EMPLOYEE_RESULTS, SUPERVISOR_RESULTS));
+            }
+            else {
+                appraisalAssessmentsArray.add(idAsString + ":" + assessmentToJSONString(assessment));
+            }
+            count++;
+        }
+        appraisalJSONArray.add("assessments:{" + StringUtils.join(appraisalAssessmentsArray, ",") + "}");
+        String closeOutReasonId = "null";
+        if(appraisal.getCloseOutReason() != null) {
+            closeOutReasonId = "" + appraisal.getCloseOutReason().getId();
+        }
+        appraisalJSONArray.add("closeOutReasonId:" + closeOutReasonId);
+        return "{" + StringUtils.join(appraisalJSONArray, ",") + "}";
+    }
+
+    private String assessmentToJSONString(Assessment assessment) {
+        return assessmentToJSONString(assessment, assessment.getEmployeeResult(), assessment.getSupervisorResult());
+    }
+
+    private String assessmentToJSONString(Assessment assessment, String employeeResults, String supervisorResults) {
+        ArrayList<String> assessmentsJSONArray = new ArrayList<String>();
+        assessmentsJSONArray.add("id:" + assessment.getId().toString());
+        assessmentsJSONArray.add("goal:" + assessment.getGoal());
+        assessmentsJSONArray.add("employeeResult:" + employeeResults);
+        assessmentsJSONArray.add("supervisorResult:" + supervisorResults);
+        String deleted = assessment.isDeleted() ? "\"1\"" : "\"0\"";
+        assessmentsJSONArray.add("deleted:" + deleted);
+        ArrayList<String> criteriaArray = new ArrayList<String>();
+        for(AssessmentCriteria assessmentCriteria : assessment.getAssessmentCriteria()) {
+            criteriaArray.add(assessmentCriteria.getId().toString() + ":" + assessmentCriteria.getChecked().toString());
+        }
+        assessmentsJSONArray.add("criteria:{" + StringUtils.join(criteriaArray, ",") + "}");
+        return "{" + StringUtils.join(assessmentsJSONArray, ",") + "}";
     }
 }
