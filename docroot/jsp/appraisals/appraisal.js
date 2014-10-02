@@ -273,8 +273,14 @@ jQuery(document).ready(function() {
   //Supervisor Results and Overall Evaluation cannot be empty when releasing appraisal
   jQuery("#<portlet:namespace />release-appraisal").click(function(event) {
       var emptyResults = areResultsEmpty();
+      var signed = isAppraisalSigned();
       if(emptyResults){
           alert('<liferay-ui:message key="appraisal-supervisor-empty-results"/>');
+      }
+      else if(!signed) {
+          alert('<liferay-ui:message key="appraisal-release-not-signed"/>');
+      }
+      if(emptyResults || !signed) {
           event.isDefaultPrevented = true;
           return false;
       }
@@ -538,6 +544,15 @@ jQuery(document).ready(function() {
           return jQuery.trim(this.value) == '';
       });
       return isEmpty.length > 0;
+  }
+
+  /**
+   * Returns true if the supervisor signature checkbox is checked. Otherwise returns false.
+   * @return {Boolean}
+   */
+  function isAppraisalSigned() {
+      var sigCheckbox = JQuery('#<portlet:namespace />acknowledge-release-appraisal');
+      return sigCheckbox.attr('checked');
   }
 
   /**

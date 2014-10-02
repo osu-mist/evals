@@ -42,5 +42,31 @@
             <%@ include file="/jsp/appraisals/salary.jsp"%>
         </c:if>
 
+        <c:if test="${not empty permissionRule.evaluation}">
+            <fieldset>
+                <legend><liferay-ui:message key="appraisal-supervisor-signature" /></legend>
+                <input type="checkbox"  name="<portlet:namespace />acknowledge-release-appraisal"
+                       id="<portlet:namespace />acknowledge-release-appraisal"
+                       <c:if test="${not empty appraisal.releaseDate}">
+                            checked="checked"
+                       </c:if>
+                       <c:if test="${not empty appraisal.releaseDate or permissionRule.evaluation == 'v'}">
+                           disabled="disabled"
+                       </c:if>
+                       />
+                <label for="<portlet:namespace />acknowledge-release-appraisal">
+                    <liferay-ui:message key="appraisal-acknowledge-release-checkbox"/>
+                </label>
+                <br />
+                <p>
+                    <c:if test="${not empty appraisal.releaseDate}">
+                        <liferay-ui:message key="appraisal-signed" />
+                        ${appraisal.job.supervisor.employee.name}
+                        <fmt:formatDate value="${appraisal.releaseDate}" pattern="MM/dd/yy h:m a"/>
+                    </c:if>
+                </p>
+            </fieldset>
+        </c:if>
+
     </fieldset>
 </div><!-- end evaluation -->
