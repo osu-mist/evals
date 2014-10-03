@@ -887,8 +887,10 @@ public class AppraisalsAction implements ActionInterface {
 
         Salary salary = appraisal.getSalary();
         Double increaseValue = 0d;
-        if (appraisal.getRating() != null) {
-            String salaryRecommendation = jsonData.getSalaryRecommendation();
+        double salaryAfterIncrease;
+        String salaryRecommendation = jsonData.getSalaryRecommendation();
+
+        if (appraisal.getRating() != null && salaryRecommendation != null && !salaryRecommendation.equals("")) {
             Double submittedIncrease = Double.parseDouble(salaryRecommendation);
 
             // allow for ratings outside of valid range when employee is close to salary high
@@ -896,13 +898,18 @@ public class AppraisalsAction implements ActionInterface {
                 // can only specify an increase if the salary is not at the top pay range
                 if (salary.getCurrent() < salary.getHigh()) {
                     // Check that the user submitted a valid salary increase
-                    if (salaryRecommendation == null || !NumberUtils.isNumber(salaryRecommendation)) {
+                    if (!NumberUtils.isNumber(salaryRecommendation)) {
                         return;
                     }
 
-                    if (submittedIncrease >= increaseRate1MinVal && submittedIncrease <= increaseRate1MaxVal) {
+                    salaryAfterIncrease = salary.getCurrent() * (1 + increaseRate1MinVal / 100.0);
+                    // check that the percentage is within allowed range for rate of 1
+                    boolean increaseInRange = submittedIncrease >= increaseRate1MinVal &&
+                            submittedIncrease <= increaseRate1MaxVal;
+                    if (increaseInRange || salaryAfterIncrease >= salary.getHigh()) {
                         increaseValue = submittedIncrease;
                     } else {
+                        // otherwise only throw an error if the salary after increase is greater than the allowed max
                         throw new ModelException(resource.getString("appraisal-salary-increase-error-invalid-change"));
                     }
                 }
@@ -910,7 +917,7 @@ public class AppraisalsAction implements ActionInterface {
                 increaseValue = increaseRate2Value;
             }
 
-            double salaryAfterIncrease = salary.getCurrent() * (1 + increaseValue / 100.0);
+            salaryAfterIncrease = salary.getCurrent() * (1 + increaseValue / 100.0);
             if (salaryAfterIncrease > salary.getHigh()) {
                 increaseValue = (salary.getHigh() - salary.getCurrent()) / salary.getCurrent() * 100;
             }

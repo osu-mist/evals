@@ -69,4 +69,15 @@
         });
         jQuery("span.evals-show-confirm a").attr("onClick","");
     });
+
+    /**
+     * Format value into currency with two decimals and the $ sign.
+     *
+     * @param value
+     * @returns {string}
+     */
+    function formatCurrency(value) {
+        var fmtValue = value.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+        return '$' + fmtValue;
+    }
 </script>

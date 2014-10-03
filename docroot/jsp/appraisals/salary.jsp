@@ -121,6 +121,11 @@
          * @return {String}
          */
         function getSalaryAfterIncrease() {
+            var rating = jQuery('input:radio[name=<portlet:namespace />appraisal.rating]:checked').val();
+            if (rating == 3) {
+                return formatCurrency(${appraisal.salary.current});
+            }
+
             var increasePercentage = jQuery(".osu-cws input.recommended-salary").val();
             if (!(increasePercentage >= 0 && increasePercentage <= 999)) {
                 increasePercentage = 0;
@@ -144,11 +149,9 @@
                     salaryAfterIncrease = salary_low;
                 }
             }
-            salaryAfterIncrease = salaryAfterIncrease.toFixed(2); // round to 2 decimals
 
-            // format salary
-            var fmtSalary = salaryAfterIncrease.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-            return '$' + fmtSalary;
+            salaryAfterIncrease = salaryAfterIncrease.toFixed(2); // round to 2 decimals
+            return formatCurrency(salaryAfterIncrease);
         }
 
         /**
