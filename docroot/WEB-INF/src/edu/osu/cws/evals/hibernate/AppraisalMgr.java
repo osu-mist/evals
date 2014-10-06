@@ -693,7 +693,7 @@ public class AppraisalMgr {
                 "where appraisal.job.employee.id = :pidm and appraisal.job.positionNumber = :positionNumber " +
                 "and appraisal.job.suffix = :suffix and appraisal.type = :type " +
                 "and (appraisal.status != 'closed' AND  appraisal.status != 'completed' AND " +
-                "appraisal.status != 'archived')";
+                "appraisal.status not like 'archived%')";
 
         Iterator resultMapIter = session.createQuery(query)
                 .setInteger("pidm", job.getEmployee().getId())
