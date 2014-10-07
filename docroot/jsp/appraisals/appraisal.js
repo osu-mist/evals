@@ -1,5 +1,6 @@
 jQuery(document).ready(function() {
 
+  var buttonClicked;
   // professional faculty start-here animation:
   jQuery('.evals-prof-faculty-start').siblings().fadeTo("slow", 0.2);
   setTimeout(function() { endStartAnimation() }, 3000);
@@ -142,7 +143,7 @@ jQuery(document).ready(function() {
     // employee rebuttal
     o.rebuttal = jQuery('#' + portlet_namespace + 'appraisal\\.rebuttal').val();
     // button clicked
-    o.buttonClicked = jQuery("input[type=submit][clicked=true]").attr('name');
+    o.buttonClicked = buttonClicked.attr('name');
 
     return o;
   }
@@ -274,16 +275,19 @@ jQuery(document).ready(function() {
   jQuery("#<portlet:namespace />release-appraisal").click(function(event) {
       var emptyResults = areResultsEmpty();
       var signed = isAppraisalSigned();
-      if(emptyResults){
-          alert('<liferay-ui:message key="appraisal-supervisor-empty-results"/>');
-      }
-      else if(!signed) {
-          alert('<liferay-ui:message key="appraisal-release-not-signed"/>');
-      }
-      if(emptyResults || !signed) {
+      if(emptyResults || !signed){
+          var msg;
+          if(emptyResults) {
+              msg = '<liferay-ui:message key="appraisal-supervisor-empty-results"/>';
+          }
+          else {
+              msg = '<liferay-ui:message key="appraisal-release-not-signed"/>';
+          }
+          alert(msg);
           event.isDefaultPrevented = true;
           return false;
       }
+      buttonClicked = jQuery(this);
   });
 
 
@@ -547,11 +551,12 @@ jQuery(document).ready(function() {
   }
 
   /**
-   * Returns true if the supervisor signature checkbox is checked. Otherwise returns false.
+   * Returns true if the supervisor signature checkbox is checked (when releasing evaluation to employee).
+   * Otherwise returns false.
    * @return {Boolean}
    */
   function isAppraisalSigned() {
-      var sigCheckbox = JQuery('#<portlet:namespace />acknowledge-release-appraisal');
+      var sigCheckbox = jQuery('#<portlet:namespace />acknowledge-release-appraisal');
       return sigCheckbox.attr('checked');
   }
 
