@@ -97,6 +97,19 @@
               overdue="0"
   />
 
+  <appraisals ID="9"
+              START_DATE="2009-05-14"
+              END_DATE="2010-05-10"
+              STATUS="archivedCompleted"
+              JOB_PIDM="12345"
+              POSITION_NUMBER="7777"
+              JOB_SUFFIX="00"
+              CREATE_DATE="2010-05-01"
+              EVALUATION_SUBMIT_DATE="2011-03-01"
+              TYPE="trial"
+              overdue="0"
+          />
+
   <goals_versions ID="1" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="1"/>
   <goals_versions ID="2" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="2"/>
   <goals_versions ID="3" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="5"/>
@@ -536,6 +549,28 @@
             PYVPASJ_SAL_STEP="0"
             PYVPASJ_TRIAL_IND="6"
             PYVPASJ_ANNUAL_IND="12"
+            PYVPASJ_EVAL_DATE="2010-01-30"
+            PYVPASJ_ORGN_DESC="testing"/>
+
+    <jobs
+            PYVPASJ_PIDM="12345"
+            PYVPASJ_SUPERVISOR_PIDM="12467"
+            PYVPASJ_SUPERVISOR_POSN="1234"
+            PYVPASJ_SUPERVISOR_SUFF="00"
+            PYVPASJ_DESC="super hero"
+            PYVPASJ_POSN="7777"
+            PYVPASJ_SUFF="00"
+            PYVPASJ_ECLS_CODE="kjlkjlk"
+            PYVPASJ_APPOINTMENT_TYPE="Classified"
+            PYVPASJ_BEGIN_DATE="2011-05-14"
+            PYVPASJ_BCTR_TITLE="UABC"
+            PYVPASJ_ORGN_CODE_TS="test"
+            PYVPASJ_STATUS="A"
+            PYVPASJ_PCLS_CODE="test"
+            PYVPASJ_SAL_GRADE="0"
+            PYVPASJ_SAL_STEP="0"
+            PYVPASJ_TRIAL_IND="9"
+            PYVPASJ_ANNUAL_IND="18"
             PYVPASJ_EVAL_DATE="2010-01-30"
             PYVPASJ_ORGN_DESC="testing"/>
 

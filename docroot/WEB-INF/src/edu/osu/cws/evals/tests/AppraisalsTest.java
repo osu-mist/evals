@@ -325,25 +325,24 @@ public class AppraisalsTest {
 
         List<Appraisal> teamActiveAppraisals = AppraisalMgr.getMyTeamsAppraisals(pidm, true,
                 null, null, appointmentTypes);
-        assert teamActiveAppraisals.size() == 7 : "Invalid size of team active appraisals";
+        assert teamActiveAppraisals.size() == 8 : "Invalid size of team active appraisals";
         for (Appraisal ap : teamActiveAppraisals) {
-            assert ap.getId() != 0 :
-                    "id should be present in list of team appraisals";
-            //@todo: should this be use jobTitle instead? check my notes
-            assert ap.getJob().getJobTitle() != null : "" +
-                    "job title should be present in list of team appraisals";
-            assert ap.getStartDate() != null :
-                    "start date should be present in list of team appraisals";
-            assert ap.getEndDate() != null :
-                    "end date should be present in list of team appraisals";
-            assert ap.getStatus() != null :
-                    "status should be present in list of team appraisals";
-            assert ap.getJob().getEmployee().getFirstName() != null :
-                    "employee first name should be present in list of team appraisals";
-            assert ap.getJob().getEmployee().getLastName() != null :
-                    "employee last name should be present in list of team appraisals";
-            assert ap.getJob().getAppointmentType() != null :
-                    "appointment type name should be present in list of team appraisals";
+            if (ap.getId() != 0) {
+                assert ap.getJob().getJobTitle() != null : "" +
+                        "job title should be present in list of team appraisals";
+                assert ap.getStartDate() != null :
+                        "start date should be present in list of team appraisals";
+                assert ap.getEndDate() != null :
+                        "end date should be present in list of team appraisals";
+                assert ap.getStatus() != null :
+                        "status should be present in list of team appraisals";
+                assert ap.getJob().getEmployee().getFirstName() != null :
+                        "employee first name should be present in list of team appraisals";
+                assert ap.getJob().getEmployee().getLastName() != null :
+                        "employee last name should be present in list of team appraisals";
+                assert ap.getJob().getAppointmentType() != null :
+                        "appointment type name should be present in list of team appraisals";
+            }
         }
     }
 
@@ -560,7 +559,6 @@ public class AppraisalsTest {
         //@todo: test appraisalExists
     }
 
-    @Test(groups={"pending"})
     public void shouldDetectIfAJobHasAnOpenTrialAppraisal() throws Exception {
         Job job = new Job();
         Employee employee = new Employee();
@@ -576,6 +574,17 @@ public class AppraisalsTest {
 
         job.setPositionNumber("4444");
         assert AppraisalMgr.openTrialAppraisalExists(job);
+    }
+
+    public void shouldNotConsiderArchivedAsOpenTrialAppraisals() throws Exception {
+        Job job = new Job();
+        Employee employee = new Employee();
+        employee.setId(12345);
+        job.setEmployee(employee);
+        job.setPositionNumber("7777");
+        job.setSuffix("00");
+
+        assert !AppraisalMgr.openTrialAppraisalExists(job);
     }
 
     @Test(groups={"pending"})
