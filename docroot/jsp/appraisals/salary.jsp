@@ -93,7 +93,7 @@
                             + ${increaseRate1MinVal} + ' - ' + ${increaseRate1MaxVal} + ')';
                     jQuery('.recommended-salary-hint').html(hint);
                 } else if (rating == 2) {
-                    increase = ${increaseRate2Value}; // disable the inputs as well if rating is 2 or 3
+                    increase = getIncreaseWithinUpperBound(${increaseRate2Value}); // disable the inputs as well if rating is 2 or 3
                 }
             }
 
@@ -121,29 +121,47 @@
          * @return {String}
          */
         function getSalaryAfterIncrease() {
-            // calculate salary after increase
+            var rating = jQuery('input:radio[name=<portlet:namespace />appraisal.rating]:checked').val();
+            if (rating == 3) {
+                return formatCurrency(${appraisal.salary.current});
+            }
+
             var increasePercentage = jQuery(".osu-cws input.recommended-salary").val();
             if (!(increasePercentage >= 0 && increasePercentage <= 999)) {
                 increasePercentage = 0;
             }
-            var salaryAfterIncrease = ${appraisal.salary.current} * (1 + increasePercentage / 100);
-            if(salaryAfterIncrease > salary_high) {
-                salaryAfterIncrease = salary_high;
-            }
-            else if(salaryAfterIncrease < salary_low) {
-                salaryAfterIncrease = salary_low;
-            }
-            salaryAfterIncrease = salaryAfterIncrease.toFixed(2); // round to 2 decimals
 
-            // format salary
-            var fmtSalary = salaryAfterIncrease.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-            return '$' + fmtSalary;
+            // Check if the salary should be set to the high value. We manually check this since the
+            // stored percentage might be rounded down due to the two decimal precision limit
+            var salaryAfterIncrease = ${appraisal.salary.current} * (1 + increasePercentage / 100);
+            var salaryAfterRate2 = ${appraisal.salary.current} * (1 + ${increaseRate2Value} / 100);
+            var salaryAfterRate1Min = ${appraisal.salary.current} * (1 + ${increaseRate1MinVal} / 100);
+            if (salaryAfterIncrease >= ${appraisal.salary.high} || salaryAfterRate2 >= ${appraisal.salary.high} ||
+                    salaryAfterRate1Min >= ${appraisal.salary.high}
+                    ) {
+                salaryAfterIncrease =  ${appraisal.salary.high};
+            } else {
+                // calculate salary after increase
+                var salaryAfterIncrease = ${appraisal.salary.current} * (1 + increasePercentage / 100);
+                if (salaryAfterIncrease > salary_high) {
+                    salaryAfterIncrease = salary_high;
+                } else if (salaryAfterIncrease < salary_low) {
+                    salaryAfterIncrease = salary_low;
+                }
+            }
+
+            salaryAfterIncrease = salaryAfterIncrease.toFixed(2); // round to 2 decimals
+            return formatCurrency(salaryAfterIncrease);
         }
 
         /**
          * Sets the salary after increase in the html table.
          */
         function setSalaryIncrease() {
+            // set % increase first and then re-calculate new salary after increase
+            var increase = jQuery(".osu-cws input.recommended-salary").val();
+            jQuery('.osu-cws input.recommended-salary').val(getIncreaseWithinUpperBound(increase));
+
             var salaryAfterIncrease = getSalaryAfterIncrease();
             jQuery('.salary-after-increase').html(salaryAfterIncrease);
         }
@@ -190,6 +208,14 @@
             return '';
         }
 
+        // If the salary is at the top range, allow increase % to reflect actual increase within salary range
+        var salaryAfterIncrease = ${appraisal.salary.current} * (1 + increase / 100);
+        if(salaryAfterIncrease.toFixed(0) == ${appraisal.salary.high}) {
+            if (increase == getIncreaseWithinUpperBound(increase)) {
+                return '';
+            }
+        }
+
         switch(rating) {
             case "1":
                 if (increase < ${increaseRate1MinVal} || increase > ${increaseRate1MaxVal}) {
@@ -209,5 +235,21 @@
         }
 
         return '';
+    }
+
+    /**
+     * Returns the actual increase percentage that is provided to the employee. This function checks
+     * if the percent increase puts the employee above the salary high, it re-calculates the actual increase
+     * percentage that puts the employee to the salary high value.
+     *
+     * @param increase
+     */
+    function getIncreaseWithinUpperBound(increase) {
+        var salaryAfterIncrease = ${appraisal.salary.current} * (1 + increase / 100);
+        if(salaryAfterIncrease >= ${appraisal.salary.high}) {
+            var actualIncrease = (${appraisal.salary.high} - ${appraisal.salary.current}) / ${appraisal.salary.current};
+            return (actualIncrease * 100).toFixed(2);
+        }
+        return increase;
     }
 </script>

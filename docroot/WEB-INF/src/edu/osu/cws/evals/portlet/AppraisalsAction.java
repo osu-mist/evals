@@ -887,27 +887,45 @@ public class AppraisalsAction implements ActionInterface {
 
         Salary salary = appraisal.getSalary();
         Double increaseValue = 0d;
-        if (appraisal.getRating() != null) {
+        double salaryAfterIncrease;
+        String salaryRecommendation = jsonData.getSalaryRecommendation();
+
+        if (appraisal.getRating() != null && salaryRecommendation != null && !salaryRecommendation.equals("")) {
+            Double submittedIncrease = Double.parseDouble(salaryRecommendation);
+
+            // allow for ratings outside of valid range when employee is close to salary high
             if (appraisal.getRating() == 1) {
                 // can only specify an increase if the salary is not at the top pay range
                 if (salary.getCurrent() < salary.getHigh()) {
-                    String salaryRecommendation = jsonData.getSalaryRecommendation();
                     // Check that the user submitted a valid salary increase
-                    if (salaryRecommendation == null || !NumberUtils.isNumber(salaryRecommendation)) {
+                    if (!NumberUtils.isNumber(salaryRecommendation)) {
                         return;
                     }
 
-                    Double submittedIncrease = Double.parseDouble(salaryRecommendation);
-                    if (submittedIncrease >= increaseRate1MinVal && submittedIncrease <= increaseRate1MaxVal) {
+                    salaryAfterIncrease = salary.getCurrent() * (1 + increaseRate1MinVal / 100.0);
+                    // check that the percentage is within allowed range for rate of 1
+                    boolean increaseInRange = submittedIncrease >= increaseRate1MinVal &&
+                            submittedIncrease <= increaseRate1MaxVal;
+                    if (increaseInRange || salaryAfterIncrease >= salary.getHigh()) {
                         increaseValue = submittedIncrease;
                     } else {
+                        // otherwise only throw an error if the salary after increase is greater than the allowed max
                         throw new ModelException(resource.getString("appraisal-salary-increase-error-invalid-change"));
                     }
                 }
             } else if (appraisal.getRating() == 2) {
                 increaseValue = increaseRate2Value;
             }
+
+            salaryAfterIncrease = salary.getCurrent() * (1 + increaseValue / 100.0);
+            if (salaryAfterIncrease > salary.getHigh()) {
+                increaseValue = (salary.getHigh() - salary.getCurrent()) / salary.getCurrent() * 100;
+            }
+
+            // round to two decimals:
+            increaseValue = Math.round(increaseValue * 100) / 100.0;
         }
+
 
         salary.setIncrease(increaseValue);
     }
