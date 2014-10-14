@@ -42,9 +42,9 @@
             <%@ include file="/jsp/appraisals/salary.jsp"%>
         </c:if>
 
-        <c:if test="${not empty permissionRule.evaluation}">
+        <c:if test="${permissionRule.canViewEvalReleaseSig}">
             <fieldset>
-                <legend><liferay-ui:message key="appraisal-supervisor-signature" /></legend>
+                <legend><liferay-ui:message key="appraisal-supervisor-signature"/></legend>
                 <input type="checkbox"  name="<portlet:namespace />acknowledge-release-appraisal"
                        id="<portlet:namespace />acknowledge-release-appraisal"
                        <c:if test="${not empty appraisal.releaseDate}">

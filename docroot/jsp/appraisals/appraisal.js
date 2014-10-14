@@ -142,8 +142,9 @@ jQuery(document).ready(function() {
 
     // employee rebuttal
     o.rebuttal = jQuery('#' + portlet_namespace + 'appraisal\\.rebuttal').val();
+
     // button clicked
-    o.buttonClicked = buttonClicked.attr('name');
+    o.buttonClicked = jQuery("input[type=submit][clicked=true]").attr('name');
 
     return o;
   }
@@ -287,7 +288,6 @@ jQuery(document).ready(function() {
           event.isDefaultPrevented = true;
           return false;
       }
-      buttonClicked = jQuery(this);
   });
 
 

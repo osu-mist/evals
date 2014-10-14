@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.models;
 
+import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.WordUtils;
 
@@ -263,6 +264,15 @@ public class PermissionRule extends Evals implements Cloneable {
         Method permissionMethod = this.getClass().getDeclaredMethod(methodName);
         String permission = (String) permissionMethod.invoke(this);
         return permission != null && permission.equals(action);
+    }
+
+    public Boolean getCanViewEvalReleaseSig() {
+        boolean canView =
+                 evaluation != null
+             && !evaluation.equals("")
+             && !status.equals(Appraisal.STATUS_APPRAISAL_DUE)
+             && !status.equals(Appraisal.STATUS_EMPLOYEE_REVIEW_DUE);
+        return canView;
     }
 
 }
