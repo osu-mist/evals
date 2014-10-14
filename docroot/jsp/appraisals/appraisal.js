@@ -280,8 +280,7 @@ jQuery(document).ready(function() {
           var msg;
           if(emptyResults) {
               msg = '<liferay-ui:message key="appraisal-supervisor-empty-results"/>';
-          }
-          else {
+          } else {
               msg = '<liferay-ui:message key="appraisal-release-not-signed"/>';
           }
           alert(msg);
