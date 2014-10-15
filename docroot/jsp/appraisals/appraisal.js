@@ -1,6 +1,5 @@
 jQuery(document).ready(function() {
 
-  var buttonClicked;
   // professional faculty start-here animation:
   jQuery('.evals-prof-faculty-start').siblings().fadeTo("slow", 0.2);
   setTimeout(function() { endStartAnimation() }, 3000);

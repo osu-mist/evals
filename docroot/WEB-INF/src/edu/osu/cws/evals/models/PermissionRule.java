@@ -1,6 +1,5 @@
 package edu.osu.cws.evals.models;
 
-import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.WordUtils;
 
