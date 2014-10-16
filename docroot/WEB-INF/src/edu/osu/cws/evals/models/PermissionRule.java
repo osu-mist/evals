@@ -265,4 +265,18 @@ public class PermissionRule extends Evals implements Cloneable {
         return permission != null && permission.equals(action);
     }
 
+    /**
+     * Checks if the supervisor signature for releasing the appraisal to the employee should be displayed.
+     * @return
+     */
+    public Boolean getCanViewEvalReleaseSig() {
+        boolean canView =
+                 evaluation != null
+             && !evaluation.equals("")
+             && !status.equals(Appraisal.STATUS_APPRAISAL_DUE)
+             && !status.equals(Appraisal.STATUS_EMPLOYEE_REVIEW_DUE)
+             && !status.equals(Appraisal.STATUS_REVIEW_DUE);
+        return canView;
+    }
+
 }
