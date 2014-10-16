@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +25,7 @@ public class ReviewCycleOptionMgr {
         Criteria criteria = session.createCriteria(ReviewCycleOption.class);
         criteria.addOrder(Order.asc("sequence"));
         criteria.addOrder(Order.asc("name"));
+        criteria.add(Restrictions.isNull("deleteDate"));
 
         return (ArrayList<ReviewCycleOption>) criteria.list();
     }
@@ -36,11 +38,12 @@ public class ReviewCycleOptionMgr {
      * @return  success
      * @throws Exception
      */
-    public static boolean delete(int id) throws Exception {
+    public static boolean delete(int id, Employee loggedOnUser) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         int deletedRows = session.getNamedQuery("reviewcycleoption.delete")
                 .setInteger("id", id)
                 .setDate("deleteDate", new Date())
+                .setParameter("deleter", loggedOnUser)
                 .executeUpdate();
 
         return deletedRows == 1;
