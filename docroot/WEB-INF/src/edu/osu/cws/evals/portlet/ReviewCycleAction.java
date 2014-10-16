@@ -5,6 +5,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.CloseOutReasonMgr;
 import edu.osu.cws.evals.hibernate.ReviewCycleOptionMgr;
 import edu.osu.cws.evals.models.CloseOutReason;
+import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.ModelException;
 import edu.osu.cws.evals.models.ReviewCycleOption;
 
@@ -104,7 +105,8 @@ public class ReviewCycleAction implements ActionInterface {
                 return list(request, response);
             }
 
-            ReviewCycleOptionMgr.delete(id);
+            Employee loggedOnUser = actionHelper.getLoggedOnUser();
+            ReviewCycleOptionMgr.delete(id, loggedOnUser);
             SessionMessages.add(request, "review-cycle-option-deleted");
         } catch (ModelException e) {
             actionHelper.addErrorsToRequest(e.getMessage());
