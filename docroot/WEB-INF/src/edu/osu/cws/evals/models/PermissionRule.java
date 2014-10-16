@@ -274,7 +274,8 @@ public class PermissionRule extends Evals implements Cloneable {
                  evaluation != null
              && !evaluation.equals("")
              && !status.equals(Appraisal.STATUS_APPRAISAL_DUE)
-             && !status.equals(Appraisal.STATUS_EMPLOYEE_REVIEW_DUE);
+             && !status.equals(Appraisal.STATUS_EMPLOYEE_REVIEW_DUE)
+             && !status.equals(Appraisal.STATUS_REVIEW_DUE);
         return canView;
     }
 

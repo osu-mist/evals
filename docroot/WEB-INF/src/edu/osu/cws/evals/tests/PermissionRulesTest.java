@@ -129,6 +129,16 @@ public class PermissionRulesTest {
         assert !rule1.getCanViewEvalReleaseSig();
     }
 
+    public void shouldReturnFalseWhenStatusIsReviewDue() {
+        // Setup
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        PermissionRule rule1 = rules.get("goalsDue-employee-Default");
+        rule1.setEvaluation("v");
+        rule1.setStatus(Appraisal.STATUS_REVIEW_DUE);
+        // Assertions
+        assert !rule1.getCanViewEvalReleaseSig();
+    }
+
     public void shouldReturnTrueWhenStatusIsReleaseDue() {
         // Setup
         HashMap<String, PermissionRule> rules = getTestRuleMap();
