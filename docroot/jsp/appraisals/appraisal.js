@@ -141,6 +141,7 @@ jQuery(document).ready(function() {
 
     // employee rebuttal
     o.rebuttal = jQuery('#' + portlet_namespace + 'appraisal\\.rebuttal').val();
+
     // button clicked
     o.buttonClicked = jQuery("input[type=submit][clicked=true]").attr('name');
 
@@ -273,8 +274,15 @@ jQuery(document).ready(function() {
   //Supervisor Results and Overall Evaluation cannot be empty when releasing appraisal
   jQuery("#<portlet:namespace />release-appraisal").click(function(event) {
       var emptyResults = areResultsEmpty();
-      if(emptyResults){
-          alert('<liferay-ui:message key="appraisal-supervisor-empty-results"/>');
+      var signed = isAppraisalSigned();
+      if(emptyResults || !signed){
+          var msg;
+          if(emptyResults) {
+              msg = '<liferay-ui:message key="appraisal-supervisor-empty-results"/>';
+          } else {
+              msg = '<liferay-ui:message key="appraisal-release-not-signed"/>';
+          }
+          alert(msg);
           event.isDefaultPrevented = true;
           return false;
       }
@@ -538,6 +546,16 @@ jQuery(document).ready(function() {
           return jQuery.trim(this.value) == '';
       });
       return isEmpty.length > 0;
+  }
+
+  /**
+   * Returns true if the supervisor signature checkbox is checked (when releasing evaluation to employee).
+   * Otherwise returns false.
+   * @return {Boolean}
+   */
+  function isAppraisalSigned() {
+      var sigCheckbox = jQuery('#<portlet:namespace />acknowledge-release-appraisal');
+      return sigCheckbox.attr('checked');
   }
 
   /**

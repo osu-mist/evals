@@ -226,7 +226,7 @@
                     </label>
                     <br />
                     <p><c:if test="${not empty appraisal.employeeSignedDate}">
-                            <liferay-ui:message key="appraisal-employee-signed" />
+                            <liferay-ui:message key="appraisal-signed" />
                             ${appraisal.job.employee.name}
                             <fmt:formatDate value="${appraisal.employeeSignedDate}" pattern="MM/dd/yy h:m a"/>
                         </c:if>

@@ -91,6 +91,114 @@ public class PermissionRulesTest {
         assert rule == null;
     }
 
+    public void shouldReturnFalseWhenEvaluationIsNull() {
+        // Setup
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        PermissionRule rule1 = rules.get("goalsDue-employee-Default");
+        rule1.setEvaluation(null);
+        // Assertions
+        assert !rule1.getCanViewEvalReleaseSig();
+    }
+
+    public void shouldReturnFalseWhenEvaluationIsEmpty() {
+        // Setup
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        PermissionRule rule1 = rules.get("goalsDue-employee-Default");
+        rule1.setEvaluation("");
+        // Assertions
+        assert !rule1.getCanViewEvalReleaseSig();
+    }
+
+    public void shouldReturnFalseWhenStatusIsAppraisalDue() {
+        // Setup
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        PermissionRule rule1 = rules.get("goalsDue-employee-Default");
+        rule1.setEvaluation("e");
+        rule1.setStatus(Appraisal.STATUS_APPRAISAL_DUE);
+        // Assertions
+        assert !rule1.getCanViewEvalReleaseSig();
+    }
+
+    public void shouldReturnFalseWhenStatusIsEmployeeReviewDue() {
+        // Setup
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        PermissionRule rule1 = rules.get("goalsDue-employee-Default");
+        rule1.setEvaluation("v");
+        rule1.setStatus(Appraisal.STATUS_EMPLOYEE_REVIEW_DUE);
+        // Assertions
+        assert !rule1.getCanViewEvalReleaseSig();
+    }
+
+    public void shouldReturnFalseWhenStatusIsReviewDue() {
+        // Setup
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        PermissionRule rule1 = rules.get("goalsDue-employee-Default");
+        rule1.setEvaluation("v");
+        rule1.setStatus(Appraisal.STATUS_REVIEW_DUE);
+        // Assertions
+        assert !rule1.getCanViewEvalReleaseSig();
+    }
+
+    public void shouldReturnTrueWhenStatusIsReleaseDue() {
+        // Setup
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        PermissionRule rule1 = rules.get("goalsDue-employee-Default");
+        rule1.setEvaluation("e");
+        rule1.setStatus(Appraisal.STATUS_RELEASE_DUE);
+        // Assertions
+        assert rule1.getCanViewEvalReleaseSig();
+    }
+
+    public void shouldReturnTrueWhenStatusIsSignatureDue() {
+        // Setup
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        PermissionRule rule1 = rules.get("goalsDue-employee-Default");
+        rule1.setEvaluation("v");
+        rule1.setStatus(Appraisal.STATUS_SIGNATURE_DUE);
+        // Assertions
+        assert rule1.getCanViewEvalReleaseSig();
+    }
+
+    public void shouldReturnTrueWhenStatusIsClosed() {
+        // Setup
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        PermissionRule rule1 = rules.get("goalsDue-employee-Default");
+        rule1.setEvaluation("v");
+        rule1.setStatus(Appraisal.STATUS_CLOSED);
+        // Assertions
+        assert rule1.getCanViewEvalReleaseSig();
+    }
+
+    public void shouldReturnTrueWhenStatusIsCompleted() {
+        // Setup
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        PermissionRule rule1 = rules.get("goalsDue-employee-Default");
+        rule1.setEvaluation("v");
+        rule1.setStatus(Appraisal.STATUS_COMPLETED);
+        // Assertions
+        assert rule1.getCanViewEvalReleaseSig();
+    }
+
+    public void shouldReturnTrueWhenStatusIsArchivedClosed() {
+        // Setup
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        PermissionRule rule1 = rules.get("goalsDue-employee-Default");
+        rule1.setEvaluation("v");
+        rule1.setStatus(Appraisal.STATUS_ARCHIVED_CLOSED);
+        // Assertions
+        assert rule1.getCanViewEvalReleaseSig();
+    }
+
+    public void shouldReturnTrueWhenStatusIsArchivedCompleted() {
+        // Setup
+        HashMap<String, PermissionRule> rules = getTestRuleMap();
+        PermissionRule rule1 = rules.get("goalsDue-employee-Default");
+        rule1.setEvaluation("v");
+        rule1.setStatus(Appraisal.STATUS_ARCHIVED_COMPLETED);
+        // Assertions
+        assert rule1.getCanViewEvalReleaseSig();
+    }
+
     private HashMap<String, PermissionRule> getTestRuleMap() {
         HashMap<String, PermissionRule> rules = new HashMap<String, PermissionRule>();
 
