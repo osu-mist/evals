@@ -792,7 +792,7 @@
        />
    <review_cycle_options
            ID="3"
-           NAME="Calendar year with typo"
+           NAME="Deleted option"
            SEQUENCE="1"
            VALUE="1"
            CREATE_DATE="2011-05-14"
