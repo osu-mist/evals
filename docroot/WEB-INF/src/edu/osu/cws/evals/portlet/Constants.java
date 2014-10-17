@@ -44,6 +44,9 @@ public class Constants {
     public static final String JSP_NOTICE_LIST = "/jsp/notices/list.jsp";
     public static final String JSP_NOTICE_EDIT = "/jsp/notices/edit.jsp";
 
+    public static final String JSP_REVIEW_CYCLE_LIST = "/jsp/review_cycle_options/list.jsp";
+    public static final String JSP_REVIEW_CYCLE_DELETE = "/jsp/review_cycle_options/delete.jsp";
+
     // Used by several Hibernate classes when executing hierarchical queries
     public static final String CONNECT_BY = "CONNECT BY " +
             "pyvpasj_supervisor_pidm = prior pyvpasj_pidm AND " +

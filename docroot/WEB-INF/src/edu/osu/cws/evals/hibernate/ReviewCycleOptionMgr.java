@@ -49,17 +49,41 @@ public class ReviewCycleOptionMgr {
         return deletedRows == 1;
     }
 
-    public static boolean add(String name, Integer value, Integer sequence, Employee loggedInUser) throws Exception {
+    /**
+     * Handles add and edit operations for a review cycle option. If the option being added was previously deleted,
+     * it un-deletes the option and updates the value and sequence.
+     *
+     * @param name
+     * @param value
+     * @param sequence
+     * @param loggedInUser
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public static boolean add(String name, Integer value, Integer sequence, Employee loggedInUser, Integer id)
+            throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         name = StringUtils.trim(name);
-        ReviewCycleOption existingCycleOption = get(name);
-        if (existingCycleOption != null) {
-            existingCycleOption.setDeleteDate(null);
-            session.save(existingCycleOption);
-            return true;
+        ReviewCycleOption reviewCycleOption;
+
+        if (id != null && id != 0) {
+            // edit - retrieve review cycle to update based on form fields
+            reviewCycleOption = get(id);
+        } else {
+            reviewCycleOption = get(name);
+
+            // add - check if option was previously deleted and set to null delete flags
+            if (reviewCycleOption != null) {
+                // clear out old delete flag values
+                reviewCycleOption.setDeleteDate(null);
+                reviewCycleOption.setDeleter(null);
+            } else {
+                // add - option was not previously deleted in db. create new object
+                reviewCycleOption = new ReviewCycleOption();
+            }
         }
 
-        ReviewCycleOption reviewCycleOption = new ReviewCycleOption();
         reviewCycleOption.setName(name);
         reviewCycleOption.setValue(value);
         reviewCycleOption.setSequence(sequence);
@@ -70,6 +94,13 @@ public class ReviewCycleOptionMgr {
         return reviewCycleOption.getId() != 0;
     }
 
+    /**
+     * Fetch review cycle option that matches name. It doesn't filter out deleted options.
+     *
+     * @param name
+     * @return
+     * @throws Exception
+     */
     public static ReviewCycleOption get(String name) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         ReviewCycleOption option = (ReviewCycleOption) session.getNamedQuery("reviewcycleoption.getOption")
@@ -79,6 +110,13 @@ public class ReviewCycleOptionMgr {
         return option;
     }
 
+    /**
+     * Fetch review cycle option that matches the id. It doesn't filter out deleted options.
+     *
+     * @param id
+     * @return
+     * @throws Exception
+     */
     public static ReviewCycleOption get(int id) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         return (ReviewCycleOption) session.get(ReviewCycleOption.class, id);

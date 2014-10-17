@@ -63,10 +63,17 @@ public class ReviewCycleAction implements ActionInterface {
         String reason = ParamUtil.getString(request, "name");
         int value = ParamUtil.getInteger(request, "value");
         int sequence = ParamUtil.getInteger(request, "sequence");
+        Integer id = ParamUtil.getInteger(request, "id");
 
         try {
-            ReviewCycleOptionMgr.add(reason, value, sequence, actionHelper.getLoggedOnUser());
-            SessionMessages.add(request, "review-cycle-option-added");
+            ReviewCycleOptionMgr.add(reason, value, sequence, actionHelper.getLoggedOnUser(), id);
+            String key = "review-cycle-option-";
+            if (id != null && id != 0) {
+                key += "updated";
+            } else {
+                key += "added";
+            }
+            SessionMessages.add(request, key);
         } catch (ModelException e) {
             actionHelper.addErrorsToRequest(e.getMessage());
         } catch (Exception e) {
