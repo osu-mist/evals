@@ -665,7 +665,7 @@ public class AppraisalsAction implements ActionInterface {
      *
      * @throws Exception
      */
-    private void setAssessmentFields() throws Exception {
+    public void setAssessmentFields() throws Exception {
         if (jsonData.getAssessments() == null) { // if there are no assessments, exit
             return;
         }

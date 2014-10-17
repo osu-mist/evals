@@ -54,6 +54,8 @@ public class AssessmentJSON {
         return id;
     }
 
+    public void setDeleted(String deleted) { this.deleted = deleted; }
+
     private boolean shouldResetCriteriaIndex() {
         return id < 500;
     }
@@ -78,4 +80,5 @@ public class AssessmentJSON {
 
         criteria = newCriteria;
     }
+
 }

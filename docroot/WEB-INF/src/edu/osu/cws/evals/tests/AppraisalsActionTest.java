@@ -21,10 +21,7 @@ import javax.portlet.PortletContext;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Test
 public class AppraisalsActionTest {
@@ -359,45 +356,75 @@ public class AppraisalsActionTest {
     }
 
     // Add new assessment to appraisal
-    // Transform appraisal into JSON object as a String
+
     //
-    public void shouldSetAppraisalFieldsCorrectly() throws Exception {
+    public void shouldSetAssessmentFieldsCorrectly() throws Exception {
+        // init database, session, and begin transaction
         DBUnit dbunit = new DBUnit();
         dbunit.seedDatabase();
-        // Get session and begin a transaction
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
-
+        // init variables
         appraisal = AppraisalMgr.getAppraisal(1);
+        Date curDate = new Date();
+        ArrayList<Integer> deletedAssessmentsIds = new ArrayList<Integer>();
+        Map<String, Assessment> id2assessment = appraisal.getAssessmentMap();
+        Employee employee = EmployeeMgr.findByOnid("cedenoj", null);
         Map<String, String[]> requestMap = new HashMap<String, String[]>();
         requestMap.put("json_data", new String[] {appraisalToJSONString()});
-        // Mock stuff
+        // init mocks
         PortletRequest mockedRequest = mock(PortletRequest.class);
         ActionHelper mockedActionHelper = mock(ActionHelper.class);
         PropertiesConfiguration mockedConfig = mock(PropertiesConfiguration.class);
         PermissionRule mockedPermRule = mock(PermissionRule.class);
+        Appraisal mockedAppraisal = mock(Appraisal.class);
+        Employee mockedEmployee = mock(Employee.class);
         // when
-        when(mockedPermRule.canEdit("unapprovedGoals")).thenReturn(false);
-        when(mockedPermRule.canEdit("results")).thenReturn(true);
-        when(mockedPermRule.canEdit("supervisorResults")).thenReturn(true);
+        when(mockedPermRule.canEdit("unapprovedGoals")).thenReturn(true);
+        when(mockedPermRule.canEdit("results")).thenReturn(false);
+        when(mockedPermRule.canEdit("supervisorResults")).thenReturn(false);
         when(mockedConfig.getString("profFaculty.maximized.Message")).thenReturn("null");
         when(mockedActionHelper.getEvalsConfig()).thenReturn(mockedConfig);
         when(mockedRequest.getParameter("id")).thenReturn("1");
-        when(mockedActionHelper.getLoggedOnUser()).thenReturn(EmployeeMgr.findByOnid("cedenoj", null));
+        when(mockedActionHelper.getLoggedOnUser()).thenReturn(employee);
         when(mockedPortletContext.getAttribute("permissionRules")).thenReturn(PermissionRuleMgr.list());
         when(mockedActionHelper.getPortletContext()).thenReturn(mockedPortletContext);
+        when(mockedAppraisal.getAssessmentMap()).thenReturn(appraisal.getAssessmentMap());
+        when(mockedAppraisal.getUnapprovedGoalsVersion()).thenReturn(new GoalVersion());
+        when(mockedEmployee.getId()).thenReturn(employee.getId());
         // add mocks
         appraisalsAction.setActionHelper(mockedActionHelper);
-        appraisalsAction.setAppraisal(appraisal);
-        // Call initialize and commit
+        appraisalsAction.setAppraisal(mockedAppraisal);
+        appraisalsAction.setPermRule(mockedPermRule);
+        appraisalsAction.setLoggedInUser(mockedEmployee);
+        // init JSON data
         appraisalsAction.initializeJSONData(requestMap);
-        System.out.println(appraisalsAction.getDbAssessmentsMap());
+        // mark every other assessment for deletion
+        int count = 0;
+        for(Map.Entry<Integer, AssessmentJSON> assessmentJSONEntry : appraisalsAction.getJsonData().getAssessments().entrySet()) {
+            if(count % 2 == 0) {
+                deletedAssessmentsIds.add(assessmentJSONEntry.getKey());
+                assessmentJSONEntry.getValue().setDeleted("1");
+            }
+            count++;
+        }
+        // function being tested
+        appraisalsAction.setAssessmentFields();
+        session.save(appraisal);
         tx.commit();
-        // Assertions
-
-        assert false;
+        // assertions
+        System.out.println(id2assessment.size());
+        for(Integer id : deletedAssessmentsIds) {
+            Assessment curAssessment = id2assessment.get(id.toString());
+            assert curAssessment.getDeleteDate().compareTo(curDate) == 1;
+            assert curAssessment.getDeleterPidm() == employee.getId();
+        }
     }
 
+    /**
+     * Transforms an appraisal to a JSON object string
+     * @return
+     */
     private String appraisalToJSONString() {
         ArrayList<String> appraisalJSONArray = new ArrayList<String>();
         appraisalJSONArray.add("id:" + appraisal.getId());
@@ -431,16 +458,30 @@ public class AppraisalsActionTest {
         return "{" + StringUtils.join(appraisalJSONArray, ",") + "}";
     }
 
+    /**
+     * Calls the method with the same name, using the assessment's
+     * employee/supervisor results.
+     * @param assessment
+     * @return
+     */
     private String assessmentToJSONString(Assessment assessment) {
         return assessmentToJSONString(assessment, assessment.getEmployeeResult(), assessment.getSupervisorResult());
     }
 
+    /**
+     * Returns the given assessment as a JSON string object. Uses the supplied
+     * employee results and supervisor results in place of the original from the assessment.
+     * @param assessment
+     * @param employeeResults
+     * @param supervisorResults
+     * @return
+     */
     private String assessmentToJSONString(Assessment assessment, String employeeResults, String supervisorResults) {
         ArrayList<String> assessmentsJSONArray = new ArrayList<String>();
-        assessmentsJSONArray.add("id:" + assessment.getId().toString());
-        assessmentsJSONArray.add("goal:" + assessment.getGoal());
-        assessmentsJSONArray.add("employeeResult:" + employeeResults);
-        assessmentsJSONArray.add("supervisorResult:" + supervisorResults);
+        assessmentsJSONArray.add("id:\"" + assessment.getId().toString() + "\"");
+        assessmentsJSONArray.add("goal:\"" + assessment.getGoal() + "\"");
+        assessmentsJSONArray.add("employeeResult:\"" + employeeResults + "\"");
+        assessmentsJSONArray.add("supervisorResult:\"" + supervisorResults + "\"");
         String deleted = assessment.isDeleted() ? "\"1\"" : "\"0\"";
         assessmentsJSONArray.add("deleted:" + deleted);
         ArrayList<String> criteriaArray = new ArrayList<String>();
