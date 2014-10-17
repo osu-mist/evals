@@ -29,6 +29,11 @@ PortletURL noticeListURL = renderResponse.createRenderURL();
 noticeListURL.setWindowState(WindowState.MAXIMIZED);
 noticeListURL.setParameter("action", "list");
 noticeListURL.setParameter("controller", "NoticeAction");
+
+PortletURL reviewCycleListURL = renderResponse.createRenderURL();
+reviewCycleListURL.setWindowState(WindowState.MAXIMIZED);
+reviewCycleListURL.setParameter("action", "list");
+reviewCycleListURL.setParameter("controller", "ReviewCycleAction");
 %>
 
 <c:if test="${isAdmin == 'true'}">
@@ -58,6 +63,10 @@ noticeListURL.setParameter("controller", "NoticeAction");
                 <li>
                     <a href="<%= noticeListURL.toString() %>">
                         <liferay-ui:message key="notice-list-title"/></a>
+                </li>
+                <li>
+                    <a href="<%= reviewCycleListURL.toString() %>">
+                        <liferay-ui:message key="review-cycle-option-list-title"/></a>
                 </li>
             </ul>
         </div>
