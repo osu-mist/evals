@@ -862,17 +862,16 @@ public class AppraisalsAction implements ActionInterface {
         assessment = AppraisalMgr.createNewAssessment(reactivatedGoalVersion, nextSequence, criterionAreas);
         session.save(assessment);
         // Create returnJSON string
-        String returnJSON = "";
-        returnJSON += "{id:" + assessment.getId();
-        returnJSON += ", assessmentCriteria:{";
-        ArrayList<String> assessmentCriteriaJSON = new ArrayList<String>();
+        HashMap jsonMap = new HashMap();
+        HashMap criteriaMap = new HashMap();
+        jsonMap.put("id", assessment.getId());
         for(AssessmentCriteria criterion : assessment.getAssessmentCriteria()) {
-            assessmentCriteriaJSON.add("\"" + criterion.getCriteriaArea().getName() + "\":" + criterion.getId());
+            criteriaMap.put(criterion.getCriteriaArea().getName(), criterion.getId());
         }
-        returnJSON += StringUtils.join(assessmentCriteriaJSON, ',');
-        returnJSON += "}, status:\"success\"}";
-        System.out.println(returnJSON);
-        return returnJSON;
+        jsonMap.put("assessmentCriteria", criteriaMap);
+        jsonMap.put("status", "success");
+        Gson gson = new Gson();
+        return gson.toJson(jsonMap);
     }
 
 
