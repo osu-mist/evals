@@ -399,21 +399,21 @@ jQuery(document).ready(function() {
   }
 
   /**
-   * Handles adding a new assessment to the DOM. This js method clones the last .appraisal-criteria
-   * fieldset in the form. The logic in this function is to update the various classes, names and ids
-   * of the various html elements in the .appraisal-criteria fieldset. The various labels, inputs,
-   * textareas and checkboxes in an assessment have in the html classes/name/id information about what
-   * assessment the property belongs to. This is so that the java side knows what assessment a goal is
-   * associated to and what assessment the assessment criteria are associated to.
+   * @id: the id of the new assessment
+   * @assessmentCriteria: a dictionary of the form: String criterion_name, int assessmentCriterionId; Contains
+   *    criteria associated to the new assessment.
+   *
+   * Called after a successful ajax call to the server which creates a new assessment and returns relevant information.
+   *
+   * Handles adding a new assessment to the DOM. Clones the last .appraisal-criteria fieldset in the form,
+   * and replaces assessment id and criteria id in appropriate html elements using the returned assessment
+   * id and criteria map.
    *
    * We chose to use js to clone & add an assessment because we didn't find an easy what for an ajax
    * serveResource call to return html from the assessment.jsp. The ajax serveResource calls can return
    * json, but we couldn't figure out how to get the serveResource method to parse a single jsp file.
-   *
-   * This function is called after an ajax call that creates a new assessment and returns the id of the new
-   * assessment. This function uses the returned id to help create the proper html elements.
    */
-  function addGoal(id) {
+  function addGoal(id, assessmentCriteria) {
       // clone last assessment in the form for modification
       var newAssessment = getLastAssessment().clone(true);
       newAssessment.show(); // last assessment could have been deleted
@@ -454,11 +454,14 @@ jQuery(document).ready(function() {
       newAssessment.find('textarea').attr('class', ''); // clear any class inputs
 
       // assessment criterias checkboxes
+      var criteriaNameSpans = jQuery(newAssessment.find(":checkbox")[0]).parent().find("span");
       jQuery.each(newAssessment.find(':checkbox'), function(index, element) {
           // The AssessmentCriteria checkboxes have suffixes. In order to make them unique ids in
           // in the form, we're using multiples of assmentCount starting with assessmentCount
+          var criteriaName = jQuery(criteriaNameSpans[index]).text().trim();
           var checkBoxName = jQuery(element).attr('name').replace(/\.\d+/, '');
-          checkBoxName += "." +  (index + id + 1);
+          var criteriaId = assessmentCriteria[criteriaName];
+          checkBoxName += "." +  criteriaId;
           jQuery(element).attr('name', checkBoxName);
           jQuery(element).attr('id', checkBoxName);
           jQuery(element).removeAttr('checked');
@@ -466,10 +469,12 @@ jQuery(document).ready(function() {
 
       // assessment criterias labels
       jQuery.each(newAssessment.find('label'), function(index, element) {
-          var checkBoxName = jQuery(element).attr('for').replace(/\.\d+/, '');
-          checkBoxName += "." +  (index + id);
           // The first label is the Goals label, the rest should be assessment criterias
-          if (index != 0) {
+          if (index > 0) {
+              var criteriaName = jQuery(criteriaNameSpans[index - 1]).text().trim();
+              var checkBoxName = jQuery(element).attr('for').replace(/\.\d+/, '');
+              var criteriaId = assessmentCriteria[criteriaName];
+              checkBoxName += "." + criteriaId;
               jQuery(element).attr('for', checkBoxName);
           }
       });
@@ -507,7 +512,7 @@ jQuery(document).ready(function() {
             success: function(msg) {
                 var response = jQuery.parseJSON(msg);
                 if (response.status == "success") {
-                    addGoal(response.id);
+                    addGoal(response.id, response.assessmentCriteria);
                 } else {
                     console.log(response);
                 }
