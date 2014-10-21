@@ -773,4 +773,31 @@
           DESCRIPTION="You're IT awesome"
           APPOINTMENT_TYPE="Classified IT"
       />
+
+   <review_cycle_options
+           ID="1"
+           NAME="Calendar year"
+           SEQUENCE="1"
+           VALUE="1"
+           CREATE_DATE="2011-05-14"
+           CREATOR_PIDM="12345"
+       />
+   <review_cycle_options
+           ID="2"
+           NAME="Fiscal year"
+           SEQUENCE="2"
+           VALUE="7"
+           CREATE_DATE="2011-05-14"
+           CREATOR_PIDM="12345"
+       />
+   <review_cycle_options
+           ID="3"
+           NAME="Deleted option"
+           SEQUENCE="1"
+           VALUE="1"
+           CREATE_DATE="2011-05-14"
+           CREATOR_PIDM="12345"
+           DELETE_DATE="2011-06-14"
+           DELETER_PIDM="12345"
+       />
 </dataset>

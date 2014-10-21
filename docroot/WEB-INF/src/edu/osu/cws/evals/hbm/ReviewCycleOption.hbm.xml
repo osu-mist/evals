@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping auto-import="false" >
+
+    <class name="edu.osu.cws.evals.models.ReviewCycleOption" table="review_cycle_options">
+        <id name="id" type="int" column="ID">
+            <generator class="native">
+                <param name="sequence">pass_seq</param>
+            </generator>
+        </id>
+
+        <property name="name" column="NAME"/>
+        <property name="value" column="VALUE"/>
+        <property name="sequence" type="int" column="SEQUENCE"/>
+        <property name="createDate" type="timestamp" column="CREATE_DATE"/>
+        <property name="deleteDate" type="timestamp" column="DELETE_DATE"/>
+
+        <many-to-one name="creator" class="edu.osu.cws.evals.models.Employee"
+                     column="CREATOR_PIDM"
+                     not-null="true"/>
+        <many-to-one name="deleter" class="edu.osu.cws.evals.models.Employee"
+                     column="DELETER_PIDM"/>
+    </class>
+
+    <query name="reviewcycleoption.delete"><![CDATA[
+        update edu.osu.cws.evals.models.ReviewCycleOption reviewCycleOption
+            set deleteDate = :deleteDate, deleter = :deleter where id = :id
+    ]]></query>
+    <query name="reviewcycleoption.getOption"><![CDATA[
+        from edu.osu.cws.evals.models.ReviewCycleOption reviewCycleOptwion
+            where name = :name
+    ]]></query>
+</hibernate-mapping>
