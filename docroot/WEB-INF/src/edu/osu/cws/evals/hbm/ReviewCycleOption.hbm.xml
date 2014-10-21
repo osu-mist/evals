@@ -24,7 +24,7 @@
     </class>
 
     <query name="reviewcycleoption.delete"><![CDATA[
-        update edu.osu.cws.evals.models.ReviewCycleOption reviewCycleOptwion
+        update edu.osu.cws.evals.models.ReviewCycleOption reviewCycleOption
             set deleteDate = :deleteDate, deleter = :deleter where id = :id
     ]]></query>
     <query name="reviewcycleoption.getOption"><![CDATA[
