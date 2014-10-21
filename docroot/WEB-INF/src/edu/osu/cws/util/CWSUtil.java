@@ -166,18 +166,4 @@ public class CWSUtil {
         NumberFormat fmt = NumberFormat.getCurrencyInstance();
         return fmt.format(amount);
     }
-
-    /**
-     * Returns the list of months in a year.
-     *
-     * @param format        String format for months to customize the list of months.
-     * @return
-     */
-    public static List<String> getMonthsInYear(String format) {
-        ArrayList<String> months = new ArrayList<String>();
-        for (int i = 1; i <= 12; i++) {
-            months.add(new DateTime().withMonthOfYear(i).toString(format));
-        }
-        return months;
-    }
 }
