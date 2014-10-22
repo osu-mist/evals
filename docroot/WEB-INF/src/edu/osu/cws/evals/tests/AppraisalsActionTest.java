@@ -174,7 +174,7 @@ public class AppraisalsActionTest {
         assert appraisalsAction.getRole().equals(ActionHelper.ROLE_SUPER_ADMIN);
     }
 
-    public void shouldGetCorrectRoleWhenUpperAdmin() throws Exception {
+    public void shouldGetCorrectRoleWhenUpperSupervisor() throws Exception {
         ActionHelper mockActionHelper = mock(ActionHelper.class);
         Employee loggedInUser = new Employee();
         Employee supervisor = new Employee();
