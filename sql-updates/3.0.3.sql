@@ -13,3 +13,20 @@ CREATE TABLE review_cycle_options (
 ALTER TABLE review_cycle_options
 ADD CONSTRAINT pk_review_cycle_options
     PRIMARY KEY(id);
+
+-- EV-544
+INSERT INTO configurations  (
+    ID, 
+    SECTION, 
+    NAME, 
+    VALUE, 
+    SEQUENCE, 
+    APPOINTMENT_TYPE
+) VALUES (
+    (SELECT MAX(ID) + 1 FROM configurations), 
+    'configuration', 
+    'allowProfFacultyPdf', 
+    1, 
+    (SELECT MAX(SEQUENCE) + 1 FROM configurations where section = 'configuration'), 
+    'Professional Faculty'
+);
