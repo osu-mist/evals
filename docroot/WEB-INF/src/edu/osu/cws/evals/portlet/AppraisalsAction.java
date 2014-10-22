@@ -137,22 +137,6 @@ public class AppraisalsAction implements ActionInterface {
         }
     }
 
-    public PermissionRule getPermRule() {
-        return permRule;
-    }
-
-    public Appraisal getAppraisal() {
-        return appraisal;
-    }
-
-    public void setAppraisal(Appraisal appraisal) {
-        this.appraisal = appraisal;
-    }
-
-    public void setUserRole(String userRole) {
-        this.userRole = userRole;
-    }
-
     /**
      * Returns the role (employee, supervisor, immediate supervisor or reviewer) of
      * the given appraisal.
@@ -174,8 +158,7 @@ public class AppraisalsAction implements ActionInterface {
         }
 
         Reviewer reviewer  = actionHelper.getReviewer();
-        if (reviewer != null)
-        {
+        if (reviewer != null) {
             String bcName  = appraisal.getJob().getBusinessCenterName();
             if (bcName.equals(reviewer.getBusinessCenterName())) {
                 return ActionHelper.ROLE_REVIEWER;
@@ -345,7 +328,7 @@ public class AppraisalsAction implements ActionInterface {
      *
      * @return
      */
-    private Map<String, String> getSalaryValidationValues() {
+    public Map<String, String> getSalaryValidationValues() {
         Map<String, String> salaryValidationValues = new HashMap<String, String>();
 
         Salary salary = appraisal.getSalary();
@@ -547,7 +530,7 @@ public class AppraisalsAction implements ActionInterface {
      *
      * @param requestMap
      */
-    private void initializeJSONData(Map<String, String[]> requestMap) {
+    public void initializeJSONData(Map<String, String[]> requestMap) {
         String jsonText = "{}";
         if (requestMap.get("json_data") != null) {
             jsonText = requestMap.get("json_data")[0];
@@ -679,7 +662,7 @@ public class AppraisalsAction implements ActionInterface {
      *
      * @return
      */
-    private boolean isAdminRole() {
+    public boolean isAdminRole() {
         return EvalsUtil.isOneOfAdminRoles(userRole);
     }
 
@@ -689,7 +672,7 @@ public class AppraisalsAction implements ActionInterface {
      *
      * @throws Exception
      */
-    private void setAssessmentFields() throws Exception {
+    public void setAssessmentFields() throws Exception {
         if (jsonData.getAssessments() == null) { // if there are no assessments, exit
             return;
         }
@@ -698,7 +681,8 @@ public class AppraisalsAction implements ActionInterface {
         for (AssessmentJSON assessmentJSON : jsonData.getAssessments().values())   {
             assessment = dbAssessmentsMap.get(assessmentJSON.getId().toString());
             if (assessment != null) {
-                if (permRule.canEdit("unapprovedGoals")) { // Save Goals
+                // Save Goals
+                if (permRule.canEdit("unapprovedGoals")) {
                     updateGoals(assessmentJSON, assessment, assessmentJSON.getDeleted().equals("1"));
                 }
 
@@ -760,7 +744,7 @@ public class AppraisalsAction implements ActionInterface {
      * @param dbAssessmentsMap
      * @return
      */
-    private Integer calculateAssessmentSequence(Map<String, Assessment> dbAssessmentsMap) {
+    public Integer calculateAssessmentSequence(Map<String, Assessment> dbAssessmentsMap) {
         Integer nextSequence = 0;
         for (Map.Entry<String, Assessment> entry : dbAssessmentsMap.entrySet()) {
             Assessment assessment = entry.getValue();
@@ -809,7 +793,8 @@ public class AppraisalsAction implements ActionInterface {
             return; // if there isn't an unapproved goals versions exit
         }
 
-        if (deleted) { // Save the deleted flag if present
+        // Save the deleted flag if present
+        if (deleted) {
             assessment.setDeleteDate(new Date());
             assessment.setDeleterPidm(loggedInUser.getId());
         }
@@ -1344,16 +1329,63 @@ public class AppraisalsAction implements ActionInterface {
         return homeAction.display(request, response);
     }
 
-    public void setActionHelper(ActionHelper actionHelper) {
-        this.actionHelper = actionHelper;
+    /************************ Getters & Setters ************************/
+    /************************ Getters **********************************/
+    public ActionHelper getActionHelper() { return actionHelper; }
+
+    public HomeAction getHomeAction() { return homeAction; }
+
+    public PortletRequest getRequest() { return request; }
+
+    public Employee getLoggedInUser() { return loggedInUser; }
+
+    public ResourceBundle getResource() { return resource; }
+
+    public ErrorHandler getErrorHandler() { return errorHandler; }
+
+    public Appraisal getAppraisal() {
+        return appraisal;
     }
 
-    public void setHomeAction(HomeAction homeAction) {
-        this.homeAction = homeAction;
+    public AppraisalStep getAppraisalStep() { return appraisalStep; }
+
+    public PermissionRule getPermRule() {
+        return permRule;
     }
 
-    public void setErrorHandler(ErrorHandler errorHandler) {
-        this.errorHandler = errorHandler;
+    public String getUserRole() { return userRole; }
+
+    public AppraisalJSON getJsonData() { return jsonData; }
+
+    public Map<String, Assessment> getDbAssessmentsMap() { return dbAssessmentsMap; }
+
+    /************************ Setters **********************************/
+    public void setActionHelper(ActionHelper actionHelper) { this.actionHelper = actionHelper; }
+
+    public void setHomeAction(HomeAction homeAction) { this.homeAction = homeAction; }
+
+    public void setRequest(PortletRequest request) { this.request = request; }
+
+    public void setLoggedInUser(Employee loggedInUser) { this.loggedInUser = loggedInUser; }
+
+    public void setResource(ResourceBundle resource) { this.resource = resource; }
+
+    public void setErrorHandler(ErrorHandler errorHandler) { this.errorHandler = errorHandler; }
+
+    public void setAppraisal(Appraisal appraisal) {
+        this.appraisal = appraisal;
     }
+
+    public void setAppraisalStep(AppraisalStep appraisalStep) { this.appraisalStep = appraisalStep; }
+
+    public void setPermRule(PermissionRule permRule) { this.permRule = permRule; }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
+    }
+
+    public void setJsonData(AppraisalJSON jsonData) { this.jsonData = jsonData; }
+
+    public void setDbAssessmentsMap(Map<String, Assessment> dbAssessmentsMap) { this.dbAssessmentsMap = dbAssessmentsMap; }
 
 }
