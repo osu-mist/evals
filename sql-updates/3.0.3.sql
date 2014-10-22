@@ -25,7 +25,7 @@ INSERT INTO configurations  (
 ) VALUES (
     (SELECT MAX(ID) + 1 FROM configurations), 
     'configuration', 
-    'allowProfFacultyPdf', 
+    'allowPdfToNolij', 
     1, 
     (SELECT MAX(SEQUENCE) + 1 FROM configurations where section = 'configuration'), 
     'Professional Faculty'
