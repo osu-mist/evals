@@ -103,7 +103,7 @@ public class RequiredAction {
         }
 
         if(appraisal.getJob().getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
-            anchorText = anchorText.replace("for rebuttal", "employee comments");
+            anchorText = anchorText.replace("for rebuttal", "employee response");
         }
     }
 
