@@ -90,6 +90,8 @@ public class Constants {
     private static final String ROOT_DIR = "WEB-INF/src/";
     private static final String DEFAULT_PROPERTIES_FILE = "backend-config.properties";
 
+    public static final String ALLOW_PDF_TO_NOLIJ = "allowPdfToNolij";
+
     /**
      * The root directory of the EvalS project. The docroot directory is removed by the fabric
      * script. During local dev & testing, we need to append docroot to the root_dir.

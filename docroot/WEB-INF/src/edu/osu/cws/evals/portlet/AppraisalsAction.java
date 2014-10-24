@@ -418,7 +418,11 @@ public class AppraisalsAction implements ActionInterface {
      * @return
      */
     private boolean downloadToNolij() {
-        if (appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+        Map<String, Configuration> configMap = (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
+        String configName = Constants.ALLOW_PDF_TO_NOLIJ;
+        String configAptType = AppointmentType.PROFESSIONAL_FACULTY;
+        Configuration pdfToNolijConfig = ConfigurationMgr.getConfiguration(configMap, configName, configAptType);
+        if (appraisal.getAppointmentType().equals(configAptType) && pdfToNolijConfig.getValue().equals("0")) {
             return false;
         }
 
