@@ -1229,7 +1229,7 @@ public class AppraisalsAction implements ActionInterface {
 
         actionHelper.addToRequestMap("shortJobsWithEvals", shortJobsWithEvals);
         actionHelper.addToRequestMap("jobsWithoutEvals", shortJobsWithOutEvals);
-        actionHelper.addToRequestMap("months", CWSUtil.getMonthsInYear("MMM"));
+        actionHelper.addToRequestMap("reviewCycleOptions", ReviewCycleOptionMgr.list());
 
         ArrayList<String> years = new ArrayList<String>();
         for (int i = -1; i <= 1; i++) {
