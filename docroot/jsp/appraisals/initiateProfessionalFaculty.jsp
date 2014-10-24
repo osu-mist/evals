@@ -69,15 +69,15 @@
         <legend><liferay-ui:message key="prof-faculty-choose-cycle"/></legend>
         <liferay-ui:message key="prof-faculty-create-evals-month"/>
         <select id="month" name="month">
-            <option value="">Select a month</option>
-            <c:forEach var="month" items="${months}" varStatus="loopStatus">
-                <option value="${loopStatus.count}"><c:out value="${month}"/></option>
+            <option value=""><liferay-ui:message key="prof-faculty-create-evals-select-month"/></option>
+            <c:forEach var="option" items="${reviewCycleOptions}" varStatus="loopStatus">
+                <option value="${option.value}"><c:out value="${option.name}"/></option>
             </c:forEach>
         </select>
 
         <liferay-ui:message key="prof-faculty-create-evals-year"/>
         <select id="year" name="year">
-            <option value="">Select a year</option>
+            <option value=""><liferay-ui:message key="prof-faculty-create-evals-select-month"/></option>
             <c:forEach var="year" items="${years}" varStatus="loopStatus">
                 <option value="${year}"><c:out value="${year}"/></option>
             </c:forEach>
