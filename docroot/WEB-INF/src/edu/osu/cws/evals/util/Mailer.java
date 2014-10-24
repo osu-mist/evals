@@ -132,7 +132,7 @@ public class Mailer implements MailerInterface {
     private String getCommentType(Appraisal appraisal) {
         String commentType = "rebuttal";
         if (appraisal.getJob().getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
-            commentType = "comment";
+            commentType = "response";
         }
         return commentType;
     }
