@@ -368,7 +368,8 @@ public class AppraisalsAction implements ActionInterface {
                 config = actionHelper.getEvalsConfig();
                 String nolijDir = config.getString("pdf.nolijDir");
                 String env = config.getString("pdf.env");
-                GeneratePDF(appraisal, nolijDir, env, true);
+                String suffix = config.getString("pdf.suffixProfessionalFaculty");
+                GeneratePDF(appraisal, nolijDir, env, suffix, true);
             }
 
             if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR)) {
@@ -970,13 +971,13 @@ public class AppraisalsAction implements ActionInterface {
         }
     }
 
-    private String GeneratePDF(Appraisal appraisal, String dirName, String env,
+    private String GeneratePDF(Appraisal appraisal, String dirName, String env, String suffix,
                                boolean  insertRecordIntoTable) throws Exception {
         // Create PDF
         String rootDir = actionHelper.getPortletContext().getRealPath("/");
         Map<String, List<Rating>> ratingsMap = (HashMap) actionHelper.getPortletContext().getAttribute("ratings");
         List<Rating> ratings = RatingMgr.getRatings(ratingsMap, appraisal.getAppointmentType());
-        EvalsPDF PdfGenerator = new EvalsPDF(rootDir, appraisal, resource, dirName, env, ratings);
+        EvalsPDF PdfGenerator = new EvalsPDF(rootDir, appraisal, resource, dirName, env, suffix, ratings);
         String filename = PdfGenerator.createPDF();
 
         // Insert a record into the nolij_copies table
@@ -1021,7 +1022,8 @@ public class AppraisalsAction implements ActionInterface {
         String tmpDir = config.getString("pdf.tmpDir");
 
         // 2) Create PDF
-        String filename = GeneratePDF(appraisal, tmpDir, "dev2", false);
+        String suffix = config.getString("pdf.suffixProfessionalFaculty");
+        String filename = GeneratePDF(appraisal, tmpDir, "dev2", suffix, false);
 
         // 3) Read the PDF file and provide to the user as attachment
         if (response instanceof ResourceResponse) {
@@ -1106,7 +1108,8 @@ public class AppraisalsAction implements ActionInterface {
         PropertiesConfiguration config = actionHelper.getEvalsConfig();
         String nolijDir = config.getString("pdf.nolijDir");
         String env = config.getString("pdf.env");
-        GeneratePDF(appraisal, nolijDir, env, true);
+        String suffix = config.getString("pdf.suffixProfessionalFaculty");
+        GeneratePDF(appraisal, nolijDir, env, suffix, true);
 
         SessionMessages.add(request, "appraisal-sent-to-nolij-success");
 
