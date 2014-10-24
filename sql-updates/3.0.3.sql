@@ -14,7 +14,7 @@ ALTER TABLE review_cycle_options
 ADD CONSTRAINT pk_review_cycle_options
     PRIMARY KEY(id);
 
--- EV-544
+-- EV-544: adding configuration that allows PDFs for Professional Faculty to be sent to Nolij
 INSERT INTO configurations  (
     ID, 
     SECTION, 
@@ -26,7 +26,7 @@ INSERT INTO configurations  (
     (SELECT MAX(ID) + 1 FROM configurations), 
     'configuration', 
     'allowPdfToNolij', 
-    1, 
+    0, 
     (SELECT MAX(SEQUENCE) + 1 FROM configurations where section = 'configuration'), 
     'Professional Faculty'
 );
