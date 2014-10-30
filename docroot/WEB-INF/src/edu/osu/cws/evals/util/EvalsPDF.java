@@ -5,12 +5,10 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.LineSeparator;
 import edu.osu.cws.evals.models.*;
-import edu.osu.cws.evals.portlet.ActionHelper;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
-import org.w3c.dom.css.Rect;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -54,6 +52,7 @@ public class EvalsPDF {
      * @param appraisal     Appraisal object
      * @param resource      ResourceBundle object
      * @param dirName       the directory PDF files resides.
+     * @param suffix        the suffix for the pdf file name.
      * @param env   either "prod" or "dev2"
      * @param ratings       Sorted list of ratings
      */
