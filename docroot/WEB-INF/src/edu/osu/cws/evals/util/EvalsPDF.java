@@ -9,7 +9,6 @@ import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
-import org.w3c.dom.css.Rect;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -43,6 +42,7 @@ public class EvalsPDF {
     private String dirName;
     private String environment;
     private String rootDir;
+    private String suffix;
     private PermissionRule permRule;
     private Document document;
     private List<Rating> ratings;
@@ -52,16 +52,18 @@ public class EvalsPDF {
      * @param appraisal     Appraisal object
      * @param resource      ResourceBundle object
      * @param dirName       the directory PDF files resides.
+     * @param suffix        the suffix for the pdf file name.
      * @param env   either "prod" or "dev2"
      * @param ratings       Sorted list of ratings
      */
     public EvalsPDF(String rootDir, Appraisal appraisal, ResourceBundle resource, String dirName, String env,
-                    List<Rating> ratings) {
+                    String suffix, List<Rating> ratings) {
         this.rootDir = rootDir;
         this.appraisal = appraisal;
         this.resource = resource;
         this.dirName = dirName;
         this.environment = env;
+        this.suffix = suffix;
         this.permRule = appraisal.getPermissionRule();
         this.ratings = ratings;
         Rectangle pageSize = new Rectangle(612f, 792f);
@@ -101,11 +103,27 @@ public class EvalsPDF {
         int pidm = appraisal.getJob().getEmployee().getId();
 
         String positionNo = appraisal.getJob().getPositionNumber();
-
+        String aptTypeSuffix = getAppointmentTypeSuffix();
         filename = dirName;
-        filename += environment + "_evals-" + pidm + "_" + fiscalYear + "_" + positionNo + "-.pdf";
+        filename += environment + "_evals-" + pidm + "_" + fiscalYear + "_" + positionNo + aptTypeSuffix + "-.pdf";
 
         return filename;
+    }
+
+    /**
+     * Returns the appropriate suffix based on appointmentType.
+     * @return
+     */
+    public String getAppointmentTypeSuffix() {
+        String aptTypeSuffix;
+        String aptType = appraisal.getAppointmentType();
+        if(aptType.equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+            aptTypeSuffix = suffix;
+        }
+        else {
+            aptTypeSuffix = "";
+        }
+        return aptTypeSuffix;
     }
 
     /**

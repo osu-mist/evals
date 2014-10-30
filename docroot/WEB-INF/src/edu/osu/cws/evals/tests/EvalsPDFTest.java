@@ -4,12 +4,13 @@ import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.EvalsPDF;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import static org.mockito.Mockito.*;
 
 import java.util.*;
 
 @Test
 public class EvalsPDFTest {
-    Appraisal appraisal = new Appraisal();
+    Appraisal appraisal = mock(Appraisal.class);
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -18,22 +19,23 @@ public class EvalsPDFTest {
         employee.setId(1234);
         job.setEmployee(employee);
         job.setPositionNumber("C555");
-        appraisal.setJob(job);
-        appraisal.setStartDate(new Date());
+        when(appraisal.getAppointmentType()).thenReturn("");
+        when(appraisal.getJob()).thenReturn(job);
+        when(appraisal.getStartDate()).thenReturn(new Date());
     }
 
     @Test(expectedExceptions = {Exception.class})
     public void shouldFailWithInvalidEnvironment() throws Exception {
-        EvalsPDF PdfGenerator = new EvalsPDF("", appraisal, null, "", "invalid", null);
+        EvalsPDF PdfGenerator = new EvalsPDF("", appraisal, null, "", "invalid", "-prof", null);
         PdfGenerator.getFileName();
     }
 
     public void shouldUsePassAndEnvironmentInFilePrefix() throws Exception {
-        EvalsPDF PdfGenerator1 = new EvalsPDF("", appraisal, null, "", "prod", null);
+        EvalsPDF PdfGenerator1 = new EvalsPDF("", appraisal, null, "", "prod", "-prof", null);
         String filename = PdfGenerator1.getFileName();
         assert filename.contains("prod_evals-") : "Invalid file prefix: " + filename;
 
-        EvalsPDF PdfGenerator2 = new EvalsPDF("", appraisal, null, "", "dev2", null);
+        EvalsPDF PdfGenerator2 = new EvalsPDF("", appraisal, null, "", "dev2", "-prof", null);
         filename = PdfGenerator2.getFileName();
         assert filename.contains("dev2_evals-") : "Invalid file prefix: " + filename;
     }
@@ -43,11 +45,21 @@ public class EvalsPDFTest {
         String expectedFilename;
 
         int fiscalYear = Calendar.getInstance().get(Calendar.YEAR);
-        EvalsPDF PdfGenerator = new EvalsPDF("", appraisal, null, "/tmp/testo/", "prod", null);
+        EvalsPDF PdfGenerator = new EvalsPDF("", appraisal, null, "/tmp/testo/", "prod", "-prof", null);
         filename = PdfGenerator.getFileName();
         expectedFilename = "/tmp/testo/prod_evals-1234_" + fiscalYear + "_C555-.pdf";
         assert filename.equals(expectedFilename);
 
+    }
+
+    public void shouldReturnCorrectNonEmptySuffixWhenProfessionalFaculty() {
+        String correctSuffix = "-prof";
+        Appraisal appraisal1 = mock(Appraisal.class);
+        when(appraisal1.getAppointmentType()).thenReturn(AppointmentType.PROFESSIONAL_FACULTY);
+        EvalsPDF PdfGenerator1 = new EvalsPDF("", appraisal1, null, "", "dev2", correctSuffix, null);
+        String suffix = PdfGenerator1.getAppointmentTypeSuffix();
+        // Assertions
+        assert suffix.equals(correctSuffix);
     }
 
     /**
