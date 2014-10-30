@@ -177,7 +177,7 @@ public class EvalsPDF {
      * @throws DocumentException
      */
     private PdfPTable getSignatureTable() throws DocumentException {
-
+        boolean isProfFaculty = appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY);
         int signatureTableMaxCols = 29;
         int signatureTableMaxRows = 7;
         int nameColSpan = 8;
@@ -276,7 +276,8 @@ public class EvalsPDF {
         signatureTable.addCell(nameAndDateCell);
 
         /** Begin ROW 4 **/
-        String employeeSignDesc = resource.getString("appraisal-acknowledge-read");
+        String employeeSignDesc = resource.getString("appraisal-acknowledge-read") + "\n"
+                                + resource.getString("appraisal-supervisor-ack-read");
         PdfPCell employeeDescCell = new PdfPCell();
         employeeDescCell.setPhrase(new Paragraph(employeeSignDesc, FONT_10));
         employeeDescCell.setColspan(nameColSpan + dateColSpan);
@@ -291,7 +292,10 @@ public class EvalsPDF {
         PdfPCell reviewerDateCell = new PdfPCell();
         reviewerDateCell.setColspan(dateColSpan);
         reviewerDateCell.setBorder(Rectangle.NO_BORDER);
-        boolean displayReviewer = appraisal.getReleaseDate() != null && appraisal.getReviewSubmitDate() != null;
+        boolean displayReviewer =
+                   appraisal.getReleaseDate() != null
+                && appraisal.getReviewSubmitDate() != null
+                && !isProfFaculty;
         if (displayReviewer) {
             String reviewerName = appraisal.getReviewer().getName();
             DateTime reviewSubmitDate = new DateTime(appraisal.getReviewSubmitDate()).withTimeAtStartOfDay();
@@ -304,12 +308,21 @@ public class EvalsPDF {
         /** End ROW 4 **/
 
         /** Begin ROW 5 **/
-        String reviewerLabel = resource.getString("role-reviewer");
+        String reviewerLabel = "";
+        String reviewerDateText = "";
+        int borderType = Rectangle.NO_BORDER;
+        // If prof faculty, we want to hide reviewer signature without disturbing the layout.
+        if (!isProfFaculty) {
+            reviewerLabel = resource.getString("role-reviewer");
+            reviewerDateText = dateText;
+            borderType = Rectangle.TOP;
+        }
         PdfPCell reviewerCellDesc = new PdfPCell(new Phrase(reviewerLabel, INFO_FONT));
         reviewerCellDesc.setColspan(nameColSpan);
-        reviewerCellDesc.setBorder(Rectangle.TOP);
+        reviewerCellDesc.setBorder(borderType);
+        dateCell.setBorder(borderType);
+        dateCell.setPhrase(new Phrase(reviewerDateText, INFO_FONT));
         signatureTable.addCell(reviewerCellDesc);
-        dateCell.setBorder(Rectangle.TOP);
         signatureTable.addCell(dateCell);
         /** End ROW 5 **/
 
