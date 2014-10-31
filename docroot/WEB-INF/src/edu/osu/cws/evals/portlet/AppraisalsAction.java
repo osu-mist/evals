@@ -18,7 +18,6 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.joda.time.DateTime;
 import org.hibernate.Session;
 
-import javax.management.relation.Role;
 import javax.portlet.*;
 import java.io.File;
 import java.io.OutputStream;
