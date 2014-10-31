@@ -251,7 +251,7 @@ public class AppraisalsAction implements ActionInterface {
         initialize(request);
 
         // Check to see if the logged in user has permission to access the appraisal
-        if (permRule == null) {
+        if (!hasPermission()) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -353,7 +353,7 @@ public class AppraisalsAction implements ActionInterface {
 
         // Check to see if the logged in user has permission to access the appraisal
         boolean isAjax = actionHelper.isAJAX();
-        if (permRule == null) {
+        if (!hasPermission()) {
             if (isAjax) {
                 return "fail";
             }
@@ -1017,7 +1017,7 @@ public class AppraisalsAction implements ActionInterface {
         initialize(request);
 
         // Check to see if the logged in user has permission to access the appraisal
-        if (permRule == null) {
+        if (!hasPermission()) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -1134,7 +1134,7 @@ public class AppraisalsAction implements ActionInterface {
 
         // Check to see if the logged in user has permission to access the appraisal
         boolean isAdminOrReviewer = isAdminRole() || userRole.equals(ActionHelper.ROLE_REVIEWER);
-        if (permRule == null || !isAdminOrReviewer) {
+        if (!hasPermission() || !isAdminOrReviewer) {
             return errorHandler.handleAccessDenied(request, response);
         }
 
@@ -1181,7 +1181,7 @@ public class AppraisalsAction implements ActionInterface {
 
         // Check to see if the logged in user has permission to access the appraisal
         // Check that user making request is employee & status is goals approved
-        if (permRule == null || !userRole.equals(ActionHelper.ROLE_EMPLOYEE) ||
+        if (!hasPermission() || !userRole.equals(ActionHelper.ROLE_EMPLOYEE) ||
                 !appraisal.getStatus().equals(Appraisal.STATUS_GOALS_APPROVED)) {
             return errorHandler.handleAccessDenied(request, response);
         }
@@ -1334,6 +1334,28 @@ public class AppraisalsAction implements ActionInterface {
         session.removeAttribute(ActionHelper.MY_TEAMS_ACTIVE_APPRAISALS);
 
         return homeAction.display(request, response);
+    }
+
+    /**
+     * Checks if the logged in user has permission for appraisal.
+     * @return true when they have permission, false when they do not.
+     */
+    private boolean hasPermission() {
+        // If permRule is null => does not have permission
+        if (permRule == null) {
+            return false;
+        }
+        // If appointment type is not prof. faculty => has permission
+        if (!appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+            return true;
+        }
+        // If role is upper supervisor && user is first upper supevisor => has permission
+        if (permRule.getRole().equals(ActionHelper.ROLE_UPPER_SUPERVISOR)) {
+            Employee upperSupervisor = appraisal.getJob().getSupervisor().getSupervisor().getEmployee();
+            return (upperSupervisor.getId() == loggedInUser.getId());
+        }
+        // Else => has permission
+        return true;
     }
 
     /************************ Getters & Setters ************************/
