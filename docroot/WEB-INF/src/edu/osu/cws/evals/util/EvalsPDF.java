@@ -276,7 +276,7 @@ public class EvalsPDF {
         signatureTable.addCell(nameAndDateCell);
 
         /** Begin ROW 4 **/
-        String employeeSignDesc = resource.getString("appraisal-acknowledge-read") + "\n"
+        String employeeSignDesc = resource.getString("appraisal-acknowledge-read") + "\n\n"
                                 + resource.getString("appraisal-supervisor-ack-read");
         PdfPCell employeeDescCell = new PdfPCell();
         employeeDescCell.setPhrase(new Paragraph(employeeSignDesc, FONT_10));
