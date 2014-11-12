@@ -4,6 +4,11 @@
 <fieldset>
     <legend><liferay-ui:message key="prof-faculty-create-evals-details"/></legend>
     <p class="pass-form-text"><liferay-ui:message key="prof-faculty-create-evals-instructions"/></p>
+    <ul>
+        <c:forEach var="option" items="${reviewCycleOptions}" varStatus="loopStatus">
+            <li><c:out value="${option.name}"/></li>
+        </c:forEach>
+    </ul>
 </fieldset>
 
 <c:if test="${not empty shortJobsWithEvals}">
