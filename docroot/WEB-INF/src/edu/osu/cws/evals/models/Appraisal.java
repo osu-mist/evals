@@ -413,7 +413,7 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
      * Compares various date fields of the appraisal object to figure out when was the last modified
      * date of the appraisal. The fields that are compared are: evaluationSubmitDate, resultSubmitDate,
      * reviewSubmitDate, rebuttalDate, employeeSignedDate, releaseDate, supervisorRebuttalRead,
-     * closeOutDate, reopenedDate
+     * closeOutDate.
      *
      * @return lastModified
      */

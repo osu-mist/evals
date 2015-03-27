@@ -742,4 +742,5 @@ public class AppraisalsTest {
         appraisal.setRating(new Integer(6));
         assert !appraisal.isRated();
     }
+
 }

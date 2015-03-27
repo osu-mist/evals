@@ -6,7 +6,7 @@ jQuery(document).ready(function() {
 
   function endStartAnimation() {
     jQuery('.evals-prof-faculty-start').siblings().fadeTo("slow", 1);
-    setTimeout(function() { jQuery('.evals-prof-faculty-start span.evals-arrow').effect("shake", "fast")}, 1000);
+    setTimeout(function() { jQuery('.evals-prof-faculty-start span.evals-arrow').effect("shake", 1000)}, 1000);
   }
 
   // Handle acknowledge appraisal rebuttal read by supervisor
@@ -35,8 +35,8 @@ jQuery(document).ready(function() {
 
     var json_data = form_to_JSON();
     var json_text = JSON.stringify(json_data);
-    var extra_data = jQuery('<input type="hidden" name="json_data"/>').val(json_text);
-    jQuery('input[name=json_data]').remove(); // remove the element if present
+    var extra_data = jQuery('<input>').attr('type', 'hidden').attr('name', 'json_data').val(json_text);
+    jQuery('input[name="json_data"]').remove(); // remove the element if present
     jQuery("#<portlet:namespace />fm").append(extra_data);
 
     return true;
@@ -131,7 +131,7 @@ jQuery(document).ready(function() {
     o.evaluation = jQuery('#' + portlet_namespace + "appraisal\\.evaluation").val();
 
     // rating
-    o.rating = jQuery(".appraisal input[name=" + portlet_namespace + "appraisal.rating]:checked").val();
+    o.rating = jQuery(".appraisal input[name=\"" + portlet_namespace + "appraisal.rating\"]:checked").val();
 
     // salary recommendation
     o.salaryRecommendation = jQuery('#' + portlet_namespace + "appraisal\\.salary\\.increase").val();
@@ -201,8 +201,8 @@ jQuery(document).ready(function() {
     }
 
     var errors = "";
-    if (jQuery("input[name=submit-appraisal]").length > 0 &&
-          jQuery("input[name=<portlet:namespace />appraisal.rating]:checked",
+    if (jQuery("input[name=\"submit-appraisal\"]").length > 0 &&
+          jQuery("input[name=\"<portlet:namespace />appraisal.rating\"]:checked",
             "#<portlet:namespace />fm").val() == undefined) {
       errors = "<li><%= bundle.getString("appraisal-ratingRequired") %></li>";
       alert("<%= bundle.getString("appraisal-ratingRequired") %>");
@@ -570,7 +570,7 @@ jQuery(document).ready(function() {
    */
   function isAssessmentDeleted() {
     // find the delete flag hidden input
-    var deleteFlag = jQuery(this).find('input:hidden').filter(function(index) {
+    var deleteFlag = jQuery(this).find('input[type=hidden]').filter(function(index) {
         return jQuery(this).attr('class').indexOf('appraisal-assessment-deleted-') == 0;
     });
     return deleteFlag.val() != 0
