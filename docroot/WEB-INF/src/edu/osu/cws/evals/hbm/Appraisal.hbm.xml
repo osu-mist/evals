@@ -262,7 +262,8 @@
         supervisorJob.PYVPASJ_PIDM=supervisorEmployee.PYVPASE_PIDM and
         ap.END_DATE < current_date and
         (ap.STATUS not in  (:ignoredStatus)) and
-        job.PYVPASJ_BCTR_TITLE in (:bcNames)
+        job.PYVPASJ_BCTR_TITLE in (:bcNames) and
+        job.PYVPASJ_APPOINTMENT_TYPE in (:appointmentTypes)
     order by
         job.PYVPASJ_BCTR_TITLE, overdue
     ]]></sql-query>

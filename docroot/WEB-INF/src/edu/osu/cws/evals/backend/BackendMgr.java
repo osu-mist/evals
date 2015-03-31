@@ -1214,9 +1214,6 @@ public class BackendMgr {
         StringWriter adminStringWriter = new StringWriter();
         CSVWriter writer = new CSVWriter(stringWriter);
         CSVWriter adminWriter = new CSVWriter(adminStringWriter);
-        String headerRow = "\"Appraisal ID\",\"Employee\",\"OSU ID\",\"Position Number\",\"Supervisor\"," +
-                "\"Status\",\"Appointment Type\",\"Start Date\",\"End Date\",\"Overdue Days\"," +
-                "\"Business Center\"\n";
 
         for (int i = 0; i < lateEvaluations.size(); i++) {
             Object[] lateEval = lateEvaluations.get(i);
@@ -1232,7 +1229,7 @@ public class BackendMgr {
 
                 StringBuffer buffer = stringWriter.getBuffer();
                 // write string buffer for the previous bc now that we are processing a different bc
-                buffer.insert(0, headerRow);
+                buffer.insert(0, getLateReportHeaderRow());
                 String bcLateString = buffer.toString();
                 out.print(bcLateString);
                 out.close();
@@ -1246,12 +1243,23 @@ public class BackendMgr {
         // Write the admin file.
         StringBuffer adminBuffer = adminStringWriter.getBuffer();
         if (adminBuffer.length() != 0) {
-            adminBuffer.insert(0, headerRow); // insert header row for admin
+            adminBuffer.insert(0, getLateReportHeaderRow()); // insert header row for admin
             PrintWriter adminOut = new PrintWriter(getLateReportFilePath("OHR"));
             adminOut.print(adminBuffer.toString());
             adminOut.close();
             adminWriter.close();
         }
+    }
+
+    /**
+     * Returns a row (string) csv to be used as the header for the late reports.
+     *
+     * @return String
+     */
+    private String getLateReportHeaderRow() {
+        return "\"Appraisal ID\",\"Employee\",\"OSU ID\",\"Position Number\",\"Supervisor\"," +
+                "\"Status\",\"Appointment Type\",\"Start Date\",\"End Date\",\"Days passed due review period column\"," +
+                "\"Business Center\"\n";
     }
 
     private String getLateReportFilePath(String bcName) {
