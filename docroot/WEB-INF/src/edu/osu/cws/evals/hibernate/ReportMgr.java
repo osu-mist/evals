@@ -622,6 +622,7 @@ public class ReportMgr {
         return session.getNamedQuery("report.reportLateEvaluations")
                 .setParameterList("ignoredStatus", ignoredStatus)
                 .setParameterList("bcNames", bcNames)
+                .setParameterList("appointmentTypes", supportedAppointmentTypes)
                 .list();
     }
 }
