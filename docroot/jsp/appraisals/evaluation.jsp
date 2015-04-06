@@ -61,7 +61,9 @@
                 <p>
                     <c:if test="${not empty appraisal.releaseDate}">
                         <liferay-ui:message key="appraisal-signed" />
-                        ${appraisal.job.supervisor.employee.name}
+                        <c:if test="${not empty appraisal.evaluator}">
+                            ${appraisal.evaluator.name}
+                        </c:if>
                         <fmt:formatDate value="${appraisal.releaseDate}" pattern="MM/dd/yy h:m a"/>
                     </c:if>
                 </p>

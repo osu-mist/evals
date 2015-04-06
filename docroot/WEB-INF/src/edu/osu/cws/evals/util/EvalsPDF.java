@@ -212,7 +212,10 @@ public class EvalsPDF {
 
         if (appraisal.getReleaseDate() != null) {
             DateTime releaseDate = new DateTime(appraisal.getReleaseDate()).withTimeAtStartOfDay();
-            String supervisorName = job.getSupervisor().getEmployee().getName();
+            String supervisorName = "";
+            if (appraisal.getEvaluator() != null) {
+                supervisorName = appraisal.getEvaluator().getName();
+            }
             String supervisorSignDate = releaseDate.toString(Constants.DATE_FORMAT);
             supervisorCell.addElement(new Phrase(supervisorName, INFO_FONT));
             supervisorDateCell.addElement(new Phrase(supervisorSignDate, INFO_FONT));
