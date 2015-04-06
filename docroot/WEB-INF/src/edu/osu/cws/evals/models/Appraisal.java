@@ -928,7 +928,10 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
     }
 
     /**
-     * Loads lazy associations
+     * Loads lazy associations. This is needed because Hibernate doesn't load all the
+     * needed object associations by default. If the first time, they are used is in the
+     * jsp, it will throw an error since the db session will have been closed at that
+     * point.
      */
     public void loadLazyAssociations() {
         job.toString();
@@ -941,6 +944,9 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
         }
         if (getCloseOutReason() != null) {
             getCloseOutReason().getReason();
+        }
+        if (evaluator != null) {
+            evaluator.getName();
         }
 
         // iterate over goalVersions to load data

@@ -268,7 +268,10 @@
                 </c:when>
                 <c:when test="${permissionRule.rebuttalRead == 'v' and not empty appraisal.supervisorRebuttalRead}">
                     <p><strong><liferay-ui:message key="appraisal-supervisor-${rebuttalType}-read" />
-                    ${appraisal.job.supervisor.employee.name} on
+                        <c:if test="${not empty appraisal.evaluator}">
+                            ${appraisal.evaluator.name}
+                        </c:if>
+                        on
                     <fmt:formatDate value="${appraisal.supervisorRebuttalRead}" pattern="MM/dd/yy"/> at
                     <fmt:formatDate value="${appraisal.supervisorRebuttalRead}" pattern="h:m a"/>
                     </strong></p>
