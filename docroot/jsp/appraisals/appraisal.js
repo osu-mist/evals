@@ -1,6 +1,7 @@
 jQuery(document).ready(function() {
 
   // professional faculty start-here animation:
+  <c:if test="${!empty profFacultyMsg and appraisal.job.appointmentType == 'Professional Faculty'}">
   jQuery('.evals-prof-faculty-start').siblings().fadeTo("slow", 0.2);
   setTimeout(function() { endStartAnimation() }, 3000);
 
@@ -8,6 +9,7 @@ jQuery(document).ready(function() {
     jQuery('.evals-prof-faculty-start').siblings().fadeTo("slow", 1);
     setTimeout(function() { jQuery('.evals-prof-faculty-start span.evals-arrow').effect("shake", 1000)}, 1000);
   }
+  </c:if>
 
   // Handle acknowledge appraisal rebuttal read by supervisor
   jQuery(".pass-appraisal-rebuttal").hide();
