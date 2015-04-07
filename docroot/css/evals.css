@@ -372,7 +372,8 @@ tr.ui-state-highlight {
     font-weight: bold;
 }
 
-.osu-cws tr.google-header-row td {
+.osu-cws tr.google-header-row td,
+.osu-cws th.google-visualization-table-th {
     color: #fff;
 }
 
