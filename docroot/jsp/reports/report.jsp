@@ -217,6 +217,42 @@
 
             <%@ include file="/jsp/home/myTeam.jsp"%>
         </c:if>
+
+
+        <p><strong><liferay-ui:message key="report-selection"/></strong></p>
+        <c:if test="${not empty supervisorJobTitle}">
+            <portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>" var="supervisorReportLink" escapeXml="false">
+                <portlet:param name="action" value="report"/>
+                <portlet:param name="controller" value="ReportsAction"/>
+                <portlet:param name="<%= ReportsAction.SCOPE %>" value="<%= ReportsAction.SCOPE_SUPERVISOR %>"/>
+                <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${myReportSupervisorKey}"/>
+                <portlet:param name="requestBreadcrumbs" value="${breadcrumbsWithRootOnly}" />
+            </portlet:actionURL>
+
+            <input type="submit" value="<c:out value="${supervisorJobTitle}"/>"
+            onclick="location.href ='<%= renderResponse.encodeURL(supervisorReportLink.toString())%>'" /><br />
+        </c:if>
+        <c:if test="${not empty myReportBcName}">
+            <portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>" var="bcReportLink" escapeXml="false">
+                <portlet:param name="action" value="report"/>
+                <portlet:param name="controller" value="ReportsAction"/>
+                <portlet:param name="<%= ReportsAction.SCOPE %>" value="<%= ReportsAction.SCOPE_BC %>"/>
+                <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="${myReportBcName}"/>
+                <portlet:param name="requestBreadcrumbs" value="${breadcrumbsWithRootOnly}" />
+            </portlet:actionURL>
+            <input type="submit" value="<c:out value="${myReportBcName}"/>"
+                onclick="location.href ='<%= renderResponse.encodeURL(bcReportLink.toString())%>'" /><br />
+        </c:if>
+        <c:if test="${isAdmin == true}">
+            <portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>" var="osuReportLink" escapeXml="false">
+                <portlet:param name="action" value="report"/>
+                <portlet:param name="controller" value="ReportsAction"/>
+                <portlet:param name="<%= ReportsAction.SCOPE %>" value="<%= ReportsAction.DEFAULT_SCOPE %>"/>
+                <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="osu"/>
+            </portlet:actionURL>
+            <input type="submit" value="OSU"
+                onclick="location.href ='<%= renderResponse.encodeURL(osuReportLink.toString())%>'" /><br />
+        </c:if>
     </c:if>
 
 </div>
