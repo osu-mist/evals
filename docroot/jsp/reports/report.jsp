@@ -218,7 +218,6 @@
             <%@ include file="/jsp/home/myTeam.jsp"%>
         </c:if>
 
-
         <p><strong><liferay-ui:message key="report-selection"/></strong></p>
         <c:if test="${not empty supervisorJobTitle}">
             <portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>" var="supervisorReportLink" escapeXml="false">
@@ -250,7 +249,7 @@
                 <portlet:param name="<%= ReportsAction.SCOPE %>" value="<%= ReportsAction.DEFAULT_SCOPE %>"/>
                 <portlet:param name="<%= ReportsAction.SCOPE_VALUE %>" value="osu"/>
             </portlet:actionURL>
-            <input type="submit" value="OSU"
+            <input type="submit" value="<liferay-ui:message key="university-acronym"/>"
                 onclick="location.href ='<%= renderResponse.encodeURL(osuReportLink.toString())%>'" /><br />
         </c:if>
     </c:if>
