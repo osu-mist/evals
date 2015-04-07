@@ -15,7 +15,7 @@
 
 JAVA_HOME=$CP_ROOT/products/java
 PORTAL=$CP_ROOT/products/tomcat/tomcat-admin
-PORTAL_LIB=$PORTAL/common/lib
+PORTAL_LIB=$PORTAL/lib
 PORTAL_LIB_EXT=$PORTAL_LIB/ext
 PORTLET_ROOT=$PORTAL/webapps/evals
 WEB_INF=$PORTLET_ROOT/WEB-INF
