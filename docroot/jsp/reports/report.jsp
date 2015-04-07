@@ -218,7 +218,7 @@
             <%@ include file="/jsp/home/myTeam.jsp"%>
         </c:if>
 
-        <p><strong><liferay-ui:message key="report-selection"/></strong></p>
+        <strong><liferay-ui:message key="report-selection"/></strong><br />
         <c:if test="${not empty supervisorJobTitle}">
             <portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>" var="supervisorReportLink" escapeXml="false">
                 <portlet:param name="action" value="report"/>
