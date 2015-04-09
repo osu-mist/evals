@@ -442,7 +442,7 @@ tr.ui-state-highlight {
 /** Professional faculty start Here message **/
 span.evals-prof-faculty-start {
     background-image: none;
-    min-height: 2em;
+    min-height: 3em;
     background-color: #d9edf7;
     border: 1px #bce8f1;
 }
