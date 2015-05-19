@@ -1037,7 +1037,9 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
         //config object of this status
         Configuration config = ConfigurationMgr.getConfiguration(configMap, status, getAppointmentType());
 
-        if (status.contains(Appraisal.DUE) && EvalsUtil.isOverdue(this, config)) {
+        // the employee review due status becomes expired instead of overdue after due date
+        if (status.contains(Appraisal.DUE) && EvalsUtil.isOverdue(this, config) &&
+                !status.equals(Appraisal.STATUS_EMPLOYEE_REVIEW_DUE)) {
             return status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
         }
 
