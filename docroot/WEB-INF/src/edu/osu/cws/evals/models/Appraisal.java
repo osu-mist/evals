@@ -1044,7 +1044,7 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
         }
 
         if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)
-                    && isGoalsReqModOverDue(configMap) && !areGoalsReactivated()) {
+                && isGoalsReqModOverDue(configMap) && !areGoalsReactivated()) {
             //goalsRequiredModification is not overdue.
             return nextStatus.get(status);
         }
