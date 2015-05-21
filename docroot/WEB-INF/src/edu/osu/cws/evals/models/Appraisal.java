@@ -1028,7 +1028,7 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
      * configuration values to see whether the status is due or overdue.
      *
      * @param configMap
-     * @return
+     * @return          The new status of the given appraisal. The status is a string.
      * @throws Exception
      */
     public String getNewStatus(Map<String, Configuration> configMap)
@@ -1037,12 +1037,14 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
         //config object of this status
         Configuration config = ConfigurationMgr.getConfiguration(configMap, status, getAppointmentType());
 
-        if (status.contains(Appraisal.DUE) && EvalsUtil.isOverdue(this, config)) {
+        // the employee review due status does not become overdue
+        if (status.contains(Appraisal.DUE) && EvalsUtil.isOverdue(this, config) &&
+                !status.equals(Appraisal.STATUS_EMPLOYEE_REVIEW_DUE)) {
             return status.replace(Appraisal.DUE, Appraisal.OVERDUE); //new status is overdue
         }
 
         if (status.equals(Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION)
-                    && isGoalsReqModOverDue(configMap) && !areGoalsReactivated()) {
+                && isGoalsReqModOverDue(configMap) && !areGoalsReactivated()) {
             //goalsRequiredModification is not overdue.
             return nextStatus.get(status);
         }
