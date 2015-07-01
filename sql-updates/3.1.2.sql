@@ -20,3 +20,13 @@ insert into configurations
 select pass_seq.nextval, section, name, (select max(sequence) from configurations where section = c.section) + rownum as seq, value, reference_point, action, 'Ranked Faculty'
 from configurations c
 where appointment_type != 'Default' and section = 'due-date';
+
+-- ratings data needs to be inserted
+insert into ratings
+select (select max(id) from ratings) + rownum, rate, name, description, 'Ranked Faculty'
+from ratings
+where
+appointment_type = 'Professional Faculty';
+
+-- EV-610
+delete from configurations where name like 'allowPdfToNolij';
