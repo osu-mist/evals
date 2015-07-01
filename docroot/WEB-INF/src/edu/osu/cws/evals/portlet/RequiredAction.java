@@ -102,7 +102,7 @@ public class RequiredAction {
             anchorText = resource.getString(key);
         }
 
-        if(appraisal.getJob().getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+        if(appraisal.getJob().isUnclassified()) {
             anchorText = anchorText.replace("for rebuttal", "employee response");
         }
     }
