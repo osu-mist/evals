@@ -57,7 +57,7 @@
                                     </portlet:actionURL>"><liferay-ui:message key="${shortAppraisal.viewStatus}" />
                                 </a>
                             </c:if>
-                            <c:if test="${shortAppraisal.id == 0 && shortAppraisal.appointmentType == 'Professional Faculty'}">
+                            <c:if test="${shortAppraisal.id == 0}">
                                 <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                                         <portlet:param name="action" value="initiateProfessionalFacultyEvals"/>
                                         <portlet:param name="controller" value="AppraisalsAction"/>
