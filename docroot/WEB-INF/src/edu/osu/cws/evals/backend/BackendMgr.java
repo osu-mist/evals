@@ -86,7 +86,7 @@ public class BackendMgr {
        {
           updateAppraisals();
           createAppraisals();
-          createProfessionalFacultyAnnual();
+          createUnclassifiedEvaluations();
           archiveAppraisals();
           emailSupervisors();
           emailReviewers();
@@ -208,11 +208,12 @@ public class BackendMgr {
         }//for loop
      }
 
-    /** Creates new annual appraisals for professional faculty that are due for creation.
+    /**
+     * Creates new annual appraisals for professional faculty and ranked faculty  that are due for creation.
      *
      * @throws Exception
      */
-    private void createProfessionalFacultyAnnual() throws Exception {
+    private void createUnclassifiedEvaluations() throws Exception {
         Job job = null;
         session = HibernateUtil.getCurrentSession();
         tx = session.beginTransaction();
@@ -221,7 +222,7 @@ public class BackendMgr {
         ArrayList<String> appointmentTypes = new ArrayList<String>();
         appointmentTypes.add(AppointmentType.PROFESSIONAL_FACULTY);
 
-        //get a list of all the active classified jobs
+        //get a list of all the active unclassified jobs
         List<Job> shortJobs = JobMgr.listShortNotTerminatedJobs(appointmentTypes);
         DateTime createForDate = getCreateForDate(AppointmentType.PROFESSIONAL_FACULTY);
         tx.commit();
@@ -255,7 +256,7 @@ public class BackendMgr {
                         System.out.println("not time to create new annual evaluation. appraisalStartDate = " + appraisalStartDate);
                     }
                 } else {
-                    System.out.println("Professional Faculty job hasn't been initialized in EvalS yet.");
+                    System.out.println("Unclassified job hasn't been initialized in EvalS yet.");
                 }
                 tx.commit();
             } catch(Exception e) {
@@ -1071,8 +1072,8 @@ public class BackendMgr {
      * @return
      */
     public static boolean timeToSendFirstStatusEmail(Appraisal appraisal, DateTime createForDate) {
-        // If the appointment type is other than prof. faculty always send email right away
-        if (!appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+        // If the appointment type is not unclassified always send email right away
+        if (!appraisal.getJob().isUnclassified()) {
             return false;
         }
 
