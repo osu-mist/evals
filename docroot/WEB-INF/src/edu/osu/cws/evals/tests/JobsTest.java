@@ -181,8 +181,8 @@ public class JobsTest {
     }
 
     public void shouldCorrectlyDetermineIfUserIsAProfessionalSupervisor() {
-        assert JobMgr.isProfessionalSupervisor(56200);
-        assert !JobMgr.isProfessionalSupervisor(12345);
+        assert JobMgr.isUnclassifiedSupervisor(56200);
+        assert !JobMgr.isUnclassifiedSupervisor(12345);
     }
 
     private void assertCorrectNewAnnualStartDateForAnnualInd18(Job job, Calendar cal, int month,

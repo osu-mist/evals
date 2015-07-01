@@ -1202,7 +1202,7 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
             return false;
         }
         boolean classifiedNotRated = aptType.equals(AppointmentType.CLASSIFIED) && rating == 4;
-        boolean profFacultyNotRated = aptType.equals(AppointmentType.PROFESSIONAL_FACULTY) && rating == 6;
+        boolean profFacultyNotRated = getJob().isUnclassified() && rating == 6;
         return !(classifiedNotRated || profFacultyNotRated);
     }
 }

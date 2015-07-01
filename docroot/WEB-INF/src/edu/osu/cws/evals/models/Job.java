@@ -65,6 +65,7 @@ public class Job extends Evals implements Serializable {
     private Double salaryHigh;
     private Double salaryCurrent;
     private String salaryGrpCode;
+    private Boolean rankedFlag;
 
     private Set appraisals = new HashSet();
 
@@ -370,6 +371,14 @@ public class Job extends Evals implements Serializable {
         this.positionDescription = positionDescription;
     }
 
+    public Boolean isRankedFlag() {
+        return rankedFlag;
+    }
+
+    public void setRankedFlag(Boolean rankedFlag) {
+        this.rankedFlag = rankedFlag;
+    }
+
     /**
      * Trial start date doed not need to be the first date of the month.
      * @return  (DateTime) start date of the trial appraisal period.
@@ -548,6 +557,25 @@ public class Job extends Evals implements Serializable {
      */
     public String getReviewPeriod() {
         return ((Appraisal) getAppraisals().iterator().next()).getReviewPeriod();
+    }
+
+    /**
+     * Whether or not the job is an appointment type other than: Classified or Classified IT.
+     *
+     * @return
+     */
+    public boolean isUnclassified() {
+        return !appointmentType.equals(AppointmentType.CLASSIFIED) &&
+                !appointmentType.equals(AppointmentType.CLASSIFIED_IT);
+    }
+
+    /**
+     * Wrapper for isUnclassified method so that it can be called from jstl.
+     *
+     * @return
+     */
+    public boolean getIsUnclassified() {
+        return isUnclassified();
     }
 }
 

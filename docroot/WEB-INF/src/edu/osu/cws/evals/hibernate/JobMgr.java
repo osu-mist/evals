@@ -134,8 +134,8 @@ public class JobMgr {
 
     /**
      * Gets a list of jobs that are not terminated (status != T) that match the provided
-     * appointment types. The job objects only have a few properties populated: pidm,
-     * position number, suffi, job status and appointment type.
+     * appointment types or ranked_flag. The job objects only have a few properties populated: pidm,
+     * position number, suffix, job status and appointment type.
      *
      * @param appointmentTypes  ArrayList of different appointment types to fetch jobs for.
      * @return
@@ -147,8 +147,16 @@ public class JobMgr {
 
         String query = "select new edu.osu.cws.evals.models.Job(employee.id, positionNumber, suffix, " +
                 "status, appointmentType) from edu.osu.cws.evals.models.Job job " +
-                "where job.status != 'T' and job.appointmentType in (:appointmentTypes) " +
+                "where job.status != 'T' " +
                 "and job.beginDate <= :currentDate and job.suffix = '00'";
+
+
+        query += "and (job.appointmentType in (:appointmentTypes) ";
+        // Only if professional faculty is included, we'll also include ranked_flag = 1 jobs
+        if (appointmentTypes.contains(AppointmentType.PROFESSIONAL_FACULTY)) {
+            query += "or job.rankedFlag = 1";
+        }
+        query += ")";
 
         jobs = session.createQuery(query)
                 .setParameterList("appointmentTypes", appointmentTypes)
@@ -189,7 +197,8 @@ public class JobMgr {
     /**
      * Gets a list of jobs that are not terminated (status != T) that match the provided
      * appointment types. The job objects only have a few properties populated: pidm,
-     * position number, suffi, job status and appointment type.
+     * position number, suffix, job status and appointment type. If professional faculty is included,
+     * ranked faculty jobs flagged with "ranked_flag = 1" will also be included.
      *
      * @param supervisorJobs          The supervisor jobs to get the list of employees
      * @param appointmentTypes      ArrayList of different appointment types to fetch jobs for.
@@ -339,9 +348,9 @@ public class JobMgr {
      * @param pidm
      * @return
      */
-    public static boolean isProfessionalSupervisor(int pidm) {
+    public static boolean isUnclassifiedSupervisor(int pidm) {
         Session session = HibernateUtil.getCurrentSession();
-        Query query = session.getNamedQuery("job.isProfessionalSupervisor");
+        Query query = session.getNamedQuery("job.isUnclassifiedSupervisor");
         query.setParameter("pidm", pidm);
         query.setString("apt_type", AppointmentType.PROFESSIONAL_FACULTY);
         int result = Integer.parseInt(query.list().get(0).toString());
