@@ -97,6 +97,15 @@ public class JobsTest {
             assert job.getAppointmentType().equals(AppointmentType.CLASSIFIED);
         }
 
+        // Try getting only unclassified
+        appointmentTypes = new ArrayList<String>();
+        Collections.addAll(appointmentTypes, new String[] {AppointmentType.PROFESSIONAL_FACULTY});
+        jobs = JobMgr.listShortNotTerminatedJobs(appointmentTypes);
+        assert jobs.size() != 0 : "Missing jobs from list";
+        for (Job job : jobs) {
+            assert job.isUnclassified();
+        }
+
         // Try getting both appointment types
         appointmentTypes = new ArrayList<String>();
         Collections.addAll(appointmentTypes, new String[]
@@ -345,5 +354,28 @@ public class JobsTest {
         assert pd2.getId() == 2;
         assert pd2.getPositionTitle().equals("PD2");
         assert pd2.getLeadWorkResponsibilities().size() == 1;
+    }
+
+    public void shouldCalculateUnclassified() {
+        Session session = HibernateUtil.getCurrentSession();
+        Employee employee = new Employee(12345);
+        Employee employee2 = new Employee(56200);
+        Employee employee3 = new Employee(74589);
+        Job classifiedJob = (Job) session.load(Job.class, new Job(employee, "1234", "00"));
+        Job rankedFacultyJob = (Job) session.load(Job.class, new Job(employee, "56200", "00"));
+        Job professionalFacultyJob = (Job) session.load(Job.class, new Job(employee2, "C56123", "AA"));
+        Job classifiedITJob = (Job) session.load(Job.class, new Job(employee3, "85392", "00"));
+
+        assert !classifiedITJob.isUnclassified();
+        assert !classifiedITJob.getIsUnclassified();
+
+        assert !classifiedJob.isUnclassified();
+        assert !classifiedJob.getIsUnclassified();
+
+        assert rankedFacultyJob.isUnclassified();
+        assert rankedFacultyJob.getIsUnclassified();
+
+        assert professionalFacultyJob.isUnclassified();
+        assert professionalFacultyJob.getIsUnclassified();
     }
 }

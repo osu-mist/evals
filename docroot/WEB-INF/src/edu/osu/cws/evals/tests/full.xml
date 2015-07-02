@@ -531,11 +531,11 @@
             PYVPASJ_SUPERVISOR_PIDM="56200"
             PYVPASJ_SUPERVISOR_POSN="C56123"
             PYVPASJ_SUPERVISOR_SUFF="AA"
-            PYVPASJ_DESC="Professional Supervisor is the job."
+            PYVPASJ_DESC="Ranked Faculty Supervisor is the job."
             PYVPASJ_POSN="56200"
-            PYVPASJ_SUFF="AA"
+            PYVPASJ_SUFF="00"
             PYVPASJ_ECLS_CODE="kjlkjlk"
-            PYVPASJ_APPOINTMENT_TYPE="Professional Faculty"
+            PYVPASJ_APPOINTMENT_TYPE="Ranked Faculty"
             PYVPASJ_BEGIN_DATE="2011-05-14"
             PYVPASJ_BCTR_TITLE="AABC"
             PYVPASJ_ORGN_CODE_TS="test"
@@ -566,7 +566,7 @@
             PYVPASJ_ANNUAL_IND="12"
             PYVPASJ_EVAL_DATE="2010-01-30"
             PYVPASJ_ORGN_DESC="testing"
-            PYVPASJ_RANKED_FLAG="1"/>
+            PYVPASJ_RANKED_FLAG="0"/>
 
     <jobs
             PYVPASJ_PIDM="12345"
