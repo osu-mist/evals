@@ -68,7 +68,7 @@
         from edu.osu.cws.evals.models.Job job
         where
             job.status != 'T' and
-            ( job.appointmentType in (:appointmentTypes) or job.rankedFlag = true) and
+            (job.appointmentType in (:appointmentTypes) or job.rankedFlag = true) and
             job.suffix = '00' and
             job.supervisor in (:supervisorJobs)
     </query>
@@ -79,7 +79,7 @@
         where
             supervisor.employee.id = :pidm and
             status != 'T' and
-            ( appointmentType = :apt_type or job.rankedFlag = true)
+            (appointmentType = :apt_type or job.rankedFlag = true)
     </query>
     <query name="job.jobsWithoutActiveEvaluations"><![CDATA[
         from edu.osu.cws.evals.models.Job
