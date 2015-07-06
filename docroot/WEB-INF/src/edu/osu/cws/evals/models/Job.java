@@ -562,7 +562,7 @@ public class Job extends Evals implements Serializable {
     /**
      * Whether or not the job is an appointment type other than: Classified or Classified IT.
      *
-     * @return
+     * @return  boolean true if the job is not classified.
      */
     public boolean isUnclassified() {
         return !appointmentType.equals(AppointmentType.CLASSIFIED) &&
@@ -571,8 +571,6 @@ public class Job extends Evals implements Serializable {
 
     /**
      * Wrapper for isUnclassified method so that it can be called from jstl.
-     *
-     * @return
      */
     public boolean getIsUnclassified() {
         return isUnclassified();
