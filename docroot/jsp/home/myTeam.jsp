@@ -57,6 +57,8 @@
                                     </portlet:actionURL>"><liferay-ui:message key="${shortAppraisal.viewStatus}" />
                                 </a>
                             </c:if>
+                            <%-- The only shortAppraisals with an id of 0 are from employees that need to be
+                            initialized manually --%>
                             <c:if test="${shortAppraisal.id == 0}">
                                 <a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
                                         <portlet:param name="action" value="initiateProfessionalFacultyEvals"/>
