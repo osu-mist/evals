@@ -154,7 +154,7 @@ public class JobMgr {
         query += "and (job.appointmentType in (:appointmentTypes) ";
         // Only if professional faculty is included, we'll also include ranked_flag = 1 jobs
         if (appointmentTypes.contains(AppointmentType.PROFESSIONAL_FACULTY)) {
-            query += "or job.rankedFlag = 1";
+            query += "or job.rankedFlag = true";
         }
         query += ")";
 
