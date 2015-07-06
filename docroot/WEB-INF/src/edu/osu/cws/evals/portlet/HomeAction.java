@@ -77,7 +77,8 @@ public class HomeAction implements ActionInterface {
      * the professional faculty and ranked faculty evaluations.
      *
      * It checks that the user is a supervisor of professional faculty or ranked_flag =1 and that at least one
-     * of these unclassified employees needs an evaluation created.
+     * of these unclassified employees needs an evaluation created. This is handled by calling the
+     * JobMgr.isUnclassifiedSupervisor() method.
      *
      * @return
      * @throws Exception
