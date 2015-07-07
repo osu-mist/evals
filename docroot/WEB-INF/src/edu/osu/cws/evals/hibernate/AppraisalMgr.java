@@ -450,8 +450,6 @@ public class AppraisalMgr {
         // end clause that checks appointment type or ranked_flag
         query += ") ";
 
-
-
         if (!StringUtils.isEmpty(posno) && !StringUtils.isEmpty(suffix)) {
             query += " AND jobs.PYVPASJ_SUPERVISOR_POSN=:posno" +
                     " AND jobs.PYVPASJ_SUPERVISOR_SUFF = :suffix";
