@@ -131,7 +131,7 @@ public class Mailer implements MailerInterface {
      */
     private String getCommentType(Appraisal appraisal) {
         String commentType = "rebuttal";
-        if (appraisal.getJob().getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+        if (appraisal.getJob().isUnclassified()) {
             commentType = "response";
         }
         return commentType;
@@ -787,7 +787,7 @@ public class Mailer implements MailerInterface {
      */
     private String releaseDueBody(Appraisal appraisal) throws Exception {
         String key = "email_releaseDue_body";
-        if (appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+        if (appraisal.getJob().isUnclassified()) {
             key = "email_releaseDueProfFaculty_body";
         }
         String bodyString = emailBundle.getString(key);

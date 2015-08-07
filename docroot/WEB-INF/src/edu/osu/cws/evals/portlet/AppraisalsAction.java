@@ -8,7 +8,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.hibernate.*;
 import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.util.*;
-import edu.osu.cws.util.CWSUtil;
 import edu.osu.cws.util.Logger;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.ArrayUtils;
@@ -413,20 +412,12 @@ public class AppraisalsAction implements ActionInterface {
     }
 
     /**
-     * Whether or not the evaluation should be downloaded for nolij. If the appointment type is not prof. faculty
-     * and the employee signed the evaluation, it is uploaded to nolij.
+     * Whether or not the evaluation should be downloaded for nolij. If the employee signed the evaluation,
+     * it is uploaded to nolij.
      *
      * @return
      */
     private boolean downloadToNolij() {
-        Map<String, Configuration> configMap = (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
-        String configName = Constants.ALLOW_PDF_TO_NOLIJ;
-        String configAptType = AppointmentType.PROFESSIONAL_FACULTY;
-        Configuration pdfToNolijConfig = ConfigurationMgr.getConfiguration(configMap, configName, configAptType);
-        if (appraisal.getAppointmentType().equals(configAptType) && pdfToNolijConfig.getValue().equals("0")) {
-            return false;
-        }
-
         String signAppraisal = ParamUtil.getString(request, "sign-appraisal");
         return signAppraisal != null && !signAppraisal.equals("");
     }
@@ -495,7 +486,7 @@ public class AppraisalsAction implements ActionInterface {
         EmailType emailType = getEmailType();
         if (emailType != null) {
             mailer.sendMail(appraisal, emailType);
-            if(!appraisal.isRated() && appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)
+            if(!appraisal.isRated() && appraisal.getJob().isUnclassified()
                     && emailType.getType().equals("signatureDue")) {
                 emailType = emailTypeMap.get("signatureDueNotRated");
                 mailer.sendMail(appraisal, emailType);
@@ -1315,7 +1306,7 @@ public class AppraisalsAction implements ActionInterface {
                 + startDate.toString(Constants.DATE_FORMAT_FULL);
 
         // create evaluations
-        List<Appraisal> newAppraisals = AppraisalMgr.createProfessionalFacultyEvals(loggedInUser, startDate);
+        List<Appraisal> newAppraisals = AppraisalMgr.createManuallyInitializedEvals(loggedInUser, startDate);
         if (newAppraisals == null || newAppraisals.isEmpty()) {
             actionHelper.addErrorsToRequest(resource.getString("prof-faculty-create-evals-error"));
             logger.log(Logger.ERROR, "Failed to create professional faculty evaluations", loggingMsg);
@@ -1326,7 +1317,7 @@ public class AppraisalsAction implements ActionInterface {
         for (Appraisal newAppraisal : newAppraisals) {
             loggingMsg += "\n" + newAppraisal.getJob().getSignature() + " appraisal id = " + newAppraisal.getId();
         }
-        logger.log(Logger.INFORMATIONAL, "Initiated professional faculty evaluations", loggingMsg);
+        logger.log(Logger.INFORMATIONAL, "Initiated unclassified evaluations", loggingMsg);
         SessionMessages.add(request, "prof-faculty-create-evals-success");
 
         // clear out cached list of evaluations in supervisor home view. display method will re-build cache
@@ -1345,8 +1336,8 @@ public class AppraisalsAction implements ActionInterface {
         if (permRule == null) {
             return false;
         }
-        // If appointment type is not prof. faculty => has permission
-        if (!appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+        // If appointment type is classified or classified IT => has permission
+        if (!appraisal.getJob().isUnclassified()) {
             return true;
         }
         // If role is upper supervisor && user is first upper supevisor => has permission

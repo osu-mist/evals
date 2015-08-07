@@ -15,6 +15,8 @@ public class AppointmentType extends Evals {
 
     public static final String PROFESSIONAL_FACULTY = "Professional Faculty";
 
+    public static final String RANKED_FACULTY = "Ranked Faculty";
+
     private String name;
 
     public AppointmentType() { }

@@ -21,6 +21,7 @@
                 <th><liferay-ui:message key="name"/></th>
                 <th><liferay-ui:message key="position-number"/></th>
                 <th><liferay-ui:message key="jobTitle"/></th>
+                <th><liferay-ui:message key="appointment-type" /></th>
                 <th><liferay-ui:message key="reviewPeriod" /></th>
                 <th><liferay-ui:message key="supervising-position-number"/></th>
             </tr>
@@ -31,6 +32,7 @@
                         <td><c:out value="${shortJob.employee.name}"/></td>
                         <td><c:out value="${shortJob.positionNumber}"/></td>
                         <td><c:out value="${shortJob.jobTitle}"/></td>
+                        <td><c:out value="${shortJob.appointmentType}"/></td>
                         <td><c:out value="${shortJob.reviewPeriod}"/></td>
                         <td><c:out value="${shortJob.supervisor.positionNumber}"/></td>
                     </tr>
@@ -49,6 +51,7 @@
             <th><liferay-ui:message key="name"/></th>
             <th><liferay-ui:message key="position-number"/></th>
             <th><liferay-ui:message key="jobTitle"/></th>
+            <th><liferay-ui:message key="appointment-type"/></th>
             <th><liferay-ui:message key="supervising-position-number"/></th>
         </tr>
         </thead>
@@ -58,6 +61,7 @@
                     <td><c:out value="${shortJob.employee.name}"/></td>
                     <td><c:out value="${shortJob.positionNumber}"/></td>
                     <td><c:out value="${shortJob.jobTitle}"/></td>
+                    <td><c:out value="${shortJob.appointmentType}"/></td>
                     <td><c:out value="${shortJob.supervisor.positionNumber}"/></td>
                 </tr>
             </c:forEach>

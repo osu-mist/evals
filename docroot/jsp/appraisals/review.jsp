@@ -1,4 +1,4 @@
-<c:set var="reviewType" value="${appraisal.job.appointmentType == 'Professional Faculty' ? 'employee' : 'hr'}"/>
+<c:set var="reviewType" value="${appraisal.job.isUnclassified ? 'employee' : 'hr'}"/>
 
 <h3 class="secret"><liferay-ui:message key="appraisal-hr-review"/></h3>
 <div class="appraisal accordion-menu">

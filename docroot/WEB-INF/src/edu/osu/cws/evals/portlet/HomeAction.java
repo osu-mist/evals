@@ -61,7 +61,7 @@ public class HomeAction implements ActionInterface {
             actionHelper.addToRequestMap("hasNoEvalsAccess", true);
         }
 
-        actionHelper.addToRequestMap("initiateProfFaculty", displayInitiateProfFacButton());
+        actionHelper.addToRequestMap("initiateProfFaculty", displayInitiateEvaluationsButton());
 
         actionHelper.setRequiredActions();
         if (homeJSP.equals(Constants.JSP_HOME_REVIEWER)) {
@@ -74,15 +74,16 @@ public class HomeAction implements ActionInterface {
 
     /**
      * Whether or not EvalS should display a button in the home view of the user to let them initiate
-     * the professional faculty evaluations.
+     * the professional faculty and ranked faculty evaluations.
      *
-     * It checks that the user is a supervisor of professional faculty and that at least one of the professional
-     * faculty employees needs an evaluation created.
+     * It checks that the user is a supervisor of professional faculty or ranked_flag =1 and that at least one
+     * of these unclassified employees needs an evaluation created. This is handled by calling the
+     * JobMgr.isUnclassifiedSupervisor() method.
      *
      * @return
      * @throws Exception
      */
-    private boolean displayInitiateProfFacButton() throws Exception {
+    private boolean displayInitiateEvaluationsButton() throws Exception {
         Map<String, Configuration> configMap = (Map<String, Configuration>) actionHelper.getPortletContextAttribute("configurations");
         if (!EvalsUtil.isProfessionalFacultyEnabled(configMap)) {
             return false;
@@ -99,7 +100,7 @@ public class HomeAction implements ActionInterface {
 
         ArrayList<Job> employeeShortJobs = (ArrayList<Job>) JobMgr.listEmployeesShortJobs(supervisorJob, appointmentTypes);
         ArrayList<Job> jobsWithoutActiveEvaluations = JobMgr.getJobWithoutActiveEvaluations(employeeShortJobs);
-        return JobMgr.isProfessionalSupervisor(actionHelper.getLoggedOnUser().getId()) &&
+        return JobMgr.isUnclassifiedSupervisor(actionHelper.getLoggedOnUser().getId()) &&
                 jobsWithoutActiveEvaluations != null && !jobsWithoutActiveEvaluations.isEmpty();
     }
 

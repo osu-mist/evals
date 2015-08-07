@@ -51,7 +51,7 @@
         <c:out value="${appraisalNotice.text}"/>
     </span>
 </c:if>
-<c:if test="${!empty profFacultyMsg and appraisal.job.appointmentType == 'Professional Faculty'}">
+<c:if test="${!empty profFacultyMsg and appraisal.job.isUnclassified}">
    <span class="portlet-msg-alert evals-prof-faculty-start">
        ${profFacultyMsg}
    </span>

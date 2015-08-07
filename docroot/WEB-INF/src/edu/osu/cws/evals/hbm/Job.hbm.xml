@@ -33,6 +33,7 @@
         <property name="salaryHigh" type="double" column="PYVPASJ_HIGH"/>
         <property name="salaryCurrent" type="double" column="PYVPASJ_SALARY"/>
         <property name="salaryGrpCode" type="string" length="6" column="PYVPASJ_SGRP_CODE"/>
+        <property name="rankedFlag" type="boolean" column="PYVPASJ_RANKED_FLAG"/>
 
         <many-to-one name="supervisor" class="edu.osu.cws.evals.models.Job" not-null="false" fetch="select">
             <column name="PYVPASJ_SUPERVISOR_PIDM"/>
@@ -67,18 +68,18 @@
         from edu.osu.cws.evals.models.Job job
         where
             job.status != 'T' and
-            job.appointmentType in (:appointmentTypes) and
+            (job.appointmentType in (:appointmentTypes) or job.rankedFlag = true) and
             job.suffix = '00' and
             job.supervisor in (:supervisorJobs)
     </query>
-    <query name="job.isProfessionalSupervisor">
+    <query name="job.isUnclassifiedSupervisor">
         select
             count(*)
         from edu.osu.cws.evals.models.Job job
         where
             supervisor.employee.id = :pidm and
             status != 'T' and
-            appointmentType = :apt_type
+            (appointmentType = :apt_type or job.rankedFlag = true)
     </query>
     <query name="job.jobsWithoutActiveEvaluations"><![CDATA[
         from edu.osu.cws.evals.models.Job

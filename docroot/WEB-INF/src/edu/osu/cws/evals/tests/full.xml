@@ -252,7 +252,8 @@
         PYVPASJ_TRIAL_IND="6"
         PYVPASJ_ANNUAL_IND="0"
         PYVPASJ_EVAL_DATE="2010-01-30"
-        PYVPASJ_ORGN_DESC="testing"/>
+        PYVPASJ_ORGN_DESC="testing"
+        PYVPASJ_RANKED_FLAG="0"/>
   <jobs
         PYVPASJ_PIDM="12345"
         PYVPASJ_SUPERVISOR_PIDM="12467"
@@ -273,7 +274,8 @@
         PYVPASJ_TRIAL_IND="9"
         PYVPASJ_ANNUAL_IND="18"
         PYVPASJ_EVAL_DATE="2010-01-30"
-        PYVPASJ_ORGN_DESC="testing"/>
+        PYVPASJ_ORGN_DESC="testing"
+        PYVPASJ_RANKED_FLAG="0"/>
   <jobs
         PYVPASJ_PIDM="12467"
         PYVPASJ_DESC="MU Supervisor"
@@ -291,7 +293,8 @@
         PYVPASJ_TRIAL_IND="18"
         PYVPASJ_ANNUAL_IND="0"
         PYVPASJ_EVAL_DATE="2010-01-30"
-        PYVPASJ_ORGN_DESC="testing"/>
+        PYVPASJ_ORGN_DESC="testing"
+        PYVPASJ_RANKED_FLAG="0"/>
   <jobs
         PYVPASJ_PIDM="12345"
         PYVPASJ_SUPERVISOR_PIDM="56198"
@@ -312,7 +315,8 @@
         PYVPASJ_TRIAL_IND="6"
         PYVPASJ_ANNUAL_IND="0"
         PYVPASJ_EVAL_DATE="2010-01-30"
-        PYVPASJ_ORGN_DESC="testing"/>
+        PYVPASJ_ORGN_DESC="testing"
+        PYVPASJ_RANKED_FLAG="0"/>
   <jobs
         PYVPASJ_PIDM="787812"
         PYVPASJ_SUPERVISOR_PIDM="8712359"
@@ -333,7 +337,8 @@
         PYVPASJ_TRIAL_IND="6"
         PYVPASJ_ANNUAL_IND="0"
         PYVPASJ_EVAL_DATE="2010-01-30"
-        PYVPASJ_ORGN_DESC="testing"/>
+        PYVPASJ_ORGN_DESC="testing"
+        PYVPASJ_RANKED_FLAG="0"/>
   <jobs
         PYVPASJ_PIDM="8712359"
         PYVPASJ_SUPERVISOR_PIDM="990871"
@@ -354,7 +359,8 @@
         PYVPASJ_TRIAL_IND="0"
         PYVPASJ_ANNUAL_IND="12"
         PYVPASJ_EVAL_DATE="2010-01-30"
-        PYVPASJ_ORGN_DESC="testing"/>
+        PYVPASJ_ORGN_DESC="testing"
+        PYVPASJ_RANKED_FLAG="0"/>
   <jobs
         PYVPASJ_PIDM="990871"
         PYVPASJ_DESC="Bar owner"
@@ -372,7 +378,8 @@
         PYVPASJ_TRIAL_IND="12"
         PYVPASJ_ANNUAL_IND="18"
         PYVPASJ_EVAL_DATE="2010-01-30"
-        PYVPASJ_ORGN_DESC="testing"/>
+        PYVPASJ_ORGN_DESC="testing"
+        PYVPASJ_RANKED_FLAG="0"/>
   <jobs
         PYVPASJ_PIDM="56198"
         PYVPASJ_SUPERVISOR_PIDM="12345"
@@ -393,7 +400,8 @@
         PYVPASJ_TRIAL_IND="6"
         PYVPASJ_ANNUAL_IND="12"
         PYVPASJ_EVAL_DATE="2010-01-30"
-        PYVPASJ_ORGN_DESC="testing"/>
+        PYVPASJ_ORGN_DESC="testing"
+        PYVPASJ_RANKED_FLAG="0"/>
     <jobs
         PYVPASJ_PIDM="56198"
         PYVPASJ_SUPERVISOR_PIDM="12345"
@@ -414,7 +422,8 @@
         PYVPASJ_TRIAL_IND="6"
         PYVPASJ_ANNUAL_IND="12"
         PYVPASJ_EVAL_DATE="2010-01-30"
-        PYVPASJ_ORGN_DESC="testing"/>
+        PYVPASJ_ORGN_DESC="testing"
+        PYVPASJ_RANKED_FLAG="0"/>
     <jobs
         PYVPASJ_PIDM="56199"
         PYVPASJ_DESC="Bar owner"
@@ -432,7 +441,8 @@
         PYVPASJ_TRIAL_IND="6"
         PYVPASJ_ANNUAL_IND="12"
         PYVPASJ_EVAL_DATE="2010-01-30"
-        PYVPASJ_ORGN_DESC="testing"/>
+        PYVPASJ_ORGN_DESC="testing"
+        PYVPASJ_RANKED_FLAG="0"/>
     <jobs
         PYVPASJ_PIDM="56199"
         PYVPASJ_DESC="Bar owner"
@@ -450,7 +460,8 @@
         PYVPASJ_TRIAL_IND="6"
         PYVPASJ_ANNUAL_IND="12"
         PYVPASJ_EVAL_DATE="2010-01-30"
-        PYVPASJ_ORGN_DESC="testing"/>
+        PYVPASJ_ORGN_DESC="testing"
+        PYVPASJ_RANKED_FLAG="0"/>
 
     <jobs
             PYVPASJ_PIDM="74589"
@@ -474,7 +485,8 @@
             PYVPASJ_MIDPOINT="3000"
             PYVPASJ_HIGH="4000"
             PYVPASJ_SALARY="2500"
-            PYVPASJ_SGRP_CODE="123456"/>
+            PYVPASJ_SGRP_CODE="123456"
+            PYVPASJ_RANKED_FLAG="0"/>
 
     <jobs
         PYVPASJ_PIDM="60001"
@@ -493,7 +505,8 @@
         PYVPASJ_TRIAL_IND="6"
         PYVPASJ_ANNUAL_IND="12"
         PYVPASJ_EVAL_DATE="2010-01-30"
-        PYVPASJ_ORGN_DESC="testing"/>
+        PYVPASJ_ORGN_DESC="testing"
+        PYVPASJ_RANKED_FLAG="0"/>
     <jobs
         PYVPASJ_PIDM="60002"
         PYVPASJ_DESC="Back to the history"
@@ -511,17 +524,18 @@
         PYVPASJ_TRIAL_IND="6"
         PYVPASJ_ANNUAL_IND="12"
         PYVPASJ_EVAL_DATE="2010-01-30"
-        PYVPASJ_ORGN_DESC="testing"/>
+        PYVPASJ_ORGN_DESC="testing"
+        PYVPASJ_RANKED_FLAG="0"/>
     <jobs
             PYVPASJ_PIDM="12345"
             PYVPASJ_SUPERVISOR_PIDM="56200"
             PYVPASJ_SUPERVISOR_POSN="C56123"
             PYVPASJ_SUPERVISOR_SUFF="AA"
-            PYVPASJ_DESC="Professional Supervisor is the job."
+            PYVPASJ_DESC="Ranked Faculty Supervisor is the job."
             PYVPASJ_POSN="56200"
-            PYVPASJ_SUFF="AA"
+            PYVPASJ_SUFF="00"
             PYVPASJ_ECLS_CODE="kjlkjlk"
-            PYVPASJ_APPOINTMENT_TYPE="Professional Faculty"
+            PYVPASJ_APPOINTMENT_TYPE="Ranked Faculty"
             PYVPASJ_BEGIN_DATE="2011-05-14"
             PYVPASJ_BCTR_TITLE="AABC"
             PYVPASJ_ORGN_CODE_TS="test"
@@ -532,7 +546,8 @@
             PYVPASJ_TRIAL_IND="6"
             PYVPASJ_ANNUAL_IND="12"
             PYVPASJ_EVAL_DATE="2010-01-30"
-            PYVPASJ_ORGN_DESC="testing"/>
+            PYVPASJ_ORGN_DESC="testing"
+            PYVPASJ_RANKED_FLAG="1"/>
     <jobs
             PYVPASJ_PIDM="56200"
             PYVPASJ_POSN="C56123"
@@ -550,7 +565,8 @@
             PYVPASJ_TRIAL_IND="6"
             PYVPASJ_ANNUAL_IND="12"
             PYVPASJ_EVAL_DATE="2010-01-30"
-            PYVPASJ_ORGN_DESC="testing"/>
+            PYVPASJ_ORGN_DESC="testing"
+            PYVPASJ_RANKED_FLAG="0"/>
 
     <jobs
             PYVPASJ_PIDM="12345"
@@ -572,7 +588,8 @@
             PYVPASJ_TRIAL_IND="9"
             PYVPASJ_ANNUAL_IND="18"
             PYVPASJ_EVAL_DATE="2010-01-30"
-            PYVPASJ_ORGN_DESC="testing"/>
+            PYVPASJ_ORGN_DESC="testing"
+            PYVPASJ_RANKED_FLAG="0"/>
 
   <permission_rules ID="1" STATUS="goalsDue" ROLE="employee" APPROVED_GOALS="e" ACTION_REQUIRED="goalsDue" APPOINTMENT_TYPE="Default"/>
   <permission_rules ID="2" STATUS="goalsDue" ROLE="immediate-supervisor" APPROVED_GOALS="e" APPOINTMENT_TYPE="Default"/>

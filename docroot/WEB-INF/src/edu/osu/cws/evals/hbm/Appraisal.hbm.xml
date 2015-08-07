@@ -230,7 +230,7 @@
         from edu.osu.cws.evals.models.Appraisal
         where
             job = :job
-        order by id desc
+        order by startDate desc
     ]]></query>
     <sql-query name="report.reportLateEvaluations"><![CDATA[
     select

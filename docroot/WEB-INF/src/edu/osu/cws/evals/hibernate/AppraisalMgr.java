@@ -132,7 +132,8 @@ public class AppraisalMgr {
      * @return appraisals           List of appraisal objects created
      * @throws Exception
      */
-    public static List<Appraisal> createProfessionalFacultyEvals(Employee supervisor, DateTime startDate) throws Exception {
+    public static List<Appraisal> createManuallyInitializedEvals(Employee supervisor, DateTime startDate)
+            throws Exception {
         List<Appraisal> appraisals = new ArrayList<Appraisal>();
         List<String> appointmentTypes = new ArrayList<String>();
         appointmentTypes.add(AppointmentType.PROFESSIONAL_FACULTY);
@@ -410,6 +411,7 @@ public class AppraisalMgr {
                                                  String posno, String suffix, List<String> appointmentTypes) {
         ArrayList<Appraisal> appraisals = new ArrayList<Appraisal>();
         List<Integer> employeePidms = new ArrayList<Integer>();
+        String csv_appointment_types = StringUtils.join(appointmentTypes, "', '");
         Session session = HibernateUtil.getCurrentSession();
 
         String query =
@@ -434,10 +436,19 @@ public class AppraisalMgr {
         }
         query += "WHERE" +
                 " jobs.PYVPASJ_SUPERVISOR_PIDM=:supervisorPidm AND " +
-                " jobs.PYVPASJ_STATUS != 'T' AND" +
-                " jobs.PYVPASJ_APPOINTMENT_TYPE IN ('" +
-                StringUtils.join(appointmentTypes, "', '") + "') ";
+                " jobs.PYVPASJ_STATUS != 'T' ";
 
+        // begin clause that checks appointment tpe or ranked_flag
+        query += "AND (" +
+                " jobs.PYVPASJ_APPOINTMENT_TYPE IN ('" +
+                csv_appointment_types + "')";
+
+        if (appointmentTypes.contains(AppointmentType.PROFESSIONAL_FACULTY)) {
+            query += " OR PYVPASJ_RANKED_FLAG = 1";
+        }
+
+        // end clause that checks appointment type or ranked_flag
+        query += ") ";
 
         if (!StringUtils.isEmpty(posno) && !StringUtils.isEmpty(suffix)) {
             query += " AND jobs.PYVPASJ_SUPERVISOR_POSN=:posno" +

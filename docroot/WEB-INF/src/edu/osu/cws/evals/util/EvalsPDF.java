@@ -177,7 +177,7 @@ public class EvalsPDF {
      * @throws DocumentException
      */
     private PdfPTable getSignatureTable() throws DocumentException {
-        boolean isProfFaculty = appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY);
+        boolean isProfFaculty = appraisal.getJob().isUnclassified();
         int signatureTableMaxCols = 29;
         int signatureTableMaxRows = 7;
         int nameColSpan = 8;
@@ -353,7 +353,7 @@ public class EvalsPDF {
      */
     private void addRebuttal() throws DocumentException {
         String rebuttalType =  "rebuttal";
-        if (appraisal.getAppointmentType().equals(AppointmentType.PROFESSIONAL_FACULTY)) {
+        if (appraisal.getJob().isUnclassified()) {
             rebuttalType = "feedback";
         }
 
