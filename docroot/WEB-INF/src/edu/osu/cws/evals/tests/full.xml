@@ -734,6 +734,16 @@
           ACTION=""
           APPOINTMENT_TYPE="Default"
           />
+  <configurations
+          ID="15"
+          SECTION="due-date"
+          NAME="appraisalDue"
+          SEQUENCE="6"
+          VALUE="60"
+          REFERENCE_POINT="end"
+          ACTION="subtract"
+          APPOINTMENT_TYPE="Default"
+          />
   <salaries
           ID="1"
           APPRAISAL_ID="8"
