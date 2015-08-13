@@ -327,6 +327,9 @@ public class BackendMgrTests {
     }
 
     public void shouldUpdateSalaryWhenAppraisalIsDue() throws Exception {
+        // The appraisal is due 60 days before the appraisal.endDate. By setting the end date to be 61
+        // days from today, makes it due in one day, 60 days from today means due today and 59 means
+        // it was due yesterday.
         Appraisal appraisal = new Appraisal();
         appraisal.setJob(new Job());
         appraisal.getJob().setAppointmentType(AppointmentType.CLASSIFIED_IT);
