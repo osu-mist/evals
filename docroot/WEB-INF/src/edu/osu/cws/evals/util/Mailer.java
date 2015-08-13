@@ -67,6 +67,10 @@ public class Mailer implements MailerInterface {
         this.testMailToAddress = testMailToAddress;
     }
 
+    public Map<String, Configuration> getConfigMap() {
+        return configMap;
+    }
+
     /**
      * Sends an email
      * @param appraisal - an Appraisal object
@@ -516,7 +520,7 @@ public class Mailer implements MailerInterface {
     private String goalsDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsDue_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDueDate(appraisal, null), getDaysRemaining(appraisal, null));
+                appraisal.getReviewPeriod(), getDueDate(appraisal, null), getDaysRemaining(appraisal, false));
     }
 
     /**
@@ -540,7 +544,7 @@ public class Mailer implements MailerInterface {
     private String goalsRequiredModificationBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsRequiredModification_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal), appraisal.getReviewPeriod(),
-                getDaysRemaining(appraisal, null));
+                getDaysRemaining(appraisal, false));
     }
 
     /**
@@ -594,7 +598,7 @@ public class Mailer implements MailerInterface {
     private String goalsApprovalDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_goalsApprovalDue_body");
         return MessageFormat.format(bodyString, getEmployeeName(appraisal), getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDueDate(appraisal, null), getDaysRemaining(appraisal, null));
+                appraisal.getReviewPeriod(), getDueDate(appraisal, null), getDaysRemaining(appraisal, false));
     }
 
     /**
@@ -678,7 +682,7 @@ public class Mailer implements MailerInterface {
     private String resultsDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_resultsDue_body");
         return MessageFormat.format(bodyString, getJobTitle(appraisal),
-                appraisal.getReviewPeriod(), getDueDate(appraisal, null), getDaysRemaining(appraisal, null));
+                appraisal.getReviewPeriod(), getDueDate(appraisal, null), getDaysRemaining(appraisal, false));
     }
 
     /**
@@ -905,7 +909,7 @@ public class Mailer implements MailerInterface {
      */
     private String firstCompletionReminderBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_completionReminder_body");
-        int daysAfterEndOfCycle = Math.abs(getDaysRemaining(appraisal, null));
+        int daysAfterEndOfCycle = Math.abs(getDaysRemaining(appraisal, "end"));
         return MessageFormat.format(bodyString, daysAfterEndOfCycle, getEmployeeName(appraisal),
                 getJobTitle(appraisal), appraisal.getReviewPeriod());
     }
@@ -1037,6 +1041,24 @@ public class Mailer implements MailerInterface {
         }
         Configuration config = ConfigurationMgr.getConfiguration(configMap, name, appraisal.getAppointmentType());
         DateTime dueDay = EvalsUtil.getDueDate(appraisal, config);
+        return Days.daysBetween(EvalsUtil.getToday(), dueDay).getDays();
+    }
+
+    /**
+     * Fetch the days remaining to respond to a particular action or before the action expires. Only
+     * supports the "end" date as reference.
+     *
+     * @param appraisal
+     * @param reference                     Reference point in appraisal stage to use when caluclating days
+     * @return
+     * @throws Exception
+     */
+    public static int getDaysRemaining(Appraisal appraisal, String reference) throws Exception {
+        if (!reference.equals("end")) {
+            return -1;
+        }
+
+        DateTime dueDay = new DateTime(appraisal.getEndDate());
         return Days.daysBetween(EvalsUtil.getToday(), dueDay).getDays();
     }
 
