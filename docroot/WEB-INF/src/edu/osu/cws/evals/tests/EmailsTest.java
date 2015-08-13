@@ -1,10 +1,13 @@
 package edu.osu.cws.evals.tests;
 
 import edu.osu.cws.evals.hibernate.EmailMgr;
+import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.Email;
 import edu.osu.cws.evals.util.HibernateUtil;
+import edu.osu.cws.evals.util.Mailer;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.joda.time.DateTime;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -120,5 +123,16 @@ public class EmailsTest {
         tx.commit();
         assert email == null : "The return value should be null because there is no row in the db";
 
+    }
+
+    public void shouldCalculateDaysRemaining() throws Exception {
+        Appraisal appraisal = new Appraisal();
+        int offset = 60;
+        DateTime endDate = new DateTime().plusDays(offset).withTimeAtStartOfDay();
+        appraisal.setEndDate(endDate.toDate());
+        assert Mailer.getDaysRemaining(appraisal, "end") == offset;
+
+        assert Mailer.getDaysRemaining(appraisal, "foo") == -1 : "-1 should be returned for invalid reference";
+        assert Mailer.getDaysRemaining(appraisal, "bar") == -1 : "-1 should be returned for invalid reference";
     }
 }
