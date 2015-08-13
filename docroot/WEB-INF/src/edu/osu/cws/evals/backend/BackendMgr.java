@@ -489,9 +489,10 @@ public class BackendMgr {
     }
 
     /**
-     * Whether or not the salary record should be updated
-     * @param appraisal
-     * @return
+     * Whether or not the salary record should be updated in appraisal
+     *
+     * @param appraisal     Classified IT appraisal to check if salary should be updated
+     * @return boolean      True if salary is not set and appraisal is not due yet
      * @throws Exception
      */
     public boolean shouldUpdateSalaryInfo(Appraisal appraisal) throws Exception{
