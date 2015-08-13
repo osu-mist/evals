@@ -338,11 +338,9 @@ public class BackendMgrTests {
         appraisal.getSalaries().add(new Salary());
 
         // get instance and call updateAppraisal
+        BackendMgr mgr = getMgrInstance();
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
-        BackendMgr mgr = getMgrInstance();
-        session = HibernateUtil.getCurrentSession();
-        tx = session.beginTransaction();
 
         assert mgr.shouldUpdateSalaryInfo(appraisal) : "Should refresh since appraisal is due in one day";
 
@@ -361,7 +359,6 @@ public class BackendMgrTests {
         salary.setIncrease(7d); // set increase in salary object
         appraisal.getSalaries().add(salary); // add association back
         assert !mgr.shouldUpdateSalaryInfo(appraisal) : "Should not refresh since salary increase is set";
-
 
         tx.commit();
     }
