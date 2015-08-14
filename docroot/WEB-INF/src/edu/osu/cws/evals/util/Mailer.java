@@ -67,10 +67,6 @@ public class Mailer implements MailerInterface {
         this.testMailToAddress = testMailToAddress;
     }
 
-    public Map<String, Configuration> getConfigMap() {
-        return configMap;
-    }
-
     /**
      * Sends an email
      * @param appraisal - an Appraisal object
@@ -1048,9 +1044,9 @@ public class Mailer implements MailerInterface {
      * Fetch the days remaining to respond to a particular action or before the action expires. Only
      * supports the "end" date as reference.
      *
-     * @param appraisal
-     * @param reference                     Reference point in appraisal stage to use when caluclating days
-     * @return
+     * @param appraisal                     Appraisal object
+     * @param reference                     Reference point in appraisal stage to use when calculating days
+     * @return                              Number of days remaining until the reference point of this appraisal
      * @throws Exception
      */
     public static int getDaysRemaining(Appraisal appraisal, String reference) throws Exception {
