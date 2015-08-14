@@ -32,6 +32,6 @@ appointment_type = 'Professional Faculty';
 delete from configurations where name like 'allowPdfToNolij';
 
 -- EV-611 @todo: what about 2nd one?
-update configurations set
-action = 'add'
+update configurations
+set action = 'add'
 where name like '%CompletionReminder';
