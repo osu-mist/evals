@@ -488,7 +488,18 @@ public class BackendMgr {
         return appraisal;
     }
 
-    private boolean shouldUpdateSalaryInfo(Appraisal appraisal) throws Exception{
+    /**
+     * Whether or not the salary record should be updated in appraisal
+     *
+     * @param appraisal     Classified IT appraisal to check if salary should be updated
+     * @return boolean      True if salary is not set and appraisal is not due yet
+     * @throws Exception
+     */
+    public boolean shouldUpdateSalaryInfo(Appraisal appraisal) throws Exception{
+        if (appraisal.getSalary().getIncrease() != null) {
+            return false;
+        }
+
         Configuration config = ConfigurationMgr.getConfiguration(configMap, "appraisalDue",
                 appraisal.getAppointmentType());
         DateTime dueDate = EvalsUtil.getDueDate(appraisal, config);

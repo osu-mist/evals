@@ -326,6 +326,43 @@ public class BackendMgrTests {
         assert !BackendMgr.timeToSendFirstStatusEmail(appraisal, new DateTime());
     }
 
+    public void shouldUpdateSalaryWhenAppraisalIsDue() throws Exception {
+        // The appraisal is due 60 days before the appraisal.endDate. By setting the end date to be 61
+        // days from today, makes it due in one day, 60 days from today means due today and 59 means
+        // it was due yesterday.
+        Appraisal appraisal = new Appraisal();
+        appraisal.setJob(new Job());
+        appraisal.getJob().setAppointmentType(AppointmentType.CLASSIFIED_IT);
+        DateTime endDate = new DateTime().plusDays(61).withTimeAtStartOfDay();
+        appraisal.setEndDate(endDate.toDate());
+        appraisal.getSalaries().add(new Salary());
+
+        // get instance and call updateAppraisal
+        BackendMgr mgr = getMgrInstance();
+        Session session = HibernateUtil.getCurrentSession();
+        Transaction tx = session.beginTransaction();
+
+        assert mgr.shouldUpdateSalaryInfo(appraisal) : "Should refresh since appraisal is due in one day";
+
+        endDate = new DateTime().plusDays(60).withTimeAtStartOfDay();
+        appraisal.setEndDate(endDate.toDate());
+        assert mgr.shouldUpdateSalaryInfo(appraisal) : "Should refresh since appraisal is due today";
+
+        endDate = new DateTime().plusDays(59).withTimeAtStartOfDay();
+        appraisal.setEndDate(endDate.toDate());
+        assert !mgr.shouldUpdateSalaryInfo(appraisal) : "Should not refresh since appraisal is due in past";
+
+        endDate = new DateTime().plusDays(60).withTimeAtStartOfDay();
+        appraisal.setEndDate(endDate.toDate());
+        appraisal.getSalaries().clear(); // remove existing salary association
+        Salary salary = new Salary();
+        salary.setIncrease(7d); // set increase in salary object
+        appraisal.getSalaries().add(salary); // add association back
+        assert !mgr.shouldUpdateSalaryInfo(appraisal) : "Should not refresh since salary increase is set";
+
+        tx.commit();
+    }
+
     /**
      * Helper method to return count of evaluations in db
      *
