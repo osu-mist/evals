@@ -33,7 +33,7 @@
         <property name="salaryHigh" type="double" column="PYVPASJ_HIGH"/>
         <property name="salaryCurrent" type="double" column="PYVPASJ_SALARY"/>
         <property name="salaryGrpCode" type="string" length="6" column="PYVPASJ_SGRP_CODE"/>
-        <property name="rankedFlag" type="boolean" column="PYVPASJ_RANKED_FLAG"/>
+        <property name="rankedFlag" type="boolean" column="PYVPASJ_INCLUDE_RANKED_FLAG"/>
 
         <many-to-one name="supervisor" class="edu.osu.cws.evals.models.Job" not-null="false" fetch="select">
             <column name="PYVPASJ_SUPERVISOR_PIDM"/>
