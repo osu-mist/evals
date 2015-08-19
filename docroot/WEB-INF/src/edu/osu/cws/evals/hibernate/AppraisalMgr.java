@@ -444,7 +444,7 @@ public class AppraisalMgr {
                 csv_appointment_types + "')";
 
         if (appointmentTypes.contains(AppointmentType.PROFESSIONAL_FACULTY)) {
-            query += " OR PYVPASJ_RANKED_FLAG = 1";
+            query += " OR PYVPASJ_INCLUDE_RANKED_FLAG = 1";
         }
 
         // end clause that checks appointment type or ranked_flag
