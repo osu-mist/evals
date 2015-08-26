@@ -593,13 +593,15 @@ public class ActionHelper {
      * @throws Exception
      */
     public void setRequiredActions() throws Exception {
-        ArrayList<RequiredAction> employeeRequiredActions;
+        ArrayList<RequiredAction> employeeRequiredActions = new ArrayList<RequiredAction>();
         ArrayList<RequiredAction> administrativeActions = new ArrayList<RequiredAction>();
         ArrayList<Appraisal> myAppraisals;
         ArrayList<Appraisal> mySupervisingAppraisals;
 
         myAppraisals = (ArrayList<Appraisal>) getFromRequestMap("myAppraisals");
-        employeeRequiredActions = getAppraisalActions(myAppraisals, "employee");
+        if (myAppraisals != null) {
+            employeeRequiredActions = getAppraisalActions(myAppraisals, "employee");
+        }
         addToRequestMap("employeeActions", employeeRequiredActions);
 
         // add supervisor required actions, if user has team's active appraisals
