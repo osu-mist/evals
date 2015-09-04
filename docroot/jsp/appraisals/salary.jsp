@@ -72,7 +72,7 @@
             jQuery('.recommended-salary-hint').html('');
 
             // rating value that the user selected
-            var rating = jQuery('input:radio[name=<portlet:namespace />appraisal.rating]:checked').val();
+            var rating = jQuery('input:radio[name="<portlet:namespace />appraisal.rating"]:checked').val();
 
              // set the hard coded increase to 0. If the rating is 2 or 1 (and not at top pay range)
              // , we'll change the value
@@ -121,7 +121,7 @@
          * @return {String}
          */
         function getSalaryAfterIncrease() {
-            var rating = jQuery('input:radio[name=<portlet:namespace />appraisal.rating]:checked').val();
+            var rating = jQuery('input:radio[name="<portlet:namespace />appraisal.rating"]:checked').val();
             if (rating == 3) {
                 return formatCurrency(${appraisal.salary.current});
             }
@@ -197,7 +197,7 @@
      * @return {String}
      */
     function validateIncrease() {
-        var rating = jQuery('input:radio[name=<portlet:namespace />appraisal.rating]:checked').val();
+        var rating = jQuery('input:radio[name="<portlet:namespace />appraisal.rating"]:checked').val();
         var increase = jQuery(".osu-cws input.recommended-salary").val();
         if (isNaN(increase)) {
             return '<liferay-ui:message key="appraisal-salary-increase-error-nan"/>';
