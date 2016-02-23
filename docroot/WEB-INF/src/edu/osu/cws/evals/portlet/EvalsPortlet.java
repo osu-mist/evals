@@ -403,6 +403,7 @@ public class EvalsPortlet extends GenericPortlet {
         message += infoMsg + "\n";
 
         // Set the Hibernate config file and store properties in portletContext
+        System.out.println(message);
         String hibernateConfig = config.getString("hibernate-cfg-file");
         infoMsg = "using hibernate cfg file - " + hibernateConfig;
         message += infoMsg + "\n";

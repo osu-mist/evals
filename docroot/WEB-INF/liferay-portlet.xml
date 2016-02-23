@@ -7,9 +7,9 @@
 		<icon>/icon.png</icon>
 		<instanceable>true</instanceable>
 		<header-portlet-css>/css/evals.css</header-portlet-css>
-		<!--<header-portlet-css>http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css</header-portlet-css>-->
-        <!--<header-portal-javascript>http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js</header-portal-javascript>-->
-        <!--<header-portal-javascript>http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js</header-portal-javascript>-->
+		<header-portlet-css>http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css</header-portlet-css>-->
+        <header-portal-javascript>http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js</header-portal-javascript>-->
+        <header-portal-javascript>http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js</header-portal-javascript>-->
         <footer-portlet-javascript>/js/jquery.autogrow-textarea.js</footer-portlet-javascript>
 	</portlet>
 	<role-mapper>
