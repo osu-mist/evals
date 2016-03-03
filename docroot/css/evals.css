@@ -553,3 +553,9 @@ span.evals-prof-faculty-start span.evals-arrow {
         padding: 0 8px !important;
     }
 }
+
+/** Prevents portlet-msg-alert and error spans from overlapping in Evals Home**/
+.aui .portlet-msg-alert, .aui .portlet-msg-error{
+  display: block;
+  margin-bottom: 10px;
+}
