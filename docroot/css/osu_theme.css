@@ -1,0 +1,370 @@
+/* Central Web Services Additions 
+* Overwriting default sungard theme, to match our color scheme.
+* Additionally, we have re-worked some code so it works better in older browser
+*/
+
+/* I. Broad and General Fixes *************************************************/
+
+body {
+  font-size: 13px;
+}
+
+
+.iphone body {
+  font-size: 11px;
+}
+
+#wrapper {
+  min-width: 974px;
+}
+
+#banner {
+  background: url("../images/osu-cws/main_top_bg.png") repeat-x left top;
+}
+
+.portlet-title {
+  padding-right: 140px; /* prevent wrapping of title, and leave space for icons */
+  white-space: nowrap;
+}
+
+.ie .portlet-title {
+	padding-bottom: 0; /* Resets space after portlet title that all IE browsers experienced */
+}
+
+
+/* II. Top Area Navigation Menu************************************************/
+
+/* "Options" menu */
+#main_menu { 
+  background-image: none;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+}
+
+/*
+.tabs-nav .tabs-selected a:link, .tabs-nav .tabs-selected a:active, .tabs-nav .tabs-selected a:visited {
+  background-image:none;
+} */
+
+#sub_menu {
+  display: inline-block;
+  float: right;
+  position: relative;
+  right: auto;
+  top: auto;
+}
+
+#greeting {
+  top: 0;
+  right: 0;
+  position: relative;
+  float: left;
+  margin: 14px 4px 6px 0;
+  font-size: 14px;
+}
+
+#sub_menu > ul, 
+#osu-branding ul {
+  background: url("../images/osu-cws/top_links_gradient.png") repeat-x left top;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+  border: 1px solid #000;
+  height: 22px;
+  margin: 0 7px;
+}
+
+#sub_menu > ul {
+  margin: 10px;
+  display: inline-block;
+  position: relative;
+  top: 0;
+  right: 0;
+}
+
+#sub_menu > ul li {
+  font-size: 14px;
+}
+
+#sub_menu li a.help_menu {
+  padding-left: 10px;
+}
+
+#osu-branding {
+  position: relative;
+  margin: 10px;
+  display: inline-block;
+}
+
+.ie7 #osu-branding {
+  float: left;
+}
+
+#osu-branding li {
+  border-left: 1px solid #FFFFFF;
+  float: left;
+  font-weight: normal;
+  list-style-type: none;
+  margin-top: 2px;
+  padding: 0 1.1em;
+}
+
+#osu-branding a {
+  color: #fff;
+  text-decoration:none;
+  font-weight: bold;
+}
+
+#osu-branding .osu-header {
+    font-size: 14px;
+    border-left: none;
+}
+
+#main_menu {
+  background-color: #333;
+  -moz-border-radius: 0 0 5px 5px;
+  border-radius: 0 0 5px 5px;
+}
+
+/* Tab related */
+.menu_scroll li.selected a,
+.menu_scroll li:hover a,
+.tabs-selected span a,
+.tabs-selected:hover span a {
+  color: #fff;
+}
+
+.portlet-title {
+  color:#333;
+}
+
+#content-wrapper {
+  margin-top: 20px; /* changed from 0 to deal with the "options" link */
+  width: 97.8%; /* to avoid horizontal scrollbars on some browsers */
+}
+
+#content-wrapper #layout-grid {
+  position: relative;
+  top: -35px;
+}
+
+#pref_appear, 
+#tools_appear {
+  top: 32px;
+  background-color: #666;
+}
+
+#pref_appear {
+  right: 190px;
+}
+
+#tools_appear {
+  right: 95px;
+}
+
+
+/* II. RSS portlets ***********************************************************/
+.portlet-rss .feed-entry-expander {
+  padding-top: 4px; /* rss feed + / - icons were spaced wrong */
+}
+
+.portlet-rss .feed-title {
+    font-size: 100%;
+    font-weight: normal;
+}
+
+.portlet-rss .feed-entry-title {
+  font-weight: normal;
+}
+
+.portlet-rss .feed-entry-title a {
+  color: #252525;
+}
+
+.portlet-rss .feed-published-date.feed-date a {
+  color: #666;
+}
+
+/* Options > Add Applications box */
+.portal-add-content {
+  background-color: #f1f1f1;
+  color: #252525;
+}
+.portal-add-content .portlet-msg-info {
+  color: #252525;
+}
+
+#portlet-set-properties ul.tabs-nav {
+  margin-top:-10px;
+}
+
+/*************************** Options > Add Application interface */
+.ui-dialog .ui-dialog-titlebar {
+  background-color: #666;
+}
+
+.ui-dialog {
+  background-color: #fff;
+}
+.portlet-msg-info,
+.ui-dialog {
+  border: 1px solid #d85a1a;
+}
+
+.portlet-msg-info {
+  background-color: #f1f1f1;
+}
+
+/* Alerts and others */
+.portlet-no-data-message {
+  height: auto; /* monitor to see if something breaks */
+}
+
+/* Link styles ****************************************************************/
+
+a, 
+a:hover,
+a:active,
+a:focus,
+.lfr-portlet-item p a, 
+.ui-tabs li.current a,
+.ui-tabs li.current a:hover, 
+.ui-tabs li.current a:active, 
+.ui-tabs li.current span,
+.portlet-form-field-mandatory,
+#greeting,
+.banner-a-content a, 
+.banner-a-content a:visited {
+  color: #C34500;
+}
+
+a:hover,
+a:active,
+a:focus {
+  text-decoration: none;
+}
+
+/* Link button colors */
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+input[type="submit"]:focus,
+input[type="button"]:focus,
+input[type="reset"]:focus {
+	background: #dedede;
+	border: 1px solid #d85a1a;
+	color: #252525;
+}
+
+/* Persmissions: Sharing tab */
+.ui-tabs li a:hover, 
+.ui-tabs li a:active,
+.ui-tabs li a:focus,
+.tabs li span:hover {
+  color: #fff;
+}
+
+.results-header,
+.ui-tabs li a, 
+.tabs li span {
+  background-color: #767676;
+}
+
+
+/* Table edits ***************************************************************/
+
+tr.results-row.hover td,
+tr.results-row td {
+  background-color: #f2f2f2;
+}
+
+tr.results-row.alt td {
+  background-color: #fff;
+}
+
+
+/* Action menu (for portlets) *************************************************/
+
+.action-menu-wrapper ul.portlet-action-menu {
+  background-color: #767676;
+  background-image: none;
+  height: 27px; /* issue with expanding menus for search */
+}
+
+.portlet-action-menu > li {
+  background-image: none;
+  border-left: 1px solid #fff;
+}
+
+.osu-cws .portlet-action-menu > li {
+  border-left: none;
+}
+
+.portlet-action-menu li li {
+  background-color: #767676;
+}
+
+.portlet-action-menu li:hover, 
+.portlet-action-menu li.sfHover, 
+.portlet-action-menu a:focus, 
+.portlet-action-menu a:hover, 
+.portlet-action-menu a:active,
+.portlet-action-menu a:focus {
+	text-decoration: underline;
+	color: #fff;
+	background-color: #767676;
+}
+
+/* Accessibility color adjustments ********************************************/
+.accordion-content,
+.accordion-menu,
+.description { 
+  color: #6e6e6e;
+}
+
+ul.treeview {
+  margin-left: .5em;
+}
+
+ul.treeview li {
+  padding-left: 15px;
+}
+
+ul.treeview li.submenu {
+  background-position: 0 3px;
+}
+
+/* IE7 and IE8 fixes **********************************************************/
+
+/* TABS */
+.ie #tabs {
+  margin-top: 0;
+  border: none;
+}
+
+.ie #portlet-set-properties ul.tabs-nav {
+  position: relative;
+}
+
+.ie #tabs > div > ul {
+  margin-top: .7em; /* Fixes a spacing issue in IE8 */
+}
+
+.ie7 #tabs > div > ul {
+  margin-top: .5em; /* Fixes a spacing issue in IE7 */
+}
+
+/* When Portlet is in full screen, this fixes an issue of overlapping with menus */
+.ie #portal_content + div.tabs-container {
+  margin-bottom:10px;
+}
+
+/* Other IE fixes */
+.ie7 .columns-max {
+  position: relative; /* some maximized view portlets were spaced to the right */
+}
+
+.ie7 #portlet-small-icon-bar_LuminisAnnouncements_WAR_luminis {
+  top: 2px; /* Fixes the position of a [?] icon in the OSU Anouncement portlet */
+}
