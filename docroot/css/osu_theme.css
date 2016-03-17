@@ -1,4 +1,4 @@
-/* Central Web Services Additions 
+/* Central Web Services Additions
 * Overwriting default sungard theme, to match our color scheme.
 * Additionally, we have re-worked some code so it works better in older browser
 */
@@ -35,7 +35,7 @@ body {
 /* II. Top Area Navigation Menu************************************************/
 
 /* "Options" menu */
-#main_menu { 
+#main_menu {
   background-image: none;
   -moz-border-radius: 6px;
   -webkit-border-radius: 6px;
@@ -64,7 +64,7 @@ body {
   font-size: 14px;
 }
 
-#sub_menu > ul, 
+#sub_menu > ul,
 #osu-branding ul {
   background: url("../images/osu-cws/top_links_gradient.png") repeat-x left top;
   -moz-border-radius: 6px;
@@ -149,7 +149,7 @@ body {
   top: -35px;
 }
 
-#pref_appear, 
+#pref_appear,
 #tools_appear {
   top: 32px;
   background-color: #666;
@@ -223,18 +223,18 @@ body {
 
 /* Link styles ****************************************************************/
 
-a, 
+a,
 a:hover,
 a:active,
 a:focus,
-.lfr-portlet-item p a, 
+.lfr-portlet-item p a,
 .ui-tabs li.current a,
-.ui-tabs li.current a:hover, 
-.ui-tabs li.current a:active, 
+.ui-tabs li.current a:hover,
+.ui-tabs li.current a:active,
 .ui-tabs li.current span,
 .portlet-form-field-mandatory,
 #greeting,
-.banner-a-content a, 
+.banner-a-content a,
 .banner-a-content a:visited {
   color: #C34500;
 }
@@ -258,7 +258,7 @@ input[type="reset"]:focus {
 }
 
 /* Persmissions: Sharing tab */
-.ui-tabs li a:hover, 
+.ui-tabs li a:hover,
 .ui-tabs li a:active,
 .ui-tabs li a:focus,
 .tabs li span:hover {
@@ -266,7 +266,7 @@ input[type="reset"]:focus {
 }
 
 .results-header,
-.ui-tabs li a, 
+.ui-tabs li a,
 .tabs li span {
   background-color: #767676;
 }
@@ -289,7 +289,7 @@ tr.results-row.alt td {
 .action-menu-wrapper ul.portlet-action-menu {
   background-color: #767676;
   background-image: none;
-  height: 27px; /* issue with expanding menus for search */
+  height: 42px; /* issue with expanding menus for search */
 }
 
 .portlet-action-menu > li {
@@ -305,10 +305,10 @@ tr.results-row.alt td {
   background-color: #767676;
 }
 
-.portlet-action-menu li:hover, 
-.portlet-action-menu li.sfHover, 
-.portlet-action-menu a:focus, 
-.portlet-action-menu a:hover, 
+.portlet-action-menu li:hover,
+.portlet-action-menu li.sfHover,
+.portlet-action-menu a:focus,
+.portlet-action-menu a:hover,
 .portlet-action-menu a:active,
 .portlet-action-menu a:focus {
 	text-decoration: underline;
@@ -319,7 +319,7 @@ tr.results-row.alt td {
 /* Accessibility color adjustments ********************************************/
 .accordion-content,
 .accordion-menu,
-.description { 
+.description {
   color: #6e6e6e;
 }
 

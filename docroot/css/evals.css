@@ -300,7 +300,7 @@ tr.ui-state-highlight {
 }
 
 .chart-menu > ul > li.float-left {
-    float: left;    
+    float: left;
 }
 
 .chart-menu > ul > li.float-left.first {
@@ -325,7 +325,6 @@ tr.ui-state-highlight {
 .chart-menu li a {
     border-bottom: 2px solid transparent;
     color: #686868;
-    display: block;
     min-height: 16px;
     padding: 3px 0 0 8px;
     text-decoration: none;
@@ -339,7 +338,7 @@ tr.ui-state-highlight {
     min-width: 7.8em;
 }
 
-.chart-menu li a:hover, 
+.chart-menu li a:hover,
 .chart-menu li a:active,
 .chart-menu li a:focus,
 .chart-menu li a.active {
@@ -552,10 +551,4 @@ span.evals-prof-faculty-start span.evals-arrow {
     .osu-cws td {
         padding: 0 8px !important;
     }
-}
-
-/** Prevents portlet-msg-alert and error spans from overlapping in Evals Home**/
-.aui .portlet-msg-alert, .aui .portlet-msg-error{
-  display: block;
-  margin-bottom: 10px;
 }

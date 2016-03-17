@@ -8,6 +8,8 @@
 		<instanceable>true</instanceable>
 		<header-portlet-css>/css/osu_portlets.css</header-portlet-css>
 		<header-portlet-css>/css/osu_theme.css</header-portlet-css>
+		<header-portlet-css>/css/custom.css</header-portlet-css>
+
 		<header-portlet-css>/css/evals.css</header-portlet-css>
 		<header-portlet-css>http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css</header-portlet-css>
         <header-portal-javascript>http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js</header-portal-javascript>

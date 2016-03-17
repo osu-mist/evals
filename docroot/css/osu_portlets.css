@@ -1,6 +1,6 @@
 /* Portlet Stylesheet *********************************************************
-* Currently used only be EvalS, but as we develop more portlets, they will be 
-* using these styles as well. 
+* Currently used only be EvalS, but as we develop more portlets, they will be
+* using these styles as well.
 * All new styles must prepend the osu-cws class to avoid any conflicts with other
 * CSS files.
 *******************************************************************************/
@@ -62,7 +62,7 @@
 .osu-cws form + form {
   border-top: 1px dotted #000;
   padding-top: 1.2em;
-  margin-top: 1em; 
+  margin-top: 1em;
 }
 
 .osu-cws fieldset {
@@ -72,7 +72,7 @@
   border-radius: 3px;
   margin-bottom: 1em;
   padding: .3em .3em .5em .8em;
-  background-color: #fff; 
+  background-color: #fff;
 }
 
 .osu-cws legend {
@@ -86,7 +86,7 @@
   border-radius: 3px;
   color: #000;
   font-weight: bold;
-  letter-spacing: .05em; 
+  letter-spacing: .05em;
 }
 
 /* The following 2 fix an IE7 and IE8 bug with fieldset and legends */
@@ -102,7 +102,7 @@
 }
 
 .osu-cws *:focus {
-  outline: none; /* Prevents blue border in Webkit */ 
+  outline: none; /* Prevents blue border in Webkit */
 }
 
 .osu-cws label {
@@ -110,27 +110,27 @@
   clear: both;
   padding-right: 1em;
   color: #666;
-  font-weight: bold; 
+  font-weight: bold;
 }
 
 .osu-cws div.required_text {
   font-weight: bold;
-  margin-bottom: .5em; 
+  margin-bottom: .5em;
 }
 
-.osu-cws label.required, 
+.osu-cws label.required,
 .osu-cws div.required_text {
-  color: #615042; 
+  color: #615042;
 }
 
-.osu-cws label.required:before, 
+.osu-cws label.required:before,
 .osu-cws div.required_text:before {
   content: "* ";
-  color: #870e01; 
+  color: #870e01;
 }
 
-.osu-cws input, 
-.osu-cws textarea, 
+.osu-cws input,
+.osu-cws textarea,
 .osu-cws select {
   background-color: #fff;
   border: 1px solid #999;
@@ -145,7 +145,7 @@
   border-radius: 3px;
   -webkit-transition: all 0.5s ease-in-out;
   -moz-transition: all 0.5s ease-in-out;
-  transition: all 0.5s ease-in-out; 
+  transition: all 0.5s ease-in-out;
 }
 
 .osu-cws input[type=text],
@@ -156,11 +156,11 @@
 
 .osu-cws textarea {
   min-height: 6em;
-  height: 8em; 
+  height: 8em;
   background-image: none;
 }
 
-.osu-cws input:focus, 
+.osu-cws input:focus,
 .osu-cws textarea:focus,
 .osu-cws select:focus {
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(195, 76, 0, 0.6);
@@ -174,8 +174,8 @@
 }
 
 .osu-cws .bttn,
-.osu-cws input[type=submit], 
-.osu-cws input[type=button].submit, 
+.osu-cws input[type=submit],
+.osu-cws input[type=button].submit,
 .osu-cws input[type=button].cancel,
 .osu-cws input[type=reset],
 .osu-cws input[type=submit][value=Cancel] {
@@ -211,7 +211,7 @@
   font-weight: bold;
   display: inline-block;
   margin-right: 2em;
-  float: inherit; 
+  float: inherit;
 }
 
 .osu-cws .bttn:hover,
@@ -229,7 +229,7 @@
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(195, 76, 0, 0.6);
 }
 
-.osu-cws input[type="submit"], 
+.osu-cws input[type="submit"],
 .osu-cws input[type="button"].submit {
   background-color: #c34500;
   background-image: -moz-linear-gradient(top, #a23900, #c34500);
@@ -246,9 +246,9 @@
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
-.osu-cws input[type="submit"]:hover, 
-.osu-cws input[type="submit"]:active, 
-.osu-cws input[type="submit"]:focus, 
+.osu-cws input[type="submit"]:hover,
+.osu-cws input[type="submit"]:active,
+.osu-cws input[type="submit"]:focus,
 .osu-cws input.submit[type="button"]:hover,
 .osu-cws input.submit[type="button"]:active,
 .osu-cws input.submit[type="button"]:focus {
@@ -272,45 +272,45 @@
 }
 
 .ie7 .osu-cws .bttn,
-.ie7 .osu-cws input[type=submit], 
-.ie7 .osu-cws input[type=button].submit, 
+.ie7 .osu-cws input[type=submit],
+.ie7 .osu-cws input[type=button].submit,
 .ie7 .osu-cws input[type=button].cancel,
 .ie7 .osu-cws input[type=reset] {
   min-width: auto;
 }
 
 .osu-cws legend + fieldset {
-  margin-top: .5em; 
+  margin-top: .5em;
 }
 
-.osu-cws fieldset fieldset input, 
-.osu-cws input[type="radio"], 
+.osu-cws fieldset fieldset input,
+.osu-cws input[type="radio"],
 .osu-cws input[type="checkbox"] {
   min-width: 1em;
   margin-bottom: .4em;
-  display: inline; 
+  display: inline;
 }
 
-.osu-cws input[type="radio"], 
+.osu-cws input[type="radio"],
 .osu-cws input[type="checkbox"] {
   padding: .25em;
-  border: 0; 
+  border: 0;
 }
 
 .osu-cws fieldset.required legend:before {
   content: "* ";
-  color: #870e01; 
+  color: #870e01;
 }
 
-.osu-cws input.inline, 
+.osu-cws input.inline,
 .osu-cws select.inline,
 .osu-cws fieldset.inline label,
-.osu-cws .checkbox-label, 
+.osu-cws .checkbox-label,
 .osu-cws .radio-label {
-  display: inline; 
+  display: inline;
 }
 
-.osu-cws input[type="radio"] + label, 
+.osu-cws input[type="radio"] + label,
 .osu-cws input[type="checkbox"] + label {
   display: inline;
   font-weight: normal;
@@ -328,12 +328,12 @@
   margin: 0;
 }
 
-.osu-cws input[type="radio"], 
+.osu-cws input[type="radio"],
 .osu-cws input[type="checkbox"] {
   margin-right: .4em; }
 
 .osu-cws input + input {
-  margin-left: .6em; 
+  margin-left: .6em;
 }
 
 .osu-cws fieldset fieldset {
@@ -356,16 +356,16 @@
 }
 
 .osu-cws fieldset fieldset label {
-  display: block; 
+  display: block;
 }
 
 .osu-cws .disabled input {
   background-color: #e1e1e1;
-  font-style: italic; 
+  font-style: italic;
 }
 
 .osu-cws .disabled label {
-  color: #999; 
+  color: #999;
 }
 
 .osu-cws form.search input[type="text"] {
@@ -374,11 +374,11 @@
 }
 
 /* Read only inputs style */
-.osu-cws input[type="text"][readonly="readonly"], 
-.osu-cws input[type="text"][disabled="disabled"], 
-.osu-cws input[type="text"][disabled], 
+.osu-cws input[type="text"][readonly="readonly"],
+.osu-cws input[type="text"][disabled="disabled"],
+.osu-cws input[type="text"][disabled],
 .osu-cws textarea[readonly="readonly"],
-.osu-cws input[type="text"][readonly="readonly"]:focus, 
+.osu-cws input[type="text"][readonly="readonly"]:focus,
 .osu-cws textarea[readonly="readonly"]:focus {
   border: none;
   pointer-events: none;
@@ -390,7 +390,7 @@
 }
 
 /**** Grails fix for inputs inside labels (radio/checkbox) **/
-.osu-cws label > input[type="radio"], 
+.osu-cws label > input[type="radio"],
 .osu-cws label > input[type="checkbox"] {
   float: left; /* Grails output has the text and input inside a label */
   width: auto;
@@ -401,7 +401,7 @@
 .osu-cws .compact label,
 .osu-cws .compact input,
 .osu-cws .compact fieldset fieldset label,
-.osu-cws .compact input[type="text"], 
+.osu-cws .compact input[type="text"],
 .osu-cws .compact textarea {
   min-width: 10em;
   width: 11em;
@@ -476,7 +476,7 @@
 
 /* Two columns in a jiffy *************************
  *  Ideally applied to two <div> wrappers, one for each column in the form.
- *  It's best use is to really make a form fit before the fold, save space 
+ *  It's best use is to really make a form fit before the fold, save space
  *  Combine with inline forms to save even more space.
  *  Can be used in any content, not just forms.
 */
@@ -660,7 +660,7 @@
 
 .osu-cws #pass-my-info h3 {
   margin-top: 0.8em;
-} 
+}
 
 /* System Messages */
 .osu-cws .portlet-msg-success {
@@ -681,7 +681,7 @@
 
 /* TOP MENU */
 .osu-cws .portlet-top-menu {
-    padding-bottom: 27px;
+    padding-bottom: 42px;
     position: relative;
     z-index: 1;
     border: 1px solid #ccc;
@@ -691,6 +691,7 @@
 .osu-cws .portlet-top-menu.action-menu-wrapper ul {
     background: #FFF;
     border-bottom: 1px solid #ccc;
+    width: 92%;
 }
 
 .osu-cws .portlet-top-menu .portlet-action-menu ul {
@@ -700,7 +701,7 @@
 }
 
 .osu-cws .portlet-top-menu .portlet-action-menu {
-  height: 28px;
+  height: 42px;
 }
 
 .osu-cws .portlet-action-menu li:hover ul,
@@ -835,7 +836,7 @@
 }
 
 .ie7 .osu-cws .actions li {
- margin-top: 0; 
+ margin-top: 0;
 }
 
 .osu-cws .actions li:hover {
@@ -882,7 +883,7 @@
 .osu-cws .rows-per-page {
     margin: 0;
 }
-.osu-cws .pagination li, 
+.osu-cws .pagination li,
 .osu-cws .rows-per-page li {
     list-style-type: none;
     margin: 0;
@@ -1033,11 +1034,11 @@
   color: #cc0000;
 }
 
-/* Fixes for positioning of elements in IE 
+/* Fixes for positioning of elements in IE
 * Mainly the "gear" dropdown "refresh" link for RSS Feeds
 */
 .ie .lfr-menu-list,
-.ie .lfr-trigger ul { 
+.ie .lfr-trigger ul {
   margin-left: -80px !important; /* IE8 and IE9 */
   margin-top: 24px;
 }
@@ -1092,7 +1093,7 @@
   margin: 2px 2px 2px 0;
 }
 
-.ui-datepicker-next a, 
+.ui-datepicker-next a,
 .ui-datepicker-prev a {
   color: transparent;
 }
