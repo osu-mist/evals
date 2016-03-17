@@ -691,7 +691,7 @@
 .osu-cws .portlet-top-menu.action-menu-wrapper ul {
     background: #FFF;
     border-bottom: 1px solid #ccc;
-    width: 92%;
+    margin: 0 0 0 0;
 }
 
 .osu-cws .portlet-top-menu .portlet-action-menu ul {
@@ -786,6 +786,7 @@
     font-size: 13px;
     display: block;
     border-bottom: 3px solid transparent;
+    font-weight: bold;
 }
 
 .osu-cws .portlet-top-menu ul.portlet-action-menu li li a {
