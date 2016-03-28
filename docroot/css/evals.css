@@ -552,3 +552,7 @@ span.evals-prof-faculty-start span.evals-arrow {
         padding: 0 8px !important;
     }
 }
+
+.portlet-action-menu .li a {
+    font-weight: bold;
+}
