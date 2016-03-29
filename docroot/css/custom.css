@@ -78,9 +78,6 @@ ol li,ul ol li {
 	list-style: decimal outside;
 }
 
-ul li,ol ul li {
-	list-style: disc outside;
-}
 
 ul ul li {
 	list-style-type: circle;
