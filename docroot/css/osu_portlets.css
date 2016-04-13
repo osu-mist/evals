@@ -87,6 +87,9 @@
   color: #000;
   font-weight: bold;
   letter-spacing: .05em;
+  width: auto;
+  font-size: 1em;
+  line-height: 20px;
 }
 
 /* The following 2 fix an IE7 and IE8 bug with fieldset and legends */
