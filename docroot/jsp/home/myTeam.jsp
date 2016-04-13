@@ -2,7 +2,7 @@
 
 <div id="<portlet:namespace/>accordionMenuMyTeam" class="accordion-menu">
     <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>MyTeam');">
-      <img id="<portlet:namespace/>MyTeamImageToggle" src="/cps/images/accordion/accordion_arrow_up.png"/>
+      <img id="<portlet:namespace/>MyTeamImageToggle" src="/images/accordion/accordion_arrow_up.png"/>
          <c:if test="${empty report}">
             <liferay-ui:message key="myTeam" />
          </c:if>

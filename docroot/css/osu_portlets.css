@@ -801,7 +801,7 @@
 .osu-cws a.osu-expanded,
 .osu-cws a.osu-collapsed {
   display: block;
-  background: url("/cps/images/accordion/accordion_arrow_up.png") no-repeat 0 center transparent;
+  background: url("/images/accordion/accordion_arrow_up.png") no-repeat 0 center transparent;
   padding-left: 14px;
   color: #333;
   text-decoration: none;
@@ -818,7 +818,7 @@
 }
 
 .osu-cws a.osu-collapsed {
-  background-image: url("/cps/images/accordion/accordion_arrow_down.png");
+  background-image: url("/images/accordion/accordion_arrow_down.png");
 }
 
 

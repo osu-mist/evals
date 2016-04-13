@@ -27,9 +27,9 @@
                   <c:if test="${configuration.section != 'due-date'}">  
                       "/cps/images/accordion/accordion_arrow_down.png"
                   </c:if>
-                  <c:if test="${configuration.section == 'due-date'}">  
-                      "/cps/images/accordion/accordion_arrow_up.png"
-                  </c:if> 
+                  <c:if test="${configuration.section == 'due-date'}">
+                      "/images/accordion/accordion_arrow_up.png"
+                  </c:if>
               />
               <liferay-ui:message key="${configuration.section}"/>
             </div>

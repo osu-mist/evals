@@ -1,7 +1,7 @@
 <h3 class="secret"><liferay-ui:message key="appraisal-info" /></h3>
 <div class="appraisal accordion-menu">
     <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>AppraisalInfo');">
-      <img id="<portlet:namespace/>AppraisalInfoImageToggle" src="/cps/images/accordion/accordion_arrow_up.png"/>
+      <img id="<portlet:namespace/>AppraisalInfoImageToggle" src="/images/accordion/accordion_arrow_up.png"/>
       <liferay-ui:message key="appraisal-info" />
     </div>
     <div class="accordion-content" id="<portlet:namespace/>AppraisalInfo" style="display: block">

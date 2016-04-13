@@ -1,6 +1,6 @@
 <div id="<portlet:namespace/>accordionMenuPassNotification" class="accordion-menu pass-notification">
     <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>passNotification');">
-      <img id="<portlet:namespace/>passNotificationImageToggle" src="/cps/images/accordion/accordion_arrow_up.png"/>
+      <img id="<portlet:namespace/>passNotificationImageToggle" src="/images/accordion/accordion_arrow_up.png"/>
       <liferay-ui:message key="notifications" />
     </div>
     <div class="accordion-content" id="<portlet:namespace/>passNotification" style="display: block;">

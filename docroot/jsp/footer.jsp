@@ -4,7 +4,7 @@
 
 <script type="text/javascript">
     function <portlet:namespace/>toggleContent(id){
-        var imgPath = '/cps/images/accordion/accordion_arrow_up.png';
+        var imgPath = '/images/accordion/accordion_arrow_up.png';
         if(jQuery('#'+id).is(":visible")){
             var imgPath = new String('/cps/images/accordion/accordion_arrow_down.png');
         }
