@@ -14,6 +14,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Job extends Evals implements Serializable {
+    private static final long serialVersionUID = 2531139600484032442L;
+
     private int id;
 
     private Employee employee;

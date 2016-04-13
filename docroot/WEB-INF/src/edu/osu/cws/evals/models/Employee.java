@@ -5,10 +5,13 @@ package edu.osu.cws.evals.models;
 
 import edu.osu.cws.util.CWSUtil;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Employee extends Evals {
+public class Employee extends Evals implements Serializable {
+    private static final long serialVersionUID = 7188173588854930062L;
+
     private int id;
 
     private String firstName;
