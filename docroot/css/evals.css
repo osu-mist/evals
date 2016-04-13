@@ -556,3 +556,7 @@ span.evals-prof-faculty-start span.evals-arrow {
 .portlet-action-menu .li a {
     font-weight: bold;
 }
+
+.lfr-textarea, .form .fieldset .lfr-textarea-container textarea {
+    max-width: 100%;
+}
