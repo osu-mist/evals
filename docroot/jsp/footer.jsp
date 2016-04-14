@@ -4,9 +4,9 @@
 
 <script type="text/javascript">
     function <portlet:namespace/>toggleContent(id){
-        var imgPath = '/images/accordion/accordion_arrow_up.png';
+        var imgPath = '/evals/images/accordion/accordion_arrow_up.png';
         if(jQuery('#'+id).is(":visible")){
-            var imgPath = new String('/cps/images/accordion/accordion_arrow_down.png');
+            var imgPath = new String('/evals/images/accordion/accordion_arrow_down.png');
         }
 
         document.getElementById(id+'ImageToggle').src = imgPath;

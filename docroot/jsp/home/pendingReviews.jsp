@@ -2,7 +2,7 @@
 <jsp:useBean id="appraisals" class="java.util.ArrayList" scope="request" />
     <div id="<portlet:namespace/>accordionMenuPendingReview" class="accordion-menu">
         <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>PendingReview');">
-          <img id="<portlet:namespace/>PendingReviewImageToggle" src="/images/accordion/accordion_arrow_up.png"/>
+          <img id="<portlet:namespace/>PendingReviewImageToggle" src="/evals/images/accordion/accordion_arrow_up.png"/>
           <liferay-ui:message key="pending-reviews" />
         </div>
         <div class="accordion-content" id="<portlet:namespace/>PendingReview" style="display: block;">

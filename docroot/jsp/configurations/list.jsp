@@ -13,22 +13,22 @@
     <c:if test="${configuration.section != sectionName}">
         <c:if test="${sectionName != ''}">
             </table>
-            </div>           
+            </div>
              <!-- end of configuration section -->
             <br />
         </c:if>
 
         <c:set var="sectionName" value="${configuration.section}"/>
-        
+
         <div id="<portlet:namespace/>accordionMenuConfiguration${configuration.section}" class="accordion-menu">
             <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>Configuration${configuration.section}');">
-            
+
               <img id="<portlet:namespace/>Configuration${configuration.section}ImageToggle" src=
-                  <c:if test="${configuration.section != 'due-date'}">  
-                      "/cps/images/accordion/accordion_arrow_down.png"
+                  <c:if test="${configuration.section != 'due-date'}">
+                      "/evals/images/accordion/accordion_arrow_down.png"
                   </c:if>
                   <c:if test="${configuration.section == 'due-date'}">
-                      "/images/accordion/accordion_arrow_up.png"
+                      "/evals/images/accordion/accordion_arrow_up.png"
                   </c:if>
               />
               <liferay-ui:message key="${configuration.section}"/>

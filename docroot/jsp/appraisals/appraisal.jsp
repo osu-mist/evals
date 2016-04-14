@@ -107,7 +107,7 @@
         <c:if test="${appraisal.isOpen}">
             <li>
                 <span><a href="<%=renderResponse.encodeURL(viewPositionDescription.toString())%>" target="_blank">
-                <img class="icon" src="/osu-standard-theme/images/common/copy.png" alt="<liferay-ui:message key="view-position-description"/>"></a>
+                <img class="icon" src="/evals/images/common/copy.png" alt="<liferay-ui:message key="view-position-description"/>"></a>
                 <a href="<%=renderResponse.encodeURL(viewPositionDescription.toString())%>" target="_blank"><liferay-ui:message key="view-position-description"/></a>
                 </span>
             </li>

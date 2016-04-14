@@ -13,7 +13,7 @@
 <c:if test="${positionDescription != null}">
     <div class="appraisal accordion-menu">
         <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>PositionDescriptionInfo');">
-            <img id="<portlet:namespace/>PositionDescriptionInfoImageToggle" src="/images/accordion/accordion_arrow_up.png"/>
+            <img id="<portlet:namespace/>PositionDescriptionInfoImageToggle" src="/evals/images/accordion/accordion_arrow_up.png"/>
             <liferay-ui:message key="position-information" />
         </div>
         <div class="accordion-content" id="<portlet:namespace/>PositionDescriptionInfo" style="display: block">

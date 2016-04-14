@@ -39,7 +39,7 @@ reviewCycleListURL.setParameter("controller", "ReviewCycleAction");
 <c:if test="${isAdmin == 'true'}">
     <div id="<portlet:namespace/>accordionMenuPassAdmin" class="accordion-menu">
         <div class="osu-accordion-header" onclick="<portlet:namespace/>toggleContent('<portlet:namespace/>passAdmin');">
-          <img id="<portlet:namespace/>passAdminImageToggle" src="/images/accordion/accordion_arrow_up.png"/>
+          <img id="<portlet:namespace/>passAdminImageToggle" src="/evals/images/accordion/accordion_arrow_up.png"/>
           <liferay-ui:message key="admin-section" />
         </div>
         <div class="accordion-content" id="<portlet:namespace/>passAdmin" style="display: block;">
