@@ -61,12 +61,10 @@
 
     <ul class="actions">
         <c:if test="${not empty displayDownloadPdf}">
-            <li><liferay-ui:icon
-                image="../document_library/pdf"
-                url="<%=renderResponse.encodeURL(downloadPDFURL.toString())%>"
-                label="true"
-                message="appraisal-download-pdf"
-            /></li>
+            <li> <span class="" >
+              <a href="<%=renderResponse.encodeURL(downloadPDFURL.toString())%>" class=" taglib-icon" >
+              <img id="rjus_null_null" src="/evals/images/pdf.png" alt=""> <span class="taglib-text " >Download as PDF</span> </a> </span>
+            </li>
         </c:if>
         <c:if test="${not empty displayResendNolij}">
             <li><liferay-ui:icon
