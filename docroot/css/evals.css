@@ -427,6 +427,10 @@ tr.ui-state-highlight {
     clear: both;
 }
 
+.osu-cws a, a:hover, a:active, a:focus{
+       color: #c34500 !important;
+}
+
 /** Header for goals **/
 .osu-cws .goals-header {
     border-bottom: solid 1px #ccc;
