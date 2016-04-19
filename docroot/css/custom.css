@@ -1368,6 +1368,10 @@ img.ui-datepicker-trigger {
 	text-align: left;
 }
 
+.osu-cws .portlet-msg-error{
+			padding: 6px 6px 6px 30px;
+}
+
 /* ---------- Warning messages ---------- */
 .portlet-msg-alert {
 	background: #ffc url(../images/messages/alert.png) no-repeat 6px 20%;
@@ -1377,6 +1381,10 @@ img.ui-datepicker-trigger {
 	margin: 4px 10px 0;
 	padding: 6px 6px 6px 30px;
 	text-align: left;
+}
+
+.osu-cws .portlet-msg-alert{
+			padding: 6px 6px 6px 30px;
 }
 
 /* ---------- Success messages ---------- */
