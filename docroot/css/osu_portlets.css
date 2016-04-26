@@ -810,6 +810,10 @@
     font-size: 12px;
 }
 
+.osu-cws {
+  font-family: Arial !important;
+}
+
 .osu-cws .accordion-menu.pass-notification.chart-area .google-visualization-table-th.gradient.sort-ascending,
 .osu-cws .accordion-menu.pass-notification.chart-area .google-visualization-table-th.gradient.sort-descending,
 .osu-cws .accordion-menu.pass-notification.chart-area .google-visualization-table-th.gradient.unsorted {
