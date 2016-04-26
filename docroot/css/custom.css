@@ -3557,7 +3557,7 @@ body.portlet {
 
 
 .portlet-title {
-	background: url(../images/portlet/portlet-header-top-left.png) no-repeat top left;
+
 	display: block;
 	color: #005C96;
 	font-weight: bold;
@@ -3603,8 +3603,6 @@ body.portlet {
 }
 
 .portlet-content,.portlet-minimized {
-	background: url(../images/portlet/portlet-bottom-right.png) 100% 100%
-	no-repeat;
 	list-style: none;
 	padding: 5px 7px 10px 7px;
 }
