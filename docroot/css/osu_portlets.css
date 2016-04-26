@@ -783,13 +783,27 @@
   white-space: normal; /* overwrites, so long names can break to next line down */
 }
 
+/* Overides the AUI theme for now. */
+
+.osu-cws a, a:hover, a:active, a:focus{
+    color: #c34500 !important;
+}
+
+.osu-cws .actions a{
+    color: #686868 !important;
+}
+
 .osu-cws .portlet-top-menu ul.portlet-action-menu li a {
-    color: #686868;
+    color: #686868 !important;
     padding: 8px 6px 4px;
     font-size: 13px;
     display: block;
     border-bottom: 3px solid transparent;
     font-weight: bold;
+}
+
+.osu-cws .portlet-top-menu ul.portlet-action-menu li a {
+    color: #686868 !important;
 }
 
 .osu-cws .portlet-top-menu ul.portlet-action-menu li li a {
