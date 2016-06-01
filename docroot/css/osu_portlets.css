@@ -908,6 +908,10 @@
   text-decoration: none;
 }
 
+.osu-cws .pass-menu-list li{
+  list-style: disc;
+}
+
 /* Pagination *****************************************************************/
 .osu-cws .rows-per-page {
     margin: 0;
