@@ -684,7 +684,7 @@
 
 /* TOP MENU */
 .osu-cws .portlet-top-menu {
-    padding-bottom: 42px;
+    padding-bottom: 36px;
     position: relative;
     z-index: 1;
     border: 1px solid #ccc;
@@ -704,13 +704,13 @@
 }
 
 .osu-cws .portlet-top-menu .portlet-action-menu {
-  height: 42px;
+  height: 36px;
 }
 
 .osu-cws .portlet-action-menu li:hover ul,
 .osu-cws .portlet-action-menu li.sfHover ul {
       left: 0;
-      top: 42px;
+      top: 36px;
 }
 
 .osu-cws .portlet-top-menu .portlet-action-menu li.pass-roles:hover ul,
@@ -795,7 +795,7 @@
 
 .osu-cws .portlet-top-menu ul.portlet-action-menu li a {
     color: #686868 !important;
-    padding: 8px 6px 4px;
+    padding: 3px 6px 3px;
     font-size: 13px;
     display: block;
     border-bottom: 3px solid transparent;
