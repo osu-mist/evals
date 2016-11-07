@@ -70,7 +70,7 @@
 .appraisal-criteria fieldset label {
   float: left;
   width: 5em;
-  font-size: 90%;
+  font-size: 11px;
 }
 
 .appraisal-criteria fieldset a.delete {
@@ -111,6 +111,7 @@
 
 .appraisal-criteria .assessment-criteria label {
   float: none;
+  font-size: 1em;
 }
 
 .appraisal-criteria .assessment-criteria label span {

@@ -557,7 +557,7 @@
 .osu-cws td + th,
 .osu-cws td + td  {
   border-left: 1px solid #ddd;
-  padding-left: 1em;
+  padding: 0.2em;
 }
 
 .osu-cws tr + tr,
