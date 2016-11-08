@@ -557,7 +557,7 @@
 .osu-cws td + th,
 .osu-cws td + td  {
   border-left: 1px solid #ddd;
-  padding-left: 1em;
+  padding: 0.2em;
 }
 
 .osu-cws tr + tr,
@@ -581,7 +581,7 @@
   border-top-left-radius: 5px;
   border: 1px solid #ccc;
   border-top: none;
-  font-size: 12px;
+  font-size: 1.25em;
   padding-top: .2em;
   padding-left: 1em;
   color: #3B3737;
@@ -875,7 +875,7 @@
 .osu-cws .actions a {
   color: #333;
   text-decoration: none;
-  font-size: 90%;
+  font-size: 1em;
   font-weight: bold;
 }
 

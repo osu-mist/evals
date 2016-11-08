@@ -14,8 +14,13 @@
                     <td><em><liferay-ui:message key="supervisor" />:</em>
                         <c:out value="${appraisal.job.supervisor.employee.name}" />
                     </td>
-                    <td><em><liferay-ui:message key="job-title" />:</em>
+                    <td colspan="2"><em><liferay-ui:message key="job-title" />:</em>
                         <c:out value="${appraisal.job.jobTitle}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><em><liferay-ui:message key="appraisal-employee-id"/>:</em>
+                        ${appraisal.job.employee.osuid}
                     </td>
                     <td><em><liferay-ui:message key="position-no" />:</em>
                         <c:out value="${appraisal.job.positionNumber}" />
@@ -23,14 +28,11 @@
                     <td><em><liferay-ui:message key="job-start-date"  />:</em>
                         <fmt:formatDate value="${appraisal.job.beginDate}" pattern="MM/dd/yy"/>
                     </td>
-                </tr>
-                <tr>
-                    <td><em><liferay-ui:message key="appraisal-employee-id"/>:</em>
-                        ${appraisal.job.employee.osuid}
-                    </td>
                     <td><em><liferay-ui:message key="appraisal-type"/>:</em>
                         <liferay-ui:message key="appraisal-type-${appraisal.type}"/>
                     </td>
+                </tr>
+                <tr>
                     <td><em><liferay-ui:message key="reviewPeriod" />:</em>
                         ${appraisal.reviewPeriod}
                     </td>
@@ -40,7 +42,7 @@
                             (Reason:<c:out value="${appraisal.closeOutReason.reason}" />)
                         </c:if>
                     </td>
-                    <td><em><liferay-ui:message key="appraisal-rating"/>:</em>
+                    <td colspan="2"><em><liferay-ui:message key="appraisal-rating"/>:</em>
                         <c:if test="${not empty appraisal.rating and (permissionRule.evaluation == 'v' or permissionRule.evaluation == 'e')}">
                             <c:forEach var="rating" items="${ratings}">
                                 <c:if test="${appraisal.rating == rating.rate}">
