@@ -1368,7 +1368,8 @@ img.ui-datepicker-trigger {
 	text-align: left;
 }
 
-.osu-cws .portlet-msg-error{
+.osu-cws .portlet-msg-error,
+.osu-cws .portlet-msg-success {
 			padding: 6px 6px 6px 30px;
 }
 
