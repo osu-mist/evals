@@ -32,6 +32,8 @@ jQuery(document).ready(function() {
       jQuery("#<portlet:namespace />flash").html(
         '<span class="portlet-msg-error"><ul>'+errors+'</ul></span>'
       );
+      $("html, body").animate({ scrollTop: $("#content").offset().top }, "slow")
+
       return false;
     }
 
@@ -228,6 +230,7 @@ jQuery(document).ready(function() {
       jQuery("#<portlet:namespace />flash").html(
         '<span class="portlet-msg-error"><ul>'+errors+'</ul></span>'
       );
+      $("html, body").animate({ scrollTop: $("#content").offset().top }, "slow");
       return false;
     }
 
@@ -251,7 +254,7 @@ jQuery(document).ready(function() {
       jQuery("#<portlet:namespace />flash").html(
         '<span class="portlet-msg-error"><ul><liferay-ui:message key="appraisal-assessment-goalErrors" /></ul></span>'
       );
-      location.href="#evals-flash";
+      $("html, body").animate({ scrollTop: $("#content").offset().top }, "slow");
 
       return false;
     }
