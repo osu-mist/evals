@@ -183,8 +183,8 @@
             <fieldset>
                 <h3 class="secret"><liferay-ui:message key="appraisal-goals-legend" /></h3>
                 <legend><liferay-ui:message key="appraisal-goals-legend" /></legend>
-                <label for="<portlet:namespace />appraisal.goalsComments"><liferay-ui:message key="appraisal-goals-comments" /></label>
-                <liferay-ui:input-textarea param="appraisal.goalsComments"
+                <label for="<portlet:namespace />appraisal.goalscomments"><liferay-ui:message key="appraisal-goals-comments" /></label>
+                <liferay-ui:input-textarea param="appraisal.goalscomments"
                     defaultValue="${appraisal.unapprovedGoalsVersion.goalsComments}" />
             </fieldset>
         </c:when>

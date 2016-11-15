@@ -17,6 +17,10 @@ jQuery(document).ready(function() {
   // Set the autosave timeout
   auto_save();
 
+  function scrollToTop() {
+    $("html, body").animate({scrollTop: $("#content").offset().top}, "slow")
+  }
+
   jQuery("#<portlet:namespace />fm").submit(function() {
     var errors = "";
     if (jQuery("#<portlet:namespace />acknowledge-read-appraisal").length > 0 &&
@@ -32,6 +36,8 @@ jQuery(document).ready(function() {
       jQuery("#<portlet:namespace />flash").html(
         '<span class="portlet-msg-error"><ul>'+errors+'</ul></span>'
       );
+      scrollToTop();
+
       return false;
     }
 
@@ -127,7 +133,7 @@ jQuery(document).ready(function() {
     o.id = jQuery('#id').val();
 
     // goals comments
-    o.goalsComments = jQuery('#' + portlet_namespace + "appraisal\\.goalsComments").val();
+    o.goalsComments = jQuery('#' + portlet_namespace + "appraisal\\.goalscomments").val();
 
     // evaluation
     o.evaluation = jQuery('#' + portlet_namespace + "appraisal\\.evaluation").val();
@@ -228,6 +234,7 @@ jQuery(document).ready(function() {
       jQuery("#<portlet:namespace />flash").html(
         '<span class="portlet-msg-error"><ul>'+errors+'</ul></span>'
       );
+      scrollToTop();
       return false;
     }
 
@@ -251,7 +258,7 @@ jQuery(document).ready(function() {
       jQuery("#<portlet:namespace />flash").html(
         '<span class="portlet-msg-error"><ul><liferay-ui:message key="appraisal-assessment-goalErrors" /></ul></span>'
       );
-      location.href="#evals-flash";
+      scrollToTop();
 
       return false;
     }
