@@ -569,7 +569,7 @@ jQuery(document).ready(function() {
    */
   function isAppraisalSigned() {
       var sigCheckbox = jQuery('#<portlet:namespace />acknowledge-release-appraisal');
-      return sigCheckbox.attr('checked');
+      return sigCheckbox.prop('checked');
   }
 
   /**
