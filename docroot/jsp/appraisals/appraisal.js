@@ -129,7 +129,7 @@ jQuery(document).ready(function() {
     o.id = jQuery('#id').val();
 
     // goals comments
-    o.goalsComments = jQuery('#' + portlet_namespace + "appraisal\\.goalsComments").val();
+    o.goalsComments = jQuery('#' + portlet_namespace + "appraisal\\.goalscomments").val();
 
     // evaluation
     o.evaluation = jQuery('#' + portlet_namespace + "appraisal\\.evaluation").val();
