@@ -785,7 +785,7 @@
 
 /* Overides the AUI theme for now. */
 
-.osu-cws a, a:hover, a:active, a:focus{
+.osu-cws a, .osu-cws a:hover, .osu-cws a:active, .osu-cws a:focus{
     color: #c34500 !important;
 }
 
