@@ -49,6 +49,7 @@
 
 .appraisal-criteria .pass-form-text {
     color: #555;
+    padding-left: 1em;
 }
 
 .appraisal-criteria div div {
@@ -117,6 +118,10 @@
 .appraisal-criteria .assessment-criteria label span {
   color: #C34500;
   text-decoration: underline;
+}
+
+.appraisal-criteria input[type="checkbox"] {
+  margin-left: 1em;
 }
 
 .appraisal-auto-save {
