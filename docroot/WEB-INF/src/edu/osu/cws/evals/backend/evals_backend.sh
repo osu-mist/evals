@@ -13,8 +13,8 @@
 #   The other script is supposed to be set as a cronjob under the luminis user.
 
 
-JAVA_HOME=$CP_ROOT/products/java
-PORTAL=$CP_ROOT/products/tomcat/tomcat-admin
+JAVA_HOME=/usr/java/latest
+PORTAL=$CP_ROOT/tc7
 PORTAL_LIB=$PORTAL/lib
 PORTAL_LIB_EXT=$PORTAL_LIB/ext
 PORTLET_ROOT=$PORTAL/webapps/evals
@@ -53,7 +53,6 @@ CLASSPATH=$CLASSPATH:$LIB_DIR/jstl.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/resources_en.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/javax.mail-1.4.4.jar
 CLASSPATH=$CLASSPATH:/$LIB_DIR/opencsv-2.3.jar
-CLASSPATH=$CLASSPATH:/$PORTAL_LIB_EXT/mysql-connector-java-5.0.4-bin.jar
 CLASSPATH=$CLASSPATH:/$PORTAL_LIB_EXT/portal-service.jar
 CLASSPATH=$CLASSPATH:/$PORTAL_LIB_EXT/jta.jar
 
