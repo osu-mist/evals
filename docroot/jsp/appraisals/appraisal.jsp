@@ -91,6 +91,7 @@
                 message="appraisal-move-to-results-due"
                 cssClass="evals-show-confirm"
                 toolTip="appraisal-move-to-results-due"
+                alt="appraisal-move-to-results-due"
             /></li>
         </c:if>
         <c:if test="${not empty displayReactivateGoals}">
