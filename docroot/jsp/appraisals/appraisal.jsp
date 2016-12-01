@@ -73,6 +73,7 @@
                 label="true"
                 message="appraisal-resend-to-nolij"
                 cssClass="evals-show-confirm"
+                alt="appraisal-resend-to-nolij"
             /></li>
         </c:if>
         <c:if test="${not empty displayCloseOutAppraisal}">
@@ -101,6 +102,7 @@
                 label="true"
                 message="appraisal-request-goals-reactivation"
                 cssClass="evals-show-confirm"
+                alt="appraisal-request-goals-reactivation"
             /></li>
         </c:if>
         <c:if test="${appraisal.isOpen}">
