@@ -183,7 +183,6 @@
 .osu-cws input[type=reset],
 .osu-cws input[type=submit][value=Cancel] {
   padding: 4px 10px;
-  margin-bottom: 0;
   font-size: 13px;
   line-height: 18px;
   color: #333333;
@@ -791,6 +790,10 @@
 
 .osu-cws .actions a{
     color: #686868 !important;
+}
+
+.osu-cws .actions a span:hover {
+    text-decoration:none;
 }
 
 .osu-cws .portlet-top-menu ul.portlet-action-menu li a {

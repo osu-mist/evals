@@ -48,7 +48,7 @@
         });
 
         // Handle the links in action menu bar that need confirmation
-        jQuery("span.evals-show-confirm a").click(function() {
+        jQuery("span.evals-show-confirm a").click(function(event) {
             var buttonText = "";
             if (jQuery(this).children()[0] != undefined) {
                 buttonText = jQuery(this).children("img").attr("alt");
@@ -61,6 +61,9 @@
                 Liferay.Util.forcePost(this);
                 return false;
             }
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
             return false;
         });
         jQuery("span.evals-show-confirm a").attr("onClick","");

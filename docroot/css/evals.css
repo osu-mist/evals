@@ -351,13 +351,6 @@ tr.ui-state-highlight {
     min-width: 7.8em;
 }
 
-.chart-menu li a:hover,
-.chart-menu li a:active,
-.chart-menu li a:focus,
-.chart-menu li a.active {
-    border-bottom-color: #d85a1a;
-}
-
 .osu-cws div.chart-area {
     width: 60em;
 }

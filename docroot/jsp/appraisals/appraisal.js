@@ -611,7 +611,7 @@ jQuery(document).ready(function() {
 
     // specify validation error of too low # of assessments
     if (nonEmptyAssessments < <%= Constants.MIN_REQUIRED_ASSESSMENTS %>) {
-      alert('<liferay-ui:message key="appraisal-assessment-min" /> <%= Constants.MIN_REQUIRED_ASSESSMENTS %>');
+      alert('<liferay-ui:message key="appraisal-assessment-min" />');
       return false;
     }
 

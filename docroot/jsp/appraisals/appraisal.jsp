@@ -62,8 +62,8 @@
     <ul class="actions">
         <c:if test="${not empty displayDownloadPdf}">
             <li> <span class="" >
-              <a href="<%=renderResponse.encodeURL(downloadPDFURL.toString())%>" class=" taglib-icon" >
-              <img id="rjus_null_null" src="/evals/images/pdf.png" alt=""> <span class="taglib-text " >Download as PDF</span> </a> </span>
+              <a href="<%=renderResponse.encodeURL(downloadPDFURL.toString())%>">
+              <img id="rjus_null_null" src="/evals/images/pdf.png" alt=""> <span>Download as PDF</span> </a> </span>
             </li>
         </c:if>
         <c:if test="${not empty displayResendNolij}">
@@ -73,6 +73,7 @@
                 label="true"
                 message="appraisal-resend-to-nolij"
                 cssClass="evals-show-confirm"
+                alt="appraisal-resend-to-nolij"
             /></li>
         </c:if>
         <c:if test="${not empty displayCloseOutAppraisal}">
@@ -91,6 +92,7 @@
                 message="appraisal-move-to-results-due"
                 cssClass="evals-show-confirm"
                 toolTip="appraisal-move-to-results-due"
+                alt="appraisal-move-to-results-due"
             /></li>
         </c:if>
         <c:if test="${not empty displayReactivateGoals}">
@@ -100,6 +102,7 @@
                 label="true"
                 message="appraisal-request-goals-reactivation"
                 cssClass="evals-show-confirm"
+                alt="appraisal-request-goals-reactivation"
             /></li>
         </c:if>
         <c:if test="${appraisal.isOpen}">
