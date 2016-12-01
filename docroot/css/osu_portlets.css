@@ -792,6 +792,10 @@
     color: #686868 !important;
 }
 
+.osu-cws .actions a span:hover {
+    text-decoration:none;
+}
+
 .osu-cws .portlet-top-menu ul.portlet-action-menu li a {
     color: #686868 !important;
     padding: 3px 6px 3px;

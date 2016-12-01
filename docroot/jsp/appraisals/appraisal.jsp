@@ -62,8 +62,8 @@
     <ul class="actions">
         <c:if test="${not empty displayDownloadPdf}">
             <li> <span class="" >
-              <a href="<%=renderResponse.encodeURL(downloadPDFURL.toString())%>" class=" taglib-icon" >
-              <img id="rjus_null_null" src="/evals/images/pdf.png" alt=""> <span class="taglib-text " >Download as PDF</span> </a> </span>
+              <a href="<%=renderResponse.encodeURL(downloadPDFURL.toString())%>">
+              <img id="rjus_null_null" src="/evals/images/pdf.png" alt=""> <span>Download as PDF</span> </a> </span>
             </li>
         </c:if>
         <c:if test="${not empty displayResendNolij}">
