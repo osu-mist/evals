@@ -10,6 +10,11 @@ goal-setting and appraisal tasks.
 
 ### Getting it to work locally
 ---
-1. [Reference](https://liferay.dev/forums/-/message_boards/message/792893) \
-in `docroot/jsp/init.jsp` \
-`<%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>` => `<%@ taglib uri="http://java.sun.com/portlet" prefix="portlet" %>`
+1. Use Java version 1.8.0_77
+  - an error was introduced in _91 that causes errors with jsp
+
+
+### Tests
+---
+1. testng.jar is so old it no longer works with Intellij
+  - downloaded new jar from https://mvnrepository.com/artifact/org.testng/testng/6.9.4
