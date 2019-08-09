@@ -12,6 +12,11 @@ goal-setting and appraisal tasks.
 ---
 1. Use Java version 1.8.0_77
   - an error was introduced in _91 that causes errors with jsp
+2. download liferay stuff
+3. install ant
+4. Open a browser to http://localhost:8080/web/guest/ and login with:
+  - username: test@liferay.com
+  - password: test
 
 
 ### Tests
