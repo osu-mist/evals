@@ -34,21 +34,35 @@ goal-setting and appraisal tasks.
     - Run evals/docroot/WEB-INF/src/edu/osu/cws/evals/tests/test-db.sql
     - Run evals/docroot/WEB-INF/src/edu/osu/cws/evals/tests/test-db-updates.sql
 
-5. Install Ant version 1.9.6
+5. Configure EvalS
+    - Clone this repository into `liferay-plugins-sdk-${version}/portlets/`
+    - Navigate to `evals/docroot/WEB-INF/src/`
+      - Copy `hibernate-sample.cfg.xml` to `hibernate.cfg.xml` and modify contents
+      - Copy `evals.sample.properties` to `evals.properties` and modify contents
+    - Add `evals-config.properties` to `/opt/lp5/`
+    - Navigate to `evals/docroot/WEB-INF/`
+      - Both `liferay-plugin-package.xml` and `liferay-plugin-package.properties` have a `liferay-versions` attribute. Set both these attributes to match the version of liferay you are using.
+
+6. Install Ant version 1.9.6
     - Current version of Ant does not work with Java 1.7
     - Using brew:
         - `brew install ant@1.9`
         - add ant to path `brew link ant@1.9` (may have to force)
 
-6. Configure EvalS
-    - Clone this repository into liferay-plugins-sdk-${version}/portlets/
-    - Navigate to evals/docroot/WEB-INF/src/
-      - Copy `hibernate-sample.cfg.xml` to `hibernate.cfg.xml` and modify contents
-      - Copy `evals.sample.properties` to `evals.properties` and modify contents
-    - Add `evals-config.properties` to `/opt/lp5/`
-    - Navigate to evals/docroot/WEB-INF/
-      - Both `liferay-plugin-package.xml` and `liferay-plugin-package.properties` have a `liferay-versions` attribute. Set both these attributes to match the version of liferay you are using.
+7. Compile EvalS
+    - Navigate to `liferay-plugins-sdk-${version}`
+    - Run `ant`
+    - A war file will be created and placed in `bundles/deploy/`
+    - A running tomcat server will automatically deploy this to `bundles/tomcat-${version}/webapps/`
 
+8. Running EvalS
+    - EvalS is a portlet and won't run on its own
+    - Open a browser to http://localhost:8080/web/guest/ and login with the user you setup earlier or the default user
+    - The UI can differ depending on the liferay version you are using but the steps should remain the same
+    - Using the "Add" button in the top left corner add a new page
+    - On that new page, use the "Add" button again and click "More..."
+    - Search for EvalS, then click and drag it onto the page
+    - If EvalS is not on the list or it shows an error message, check the logs in `bundles/tomcat-${version}/logs/catalina.out`
 
 ### Tests
 ---
