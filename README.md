@@ -3,6 +3,7 @@ An electronically-driven performance evaluation system designed
 to assist supervisors and employees to complete their annual
 goal-setting and appraisal tasks.
 
+[Wiki](https://wiki.library.oregonstate.edu/confluence/display/EVALS/EvalS+Home)
 
 ### Getting it to work locally
 ---
