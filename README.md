@@ -66,5 +66,8 @@ goal-setting and appraisal tasks.
 1. testng.jar is so old it no longer works with Intellij
     - downloaded new jar from https://mvnrepository.com/artifact/org.testng/testng/6.9.4
 
+2. Missing jar for Hibernate tests
+  - downloaded from https://mvnrepository.com/artifact/javax.transaction/jta/1.1
+
 2. Make sure working directory is set correctly in Intellij
     - Should be the root of evals
