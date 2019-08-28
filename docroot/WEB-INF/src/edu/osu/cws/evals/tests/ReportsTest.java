@@ -69,9 +69,9 @@ public class ReportsTest {
         combinedSortedData = ReportMgr.combineAndSortStages(mixedData);
 
         assert combinedSortedData.size() == 2;
-        assert combinedSortedData.get(0)[1].equals("goals");
+        assert combinedSortedData.get(0)[1].equals("results");
         assert combinedSortedData.get(0)[0].equals(40);
-        assert combinedSortedData.get(1)[1].equals("results");
+        assert combinedSortedData.get(1)[1].equals("goals");
         assert combinedSortedData.get(1)[0].equals(40);
 
         row1[1] = "results";
