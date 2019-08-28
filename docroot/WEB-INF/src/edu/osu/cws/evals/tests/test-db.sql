@@ -54,7 +54,7 @@
 -- ------------------------------------------------------
 
   CREATE TABLE `ADMINS` (
-    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `ID` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `EMPLOYEE_PIDM` BIGINT NOT NULL,
     `IS_MASTER` BOOLEAN NOT NULL,
     `CREATE_DATE` DATETIME NOT NULL,
@@ -74,7 +74,7 @@
 -- ------------------------------------------------------
 
   CREATE TABLE `APPRAISALS` (
-    `ID` BIGINT NOT NULL AUTO_INCREMENT,
+    `ID` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `STATUS` VARCHAR(45) NOT NULL,
     `START_DATE` DATETIME NOT NULL,
     `END_DATE` DATETIME NOT NULL,
@@ -141,7 +141,7 @@
 -- ------------------------------------------------------
 
   CREATE TABLE `ASSESSMENTS_CRITERIA` (
-    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `ID` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `ASSESSMENT_ID` BIGINT NOT NULL,
     `CRITERIA_AREA_ID` BIGINT NOT NULL,
     `CHECKED` TINYINT);
@@ -157,7 +157,7 @@
 -- ------------------------------------------------------
 
   CREATE TABLE `CLOSEOUT_REASONS` (
-    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `ID` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `REASON` VARCHAR(255) NOT NULL,
     `CREATE_DATE` DATETIME NOT NULL,
     `CREATOR_PIDM` BIGINT NOT NULL,
@@ -189,7 +189,7 @@
 -- ------------------------------------------------------
 
   CREATE TABLE `CRITERIA_AREAS` (
-    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `ID` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `NAME` VARCHAR(255) NOT NULL,
     `APPOINTMENT_TYPE` VARCHAR(45) NOT NULL,
     `ANCESTOR_ID` BIGINT,
@@ -217,7 +217,7 @@
 -- ------------------------------------------------------
 
   CREATE TABLE `EMAILS` (
-    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `ID` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `APPRAISAL_ID` BIGINT NOT NULL,
     `EMAIL_TYPE` VARCHAR(64) NOT NULL,
     `SENT_TIME` DATETIME NOT NULL) ;
@@ -229,7 +229,7 @@
 
   CREATE TABLE `EMAIL_TYPES` (
     `TYPE` VARCHAR(64) NOT NULL COMMENT 'goalsDue goalsOverDue...These are keys to an email subjects and bodies in a resource bundle file.',
-    `MAILTO` VARCHAR(64) NOT NULL COMMENT 'emloyeee supervisor upper supervisor reviewer employee, superviosr',
+    `MAILTO` VARCHAR(64) NOT NULL COMMENT 'emloyee supervisor upper supervisor reviewer employee, supervisor',
     `CC` VARCHAR(64), `BCC` VARCHAR(64)) ;
 
    ALTER TABLE `EMAIL_TYPES`  COMMENT 'Email types (goals due, results due, etc)';
@@ -238,7 +238,7 @@
 -- ------------------------------------------------------
 
   CREATE TABLE `GOALS_LOGS` (
-    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `ID` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `ASSESSMENT_ID` BIGINT NOT NULL,
     `CONTENT` LONGTEXT NOT NULL,
     `AUTHOR_PIDM` BIGINT NOT NULL,
@@ -253,7 +253,7 @@
 -- ------------------------------------------------------
 
   CREATE TABLE `GOALS_VERSIONS` (
-    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `ID` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `APPRAISAL_ID` BIGINT NOT NULL,
     `CREATE_DATE` DATETIME, `GOALS_APPROVED_DATE` DATETIME, `GOALS_APPROVER_PIDM` BIGINT, `REQUEST_DECISION` TINYINT, `REQUEST_DECISION_PIDM` BIGINT, `TIMED_OUT_AT` VARCHAR(255), `REQUEST_DECISION_DATE` DATETIME, `GOALS_SUBMIT_DATE` DATETIME, `GOALS_COMMENTS` VARCHAR(4000), `GOALS_REQUIRED_MOD_DATE` DATETIME);
 -- ------------------------------------------------------
@@ -295,7 +295,7 @@
 -- ------------------------------------------------------
 
   CREATE TABLE `PYVPASE` (
-    `PYVPASE_PIDM` INT NOT NULL AUTO_INCREMENT COMMENT 'Pidm',
+    `PYVPASE_PIDM` INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'Pidm',
     `PYVPASE_ID` VARCHAR(9) NOT NULL COMMENT 'OSU ID',
     `PYVPASE_LAST_NAME` VARCHAR(60) NOT NULL COMMENT 'Last Name',
     `PYVPASE_FIRST_NAME` VARCHAR(60) COMMENT 'First Name',
@@ -384,7 +384,7 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
 -- ------------------------------------------------------
 
   CREATE TABLE `REVIEWERS` (
-    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `ID` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `EMPLOYEE_PIDM` BIGINT NOT NULL,
     `BUSINESS_CENTER_NAME` VARCHAR(4) NOT NULL) ;
 
@@ -394,7 +394,7 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
 -- ------------------------------------------------------
 
   CREATE TABLE `REVIEW_CYCLE_OPTIONS` (
-    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `ID` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `NAME` VARCHAR(75) NOT NULL,
     `VALUE` TINYINT NOT NULL,
     `SEQUENCE` TINYINT NOT NULL,
@@ -426,7 +426,7 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
 --  Constraints for Table ADMINS
 -- ------------------------------------------------------
 
-  ALTER TABLE `ADMINS` ADD CONSTRAINT `PK_ADMINS` PRIMARY KEY (`ID`);
+  -- ALTER TABLE `ADMINS` ADD CONSTRAINT `PK_ADMINS` PRIMARY KEY (`ID`);
 -- ------------------------------------------------------
 --  Constraints for Table APPOINTMENT_TYPES
 -- ------------------------------------------------------
@@ -437,7 +437,7 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
 --  Constraints for Table APPRAISALS
 -- ------------------------------------------------------
 
-  ALTER TABLE `APPRAISALS` ADD CONSTRAINT `PK_APPRAISALS` PRIMARY KEY (`ID`);
+  -- ALTER TABLE `APPRAISALS` ADD CONSTRAINT `PK_APPRAISALS` PRIMARY KEY (`ID`);
 -- ------------------------------------------------------
 --  Constraints for Table APPRAISAL_STEPS
 -- ------------------------------------------------------
@@ -452,7 +452,7 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
 --  Constraints for Table ASSESSMENTS_CRITERIA
 -- ------------------------------------------------------
 
-  ALTER TABLE `ASSESSMENTS_CRITERIA` ADD CONSTRAINT `PK_ASSESSMENTSCRITERIA` PRIMARY KEY (`ID`);
+  -- ALTER TABLE `ASSESSMENTS_CRITERIA` ADD CONSTRAINT `PK_ASSESSMENTSCRITERIA` PRIMARY KEY (`ID`);
 -- ------------------------------------------------------
 --  Constraints for Table BUSINESS_CENTERS
 -- ------------------------------------------------------
@@ -462,7 +462,7 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
 --  Constraints for Table CLOSEOUT_REASONS
 -- ------------------------------------------------------
 
-  ALTER TABLE `CLOSEOUT_REASONS` ADD CONSTRAINT `PK_CLOSEOUT_REASONS` PRIMARY KEY (`ID`);
+  -- ALTER TABLE `CLOSEOUT_REASONS` ADD CONSTRAINT `PK_CLOSEOUT_REASONS` PRIMARY KEY (`ID`);
 -- ------------------------------------------------------
 --  Constraints for Table CONFIGURATIONS
 -- ------------------------------------------------------
@@ -477,7 +477,7 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
 --  Constraints for Table CRITERIA_AREAS
 -- ------------------------------------------------------
 
-  ALTER TABLE `CRITERIA_AREAS` ADD CONSTRAINT `PK_CRITERIA_AREAS` PRIMARY KEY (`ID`);
+  -- ALTER TABLE `CRITERIA_AREAS` ADD CONSTRAINT `PK_CRITERIA_AREAS` PRIMARY KEY (`ID`);
 -- ------------------------------------------------------
 --  Constraints for Table CRITERIA_DETAILS
 -- ------------------------------------------------------
@@ -487,7 +487,7 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
 --  Constraints for Table EMAILS
 -- ------------------------------------------------------
 
-  ALTER TABLE `EMAILS` ADD CONSTRAINT `PK_EMAILS` PRIMARY KEY (`ID`);
+  -- ALTER TABLE `EMAILS` ADD CONSTRAINT `PK_EMAILS` PRIMARY KEY (`ID`);
 -- ------------------------------------------------------
 --  Constraints for Table EMAIL_TYPES
 -- ------------------------------------------------------
@@ -497,12 +497,12 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
 --  Constraints for Table GOALS_LOGS
 -- ------------------------------------------------------
 
-  ALTER TABLE `GOALS_LOGS` ADD CONSTRAINT `PK_GOALS_LOGS` PRIMARY KEY (`ID`);
+  -- ALTER TABLE `GOALS_LOGS` ADD CONSTRAINT `PK_GOALS_LOGS` PRIMARY KEY (`ID`);
 -- ------------------------------------------------------
 --  Constraints for Table GOALS_VERSIONS
 -- ------------------------------------------------------
 
-  ALTER TABLE `GOALS_VERSIONS` ADD CONSTRAINT `PK_GOALSVERSIONS` PRIMARY KEY (`ID`);
+  -- ALTER TABLE `GOALS_VERSIONS` ADD CONSTRAINT `PK_GOALSVERSIONS` PRIMARY KEY (`ID`);
 -- ------------------------------------------------------
 --  Constraints for Table NOLIJ_COPIES
 -- ------------------------------------------------------
@@ -517,7 +517,7 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
 --  Constraints for Table PYVPASE
 -- ------------------------------------------------------
 
-  ALTER TABLE `PYVPASE` ADD CONSTRAINT `PK_PYVPASE` PRIMARY KEY (`PYVPASE_PIDM`);
+  -- ALTER TABLE `PYVPASE` ADD CONSTRAINT `PK_PYVPASE` PRIMARY KEY (`PYVPASE_PIDM`);
 -- ------------------------------------------------------
 --  Constraints for Table PYVPASJ
 -- ------------------------------------------------------
@@ -536,12 +536,12 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
 --  Constraints for Table REVIEWERS
 -- ------------------------------------------------------
 
-  ALTER TABLE `REVIEWERS` ADD CONSTRAINT `PK_REVIEWERS` PRIMARY KEY (`ID`);
+  -- ALTER TABLE `REVIEWERS` ADD CONSTRAINT `PK_REVIEWERS` PRIMARY KEY (`ID`);
 -- ------------------------------------------------------
 --  Constraints for Table REVIEW_CYCLE_OPTIONS
 -- ------------------------------------------------------
 
-  ALTER TABLE `REVIEW_CYCLE_OPTIONS` ADD CONSTRAINT `PK_REVIEW_CYCLE_OPTIONS` PRIMARY KEY (`ID`);
+  -- ALTER TABLE `REVIEW_CYCLE_OPTIONS` ADD CONSTRAINT `PK_REVIEW_CYCLE_OPTIONS` PRIMARY KEY (`ID`);
 -- ------------------------------------------------------
 --  Constraints for Table SALARIES
 -- ------------------------------------------------------
