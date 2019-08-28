@@ -1,321 +1,554 @@
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
+-- ------------------------------------------------------
+--  File created - Friday-August-16-2019   
+-- ------------------------------------------------------
+-- ------------------------------------------------------
+--  DDL for Sequence PASS_SEQ
+-- ------------------------------------------------------
 
-CREATE TABLE `actions` (
-  `ACTION` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`ACTION`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+-- CALL  CreateSequence('`PASS_SEQ`', 643847, 1)  ORDER  NOCYCLE
 
-CREATE TABLE `admins` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `EMPLOYEE_PIDM` int(11) NOT NULL,
-  `IS_MASTER` tinyint(1) NOT NULL,
-  `CREATE_DATE` datetime NOT NULL,
-  `CREATOR_PIDM` int(11) NOT NULL,
-  `MODIFIED_DATE` datetime DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `employeeID` (`EMPLOYEE_PIDM`),
-  KEY `createdBy` (`CREATOR_PIDM`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=35 ;
+-- ------------------------------------------------------
+-- DDL for drop tables
+-- ------------------------------------------------------
 
-CREATE TABLE `appointment_types` (
-  `NAME` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`NAME`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  DROP TABLE IF EXISTS
+    ACTIONS,
+    ADMINS,
+    APPOINTMENT_TYPES,
+    APPRAISALS,
+    APPRAISAL_STEPS,
+    ASSESSMENTS,
+    ASSESSMENTS_CRITERIA,
+    BUSINESS_CENTERS,
+    CLOSEOUT_REASONS,
+    CONFIGURATIONS,
+    CONFIG_TIMES,
+    CRITERIA_AREAS,
+    CRITERIA_DETAILS,
+    EMAILS,
+    EMAIL_TYPES,
+    GOALS_LOGS,
+    GOALS_VERSIONS,
+    NOLIJ_COPIES,
+    NOTICES,
+    PERMISSION_RULES,
+    PYVPASE,
+    PYVPASJ,
+    PYVPDES,
+    PYVPDLW,
+    RATINGS,
+    REVIEWERS,
+    REVIEW_CYCLE_OPTIONS,
+    SALARIES,
+    `STATUS`;
 
-CREATE TABLE `appraisals` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `STATUS` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `START_DATE` date NOT NULL,
-  `END_DATE` date NOT NULL,
-  `JOB_PIDM` int(11) NOT NULL,
-  `POSITION_NUMBER` varchar(8) COLLATE utf8_unicode_ci NOT NULL,
-  `JOB_SUFFIX` varchar(2) COLLATE utf8_unicode_ci NOT NULL,
-  `OVERDUE` int(11) DEFAULT NULL,
-  `GOALS_APPROVER_PIDM` int(11) DEFAULT NULL,
-  `GOALS_SUBMIT_DATE` datetime DEFAULT NULL,
-  `GOALS_APPROVED_DATE` datetime DEFAULT NULL,
-  `GOALS_REQUIRED_MOD_DATE` datetime DEFAULT NULL,
-  `GOALS_COMMENTS` text COLLATE utf8_unicode_ci,
-  `RESULT_SUBMIT_DATE` datetime DEFAULT NULL,
-  `EVALUATION` text COLLATE utf8_unicode_ci,
-  `EVALUATOR_PIDM` int(11) DEFAULT NULL,
-  `EVALUATION_SUBMIT_DATE` datetime DEFAULT NULL,
-  `RATING` int(1) DEFAULT NULL,
-  `REVIEWER_PIDM` int(11) DEFAULT NULL,
-  `REVIEW_SUBMIT_DATE` datetime DEFAULT NULL,
-  `REVIEW` text COLLATE utf8_unicode_ci,
-  `CREATE_DATE` datetime NOT NULL,
-  `REBUTTAL` text COLLATE utf8_unicode_ci,
-  `REBUTTAL_DATE` datetime DEFAULT NULL,
-  `EMPLOYEE_SIGNED_DATE` datetime DEFAULT NULL,
-  `CLOSEOUT_PIDM` int(11) DEFAULT NULL,
-  `CLOSEOUT_DATE` date DEFAULT NULL,
-  `CLOSEOUT_REASON_ID` int(11) DEFAULT NULL,
-  `REOPENER_PIDM` int(11) DEFAULT NULL,
-  `REOPENED_DATE` datetime DEFAULT NULL,
-  `REOPEN_REASON` text COLLATE utf8_unicode_ci,
-  `ORIGINAL_STATUS` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `RELEASE_DATE` datetime DEFAULT NULL COMMENT 'The time when the supervisor requested employee''s signature.',
-  `SUPERVISOR_REBUTTAL_READ` datetime DEFAULT NULL,
-  `TYPE` varchar(16) COLLATE utf8_unicode_ci NOT NULL COMMENT 'possible values are: trial annual special',
-  `GOALS_OVERDUE` int(3) DEFAULT NULL,
-  `RESULTS_OVERDUE` int(3) DEFAULT NULL,
-  `APPRAISAL_OVERDUE` int(3) DEFAULT NULL,
-  `REVIEW_OVERDUE` int(3) DEFAULT NULL,
-  `RELEASE_OVERDUE` int(3) DEFAULT NULL,
-  `SIGNATURE_OVERDUE` int(3) DEFAULT NULL,
-  `REBUTTAL_READ_OVERDUE` int(3) DEFAULT NULL,
-  `GOALS_APPROVAL_OVERDUE` int(3) DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `hrApproverID` (`REVIEWER_PIDM`),
-  KEY `closeOutBy` (`CLOSEOUT_PIDM`),
-  KEY `goalApproverID` (`GOALS_APPROVER_PIDM`),
-  KEY `reopenedBy` (`REOPENER_PIDM`),
-  KEY `originalStatus` (`ORIGINAL_STATUS`),
-  KEY `status` (`STATUS`),
-  KEY `CLOSEOUT_REASON_ID` (`CLOSEOUT_REASON_ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=382 ;
+-- ------------------------------------------------------
+--  DDL for Table ACTIONS
+-- ------------------------------------------------------
 
-CREATE TABLE `appraisal_steps` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `ACTION` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
-  `APPOINTMENT_TYPE` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `NEW_STATUS` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
-  `EMAIL_TYPE` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `emailType` (`EMAIL_TYPE`),
-  KEY `newStatus` (`NEW_STATUS`),
-  KEY `appointmentType` (`APPOINTMENT_TYPE`),
-  KEY `action` (`ACTION`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3 ;
+  CREATE TABLE `ACTIONS` (`ACTION` VARCHAR(32) NOT NULL);
 
-CREATE TABLE `assessments` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `GOAL_VERSION_ID` int(11) NOT NULL,
-  `GOAL` text COLLATE utf8_unicode_ci,
-  `EMPLOYEE_RESULT` text COLLATE utf8_unicode_ci,
-  `SUPERVISOR_RESULT` text COLLATE utf8_unicode_ci,
-  `SEQUENCE` int(11) NOT NULL,
-  `CREATE_DATE` datetime NOT NULL,
-  `MODIFIED_DATE` datetime DEFAULT NULL,
-  `DELETER_PIDM` int(11) DEFAULT NULL,
-  `DELETE_DATE` date DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `appraisalID` (`GOAL_VERSION_ID`),
-  KEY `criterionDetailID` (`SEQUENCE`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1866 ;
+   ALTER TABLE `ACTIONS`  COMMENT 'Possible actions on the appraisal records';
+-- ------------------------------------------------------
+--  DDL for Table ADMINS
+-- ------------------------------------------------------
 
-CREATE TABLE `assessments_criteria` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `CRITERIA_AREA_ID` int(11) NOT NULL,
-  `ASSESSMENT_ID` int(11) NOT NULL,
-  `CHECKED` int(1) DEFAULT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3729 ;
+  CREATE TABLE `ADMINS` (
+    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `EMPLOYEE_PIDM` BIGINT NOT NULL,
+    `IS_MASTER` BOOLEAN NOT NULL,
+    `CREATE_DATE` DATETIME NOT NULL,
+    `CREATOR_PIDM` BIGINT NOT NULL,
+    `MODIFIED_DATE` DATETIME DEFAULT NULL);
 
-CREATE TABLE `business_centers` (
-  `NAME` varchar(4) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`NAME`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+   ALTER TABLE `ADMINS`  COMMENT 'PASS administrators';
+-- ------------------------------------------------------
+--  DDL for Table APPOINTMENT_TYPES
+-- ------------------------------------------------------
 
-CREATE TABLE `closeout_reasons` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `REASON` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `CREATE_DATE` datetime NOT NULL,
-  `CREATOR_PIDM` int(11) NOT NULL,
-  `DELETE_DATE` datetime DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `CREATOR_PIDM` (`CREATOR_PIDM`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=12 ;
+  CREATE TABLE `APPOINTMENT_TYPES` (`NAME` VARCHAR(45) NOT NULL);
 
-CREATE TABLE `configurations` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `SECTION` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
-  `NAME` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `SEQUENCE` int(3) NOT NULL,
-  `VALUE` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `REFERENCE_POINT` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
-  `ACTION` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=8 ;
+   ALTER TABLE `APPOINTMENT_TYPES`  COMMENT 'Possible types of appointments';
+-- ------------------------------------------------------
+--  DDL for Table APPRAISALS
+-- ------------------------------------------------------
 
-CREATE TABLE `config_times` (
-  `CONTEXT_DATETIME` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  CREATE TABLE `APPRAISALS` (
+    `ID` BIGINT NOT NULL AUTO_INCREMENT,
+    `STATUS` VARCHAR(45) NOT NULL,
+    `START_DATE` DATETIME NOT NULL,
+    `END_DATE` DATETIME NOT NULL,
+    `JOB_PIDM` BIGINT NOT NULL,
+    `POSITION_NUMBER` VARCHAR(8) NOT NULL,
+    `JOB_SUFFIX` VARCHAR(2) NOT NULL,
+    `CREATE_DATE` DATETIME NOT NULL,
+    `RESULT_SUBMIT_DATE` DATETIME,
+    `EVALUATOR_PIDM` BIGINT COMMENT 'pidm of the employee who performed the evaluation.',
+    `EVALUATION` LONGTEXT,
+    `RATING` TINYINT DEFAULT 4,
+    `REVIEWER_PIDM` BIGINT COMMENT 'pidm of the employee that performed the review',
+    `REVIEW_SUBMIT_DATE` DATETIME,
+    `REVIEW` VARCHAR(4000),
+    `REBUTTAL` LONGTEXT,
+    `EMPLOYEE_SIGNED_DATE` DATETIME COMMENT 'Reason for closing out.',
+    `REBUTTAL_DATE` DATETIME,
+    `CLOSEOUT_DATE` DATETIME COMMENT 'This is closing out without finishing the review.',
+    `CLOSEOUT_PIDM` BIGINT COMMENT 'The pidm of the employee who performed the closeout.',
+    `TYPE` VARCHAR(16) COMMENT 'possible values are: - trial - annual - special' NOT NULL,
+    `ORIGINAL_STATUS` VARCHAR(32) COMMENT 'This is only used for the closeAppraisal and reopenAppraisal action.CloseApraisal sets it to the original status before closing. ReopenStatus sets the status to the value of this column.',
+    `RELEASE_DATE` DATETIME COMMENT 'The date when supervisor releases the appraisal for employee to sign',
+    `SUPERVISOR_REBUTTAL_READ` DATETIME, `EVALUATION_SUBMIT_DATE` DATETIME, `GRANT_DRAFT_RESULTS_PERMISSION` INT,
+    `CLOSEOUT_REASON_ID` BIGINT, `OVERDUE` SMALLINT, `GOALS_OVERDUE` SMALLINT, `GOALS_APPROVAL_OVERDUE` SMALLINT,
+    `RESULTS_OVERDUE` SMALLINT, `APPRAISAL_OVERDUE` SMALLINT, `REVIEW_OVERDUE` SMALLINT, `RELEASE_OVERDUE` SMALLINT,
+    `SIGNATURE_OVERDUE` SMALLINT,
+    `REBUTTAL_READ_OVERDUE` SMALLINT);
+    
+    /* BLOB (`EVALUATION`) STORE AS BASICFILE `EVALUATION_STORAGE`(ENABLE STORAGE IN ROW CHUNK 8192 RETENTION  NOCACHE LOGGING )
+    BLOB (`REBUTTAL`) STORE AS BASICFILE `REBUTTAL_STORAGE`(ENABLE STORAGE IN ROW CHUNK 8192 RETENTION  NOCACHE LOGGING ) */
 
-CREATE TABLE `criteria_areas` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `NAME` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `APPOINTMENT_TYPE` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `DESCRIPTION` text COLLATE utf8_unicode_ci NOT NULL,
-  `ANCESTOR_ID` int(11) DEFAULT NULL,
-  `CREATE_DATE` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `CREATOR_PIDM` int(11) NOT NULL,
-  `DELETE_DATE` timestamp NULL DEFAULT NULL,
-  `DELETER_PIDM` int(11) DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `originalID` (`ANCESTOR_ID`),
-  KEY `createdBy` (`CREATOR_PIDM`),
-  KEY `deletedBy` (`DELETER_PIDM`),
-  KEY `appointmentType` (`APPOINTMENT_TYPE`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=78 ;
+   ALTER TABLE `APPRAISALS`  COMMENT 'Performance appraisal records';
+-- ------------------------------------------------------
+--  DDL for Table APPRAISAL_STEPS
+-- ------------------------------------------------------
 
-CREATE TABLE `emails` (
-  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `APPRAISAL_ID` int(11) unsigned NOT NULL,
-  `EMAIL_TYPE` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
-  `SENT_TIME` datetime NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=34 ;
+  CREATE TABLE `APPRAISAL_STEPS` (
+    `ID` BIGINT NOT NULL,
+    `ACTION` VARCHAR(32) NOT NULL,
+    `APPOINTMENT_TYPE` VARCHAR(45) NOT NULL,
+    `NEW_STATUS` VARCHAR(32) NOT NULL,
+    `EMAIL_TYPE` VARCHAR(64)) ;
 
-CREATE TABLE `email_types` (
-  `TYPE` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
-  `MAILTO` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
-  `CC` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `BCC` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL,
-  KEY `type` (`TYPE`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+   ALTER TABLE `APPRAISAL_STEPS`  COMMENT 'Consequences of actions taken on the appraisals';
+-- ------------------------------------------------------
+--  DDL for Table ASSESSMENTS
+-- ------------------------------------------------------
 
-CREATE TABLE `employees` (
-  `PYVPASE_PIDM` int(11) NOT NULL,
-  `PYVPASE_FIRST_NAME` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASE_MI` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `PYVPASE_LAST_NAME` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASE_ID` varchar(9) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASE_ONID_LOGIN` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASE_EMAIL` varchar(75) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASE_EMPL_STATUS` varchar(1) COLLATE utf8_unicode_ci NOT NULL,
-  KEY `pidm` (`PYVPASE_PIDM`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  CREATE TABLE `ASSESSMENTS` (
+    `ID` BIGINT NOT NULL,
+    `GOAL` LONGTEXT,
+    `EMPLOYEE_RESULT` LONGTEXT,
+    `SUPERVISOR_RESULT` LONGTEXT COMMENT 'supervisor''s result box',
+    `CREATE_DATE` DATETIME NOT NULL,
+    `MODIFIED_DATE` DATETIME DEFAULT NULL,
+    `GOAL_VERSION_ID` BIGINT NOT NULL,
+    `SEQUENCE` BIGINT NOT NULL, `DELETER_PIDM` BIGINT, `DELETE_DATE` DATETIME);
+  
+  -- RETENTION  NOCACHE LOGGING )  LOB (`EMPLOYEE_RESULT`) STORE AS BASICFILE "EMPLOYEE_RESULT_STORAGE"(ENABLE STORAGE IN ROW CHUNK 8192 RETENTION  NOCACHE LOGGING )  LOB (`SUPERVISOR_RESULT`) STORE AS BASICFILE "SUPERVISOR_RESULT_STORAGE"(ENABLE STORAGE IN ROW CHUNK 8192 RETENTION  NOCACHE LOGGING ) 
 
-CREATE TABLE `goals_logs` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `CONTENT` text COLLATE utf8_unicode_ci NOT NULL,
-  `ASSESSMENT_ID` int(11) NOT NULL,
-  `AUTHOR_PIDM` int(11) NOT NULL,
-  `CREATE_DATE` datetime NOT NULL,
-  `TYPE` varchar(45) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'default to null, which will be for normal approvedGoals. the value is new for new approvedGoals, used for goalsReactivated.',
-  PRIMARY KEY (`ID`),
-  KEY `assessmentID` (`ASSESSMENT_ID`),
-  KEY `authorPidm` (`AUTHOR_PIDM`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=71 ;
+   ALTER TABLE `ASSESSMENTS`  COMMENT 'Goals and results of appraisal records';
+-- ------------------------------------------------------
+--  DDL for Table ASSESSMENTS_CRITERIA
+-- ------------------------------------------------------
 
-CREATE TABLE `goals_versions` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `APPROVER_PIDM` int(11) DEFAULT NULL,
-  `CREATE_DATE` date NOT NULL,
-  `APPROVED_DATE` date DEFAULT NULL,
-  `APPRAISAL_ID` int(11) NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=378 ;
+  CREATE TABLE `ASSESSMENTS_CRITERIA` (
+    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `ASSESSMENT_ID` BIGINT NOT NULL,
+    `CRITERIA_AREA_ID` BIGINT NOT NULL,
+    `CHECKED` TINYINT);
+-- ------------------------------------------------------
+--  DDL for Table BUSINESS_CENTERS
+-- ------------------------------------------------------
 
-CREATE TABLE `jobs` (
-  `PYVPASJ_PIDM` int(11) NOT NULL DEFAULT '0',
-  `PYVPASJ_STATUS` varchar(1) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASJ_DESC` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASJ_POSN` varchar(8) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASJ_SUFF` varchar(2) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASJ_ECLS_CODE` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASJ_APPOINTMENT_TYPE` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASJ_BEGIN_DATE` date NOT NULL,
-  `PYVPASJ_END_DATE` date DEFAULT NULL,
-  `PYVPASJ_BCTR_TITLE` varchar(4) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASJ_ORGN_CODE_TS` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASJ_ORGN_DESC` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASJ_PCLS_CODE` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASJ_SAL_GRADE` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASJ_SAL_STEP` varchar(3) COLLATE utf8_unicode_ci NOT NULL,
-  `PYVPASJ_SUPERVISOR_PIDM` int(11) DEFAULT NULL,
-  `PYVPASJ_SUPERVISOR_POSN` varchar(8) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `PYVPASJ_SUPERVISOR_SUFF` varchar(2) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `PYVPASJ_TRIAL_IND` int(11) NOT NULL,
-  `PYVPASJ_ANNUAL_IND` int(11) NOT NULL,
-  `PYVPASJ_EVAL_DATE` datetime DEFAULT NULL,
-  PRIMARY KEY (`PYVPASJ_PIDM`,`PYVPASJ_POSN`,`PYVPASJ_SUFF`),
-  KEY `employeePidm` (`PYVPASJ_PIDM`),
-  KEY `appointmentType` (`PYVPASJ_APPOINTMENT_TYPE`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  CREATE TABLE `BUSINESS_CENTERS` (`NAME` VARCHAR(255) NOT NULL) ;
 
-CREATE TABLE `nolij_copies` (
-  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `APPRAISAL_ID` int(11) unsigned NOT NULL,
-  `SUBMIT_DATE` datetime NOT NULL,
-  `FILE_NAME` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+   ALTER TABLE `BUSINESS_CENTERS`  COMMENT 'OSU business centers';
+-- ------------------------------------------------------
+--  DDL for Table CLOSEOUT_REASONS
+-- ------------------------------------------------------
 
-CREATE TABLE `permission_rules` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `STATUS` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
-  `ROLE` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
-  `GOALS` varchar(1) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `NEW_GOALS` varchar(1) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `GOAL_COMMENTS` varchar(1) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `RESULTS` varchar(1) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `SUPERVISOR_RESULTS` varchar(1) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `EVALUATION` varchar(1) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `REVIEW` varchar(1) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `EMPLOYEE_RESPONSE` varchar(1) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `REBUTTAL_READ` varchar(1) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `SAVE_DRAFT` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `REQUIRE_MODIFICATION` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `SUBMIT` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `ACTION_REQUIRED` varchar(45) COLLATE utf8_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `status` (`STATUS`),
-  KEY `submit` (`SUBMIT`),
-  KEY `secondarySubmit` (`REQUIRE_MODIFICATION`),
-  KEY `saveDraft` (`SAVE_DRAFT`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3 ;
-CREATE TABLE `pyvpase` (
-`PYVPASE_PIDM` int(11)
-,`PYVPASE_FIRST_NAME` varchar(150)
-,`PYVPASE_MI` varchar(150)
-,`PYVPASE_LAST_NAME` varchar(150)
-,`PYVPASE_ID` varchar(9)
-,`PYVPASE_ONID_LOGIN` varchar(15)
-,`PYVPASE_EMAIL` varchar(75)
-,`PYVPASE_EMPL_STATUS` varchar(1)
-);CREATE TABLE `pyvpasj` (
-`PYVPASJ_PIDM` int(11)
-,`PYVPASJ_STATUS` varchar(1)
-,`PYVPASJ_DESC` varchar(255)
-,`PYVPASJ_POSN` varchar(8)
-,`PYVPASJ_SUFF` varchar(2)
-,`PYVPASJ_ECLS_CODE` varchar(45)
-,`PYVPASJ_APPOINTMENT_TYPE` varchar(45)
-,`PYVPASJ_BEGIN_DATE` date
-,`PYVPASJ_END_DATE` date
-,`PYVPASJ_BCTR_TITLE` varchar(4)
-,`PYVPASJ_ORGN_CODE_TS` varchar(45)
-,`PYVPASJ_ORGN_DESC` varchar(255)
-,`PYVPASJ_PCLS_CODE` varchar(45)
-,`PYVPASJ_SAL_GRADE` varchar(45)
-,`PYVPASJ_SAL_STEP` varchar(3)
-,`PYVPASJ_SUPERVISOR_PIDM` int(11)
-,`PYVPASJ_SUPERVISOR_POSN` varchar(8)
-,`PYVPASJ_SUPERVISOR_SUFF` varchar(2)
-,`PYVPASJ_TRIAL_IND` int(11)
-,`PYVPASJ_ANNUAL_IND` int(11)
-,`PYVPASJ_EVAL_DATE` datetime
-);
-CREATE TABLE `reviewers` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `EMPLOYEE_PIDM` int(11) NOT NULL,
-  `BUSINESS_CENTER_NAME` varchar(4) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `employeeID` (`EMPLOYEE_PIDM`),
-  KEY `businessCenterName` (`BUSINESS_CENTER_NAME`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=24 ;
+  CREATE TABLE `CLOSEOUT_REASONS` (
+    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `REASON` VARCHAR(255) NOT NULL,
+    `CREATE_DATE` DATETIME NOT NULL,
+    `CREATOR_PIDM` BIGINT NOT NULL,
+    `DELETE_DATE` DATETIME) ;
 
-CREATE TABLE `status` (
-  `STATUS` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  KEY `status` (`STATUS`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-DROP TABLE IF EXISTS `pyvpase`;
+   ALTER TABLE `CLOSEOUT_REASONS`  COMMENT 'Reason for closeout';
+-- ------------------------------------------------------
+--  DDL for Table CONFIGURATIONS
+-- ------------------------------------------------------
 
-CREATE  VIEW `pyvpase` AS select * from `employees`;
-DROP TABLE IF EXISTS `pyvpasj`;
+  CREATE TABLE `CONFIGURATIONS` (`ID` BIGINT NOT NULL,
+  `SECTION` VARCHAR(32),
+  `NAME` VARCHAR(255) NOT NULL,
+  `SEQUENCE` INT,
+  `VALUE` VARCHAR(45) NOT NULL,
+  `REFERENCE_POINT` VARCHAR(64),
+  `ACTION` VARCHAR(32), `APPOINTMENT_TYPE` VARCHAR(45)) ;
 
-CREATE  VIEW `pyvpasj` AS select * from `jobs`;
+   ALTER TABLE `CONFIGURATIONS`  COMMENT 'PASS configuration parameters';
+-- ------------------------------------------------------
+--  DDL for Table CONFIG_TIMES
+-- ------------------------------------------------------
+
+  CREATE TABLE `CONFIG_TIMES` (`CONTEXT_DATETIME` DATETIME NOT NULL) ;
+
+   ALTER TABLE `CONFIG_TIMES`  COMMENT 'Stores datetime servers are refreshed';
+-- ------------------------------------------------------
+--  DDL for Table CRITERIA_AREAS
+-- ------------------------------------------------------
+
+  CREATE TABLE `CRITERIA_AREAS` (
+    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `NAME` VARCHAR(255) NOT NULL,
+    `APPOINTMENT_TYPE` VARCHAR(45) NOT NULL,
+    `ANCESTOR_ID` BIGINT,
+    `CREATE_DATE` DATETIME NOT NULL,
+    `CREATOR_PIDM` BIGINT NOT NULL,
+    `DELETE_DATE` DATETIME,
+    `DELETER_PIDM` BIGINT,
+    `DESCRIPTION` VARCHAR(4000) NOT NULL) ;
+
+   ALTER TABLE `CRITERIA_AREAS`  COMMENT 'Names of evaluation criteria';
+-- ------------------------------------------------------
+--  DDL for Table CRITERIA_DETAILS
+-- ------------------------------------------------------
+
+  CREATE TABLE `CRITERIA_DETAILS` (
+    `ID` BIGINT NOT NULL,
+    `AREA_ID` BIGINT NOT NULL,
+    `DESCRIPTION` VARCHAR(4000) NOT NULL,
+    `CREATE_DATE` DATETIME NOT NULL,
+    `CREATOR_PIDM` BIGINT NOT NULL) ;
+
+   ALTER TABLE `CRITERIA_DETAILS`  COMMENT 'Description of evaluation criteria';
+-- ------------------------------------------------------
+--  DDL for Table EMAILS
+-- ------------------------------------------------------
+
+  CREATE TABLE `EMAILS` (
+    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `APPRAISAL_ID` BIGINT NOT NULL,
+    `EMAIL_TYPE` VARCHAR(64) NOT NULL,
+    `SENT_TIME` DATETIME NOT NULL) ;
+
+   ALTER TABLE `EMAILS`  COMMENT 'Records of emails sent by PASS system';
+-- ------------------------------------------------------
+--  DDL for Table EMAIL_TYPES
+-- ------------------------------------------------------
+
+  CREATE TABLE `EMAIL_TYPES` (
+    `TYPE` VARCHAR(64) NOT NULL COMMENT 'goalsDue goalsOverDue...These are keys to an email subjects and bodies in a resource bundle file.',
+    `MAILTO` VARCHAR(64) NOT NULL COMMENT 'emloyeee supervisor upper supervisor reviewer employee, superviosr',
+    `CC` VARCHAR(64), `BCC` VARCHAR(64)) ;
+
+   ALTER TABLE `EMAIL_TYPES`  COMMENT 'Email types (goals due, results due, etc)';
+-- ------------------------------------------------------
+--  DDL for Table GOALS_LOGS
+-- ------------------------------------------------------
+
+  CREATE TABLE `GOALS_LOGS` (
+    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `ASSESSMENT_ID` BIGINT NOT NULL,
+    `CONTENT` LONGTEXT NOT NULL,
+    `AUTHOR_PIDM` BIGINT NOT NULL,
+    `CREATE_DATE` DATETIME NOT NULL,
+    `TYPE` VARCHAR(45) COMMENT 'default to null, which will be for normal goals. the value is new for new goals, used for goalsReactivated.');
+  
+  -- RETENTION  NOCACHE LOGGING ) 
+
+   ALTER TABLE `GOALS_LOGS`  COMMENT 'Goals change history';
+-- ------------------------------------------------------
+--  DDL for Table GOALS_VERSIONS
+-- ------------------------------------------------------
+
+  CREATE TABLE `GOALS_VERSIONS` (
+    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `APPRAISAL_ID` BIGINT NOT NULL,
+    `CREATE_DATE` DATETIME, `GOALS_APPROVED_DATE` DATETIME, `GOALS_APPROVER_PIDM` BIGINT, `REQUEST_DECISION` TINYINT, `REQUEST_DECISION_PIDM` BIGINT, `TIMED_OUT_AT` VARCHAR(255), `REQUEST_DECISION_DATE` DATETIME, `GOALS_SUBMIT_DATE` DATETIME, `GOALS_COMMENTS` VARCHAR(4000), `GOALS_REQUIRED_MOD_DATE` DATETIME);
+-- ------------------------------------------------------
+--  DDL for Table NOLIJ_COPIES
+-- ------------------------------------------------------
+
+  CREATE TABLE `NOLIJ_COPIES` (
+    `ID` BIGINT NOT NULL,
+    `APPRAISAL_ID` BIGINT NOT NULL,
+    `SUBMIT_DATE` DATETIME NOT NULL,
+    `FILE_NAME` VARCHAR(255) NOT NULL COMMENT 'Name of he file sent to Nolij.') ;
+
+   ALTER TABLE `NOLIJ_COPIES`  COMMENT 'Records of appraisals to Nolij';
+-- ------------------------------------------------------
+--  DDL for Table NOTICES
+-- ------------------------------------------------------
+
+  CREATE TABLE `NOTICES` (`ID` DECIMAL(38,0), `ANCESTOR_ID` DECIMAL(38,0), `NAME` VARCHAR(255), `TEXT` VARCHAR(255), `CREATOR_PIDM` DECIMAL(38,0), `CREATE_DATE` DATETIME (6));
+-- ------------------------------------------------------
+--  DDL for Table PERMISSION_RULES
+-- ------------------------------------------------------
+
+  CREATE TABLE `PERMISSION_RULES` (
+    `ID` BIGINT NOT NULL,
+    `STATUS` VARCHAR(32) NOT NULL,
+    `ROLE` VARCHAR(45) NOT NULL COMMENT 'employee supervisor upper supervisor reviewer',
+    `APPROVED_GOALS` VARCHAR(1) COMMENT 'possible valeus: e: edit v: view null: no permission', `UNAPPROVED_GOALS` VARCHAR(1),
+    `GOAL_COMMENTS` VARCHAR(1), `RESULTS` VARCHAR(1), `SUPERVISOR_RESULTS` VARCHAR(1) COMMENT 'e for edit v for view or empty for no access.',
+    `EVALUATION` VARCHAR(1), `REVIEW` VARCHAR(1), `EMPLOYEE_RESPONSE` VARCHAR(1), `REBUTTAL_READ` VARCHAR(1),
+    `SECONDARY_SUBMIT` VARCHAR(32) COMMENT 'if null, then then no require modification  button value for this column is the resource bundle key.  The value of the button is from resource bundle.',
+    `SUBMIT` VARCHAR(32) COMMENT 'if null, then then no submit button value for this column is the resource bundle key.  The value of the button is from resource bundle.',
+    `ACTION_REQUIRED` VARCHAR(45) DEFAULT 4 COMMENT 'if null, then then no action required. value for this column is the resource bundle key.  The value of the button is from resource bundle.',
+    `DOWNLOAD_PDF` VARCHAR(1), `CLOSEOUT` VARCHAR(1), `SEND_TO_NOLIJ` VARCHAR(1), `SET_STATUS_TO_RESULTS_DUE` VARCHAR(1),
+    `REACTIVATE_GOALS` VARCHAR(1), `APPOINTMENT_TYPE` VARCHAR(45)) ;
+
+   ALTER TABLE `PERMISSION_RULES`  COMMENT 'Permissions to fields on the appraisal records based on';
+-- ------------------------------------------------------
+--  DDL for Table PYVPASE
+-- ------------------------------------------------------
+
+  CREATE TABLE `PYVPASE` (
+    `PYVPASE_PIDM` INT NOT NULL AUTO_INCREMENT COMMENT 'Pidm',
+    `PYVPASE_ID` VARCHAR(9) NOT NULL COMMENT 'OSU ID',
+    `PYVPASE_LAST_NAME` VARCHAR(60) NOT NULL COMMENT 'Last Name',
+    `PYVPASE_FIRST_NAME` VARCHAR(60) COMMENT 'First Name',
+    `PYVPASE_MI` VARCHAR(60) COMMENT 'Middle Initial',
+    `PYVPASE_ONID_LOGIN` VARCHAR(20) COMMENT 'ONID Login ID',
+    `PYVPASE_EMAIL` VARCHAR(4000) COMMENT 'Preferred Email address',
+    `PYVPASE_EMPL_STATUS` VARCHAR(1) NOT NULL COMMENT 'Employee Status from PEBEMPL') ;
+
+   ALTER TABLE `PYVPASE`  COMMENT 'OSU PASS System -- Employee View';
+-- ------------------------------------------------------
+--  DDL for Table PYVPASJ
+-- ------------------------------------------------------
+
+  CREATE TABLE `PYVPASJ` (
+    `PYVPASJ_PIDM` INT NOT NULL COMMENT 'Pidm',
+    `PYVPASJ_POSN` VARCHAR(6) NOT NULL,
+    `PYVPASJ_SUFF` VARCHAR(2) NOT NULL,
+    `PYVPASJ_STATUS` VARCHAR(1) NOT NULL,
+    `PYVPASJ_DESC` VARCHAR(30),
+    `PYVPASJ_ECLS_CODE` VARCHAR(20) NOT NULL,
+    `PYVPASJ_APPOINTMENT_TYPE` VARCHAR(4000),
+    `PYVPASJ_BEGIN_DATE` DATETIME NOT NULL,
+    `PYVPASJ_END_DATE` DATETIME,
+    `PYVPASJ_PCLS_CODE` VARCHAR(5) NOT NULL,
+    `PYVPASJ_SAL_GRADE` VARCHAR(5),
+    `PYVPASJ_SAL_STEP` SMALLINT,
+    `PYVPASJ_ORGN_CODE_TS` VARCHAR(6) NOT NULL,
+    `PYVPASJ_ORGN_DESC` VARCHAR(30), `PYVPASJ_BCTR_TITLE` VARCHAR(4), `PYVPASJ_SUPERVISOR_PIDM` INT, `PYVPASJ_SUPERVISOR_POSN` VARCHAR(6), `PYVPASJ_SUPERVISOR_SUFF` VARCHAR(2), `PYVPASJ_TRIAL_IND` DOUBLE NOT NULL, `PYVPASJ_ANNUAL_IND` DOUBLE NOT NULL, `PYVPASJ_EVAL_DATE` DATETIME, `PYVPASJ_LOW` DECIMAL(13,4), `PYVPASJ_MIDPOINT` DECIMAL(13,4), `PYVPASJ_HIGH` DECIMAL(13,4), `PYVPASJ_SALARY` DECIMAL(11,2), `PYVPASJ_SGRP_CODE` VARCHAR(6), `PYVPASJ_INCLUDE_RANKED_FLAG` TINYINT) ;
+
+   /* Moved to CREATE TABLE
+COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
+   ALTER TABLE `PYVPASJ`  COMMENT 'OSU PASS System -- Jobs View';
+-- ------------------------------------------------------
+--  DDL for Table PYVPDES
+-- ------------------------------------------------------
+
+  CREATE TABLE `PYVPDES` (
+    `POSITIONDESCRIPTIONID` TEXT,
+    `POSITIONNUMBER` TEXT,
+    `UNIVERSITYID` TEXT,
+    `POSITIONTITLE` TEXT,
+    `JOBTITLE` TEXT,
+    `DEPARTMENT` TEXT,
+    `EMPLOYEEFIRSTNAME` TEXT,
+    `EMPLOYEELASTNAME` TEXT,
+    `EFFECTIVEDATE` TEXT,
+    `POSITIONAPPOINTMENTPERCENT` TEXT,
+    `APPOINTMENTBASIS` TEXT,
+    `FLSASTATUS` TEXT,
+    `JOBLOCATION` TEXT,
+    `POSITIONCODEDESCRIPTION` TEXT,
+    `POSITIONSUMMARY` TEXT,
+    `DECISIONMAKINGGUIDELINES` TEXT,
+    `PERCLEADWORKSUPERDUTIES` TEXT,
+    `NBREMPLLEADORSUPVD` TEXT,
+    `POSITIONDUTIES` TEXT,
+    `POSITIONDUTIESCONTINUED` TEXT,
+    `ADDTLREQQUALIFS` TEXT,
+    `PREFERREDQUALIFICATIONS` TEXT,
+    `CRIMBCKGRNDANDORDMVCHKRQRD` TEXT,
+    `VALIDDRIVERLICENSEREQUIRED` TEXT,
+    `COMMITMENTNCAAANDFSB` TEXT,
+    `EMPLOYMENTCATEGORY` TEXT,
+    `WORKSCHEDULE` TEXT,
+    `WORKINGCONDITIONS` TEXT,
+    `LASTUPDATEDATE` DATETIME,
+    `LEADERSHIPPOSNCOMMTODIVERSITY` TEXT,
+    `POSITIONTITLECODE` TEXT,
+    `MINIMUMQUALIFICATIONS` TEXT);
+-- ------------------------------------------------------
+--  DDL for Table PYVPDLW
+-- ------------------------------------------------------
+
+  CREATE TABLE `PYVPDLW` (`POSITIONDESCRIPTIONID` BIGINT NOT NULL, `RESPONSE` VARCHAR(4000));
+-- ------------------------------------------------------
+--  DDL for Table RATINGS
+-- ------------------------------------------------------
+
+  CREATE TABLE `RATINGS` (
+    `ID` BIGINT NOT NULL,
+    `RATE` SMALLINT NOT NULL,
+    `NAME` VARCHAR(64),
+    `DESCRIPTION` VARCHAR(512), `APPOINTMENT_TYPE` VARCHAR(45));
+-- ------------------------------------------------------
+--  DDL for Table REVIEWERS
+-- ------------------------------------------------------
+
+  CREATE TABLE `REVIEWERS` (
+    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `EMPLOYEE_PIDM` BIGINT NOT NULL,
+    `BUSINESS_CENTER_NAME` VARCHAR(4) NOT NULL) ;
+
+   ALTER TABLE `REVIEWERS`  COMMENT 'Business center HR reviewers';
+-- ------------------------------------------------------
+--  DDL for Table REVIEW_CYCLE_OPTIONS
+-- ------------------------------------------------------
+
+  CREATE TABLE `REVIEW_CYCLE_OPTIONS` (
+    `ID` BIGINT AUTO_INCREMENT NOT NULL,
+    `NAME` VARCHAR(75) NOT NULL,
+    `VALUE` TINYINT NOT NULL,
+    `SEQUENCE` TINYINT NOT NULL,
+    `CREATOR_PIDM` BIGINT NOT NULL,
+    `CREATE_DATE` DATETIME NOT NULL,
+    `DELETER_PIDM` BIGINT, `DELETE_DATE` DATETIME);
+-- ------------------------------------------------------
+--  DDL for Table SALARIES
+-- ------------------------------------------------------
+
+  CREATE TABLE `SALARIES` (
+    `ID` BIGINT NOT NULL,
+    `APPRAISAL_ID` BIGINT NOT NULL,
+    `SALARY_LOW` DECIMAL(13,4), `SALARY_MIDPOINT` DECIMAL(13,4), `SALARY_HIGH` DECIMAL(13,4), `SALARY_CURRENT` DECIMAL(11,4), `SALARY_SGRP_CODE` VARCHAR(6), `SALARY_INCREASE` DECIMAL(4,2), `TWO_INCREASE` DECIMAL(4,2), `ONE_MAX` DECIMAL(4,2), `ONE_MIN` DECIMAL(4,2));
+-- ------------------------------------------------------
+--  DDL for Table STATUS
+-- ------------------------------------------------------
+
+  CREATE TABLE `STATUS` (`STATUS` VARCHAR(32) NOT NULL) ;
+
+   ALTER TABLE `STATUS`  COMMENT 'Possible status of appraisals';
+-- ------------------------------------------------------
+--  Constraints for Table ACTIONS
+-- ------------------------------------------------------
+
+  -- ALTER TABLE `ACTIONS` MODIFY `ACTION` NOT NULL;
+  ALTER TABLE `ACTIONS` ADD CONSTRAINT `PK_ACTIONS` PRIMARY KEY (`ACTION`);
+-- ------------------------------------------------------
+--  Constraints for Table ADMINS
+-- ------------------------------------------------------
+
+  ALTER TABLE `ADMINS` ADD CONSTRAINT `PK_ADMINS` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table APPOINTMENT_TYPES
+-- ------------------------------------------------------
+
+  -- ALTER TABLE `APPOINTMENT_TYPES` MODIFY (`NAME` NOT NULL ENABLE);
+  ALTER TABLE `APPOINTMENT_TYPES` ADD CONSTRAINT `PK_APPOINTMENT_TYPES` PRIMARY KEY (`NAME`);
+-- ------------------------------------------------------
+--  Constraints for Table APPRAISALS
+-- ------------------------------------------------------
+
+  ALTER TABLE `APPRAISALS` ADD CONSTRAINT `PK_APPRAISALS` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table APPRAISAL_STEPS
+-- ------------------------------------------------------
+
+  ALTER TABLE `APPRAISAL_STEPS` ADD CONSTRAINT `PK_APPRAISAL_STEPS` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table ASSESSMENTS
+-- ------------------------------------------------------
+
+  ALTER TABLE `ASSESSMENTS` ADD CONSTRAINT `PK_ASSESSMENTS` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table ASSESSMENTS_CRITERIA
+-- ------------------------------------------------------
+
+  ALTER TABLE `ASSESSMENTS_CRITERIA` ADD CONSTRAINT `PK_ASSESSMENTSCRITERIA` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table BUSINESS_CENTERS
+-- ------------------------------------------------------
+
+  ALTER TABLE `BUSINESS_CENTERS` ADD CONSTRAINT `PK_BUSINESS_CENTERS` PRIMARY KEY (`NAME`);
+-- ------------------------------------------------------
+--  Constraints for Table CLOSEOUT_REASONS
+-- ------------------------------------------------------
+
+  ALTER TABLE `CLOSEOUT_REASONS` ADD CONSTRAINT `PK_CLOSEOUT_REASONS` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table CONFIGURATIONS
+-- ------------------------------------------------------
+
+  ALTER TABLE `CONFIGURATIONS` ADD CONSTRAINT `PK_CONFIGURATIONS` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table CONFIG_TIMES
+-- ------------------------------------------------------
+
+  -- ALTER TABLE `CONFIG_TIMES` MODIFY (`CONTEXT_DATETIME` NOT NULL ENABLE);
+-- ------------------------------------------------------
+--  Constraints for Table CRITERIA_AREAS
+-- ------------------------------------------------------
+
+  ALTER TABLE `CRITERIA_AREAS` ADD CONSTRAINT `PK_CRITERIA_AREAS` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table CRITERIA_DETAILS
+-- ------------------------------------------------------
+
+  ALTER TABLE `CRITERIA_DETAILS` ADD CONSTRAINT `PK_CRITERIA_DETAILS` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table EMAILS
+-- ------------------------------------------------------
+
+  ALTER TABLE `EMAILS` ADD CONSTRAINT `PK_EMAILS` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table EMAIL_TYPES
+-- ------------------------------------------------------
+
+  ALTER TABLE `EMAIL_TYPES` ADD CONSTRAINT `PK_EMAIL_TYPES` PRIMARY KEY (`TYPE`);
+-- ------------------------------------------------------
+--  Constraints for Table GOALS_LOGS
+-- ------------------------------------------------------
+
+  ALTER TABLE `GOALS_LOGS` ADD CONSTRAINT `PK_GOALS_LOGS` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table GOALS_VERSIONS
+-- ------------------------------------------------------
+
+  ALTER TABLE `GOALS_VERSIONS` ADD CONSTRAINT `PK_GOALSVERSIONS` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table NOLIJ_COPIES
+-- ------------------------------------------------------
+
+  ALTER TABLE `NOLIJ_COPIES` ADD CONSTRAINT `PK_NOLIJ_COPIES` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table PERMISSION_RULES
+-- ------------------------------------------------------
+
+  ALTER TABLE `PERMISSION_RULES` ADD CONSTRAINT `PK_PERMISSION_RULES` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table PYVPASE
+-- ------------------------------------------------------
+
+  ALTER TABLE `PYVPASE` ADD CONSTRAINT `PK_PYVPASE` PRIMARY KEY (`PYVPASE_PIDM`);
+-- ------------------------------------------------------
+--  Constraints for Table PYVPASJ
+-- ------------------------------------------------------
+
+  ALTER TABLE `PYVPASJ` ADD CONSTRAINT `PK_PYVPASJ` PRIMARY KEY (`PYVPASJ_PIDM`, `PYVPASJ_POSN`, `PYVPASJ_SUFF`);
+-- ------------------------------------------------------
+--  Constraints for Table PYVPDLW
+-- ------------------------------------------------------
+
+  -- ALTER TABLE `PYVPDLW` MODIFY (`POSITIONDESCRIPTIONID` NOT NULL ENABLE);
+-- ------------------------------------------------------
+--  Constraints for Table RATINGS
+-- ------------------------------------------------------
+
+-- ------------------------------------------------------
+--  Constraints for Table REVIEWERS
+-- ------------------------------------------------------
+
+  ALTER TABLE `REVIEWERS` ADD CONSTRAINT `PK_REVIEWERS` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table REVIEW_CYCLE_OPTIONS
+-- ------------------------------------------------------
+
+  ALTER TABLE `REVIEW_CYCLE_OPTIONS` ADD CONSTRAINT `PK_REVIEW_CYCLE_OPTIONS` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table SALARIES
+-- ------------------------------------------------------
+
+  ALTER TABLE `SALARIES` ADD CONSTRAINT `PK_SALARIES` PRIMARY KEY (`ID`);
+-- ------------------------------------------------------
+--  Constraints for Table STATUS
+-- ------------------------------------------------------
+
+  ALTER TABLE `STATUS` ADD CONSTRAINT `PK_STATUS` PRIMARY KEY (`STATUS`);
