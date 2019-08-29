@@ -124,7 +124,7 @@
 -- ------------------------------------------------------
 
   CREATE TABLE `ASSESSMENTS` (
-    `ID` BIGINT NOT NULL,
+    `ID` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `GOAL` LONGTEXT,
     `EMPLOYEE_RESULT` LONGTEXT,
     `SUPERVISOR_RESULT` LONGTEXT COMMENT 'supervisor''s result box',
@@ -447,7 +447,7 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
 --  Constraints for Table ASSESSMENTS
 -- ------------------------------------------------------
 
-  ALTER TABLE `ASSESSMENTS` ADD CONSTRAINT `PK_ASSESSMENTS` PRIMARY KEY (`ID`);
+  -- ALTER TABLE `ASSESSMENTS` ADD CONSTRAINT `PK_ASSESSMENTS` PRIMARY KEY (`ID`);
 -- ------------------------------------------------------
 --  Constraints for Table ASSESSMENTS_CRITERIA
 -- ------------------------------------------------------
