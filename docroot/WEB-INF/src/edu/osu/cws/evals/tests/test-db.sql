@@ -48,7 +48,7 @@
 
   CREATE TABLE `ACTIONS` (`ACTION` VARCHAR(32) NOT NULL);
 
-   ALTER TABLE `ACTIONS`  COMMENT 'Possible actions on the appraisal records';
+   ALTER TABLE `ACTIONS` COMMENT 'Possible actions on the appraisal records. Records are predefined and should be present before running EvalS.';
 -- ------------------------------------------------------
 --  DDL for Table ADMINS
 -- ------------------------------------------------------
@@ -61,14 +61,14 @@
     `CREATOR_PIDM` BIGINT NOT NULL,
     `MODIFIED_DATE` DATETIME DEFAULT NULL);
 
-   ALTER TABLE `ADMINS`  COMMENT 'PASS administrators';
+   ALTER TABLE `ADMINS` COMMENT 'PASS administrators';
 -- ------------------------------------------------------
 --  DDL for Table APPOINTMENT_TYPES
 -- ------------------------------------------------------
 
   CREATE TABLE `APPOINTMENT_TYPES` (`NAME` VARCHAR(45) NOT NULL);
 
-   ALTER TABLE `APPOINTMENT_TYPES`  COMMENT 'Possible types of appointments';
+   ALTER TABLE `APPOINTMENT_TYPES` COMMENT 'Possible types of appointments';
 -- ------------------------------------------------------
 --  DDL for Table APPRAISALS
 -- ------------------------------------------------------
@@ -80,7 +80,7 @@
     `END_DATE` DATETIME NOT NULL,
     `JOB_PIDM` BIGINT NOT NULL,
     `POSITION_NUMBER` VARCHAR(8) NOT NULL,
-    `JOB_SUFFIX` VARCHAR(2) NOT NULL,
+    `JOB_SUFFIX` VARCHAR(2) NOT NULL COMMENT 'Must match employee\'s job suffix',
     `CREATE_DATE` DATETIME NOT NULL,
     `RESULT_SUBMIT_DATE` DATETIME,
     `EVALUATOR_PIDM` BIGINT COMMENT 'pidm of the employee who performed the evaluation.',
@@ -113,7 +113,7 @@
     /* BLOB (`EVALUATION`) STORE AS BASICFILE `EVALUATION_STORAGE`(ENABLE STORAGE IN ROW CHUNK 8192 RETENTION  NOCACHE LOGGING )
     BLOB (`REBUTTAL`) STORE AS BASICFILE `REBUTTAL_STORAGE`(ENABLE STORAGE IN ROW CHUNK 8192 RETENTION  NOCACHE LOGGING ) */
 
-   ALTER TABLE `APPRAISALS`  COMMENT 'Performance appraisal records';
+   ALTER TABLE `APPRAISALS` COMMENT 'Performance appraisal records';
 -- ------------------------------------------------------
 --  DDL for Table APPRAISAL_STEPS
 -- ------------------------------------------------------
@@ -125,24 +125,26 @@
     `NEW_STATUS` VARCHAR(32) NOT NULL,
     `EMAIL_TYPE` VARCHAR(64));
 
-   ALTER TABLE `APPRAISAL_STEPS`  COMMENT 'Consequences of actions taken on the appraisals';
+   ALTER TABLE `APPRAISAL_STEPS` COMMENT 'Consequences of actions taken on the appraisals. Predefined steps, should be present before running EvalS';
 -- ------------------------------------------------------
 --  DDL for Table ASSESSMENTS
 -- ------------------------------------------------------
 
   CREATE TABLE `ASSESSMENTS` (
     `ID` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    `GOAL` LONGTEXT,
-    `EMPLOYEE_RESULT` LONGTEXT,
-    `SUPERVISOR_RESULT` LONGTEXT COMMENT 'supervisor''s result box',
+    `GOAL` LONGTEXT COMMENT 'Original text of the goal set by the employee',
+    `EMPLOYEE_RESULT` LONGTEXT COMMENT 'Text from the employee detailing the results from attempting to satisfy the goal',
+    `SUPERVISOR_RESULT` LONGTEXT COMMENT 'Text from the supervisor/reviewer detailing the results from the employee\'s attempt at the goal',
     `CREATE_DATE` DATETIME NOT NULL,
     `MODIFIED_DATE` DATETIME DEFAULT NULL,
-    `GOAL_VERSION_ID` BIGINT NOT NULL,
-    `SEQUENCE` BIGINT NOT NULL, `DELETER_PIDM` BIGINT, `DELETE_DATE` DATETIME);
+    `GOAL_VERSION_ID` BIGINT NOT NULL COMMENT 'All assessments for one appraisal must have the same GOAL_VERSION_ID',
+    `SEQUENCE` BIGINT NOT NULL COMMENT 'Order in which the goals visually appear for an appraisal',
+    `DELETER_PIDM` BIGINT,
+    `DELETE_DATE` DATETIME);
   
   -- RETENTION  NOCACHE LOGGING )  LOB (`EMPLOYEE_RESULT`) STORE AS BASICFILE "EMPLOYEE_RESULT_STORAGE"(ENABLE STORAGE IN ROW CHUNK 8192 RETENTION  NOCACHE LOGGING )  LOB (`SUPERVISOR_RESULT`) STORE AS BASICFILE "SUPERVISOR_RESULT_STORAGE"(ENABLE STORAGE IN ROW CHUNK 8192 RETENTION  NOCACHE LOGGING ) 
 
-   ALTER TABLE `ASSESSMENTS`  COMMENT 'Goals and results of appraisal records';
+   ALTER TABLE `ASSESSMENTS` COMMENT 'An individual Goal and result for an appraisal record. There can be issues with IDs less than 500, see AssessmentJSON.shouldResetCriteriaIndex()';
 -- ------------------------------------------------------
 --  DDL for Table ASSESSMENTS_CRITERIA
 -- ------------------------------------------------------
@@ -152,13 +154,15 @@
     `ASSESSMENT_ID` BIGINT NOT NULL,
     `CRITERIA_AREA_ID` BIGINT NOT NULL,
     `CHECKED` TINYINT);
+
+   ALTER TABLE `ASSESSMENTS_CRITERIA` COMMENT 'Criteria potentially covered by a goal. These are the checkboxes below the goal text boxes. Each assessment on an appraisal should have the same criteria options but this is not enforced.';
 -- ------------------------------------------------------
 --  DDL for Table BUSINESS_CENTERS
 -- ------------------------------------------------------
 
   CREATE TABLE `BUSINESS_CENTERS` (`NAME` VARCHAR(255) NOT NULL);
 
-   ALTER TABLE `BUSINESS_CENTERS`  COMMENT 'OSU business centers';
+   ALTER TABLE `BUSINESS_CENTERS` COMMENT 'OSU business centers. Predefined data that should be present before running EvalS.';
 -- ------------------------------------------------------
 --  DDL for Table CLOSEOUT_REASONS
 -- ------------------------------------------------------
@@ -170,7 +174,7 @@
     `CREATOR_PIDM` BIGINT NOT NULL,
     `DELETE_DATE` DATETIME);
 
-   ALTER TABLE `CLOSEOUT_REASONS`  COMMENT 'Reason for closeout';
+   ALTER TABLE `CLOSEOUT_REASONS` COMMENT 'Reason for closeout. Records need to be defined before a closeout can be performed';
 -- ------------------------------------------------------
 --  DDL for Table CONFIGURATIONS
 -- ------------------------------------------------------
@@ -183,14 +187,14 @@
   `REFERENCE_POINT` VARCHAR(64),
   `ACTION` VARCHAR(32), `APPOINTMENT_TYPE` VARCHAR(45));
 
-   ALTER TABLE `CONFIGURATIONS`  COMMENT 'PASS configuration parameters';
+   ALTER TABLE `CONFIGURATIONS` COMMENT 'PASS configuration parameters. Predefined records required to run EvalS';
 -- ------------------------------------------------------
 --  DDL for Table CONFIG_TIMES
 -- ------------------------------------------------------
 
   CREATE TABLE `CONFIG_TIMES` (`CONTEXT_DATETIME` DATETIME NOT NULL) ;
 
-   ALTER TABLE `CONFIG_TIMES`  COMMENT 'Stores datetime servers are refreshed';
+   ALTER TABLE `CONFIG_TIMES` COMMENT 'Stores datetime servers are refreshed';
 -- ------------------------------------------------------
 --  DDL for Table CRITERIA_AREAS
 -- ------------------------------------------------------
@@ -206,7 +210,7 @@
     `DELETER_PIDM` BIGINT,
     `DESCRIPTION` VARCHAR(4000) NOT NULL);
 
-   ALTER TABLE `CRITERIA_AREAS`  COMMENT 'Names of evaluation criteria';
+   ALTER TABLE `CRITERIA_AREAS` COMMENT 'Names of evaluation criteria';
 -- ------------------------------------------------------
 --  DDL for Table CRITERIA_DETAILS
 -- ------------------------------------------------------
@@ -218,7 +222,7 @@
     `CREATE_DATE` DATETIME NOT NULL,
     `CREATOR_PIDM` BIGINT NOT NULL);
 
-   ALTER TABLE `CRITERIA_DETAILS`  COMMENT 'Description of evaluation criteria';
+   ALTER TABLE `CRITERIA_DETAILS` COMMENT 'Description of evaluation criteria';
 -- ------------------------------------------------------
 --  DDL for Table EMAILS
 -- ------------------------------------------------------
@@ -229,7 +233,7 @@
     `EMAIL_TYPE` VARCHAR(64) NOT NULL,
     `SENT_TIME` DATETIME NOT NULL);
 
-   ALTER TABLE `EMAILS`  COMMENT 'Records of emails sent by PASS system';
+   ALTER TABLE `EMAILS` COMMENT 'Records of emails sent by PASS system';
 -- ------------------------------------------------------
 --  DDL for Table EMAIL_TYPES
 -- ------------------------------------------------------
@@ -239,7 +243,7 @@
     `MAILTO` VARCHAR(64) NOT NULL COMMENT 'emloyee supervisor upper supervisor reviewer employee, supervisor',
     `CC` VARCHAR(64), `BCC` VARCHAR(64));
 
-   ALTER TABLE `EMAIL_TYPES`  COMMENT 'Email types (goals due, results due, etc)';
+   ALTER TABLE `EMAIL_TYPES` COMMENT 'Email types (goals due, results due, etc). Predefined records';
 -- ------------------------------------------------------
 --  DDL for Table GOALS_LOGS
 -- ------------------------------------------------------
@@ -250,11 +254,11 @@
     `CONTENT` LONGTEXT NOT NULL,
     `AUTHOR_PIDM` BIGINT NOT NULL,
     `CREATE_DATE` DATETIME NOT NULL,
-    `TYPE` VARCHAR(45) COMMENT 'default to null, which will be for normal goals. the value is new for new goals, used for goalsReactivated.');
+    `TYPE` VARCHAR(45) COMMENT 'default to null, which will be for normal goals. The value is new for new goals, used for goalsReactivated.');
   
   -- RETENTION  NOCACHE LOGGING ) 
 
-   ALTER TABLE `GOALS_LOGS`  COMMENT 'Goals change history';
+   ALTER TABLE `GOALS_LOGS` COMMENT 'Goals change history';
 -- ------------------------------------------------------
 --  DDL for Table GOALS_VERSIONS
 -- ------------------------------------------------------
@@ -265,7 +269,7 @@
     `CREATE_DATE` DATETIME,
     `GOALS_APPROVED_DATE` DATETIME,
     `GOALS_APPROVER_PIDM` BIGINT,
-    `REQUEST_DECISION` TINYINT,
+    `REQUEST_DECISION` TINYINT COMMENT 'Should be 1 by default. Not sure why but goals will not show up on an appraisal without this.',
     `REQUEST_DECISION_PIDM` BIGINT,
     `TIMED_OUT_AT` VARCHAR(255),
     `REQUEST_DECISION_DATE` DATETIME,
@@ -282,7 +286,7 @@
     `SUBMIT_DATE` DATETIME NOT NULL,
     `FILE_NAME` VARCHAR(255) NOT NULL COMMENT 'Name of he file sent to Nolij.');
 
-   ALTER TABLE `NOLIJ_COPIES`  COMMENT 'Records of appraisals to Nolij';
+   ALTER TABLE `NOLIJ_COPIES` COMMENT 'Records of appraisals to Nolij';
 -- ------------------------------------------------------
 --  DDL for Table NOTICES
 -- ------------------------------------------------------
@@ -301,8 +305,8 @@
   CREATE TABLE `PERMISSION_RULES` (
     `ID` BIGINT NOT NULL,
     `STATUS` VARCHAR(32) NOT NULL,
-    `ROLE` VARCHAR(45) NOT NULL COMMENT 'employee supervisor upper supervisor reviewer',
-    `APPROVED_GOALS` VARCHAR(1) COMMENT 'possible valeus: e: edit v: view null: no permission',
+    `ROLE` VARCHAR(45) NOT NULL COMMENT 'employee, supervisor, upper supervisor, reviewer',
+    `APPROVED_GOALS` VARCHAR(1) COMMENT 'possible values: e: edit, v: view, null: no permission',
     `UNAPPROVED_GOALS` VARCHAR(1),
     `GOAL_COMMENTS` VARCHAR(1),
     `RESULTS` VARCHAR(1),
@@ -321,7 +325,7 @@
     `REACTIVATE_GOALS` VARCHAR(1),
     `APPOINTMENT_TYPE` VARCHAR(45));
 
-   ALTER TABLE `PERMISSION_RULES`  COMMENT 'Permissions to fields on the appraisal records based on';
+   ALTER TABLE `PERMISSION_RULES` COMMENT 'Permissions to fields on the appraisal records based on. Needs to be defined before running EvalS.';
 -- ------------------------------------------------------
 --  DDL for Table PYVPASE
 -- ------------------------------------------------------
@@ -336,19 +340,19 @@
     `PYVPASE_EMAIL` VARCHAR(4000) COMMENT 'Preferred Email address',
     `PYVPASE_EMPL_STATUS` VARCHAR(1) NOT NULL COMMENT 'Employee Status from PEBEMPL');
 
-   ALTER TABLE `PYVPASE`  COMMENT 'OSU PASS System -- Employee View';
+   ALTER TABLE `PYVPASE` COMMENT 'OSU PASS System -- Employee Table';
 -- ------------------------------------------------------
 --  DDL for Table PYVPASJ
 -- ------------------------------------------------------
 
   CREATE TABLE `PYVPASJ` (
-    `PYVPASJ_PIDM` INT NOT NULL COMMENT 'Pidm',
+    `PYVPASJ_PIDM` INT NOT NULL COMMENT 'Employee Pidm',
     `PYVPASJ_POSN` VARCHAR(6) NOT NULL,
     `PYVPASJ_SUFF` VARCHAR(2) NOT NULL,
     `PYVPASJ_STATUS` VARCHAR(1) NOT NULL,
     `PYVPASJ_DESC` VARCHAR(30),
     `PYVPASJ_ECLS_CODE` VARCHAR(20) NOT NULL,
-    `PYVPASJ_APPOINTMENT_TYPE` VARCHAR(4000),
+    `PYVPASJ_APPOINTMENT_TYPE` VARCHAR(4000) COMMENT 'See APPOINTMENT_TYPES table.',
     `PYVPASJ_BEGIN_DATE` DATETIME NOT NULL,
     `PYVPASJ_END_DATE` DATETIME,
     `PYVPASJ_PCLS_CODE` VARCHAR(5) NOT NULL,
@@ -360,8 +364,8 @@
     `PYVPASJ_SUPERVISOR_PIDM` INT,
     `PYVPASJ_SUPERVISOR_POSN` VARCHAR(6),
     `PYVPASJ_SUPERVISOR_SUFF` VARCHAR(2),
-    `PYVPASJ_TRIAL_IND` DOUBLE NOT NULL,
-    `PYVPASJ_ANNUAL_IND` DOUBLE NOT NULL,
+    `PYVPASJ_TRIAL_IND` DOUBLE NOT NULL COMMENT 'Required to complete appraisals',
+    `PYVPASJ_ANNUAL_IND` DOUBLE NOT NULL COMMENT 'Required to complete appraisals',
     `PYVPASJ_EVAL_DATE` DATETIME,
     `PYVPASJ_LOW` DECIMAL(13,4),
     `PYVPASJ_MIDPOINT` DECIMAL(13,4),
@@ -372,7 +376,7 @@
 
    /* Moved to CREATE TABLE
 COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
-   ALTER TABLE `PYVPASJ`  COMMENT 'OSU PASS System -- Jobs View';
+   ALTER TABLE `PYVPASJ` COMMENT 'OSU PASS System -- Jobs Table';
 -- ------------------------------------------------------
 --  DDL for Table PYVPDES
 -- ------------------------------------------------------
@@ -410,6 +414,8 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
     `LEADERSHIPPOSNCOMMTODIVERSITY` TEXT,
     `POSITIONTITLECODE` TEXT,
     `MINIMUMQUALIFICATIONS` TEXT);
+
+   ALTER TABLE `PYVPASJ` COMMENT 'OSU PASS System -- Position Description table';
 -- ------------------------------------------------------
 --  DDL for Table PYVPDLW
 -- ------------------------------------------------------
@@ -434,7 +440,7 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
     `EMPLOYEE_PIDM` BIGINT NOT NULL,
     `BUSINESS_CENTER_NAME` VARCHAR(4) NOT NULL);
 
-   ALTER TABLE `REVIEWERS`  COMMENT 'Business center HR reviewers';
+   ALTER TABLE `REVIEWERS` COMMENT 'Business center HR reviewers';
 -- ------------------------------------------------------
 --  DDL for Table REVIEW_CYCLE_OPTIONS
 -- ------------------------------------------------------
@@ -468,9 +474,9 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
 --  DDL for Table STATUS
 -- ------------------------------------------------------
 
-  CREATE TABLE `STATUS` (`STATUS` VARCHAR(32) NOT NULL) ;
+  CREATE TABLE `STATUS` (`STATUS` VARCHAR(32) NOT NULL);
 
-   ALTER TABLE `STATUS`  COMMENT 'Possible status of appraisals';
+   ALTER TABLE `STATUS` COMMENT 'Possible status of appraisals. Should be predefined before running EvalS';
 -- ------------------------------------------------------
 --  Constraints for Table ACTIONS
 -- ------------------------------------------------------
