@@ -116,7 +116,7 @@
     `ACTION` VARCHAR(32) NOT NULL,
     `APPOINTMENT_TYPE` VARCHAR(45) NOT NULL,
     `NEW_STATUS` VARCHAR(32) NOT NULL,
-    `EMAIL_TYPE` VARCHAR(64)) ;
+    `EMAIL_TYPE` VARCHAR(64));
 
    ALTER TABLE `APPRAISAL_STEPS`  COMMENT 'Consequences of actions taken on the appraisals';
 -- ------------------------------------------------------
@@ -149,7 +149,7 @@
 --  DDL for Table BUSINESS_CENTERS
 -- ------------------------------------------------------
 
-  CREATE TABLE `BUSINESS_CENTERS` (`NAME` VARCHAR(255) NOT NULL) ;
+  CREATE TABLE `BUSINESS_CENTERS` (`NAME` VARCHAR(255) NOT NULL);
 
    ALTER TABLE `BUSINESS_CENTERS`  COMMENT 'OSU business centers';
 -- ------------------------------------------------------
@@ -161,7 +161,7 @@
     `REASON` VARCHAR(255) NOT NULL,
     `CREATE_DATE` DATETIME NOT NULL,
     `CREATOR_PIDM` BIGINT NOT NULL,
-    `DELETE_DATE` DATETIME) ;
+    `DELETE_DATE` DATETIME);
 
    ALTER TABLE `CLOSEOUT_REASONS`  COMMENT 'Reason for closeout';
 -- ------------------------------------------------------
@@ -174,7 +174,7 @@
   `SEQUENCE` INT,
   `VALUE` VARCHAR(45) NOT NULL,
   `REFERENCE_POINT` VARCHAR(64),
-  `ACTION` VARCHAR(32), `APPOINTMENT_TYPE` VARCHAR(45)) ;
+  `ACTION` VARCHAR(32), `APPOINTMENT_TYPE` VARCHAR(45));
 
    ALTER TABLE `CONFIGURATIONS`  COMMENT 'PASS configuration parameters';
 -- ------------------------------------------------------
@@ -197,7 +197,7 @@
     `CREATOR_PIDM` BIGINT NOT NULL,
     `DELETE_DATE` DATETIME,
     `DELETER_PIDM` BIGINT,
-    `DESCRIPTION` VARCHAR(4000) NOT NULL) ;
+    `DESCRIPTION` VARCHAR(4000) NOT NULL);
 
    ALTER TABLE `CRITERIA_AREAS`  COMMENT 'Names of evaluation criteria';
 -- ------------------------------------------------------
@@ -209,7 +209,7 @@
     `AREA_ID` BIGINT NOT NULL,
     `DESCRIPTION` VARCHAR(4000) NOT NULL,
     `CREATE_DATE` DATETIME NOT NULL,
-    `CREATOR_PIDM` BIGINT NOT NULL) ;
+    `CREATOR_PIDM` BIGINT NOT NULL);
 
    ALTER TABLE `CRITERIA_DETAILS`  COMMENT 'Description of evaluation criteria';
 -- ------------------------------------------------------
@@ -220,7 +220,7 @@
     `ID` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `APPRAISAL_ID` BIGINT NOT NULL,
     `EMAIL_TYPE` VARCHAR(64) NOT NULL,
-    `SENT_TIME` DATETIME NOT NULL) ;
+    `SENT_TIME` DATETIME NOT NULL);
 
    ALTER TABLE `EMAILS`  COMMENT 'Records of emails sent by PASS system';
 -- ------------------------------------------------------
@@ -230,7 +230,7 @@
   CREATE TABLE `EMAIL_TYPES` (
     `TYPE` VARCHAR(64) NOT NULL COMMENT 'goalsDue goalsOverDue...These are keys to an email subjects and bodies in a resource bundle file.',
     `MAILTO` VARCHAR(64) NOT NULL COMMENT 'emloyee supervisor upper supervisor reviewer employee, supervisor',
-    `CC` VARCHAR(64), `BCC` VARCHAR(64)) ;
+    `CC` VARCHAR(64), `BCC` VARCHAR(64));
 
    ALTER TABLE `EMAIL_TYPES`  COMMENT 'Email types (goals due, results due, etc)';
 -- ------------------------------------------------------
@@ -255,7 +255,16 @@
   CREATE TABLE `GOALS_VERSIONS` (
     `ID` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `APPRAISAL_ID` BIGINT NOT NULL,
-    `CREATE_DATE` DATETIME, `GOALS_APPROVED_DATE` DATETIME, `GOALS_APPROVER_PIDM` BIGINT, `REQUEST_DECISION` TINYINT, `REQUEST_DECISION_PIDM` BIGINT, `TIMED_OUT_AT` VARCHAR(255), `REQUEST_DECISION_DATE` DATETIME, `GOALS_SUBMIT_DATE` DATETIME, `GOALS_COMMENTS` VARCHAR(4000), `GOALS_REQUIRED_MOD_DATE` DATETIME);
+    `CREATE_DATE` DATETIME,
+    `GOALS_APPROVED_DATE` DATETIME,
+    `GOALS_APPROVER_PIDM` BIGINT,
+    `REQUEST_DECISION` TINYINT,
+    `REQUEST_DECISION_PIDM` BIGINT,
+    `TIMED_OUT_AT` VARCHAR(255),
+    `REQUEST_DECISION_DATE` DATETIME,
+    `GOALS_SUBMIT_DATE` DATETIME,
+    `GOALS_COMMENTS` VARCHAR(4000),
+    `GOALS_REQUIRED_MOD_DATE` DATETIME);
 -- ------------------------------------------------------
 --  DDL for Table NOLIJ_COPIES
 -- ------------------------------------------------------
@@ -264,14 +273,20 @@
     `ID` BIGINT NOT NULL,
     `APPRAISAL_ID` BIGINT NOT NULL,
     `SUBMIT_DATE` DATETIME NOT NULL,
-    `FILE_NAME` VARCHAR(255) NOT NULL COMMENT 'Name of he file sent to Nolij.') ;
+    `FILE_NAME` VARCHAR(255) NOT NULL COMMENT 'Name of he file sent to Nolij.');
 
    ALTER TABLE `NOLIJ_COPIES`  COMMENT 'Records of appraisals to Nolij';
 -- ------------------------------------------------------
 --  DDL for Table NOTICES
 -- ------------------------------------------------------
 
-  CREATE TABLE `NOTICES` (`ID` DECIMAL(38,0), `ANCESTOR_ID` DECIMAL(38,0), `NAME` VARCHAR(255), `TEXT` VARCHAR(255), `CREATOR_PIDM` DECIMAL(38,0), `CREATE_DATE` DATETIME (6));
+  CREATE TABLE `NOTICES` (
+    `ID` DECIMAL(38,0),
+    `ANCESTOR_ID` DECIMAL(38,0),
+    `NAME` VARCHAR(255),
+    `TEXT` VARCHAR(255),
+    `CREATOR_PIDM` DECIMAL(38,0),
+    `CREATE_DATE` DATETIME (6));
 -- ------------------------------------------------------
 --  DDL for Table PERMISSION_RULES
 -- ------------------------------------------------------
@@ -280,14 +295,24 @@
     `ID` BIGINT NOT NULL,
     `STATUS` VARCHAR(32) NOT NULL,
     `ROLE` VARCHAR(45) NOT NULL COMMENT 'employee supervisor upper supervisor reviewer',
-    `APPROVED_GOALS` VARCHAR(1) COMMENT 'possible valeus: e: edit v: view null: no permission', `UNAPPROVED_GOALS` VARCHAR(1),
-    `GOAL_COMMENTS` VARCHAR(1), `RESULTS` VARCHAR(1), `SUPERVISOR_RESULTS` VARCHAR(1) COMMENT 'e for edit v for view or empty for no access.',
-    `EVALUATION` VARCHAR(1), `REVIEW` VARCHAR(1), `EMPLOYEE_RESPONSE` VARCHAR(1), `REBUTTAL_READ` VARCHAR(1),
+    `APPROVED_GOALS` VARCHAR(1) COMMENT 'possible valeus: e: edit v: view null: no permission',
+    `UNAPPROVED_GOALS` VARCHAR(1),
+    `GOAL_COMMENTS` VARCHAR(1),
+    `RESULTS` VARCHAR(1),
+    `SUPERVISOR_RESULTS` VARCHAR(1) COMMENT 'e for edit v for view or empty for no access.',
+    `EVALUATION` VARCHAR(1),
+    `REVIEW` VARCHAR(1),
+    `EMPLOYEE_RESPONSE` VARCHAR(1),
+    `REBUTTAL_READ` VARCHAR(1),
     `SECONDARY_SUBMIT` VARCHAR(32) COMMENT 'if null, then then no require modification  button value for this column is the resource bundle key.  The value of the button is from resource bundle.',
     `SUBMIT` VARCHAR(32) COMMENT 'if null, then then no submit button value for this column is the resource bundle key.  The value of the button is from resource bundle.',
     `ACTION_REQUIRED` VARCHAR(45) DEFAULT 4 COMMENT 'if null, then then no action required. value for this column is the resource bundle key.  The value of the button is from resource bundle.',
-    `DOWNLOAD_PDF` VARCHAR(1), `CLOSEOUT` VARCHAR(1), `SEND_TO_NOLIJ` VARCHAR(1), `SET_STATUS_TO_RESULTS_DUE` VARCHAR(1),
-    `REACTIVATE_GOALS` VARCHAR(1), `APPOINTMENT_TYPE` VARCHAR(45)) ;
+    `DOWNLOAD_PDF` VARCHAR(1),
+    `CLOSEOUT` VARCHAR(1),
+    `SEND_TO_NOLIJ` VARCHAR(1),
+    `SET_STATUS_TO_RESULTS_DUE` VARCHAR(1),
+    `REACTIVATE_GOALS` VARCHAR(1),
+    `APPOINTMENT_TYPE` VARCHAR(45));
 
    ALTER TABLE `PERMISSION_RULES`  COMMENT 'Permissions to fields on the appraisal records based on';
 -- ------------------------------------------------------
@@ -302,7 +327,7 @@
     `PYVPASE_MI` VARCHAR(60) COMMENT 'Middle Initial',
     `PYVPASE_ONID_LOGIN` VARCHAR(20) COMMENT 'ONID Login ID',
     `PYVPASE_EMAIL` VARCHAR(4000) COMMENT 'Preferred Email address',
-    `PYVPASE_EMPL_STATUS` VARCHAR(1) NOT NULL COMMENT 'Employee Status from PEBEMPL') ;
+    `PYVPASE_EMPL_STATUS` VARCHAR(1) NOT NULL COMMENT 'Employee Status from PEBEMPL');
 
    ALTER TABLE `PYVPASE`  COMMENT 'OSU PASS System -- Employee View';
 -- ------------------------------------------------------
@@ -323,7 +348,20 @@
     `PYVPASJ_SAL_GRADE` VARCHAR(5),
     `PYVPASJ_SAL_STEP` SMALLINT,
     `PYVPASJ_ORGN_CODE_TS` VARCHAR(6) NOT NULL,
-    `PYVPASJ_ORGN_DESC` VARCHAR(30), `PYVPASJ_BCTR_TITLE` VARCHAR(4), `PYVPASJ_SUPERVISOR_PIDM` INT, `PYVPASJ_SUPERVISOR_POSN` VARCHAR(6), `PYVPASJ_SUPERVISOR_SUFF` VARCHAR(2), `PYVPASJ_TRIAL_IND` DOUBLE NOT NULL, `PYVPASJ_ANNUAL_IND` DOUBLE NOT NULL, `PYVPASJ_EVAL_DATE` DATETIME, `PYVPASJ_LOW` DECIMAL(13,4), `PYVPASJ_MIDPOINT` DECIMAL(13,4), `PYVPASJ_HIGH` DECIMAL(13,4), `PYVPASJ_SALARY` DECIMAL(11,2), `PYVPASJ_SGRP_CODE` VARCHAR(6), `PYVPASJ_INCLUDE_RANKED_FLAG` TINYINT) ;
+    `PYVPASJ_ORGN_DESC` VARCHAR(30),
+    `PYVPASJ_BCTR_TITLE` VARCHAR(4),
+    `PYVPASJ_SUPERVISOR_PIDM` INT,
+    `PYVPASJ_SUPERVISOR_POSN` VARCHAR(6),
+    `PYVPASJ_SUPERVISOR_SUFF` VARCHAR(2),
+    `PYVPASJ_TRIAL_IND` DOUBLE NOT NULL,
+    `PYVPASJ_ANNUAL_IND` DOUBLE NOT NULL,
+    `PYVPASJ_EVAL_DATE` DATETIME,
+    `PYVPASJ_LOW` DECIMAL(13,4),
+    `PYVPASJ_MIDPOINT` DECIMAL(13,4),
+    `PYVPASJ_HIGH` DECIMAL(13,4),
+    `PYVPASJ_SALARY` DECIMAL(11,2),
+    `PYVPASJ_SGRP_CODE` VARCHAR(6),
+    `PYVPASJ_INCLUDE_RANKED_FLAG` TINYINT);
 
    /* Moved to CREATE TABLE
 COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
@@ -378,7 +416,8 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
     `ID` BIGINT NOT NULL,
     `RATE` SMALLINT NOT NULL,
     `NAME` VARCHAR(64),
-    `DESCRIPTION` VARCHAR(512), `APPOINTMENT_TYPE` VARCHAR(45));
+    `DESCRIPTION` VARCHAR(512),
+    `APPOINTMENT_TYPE` VARCHAR(45));
 -- ------------------------------------------------------
 --  DDL for Table REVIEWERS
 -- ------------------------------------------------------
@@ -386,7 +425,7 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
   CREATE TABLE `REVIEWERS` (
     `ID` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `EMPLOYEE_PIDM` BIGINT NOT NULL,
-    `BUSINESS_CENTER_NAME` VARCHAR(4) NOT NULL) ;
+    `BUSINESS_CENTER_NAME` VARCHAR(4) NOT NULL);
 
    ALTER TABLE `REVIEWERS`  COMMENT 'Business center HR reviewers';
 -- ------------------------------------------------------
@@ -400,7 +439,8 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
     `SEQUENCE` TINYINT NOT NULL,
     `CREATOR_PIDM` BIGINT NOT NULL,
     `CREATE_DATE` DATETIME NOT NULL,
-    `DELETER_PIDM` BIGINT, `DELETE_DATE` DATETIME);
+    `DELETER_PIDM` BIGINT,
+    `DELETE_DATE` DATETIME);
 -- ------------------------------------------------------
 --  DDL for Table SALARIES
 -- ------------------------------------------------------
@@ -408,7 +448,15 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
   CREATE TABLE `SALARIES` (
     `ID` BIGINT NOT NULL,
     `APPRAISAL_ID` BIGINT NOT NULL,
-    `SALARY_LOW` DECIMAL(13,4), `SALARY_MIDPOINT` DECIMAL(13,4), `SALARY_HIGH` DECIMAL(13,4), `SALARY_CURRENT` DECIMAL(11,4), `SALARY_SGRP_CODE` VARCHAR(6), `SALARY_INCREASE` DECIMAL(4,2), `TWO_INCREASE` DECIMAL(4,2), `ONE_MAX` DECIMAL(4,2), `ONE_MIN` DECIMAL(4,2));
+    `SALARY_LOW` DECIMAL(13,4),
+    `SALARY_MIDPOINT` DECIMAL(13,4),
+    `SALARY_HIGH` DECIMAL(13,4),
+    `SALARY_CURRENT` DECIMAL(11,4),
+    `SALARY_SGRP_CODE` VARCHAR(6),
+    `SALARY_INCREASE` DECIMAL(4,2),
+    `TWO_INCREASE` DECIMAL(4,2),
+    `ONE_MAX` DECIMAL(4,2),
+    `ONE_MIN` DECIMAL(4,2));
 -- ------------------------------------------------------
 --  DDL for Table STATUS
 -- ------------------------------------------------------
