@@ -5,7 +5,7 @@ goal-setting and appraisal tasks.
 
 [Wiki](https://wiki.library.oregonstate.edu/confluence/display/EVALS/EvalS+Home)
 
-### Getting it to work locally
+### Setup a local test environment
 ---
 1. Java version 1.7.0_80 is the only version I was successful with
 
@@ -22,14 +22,15 @@ goal-setting and appraisal tasks.
 
 3. Test Liferay apache server
     - Open a browser to http://localhost:8080/web/guest/
+    - Depending on the version of liferay you may not be asked to setup an admin account. In that case below is the default login information.
     - Default login information:
       - username: test@liferay.com
       - password: test
 
-4. (Optional) Setup test database
+4. Setup test database or use existing oracle development server
     - I used [Mamp](https://www.mamp.info/en/) for a quick and dirty mysql server
     - Run evals/docroot/WEB-INF/src/edu/osu/cws/evals/tests/test-db.sql
-    - Run evals/docroot/WEB-INF/src/edu/osu/cws/evals/tests/test-db-updates.sql
+    - Run evals/docroot/WEB-INF/src/edu/osu/cws/evals/tests/local-dev-env-data.sql
 
 5. Configure EvalS
     - Clone this repository into `liferay-plugins-sdk-${version}/portlets/`
