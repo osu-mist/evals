@@ -16,7 +16,7 @@ goal-setting and appraisal tasks.
     - Extract both folders to the same directory
     - Rename "liferay-portal-tomcat-${version}" to "bundles"
     - Add `CATALINA_HOME` to your path pointing to your tomcat directory
-      - `CATALINA_HOME="bundles/tomcat-${version}"`
+      - `export CATALINA_HOME="bundles/tomcat-${version}"`
     - Use `$CATALINA_HOME/bin/startup.sh` to start the server
     - Use `$CATALINA_HOME/bin/shutdown.sh` to stop the server
 
