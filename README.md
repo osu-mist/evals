@@ -71,7 +71,3 @@ goal-setting and appraisal tasks.
 
 2. Make sure working directory is set correctly in Intellij
     - Should be the root of evals
-
-### DB Quirks
----
-1. ASSESSMENTS IDs must be greater than 500. See AssessmentJSON.shouldResetCriteriaIndex()
