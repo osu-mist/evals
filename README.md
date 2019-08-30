@@ -65,7 +65,7 @@ goal-setting and appraisal tasks.
 ### Tests
 ---
 
-1. Open evals in Intellij
+1. In Intellij select File > New > Project from Existing Sources...
 
 2. Make sure working directory is set correctly in Intellij
     - Should be the root directory of evals
