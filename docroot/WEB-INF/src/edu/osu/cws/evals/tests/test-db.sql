@@ -352,7 +352,7 @@
     `PYVPASJ_POSN` VARCHAR(6) NOT NULL,
     `PYVPASJ_SUFF` VARCHAR(2) NOT NULL,
     `PYVPASJ_STATUS` VARCHAR(1) NOT NULL,
-    `PYVPASJ_DESC` VARCHAR(30) COMMENT 'Job description',
+    `PYVPASJ_DESC` VARCHAR(255) COMMENT 'Job description',
     `PYVPASJ_ECLS_CODE` VARCHAR(20) NOT NULL COMMENT 'Employee class code',
     `PYVPASJ_APPOINTMENT_TYPE` VARCHAR(4000) COMMENT 'See APPOINTMENT_TYPES table.',
     `PYVPASJ_BEGIN_DATE` DATETIME NOT NULL,
@@ -461,7 +461,7 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
 -- ------------------------------------------------------
 
   CREATE TABLE `SALARIES` (
-    `ID` BIGINT NOT NULL,
+    `ID` BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `APPRAISAL_ID` BIGINT NOT NULL,
     `SALARY_LOW` DECIMAL(13,4),
     `SALARY_MIDPOINT` DECIMAL(13,4),
@@ -609,7 +609,7 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
 --  Constraints for Table SALARIES
 -- ------------------------------------------------------
 
-  ALTER TABLE `SALARIES` ADD CONSTRAINT `PK_SALARIES` PRIMARY KEY (`ID`);
+  -- ALTER TABLE `SALARIES` ADD CONSTRAINT `PK_SALARIES` PRIMARY KEY (`ID`);
 -- ------------------------------------------------------
 --  Constraints for Table STATUS
 -- ------------------------------------------------------
