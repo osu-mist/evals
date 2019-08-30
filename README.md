@@ -74,6 +74,7 @@ goal-setting and appraisal tasks.
     - Follow the instructions [here](#setup-a-local-test-environment) to get the `bundles` files.
     - Navigate to `bundles/tomcat-${version}/lib/ext/`
     - Copy `portlet.jar` and `portal-service.jar` to the evals repo
+    - Sometimes you need `servlet-api.jar` which is one directory up in `bundles/tomcat-${version}/lib/`
     - Add the jars to the `lib` dependency in Intellij project settings
     ![Image](images/intellij-test-lib.png)
 
