@@ -64,11 +64,21 @@ goal-setting and appraisal tasks.
 
 ### Tests
 ---
-1. testng.jar is so old it no longer works with Intellij
-    - downloaded new jar from https://mvnrepository.com/artifact/org.testng/testng/6.9.4
 
-2. Missing jar for Hibernate tests
-  - downloaded from https://mvnrepository.com/artifact/javax.transaction/jta/1.1
+1. Open evals in Intellij
 
 2. Make sure working directory is set correctly in Intellij
-    - Should be the root of evals
+    - Should be the root directory of evals
+
+3. In order for evals to compile in Intellij you need missing jars that are usually included with the liferay tomcat server.
+    - Follow the instructions [here](#setup-a-local-test-environment) to get the `bundles` files.
+    - Navigate to `bundles/tomcat-${version}/lib/ext/`
+    - Copy `portlet.jar` and `portal-service.jar` to the evals repo
+    - Add the jars to the `lib` dependency in Intellij project settings
+    ![Image](images/intellij-test-lib.png)
+
+4. Follow the instructions in [Setup a local test environment](#setup-a-local-test-environment) to setup a mamp server
+    - **NOTE THAT RUNNING TESTS WILL REMOVE ALL DATA FROM THE DATABASE AND REPLACE IT WITH TEST DATA**
+
+5. In Intellij navigate to `evals/docroot/WEB-INF/src/edu/osu/cws/evals/`
+    - Right click the `tests` folder and choose the option to run tests using Testng
