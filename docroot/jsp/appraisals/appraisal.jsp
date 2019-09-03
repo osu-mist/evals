@@ -106,9 +106,9 @@
         </c:if>
         <c:if test="${appraisal.isOpen}">
             <li>
-                <span><a href="<%=renderResponse.encodeURL(viewPositionDescription.toString())%>" target="_blank">
+                <span><a href="https://jobs.oregonstate.edu" target="_blank">
                 <img class="icon" src="/LP5-corp-theme/images/common/copy.png" alt="<liferay-ui:message key="view-position-description"/>"></a>
-                <a href="<%=renderResponse.encodeURL(viewPositionDescription.toString())%>" target="_blank"><liferay-ui:message key="view-position-description"/></a>
+                <a href="https://jobs.oregonstate.edu" target="_blank"><liferay-ui:message key="view-position-description"/></a>
                 </span>
             </li>
         </c:if>
