@@ -83,5 +83,3 @@ goal-setting and appraisal tasks.
 
 5. In Intellij navigate to `evals/docroot/WEB-INF/src/edu/osu/cws/evals/`
     - Right click the `tests` folder and choose the option to run tests using Testng
-
-    small change
