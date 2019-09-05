@@ -38,6 +38,7 @@ public class AppraisalsTest {
      */
     @BeforeMethod
     public void setUp() throws Exception {
+        System.out.println("AppraisalsTest setup");
         DBUnit dbunit = new DBUnit();
         dbunit.seedDatabase();
         session = HibernateUtil.getCurrentSession();
