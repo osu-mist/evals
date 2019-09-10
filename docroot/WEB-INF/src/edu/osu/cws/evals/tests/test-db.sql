@@ -10,6 +10,8 @@
 -- ------------------------------------------------------
 -- DDL for drop tables
 -- ------------------------------------------------------
+  CREATE DATABASE IF NOT EXISTS evals_test;
+  USE evals_test;
 
   DROP TABLE IF EXISTS
     ACTIONS,
