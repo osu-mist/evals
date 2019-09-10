@@ -10,7 +10,7 @@
 -- ------------------------------------------------------
 -- DDL for drop tables
 -- ------------------------------------------------------
-  CREATE SCHEMA IF NOT EXISTS evals_test;
+  CREATE DATABASE IF NOT EXISTS evals_test;
   USE evals_test;
 
   DROP TABLE IF EXISTS
