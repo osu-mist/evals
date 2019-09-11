@@ -457,7 +457,8 @@ COMMENT ON COLUMN `PYVPASJ`.`PYVPASJ_PIDM` IS 'Pidm' */
     `CREATOR_PIDM` BIGINT NOT NULL,
     `CREATE_DATE` DATETIME NOT NULL,
     `DELETER_PIDM` BIGINT,
-    `DELETE_DATE` DATETIME);
+    `DELETE_DATE` DATETIME)
+    DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 -- ------------------------------------------------------
 --  DDL for Table SALARIES
 -- ------------------------------------------------------
