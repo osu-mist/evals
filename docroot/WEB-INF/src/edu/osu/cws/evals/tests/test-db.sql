@@ -10,7 +10,7 @@
 -- ------------------------------------------------------
 -- DDL for drop tables
 -- ------------------------------------------------------
-  CREATE DATABASE IF NOT EXISTS evals_test SET utf8 COLLATE utf8_general_ci;
+  CREATE DATABASE IF NOT EXISTS evals_test CHARACTER SET utf8 COLLATE utf8_general_ci;
   USE evals_test;
 
   DROP TABLE IF EXISTS
