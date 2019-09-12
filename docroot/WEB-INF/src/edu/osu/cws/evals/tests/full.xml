@@ -163,7 +163,7 @@
       EMAIL_TYPE="goals-submitted"
       SENT_TIME="2010-08-01"
   />
-  <PYVPASE
+  <pyvpase
       PYVPASE_PIDM="12345"
       PYVPASE_FIRST_NAME="Jose"
       PYVPASE_MI="Daniel"
@@ -172,7 +172,7 @@
       PYVPASE_ONID_LOGIN="cedenoj"
       PYVPASE_EMAIL="jose.cedeno@oregonstate.edu"
       PYVPASE_EMPL_STATUS="A"/>
-  <PYVPASE
+  <pyvpase
       PYVPASE_PIDM="12467"
       PYVPASE_FIRST_NAME="Joan"
       PYVPASE_LAST_NAME="Lu"
@@ -180,7 +180,7 @@
       PYVPASE_ONID_LOGIN="luf"
       PYVPASE_EMAIL="joan.lu@oregonstate.edu"
       PYVPASE_EMPL_STATUS="A"/>
-  <PYVPASE
+  <pyvpase
       PYVPASE_PIDM="787812"
       PYVPASE_FIRST_NAME="Clark"
       PYVPASE_LAST_NAME="Barlow"
@@ -188,7 +188,7 @@
       PYVPASE_ONID_LOGIN="barlowc"
       PYVPASE_EMAIL="test@orst.edu"
       PYVPASE_EMPL_STATUS="A"/>
-  <PYVPASE
+  <pyvpase
       PYVPASE_PIDM="8712359" 
       PYVPASE_FIRST_NAME="Lois"
       PYVPASE_LAST_NAME="Barlow"
@@ -196,7 +196,7 @@
       PYVPASE_ONID_LOGIN="barlowc2"
       PYVPASE_EMAIL="test@orst.edu"
       PYVPASE_EMPL_STATUS="A"/>
-  <PYVPASE
+  <pyvpase
       PYVPASE_PIDM="990871" 
       PYVPASE_FIRST_NAME="Megan"
       PYVPASE_LAST_NAME="Barlow"
@@ -204,7 +204,7 @@
       PYVPASE_ONID_LOGIN="barlowc3"
       PYVPASE_EMAIL="test@orst.edu"
       PYVPASE_EMPL_STATUS="A"/>
-  <PYVPASE
+  <pyvpase
       PYVPASE_PIDM="56198" 
       PYVPASE_FIRST_NAME="Jess"
       PYVPASE_LAST_NAME="Smith"
@@ -212,7 +212,7 @@
       PYVPASE_ONID_LOGIN="jesstest2"
       PYVPASE_EMAIL="test@orst.edu"
       PYVPASE_EMPL_STATUS="T"/>
-  <PYVPASE
+  <pyvpase
       PYVPASE_PIDM="56199"
       PYVPASE_FIRST_NAME="Jessica"
       PYVPASE_LAST_NAME="Smith"
@@ -220,7 +220,7 @@
       PYVPASE_ONID_LOGIN="jesstest"
       PYVPASE_EMAIL="test@orst.edu"
       PYVPASE_EMPL_STATUS="T"/>
-  <PYVPASE
+  <pyvpase
           PYVPASE_PIDM="56200"
           PYVPASE_FIRST_NAME="Johnny"
           PYVPASE_LAST_NAME="Smith"
@@ -317,7 +317,7 @@
         PYVPASJ_EVAL_DATE="2010-01-30"
         PYVPASJ_ORGN_DESC="testing"
         PYVPASJ_INCLUDE_RANKED_FLAG="0"/>
-  <PYVPASJ
+  <pyvpasj
         PYVPASJ_PIDM="787812"
         PYVPASJ_SUPERVISOR_PIDM="8712359"
         PYVPASJ_SUPERVISOR_POSN="1234"
