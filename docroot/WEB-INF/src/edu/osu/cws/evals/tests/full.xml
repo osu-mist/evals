@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <dataset>
-  <admins ID="1" EMPLOYEE_PIDM="12345" IS_MASTER="true" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0"/>
-  <admins ID="2" EMPLOYEE_PIDM="12467" IS_MASTER="false" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0"/>
-  <admins ID="3" EMPLOYEE_PIDM="8712359" IS_MASTER="true" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0"/>
-  <appointment_types NAME="Classified"/>
-  <appraisal_steps ID="1" ACTION="submit" APPOINTMENT_TYPE="Classified" NEW_STATUS="goalsApprovalDue" EMAIL_TYPE="goals-submitted"/>
-  <appraisal_steps ID="2" ACTION="require-modification" APPOINTMENT_TYPE="Classified" NEW_STATUS="goalsRequiredModification" EMAIL_TYPE="goals-require-modification"/>
-  <appraisals ID="1"
+  <APPOINTMENT_TYPES ID="1" EMPLOYEE_PIDM="12345" IS_MASTER="true" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0"/>
+  <APPOINTMENT_TYPES ID="2" EMPLOYEE_PIDM="12467" IS_MASTER="false" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0"/>
+  <APPOINTMENT_TYPES ID="3" EMPLOYEE_PIDM="8712359" IS_MASTER="true" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" MODIFIED_DATE="2011-05-14 07:41:11.0"/>
+  <APPOINTMENT_TYPES NAME="Classified"/>
+  <APPRAISAL_STEPS ID="1" ACTION="submit" APPOINTMENT_TYPE="Classified" NEW_STATUS="goalsApprovalDue" EMAIL_TYPE="goals-submitted"/>
+  <APPRAISAL_STEPS ID="2" ACTION="require-modification" APPOINTMENT_TYPE="Classified" NEW_STATUS="goalsRequiredModification" EMAIL_TYPE="goals-require-modification"/>
+  <APPRAISALS ID="1"
               START_DATE="2011-05-14"
               END_DATE="2012-05-14"
               STATUS="goalsDue"
@@ -17,7 +17,7 @@
               TYPE="annual"
               overdue="0"
   />
-  <appraisals ID="2"
+  <APPRAISALS ID="2"
               START_DATE="2010-05-14"
               END_DATE="2011-05-10"
               STATUS="resultsDue"
@@ -28,7 +28,7 @@
               TYPE="annual"
               overdue="0"
   />
-  <appraisals ID="3"
+  <APPRAISALS ID="3"
               START_DATE="2009-05-14"
               END_DATE="2010-05-10"
               STATUS="reviewDue"
@@ -40,7 +40,7 @@
               TYPE="annual"
               overdue="0"
   />
-  <appraisals ID="4"
+  <APPRAISALS ID="4"
               START_DATE="2009-05-14"
               END_DATE="2010-05-10"
               STATUS="reviewOverdue"
@@ -52,7 +52,7 @@
               TYPE="annual"
               overdue="0"
   />
-  <appraisals ID="5"
+  <APPRAISALS ID="5"
               START_DATE="2009-05-14"
               END_DATE="2010-05-10"
               STATUS="closed"
@@ -63,7 +63,7 @@
               TYPE="annual"
               overdue="0"
   />
-  <appraisals ID="6"
+  <APPRAISALS ID="6"
               START_DATE="2009-05-14"
               END_DATE="2010-05-10"
               STATUS="completed"
@@ -74,7 +74,7 @@
               TYPE="annual"
               overdue="0"
   />
-  <appraisals ID="7"
+  <APPRAISALS ID="7"
               START_DATE="2011-05-14"
               END_DATE="2010-05-10"
               STATUS="goalsDue"
@@ -85,7 +85,7 @@
               TYPE="trial"
               overdue="0"
   />
-  <appraisals ID="8"
+  <APPRAISALS ID="8"
               START_DATE="2013-01-01"
               END_DATE="2014-01-31"
               STATUS="goalsDue"
@@ -97,7 +97,7 @@
               overdue="0"
   />
 
-  <appraisals ID="9"
+  <APPRAISALS ID="9"
               START_DATE="2009-05-14"
               END_DATE="2010-05-10"
               STATUS="archivedCompleted"
@@ -110,54 +110,54 @@
               overdue="0"
           />
 
-  <goals_versions ID="1" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="1"/>
-  <goals_versions ID="2" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="2"/>
-  <goals_versions ID="3" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="5"/>
-  <goals_versions ID="4" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="6"/>
+  <GOALS_VERSIONS ID="1" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="1"/>
+  <GOALS_VERSIONS ID="2" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="2"/>
+  <GOALS_VERSIONS ID="3" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="5"/>
+  <GOALS_VERSIONS ID="4" CREATE_DATE="2011-04-10 20:16:48.0" APPRAISAL_ID="6"/>
 
   <goals_logs/>
-  <assessments ID="1" GOAL_VERSION_ID="1" CREATE_DATE="2011-04-10 20:16:48.0" SEQUENCE="1"/>
-  <assessments ID="2" GOAL_VERSION_ID="2" CREATE_DATE="2011-04-10 20:16:48.0" SEQUENCE="1"/>
-  <assessments ID="3" GOAL_VERSION_ID="3" CREATE_DATE="2011-04-10 20:16:48.0" SEQUENCE="1"/>
-  <assessments ID="4" GOAL_VERSION_ID="4" CREATE_DATE="2011-04-10 20:16:48.0" SEQUENCE="1"/>
+  <ASSESSMENTS ID="1" GOAL_VERSION_ID="1" CREATE_DATE="2011-04-10 20:16:48.0" SEQUENCE="1"/>
+  <ASSESSMENTS ID="2" GOAL_VERSION_ID="2" CREATE_DATE="2011-04-10 20:16:48.0" SEQUENCE="1"/>
+  <ASSESSMENTS ID="3" GOAL_VERSION_ID="3" CREATE_DATE="2011-04-10 20:16:48.0" SEQUENCE="1"/>
+  <ASSESSMENTS ID="4" GOAL_VERSION_ID="4" CREATE_DATE="2011-04-10 20:16:48.0" SEQUENCE="1"/>
 
-  <assessments_criteria ID="1" CRITERIA_AREA_ID="1" ASSESSMENT_ID="1" CHECKED="0"/>
-  <assessments_criteria ID="2" CRITERIA_AREA_ID="2" ASSESSMENT_ID="1" CHECKED="0"/>
-  <assessments_criteria ID="3" CRITERIA_AREA_ID="1" ASSESSMENT_ID="2" CHECKED="0"/>
-  <assessments_criteria ID="4" CRITERIA_AREA_ID="2" ASSESSMENT_ID="2" CHECKED="0"/>
-  <assessments_criteria ID="5" CRITERIA_AREA_ID="1" ASSESSMENT_ID="3" CHECKED="0"/>
-  <assessments_criteria ID="6" CRITERIA_AREA_ID="2" ASSESSMENT_ID="3" CHECKED="0"/>
-  <assessments_criteria ID="7" CRITERIA_AREA_ID="1" ASSESSMENT_ID="4" CHECKED="0"/>
-  <assessments_criteria ID="8" CRITERIA_AREA_ID="2" ASSESSMENT_ID="4" CHECKED="0"/>
+  <ASSESSMENTS_CRITERIA ID="1" CRITERIA_AREA_ID="1" ASSESSMENT_ID="1" CHECKED="0"/>
+  <ASSESSMENTS_CRITERIA ID="2" CRITERIA_AREA_ID="2" ASSESSMENT_ID="1" CHECKED="0"/>
+  <ASSESSMENTS_CRITERIA ID="3" CRITERIA_AREA_ID="1" ASSESSMENT_ID="2" CHECKED="0"/>
+  <ASSESSMENTS_CRITERIA ID="4" CRITERIA_AREA_ID="2" ASSESSMENT_ID="2" CHECKED="0"/>
+  <ASSESSMENTS_CRITERIA ID="5" CRITERIA_AREA_ID="1" ASSESSMENT_ID="3" CHECKED="0"/>
+  <ASSESSMENTS_CRITERIA ID="6" CRITERIA_AREA_ID="2" ASSESSMENT_ID="3" CHECKED="0"/>
+  <ASSESSMENTS_CRITERIA ID="7" CRITERIA_AREA_ID="1" ASSESSMENT_ID="4" CHECKED="0"/>
+  <ASSESSMENTS_CRITERIA ID="8" CRITERIA_AREA_ID="2" ASSESSMENT_ID="4" CHECKED="0"/>
 
-  <business_centers NAME="UABC"/>
-  <business_centers NAME="AABC"/>
-  <closeout_reasons ID="1" REASON="Does not work at OSU anymore" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" />
-  <closeout_reasons ID="2" REASON="Eval was submitted on paper" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" />
-  <closeout_reasons ID="3" REASON="Lateral move does not require eval" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" DELETE_DATE="2011-05-14 07:41:11.0" />
-  <closeout_reasons ID="4" REASON="Abducted by Aliens" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" />
+  <BUSINESS_CENTERS NAME="UABC"/>
+  <BUSINESS_CENTERS NAME="AABC"/>
+  <CLOSEOUT_REASONS ID="1" REASON="Does not work at OSU anymore" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" />
+  <CLOSEOUT_REASONS ID="2" REASON="Eval was submitted on paper" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" />
+  <CLOSEOUT_REASONS ID="3" REASON="Lateral move does not require eval" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" DELETE_DATE="2011-05-14 07:41:11.0" />
+  <CLOSEOUT_REASONS ID="4" REASON="Abducted by Aliens" CREATE_DATE="2011-05-14 07:41:11.0" CREATOR_PIDM="12345" />
 
-  <criteria_areas ID="1" NAME="COMMUNICATION SKILLS" DESCRIPTION="How will you improve your communication?" APPOINTMENT_TYPE="Classified" CREATE_DATE="2011-04-10 20:16:48.0" CREATOR_PIDM="12345"/>
-  <criteria_areas ID="2" NAME="TECHNICAL SKILLS" DESCRIPTION="What training will you obtain this year?" APPOINTMENT_TYPE="Classified" CREATE_DATE="2011-04-11 09:57:08.0" CREATOR_PIDM="12345"/>
-  <criteria_areas ID="3" NAME="DELETETED CRITERIA AREA" DESCRIPTION="How will you increase your communication skills?" APPOINTMENT_TYPE="Classified" CREATE_DATE="2011-04-11 09:57:08.0" CREATOR_PIDM="12345" DELETE_DATE="2011-04-11 09:57:08.0"/>
+  <CRITERIA_AREAS ID="1" NAME="COMMUNICATION SKILLS" DESCRIPTION="How will you improve your communication?" APPOINTMENT_TYPE="Classified" CREATE_DATE="2011-04-10 20:16:48.0" CREATOR_PIDM="12345"/>
+  <CRITERIA_AREAS ID="2" NAME="TECHNICAL SKILLS" DESCRIPTION="What training will you obtain this year?" APPOINTMENT_TYPE="Classified" CREATE_DATE="2011-04-11 09:57:08.0" CREATOR_PIDM="12345"/>
+  <CRITERIA_AREAS ID="3" NAME="DELETETED CRITERIA AREA" DESCRIPTION="How will you increase your communication skills?" APPOINTMENT_TYPE="Classified" CREATE_DATE="2011-04-11 09:57:08.0" CREATOR_PIDM="12345" DELETE_DATE="2011-04-11 09:57:08.0"/>
 
-  <email_types TYPE="goals-submitted" MAILTO="employee"/>
-  <email_types TYPE="goals-require-modification" MAILTO="employee"/>
-  <email_types TYPE="goalsDue" MAILTO="employee"/>
-  <email_types TYPE="appraisalDue" MAILTO="supervisor"/>
-  <emails
+  <EMAIL_TYPES TYPE="goals-submitted" MAILTO="employee"/>
+  <EMAIL_TYPES TYPE="goals-require-modification" MAILTO="employee"/>
+  <EMAIL_TYPES TYPE="goalsDue" MAILTO="employee"/>
+  <EMAIL_TYPES TYPE="appraisalDue" MAILTO="supervisor"/>
+  <EMAILS
       ID="1"
       APPRAISAL_ID="1"
       EMAIL_TYPE="goals-submitted"
       SENT_TIME="2010-06-01"
   />
-  <emails
+  <EMAILS
       ID="2"
       APPRAISAL_ID="1"
       EMAIL_TYPE="goals-submitted"
       SENT_TIME="2010-07-01"
   />
-  <emails
+  <EMAILS
       ID="3"
       APPRAISAL_ID="1"
       EMAIL_TYPE="goals-submitted"
@@ -591,52 +591,52 @@
             PYVPASJ_ORGN_DESC="testing"
             PYVPASJ_INCLUDE_RANKED_FLAG="0"/>
 
-  <permission_rules ID="1" STATUS="goalsDue" ROLE="employee" APPROVED_GOALS="e" ACTION_REQUIRED="goalsDue" APPOINTMENT_TYPE="Default"/>
-  <permission_rules ID="2" STATUS="goalsDue" ROLE="immediate-supervisor" APPROVED_GOALS="e" APPOINTMENT_TYPE="Default"/>
+  <PERMISSION_RULES ID="1" STATUS="goalsDue" ROLE="employee" APPROVED_GOALS="e" ACTION_REQUIRED="goalsDue" APPOINTMENT_TYPE="Default"/>
+  <PERMISSION_RULES ID="2" STATUS="goalsDue" ROLE="immediate-supervisor" APPROVED_GOALS="e" APPOINTMENT_TYPE="Default"/>
   <status/>
-  <configurations
+  <CONFIGURATIONS
           ID="1"
-          SECTION="appraisals"
-          NAME="configurations-goal-max-char"
+          SECTION="APPRAISALS"
+          NAME="CONFIGURATIONS-goal-max-char"
           SEQUENCE="1"
           VALUE=""
           REFERENCE_POINT=""
           ACTION=""
           APPOINTMENT_TYPE="Default"
           />
-  <configurations
+  <CONFIGURATIONS
           ID="2"
-          SECTION="appraisals"
-          NAME="configurations-result-max-char"
+          SECTION="APPRAISALS"
+          NAME="CONFIGURATIONS-result-max-char"
           SEQUENCE="2"
           VALUE=""
           REFERENCE_POINT=""
           ACTION=""
           APPOINTMENT_TYPE="Default"
           />
-  <configurations
+  <CONFIGURATIONS
           ID="3"
-          SECTION="appraisals"
-          NAME="configurations-goal-min-char"
+          SECTION="APPRAISALS"
+          NAME="CONFIGURATIONS-goal-min-char"
           SEQUENCE="4"
           VALUE=""
           REFERENCE_POINT=""
           ACTION=""
           APPOINTMENT_TYPE="Default"
           />
-  <configurations
+  <CONFIGURATIONS
           ID="4"
-          SECTION="appraisals"
-          NAME="configurations-result-min-char"
+          SECTION="APPRAISALS"
+          NAME="CONFIGURATIONS-result-min-char"
           SEQUENCE="3"
           VALUE=""
           REFERENCE_POINT=""
           ACTION=""
           APPOINTMENT_TYPE="Default"
           />
-  <configurations
+  <CONFIGURATIONS
           ID="5"
-          SECTION="appraisals"
+          SECTION="APPRAISALS"
           NAME="firstGoalDueReminder"
           SEQUENCE="5"
           VALUE="30"
@@ -644,37 +644,37 @@
           ACTION=""
           APPOINTMENT_TYPE="Default"
           />
-  <configurations
+  <CONFIGURATIONS
           ID="6"
           SECTION="notifications"
-          NAME="configurations-frequency-terminate-emails"
+          NAME="CONFIGURATIONS-frequency-terminate-EMAILS"
           SEQUENCE="3"
           VALUE=""
           REFERENCE_POINT=""
           ACTION=""
           APPOINTMENT_TYPE="Default"
           />
-  <configurations
+  <CONFIGURATIONS
           ID="7"
           SECTION="notifications"
-          NAME="configurations-employee-result-notifications"
+          NAME="CONFIGURATIONS-employee-result-notifications"
           SEQUENCE="2"
           VALUE=""
           REFERENCE_POINT=""
           ACTION=""
           APPOINTMENT_TYPE="Default"
           />
-  <configurations
+  <CONFIGURATIONS
           ID="8"
           SECTION="notifications"
-          NAME="configurations-review-due-notifications"
+          NAME="CONFIGURATIONS-review-due-notifications"
           SEQUENCE="1"
           VALUE=""
           REFERENCE_POINT=""
           ACTION=""
           APPOINTMENT_TYPE="Default"
           />
-  <configurations
+  <CONFIGURATIONS
           ID="9"
           SECTION="classified-it-salary"
           NAME="IT-increase-rate2-below-control-value"
@@ -684,7 +684,7 @@
           ACTION=""
           APPOINTMENT_TYPE="Default"
           />
-  <configurations
+  <CONFIGURATIONS
           ID="10"
           SECTION="classified-it-salary"
           NAME="IT-increase-rate2-above-control-value"
@@ -694,7 +694,7 @@
           ACTION=""
           APPOINTMENT_TYPE="Default"
           />
-  <configurations
+  <CONFIGURATIONS
           ID="11"
           SECTION="classified-it-salary"
           NAME="IT-increase-rate1-above-control-min-value"
@@ -704,7 +704,7 @@
           ACTION=""
           APPOINTMENT_TYPE="Default"
           />
-  <configurations
+  <CONFIGURATIONS
           ID="12"
           SECTION="classified-it-salary"
           NAME="IT-increase-rate1-below-control-min-value"
@@ -714,7 +714,7 @@
           ACTION=""
           APPOINTMENT_TYPE="Default"
           />
-  <configurations
+  <CONFIGURATIONS
           ID="13"
           SECTION="classified-it-salary"
           NAME="IT-increase-rate1-above-control-max-value"
@@ -724,7 +724,7 @@
           ACTION=""
           APPOINTMENT_TYPE="Default"
           />
-  <configurations
+  <CONFIGURATIONS
           ID="14"
           SECTION="classified-it-salary"
           NAME="IT-increase-rate1-below-control-max-value"
@@ -734,7 +734,7 @@
           ACTION=""
           APPOINTMENT_TYPE="Default"
           />
-  <configurations
+  <CONFIGURATIONS
           ID="15"
           SECTION="due-date"
           NAME="appraisalDue"
@@ -744,7 +744,7 @@
           ACTION="subtract"
           APPOINTMENT_TYPE="Default"
           />
-  <salaries
+  <SALARIES
           ID="1"
           APPRAISAL_ID="8"
           SALARY_LOW="2000"
@@ -753,47 +753,47 @@
           SALARY_CURRENT="2500"
           SALARY_SGRP_CODE="123456"
         />
-  <pyvpdes
+  <PYVPDES
           POSITIONDESCRIPTIONID="1"
           POSITIONNUMBER="1234"
           UNIVERSITYID="931421235"
           POSITIONTITLE="PD1"
           POSITIONDUTIES="Job position duties"
       />
-  <pyvpdes
+  <PYVPDES
           POSITIONDESCRIPTIONID="2"
           POSITIONNUMBER="1234"
           UNIVERSITYID="931421234"
           POSITIONTITLE="PD2"
           POSITIONDUTIES="Job position duties"
       />
-  <pyvpdlw
+  <PYVPDLW
           POSITIONDESCRIPTIONID="1"
           RESPONSE="response text 1"
       />
-  <pyvpdlw
+  <PYVPDLW
           POSITIONDESCRIPTIONID="1"
           RESPONSE="response text 2"
       />
-  <pyvpdlw
+  <PYVPDLW
           POSITIONDESCRIPTIONID="2"
           RESPONSE="response text 3"
       />
-  <ratings
+  <RATINGS
           ID="2"
           RATE="2"
           NAME="great"
           DESCRIPTION="You're great"
           APPOINTMENT_TYPE="Classified"
       />
-  <ratings
+  <RATINGS
           ID="1"
           RATE="1"
           NAME="awesome"
           DESCRIPTION="You're awesome"
           APPOINTMENT_TYPE="Classified"
       />
-  <ratings
+  <RATINGS
           ID="3"
           RATE="1"
           NAME="IT awesome"
