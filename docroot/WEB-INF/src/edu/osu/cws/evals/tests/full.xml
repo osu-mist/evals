@@ -801,7 +801,7 @@
           APPOINTMENT_TYPE="Classified IT"
       />
 
-   <review_cycle_options
+   <REVIEW_CYCLE_OPTIONS
            ID="1"
            NAME="Calendar year"
            SEQUENCE="1"
@@ -809,7 +809,7 @@
            CREATE_DATE="2011-05-14"
            CREATOR_PIDM="12345"
        />
-   <review_cycle_options
+   <REVIEW_CYCLE_OPTIONS
            ID="2"
            NAME="Fiscal year"
            SEQUENCE="2"
@@ -817,7 +817,7 @@
            CREATE_DATE="2011-05-14"
            CREATOR_PIDM="12345"
        />
-   <review_cycle_options
+   <REVIEW_CYCLE_OPTIONS
            ID="3"
            NAME="Deleted option"
            SEQUENCE="1"
