@@ -753,29 +753,29 @@
           SALARY_CURRENT="2500"
           SALARY_SGRP_CODE="123456"
         />
-  <pyvpdes
+  <PYVPDES
           POSITIONDESCRIPTIONID="1"
           POSITIONNUMBER="1234"
           UNIVERSITYID="931421235"
           POSITIONTITLE="PD1"
           POSITIONDUTIES="Job position duties"
       />
-  <pyvpdes
+  <PYVPDES
           POSITIONDESCRIPTIONID="2"
           POSITIONNUMBER="1234"
           UNIVERSITYID="931421234"
           POSITIONTITLE="PD2"
           POSITIONDUTIES="Job position duties"
       />
-  <pyvpdlw
+  <PYVPDLW
           POSITIONDESCRIPTIONID="1"
           RESPONSE="response text 1"
       />
-  <pyvpdlw
+  <PYVPDLW
           POSITIONDESCRIPTIONID="1"
           RESPONSE="response text 2"
       />
-  <pyvpdlw
+  <PYVPDLW
           POSITIONDESCRIPTIONID="2"
           RESPONSE="response text 3"
       />
