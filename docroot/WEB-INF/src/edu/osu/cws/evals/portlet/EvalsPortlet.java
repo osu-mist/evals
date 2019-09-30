@@ -287,6 +287,7 @@ public class EvalsPortlet extends GenericPortlet {
                 }
                 getPortletContext().setAttribute(CONTEXT_LOAD_DATE, new Date());
             } catch (Exception e) {
+                e.printStackTrace();
                 if (hibSession != null && hibSession.isOpen()) {
                     hibSession.close();
                 }
