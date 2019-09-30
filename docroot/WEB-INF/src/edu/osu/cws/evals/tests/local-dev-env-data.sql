@@ -1,3 +1,5 @@
+USE evals_test;
+
 Insert into ACTIONS (ACTION) values ('approve-goals');
 Insert into ACTIONS (ACTION) values ('close-appraisal');
 Insert into ACTIONS (ACTION) values ('create-appraisal');
