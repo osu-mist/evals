@@ -323,8 +323,12 @@ public class ActionHelper {
      * @throws Exception
      */
     private void setEvalsConfiguration() throws Exception {
+        try {
         portletContext.setAttribute("configurations", ConfigurationMgr.mapByName());
         portletContext.setAttribute("configurationsList", ConfigurationMgr.list());
+        } catch (Error e) {
+          e.printStackTrace();
+        }
     }
 
     /**
