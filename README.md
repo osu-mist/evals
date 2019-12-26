@@ -7,9 +7,11 @@ goal-setting and appraisal tasks.
 
 ### Setup a local test environment
 ---
-1. Java version 1.7.0_80 is the only version I was successful with
+1. Using a docker container is recommended and can be found [here](https://github.sig.oregonstate.edu/ecs-data/ansible-private-roles/tree/master/roles/evals_liferay_server_setup). Otherwise instructions are as follows.
 
-2. Choose and download a [Liferay version](https://sourceforge.net/projects/lportal/files/Liferay%20Portal/)
+2. Java version 1.7.0_80 is the only version I was successful with
+
+3. Choose and download a [Liferay version](https://sourceforge.net/projects/lportal/files/Liferay%20Portal/)
     - I had the most success with version 6.1.1-ce-ga2
     - Download liferay-portal-tomcat-${version}
     - Download liferay-plugins-sdk-${version}
@@ -20,19 +22,19 @@ goal-setting and appraisal tasks.
     - Use `$CATALINA_HOME/bin/startup.sh` to start the server
     - Use `$CATALINA_HOME/bin/shutdown.sh` to stop the server
 
-3. Test Liferay apache server
+4. Test Liferay apache server
     - Open a browser to http://localhost:8080/web/guest/
     - Depending on the version of liferay you may not be asked to setup an admin account. In that case below is the default login information.
     - Default login information:
       - username: test@liferay.com
       - password: test
 
-4. Setup test database or use existing oracle development server
+5. Setup test database or use existing oracle development server
     - I used [Mamp](https://www.mamp.info/en/) for a quick and dirty mysql server
     - Run evals/docroot/WEB-INF/src/edu/osu/cws/evals/tests/test-db.sql
     - Run evals/docroot/WEB-INF/src/edu/osu/cws/evals/tests/local-dev-env-data.sql
 
-5. Configure EvalS
+6. Configure EvalS
     - Clone this repository into `liferay-plugins-sdk-${version}/portlets/`
     - Navigate to `evals/docroot/WEB-INF/src/`
       - Copy `hibernate-sample.cfg.xml` to `hibernate.cfg.xml` and modify contents
@@ -41,19 +43,19 @@ goal-setting and appraisal tasks.
     - Navigate to `evals/docroot/WEB-INF/`
       - Both `liferay-plugin-package.xml` and `liferay-plugin-package.properties` have a `liferay-versions` attribute. Set both these attributes to match the version of liferay you are using.
 
-6. Install Ant version 1.9.6
+7. Install Ant version 1.9.6
     - Current version of Ant does not work with Java 1.7
     - Using brew:
         - `brew install ant@1.9`
         - add ant to path `brew link ant@1.9` (may have to force)
 
-7. Compile EvalS
+8. Compile EvalS
     - Navigate to `liferay-plugins-sdk-${version}`
     - Run `ant`
     - A war file will be created and placed in `bundles/deploy/`
     - A running tomcat server will automatically deploy this to `bundles/tomcat-${version}/webapps/`
 
-8. Running EvalS
+9. Running EvalS
     - EvalS is a portlet and won't run on its own
     - Open a browser to http://localhost:8080/web/guest/ and login with the user you setup earlier or the default user
     - The UI can differ depending on the liferay version you are using but the steps should remain the same
