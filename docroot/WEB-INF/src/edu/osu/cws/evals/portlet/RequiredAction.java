@@ -98,7 +98,7 @@ public class RequiredAction {
 
         // If the key has not matched any of the dynamic keys defined before, return the plain
         // text value.
-        if (anchorText.equals("")) {
+        if ("".equals(anchorText) || anchorText == null) {
             anchorText = resource.getString(key);
         }
 

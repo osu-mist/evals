@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="SuiteAll" verbose="1">
+<suite name="SuiteAll" verbose="2">
     <test name="TestAll">
         <packages>
             <package name="edu.osu.cws.evals.tests"/>
