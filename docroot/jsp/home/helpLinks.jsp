@@ -10,4 +10,8 @@
             </c:forEach>
         </ul>
     </div>
+
+    <div>
+        <input type="button" class="cancel" value="im a button"/>
+    </div>
 </div>
