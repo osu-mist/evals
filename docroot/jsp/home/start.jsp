@@ -9,4 +9,5 @@
 <c:if test="${isDemo}">
     <%@ include file="/jsp/home/switchUser.jsp" %>
 </c:if>
+<%@ include file="/jsp/home/testTools.jsp" %>
 <%@ include file="/jsp/footer.jsp" %>
