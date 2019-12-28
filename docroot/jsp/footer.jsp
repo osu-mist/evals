@@ -11,7 +11,7 @@
 
         document.getElementById(id+'ImageToggle').src = imgPath;
         jQuery('#' + id).toggle('slow');
-        }
+    }
 
     /**
      * Handles displaying a confirmation pop-up box to the end user. Displays the
