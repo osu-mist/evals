@@ -286,12 +286,12 @@
     <div class="pass-actions">
         <c:if test="${not empty permissionRule.saveDraft}">
         <input name="${permissionRule.saveDraft}" type="submit" value="<liferay-ui:message key="${permissionRule.saveDraft}" />">
+        <liferay-ui:message key="${saveDraftAJAXURL.toString()}" />
         </c:if>
 
         <c:if test="${not empty permissionRule.secondarySubmit}">
         <input name="${permissionRule.secondarySubmit}" class="evals-show-confirm"
                type="submit" value="<liferay-ui:message key="${permissionRule.secondarySubmit}" />">
-        <liferay-ui:message key="${saveDraftAJAXURL.toString()}" />
         </c:if>
 
         <c:if test="${not empty permissionRule.submit}">
