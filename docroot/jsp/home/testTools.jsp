@@ -5,3 +5,7 @@
     <input name="${permissionRule.saveDraft}" type="submit" value="<liferay-ui:message key="${permissionRule.saveDraft}" />">
     <input name="${permissionRule.saveDraft}" type="submit" value="<liferay-ui:message key="test button" />">
 </div>
+
+<script type="text/javascript">
+    <%@ include file="/jsp/home/testTools.js"%>
+</script>
