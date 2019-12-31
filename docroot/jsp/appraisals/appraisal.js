@@ -192,6 +192,7 @@ jQuery(document).ready(function() {
 
   // Handles validation
   jQuery("#<portlet:namespace />fm.appraisalDue, #<portlet:namespace />fm.appraisalOverdue, #<portlet:namespace />fm.releaseDue, #<portlet:namespace />fm.releaseOverdue").submit(function(event) {
+    console.log("button clicked");
     var clickedButton = jQuery("input[type=submit][clicked=true]").attr('name');
     // if there wasn't a clicked button, it means that the user clicked enter, which we treat
     // as save draft.
