@@ -6,7 +6,7 @@ jQuery(document).ready(function() {
 
     var data = {};
     jQuery.ajax({
-      type: "GET",
+      type: "POST",
       url: "<%=renderResponse.encodeURL(saveDraftAJAXURL.toString())%>",
       data: data,
       success: function(msg) {
