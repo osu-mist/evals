@@ -4,6 +4,7 @@ jQuery(document).ready(function() {
   jQuery("#testForm").submit(function(event) {
     console.log('submit');
 
+    var data = {};
     jQuery.ajax({
       type: "GET",
       url: "<%=renderResponse.encodeURL(saveDraftAJAXURL.toString())%>",
