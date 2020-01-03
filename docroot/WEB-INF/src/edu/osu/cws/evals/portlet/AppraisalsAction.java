@@ -413,11 +413,6 @@ public class AppraisalsAction implements ActionInterface {
         return homeAction.display(request, response);
     }
 
-    public String updateTest(PortletRequest request, PortletResponse response) {
-      System.out.println("new update");
-      return "true";
-    }
-
     /**
      * Whether or not the evaluation should be downloaded for nolij. If the employee signed the evaluation,
      * it is uploaded to nolij.

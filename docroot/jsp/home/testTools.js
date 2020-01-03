@@ -1,12 +1,10 @@
 jQuery(document).ready(function() {
   console.log('eyo');
 
-  /*jQuery("#testForm").submit(function(event) {
+  jQuery("#testForm").submit(function(event) {
     console.log('submit');
 
     var data = {};
-    // data.controller = "AppraisalsAction";
-    // data.action = "updateTest";
     jQuery.ajax({
       type: "POST",
       url: "<%=renderResponse.encodeURL(saveDraftAJAXURL.toString())%>",
@@ -19,5 +17,5 @@ jQuery(document).ready(function() {
         }
       }
     });
-  });*/
+  });
 });
