@@ -1,5 +1,6 @@
 jQuery(document).ready(function() {
   console.log('eyo');
+  console.log(jQuery("#update").var);
 
   jQuery("#testForm").submit(function(event) {
     console.log('submit');
