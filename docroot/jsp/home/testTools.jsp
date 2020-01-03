@@ -1,6 +1,6 @@
 <jsp:useBean id="permissionRule" class="edu.osu.cws.evals.models.PermissionRule" scope="request" />
 <portlet:resourceURL var="saveDraftAJAXURL" id="updateTest" escapeXml="false">
-    <!--<portlet:param name="action" value="updateTest"/>-->
+    <portlet:param name="controller" value="AppraisalsAction"/>
 </portlet:resourceURL>
 
 <div>
