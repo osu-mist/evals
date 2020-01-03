@@ -5,7 +5,7 @@ jQuery(document).ready(function() {
   jQuery("#testForm").submit(function(event) {
     console.log('submit');
 
-    var data = {};
+    /*var data = {};
     // data.controller = "AppraisalsAction";
     // data.action = "updateTest";
     jQuery.ajax({
@@ -19,6 +19,6 @@ jQuery(document).ready(function() {
           console.log(msg);
         }
       }
-    });
+    });*/
   });
 });
