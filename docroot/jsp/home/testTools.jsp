@@ -5,6 +5,8 @@
 
 <div>
     <form id="testForm">
+        <portlet:param name="action" value="updateTest" />
+        <portlet:param name="controller" value="AppraisalsAction" />
         <input type="submit" class="cancel" value="im a button in test tools"/>
         <input name="${permissionRule.saveDraft}" type="submit" value="<liferay-ui:message key="${permissionRule.saveDraft}" />">
         <input name="${permissionRule.saveDraft}" type="submit" value="<liferay-ui:message key="test button" />">
