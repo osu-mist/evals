@@ -4,11 +4,6 @@
 </portlet:resourceURL>
 
 <div>
-    <!--<form id="testForm" action=
-        "<portlet:actionURL windowState="<%= WindowState.NORMAL.toString() %>">
-        <portlet:param name="action" value="updateTest" />
-        <portlet:param name="controller" value="AppraisalsAction" />
-        </portlet:actionURL>" method="post" name="<portlet:namespace />request_form">-->
     <form id="testForm">
         <input type="submit" class="cancel" value="im a button in test tools"/>
         <input name="${permissionRule.saveDraft}" type="submit" value="<liferay-ui:message key="${permissionRule.saveDraft}" />">
