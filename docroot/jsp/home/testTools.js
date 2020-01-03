@@ -1,12 +1,11 @@
 jQuery(document).ready(function() {
   console.log('eyo');
-  console.log(jQuery("#update").toString());
 
   jQuery("#testForm").submit(function(event) {
     console.log('submit');
 
-    /*var data = {};
-    // data.controller = "AppraisalsAction";
+    var data = {};
+    data.controller = "AppraisalsAction";
     // data.action = "updateTest";
     jQuery.ajax({
       type: "POST",
@@ -19,6 +18,6 @@ jQuery(document).ready(function() {
           console.log(msg);
         }
       }
-    });*/
+    });
   });
 });
