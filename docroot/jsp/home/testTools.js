@@ -6,6 +6,7 @@ jQuery(document).ready(function() {
     console.log('submit');
 
     var data = {};
+    data.controller = "AppraisalsAction";
     jQuery.ajax({
       type: "POST",
       url: "<%=renderResponse.encodeURL(saveDraftAJAXURL.toString())%>",
