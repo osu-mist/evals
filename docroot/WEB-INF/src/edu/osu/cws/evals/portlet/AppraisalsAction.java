@@ -347,6 +347,8 @@ public class AppraisalsAction implements ActionInterface {
      * @throws Exception
      */
     public String update(PortletRequest request, PortletResponse response) throws Exception {
+        System.out.println("Appraisal update");
+        System.out.println(request.getContextPath());
         initialize(request);
         boolean isReviewer = actionHelper.getReviewer() != null;
 
