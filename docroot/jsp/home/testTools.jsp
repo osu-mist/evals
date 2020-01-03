@@ -4,7 +4,7 @@
 </portlet:resourceURL>
 
 <div>
-    <form id="testForm" action="
+    <form id="testForm" action=
         "<portlet:actionURL windowState="<%= WindowState.NORMAL.toString() %>">
         <portlet:param name="action" value="updateTest" />
         <portlet:param name="controller" value="AppraisalsAction" />
