@@ -4,6 +4,12 @@ import javax.portlet.*;
 
 public class TestsAction implements ActionInterface {
 
+    private ActionHelper actionHelper;
+
+    private HomeAction homeAction;
+
+    private ErrorHandler errorHandler;
+
     public String updateTest(PortletRequest request, PortletResponse response) {
       System.out.println("new update");
       return "true";
