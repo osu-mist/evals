@@ -520,6 +520,7 @@ jQuery(document).ready(function() {
             url: "<%= renderResponse.encodeURL(addGoalAJAXURL.toString()) %>",
             data: data,
             success: function(msg) {
+                console.log("added assesment return");
                 var response = jQuery.parseJSON(msg);
                 if (response.status == "success") {
                     addGoal(response.id, response.assessmentCriteria);
