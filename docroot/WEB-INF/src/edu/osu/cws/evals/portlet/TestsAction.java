@@ -11,7 +11,11 @@ public class TestsAction implements ActionInterface {
     private ErrorHandler errorHandler;
 
     public String updateTest(PortletRequest request, PortletResponse response) {
+      PortletSession session = ActionHelper.getSession(request);
       System.out.println("new update");
+
+      Employee employee = session.getAttribute("loggedOnUser");
+      System.out.println(employee.getFirstName());
       return "true";
     }
 
