@@ -16,7 +16,7 @@ public class TestsAction implements ActionInterface {
       PortletSession session = ActionHelper.getSession(request);
       System.out.println("new update");
 
-      Employee employee = session.getAttribute("loggedOnUser");
+      Employee employee = (Employee)session.getAttribute("loggedOnUser");
       System.out.println(employee.getFirstName());
       return "true";
     }
