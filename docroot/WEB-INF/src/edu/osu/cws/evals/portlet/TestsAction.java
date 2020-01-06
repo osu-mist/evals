@@ -18,7 +18,7 @@ public class TestsAction implements ActionInterface {
       System.out.println("new update");
 
       Employee employee = (Employee)session.getAttribute("loggedOnUser");
-      Set<Job> jobs = employee.getNonTerminatedJobs();
+      Set<Job> jobs = new Set<Job>(employee.getNonTerminatedJobs());
       for(Job job : jobs) {
         System.out.println(job.getJobTitle());
       }
