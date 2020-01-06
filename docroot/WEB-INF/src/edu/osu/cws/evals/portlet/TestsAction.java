@@ -5,6 +5,8 @@ import edu.osu.cws.evals.models.Job;
 
 import javax.portlet.*;
 
+import java.util.Set;
+
 public class TestsAction implements ActionInterface {
 
     private ActionHelper actionHelper;
@@ -18,7 +20,7 @@ public class TestsAction implements ActionInterface {
       System.out.println("new update");
 
       Employee employee = (Employee)session.getAttribute("loggedOnUser");
-      Set<Job> jobs = new HashSet<Job>(employee.getNonTerminatedJobs());
+      Set<Job> jobs = new Set<Job>(employee.getNonTerminatedJobs());
       for(Job job : jobs) {
         System.out.println(job.getJobTitle());
       }
