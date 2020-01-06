@@ -1,6 +1,7 @@
 package edu.osu.cws.evals.portlet;
 
 import edu.osu.cws.evals.models.Employee;
+import edu.osu.cws.evals.models.Job;
 
 import javax.portlet.*;
 
@@ -17,7 +18,10 @@ public class TestsAction implements ActionInterface {
       System.out.println("new update");
 
       Employee employee = (Employee)session.getAttribute("loggedOnUser");
-      System.out.println(employee.getFirstName());
+      Set<Job> jobs = employee.getNonTerminatedJobs();
+      for(Job job : jobs) {
+        System.out.println(job.getJobTitle());
+      }
       return "true";
     }
 
