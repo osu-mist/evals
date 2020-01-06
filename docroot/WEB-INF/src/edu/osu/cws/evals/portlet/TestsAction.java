@@ -12,7 +12,7 @@ public class TestsAction implements ActionInterface {
 
     private ErrorHandler errorHandler;
 
-    public String updateTest(PortletRequest request, PortletResponse response) throws exception {
+    public String updateTest(PortletRequest request, PortletResponse response) throws Exception {
       PortletSession session = ActionHelper.getSession(request);
       System.out.println("new update");
 
