@@ -2,10 +2,13 @@ package edu.osu.cws.evals.portlet;
 
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Job;
+import edu.osu.cws.evals.models.Appraisal;
+import edu.osu.cws.evals.hibernate.AppraisalMgr;
 
 import javax.portlet.*;
 
 import java.util.Set;
+import org.joda.time.DateTime;
 
 public class TestsAction implements ActionInterface {
 
@@ -22,7 +25,9 @@ public class TestsAction implements ActionInterface {
       Employee employee = (Employee)session.getAttribute("loggedOnUser");
       Set<Job> jobs = employee.getNonTerminatedJobs();
       for(Job job : jobs) {
-        System.out.println(job.getJobTitle());
+        System.out.println("Creating appraisal for: " + job.getJobTitle());
+        AppraisalMgr.createAppraisal(job, new DateTime(2019, 11, 15, 0, 0), Appraisal.TYPE_ANNUAL);
+        System.out.println("appraisal created");
       }
       return "true";
     }
