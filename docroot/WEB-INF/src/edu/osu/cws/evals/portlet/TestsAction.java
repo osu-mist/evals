@@ -1,5 +1,7 @@
 package edu.osu.cws.evals.portlet;
 
+import edu.osu.cws.evals.models.Employee;
+
 import javax.portlet.*;
 
 public class TestsAction implements ActionInterface {
