@@ -29,7 +29,8 @@ public class TestsAction implements ActionInterface {
         AppraisalMgr.createAppraisal(job, new DateTime(2019, 11, 15, 0, 0), Appraisal.TYPE_ANNUAL);
         System.out.println("appraisal created");
       }
-      return "true";
+
+      return homeAction.display(request, response);
     }
 
     public void setErrorHandler(ErrorHandler errorHandler) { this.errorHandler = errorHandler; }
