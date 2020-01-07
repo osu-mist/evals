@@ -13,7 +13,9 @@ jQuery(document).ready(function() {
         console.log("we have success");
         console.log(msg);
 
-        console.log($('#evaluations'))
+        $('#evaluations').load('testTools.jsp', function() {
+          console.log("loading testTools");
+        }).fadeIn("slow");
 
         jQuery('.portlet-msg-success').remove();
 
