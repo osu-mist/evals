@@ -15,7 +15,8 @@ jQuery(document).ready(function() {
 
         jQuery('.portlet-msg-success').remove();
 
-        jQuery("#<portlet:namespace />flash").html(
+        //jQuery("#<portlet:namespace />flash").html(
+        jQuery().html(
           '<span class="portlet-msg-success"><liferay-ui:message key="Appraisal Created"/></span>'
         );
 
