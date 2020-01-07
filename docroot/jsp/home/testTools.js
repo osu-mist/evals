@@ -24,6 +24,10 @@ jQuery(document).ready(function() {
 
         jQuery('.portlet-msg-success').fadeIn('slow');
         setTimeout(function() {jQuery('.portlet-msg-success').fadeOut('slow')}, 30000);
+      },
+      fail: function(msg) {
+        console.log("fail");
+        console.log(msg);
       }
     });
   });
