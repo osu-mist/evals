@@ -4,9 +4,9 @@
 </portlet:resourceURL>
 
 <div>
-    <form id="testForm">
-        <input name="testName" type="submit" value="<liferay-ui:message key="Create Appraisal" />">
-    </form>
+    <!--<form id="testForm">-->
+        <input id="addAppraisal" name="testName" type="submit" value="<liferay-ui:message key="Create Appraisal" />">
+    <!--</form>-->
 </div>
 
 <script type="text/javascript">
