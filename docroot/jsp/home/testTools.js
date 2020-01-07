@@ -13,9 +13,9 @@ jQuery(document).ready(function() {
         console.log("we have success");
         console.log(msg);
 
-        $('#evaluations').load('/jsp/home/testTools.jsp', function() {
-          console.log("loading testTools");
-        }).fadeIn("slow");
+        jQuery('#evaluations').html(
+          '<span class="portlet-msg-success"><liferay-ui:message key="Appraisal Created"/></span>'
+        );
 
         jQuery('.portlet-msg-success').remove();
 
