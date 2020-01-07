@@ -45,18 +45,14 @@ jQuery(document).ready(function() {
       url: "<%=renderResponse.encodeURL(saveDraftAJAXURL.toString())%>",
       data: data,
       success: function(msg) {
-        console.log("success");
-        if (msg == "success") {
-          console.log("we have success");
+        console.log("we have success");
+        console.log(msg);
 
-          jQuery('.portlet-msg-success').remove();
+        jQuery('.portlet-msg-success').remove();
 
-          jQuery("#<portlet:namespace />flash").html(
-            '<span class="portlet-msg-success"><liferay-ui:message key="Appraisal Created"/></span>'
-          );
-        } else {
-          console.log(msg);
-        }
+        jQuery("#<portlet:namespace />flash").html(
+          '<span class="portlet-msg-success"><liferay-ui:message key="Appraisal Created"/></span>'
+        );
 
         jQuery('.portlet-msg-success').fadeIn('slow');
         setTimeout(function() {jQuery('.portlet-msg-success').fadeOut('slow')}, 30000);
