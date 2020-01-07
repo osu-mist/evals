@@ -28,6 +28,10 @@ jQuery(document).ready(function() {
       fail: function(msg) {
         console.log("fail");
         console.log(msg);
+      },
+      done: function(msg) {
+        console.log("done");
+        console.log(msg);
       }
     });
   });
