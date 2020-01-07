@@ -45,6 +45,7 @@ jQuery(document).ready(function() {
       url: "<%=renderResponse.encodeURL(saveDraftAJAXURL.toString())%>",
       data: data,
       success: function(msg) {
+        console.log("success");
         if (msg == "success") {
           console.log("we have success");
 
