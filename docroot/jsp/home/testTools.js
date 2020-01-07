@@ -13,7 +13,7 @@ jQuery(document).ready(function() {
         console.log("we have success");
         console.log(msg);
 
-        $('#evaluations').load('testTools.jsp', function() {
+        $('#evaluations').load('/jsp/home/testTools.jsp', function() {
           console.log("loading testTools");
         }).fadeIn("slow");
 
