@@ -13,6 +13,8 @@ jQuery(document).ready(function() {
         console.log("we have success");
         console.log(msg);
 
+        console.log($('#evaluations'))
+
         jQuery('.portlet-msg-success').remove();
 
         jQuery("#<portlet:namespace />flash").html(
