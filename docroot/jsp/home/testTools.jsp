@@ -5,6 +5,7 @@
 
 <div>
     <input id="addAppraisal" name="testName" type="submit" value="<liferay-ui:message key="Create Appraisal" />">
+    <input id="deleteAppraisal" name="testName" type="submit" value="<liferay-ui:message key="Delete Appraisal" />">
 </div>
 
 <script type="text/javascript">

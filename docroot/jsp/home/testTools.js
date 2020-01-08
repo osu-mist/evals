@@ -33,4 +33,8 @@ jQuery(document).ready(function() {
       }
     });
   });
+
+  jQuery("#deleteAppraisal").click(function(event) {
+    console.log("delete clicked");
+  });
 });
