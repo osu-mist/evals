@@ -23,7 +23,7 @@ jQuery(document).ready(function() {
         var jspFile = '<%@ include file="' + msg + '"%>';
         console.log(jspFile);
         jQuery("#<portlet:namespace />flash").html(
-          jspFile
+          '<%@ include file="/jsp/home/myInfo.jsp"%>'
         );
         // '<span class="portlet-msg-success"><liferay-ui:message key="Appraisal Created"/></span>'
 
