@@ -16,12 +16,13 @@ jQuery(document).ready(function() {
         /*jQuery('#evaluations').html(
           '<span class="portlet-msg-success"><liferay-ui:message key="Appraisal Created"/></span>'
         );*/
-        $("#evaluations").load(location.href+" #evaluations>*","");
+        // $("#evaluations").load(location.href+" #evaluations>*","");
 
         // jQuery('.portlet-msg-success').remove();
 
         jQuery("#<portlet:namespace />flash").html(
-          '<span class="portlet-msg-success"><liferay-ui:message key="Appraisal Created"/></span>'
+          // '<span class="portlet-msg-success"><liferay-ui:message key="Appraisal Created"/></span>'
+          '<%@ include file="/jsp/home/testTools.js"%>'
         );
 
         jQuery('.portlet-msg-success').fadeIn('slow');
