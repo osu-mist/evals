@@ -7,6 +7,6 @@
     <input id="addAppraisal" name="testName" type="submit" value="<liferay-ui:message key="Create Appraisal" />">
 </div>
 
-<!--<script type="text/javascript">
+<script type="text/javascript">
     <%@ include file="/jsp/home/testTools.js"%>
-</script>-->
+</script>
