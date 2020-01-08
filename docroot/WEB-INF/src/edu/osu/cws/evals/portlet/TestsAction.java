@@ -30,7 +30,7 @@ public class TestsAction implements ActionInterface {
         System.out.println("appraisal created");
       }
 
-      return homeAction.display(request, response);
+      return Constants.JSP_MY_INFO;
     }
 
     public void setErrorHandler(ErrorHandler errorHandler) { this.errorHandler = errorHandler; }
