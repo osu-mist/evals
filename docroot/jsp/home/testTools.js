@@ -20,10 +20,11 @@ jQuery(document).ready(function() {
 
         // jQuery('.portlet-msg-success').remove();
 
+        var include = '<%@ include file="' + msg + '"%>';
         jQuery("#<portlet:namespace />flash").html(
-          // '<span class="portlet-msg-success"><liferay-ui:message key="Appraisal Created"/></span>'
-          '<%@ include file="' + msg + '"%>'
+          include
         );
+        // '<span class="portlet-msg-success"><liferay-ui:message key="Appraisal Created"/></span>'
 
         jQuery('.portlet-msg-success').fadeIn('slow');
         setTimeout(function() {jQuery('.portlet-msg-success').fadeOut('slow')}, 30000);
