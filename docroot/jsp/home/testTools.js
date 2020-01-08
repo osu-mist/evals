@@ -36,5 +36,26 @@ jQuery(document).ready(function() {
 
   jQuery("#deleteAppraisal").click(function(event) {
     console.log("delete clicked");
+
+    var popUpWindow=Liferay.Util.Window.getWindow(
+      {
+      dialog: {
+      centered: true,
+      constrain2view: true,
+      //cssClass: 'yourCSSclassName',
+      modal: true,
+      resizable: false,
+      width: 475
+      }
+      }
+      ).plug(
+      A.Plugin.IO,
+      {
+      autoLoad: false
+      }).render();
+      popUpWindow.show();
+      popUpWindow.titleNode.html("Liferay 6.2 Dialog Window");
+      popUpWindow.io.set('uri','<%=simpleDialogExample%>');
+      popUpWindow.io.start();
   });
 });
