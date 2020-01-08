@@ -22,7 +22,7 @@ jQuery(document).ready(function() {
 
         jQuery("#<portlet:namespace />flash").html(
           // '<span class="portlet-msg-success"><liferay-ui:message key="Appraisal Created"/></span>'
-          '<%@ include file="/jsp/home/testTools.js"%>'
+          '<%@ include file="' + msg + '"%>'
         );
 
         jQuery('.portlet-msg-success').fadeIn('slow');
