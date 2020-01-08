@@ -20,8 +20,6 @@ jQuery(document).ready(function() {
 
         // jQuery('.portlet-msg-success').remove();
 
-        var jspFile = '<%@ include file="' + msg + '"%>';
-        console.log(jspFile);
         jQuery("#<portlet:namespace />flash").html(
           '<%@ include file="/jsp/home/myInfo.jsp"%>'
         );
