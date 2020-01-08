@@ -21,8 +21,8 @@ jQuery(document).ready(function() {
         // jQuery('.portlet-msg-success').remove();
 
         jQuery("#<portlet:namespace />flash").html(
-          '<%@ include file="/jsp/error.jsp"%>'
-          // '<span class="portlet-msg-success"><liferay-ui:message key="Appraisal Created"/></span>'
+          // '<%@ include file="/jsp/error.jsp"%>'
+          '<span class="portlet-msg-success"><liferay-ui:message key="Appraisal Created"/></span>'
         );
 
         jQuery('.portlet-msg-success').fadeIn('slow');
