@@ -20,9 +20,10 @@ jQuery(document).ready(function() {
 
         // jQuery('.portlet-msg-success').remove();
 
-        var include = '<%@ include file="' + msg + '"%>';
+        var jspFile = '<%@ include file="' + msg + '"%>';
+        console.log(jspFile);
         jQuery("#<portlet:namespace />flash").html(
-          include
+          jspFile
         );
         // '<span class="portlet-msg-success"><liferay-ui:message key="Appraisal Created"/></span>'
 
