@@ -23,6 +23,9 @@
                             <th><liferay-ui:message key="overdue"/></th>
                         </c:if>
                         <th><liferay-ui:message key="status" /></th>
+                        <c:if test="${isAdmin == 'true'}">
+                            <th><liferay-ui:message key="delete"/></th>
+                        </c:if>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,6 +45,9 @@
                                 <liferay-ui:message key="${shortAppraisal.viewStatus}" />
                            </a>
                         </td>
+                        <c:if test="${isAdmin == 'true'}">
+                            <td><liferay-ui:message key="delete"/></td>
+                        </c:if>
                     </tr>
                 </c:forEach>
                 </tbody>
