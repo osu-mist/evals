@@ -33,6 +33,10 @@ public class TestsAction implements ActionInterface {
       return homeAction.display(request, response);
     }
 
+    public String deleteAppraisal(PortletRequest request, PortletResponse response) throws Exception {
+      System.out.println("delete appraisal");
+    }
+
     public void setErrorHandler(ErrorHandler errorHandler) { this.errorHandler = errorHandler; }
     public void setHomeAction(HomeAction homeAction) { this.homeAction = homeAction; }
     public void setActionHelper(ActionHelper actionHelper) { this.actionHelper = actionHelper; }

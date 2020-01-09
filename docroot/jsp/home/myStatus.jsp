@@ -46,10 +46,15 @@
                            </a>
                         </td>
                         <c:if test="${isAdmin == 'true'}">
-                            <td>
-                                <input id="deleteAppraisal" type="submit" value="<liferay-ui:message key="Delete" />">
+                            <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
+                                <portlet:param name="id" value="${shortAppraisal.id}"/>
+                                <portlet:param  name="action" value="deleteAppraisal"/>
+                                <portlet:param  name="controller" value="TestsAction"/>
+                              </portlet:actionURL>">
+                                    <liferay-ui:message key="Delete" />
+                              </a>
                             </td>
-                            </c:if>
+                        </c:if>
                         </tr>
                 </c:forEach>
                 </tbody>
