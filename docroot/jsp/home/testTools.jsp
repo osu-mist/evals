@@ -5,12 +5,6 @@
     <portlet:param name="controller" value="TestsAction"/>
 </portlet:resourceURL>
 
-<div id="dialog" title="dialog box">
-    <c:forEach var="appraisal" items="${myAppraisals}" varStatus="loopStatus">
-        ${appraisal.job.jobTitle}<br/>
-    </c:forEach>
-</div>
-
 <div>
     <input id="addAppraisal" name="testName" type="submit" value="<liferay-ui:message key="Create Appraisal" />">
     <input id="deleteAppraisal" name="testName" type="submit" value="<liferay-ui:message key="Delete Appraisal" />">

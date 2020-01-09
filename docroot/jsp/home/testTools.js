@@ -1,11 +1,6 @@
 jQuery(document).ready(function() {
   console.log('eyo');
 
-  jQuery("#dialog").dialog({
-    autoOpen: false,
-    modal: true
-  });
-
   jQuery("#addAppraisal").click(function(event) {
     console.log('onClick');
 
@@ -41,8 +36,7 @@ jQuery(document).ready(function() {
 
   jQuery("#deleteAppraisal").click(function(event) {
     console.log("delete clicked");
+    console.log(event);
 
-    event.preventDefault();
-    jQuery("#dialog").dialog("open");
   });
 });

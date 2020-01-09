@@ -47,10 +47,8 @@
                         </td>
                         <c:if test="${isAdmin == 'true'}">
                             <td>
-                                <form id="deleteAppraisal">
-                                        <input type="submit" value="<liferay-ui:message key="Delete" />">
-                                    </form>
-                                </td>
+                                <input id="deleteAppraisal" type="submit" value="<liferay-ui:message key="Delete" />">
+                            </td>
                             </c:if>
                         </tr>
                 </c:forEach>
