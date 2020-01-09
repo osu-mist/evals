@@ -6,7 +6,7 @@
 </portlet:resourceURL>
 
 <div id="dialog" title="dialog box">
-    <c:forEach var="appraisal" items="${testAppraisals}" varStatus="loopStatus">
+    <c:forEach var="appraisal" items="${myAppraisals}" varStatus="loopStatus">
         ${appraisal.job.jobTitle}<br/>
     </c:forEach>
 </div>
