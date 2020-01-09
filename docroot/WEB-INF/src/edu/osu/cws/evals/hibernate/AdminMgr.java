@@ -22,7 +22,6 @@ public class AdminMgr {
     public static HashMap<Integer, Admin> mapByEmployeeId() throws Exception {
         HashMap<Integer, Admin> admins = new HashMap<Integer, Admin>();
         for (Admin admin : AdminMgr.list()) {
-            System.out.println(admin.getEmployee().getId());
             admins.put(admin.getEmployee().getId(),  admin);
         }
         return admins;
