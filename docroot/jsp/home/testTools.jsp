@@ -1,4 +1,4 @@
-<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.css"></script>
+<jsp:useBean id="myAppraisals" class="java.util.ArrayList" scope="request" />
 
 <jsp:useBean id="permissionRule" class="edu.osu.cws.evals.models.PermissionRule" scope="request" />
 <portlet:resourceURL var="saveDraftAJAXURL" id="updateTest" escapeXml="false">
@@ -6,7 +6,9 @@
 </portlet:resourceURL>
 
 <div id="dialog" title="dialog box">
-  my content
+    <c:forEach var="appraisal" items="${myAppraisals}" varStatus="loopStatus">
+        ${shortAppraisal.job.jobTitle}<br/>
+    </c:forEach>
 </div>
 
 <div>
