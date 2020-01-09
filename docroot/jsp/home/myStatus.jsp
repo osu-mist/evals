@@ -47,7 +47,7 @@
                         </td>
                         <c:if test="${isAdmin == 'true'}">
                             <td>
-                                <input id="deleteAppraisal" type="submit" value="<liferay-ui:message key="Delete" />">
+                                <input id="notdeleteAppraisal" type="submit" value="<liferay-ui:message key="Delete" />">
                             </td>
                             </c:if>
                         </tr>
