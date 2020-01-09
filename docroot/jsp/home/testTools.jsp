@@ -1,3 +1,5 @@
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
 <jsp:useBean id="permissionRule" class="edu.osu.cws.evals.models.PermissionRule" scope="request" />
 <portlet:resourceURL var="saveDraftAJAXURL" id="updateTest" escapeXml="false">
     <portlet:param name="controller" value="TestsAction"/>

@@ -43,6 +43,6 @@ jQuery(document).ready(function() {
     console.log("delete clicked");
 
     event.preventDefault();
-    $("#dialog").dialog("open");
+    jQuery("#dialog").dialog("open");
   });
 });
