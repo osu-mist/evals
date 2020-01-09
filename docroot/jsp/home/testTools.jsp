@@ -5,6 +5,10 @@
     <portlet:param name="controller" value="TestsAction"/>
 </portlet:resourceURL>
 
+<div id="dialog" title="dialog box">
+  my content
+</div>
+
 <div>
     <input id="addAppraisal" name="testName" type="submit" value="<liferay-ui:message key="Create Appraisal" />">
     <input id="deleteAppraisal" name="testName" type="submit" value="<liferay-ui:message key="Delete Appraisal" />">
