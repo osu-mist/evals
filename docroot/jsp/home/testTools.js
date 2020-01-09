@@ -1,7 +1,7 @@
 jQuery(document).ready(function() {
   console.log('eyo');
 
-  $("#dialog").dialog({
+  jQuery("#dialog").dialog({
     autoOpen: false,
     modal: true
   });

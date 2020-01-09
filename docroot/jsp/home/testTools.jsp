@@ -1,5 +1,3 @@
-<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %>
-
 <jsp:useBean id="permissionRule" class="edu.osu.cws.evals.models.PermissionRule" scope="request" />
 <portlet:resourceURL var="saveDraftAJAXURL" id="updateTest" escapeXml="false">
     <portlet:param name="controller" value="TestsAction"/>
