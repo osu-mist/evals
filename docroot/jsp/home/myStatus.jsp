@@ -46,9 +46,13 @@
                            </a>
                         </td>
                         <c:if test="${isAdmin == 'true'}">
-                            <td><liferay-ui:message key="delete"/></td>
-                        </c:if>
-                    </tr>
+                            <td>
+                                <form id="deleteAppraisal">
+                                        <input type="submit" value="<liferay-ui:message key="Delete" />">
+                                    </form>
+                                </td>
+                            </c:if>
+                        </tr>
                 </c:forEach>
                 </tbody>
             </table>
