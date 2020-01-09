@@ -35,6 +35,8 @@ public class TestsAction implements ActionInterface {
 
     public String deleteAppraisal(PortletRequest request, PortletResponse response) throws Exception {
       System.out.println("delete appraisal");
+
+      return "true";
     }
 
     public void setErrorHandler(ErrorHandler errorHandler) { this.errorHandler = errorHandler; }
