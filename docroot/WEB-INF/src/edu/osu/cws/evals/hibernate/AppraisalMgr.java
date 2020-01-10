@@ -81,10 +81,13 @@ public class AppraisalMgr {
      * @throws Exception
      */
      public static void deleteAppraisal(Appraisal appraisal) throws Exception {
-       resetAppraisal(appraisal);
+        resetAppraisal(appraisal);
 
-       Session session = HibernateUtil.getCurrentSession();
-       session.delete(appraisal);
+        Session session = HibernateUtil.getCurrentSession();
+        session.delete(appraisal);
+        List<Appraisal> allMyAppraisals =
+              AppraisalMgr.getAllMyAppraisals(loggedOnUser.getId(), null, null, false);
+        session.setAttribute(ALL_MY_APPRAISALS, allMyAppraisals);
      }
 
     /**
