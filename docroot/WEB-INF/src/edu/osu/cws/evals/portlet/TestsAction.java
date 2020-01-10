@@ -40,8 +40,6 @@ public class TestsAction implements ActionInterface {
       Appraisal appraisal = AppraisalMgr.getAppraisal(appraisalId);
       AppraisalMgr.deleteAppraisal(appraisal);
 
-      actionHelper.refreshContextCache();
-
       return homeAction.display(request, response);
     }
 

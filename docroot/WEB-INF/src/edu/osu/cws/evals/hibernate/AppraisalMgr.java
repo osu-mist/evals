@@ -85,6 +85,7 @@ public class AppraisalMgr {
 
        Session session = HibernateUtil.getCurrentSession();
        session.delete(appraisal);
+       session.flush();
      }
 
     /**
