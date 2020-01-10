@@ -18,8 +18,8 @@ public class TestsAction implements ActionInterface {
 
     private ErrorHandler errorHandler;
 
-    public String updateTest(PortletRequest request, PortletResponse response) throws Exception {
-      PortletSession session = ActionHelper.getSession(request);
+    public String createAppraisal(PortletRequest request, PortletResponse response) throws Exception {
+      PortletSession session = actionHelper.getSession(request);
       System.out.println("new update");
 
       Employee employee = (Employee)session.getAttribute("loggedOnUser");
