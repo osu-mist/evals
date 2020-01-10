@@ -36,7 +36,8 @@ public class TestsAction implements ActionInterface {
     public String deleteAppraisal(PortletRequest request, PortletResponse response) throws Exception {
       System.out.println("delete appraisal");
       System.out.println(request.getParameter("id"));
-      Appraisal appraisal = AppraisalMgr.getAppraisal((int)request.getParameter("id"));
+      int appraisalId = Integer.parseInt(request.getParameter("id"));
+      Appraisal appraisal = AppraisalMgr.getAppraisal(appraisalId);
       AppraisalMgr.resetAppraisal(appraisal);
 
       return homeAction.display(request, response);
