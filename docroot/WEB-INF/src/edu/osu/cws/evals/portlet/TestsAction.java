@@ -38,7 +38,7 @@ public class TestsAction implements ActionInterface {
       System.out.println(request.getParameter("id"));
       int appraisalId = Integer.parseInt(request.getParameter("id"));
       Appraisal appraisal = AppraisalMgr.getAppraisal(appraisalId);
-      AppraisalMgr.resetAppraisal(appraisal);
+      AppraisalMgr.deleteAppraisal(appraisal);
 
       return homeAction.display(request, response);
     }
