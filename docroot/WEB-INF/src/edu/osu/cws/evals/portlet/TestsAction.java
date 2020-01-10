@@ -29,6 +29,7 @@ public class TestsAction implements ActionInterface {
         AppraisalMgr.createAppraisal(job, new DateTime(2019, 11, 15, 0, 0), Appraisal.TYPE_ANNUAL);
         System.out.println("appraisal created");
       }
+      actionHelper.reloadMyAppraisals();
 
       return homeAction.display(request, response);
     }
@@ -38,7 +39,7 @@ public class TestsAction implements ActionInterface {
       int appraisalId = Integer.parseInt(request.getParameter("id"));
       Appraisal appraisal = AppraisalMgr.getAppraisal(appraisalId);
       AppraisalMgr.deleteAppraisal(appraisal);
-      actionHelper.resetMyAppraisals();
+      actionHelper.reloadMyAppraisals();
 
       return homeAction.display(request, response);
     }

@@ -223,7 +223,7 @@ public class ActionHelper {
      * @return List<Appraisal>
      * @throws Exception
      */
-    public List<Appraisal> resetMyAppraisals() throws Exception {
+    public List<Appraisal> reloadMyAppraisals() throws Exception {
         PortletSession session = getSession();
         List<Appraisal> allMyAppraisals;
 
