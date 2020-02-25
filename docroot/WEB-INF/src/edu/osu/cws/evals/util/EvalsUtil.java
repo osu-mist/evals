@@ -330,10 +330,10 @@ public class EvalsUtil {
         String linkUrl = config.getString("mail.linkUrl");
         String helpLinkUrl = config.getString("helpfulLinks.url");
         String environment = config.getString("log.environment");
-        String testMailToAddress = null;
-        if (!environment.startsWith("prod")){
+        //String testMailToAddress = null;
+        //if (!environment.startsWith("prod")){
             testMailToAddress = config.getString("mail.testMailToAddress");
-        }
+        //}
         return new Mailer(resources, hostname, from, linkUrl,  helpLinkUrl, configurationMap,
                 logger, replyTo, testMailToAddress);
     }

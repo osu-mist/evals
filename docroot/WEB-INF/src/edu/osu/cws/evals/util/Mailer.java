@@ -101,7 +101,7 @@ public class Mailer implements MailerInterface {
             }
 
             email.setSubject(subject);
-            email.send();
+            //email.send();
 
             Email evalsEmail = new Email(appraisal.getId(), emailType.getType());
             EmailMgr.add(evalsEmail);
@@ -372,7 +372,7 @@ public class Mailer implements MailerInterface {
             email.addTo(emailAddress);
             email.setHtmlMsg(body);
             email.setSubject(emailBundle.getString("email_supervisor_subject"));
-            email.send();
+            //email.send();
             EmailMgr.add(emailList);
 
             for (Email evalsEmail : emailList) {
@@ -442,7 +442,7 @@ public class Mailer implements MailerInterface {
             email.addTo(emailAddresses);
             email.setHtmlMsg(body);
             email.setSubject(emailBundle.getString("email_reviewer_subject"));
-            email.send();
+            //email.send();
 
             String longMsg = "Emails sent to: various reviewers";
             logger.log(Logger.INFORMATIONAL, "Reviewer emails sent", longMsg);
@@ -489,7 +489,7 @@ public class Mailer implements MailerInterface {
             email.addTo(emailAddresses);
             email.setHtmlMsg(body);
             email.setSubject(emailBundle.getString("email_lateReport_subject"));
-            email.send();
+            //email.send();
 
             String longMsg = "Late report emails sent to: various reviewers";
             logger.log(Logger.INFORMATIONAL, "Late Report email sent", longMsg);
