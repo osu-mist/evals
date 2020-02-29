@@ -13,8 +13,8 @@
 #   The other script is supposed to be set as a cronjob under the luminis user.
 
 
-JAVA_HOME=/usr/java/latest
-PORTAL=$CP_ROOT/tc7
+JAVA_HOME=/usr/bin
+PORTAL=$CP_ROOT/tomcat-7.0.62
 PORTAL_LIB=$PORTAL/lib
 PORTAL_LIB_EXT=$PORTAL_LIB/ext
 PORTLET_ROOT=$PORTAL/webapps/evals
