@@ -101,6 +101,7 @@ public class Mailer implements MailerInterface {
             }
 
             email.setSubject(subject);
+            System.out.println("Fake sending email");
             //email.send();
 
             Email evalsEmail = new Email(appraisal.getId(), emailType.getType());
@@ -372,6 +373,7 @@ public class Mailer implements MailerInterface {
             email.addTo(emailAddress);
             email.setHtmlMsg(body);
             email.setSubject(emailBundle.getString("email_supervisor_subject"));
+            System.out.println("Fake sending email");
             //email.send();
             EmailMgr.add(emailList);
 
@@ -442,6 +444,7 @@ public class Mailer implements MailerInterface {
             email.addTo(emailAddresses);
             email.setHtmlMsg(body);
             email.setSubject(emailBundle.getString("email_reviewer_subject"));
+            System.out.println("Fake sending email");
             //email.send();
 
             String longMsg = "Emails sent to: various reviewers";
@@ -489,6 +492,7 @@ public class Mailer implements MailerInterface {
             email.addTo(emailAddresses);
             email.setHtmlMsg(body);
             email.setSubject(emailBundle.getString("email_lateReport_subject"));
+            System.out.println("Fake sending email");
             //email.send();
 
             String longMsg = "Late report emails sent to: various reviewers";
