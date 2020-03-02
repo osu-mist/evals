@@ -104,7 +104,8 @@ public class Mailer implements MailerInterface {
             }
 
             email.setSubject(subject);
-            System.out.println("Fake sending email to " + addressee);
+            System.out.println("Fake sending email");
+            System.out.println(email.getRecipients());
             if ("alex.ruef@oregonstate.edu".equals(addressee) || "ruefa@oregonstate.edu".equals(addressee)) {
                 System.out.println("for real sending email");
                 email.send();
