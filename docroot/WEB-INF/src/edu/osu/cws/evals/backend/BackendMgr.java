@@ -694,6 +694,7 @@ public class BackendMgr {
         System.out.println("have not sent due or overdue email: " + EmailMgr.haveNotSentDueOrOverdueEmail(appraisal.getId(), status));
         try{
         if (status.contains(Appraisal.OVERDUE) && EmailMgr.haveNotSentDueOrOverdueEmail(appraisal.getId(), status)) {
+            System.out.println("isEmailFrequencyEnabled returning true");
             return true;
         }
 
