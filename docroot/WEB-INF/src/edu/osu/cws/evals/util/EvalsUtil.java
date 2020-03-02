@@ -332,7 +332,7 @@ public class EvalsUtil {
         String environment = config.getString("log.environment");
         String testMailToAddress = null;
         //if (!environment.startsWith("prod")){
-            testMailToAddress = config.getString("mail.testMailToAddress");
+            //testMailToAddress = config.getString("mail.testMailToAddress");
         //}
         return new Mailer(resources, hostname, from, linkUrl,  helpLinkUrl, configurationMap,
                 logger, replyTo, testMailToAddress);
