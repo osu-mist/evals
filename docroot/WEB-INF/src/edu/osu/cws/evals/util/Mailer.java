@@ -74,6 +74,7 @@ public class Mailer implements MailerInterface {
      * @throws Exception
      */
     public boolean sendMail(Appraisal appraisal, EmailType emailType) {
+        System.out.println("sendMail");
         String logShortMessage = "";
         String logLongMessage = "";
 
