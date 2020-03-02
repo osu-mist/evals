@@ -696,8 +696,8 @@ public class BackendMgr {
             return true;
         }
 
-        // return frequencyConfig != null && !frequencyConfig.getValue().equals("-1");
-        return true;
+        System.out.println("frequencyConfig: " + frequencyConfig != null);
+        return frequencyConfig != null && !frequencyConfig.getValue().equals("-1");
     }
 
     private void log_error(String title, Exception e)throws Exception
