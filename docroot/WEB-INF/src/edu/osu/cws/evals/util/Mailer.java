@@ -118,6 +118,7 @@ public class Mailer implements MailerInterface {
             logger.log(Logger.INFORMATIONAL, logShortMessage, logLongMessage, logFields);
         } catch (Exception e) {
             System.out.println("exception happened");
+            e.printStackTrace();
             try {
                 logShortMessage = "Email not sent";
                 String stackTrace = replaceEmails(CWSUtil.stackTraceString(e), "email address removed");
