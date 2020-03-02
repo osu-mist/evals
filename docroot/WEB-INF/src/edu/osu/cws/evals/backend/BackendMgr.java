@@ -641,6 +641,7 @@ public class BackendMgr {
         // Do we need to send additional reminder email?
         Configuration frequencyConfig = getFrequencyConfig(appraisal);
         if (!isEmailFrequencyEnabled(frequencyConfig, appraisal)) {   //May need to send followup email
+            System.out.println("Not time to send reminder email");
             return;
         }
 
@@ -649,6 +650,7 @@ public class BackendMgr {
         boolean notTimeToSendReminder = lastEmail != null &&
                 !EvalsUtil.anotherEmail(lastEmail, frequencyConfig); //not time yet
         if (notTimeToSendReminder || timeToSendFirstStatusEmail(appraisal, createForDate)) {
+            System.out.println("Not time to send");
             return;
         }
 
