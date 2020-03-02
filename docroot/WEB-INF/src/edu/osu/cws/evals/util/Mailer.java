@@ -87,6 +87,7 @@ public class Mailer implements MailerInterface {
                 return false;
             }
 
+            System.out.println("checking recipients");
             HtmlEmail email = getHtmlEmail();
             if (!setEmailRecipients(appraisal, email, emailType)) {
                 System.out.println("no recipients");
