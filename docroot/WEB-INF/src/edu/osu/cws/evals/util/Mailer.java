@@ -117,6 +117,7 @@ public class Mailer implements MailerInterface {
             logLongMessage = "email of type " + emailType.getType() + " sent regarding appraisal " + appraisal.getId();
             logger.log(Logger.INFORMATIONAL, logShortMessage, logLongMessage, logFields);
         } catch (Exception e) {
+            System.out.println("exception happened");
             try {
                 logShortMessage = "Email not sent";
                 String stackTrace = replaceEmails(CWSUtil.stackTraceString(e), "email address removed");
