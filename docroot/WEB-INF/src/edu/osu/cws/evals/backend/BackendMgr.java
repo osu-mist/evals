@@ -654,6 +654,7 @@ public class BackendMgr {
         System.out.println("need to send another email for status of " + status
                 + " for appraisal " + appraisal.getId());
         sendMail(appraisal);
+        System.out.println("sent to: " + appraisal.getJob().getEmployee().getEmail());
         System.out.println("Sent email for " + status);
         followupEmailCount++;
 
