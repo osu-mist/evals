@@ -102,7 +102,7 @@ public class Mailer implements MailerInterface {
 
             email.setSubject(subject);
             System.out.println("Fake sending email");
-            logger.log(addressee)
+            logger.log(addressee);
             //email.send();
 
             Email evalsEmail = new Email(appraisal.getId(), emailType.getType());
