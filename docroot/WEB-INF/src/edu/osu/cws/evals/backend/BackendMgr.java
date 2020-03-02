@@ -637,6 +637,7 @@ public class BackendMgr {
      */
     private void checkFrequencyAndSendMail(Appraisal appraisal, DateTime createForDate, String status)
             throws Exception {
+        System.out.println("checking for " + appraisal.getJob().getEmployee().getEmail());
         // Do we need to send additional reminder email?
         Configuration frequencyConfig = getFrequencyConfig(appraisal);
         if (!isEmailFrequencyEnabled(frequencyConfig, appraisal)) {   //May need to send followup email
@@ -653,7 +654,6 @@ public class BackendMgr {
 
         System.out.println("need to send another email for status of " + status
                 + " for appraisal " + appraisal.getId());
-        System.out.println("sent to: " + appraisal.getJob().getEmployee().getEmail());
         sendMail(appraisal);
         System.out.println("Sent email for " + status);
         followupEmailCount++;
