@@ -200,9 +200,6 @@ public class Mailer implements MailerInterface {
 
     private HtmlEmail getHtmlEmail() throws EmailException {
         HtmlEmail email = new HtmlEmail();
-        System.out.println(hostName);
-        System.out.println(from);
-        System.out.println(replyTo);
         email.setHostName(hostName);
         email.setFrom(from);
         email.addReplyTo(replyTo);
