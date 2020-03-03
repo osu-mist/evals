@@ -690,20 +690,20 @@ public class BackendMgr {
      */
     private boolean isEmailFrequencyEnabled(Configuration frequencyConfig, Appraisal appraisal) {
         // If the status is *Overdue, check if the *Due email was sent. This overwrites disabled frequencyConfigs
+        try{
         String status = appraisal.getStatus();
         System.out.println("have not sent due or overdue email: " + EmailMgr.haveNotSentDueOrOverdueEmail(appraisal.getId(), status));
-        try{
         if (status.contains(Appraisal.OVERDUE) && EmailMgr.haveNotSentDueOrOverdueEmail(appraisal.getId(), status)) {
             System.out.println("isEmailFrequencyEnabled returning true");
             return true;
         }
 
         System.out.println("frequencyConfig: " + frequencyConfig != null);
+        return frequencyConfig != null && !frequencyConfig.getValue().equals("-1");
         } catch(Exception e) {
             System.out.println("Exception in: isEmailFrequencyEnabled");
             e.printStackTrace();
         }
-        return frequencyConfig != null && !frequencyConfig.getValue().equals("-1");
     }
 
     private void log_error(String title, Exception e)throws Exception
