@@ -699,6 +699,7 @@ public class BackendMgr {
         }
 
         System.out.println("frequencyConfig: " + String.valueOf(frequencyConfig != null));
+        System.out.println("frequencyConfig.getValue(): " + frequencyConfig.getValue());
         return frequencyConfig != null && !frequencyConfig.getValue().equals("-1");
         } catch(Exception e) {
             System.out.println("Exception in: isEmailFrequencyEnabled");
