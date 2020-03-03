@@ -703,6 +703,7 @@ public class BackendMgr {
         } catch(Exception e) {
             System.out.println("Exception in: isEmailFrequencyEnabled");
             e.printStackTrace();
+            return false;
         }
     }
 
