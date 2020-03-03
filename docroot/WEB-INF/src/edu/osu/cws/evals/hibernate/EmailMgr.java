@@ -126,6 +126,10 @@ public class EmailMgr {
         String dueStatus = status.replace(Appraisal.OVERDUE, Appraisal.DUE);
         Email lastDueEmail = EmailMgr.getLastEmail(appraisalId, dueStatus);
         Email lastOverDueEmail = EmailMgr.getLastEmail(appraisalId, status);
+        System.out.println("Appraisal Id: " + appraisalId);
+        System.out.println("lastDueEmail && lastOverDueEmail:");
+        System.out.println(lastDueEmail);
+        System.out.println(lastOverDueEmail);
 
         // only allow overdue email to be sent if no due or *overdue email has been sent
         return lastDueEmail == null && lastOverDueEmail == null;
