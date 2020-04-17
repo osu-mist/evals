@@ -332,9 +332,12 @@ public class AppraisalsAction implements ActionInterface {
 
         Salary salary = appraisal.getSalary();
         System.out.println(salary);
-        salaryValidationValues.put("increaseRate2Value", salary.getTwoIncrease().toString());
-        salaryValidationValues.put("increaseRate1MinVal", salary.getOneMin().toString());
-        salaryValidationValues.put("increaseRate1MaxVal", salary.getOneMax().toString());
+        // salaryValidationValues.put("increaseRate2Value", salary.getTwoIncrease().toString());
+        // salaryValidationValues.put("increaseRate1MinVal", salary.getOneMin().toString());
+        // salaryValidationValues.put("increaseRate1MaxVal", salary.getOneMax().toString());
+        salaryValidationValues.put("increaseRate2Value", "0");
+        salaryValidationValues.put("increaseRate1MinVal", "0");
+        salaryValidationValues.put("increaseRate1MaxVal", "0");
 
         return salaryValidationValues;
     }
