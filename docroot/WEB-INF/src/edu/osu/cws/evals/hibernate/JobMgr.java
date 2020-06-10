@@ -209,10 +209,12 @@ public class JobMgr {
             throws Exception {
         Session session = HibernateUtil.getCurrentSession();
 
+        System.out.println(supervisorJobs);
         List<Job> jobs = (List<Job>) session.getNamedQuery("job.directShortJobEmployees")
                 .setParameterList("supervisorJobs", supervisorJobs)
                 .setParameterList("appointmentTypes", appointmentTypes)
                 .list();
+        System.out.println(jobs);
         return jobs;
     }
 
