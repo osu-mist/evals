@@ -122,7 +122,7 @@ public class EmployeeMgr {
       emp.setOsuid(osuId);
       emp.setOnid(onid);
       emp.setEmail(email);
-      emp.setStatus('A');
+      emp.setStatus("A");
       Session session = HibernateUtil.getCurrentSession();
       session.save(emp);
     }
