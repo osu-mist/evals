@@ -119,7 +119,11 @@ public class EmployeeMgr {
 
     public static void createEmployee (int internalId, int osuId, String lastName, String firstName, String onid, String email) {
       Employee emp = new Employee(internalId, firstName, lastName);
-      System.out.println(emp.getFirstName());
+      emp.setOsuid(osuId);
+      emp.setOnid(onid);
+      emp.setEmail(email);
+      Session session = HibernateUtil.getCurrentSession();
+      session.save(emp);
     }
 
 }
