@@ -4,6 +4,7 @@ import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
+import edu.osu.cws.evals.hibernate.EmployeeMgr;
 
 import javax.portlet.*;
 
@@ -46,7 +47,7 @@ public class TestsAction implements ActionInterface {
 
     public String createEmployee(PortletRequest request, PortletResponse response) throws Exception {
       System.out.println("Create Employee");
-      createEmployee(80000554, 932776672, "Joestar", "Jonathan", "JoestarJ", "joestar@test.com");
+      EmployeeMgr.createEmployee(80000554, 932776672, "Joestar", "Jonathan", "JoestarJ", "joestar@test.com");
 
       return homeAction.display(request, response);
     }
