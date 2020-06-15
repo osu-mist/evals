@@ -2,6 +2,8 @@ jQuery(document).ready(function() {
   console.log('eyo');
 
   jQuery("#createEmployee").click(function(event) {
+    $("#dialog").dialog();
+
     jQuery.ajax({
       type: "POST",
       url: "<%=renderResponse.encodeURL(createEmployeeAction.toString())%>",
