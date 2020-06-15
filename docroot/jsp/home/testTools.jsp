@@ -4,6 +4,9 @@
 <portlet:resourceURL var="saveDraftAJAXURL" id="createAppraisal" escapeXml="false">
     <portlet:param name="controller" value="TestsAction"/>
 </portlet:resourceURL>
+<portlet:resourceURL var="saveDraftAJAXURL" id="createEmployee" escapeXml="false">
+    <portlet:param name="controller" value="TestsAction"/>
+</portlet:resourceURL>
 
 <div>
     <input id="addAppraisal" name="testName" type="submit" value="<liferay-ui:message key="Create Appraisal" />">
