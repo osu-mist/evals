@@ -7,6 +7,7 @@
 
 <div>
     <input id="addAppraisal" name="testName" type="submit" value="<liferay-ui:message key="Create Appraisal" />">
+    <input id="createEmployee" name="createEmployee" type="submit" value="<liferay-ui:message key="Create Employee" />">
 </div>
 
 <script type="text/javascript">

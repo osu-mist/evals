@@ -117,4 +117,9 @@ public class EmployeeMgr {
         return jobs;
     }
 
+    public static void createEmployee (int internalId, int osuId, String lastName, String firstName, String onid, String email) {
+      Employee emp = new Employee(internalId, firstName, lastName);
+      System.out.println(emp.getFirstName);
+    }
+
 }

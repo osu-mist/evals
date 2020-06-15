@@ -3,7 +3,8 @@
 
 <hibernate-mapping auto-import="false" >
 
-    <class name="edu.osu.cws.evals.models.Employee" table="PYVPASE" mutable="false" batch-size="10">
+    <class name="edu.osu.cws.evals.models.Employee" table="PYVPASE" mutable="false" batch-size="10"
+           dynamic-insert="true">
         <id name="id" column="PYVPASE_PIDM" type="int"/>
 
         <property name="firstName" column="PYVPASE_FIRST_NAME"/>

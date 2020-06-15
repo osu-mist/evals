@@ -44,6 +44,13 @@ public class TestsAction implements ActionInterface {
       return homeAction.display(request, response);
     }
 
+    public String createEmployee(PortletRequest request, PortletResponse response) throws Exception {
+      System.out.println("Create Employee");
+      createEmployee(80000554, 932776672, "Joestar", "Jonathan", "JoestarJ", "joestar@test.com");
+
+      return homeAction.display(request, response);
+    }
+
     public void setErrorHandler(ErrorHandler errorHandler) { this.errorHandler = errorHandler; }
     public void setHomeAction(HomeAction homeAction) { this.homeAction = homeAction; }
     public void setActionHelper(ActionHelper actionHelper) { this.actionHelper = actionHelper; }
