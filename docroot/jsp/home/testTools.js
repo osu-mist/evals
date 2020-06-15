@@ -1,13 +1,27 @@
 jQuery(document).ready(function() {
   console.log('eyo');
 
+  jQuery("#createEmployee").click(function(event) {
+    jQuery.ajax({
+      type: "POST",
+      url: "<%=renderResponse.encodeURL(createEmployeeAction.toString())%>",
+      data: {},
+      success: function(msg) {
+        console.log(msg);
+      },
+      fail: function(msg) {
+        console.log(msg);
+      },
+    });
+  });
+
   jQuery("#addAppraisal").click(function(event) {
     console.log('onClick');
 
     var data = {};
     jQuery.ajax({
       type: "POST",
-      url: "<%=renderResponse.encodeURL(saveDraftAJAXURL.toString())%>",
+      url: "<%=renderResponse.encodeURL(createAppraisalAction.toString())%>",
       data: data,
       success: function(msg) {
         console.log("we have success");
