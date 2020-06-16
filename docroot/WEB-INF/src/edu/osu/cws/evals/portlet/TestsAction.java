@@ -51,7 +51,7 @@ public class TestsAction implements ActionInterface {
       System.out.println("Create Employee");
       EmployeeMgr.createEmployee(80000554, "932776672", "Joestar", "Jonathan", "JoestarJ", "joestar@test.com");
 
-      Enumeration<String> attNames = request.getAttributeNames();
+      /*Enumeration<String> attNames = request.getAttributeNames();
       while(attNames.hasMoreElements()) {
         System.out.println(attNames.nextElement());
       }
@@ -66,7 +66,9 @@ public class TestsAction implements ActionInterface {
       Enumeration<String> propNames = request.getPortalContext().getPropertyNames();
       while(propNames.hasMoreElements()) {
         System.out.println(propNames.nextElement());
-      }
+      }*/
+
+      System.out.println(request.getParameter("firstName"));
 
       return homeAction.display(request, response);
     }
