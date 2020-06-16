@@ -124,7 +124,7 @@ public class EmployeeMgr {
       emp.setEmail(email);
       emp.setStatus("A");
       Session session = HibernateUtil.getCurrentSession();
-      session.save(emp);
+      // session.save(emp);
     }
 
 }

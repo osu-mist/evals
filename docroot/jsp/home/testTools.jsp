@@ -14,7 +14,7 @@
 </div>
 
 <div id="dialog" title="Basic dialog" style="display:none">
-  <p>This is the default dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.</p>
+  <liferay-ui:input-textarea param="firstName"/>
 </div>
 
 <script type="text/javascript">

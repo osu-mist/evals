@@ -48,6 +48,7 @@ public class TestsAction implements ActionInterface {
     public String createEmployee(PortletRequest request, PortletResponse response) throws Exception {
       System.out.println("Create Employee");
       EmployeeMgr.createEmployee(80000554, "932776672", "Joestar", "Jonathan", "JoestarJ", "joestar@test.com");
+      System.out.println(request.getParameter("firstName"));
 
       return homeAction.display(request, response);
     }

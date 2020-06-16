@@ -18,8 +18,6 @@ jQuery(document).ready(function() {
   });
 
   jQuery("#addAppraisal").click(function(event) {
-    console.log('onClick');
-
     var data = {};
     jQuery.ajax({
       type: "POST",
