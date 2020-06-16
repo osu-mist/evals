@@ -10,10 +10,13 @@
 
 <div>
     <input id="addAppraisal" name="testName" type="submit" value="<liferay-ui:message key="Create Appraisal" />">
-    <input id="createEmployee" name="createEmployee" type="submit" value="<liferay-ui:message key="Create Employee" />">
+    <input id="showCreateEmployee" type="submit" value="<liferay-ui:message key="Create Employee" />">
 
   <div id="dialog" title="Basic dialog" style="display:none">
-    <liferay-ui:input-textarea param="firstName"/>
+    <form>
+      <liferay-ui:input-textarea param="firstName"/>
+      <input id="createEmployee" name="createEmployee" type="submit" value="<liferay-ui:message key="Create Employee" />">
+    </form>
   </div>
 </div>
 
