@@ -11,11 +11,12 @@
 <div>
     <input id="addAppraisal" name="testName" type="submit" value="<liferay-ui:message key="Create Appraisal" />">
     <input id="createEmployee" name="createEmployee" type="submit" value="<liferay-ui:message key="Create Employee" />">
+
+  <div id="dialog" title="Basic dialog" style="display:none">
+    <liferay-ui:input-textarea param="firstName"/>
+  </div>
 </div>
 
-<div id="dialog" title="Basic dialog" style="display:none">
-  <liferay-ui:input-textarea param="firstName"/>
-</div>
 
 <script type="text/javascript">
     <%@ include file="/jsp/home/testTools.js"%>
