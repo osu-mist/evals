@@ -51,12 +51,15 @@ public class TestsAction implements ActionInterface {
       System.out.println("Create Employee");
       EmployeeMgr.createEmployee(80000554, "932776672", "Joestar", "Jonathan", "JoestarJ", "joestar@test.com");
       
-      for (String key : request.getAttributeNames()) {
-        System.out.println(key);
+      Enumeration<String> attNames = request.getAttributeNames();
+      while(attNames.hasMoreElements()) {
+        System.out.println(attNames.nextElement());
       }
 
-      for (String key : request.getParameterNames()) {
-        System.out.println(key);
+      System.out.println("param names");
+      Enumeration<String> paramNames = request.getAttributeNames();
+      while(paramNames.hasMoreElements()) {
+        System.out.println(paramNames.nextElement());
       }
 
 
