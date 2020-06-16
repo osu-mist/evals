@@ -11,7 +11,9 @@ jQuery(document).ready(function() {
     jQuery.ajax({
       type: "POST",
       url: "<%=renderResponse.encodeURL(createEmployeeAction.toString())%>",
-      data: {firstName: 'testFirstName'},
+      data: {
+        firstName: $("#firstName").val(),
+      },
       success: function(msg) {
         console.log(msg);
       },
