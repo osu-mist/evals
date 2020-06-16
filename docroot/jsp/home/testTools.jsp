@@ -6,7 +6,6 @@
 </portlet:resourceURL>
 <portlet:resourceURL var="createEmployeeAction" id="createEmployee" escapeXml="false">
     <portlet:param name="controller" value="TestsAction"/>
-    <portlet:param name="firstName" value="firstName"/>
 </portlet:resourceURL>
 
 <div>

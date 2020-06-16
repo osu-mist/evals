@@ -39,8 +39,10 @@ public class TestsAction implements ActionInterface {
       System.out.println("delete appraisal");
       int appraisalId = Integer.parseInt(request.getParameter("id"));
       Appraisal appraisal = AppraisalMgr.getAppraisal(appraisalId);
-      AppraisalMgr.deleteAppraisal(appraisal);
-      actionHelper.reloadMyAppraisals();
+      if (appraisal != null) {
+        AppraisalMgr.deleteAppraisal(appraisal);
+        actionHelper.reloadMyAppraisals();
+      }
 
       return homeAction.display(request, response);
     }
