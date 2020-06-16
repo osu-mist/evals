@@ -14,6 +14,8 @@ jQuery(document).ready(function() {
       data: {
         firstName: $("#firstName").val(),
         lastName: $("#lastName").val(),
+        lastName: $("#email").val(),
+        lastName: $("#onid").val(),
       },
       success: function(msg) {
         console.log(msg);

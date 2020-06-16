@@ -18,6 +18,10 @@
       <input type="text" id="firstName"/><br/>
       <label>Last name:</label>
       <input type="text" id="lastName"/><br/>
+      <label>Email:</label>
+      <input type="text" id="email"/><br/>
+      <label>onid:</label>
+      <input type="text" id="onid"/><br/>
       <input id="createEmployee" name="createEmployee" type="submit" value="<liferay-ui:message key="Create Employee" />">
     </form>
   </div>
