@@ -14,7 +14,7 @@
 
   <div id="dialog" title="Basic dialog" style="display:none">
     <form>
-      <liferay-ui:input-textarea param="firstName"/>
+      <liferay-ui:input-textarea name="<portlet:namespace/>fistName" id="<portlet:namespace/>firstName" param="firstName"/>
       <input id="createEmployee" name="createEmployee" type="submit" value="<liferay-ui:message key="Create Employee" />">
     </form>
   </div>
