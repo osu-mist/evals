@@ -50,7 +50,7 @@ public class TestsAction implements ActionInterface {
     public String createEmployee(PortletRequest request, PortletResponse response) throws Exception {
       System.out.println("Create Employee");
       EmployeeMgr.createEmployee(80000554, "932776672", "Joestar", "Jonathan", "JoestarJ", "joestar@test.com");
-      
+
       Enumeration<String> attNames = request.getAttributeNames();
       while(attNames.hasMoreElements()) {
         System.out.println(attNames.nextElement());
@@ -61,7 +61,12 @@ public class TestsAction implements ActionInterface {
       while(paramNames.hasMoreElements()) {
         System.out.println(paramNames.nextElement());
       }
-
+      
+      System.out.println("prop names");
+      Enumeration<String> propNames = request.getPortalContext().getPropertyNames();
+      while(propNames.hasMoreElements()) {
+        System.out.println(propNames.nextElement());
+      }
 
       return homeAction.display(request, response);
     }
