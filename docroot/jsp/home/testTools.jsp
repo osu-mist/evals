@@ -14,8 +14,10 @@
 
   <div id="dialog" title="Basic dialog" style="display:none">
     <form>
-      <!--<liferay-ui:input-textarea param="${firstName}"/>-->
-      <input type="text" id="firstName"/>
+      <label>First name:</label>
+      <input type="text" id="firstName"/><br/>
+      <label>Last name:</label>
+      <input type="text" id="lastName"/><br/>
       <input id="createEmployee" name="createEmployee" type="submit" value="<liferay-ui:message key="Create Employee" />">
     </form>
   </div>

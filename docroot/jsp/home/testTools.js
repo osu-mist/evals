@@ -13,6 +13,7 @@ jQuery(document).ready(function() {
       url: "<%=renderResponse.encodeURL(createEmployeeAction.toString())%>",
       data: {
         firstName: $("#firstName").val(),
+        lastName: $("#lastName").val(),
       },
       success: function(msg) {
         console.log(msg);
