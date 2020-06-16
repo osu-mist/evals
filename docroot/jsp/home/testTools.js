@@ -9,7 +9,7 @@ jQuery(document).ready(function() {
     jQuery.ajax({
       type: "POST",
       url: "<%=renderResponse.encodeURL(createEmployeeAction.toString())%>",
-      data: {},
+      data: {firstName: 'testname'},
       success: function(msg) {
         console.log(msg);
       },
