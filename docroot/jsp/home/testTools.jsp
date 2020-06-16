@@ -1,7 +1,7 @@
 <jsp:useBean id="testAppraisals" class="java.util.ArrayList" scope="request" />
 
 <jsp:useBean id="permissionRule" class="edu.osu.cws.evals.models.PermissionRule" scope="request" />
-<jsp:useBean id="firstName" class="java.util.String" scope="request"/>
+<jsp:useBean id="firstName" class="java.lang.String" scope="request"/>
 <portlet:resourceURL var="createAppraisalAction" id="createAppraisal" escapeXml="false">
     <portlet:param name="controller" value="TestsAction"/>
 </portlet:resourceURL>
