@@ -6,7 +6,7 @@ jQuery(document).ready(function() {
   });
 
   jQuery("#createEmployee").click(function(event) {
-    console.log($("#firstName"))
+    console.log($("#firstName").val());
 
     jQuery.ajax({
       type: "POST",
