@@ -33,4 +33,9 @@
         SELECT new edu.osu.cws.evals.models.Employee(id, firstName, lastName)
         FROM edu.osu.cws.evals.models.Employee where id in (:ids)
     </query>
+
+    <query name="employee.getNewOsuid">
+      select f from edu.osu.cws.evals.models.Employee f
+      where f.osuid = (select max(ff.osuid) from edu.osu.cws.evals.models.Employee ff where ff.id = f.id)
+    </query>
 </hibernate-mapping>

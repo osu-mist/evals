@@ -128,16 +128,18 @@ public class EmployeeMgr {
     private static String getNewOsuId () {
       Session session = HibernateUtil.getCurrentSession();
 
-      DetachedCriteria versions = DetachedCriteria.forClass(Employee.class, "f")
+      /*DetachedCriteria versions = DetachedCriteria.forClass(Employee.class, "f")
         .setProjection( Property.forName("f.osuid").max())
         .add(Property.forName("f.id").eqProperty("fl.id"));
 
       List<Employee> employeeList = session.createCriteria(Employee.class, "fl")
         .add( Property.forName("fl.osuid").eq(versions) )
-        .list();
+        .list();*/
+      List<Employee> employeeList = session.getNamedQuery("employee.getNewOsuid");
 
-      System.out.println(employeeList.get(0).getOsuid());
-      System.out.println(employeeList.get(employeeList.size()-1).getOsuid());
+      // System.out.println(employeeList.get(0).getOsuid());
+      // System.out.println(employeeList.get(employeeList.size()-1).getOsuid());
+      System.out.println(employeeList);
 
       return "test";
     }
