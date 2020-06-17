@@ -137,7 +137,7 @@ public class EmployeeMgr {
         .list();*/
       List<String> employeeList = session.getNamedQuery("employee.getNewOsuid").list();
 
-      return employeeList.get(0);
+      return employeeList.get(0) + 1;
     }
 
 }
