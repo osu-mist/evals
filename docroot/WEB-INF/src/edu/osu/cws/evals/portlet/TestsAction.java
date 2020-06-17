@@ -74,7 +74,7 @@ public class TestsAction implements ActionInterface {
       System.out.println(request.getParameter("admin"));
       if ("true".equals(request.getParameter("admin"))) {
         System.out.println("create admin");
-        AdminMgr.add(employee.getOnid(), "1", employee);
+        AdminMgr.add(employee.getOnid(), "1", actionHelper.getLoggedOnUser());
       }
 
       return homeAction.display(request, response);
