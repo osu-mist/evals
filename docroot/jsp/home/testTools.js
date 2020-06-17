@@ -6,7 +6,7 @@ jQuery(document).ready(function() {
   });
 
   jQuery("#createEmployee").click(function(event) {
-    console.log($("#admin").val());
+    console.log($("#admin").is(":checked"));
     jQuery.ajax({
       type: "POST",
       url: "<%=renderResponse.encodeURL(createEmployeeAction.toString())%>",
