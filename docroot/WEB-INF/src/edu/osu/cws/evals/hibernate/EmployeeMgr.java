@@ -136,7 +136,8 @@ public class EmployeeMgr {
         .add( Property.forName("fl.osuid").eq(versions) )
         .list();
 
-      System.out.println(employeeList);
+      System.out.println(employeeList.get(0).getOsuid());
+      System.out.println(employeeList.get(employeeList.size()-1).getOsuid());
 
       return "test";
     }
