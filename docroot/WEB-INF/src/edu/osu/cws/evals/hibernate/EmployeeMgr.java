@@ -106,6 +106,7 @@ public class EmployeeMgr {
         Criteria criteria = session.createCriteria(Job.class); //Create the criteria query
         criteria.add(Restrictions.eq("employee.id", pidm)).add(Restrictions.eq("status","A"));
         List list = criteria.list();
+        System.out.println(list);
         for(Object obj : list){
             Job job = (Job)obj;
             if (job.getSupervisor() != null && job.getSupervisor().getEmployee() != null) {
