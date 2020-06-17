@@ -24,6 +24,8 @@
       <input type="text" id="onid"/><br/>
       <label>Appointment type:</label>
       <input type="text" id="appointmentType"/><br/>
+      <label>Admin:</label>
+      <input type="checkbox" id="admin"/><br/>
       <input id="createEmployee" name="createEmployee" type="submit" value="<liferay-ui:message key="Create Employee" />">
     </form>
   </div>

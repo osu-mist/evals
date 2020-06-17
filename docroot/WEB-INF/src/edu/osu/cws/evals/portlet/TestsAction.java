@@ -68,8 +68,8 @@ public class TestsAction implements ActionInterface {
     }
 
     public String createPerson(PortletRequest request, PortletResponse response) throws Exception {
-      Employee employee = createEmployee(request);
-      Job job = createJob(request, employee);
+      // Employee employee = createEmployee(request);
+      // Job job = createJob(request, employee);
 
       return homeAction.display(request, response);
     }
