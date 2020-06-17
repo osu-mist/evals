@@ -126,7 +126,9 @@ public class AppraisalMgr {
         DateTime endDate = job.getEndEvalDate(startDate, type);
         appraisal.setEndDate(CWSUtil.toDate(endDate));
 
+        System.out.println("before validate");
         if (appraisal.validate()) {
+            System.out.println("valid");
             Session session = HibernateUtil.getCurrentSession();
 
             // Create the assessments & assessment criteria
