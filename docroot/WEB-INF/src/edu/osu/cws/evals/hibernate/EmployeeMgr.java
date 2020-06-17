@@ -120,9 +120,9 @@ public class EmployeeMgr {
     public static void createEmployee (String lastName, String firstName, String onid, String email) {
       Employee emp = new Employee(firstName, lastName, onid, email);
       emp.setStatus("A");
-      getNewOsuId();
+      emp.setOsuid(getNewOsuId());
       Session session = HibernateUtil.getCurrentSession();
-      // session.save(emp);
+      session.save(emp);
     }
 
     private static String getNewOsuId () {
@@ -137,10 +137,7 @@ public class EmployeeMgr {
         .list();*/
       List<Employee> employeeList = session.getNamedQuery("employee.getNewOsuid").list();
 
-      System.out.println(employeeList.get(0));
-      System.out.println(employeeList.get(employeeList.size()-1));
-
-      return "test";
+      return employeeList.get(0);
     }
 
 }
