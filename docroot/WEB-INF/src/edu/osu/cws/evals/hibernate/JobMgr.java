@@ -668,6 +668,8 @@ public class JobMgr {
       job.setBeginDate(new Date());
       job.setTrialInd(6);
       job.setAnnualInd(12);
+      job.setPositionClass("A");
+      job.setJobTitle("Evals Testing");
 
       session.save(job);
 
