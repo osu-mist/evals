@@ -35,7 +35,6 @@
     </query>
 
     <query name="employee.getNewOsuid">
-      select f from edu.osu.cws.evals.models.Employee f
-      where f.osuid = (select max(ff.osuid) from edu.osu.cws.evals.models.Employee ff where ff.id = f.id)
+      select max(f.osuid) from edu.osu.cws.evals.models.Employee f
     </query>
 </hibernate-mapping>
