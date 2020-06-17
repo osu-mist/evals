@@ -670,6 +670,7 @@ public class JobMgr {
       job.setAnnualInd(12);
       job.setPositionClass("A");
       job.setJobTitle("Evals Testing");
+      job.setTsOrgCode("A");
 
       session.save(job);
 
