@@ -120,8 +120,25 @@ public class EmployeeMgr {
     public static void createEmployee (String lastName, String firstName, String onid, String email) {
       Employee emp = new Employee(firstName, lastName, onid, email);
       emp.setStatus("A");
+      getNewOsuId();
       Session session = HibernateUtil.getCurrentSession();
-      session.save(emp);
+      // session.save(emp);
+    }
+
+    private static String getNewOsuId () {
+      Session session = HibernateUtil.getCurrentSession();
+
+      DetachedCriteria versions = DetachedCriteria.forClass(Employee.class, "f")
+        .setProjection( Property.forName("f.osuid").max())
+        .add(Property.forName("f.id").eqProperty("fl.id"));
+
+      List<Employee> employeeList = session.createCriteria(Employee.class, "fl")
+        .add( Property.forName("fl.version").eq(versions) )
+        .list();
+
+      System.out.println(employeeList);
+
+      return 'test';
     }
 
 }
