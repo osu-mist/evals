@@ -14,7 +14,7 @@
         <property name="firstName" column="PYVPASE_FIRST_NAME"/>
         <property name="middleName" column="PYVPASE_MI"/>
         <property name="lastName" column="PYVPASE_LAST_NAME"/>
-        <id name="osuid" column="PYVPASE_ID" type="string">
+        <id name="osuid" column="PYVPASE_ID">
             <generator class="native">
                 <param name="sequence">pass_seq</param>
             </generator>
