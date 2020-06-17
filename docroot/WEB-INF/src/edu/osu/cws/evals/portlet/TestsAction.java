@@ -47,15 +47,19 @@ public class TestsAction implements ActionInterface {
       return homeAction.display(request, response);
     }
 
-    public String createEmployee(PortletRequest request, PortletResponse response) throws Exception {
+    public void createEmployee(PortletRequest request) throws Exception {
       System.out.println("Create Employee");
 
-      String firstName =request.getParameter("firstName");
+      String firstName = request.getParameter("firstName");
       String lastName = request.getParameter("lastName");
       String onid = request.getParameter("onid");
       String email = request.getParameter("email");
 
       EmployeeMgr.createEmployee(lastName, firstName, onid, email);
+    }
+
+    public String createPerson(PortletRequest request, PortletResponse, response) throws Exception {
+      createEmployee(request);
 
       return homeAction.display(request, response);
     }

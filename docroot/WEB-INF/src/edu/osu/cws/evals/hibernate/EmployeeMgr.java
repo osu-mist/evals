@@ -117,24 +117,19 @@ public class EmployeeMgr {
         return jobs;
     }
 
-    public static void createEmployee (String lastName, String firstName, String onid, String email) {
+    public static Employee createEmployee (String lastName, String firstName, String onid, String email) {
       Employee emp = new Employee(firstName, lastName, onid, email);
       emp.setStatus("A");
       emp.setOsuid(getNewOsuId());
       Session session = HibernateUtil.getCurrentSession();
       session.save(emp);
+
+      return emp;
     }
 
     private static String getNewOsuId () {
       Session session = HibernateUtil.getCurrentSession();
 
-      /*DetachedCriteria versions = DetachedCriteria.forClass(Employee.class, "f")
-        .setProjection( Property.forName("f.osuid").max())
-        .add(Property.forName("f.id").eqProperty("fl.id"));
-
-      List<Employee> employeeList = session.createCriteria(Employee.class, "fl")
-        .add( Property.forName("fl.osuid").eq(versions) )
-        .list();*/
       List<String> employeeList = session.getNamedQuery("employee.getNewOsuid").list();
 
       return String.valueOf(Integer.parseInt(employeeList.get(0)) + 1);

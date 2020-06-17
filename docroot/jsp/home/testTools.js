@@ -6,8 +6,6 @@ jQuery(document).ready(function() {
   });
 
   jQuery("#createEmployee").click(function(event) {
-    console.log($("#firstName").val());
-
     jQuery.ajax({
       type: "POST",
       url: "<%=renderResponse.encodeURL(createEmployeeAction.toString())%>",

@@ -4,7 +4,7 @@
 <portlet:resourceURL var="createAppraisalAction" id="createAppraisal" escapeXml="false">
     <portlet:param name="controller" value="TestsAction"/>
 </portlet:resourceURL>
-<portlet:resourceURL var="createEmployeeAction" id="createEmployee" escapeXml="false">
+<portlet:resourceURL var="createEmployeeAction" id="createPerson" escapeXml="false">
     <portlet:param name="controller" value="TestsAction"/>
 </portlet:resourceURL>
 
