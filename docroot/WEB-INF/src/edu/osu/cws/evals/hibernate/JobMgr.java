@@ -657,4 +657,20 @@ public class JobMgr {
                 .setString("posno", job.getPositionNumber())
                 .uniqueResult();
     }
+
+    public static Job createJob(Employee employee) {
+      Session session = HibernateUtil.getCurrentSession();
+
+      Job job = new Job(employee, "E1", "00");
+      job.setPositionType("Classified IT");
+      job.setStatus("A");
+      job.setJobEcls("AC");
+      job.setBeginDate("03-AUG-18");
+      job.setTrialInd(6);
+      job.setAnnualInd(12);
+
+      session.save(job);
+
+      return job;
+    }
 }

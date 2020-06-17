@@ -5,6 +5,7 @@ import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
+import edu.osu.cws.evals.hibernate.JobMgr;
 
 import javax.portlet.*;
 
@@ -47,7 +48,7 @@ public class TestsAction implements ActionInterface {
       return homeAction.display(request, response);
     }
 
-    public void createEmployee(PortletRequest request) throws Exception {
+    public Employee createEmployee(PortletRequest request) throws Exception {
       System.out.println("Create Employee");
 
       String firstName = request.getParameter("firstName");
@@ -55,11 +56,18 @@ public class TestsAction implements ActionInterface {
       String onid = request.getParameter("onid");
       String email = request.getParameter("email");
 
-      EmployeeMgr.createEmployee(lastName, firstName, onid, email);
+      return EmployeeMgr.createEmployee(lastName, firstName, onid, email);
+    }
+
+    public Job createJob(PortletRequest request, Employee employee) throws Exception {
+      System.out.println("Create Job");
+
+      return JobMgr.createJob(employee);
     }
 
     public String createPerson(PortletRequest request, PortletResponse response) throws Exception {
-      createEmployee(request);
+      Employee employee = createEmployee(request);
+      Job job = createJob(request, employee);
 
       return homeAction.display(request, response);
     }
