@@ -5,7 +5,7 @@ import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 
 import java.util.HashSet;
 import java.util.List;
