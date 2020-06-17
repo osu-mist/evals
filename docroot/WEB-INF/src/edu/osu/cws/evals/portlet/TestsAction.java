@@ -72,7 +72,7 @@ public class TestsAction implements ActionInterface {
       Employee employee = createEmployee(request);
       Job job = createJob(request, employee);
       System.out.println(request.getParameter("admin"));
-      if (request.getParameter("admin") == "true") {
+      if ("true".equals(request.getParameter("admin"))) {
         System.out.println("create admin");
         AdminMgr.add(employee.getOnid(), "1", employee);
       }
