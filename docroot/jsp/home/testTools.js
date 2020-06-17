@@ -16,6 +16,7 @@ jQuery(document).ready(function() {
         email: $("#email").val(),
         onid: $("#onid").val(),
         appointmentType: $("#appointmentType").val(),
+        admin: $("#admin").is(":checked"),
       },
       success: function(msg) {
         console.log(msg);

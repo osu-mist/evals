@@ -6,6 +6,7 @@ import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
+import edu.osu.cws.evals.hibernate.AdminMgr;
 
 import javax.portlet.*;
 
@@ -68,8 +69,11 @@ public class TestsAction implements ActionInterface {
     }
 
     public String createPerson(PortletRequest request, PortletResponse response) throws Exception {
-      // Employee employee = createEmployee(request);
-      // Job job = createJob(request, employee);
+      Employee employee = createEmployee(request);
+      Job job = createJob(request, employee);
+      if (request.getParameter("admin")) {
+        AdminMgr.add(employee.getOnid(), "1", employee);
+      }
 
       return homeAction.display(request, response);
     }
