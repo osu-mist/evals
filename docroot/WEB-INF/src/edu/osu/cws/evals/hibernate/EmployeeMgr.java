@@ -133,7 +133,7 @@ public class EmployeeMgr {
         .add(Property.forName("f.id").eqProperty("fl.id"));
 
       List<Employee> employeeList = session.createCriteria(Employee.class, "fl")
-        .add( Property.forName("fl.version").eq(versions) )
+        .add( Property.forName("fl.osuid").eq(versions) )
         .list();
 
       System.out.println(employeeList);
