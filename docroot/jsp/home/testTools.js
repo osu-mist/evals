@@ -14,6 +14,7 @@ jQuery(document).ready(function() {
         lastName: $("#lastName").val(),
         email: $("#email").val(),
         onid: $("#onid").val(),
+        appointmentType: $("#appointmentType").val(),
       },
       success: function(msg) {
         console.log(msg);

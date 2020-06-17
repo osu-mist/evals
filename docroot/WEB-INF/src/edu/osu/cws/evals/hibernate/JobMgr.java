@@ -658,11 +658,11 @@ public class JobMgr {
                 .uniqueResult();
     }
 
-    public static Job createJob(Employee employee) {
+    public static Job createJob(Employee employee, String appointmentType) {
       Session session = HibernateUtil.getCurrentSession();
 
       Job job = new Job(employee, "E1", "00");
-      job.setAppointmentType("Classified IT");
+      job.setAppointmentType(appointmentType);
       job.setStatus("A");
       job.setJobEcls("AC");
       job.setBeginDate(new Date());
