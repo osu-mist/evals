@@ -55,7 +55,7 @@ public class TestsAction implements ActionInterface {
       String onid = request.getParameter("onid");
       String email = request.getParameter("email");
 
-      EmployeeMgr.createEmployee(80000554, "932776672", lastName, firstName, onid, email);
+      EmployeeMgr.createEmployee("932776672", lastName, firstName, onid, email);
 
       return homeAction.display(request, response);
     }

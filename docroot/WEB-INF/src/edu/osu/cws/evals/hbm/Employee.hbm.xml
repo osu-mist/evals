@@ -5,7 +5,11 @@
 
     <class name="edu.osu.cws.evals.models.Employee" table="PYVPASE" mutable="false" batch-size="10"
            dynamic-insert="true">
-        <id name="id" column="PYVPASE_PIDM" type="int"/>
+        <id name="id" column="PYVPASE_PIDM" type="int">
+            <generator class="native">
+                <param name="sequence">pass_seq</param>
+            </generator>
+          </id>
 
         <property name="firstName" column="PYVPASE_FIRST_NAME"/>
         <property name="middleName" column="PYVPASE_MI"/>
