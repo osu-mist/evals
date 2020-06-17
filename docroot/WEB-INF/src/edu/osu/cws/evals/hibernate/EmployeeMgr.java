@@ -137,9 +137,8 @@ public class EmployeeMgr {
         .list();*/
       List<Employee> employeeList = session.getNamedQuery("employee.getNewOsuid").list();
 
-      // System.out.println(employeeList.get(0).getOsuid());
-      // System.out.println(employeeList.get(employeeList.size()-1).getOsuid());
-      System.out.println(employeeList);
+      System.out.println(employeeList.get(0).getOsuid());
+      System.out.println(employeeList.get(employeeList.size()-1).getOsuid());
 
       return "test";
     }
