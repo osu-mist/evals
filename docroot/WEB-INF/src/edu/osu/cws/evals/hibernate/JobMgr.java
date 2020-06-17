@@ -662,10 +662,10 @@ public class JobMgr {
       Session session = HibernateUtil.getCurrentSession();
 
       Job job = new Job(employee, "E1", "00");
-      job.setPositionType("Classified IT");
+      job.setAppointmentType("Classified IT");
       job.setStatus("A");
       job.setJobEcls("AC");
-      job.setBeginDate("03-AUG-18");
+      job.setBeginDate(new Date());
       job.setTrialInd(6);
       job.setAnnualInd(12);
 
