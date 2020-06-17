@@ -62,7 +62,7 @@ public class TestsAction implements ActionInterface {
     public Job createJob(PortletRequest request, Employee employee) throws Exception {
       System.out.println("Create Job");
 
-      string appointmentType = request.getParameter("appointmentType");
+      String appointmentType = request.getParameter("appointmentType");
 
       return JobMgr.createJob(employee, appointmentType);
     }
