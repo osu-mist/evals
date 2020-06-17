@@ -135,7 +135,7 @@ public class EmployeeMgr {
       List<Employee> employeeList = session.createCriteria(Employee.class, "fl")
         .add( Property.forName("fl.osuid").eq(versions) )
         .list();*/
-      List<Employee> employeeList = session.getNamedQuery("employee.getNewOsuid").list();
+      List<String> employeeList = session.getNamedQuery("employee.getNewOsuid").list();
 
       return employeeList.get(0);
     }
