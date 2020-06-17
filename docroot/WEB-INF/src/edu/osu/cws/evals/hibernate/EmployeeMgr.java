@@ -117,8 +117,8 @@ public class EmployeeMgr {
         return jobs;
     }
 
-    public static void createEmployee (String osuId, String lastName, String firstName, String onid, String email) {
-      Employee emp = new Employee(firstName, lastName, onid, osuId, email);
+    public static void createEmployee (String lastName, String firstName, String onid, String email) {
+      Employee emp = new Employee(firstName, lastName, onid, email);
       emp.setStatus("A");
       Session session = HibernateUtil.getCurrentSession();
       session.save(emp);

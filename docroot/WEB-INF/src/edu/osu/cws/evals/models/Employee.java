@@ -73,7 +73,7 @@ public class Employee extends Evals implements Serializable {
         this.lastName = lastName;
     }
 
-    public Employee(String firstName, String lastName, String onid, String osuid, String email) {
+    public Employee(String firstName, String lastName, String onid, String email) {
       this.firstName = firstName;
       this.lastName = lastName;
       this.onid = onid;
