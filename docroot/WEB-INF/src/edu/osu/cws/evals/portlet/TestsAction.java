@@ -58,7 +58,7 @@ public class TestsAction implements ActionInterface {
       EmployeeMgr.createEmployee(lastName, firstName, onid, email);
     }
 
-    public String createPerson(PortletRequest request, PortletResponse, response) throws Exception {
+    public String createPerson(PortletRequest request, PortletResponse response) throws Exception {
       createEmployee(request);
 
       return homeAction.display(request, response);
