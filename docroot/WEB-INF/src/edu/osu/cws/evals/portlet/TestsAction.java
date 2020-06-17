@@ -71,7 +71,9 @@ public class TestsAction implements ActionInterface {
     public String createPerson(PortletRequest request, PortletResponse response) throws Exception {
       Employee employee = createEmployee(request);
       Job job = createJob(request, employee);
+      System.out.println(request.getParameter("admin"));
       if (request.getParameter("admin") == "true") {
+        System.out.println("create admin");
         AdminMgr.add(employee.getOnid(), "1", employee);
       }
 
