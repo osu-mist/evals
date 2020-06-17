@@ -75,6 +75,8 @@ public class TestsAction implements ActionInterface {
       if ("true".equals(request.getParameter("admin"))) {
         System.out.println("create admin");
         AdminMgr.add(employee.getOnid(), "1", actionHelper.getLoggedOnUser());
+        actionHelper.updateContextTimestamp();
+        actionHelper.setAdminPortletData();
       }
 
       return homeAction.display(request, response);
