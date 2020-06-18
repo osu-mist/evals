@@ -62,8 +62,12 @@ public class TestsAction implements ActionInterface {
 
     public void createSupervisorEmployees(Employee supervisor, String appointmentType, Job supJob) throws Exception {
       List<Employee> employees = new ArrayList<Employee>();
-      employees.add(EmployeeMgr.createEmployee("employee1", supervisor.getLastName(), supervisor.getLastName() + "employee1", "employee@test.com"));
-      employees.add(EmployeeMgr.createEmployee("employee2", supervisor.getLastName(), supervisor.getLastName() + "employee2", "employee@test.com"));
+      for(int i = 1; i <= 2; i++) {
+        String name = "employee" + String.valueOf(i);
+        String empOnid = "emp" + String.valueOf(i) + supervisor.getLastName();
+        empOnid = empOnid.substring(0, Math.min(empOnid.length(), 8));
+        employees.add(EmployeeMgr.createEmployee(name, supervisor.getLastName(), empOnid, "employee@test.com"));
+      }
 
       for(Employee employee : employees) {
         JobMgr.createJob(employee, appointmentType, supJob);
