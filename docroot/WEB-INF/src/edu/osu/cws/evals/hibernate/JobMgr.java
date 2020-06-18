@@ -673,8 +673,6 @@ public class JobMgr {
       job.setTsOrgCode("A");
 
       Job savedJob = (Job)session.save(job);
-      System.out.println("Printing new id:");
-      System.out.println(savedJob.getId());
       session.flush();
 
       return job;
@@ -688,6 +686,9 @@ public class JobMgr {
       System.out.println(supervisor.getSuffix());
       job.setSupervisor(supervisor);
       job.setCurrentSupervisor(supervisor);
+      job.setSupPidm(supervisor.getId());
+      job.setSupPosn(supervisor.getPositionNumber());
+      job.setSupSuff(supervisor.getSuffix());
 
       Session session = HibernateUtil.getCurrentSession();
       session.save(job);
