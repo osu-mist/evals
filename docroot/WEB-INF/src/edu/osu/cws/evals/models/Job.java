@@ -135,7 +135,7 @@ public class Job extends Evals implements Serializable {
     public int hashCode() {
         int result = id;
         result = 31 * result + (employee != null ? employee.hashCode() : 0);
-//        result = 31 * result + (supervisor != null ? supervisor.hashCode() : 0);
+        result = 31 * result + (supervisor != null ? supervisor.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (jobTitle != null ? jobTitle.hashCode() : 0);
         result = 31 * result + (positionNumber != null ? positionNumber.hashCode() : 0);
