@@ -7,6 +7,7 @@ import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
 import edu.osu.cws.evals.hibernate.AdminMgr;
+import edu.osu.cws.evals.hibernate.ReviewerMgr;
 
 import javax.portlet.*;
 
@@ -74,7 +75,7 @@ public class TestsAction implements ActionInterface {
       }
     }
 
-    public Job createJob(PortletRequest request, Employee employee) throws Exception {
+    public Job createJob(PortletRequest request, Employee employee, boolean reviewer) throws Exception {
       System.out.println("Create Job");
 
       String appointmentType = request.getParameter("appointmentType");
@@ -82,10 +83,10 @@ public class TestsAction implements ActionInterface {
       Job job = JobMgr.createJob(employee, appointmentType);
       job.setId(employee.getId());
 
-      if("true".equals(request.getParameter("reviewer"))) {
+      if("true".equals(request.getAttribute("reviewer"))) {
         System.out.println("create reviewer");
         ReviewerMgr.add(employee.getOnid(), request.getParameter("businessCenter"));
-        request.setParameter("reviewer", "false");
+        request.setAttribute("reviewer", "false");
       } else if ("true".equals(request.getParameter("supervisor"))) {
         System.out.println("create supervisor");
         createSupervisorEmployees(employee, appointmentType, job);
@@ -95,6 +96,11 @@ public class TestsAction implements ActionInterface {
     }
 
     public String createPerson(PortletRequest request, PortletResponse response) throws Exception {
+      if (!request.getAttributeNames().contains("reviewer")) {
+        System.out.println("adding reviewer to attributes");
+        request.setAttribute("reviewer", request.getParameter("reviewer"));
+      }
+
       Employee employee = createEmployee(request);
       Job job = createJob(request, employee);
 
