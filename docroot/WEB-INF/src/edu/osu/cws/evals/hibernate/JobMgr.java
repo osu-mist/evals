@@ -681,14 +681,8 @@ public class JobMgr {
     public static Job createJob(Employee employee, String appointmentType, Job supervisor) {
       Job job = createJob(employee, appointmentType);
 
-      System.out.println(supervisor.getId());
-      System.out.println(supervisor.getPositionNumber());
-      System.out.println(supervisor.getSuffix());
       job.setSupervisor(supervisor);
       job.setCurrentSupervisor(supervisor);
-      job.setSupPidm(supervisor.getId());
-      job.setSupPosn(supervisor.getPositionNumber());
-      job.setSupSuff(supervisor.getSuffix());
       // this is what desperation looks like
       String query = "update pyvpasj set PYVPASJ_SUPERVISOR_PIDM = " + supervisor.getId() + ", PYVPASJ_SUPERVISOR_POSN = \'" + supervisor.getPositionNumber() + "\', PYVPASJ_SUPERVISOR_SUFF = \'" + supervisor.getSuffix() + "\' where PYVPASJ_PIDM = " + employee.getId();
 

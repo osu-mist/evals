@@ -28,6 +28,10 @@
       <input type="checkbox" id="admin"/><br/>
       <label>Supervisor:</label>
       <input type="checkbox" id="supervisor"/><br/>
+      <label>Reviewer:</label>
+      <input type="checkbox" id="reviewer"/><br/>
+      <label>Business center:</label>
+      <input type="text" id="businessCenter"/><br/>
       <input id="createEmployee" name="createEmployee" type="submit" value="<liferay-ui:message key="Create Employee" />">
     </form>
   </div>

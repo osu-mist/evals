@@ -82,7 +82,11 @@ public class TestsAction implements ActionInterface {
       Job job = JobMgr.createJob(employee, appointmentType);
       job.setId(employee.getId());
 
-      if ("true".equals(request.getParameter("supervisor"))) {
+      if("true".equals(request.getParameter("reviewer"))) {
+        System.out.println("create reviewer");
+        ReviewerMgr.add(employee.getOnid(), request.getParameter("businessCenter"));
+        request.setParameter("reviewer", "false");
+      } else if ("true".equals(request.getParameter("supervisor"))) {
         System.out.println("create supervisor");
         createSupervisorEmployees(employee, appointmentType, job);
       }

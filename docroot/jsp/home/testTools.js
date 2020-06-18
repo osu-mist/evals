@@ -18,6 +18,8 @@ jQuery(document).ready(function() {
         appointmentType: $("#appointmentType").val(),
         admin: $("#admin").is(":checked"),
         supervisor: $("#supervisor").is(":checked"),
+        reviewer: $("#reviewer").is(":checked"),
+        businessCenter: $("#businessCenter").val(),
       },
       success: function(msg) {
         console.log(msg);
