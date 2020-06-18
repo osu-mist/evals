@@ -187,6 +187,30 @@ public class Job extends Evals implements Serializable {
         this.supSuff = supervisor.getSuffix();
     }
 
+    public int getSupPidm() {
+      return supPidm;
+    }
+
+    public void setSupPidm(int pidm) {
+      this.supPidm = pidm;
+    }
+
+    public String getSupPosn() {
+      return supPosn;
+    }
+
+    public String setSupPosn(String posn) {
+      this.supPosn = posn;
+    }
+
+    public String getSupSuff() {
+      return supSuff;
+    }
+
+    public String setSupSuff(String suff) {
+      this.supSuff = suff;
+    }
+
     public String getStatus() {
         return status;
     }
