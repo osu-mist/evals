@@ -678,12 +678,12 @@ public class JobMgr {
     }
 
     public static Job createJob(Employee employee, String appointmentType, Job supervisor) {
-      Session session = HibernateUtil.getCurrentSession();
-
       Job job = createJob(employee, appointmentType);
 
+      System.out.println(supervisor);
       job.setSupervisor(supervisor);
 
+      Session session = HibernateUtil.getCurrentSession();
       session.save(job);
 
       return job;
