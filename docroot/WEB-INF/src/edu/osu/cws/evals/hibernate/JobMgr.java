@@ -673,6 +673,7 @@ public class JobMgr {
       job.setTsOrgCode("A");
 
       session.save(job);
+      session.flush();
 
       return job;
     }
