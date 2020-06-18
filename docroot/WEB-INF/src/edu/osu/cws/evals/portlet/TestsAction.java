@@ -75,7 +75,7 @@ public class TestsAction implements ActionInterface {
       }
     }
 
-    public Job createJob(PortletRequest request, Employee employee, boolean reviewer) throws Exception {
+    public Job createJob(PortletRequest request, Employee employee) throws Exception {
       System.out.println("Create Job");
 
       String appointmentType = request.getParameter("appointmentType");
@@ -96,7 +96,7 @@ public class TestsAction implements ActionInterface {
     }
 
     public String createPerson(PortletRequest request, PortletResponse response) throws Exception {
-      if (!request.getAttributeNames().contains("reviewer")) {
+      if (request.getAttribute("reviewer") == null)) {
         System.out.println("adding reviewer to attributes");
         request.setAttribute("reviewer", request.getParameter("reviewer"));
       }
