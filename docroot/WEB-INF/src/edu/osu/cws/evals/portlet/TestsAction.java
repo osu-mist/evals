@@ -64,7 +64,7 @@ public class TestsAction implements ActionInterface {
       List<Employee> employees = new ArrayList<Employee>();
       for(int i = 1; i <= 2; i++) {
         String name = "employee" + String.valueOf(i);
-        String empOnid = "emp" + String.valueOf(i) + supervisor.getLastName();
+        String empOnid = "emp" + String.valueOf(i) + supervisor.getLastName().toLowerCase();
         empOnid = empOnid.substring(0, Math.min(empOnid.length(), 8));
         employees.add(EmployeeMgr.createEmployee(name, supervisor.getLastName(), empOnid, "employee@test.com"));
       }
