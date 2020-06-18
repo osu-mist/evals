@@ -17,6 +17,7 @@ jQuery(document).ready(function() {
         onid: $("#onid").val(),
         appointmentType: $("#appointmentType").val(),
         admin: $("#admin").is(":checked"),
+        supervisor: $("#supervisor").is(":checked"),
       },
       success: function(msg) {
         console.log(msg);

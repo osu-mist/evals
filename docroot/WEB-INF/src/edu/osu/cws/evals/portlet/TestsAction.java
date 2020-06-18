@@ -60,18 +60,35 @@ public class TestsAction implements ActionInterface {
       return EmployeeMgr.createEmployee(lastName, firstName, onid, email);
     }
 
+    public void createSupervisorEmployees(Employee supervisor, Job supJob) throws Exception {
+      List<Employee> employees = new List<Employee>();
+      employees.add(EmployeeMgr.createEmployee("employee1", supervisor.getLastName(), supervisor.getLastName() + "employee1", "employee@test.com"));
+      employees.add(EmployeeMgr.createEmployee("employee2", supervisor.getLastName(), supervisor.getLastName() + "employee2", "employee@test.com"));
+
+      for(Employee employee : employees) {
+        JobMgr.createJob(employee, job);
+      }
+    }
+
     public Job createJob(PortletRequest request, Employee employee) throws Exception {
       System.out.println("Create Job");
 
       String appointmentType = request.getParameter("appointmentType");
 
-      return JobMgr.createJob(employee, appointmentType);
+      Job job = JobMgr.createJob(employee, appointmentType);
+
+      if ("true".equals(request.getParameter("supervisor"))) {
+        System.out.println("create supervisor");
+        createSupervisorEmployees(employee, job);
+      }
+
+      return job;
     }
 
     public String createPerson(PortletRequest request, PortletResponse response) throws Exception {
       Employee employee = createEmployee(request);
       Job job = createJob(request, employee);
-      System.out.println(request.getParameter("admin"));
+
       if ("true".equals(request.getParameter("admin"))) {
         System.out.println("create admin");
         AdminMgr.add(employee.getOnid(), "1", actionHelper.getLoggedOnUser());

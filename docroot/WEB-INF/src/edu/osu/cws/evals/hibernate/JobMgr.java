@@ -676,4 +676,14 @@ public class JobMgr {
 
       return job;
     }
+
+    public static Job createJob(Employee employee, String appointmentType, Job supervisor) {
+      Session session = HibernateUtil.getCurrentSession();
+
+      Job job = createJob(employee, appointmentType);
+
+      job.setSupervisor(supervisor);
+
+      session.save(job);
+    }
 }
