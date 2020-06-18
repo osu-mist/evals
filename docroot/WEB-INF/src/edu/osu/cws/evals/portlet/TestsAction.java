@@ -96,7 +96,7 @@ public class TestsAction implements ActionInterface {
     }
 
     public String createPerson(PortletRequest request, PortletResponse response) throws Exception {
-      if (request.getAttribute("reviewer") == null)) {
+      if (request.getAttribute("reviewer") == null) {
         System.out.println("adding reviewer to attributes");
         request.setAttribute("reviewer", request.getParameter("reviewer"));
       }
