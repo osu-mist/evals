@@ -182,9 +182,9 @@ public class Job extends Evals implements Serializable {
 
     public void setSupervisor(Job supervisor) {
         this.supervisor = supervisor;
-        this.supPidm = supervisor.getId();
+        /*this.supPidm = supervisor.getId();
         this.supPosn = supervisor.getPositionNumber();
-        this.supSuff = supervisor.getSuffix();
+        this.supSuff = supervisor.getSuffix();*/
     }
 
     public void setCurrentSupervisor(Job supervisor) {
