@@ -61,12 +61,12 @@ public class TestsAction implements ActionInterface {
     }
 
     public void createSupervisorEmployees(Employee supervisor, Job supJob) throws Exception {
-      List<Employee> employees = new List<Employee>();
+      List<Employee> employees = new ArrayList<Employee>();
       employees.add(EmployeeMgr.createEmployee("employee1", supervisor.getLastName(), supervisor.getLastName() + "employee1", "employee@test.com"));
       employees.add(EmployeeMgr.createEmployee("employee2", supervisor.getLastName(), supervisor.getLastName() + "employee2", "employee@test.com"));
 
       for(Employee employee : employees) {
-        JobMgr.createJob(employee, job);
+        JobMgr.createJob(employee, supJob);
       }
     }
 

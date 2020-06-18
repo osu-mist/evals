@@ -685,5 +685,7 @@ public class JobMgr {
       job.setSupervisor(supervisor);
 
       session.save(job);
+
+      return job;
     }
 }
