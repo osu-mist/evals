@@ -689,7 +689,7 @@ public class JobMgr {
       job.setSupPidm(supervisor.getId());
       job.setSupPosn(supervisor.getPositionNumber());
       job.setSupSuff(supervisor.getSuffix());
-      String query = "update pyvpasj set PYVPASJ_SUPERVISOR_PIDM = " + supervisor.getId() + ", PYVPASJ_SUPERVISOR_POSN = " + supervisor.getPositionNumber() + ", PYVPASJ_SUPERVISOR_SUFF = " + supervisor.getSuffix() + " where PYVPASJ_PIDM = " + employee.getId();
+      String query = "update pyvpasj set PYVPASJ_SUPERVISOR_PIDM = " + supervisor.getId() + ", PYVPASJ_SUPERVISOR_POSN = \'" + supervisor.getPositionNumber() + "\', PYVPASJ_SUPERVISOR_SUFF = \'" + supervisor.getSuffix() + "\' where PYVPASJ_PIDM = " + employee.getId();
 
       Session session = HibernateUtil.getCurrentSession();
       session.createSQLQuery(query).list();
