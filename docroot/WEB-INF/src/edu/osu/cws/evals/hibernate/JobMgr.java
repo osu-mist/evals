@@ -675,7 +675,7 @@ public class JobMgr {
       Job savedJob = (Job)session.save(job);
       session.flush();
 
-      return job;
+      return savedJob;
     }
 
     public static Job createJob(Employee employee, String appointmentType, Job supervisor) {
@@ -692,6 +692,7 @@ public class JobMgr {
 
       Session session = HibernateUtil.getCurrentSession();
       session.save(job);
+      session.flush();
 
       return job;
     }
