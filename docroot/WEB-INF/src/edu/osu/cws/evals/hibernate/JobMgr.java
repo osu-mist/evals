@@ -672,9 +672,9 @@ public class JobMgr {
       job.setJobTitle("Evals Testing");
       job.setTsOrgCode("A");
 
-      Integer newId = (Integer)session.save(job);
+      Job savedJob = (Job)session.save(job);
       System.out.println("Printing new id:");
-      System.out.println(newId);
+      System.out.println(savedJob.getId());
       session.flush();
 
       return job;
