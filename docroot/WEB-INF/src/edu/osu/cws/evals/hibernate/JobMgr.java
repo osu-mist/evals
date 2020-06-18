@@ -672,7 +672,9 @@ public class JobMgr {
       job.setJobTitle("Evals Testing");
       job.setTsOrgCode("A");
 
-      session.save(job);
+      Integer newId = (Integer)session.save(job);
+      System.out.println("Printing new id:");
+      System.out.println(newId);
       session.flush();
 
       return job;
@@ -682,6 +684,8 @@ public class JobMgr {
       Job job = createJob(employee, appointmentType);
 
       System.out.println(supervisor.getId());
+      System.out.println(supervisor.getPositionNumber());
+      System.out.println(supervisor.getSuffix());
       job.setSupervisor(supervisor);
       job.setCurrentSupervisor(supervisor);
 
