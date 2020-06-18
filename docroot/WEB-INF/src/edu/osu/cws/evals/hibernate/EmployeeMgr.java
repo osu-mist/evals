@@ -124,6 +124,7 @@ public class EmployeeMgr {
       emp.setOsuid(getNewOsuId());
       Session session = HibernateUtil.getCurrentSession();
       session.save(emp);
+      session.flush();
 
       return emp;
     }
