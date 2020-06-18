@@ -38,11 +38,11 @@
         <property name="supPosn" type="string" column="PYVPASJ_SUPERVISOR_POSN"/>
         <property name="supSuff" type="string" column="PYVPASJ_SUPERVISOR_SUFF"/>-->
 
-        <many-to-one name="supervisor" class="edu.osu.cws.evals.models.Job" not-null="false" fetch="select">
+        <!--<many-to-one name="supervisor" class="edu.osu.cws.evals.models.Job" not-null="false" fetch="select">
             <column name="PYVPASJ_SUPERVISOR_PIDM"/>
             <column name="PYVPASJ_SUPERVISOR_POSN"/>
             <column name="PYVPASJ_SUPERVISOR_SUFF"/>
-        </many-to-one>
+        </many-to-one>-->
 
         <set name="appraisals" inverse="true">
             <key>
