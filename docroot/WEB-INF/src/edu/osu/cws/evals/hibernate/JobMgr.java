@@ -680,7 +680,7 @@ public class JobMgr {
     public static Job createJob(Employee employee, String appointmentType, Job supervisor) {
       Job job = createJob(employee, appointmentType);
 
-      System.out.println(supervisor);
+      System.out.println(supervisor.getId());
       job.setSupervisor(supervisor);
       job.setCurrentSupervisor(supervisor);
 
