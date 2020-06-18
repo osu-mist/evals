@@ -60,7 +60,7 @@ public class TestsAction implements ActionInterface {
       return EmployeeMgr.createEmployee(lastName, firstName, onid, email);
     }
 
-    public void createSupervisorEmployees(Employee supervisor, String appointmentType Job supJob) throws Exception {
+    public void createSupervisorEmployees(Employee supervisor, String appointmentType, Job supJob) throws Exception {
       List<Employee> employees = new ArrayList<Employee>();
       employees.add(EmployeeMgr.createEmployee("employee1", supervisor.getLastName(), supervisor.getLastName() + "employee1", "employee@test.com"));
       employees.add(EmployeeMgr.createEmployee("employee2", supervisor.getLastName(), supervisor.getLastName() + "employee2", "employee@test.com"));
