@@ -682,6 +682,7 @@ public class JobMgr {
 
       System.out.println(supervisor);
       job.setSupervisor(supervisor);
+      job.setCurrentSupervisor(supervisor);
 
       Session session = HibernateUtil.getCurrentSession();
       session.save(job);
