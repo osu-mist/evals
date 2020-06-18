@@ -21,7 +21,7 @@ public class Job extends Evals implements Serializable {
     private Employee employee;
 
     private Job supervisor;
-    private Integer supPidm;
+    private int supPidm;
     private String supPosn;
     private String supSuff;
 
@@ -195,7 +195,7 @@ public class Job extends Evals implements Serializable {
       return supPidm;
     }
 
-    public void setSupPidm(Integer pidm) {
+    public void setSupPidm(int pidm) {
       this.supPidm = pidm;
     }
 
