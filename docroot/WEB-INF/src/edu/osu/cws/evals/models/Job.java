@@ -21,6 +21,9 @@ public class Job extends Evals implements Serializable {
     private Employee employee;
 
     private Job supervisor;
+    private int supPidm;
+    private String supPosn;
+    private String supSuff;
 
     /**
      * Possible values of status are:
@@ -179,6 +182,9 @@ public class Job extends Evals implements Serializable {
 
     public void setSupervisor(Job supervisor) {
         this.supervisor = supervisor;
+        this.supPidm = supervisor.getId();
+        this.supPosn = supervisor.getPositionNumber();
+        this.supSuff = supervisor.getSuffix();
     }
 
     public String getStatus() {
