@@ -34,14 +34,11 @@
         <property name="salaryCurrent" type="double" column="PYVPASJ_SALARY"/>
         <property name="salaryGrpCode" type="string" length="6" column="PYVPASJ_SGRP_CODE"/>
         <property name="rankedFlag" type="boolean" column="PYVPASJ_INCLUDE_RANKED_FLAG"/>
-        <property name="supPidm" type="int" column="PYVPASJ_SUPERVISOR_PIDM"/>
-        <property name="supPosn" type="string" column="PYVPASJ_SUPERVISOR_POSN"/>
-        <property name="supSuff" type="string" column="PYVPASJ_SUPERVISOR_SUFF"/>
 
         <many-to-one name="supervisor" class="edu.osu.cws.evals.models.Job" not-null="false" fetch="select">
-            <column name="PYVPASJ_SUPERVISOR_PIDM"/>
-            <column name="PYVPASJ_SUPERVISOR_POSN"/>
-            <column name="PYVPASJ_SUPERVISOR_SUFF"/>
+            <property name="supPidm" type="int" column="PYVPASJ_SUPERVISOR_PIDM"/>
+            <property name="supPosn" type="string" column="PYVPASJ_SUPERVISOR_POSN"/>
+            <property name="supSuff" type="string" column="PYVPASJ_SUPERVISOR_SUFF"/>
         </many-to-one>
 
         <set name="appraisals" inverse="true">
