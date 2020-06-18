@@ -199,7 +199,7 @@ public class Job extends Evals implements Serializable {
       return supPosn;
     }
 
-    public String setSupPosn(String posn) {
+    public void setSupPosn(String posn) {
       this.supPosn = posn;
     }
 
@@ -207,7 +207,7 @@ public class Job extends Evals implements Serializable {
       return supSuff;
     }
 
-    public String setSupSuff(String suff) {
+    public void setSupSuff(String suff) {
       this.supSuff = suff;
     }
 
