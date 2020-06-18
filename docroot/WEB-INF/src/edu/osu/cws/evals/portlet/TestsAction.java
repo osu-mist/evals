@@ -85,9 +85,9 @@ public class TestsAction implements ActionInterface {
 
       if("true".equals(request.getAttribute("reviewer"))) {
         System.out.println("create reviewer");
-        ReviewerMgr.add(employee.getOnid(), request.getParameter("businessCenter").substring(0, 4));
-        actionHelper.updateContextTimestamp();
-        actionHelper.setAdminPortletData();
+        // ReviewerMgr.add(employee.getOnid(), request.getParameter("businessCenter").substring(0, 4));
+        // actionHelper.updateContextTimestamp();
+        // actionHelper.setAdminPortletData();
         request.setAttribute("reviewer", "false");
       } else if ("true".equals(request.getParameter("supervisor"))) {
         System.out.println("create supervisor");
