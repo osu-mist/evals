@@ -127,7 +127,7 @@ public class EmployeeMgr {
       Session session = HibernateUtil.getCurrentSession();
       Integer newEmp = (Integer)session.save(emp);
       System.out.println("new employee id:");
-      System.out.println(newEmp);
+      System.out.println(emp.getId());
       session.flush();
 
       return emp;
