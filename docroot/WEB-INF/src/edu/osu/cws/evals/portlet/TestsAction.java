@@ -197,6 +197,8 @@ public class TestsAction implements ActionInterface {
         }
         appraisal.setRating(1);
         appraisal.setEvaluation("autocompleted evaluation");
+        appraisal.setEvaluator(appraisal.getJob().getSupervisor().getEmployee());
+        appraisal.setEvaluationSubmitDate(new Date());
         appraisal.setStatus(Appraisal.STATUS_REVIEW_DUE);
         session.save(appraisal);
       }
