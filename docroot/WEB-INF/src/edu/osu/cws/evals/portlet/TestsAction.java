@@ -170,6 +170,7 @@ public class TestsAction implements ActionInterface {
         session.save(appraisal);
       }
 
+      actionHelper.reloadMyAppraisals();
       return homeAction.display(request, response);
     }
 
