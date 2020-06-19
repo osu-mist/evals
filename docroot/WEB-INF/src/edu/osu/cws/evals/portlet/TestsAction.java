@@ -141,7 +141,8 @@ public class TestsAction implements ActionInterface {
         // }
       // }
 
-      if("goalsDue".equals(appraisal.getStatus()) || "goalsOverdue".equals(appraisal.getStatus())) {
+      String status = appraisal.getStatus();
+      if("goalsDue".equals(status) || "goalsOverdue".equals(status)) {
         for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
           for (Assessment assessment : goalVersion.getAssessments()) {
             if(assessment.getGoal() == null || assessment.getGoal().isEmpty()) {
@@ -155,6 +156,14 @@ public class TestsAction implements ActionInterface {
         appraisal.getUnapprovedGoalsVersion().setGoalsSubmitDate(new Date());
         appraisal.setStatus("goalsApprovalDue");
         session.save(appraisal);
+      }
+
+      if("goalsApprovalDue".equals(status) || "goalsApprovalOverdue".equals(status)) {
+        for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
+          goalVersion.setGoalsApprovedDate(new Date());
+          goalVersion.setGoalsComments("autocompleted goals comment");
+          goalVersion.setGoalsApproverPidm(appraisal.getJob().getSupervisor().getId());
+        }
       }
 
       return homeAction.display(request, response);
