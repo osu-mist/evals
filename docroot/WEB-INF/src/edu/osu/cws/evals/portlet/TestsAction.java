@@ -89,8 +89,10 @@ public class TestsAction implements ActionInterface {
         actionHelper.updateContextTimestamp();
         actionHelper.setAdminPortletData();
         parameters.put("reviewer", "false");
-        // createPerson(parameters);
-      } else if ("true".equals(parameters.get("supervisor")) || "true".equals(parameters.get("reviewer"))) {
+        parameters.put("supervisor", "true");
+      }
+
+      if ("true".equals(parameters.get("supervisor"))) {
         System.out.println("create supervisor");
         createSupervisorEmployees(employee, appointmentType, job);
       }
