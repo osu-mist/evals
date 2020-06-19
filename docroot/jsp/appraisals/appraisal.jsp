@@ -300,13 +300,13 @@
         </c:if>
 
         <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.secondarySubmit || not empty permissionRule.submit}">
+    </c:if>
         </form>
     </div><!-- end pass-actions-->
 
     <script type="text/javascript">
         <%@ include file="/jsp/appraisals/appraisal.js"%>
     </script>
-    </c:if>
 
 <c:if test="${isDemo}">
     <%@ include file="/jsp/appraisals/demoSettings.jsp"%>
