@@ -133,7 +133,7 @@ public class TestsAction implements ActionInterface {
     public String advanceAppraisal(PortletRequest request, PortletResponse response) throws Exception {
       int appraisalId = ParamUtil.getInteger(request, "id");
       Appraisal appraisal = AppraisalMgr.getAppraisal(appraisalId);
-      Session session = HibernateUtil.getSession();
+      Session session = HibernateUtil.getCurrentSession();
       // for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
         // for (Assessment assessment : goalVersion.getAssessments()) {
           // System.out.println(assessment.getGoal());
