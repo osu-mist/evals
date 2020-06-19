@@ -164,8 +164,9 @@ public class TestsAction implements ActionInterface {
           goalVersion.setGoalsComments("autocompleted goals comment");
           System.out.println(appraisal.getJob());
           System.out.println(appraisal.getJob().getSupervisor());
-          System.out.println(appraisal.getJob().getSupervisor().getId());
-          goalVersion.setGoalsApproverPidm(appraisal.getJob().getSupervisor().getId());
+          System.out.println(appraisal.getJob().getSupervisor().getEmployee());
+          System.out.println(appraisal.getJob().getSupervisor().getEmployee().getId());
+          goalVersion.setGoalsApproverPidm(appraisal.getJob().getSupervisor().getEmployee().getId());
         }
         session.save(appraisal);
       }
