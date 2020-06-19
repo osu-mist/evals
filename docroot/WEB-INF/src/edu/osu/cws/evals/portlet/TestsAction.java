@@ -98,7 +98,7 @@ public class TestsAction implements ActionInterface {
       return job;
     }
 
-    private void createPerson(Map<String, String> parameters) {
+    private void createPerson(Map<String, String> parameters) throws Exception {
       Employee employee = createEmployee(parameters);
       Job job = createJob(parameters, employee);
 
@@ -113,7 +113,9 @@ public class TestsAction implements ActionInterface {
     public String createPerson(PortletRequest request, PortletResponse response) throws Exception {
       // System.out.println(request.getParameterMap().get("firstName"));
       Map<String, String> parameters = new Map<String, String>();
-      for(String key : request.getParameterNames()) {
+      Enumeration<String> names = request.getParameterNames();
+      while(names.hasMoreElements()) {
+        String key = names.nextElement();
         parameters.put(key, request.getParameter(key));
       }
       createPerson(parameters);
