@@ -161,12 +161,11 @@ public class TestsAction implements ActionInterface {
       if("goalsApprovalDue".equals(status) || "goalsApprovalOverdue".equals(status)) {
         for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
           goalVersion.setGoalsApprovedDate(new Date());
-          goalVersion.setGoalsComments("autocompleted goals comment");
-          System.out.println(appraisal.getJob());
-          System.out.println(appraisal.getJob().getSupervisor());
-          System.out.println(appraisal.getJob().getSupervisor().getEmployee());
-          System.out.println(appraisal.getJob().getSupervisor().getEmployee().getId());
+          if (goalVersion.getGoalsComments() == null || goalVersion.getGoalsComments().isEmpty()) {
+            goalVersion.setGoalsComments("autocompleted goals comment");
+          }
           goalVersion.setGoalsApproverPidm(appraisal.getJob().getSupervisor().getEmployee().getId());
+          appraisal.setStatus("resultsDue");
         }
         session.save(appraisal);
       }
