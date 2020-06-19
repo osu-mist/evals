@@ -4,6 +4,8 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.models.Appraisal;
+import edu.osu.cws.evals.models.GoalVersion;
+import edu.osu.cws.evals.models.Assessment;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
@@ -129,7 +131,11 @@ public class TestsAction implements ActionInterface {
     public String advanceAppraisal(PortletRequest request, PortletResponse response) throws Exception {
       int appraisalId = ParamUtil.getInteger(request, "id");
       Appraisal appraisal = AppraisalMgr.getAppraisal(appraisalId);
-      System.out.println(appraisal.getStatus());
+      for (GoalVersion goalVersion : modifiedAppraisal.getGoalVersions()) {
+        for (Assessment assessment : goalVersion.getAssessments()) {
+          System.out.println(assessment.getGoal());
+        }
+      }
 
       return homeAction.display(request, response);
     }

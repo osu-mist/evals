@@ -331,7 +331,6 @@ public class AppraisalsAction implements ActionInterface {
         Map<String, String> salaryValidationValues = new HashMap<String, String>();
 
         Salary salary = appraisal.getSalary();
-        System.out.println(salary);
         String getTwoIncrease, getOneMin, getOneMax;
         if (salary == null) {
           getTwoIncrease = "0";
