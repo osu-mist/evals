@@ -187,6 +187,20 @@ public class TestsAction implements ActionInterface {
         session.save(appraisal);
       }
 
+      if(Appraisal.STATUS_APPRAISAL_DUE.equals(status) || Appraisal.STATUS_APPRAISAL_OVERDUE.equals(status)) {
+        for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
+          for (Assessment assessment : goalVersion.getAssessments()) {
+            if(assessment.getSupervisorResult() == null || assessment.getSupervisorResult().isEmpty()) {
+              assessment.setSupervisorResult("autocompleted supervisor result");
+            }
+          }
+        }
+        appraisal.setRating(1);
+        appraisal.setEvaluation("autocompleted evaluation");
+        appraisal.setStatus(Appraisal.STATUS_REVIEW_DUE);
+        session.save(appraisal);
+      }
+
       actionHelper.reloadMyAppraisals();
       return homeAction.display(request, response);
     }
