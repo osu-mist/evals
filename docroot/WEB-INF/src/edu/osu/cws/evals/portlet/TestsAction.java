@@ -1,5 +1,7 @@
 package edu.osu.cws.evals.portlet;
 
+import edu.osu.cws.evals.util.HibernateUtil;
+import org.hibernate.Session;
 import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Job;
@@ -131,10 +133,23 @@ public class TestsAction implements ActionInterface {
     public String advanceAppraisal(PortletRequest request, PortletResponse response) throws Exception {
       int appraisalId = ParamUtil.getInteger(request, "id");
       Appraisal appraisal = AppraisalMgr.getAppraisal(appraisalId);
-      for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
-        for (Assessment assessment : goalVersion.getAssessments()) {
-          System.out.println(assessment.getGoal());
+      Session session = HibernateUtil.getSession();
+      // for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
+        // for (Assessment assessment : goalVersion.getAssessments()) {
+          // System.out.println(assessment.getGoal());
+        // }
+      // }
+
+      if("goalsDue".equals(appraisal.getStatus())) {
+        for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
+          for (Assessment assessment : goalVersion.getAssessments()) {
+            if(assessment.getGoal() == null || assessment.getGoal().isEmpty()) {
+              assessment.setGoal("autocompleted goal");
+            }
+            System.out.println(assessment.getGoal());
+          }
         }
+        session.save(appraisal);
       }
 
       return homeAction.display(request, response);
