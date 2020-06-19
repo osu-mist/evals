@@ -164,6 +164,7 @@ public class TestsAction implements ActionInterface {
           goalVersion.setGoalsComments("autocompleted goals comment");
           goalVersion.setGoalsApproverPidm(appraisal.getJob().getSupervisor().getId());
         }
+        session.save(appraisal);
       }
 
       return homeAction.display(request, response);
