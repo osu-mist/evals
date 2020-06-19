@@ -162,6 +162,9 @@ public class TestsAction implements ActionInterface {
         for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
           goalVersion.setGoalsApprovedDate(new Date());
           goalVersion.setGoalsComments("autocompleted goals comment");
+          System.out.println(appraisal.getJob());
+          System.out.println(appraisal.getJob().getSupervisor());
+          System.out.println(appraisal.getJob().getSupervisor().getId());
           goalVersion.setGoalsApproverPidm(appraisal.getJob().getSupervisor().getId());
         }
         session.save(appraisal);
