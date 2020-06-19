@@ -112,7 +112,7 @@ public class TestsAction implements ActionInterface {
 
     public String createPerson(PortletRequest request, PortletResponse response) throws Exception {
       // System.out.println(request.getParameterMap().get("firstName"));
-      Map<String, String> parameters = new Map<String, String>();
+      Map<String, String> parameters = new HashMap<String, String>();
       Enumeration<String> names = request.getParameterNames();
       while(names.hasMoreElements()) {
         String key = names.nextElement();
