@@ -131,7 +131,7 @@ public class TestsAction implements ActionInterface {
     public String advanceAppraisal(PortletRequest request, PortletResponse response) throws Exception {
       int appraisalId = ParamUtil.getInteger(request, "id");
       Appraisal appraisal = AppraisalMgr.getAppraisal(appraisalId);
-      for (GoalVersion goalVersion : modifiedAppraisal.getGoalVersions()) {
+      for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
         for (Assessment assessment : goalVersion.getAssessments()) {
           System.out.println(assessment.getGoal());
         }
