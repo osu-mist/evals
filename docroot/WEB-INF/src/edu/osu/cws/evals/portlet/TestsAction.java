@@ -50,7 +50,7 @@ public class TestsAction implements ActionInterface {
       return homeAction.display(request, response);
     }
 
-    public Employee createEmployee(Map<String, String[]> parameters) throws Exception {
+    public Employee createEmployee(Map<String, String> parameters) throws Exception {
       System.out.println("Create Employee");
 
       String firstName = parameters.get("firstName");
@@ -75,7 +75,7 @@ public class TestsAction implements ActionInterface {
       }
     }
 
-    public Job createJob(Map<String, String[]> parameters, Employee employee) throws Exception {
+    public Job createJob(Map<String, String> parameters, Employee employee) throws Exception {
       System.out.println("Create Job");
 
       String appointmentType = parameters.get("appointmentType");
@@ -98,7 +98,7 @@ public class TestsAction implements ActionInterface {
       return job;
     }
 
-    private void createPerson(Map<String, String[]> parameters) {
+    private void createPerson(Map<String, String> parameters) {
       Employee employee = createEmployee(parameters);
       Job job = createJob(parameters, employee);
 
@@ -111,8 +111,12 @@ public class TestsAction implements ActionInterface {
     }
 
     public String createPerson(PortletRequest request, PortletResponse response) throws Exception {
-      System.out.println(request.getParameterMap().get("firstName"));
-      createPerson(request.getParameterMap());
+      // System.out.println(request.getParameterMap().get("firstName"));
+      Map<String, String> parameters = new Map<String, String>();
+      for(String key : request.getParameterNames()) {
+        parameters.put(key, request.getParameter(key));
+      }
+      createPerson(parameters);
 
       return homeAction.display(request, response);
     }
