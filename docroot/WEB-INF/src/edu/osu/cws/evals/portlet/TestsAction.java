@@ -170,6 +170,19 @@ public class TestsAction implements ActionInterface {
         session.save(appraisal);
       }
 
+      if(Appraisal.STATUS_RESULTS_DUE.equals(status) || Appraisal.STATUS_RESULTS_OVERDUE.equals(status)) {
+        for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
+          for (Assessment assessment : goalVersion.getAssessments()) {
+            if(assessment.getEmployeeResult() == null || assessment.getEmployeeResult().isEmpty()) {
+              assessment.setEmployeeResult("autocompleted employee result");
+            }
+          }
+        }
+        appraisal.setResultSubmitDate(new Date());
+        appraisal.setStatus(Appraisal.STATUS_APPRAISAL_DUE);
+        session.save(appraisal);
+      }
+
       actionHelper.reloadMyAppraisals();
       return homeAction.display(request, response);
     }
