@@ -9,6 +9,7 @@ import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.GoalVersion;
 import edu.osu.cws.evals.models.Assessment;
 import edu.osu.cws.evals.models.AssessmentCriteria;
+import edu.osu.cws.evals.models.Salary;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
