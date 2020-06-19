@@ -30,13 +30,16 @@ public class TestsAction implements ActionInterface {
 
     public String createAppraisal(PortletRequest request, PortletResponse response) throws Exception {
       PortletSession session = actionHelper.getSession(request);
+      Session hibSession = HibernateUtil.getCurrentSession();
       System.out.println("new update");
 
       Employee employee = (Employee)session.getAttribute("loggedOnUser");
       Set<Job> jobs = employee.getNonTerminatedJobs();
       for(Job job : jobs) {
         System.out.println("Creating appraisal for: " + job.getJobTitle());
-        AppraisalMgr.createAppraisal(job, new DateTime(2019, 11, 15, 0, 0), Appraisal.TYPE_ANNUAL);
+        Appraisal appraisal = AppraisalMgr.createAppraisal(job, new DateTime(2019, 11, 15, 0, 0), Appraisal.TYPE_ANNUAL);
+        Salary salary = new Salary(appraisal.getId());
+        hibSession.save(salary);
         System.out.println("appraisal created");
       }
       actionHelper.reloadMyAppraisals();
