@@ -43,6 +43,11 @@
     <portlet:param name="action" value="display"/>
     <portlet:param name="controller" value="PositionDescriptionAction"/>
 </portlet:actionURL>
+<portlet:actionURL var="advanceAppraisalAction" escapeXml="false">
+    <portlet:param name="id" value="${appraisal.id}"/>
+    <portlet:param name="action" value="advanceAppraisal"/>
+    <portlet:param name="controller" value="TestsAction"/>
+</portlet:actionURL>
 
 <div id="pass-appraisal-form" class="osu-cws">
 
@@ -300,13 +305,22 @@
         </c:if>
 
         <c:if test="${not empty permissionRule.saveDraft || not empty permissionRule.secondarySubmit || not empty permissionRule.submit}">
-    </c:if>
         </form>
     </div><!-- end pass-actions-->
 
     <script type="text/javascript">
         <%@ include file="/jsp/appraisals/appraisal.js"%>
     </script>
+    </c:if>
+
+<a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+    <portlet:param name="id" value="${appraisal.id}" />
+    <portlet:param name="action" value="advanceAppraisal" />
+    <portlet:param name="controller" value="TestsAction" />
+    </portlet:actionURL>">
+<liferay-ui:message key="Advance Evaluation"/>
+
+</a><br />
 
 <c:if test="${isDemo}">
     <%@ include file="/jsp/appraisals/demoSettings.jsp"%>

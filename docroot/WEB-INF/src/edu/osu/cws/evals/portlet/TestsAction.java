@@ -1,5 +1,6 @@
 package edu.osu.cws.evals.portlet;
 
+import com.liferay.portal.kernel.util.ParamUtil;
 import edu.osu.cws.evals.models.Employee;
 import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.models.Appraisal;
@@ -121,6 +122,14 @@ public class TestsAction implements ActionInterface {
         parameters.put(key, request.getParameter(key));
       }
       createPerson(parameters);
+
+      return homeAction.display(request, response);
+    }
+
+    public String advanceAppraisal(PortletRequest request, PortletResponse response) throws Exception {
+      int appraisalId = ParamUtil.getInteger(request, "id");
+      Appraisal appraisal = AppraisalMgr.getAppraisal(appraisalId);
+      System.out.println(appraisal.getStatus());
 
       return homeAction.display(request, response);
     }
