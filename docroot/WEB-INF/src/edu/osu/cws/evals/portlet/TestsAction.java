@@ -40,7 +40,7 @@ public class TestsAction implements ActionInterface {
 
     public String deleteAppraisal(PortletRequest request, PortletResponse response) throws Exception {
       System.out.println("delete appraisal");
-      int appraisalId = Integer.parseInt(parameters.get("id"));
+      int appraisalId = Integer.parseInt(request.getParameter("id"));
       Appraisal appraisal = AppraisalMgr.getAppraisal(appraisalId);
       if (appraisal != null) {
         AppraisalMgr.deleteAppraisal(appraisal);
@@ -50,7 +50,7 @@ public class TestsAction implements ActionInterface {
       return homeAction.display(request, response);
     }
 
-    public Employee createEmployee(Map<String, String> parameters) throws Exception {
+    public Employee createEmployee(Map<String, String[]> parameters) throws Exception {
       System.out.println("Create Employee");
 
       String firstName = parameters.get("firstName");
@@ -75,7 +75,7 @@ public class TestsAction implements ActionInterface {
       }
     }
 
-    public Job createJob(Map<String, String> parameters, Employee employee) throws Exception {
+    public Job createJob(Map<String, String[]> parameters, Employee employee) throws Exception {
       System.out.println("Create Job");
 
       String appointmentType = parameters.get("appointmentType");
@@ -98,9 +98,9 @@ public class TestsAction implements ActionInterface {
       return job;
     }
 
-    private void createPerson(Map<String, String> parameters) {
-      Employee employee = createEmployee(request);
-      Job job = createJob(request, employee, response);
+    private void createPerson(Map<String, String[]> parameters) {
+      Employee employee = createEmployee(parameters);
+      Job job = createJob(parameters, employee);
 
       if ("true".equals(parameters.get("admin"))) {
         System.out.println("create admin");
@@ -111,6 +111,7 @@ public class TestsAction implements ActionInterface {
     }
 
     public String createPerson(PortletRequest request, PortletResponse response) throws Exception {
+      System.out.println(request.getParameterMap().get("firstName"));
       createPerson(request.getParameterMap());
 
       return homeAction.display(request, response);
