@@ -8,6 +8,7 @@ import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.models.Appraisal;
 import edu.osu.cws.evals.models.GoalVersion;
 import edu.osu.cws.evals.models.Assessment;
+import edu.osu.cws.evals.models.AssessmentCriteria;
 import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.hibernate.EmployeeMgr;
 import edu.osu.cws.evals.hibernate.JobMgr;
@@ -146,7 +147,9 @@ public class TestsAction implements ActionInterface {
             if(assessment.getGoal() == null || assessment.getGoal().isEmpty()) {
               assessment.setGoal("autocompleted goal");
             }
-            System.out.println(assessment.getGoal());
+            for(AssessmentCriteria crit : assessment.getAssessmentCriteria()) {
+              crit.setChecked(true);
+            }
           }
         }
         session.save(appraisal);
