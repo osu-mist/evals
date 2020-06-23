@@ -313,13 +313,13 @@
     </script>
     </c:if>
 
-<button onclick="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+<form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
     <portlet:param name="id" value="${appraisal.id}" />
     <portlet:param name="action" value="advanceAppraisal" />
     <portlet:param name="controller" value="TestsAction" />
     </portlet:actionURL>"
-value="<liferay-ui:message key="Advance Evaluation"/>"
-</button><br />
+<input type="submit" value="Advance Evaluation"/>
+</form><br />
 
 <c:if test="${isDemo}">
     <%@ include file="/jsp/appraisals/demoSettings.jsp"%>
