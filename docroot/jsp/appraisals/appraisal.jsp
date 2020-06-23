@@ -313,14 +313,24 @@
     </script>
     </c:if>
 
-<a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+<a class="button" href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
     <portlet:param name="id" value="${appraisal.id}" />
     <portlet:param name="action" value="advanceAppraisal" />
     <portlet:param name="controller" value="TestsAction" />
     </portlet:actionURL>">
 <liferay-ui:message key="Advance Evaluation"/>
-
 </a><br />
+
+<style>
+a.button {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+
+    text-decoration: none;
+    color: initial;
+}
+</style>
 
 <c:if test="${isDemo}">
     <%@ include file="/jsp/appraisals/demoSettings.jsp"%>
