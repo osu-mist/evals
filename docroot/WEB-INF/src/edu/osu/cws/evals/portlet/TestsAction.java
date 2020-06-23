@@ -203,6 +203,13 @@ public class TestsAction implements ActionInterface {
         session.save(appraisal);
       }
 
+      if(Appraisal.STATUS_REVIEW_DUE.equals(status) || Appraisal.STATUS_REVIEW_OVERDUE.equals(status)) {
+        appraisal.setReviewSubmitDate(new Date());
+        appraisal.setReview("autocompleted review");
+        appraisal.setStatus(Appraisal.STATUS_RELEASE_DUE);
+        session.save(appraisal);
+      }
+
       actionHelper.reloadMyAppraisals();
       return homeAction.display(request, response);
     }
