@@ -210,6 +210,12 @@ public class TestsAction implements ActionInterface {
         session.save(appraisal);
       }
 
+      if(Appraisal.STATUS_RELEASE_DUE.equals(status) || Appraisal.STATUS_RELEASE_OVERDUE.equals(status)) {
+        appraisal.setReleaseDate(new Date());
+        appraisal.setStatus(appraisal.STATUS_SIGNATURE_DUE);
+        session.save(appraisal);
+      }
+
       actionHelper.reloadMyAppraisals();
       return homeAction.display(request, response);
     }
