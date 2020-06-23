@@ -313,7 +313,7 @@
     </script>
     </c:if>
 
-<a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+<a style="font-size:large" href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
     <portlet:param name="id" value="${appraisal.id}" />
     <portlet:param name="action" value="advanceAppraisal" />
     <portlet:param name="controller" value="TestsAction" />
