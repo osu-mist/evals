@@ -216,6 +216,8 @@ public class TestsAction implements ActionInterface {
         session.save(appraisal);
       }
 
+      System.out.println(appraisal.getStatus());
+
       actionHelper.reloadMyAppraisals();
       return homeAction.display(request, response);
     }
