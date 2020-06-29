@@ -31,7 +31,7 @@ public class Salary {
       this.midPoint = 750.;
       this.high = 1000.;
       this.current = 650.;
-      this.increase = 0.;
+      this.increase = .5;
       this.sgrpCode = "21011A";
       this.twoIncrease = 0.;
       this.oneMax = 0.;
