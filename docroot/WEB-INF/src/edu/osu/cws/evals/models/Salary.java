@@ -34,8 +34,8 @@ public class Salary {
       this.increase = .5;
       this.sgrpCode = "21011A";
       this.twoIncrease = 0.;
-      this.oneMax = 0.;
-      this.oneMin = 0.;
+      this.oneMax = .9;
+      this.oneMin = .2;
     }
 
     public Integer getId() {
