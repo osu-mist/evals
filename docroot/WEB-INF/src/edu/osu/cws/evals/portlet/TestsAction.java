@@ -206,6 +206,7 @@ public class TestsAction implements ActionInterface {
       if(Appraisal.STATUS_REVIEW_DUE.equals(status) || Appraisal.STATUS_REVIEW_OVERDUE.equals(status)) {
         appraisal.setReviewSubmitDate(new Date());
         appraisal.setReview("autocompleted review");
+        appraisal.setReviewer(appraisal.getJob().getSupervisor().getEmployee());
         appraisal.setStatus(Appraisal.STATUS_RELEASE_DUE);
         session.save(appraisal);
       }
