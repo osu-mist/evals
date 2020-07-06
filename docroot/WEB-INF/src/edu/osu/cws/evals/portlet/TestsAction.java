@@ -174,6 +174,11 @@ public class TestsAction implements ActionInterface {
         session.save(appraisal);
       }
 
+      if(Appraisal.STATUS_GOALS_APPROVED.equals(status)) {
+        appraisal.setStatus(Appraisal.STATUS_RESULTS_DUE);
+        session.save(appraisal);
+      }
+
       if(Appraisal.STATUS_RESULTS_DUE.equals(status) || Appraisal.STATUS_RESULTS_OVERDUE.equals(status)) {
         for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
           for (Assessment assessment : goalVersion.getAssessments()) {
