@@ -29,7 +29,7 @@ public class TestsAction implements ActionInterface {
 
     private ErrorHandler errorHandler;
 
-    public void createAppraisal(Employee employee) {
+    public void createAppraisal(Employee employee) throws Exception {
       Session hibSession = HibernateUtil.getCurrentSession();
 
       Set<Job> jobs = employee.getNonTerminatedJobs();
