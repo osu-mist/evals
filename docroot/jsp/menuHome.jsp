@@ -39,6 +39,7 @@
                   </li>
               </c:if>
               <c:if test="${isReviewer == 'true'}">
+              <liferay-ui:message key="role-reviewer"/>
                   <li><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
                       <portlet:param name="action" value="display"/>
                       <portlet:param name="controller" value="HomeAction"/>
@@ -47,6 +48,7 @@
                   </li>
               </c:if>
               <c:if test="${isSupervisor == 'true'}">
+              <liferay-ui:message key="role-supervisor"/>
                   <li><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
                       <portlet:param name="action" value="display"/>
                       <portlet:param name="controller" value="HomeAction"/>
@@ -54,6 +56,7 @@
                           </portlet:renderURL>"><liferay-ui:message key="role-supervisor"/></a>
                   </li>
               </c:if>
+              <liferay-ui:message key="role-self"/>
                   <li><a href="<portlet:renderURL windowState="<%= WindowState.NORMAL.toString() %>">
                       <portlet:param name="action" value="display"/>
                       <portlet:param name="controller" value="HomeAction"/>
