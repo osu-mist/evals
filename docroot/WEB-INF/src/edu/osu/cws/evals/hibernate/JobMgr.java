@@ -688,6 +688,7 @@ public class JobMgr {
 
       Session session = HibernateUtil.getCurrentSession();
       session.createSQLQuery(query).executeUpdate();
+      session.flush();
 
       return job;
     }
