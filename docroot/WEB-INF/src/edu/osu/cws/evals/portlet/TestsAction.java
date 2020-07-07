@@ -86,7 +86,7 @@ public class TestsAction implements ActionInterface {
 
       for(Employee employee : employees) {
         Job job = JobMgr.createJob(employee, "Classified IT", supJob);
-        Set<Job> jobSet = new Set<Job>();
+        Set<Job> jobSet = new HashSet<Job>();
         jobSet.add(job);
         employee.setJobs(jobSet);
         createAppraisal(employee);
