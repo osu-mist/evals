@@ -216,6 +216,14 @@ public class TestsAction implements ActionInterface {
         session.save(appraisal);
       }
 
+      if(Appraisal.STATUS_EMPLOYEE_REVIEW_DUE.equals(status)) {
+        appraisal.setReviewSubmitDate(new Date());
+        appraisal.setReview("autocompleted employee review");
+        appraisal.setReviewer(appraisal.getJob().getEmployee());
+        appraisal.setStatus(Appraisal.STATUS_RELEASE_DUE);
+        session.save(appraisal);
+      }
+
       if(Appraisal.STATUS_RELEASE_DUE.equals(status) || Appraisal.STATUS_RELEASE_OVERDUE.equals(status)) {
         appraisal.setReleaseDate(new Date());
         appraisal.setStatus(appraisal.STATUS_SIGNATURE_DUE);
