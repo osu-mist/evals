@@ -29,12 +29,9 @@ public class TestsAction implements ActionInterface {
 
     private ErrorHandler errorHandler;
 
-    public String createAppraisal(PortletRequest request, PortletResponse response) throws Exception {
-      PortletSession session = actionHelper.getSession(request);
+    public void createAppraisal(Employee employee) {
       Session hibSession = HibernateUtil.getCurrentSession();
-      System.out.println("new update");
 
-      Employee employee = (Employee)session.getAttribute("loggedOnUser");
       Set<Job> jobs = employee.getNonTerminatedJobs();
       for(Job job : jobs) {
         System.out.println("Creating appraisal for: " + job.getJobTitle());
@@ -43,6 +40,13 @@ public class TestsAction implements ActionInterface {
         hibSession.save(salary);
         System.out.println("appraisal created");
       }
+    }
+
+    public String createAppraisal(PortletRequest request, PortletResponse response) throws Exception {
+      PortletSession session = actionHelper.getSession(request);
+
+      Employee employee = (Employee)session.getAttribute("loggedOnUser");
+      createAppraisal(employee);
       actionHelper.reloadMyAppraisals();
 
       return homeAction.display(request, response);
@@ -82,6 +86,7 @@ public class TestsAction implements ActionInterface {
 
       for(Employee employee : employees) {
         JobMgr.createJob(employee, "Classified IT", supJob);
+        createAppraisal(employee);
       }
     }
 
