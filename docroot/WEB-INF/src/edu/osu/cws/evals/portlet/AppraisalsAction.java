@@ -92,7 +92,10 @@ public class AppraisalsAction implements ActionInterface {
      */
     public void initialize(PortletRequest request) throws Exception {
         System.out.println("initialize");
-        System.out.println(request.getParameterNames());
+        Enumeration<String> names = request.getParameterNames();
+        while(names.hasMoreElements()) {
+          System.out.println(names.nextElement());
+        }
         this.request = request;
         this.resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         this.loggedInUser = actionHelper.getLoggedOnUser();
