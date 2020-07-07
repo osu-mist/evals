@@ -154,7 +154,7 @@ public class AppraisalsAction implements ActionInterface {
         Job supervisor = appraisal.getJob().getSupervisor();
         if (supervisor != null && pidm == supervisor.getEmployee().getId()) {
             System.out.println("supervisor role");
-            // return ActionHelper.ROLE_SUPERVISOR;
+            return ActionHelper.ROLE_SUPERVISOR;
         }
 
         Reviewer reviewer  = actionHelper.getReviewer();
