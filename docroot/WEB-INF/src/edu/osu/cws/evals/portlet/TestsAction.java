@@ -81,7 +81,7 @@ public class TestsAction implements ActionInterface {
       }
 
       for(Employee employee : employees) {
-        JobMgr.createJob(employee, appointmentType, supJob);
+        JobMgr.createJob(employee, "Classified IT", supJob);
       }
     }
 
