@@ -153,6 +153,7 @@ public class AppraisalsAction implements ActionInterface {
 
         Job supervisor = appraisal.getJob().getSupervisor();
         if (supervisor != null && pidm == supervisor.getEmployee().getId()) {
+            System.out.println("supervisor role");
             return ActionHelper.ROLE_SUPERVISOR;
         }
 
@@ -160,6 +161,7 @@ public class AppraisalsAction implements ActionInterface {
         if (reviewer != null) {
             String bcName  = appraisal.getJob().getBusinessCenterName();
             if (bcName.equals(reviewer.getBusinessCenterName())) {
+                System.out.println("reviewer role");
                 return ActionHelper.ROLE_REVIEWER;
             }
         }
