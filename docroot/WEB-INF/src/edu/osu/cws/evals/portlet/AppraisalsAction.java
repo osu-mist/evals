@@ -96,6 +96,7 @@ public class AppraisalsAction implements ActionInterface {
         while(names.hasMoreElements()) {
           System.out.println(names.nextElement());
         }
+        System.out.println(request.getParameter("id"));
         this.request = request;
         this.resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         this.loggedInUser = actionHelper.getLoggedOnUser();
