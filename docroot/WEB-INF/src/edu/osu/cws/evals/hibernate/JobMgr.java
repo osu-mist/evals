@@ -688,7 +688,8 @@ public class JobMgr {
 
       Session session = HibernateUtil.getCurrentSession();
       session.createSQLQuery(query).executeUpdate();
-      session.flush();
+
+      employee.setJobs(new Set<Job>{job});
 
       return job;
     }
