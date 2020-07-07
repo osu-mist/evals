@@ -361,6 +361,8 @@ public class AppraisalsAction implements ActionInterface {
         System.out.println(request.getContextPath());
         initialize(request);
         boolean isReviewer = actionHelper.getReviewer() != null;
+        System.out.println("isReviewer");
+        System.out.println(isReviewer);
 
         // Check to see if the logged in user has permission to access the appraisal
         boolean isAjax = actionHelper.isAJAX();
