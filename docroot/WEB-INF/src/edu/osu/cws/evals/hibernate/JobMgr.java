@@ -681,6 +681,7 @@ public class JobMgr {
     public static Job createJob(Employee employee, String appointmentType, Job supervisor) {
       Job job = createJob(employee, appointmentType);
       job.setBusinessCenterName(supervisor.getEmployee().getOnid().substring(0, 4));
+      System.out.println(job.getBusinessCenterName());
 
       job.setSupervisor(supervisor);
       job.setCurrentSupervisor(supervisor);
