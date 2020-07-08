@@ -680,6 +680,7 @@ public class JobMgr {
 
     public static Job createJob(Employee employee, String appointmentType, Job supervisor) {
       Job job = createJob(employee, appointmentType);
+      job.setBusinessCenterName(supervisor.getEmployee().getOnid().substring(0, 4));
 
       job.setSupervisor(supervisor);
       job.setCurrentSupervisor(supervisor);
@@ -687,6 +688,7 @@ public class JobMgr {
       String query = "update pyvpasj set PYVPASJ_SUPERVISOR_PIDM = " + supervisor.getId() + ", PYVPASJ_SUPERVISOR_POSN = \'" + supervisor.getPositionNumber() + "\', PYVPASJ_SUPERVISOR_SUFF = \'" + supervisor.getSuffix() + "\' where PYVPASJ_PIDM = " + employee.getId();
 
       Session session = HibernateUtil.getCurrentSession();
+      session.save(job);
       session.createSQLQuery(query).executeUpdate();
 
       return job;
