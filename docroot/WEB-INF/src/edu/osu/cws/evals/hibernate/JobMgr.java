@@ -680,13 +680,12 @@ public class JobMgr {
 
     public static Job createJob(Employee employee, String appointmentType, Job supervisor) {
       Job job = createJob(employee, appointmentType);
-      job.setBusinessCenterName(supervisor.getEmployee().getOnid().substring(0, 4));
-      System.out.println(job.getBusinessCenterName());
+      String busName = supervisor.getEmployee().getOnid().substring(0, 4).toUpperCase();
 
       job.setSupervisor(supervisor);
       job.setCurrentSupervisor(supervisor);
       // this is what desperation looks like
-      String query = "update pyvpasj set PYVPASJ_SUPERVISOR_PIDM = " + supervisor.getId() + ", PYVPASJ_SUPERVISOR_POSN = \'" + supervisor.getPositionNumber() + "\', PYVPASJ_SUPERVISOR_SUFF = \'" + supervisor.getSuffix() + "\' where PYVPASJ_PIDM = " + employee.getId();
+      String query = "update pyvpasj set PYVPASJ_SUPERVISOR_PIDM = " + supervisor.getId() + ", PYVPASJ_SUPERVISOR_POSN = \'" + supervisor.getPositionNumber() + "\', PYVPASJ_SUPERVISOR_SUFF = \'" + supervisor.getSuffix() + "\', PYVPASJ_BCTR_TITLE = \'" + busName + "\' where PYVPASJ_PIDM = " + employee.getId();
 
       Session session = HibernateUtil.getCurrentSession();
       session.save(job);
