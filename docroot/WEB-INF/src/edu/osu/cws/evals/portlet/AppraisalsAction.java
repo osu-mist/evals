@@ -152,6 +152,7 @@ public class AppraisalsAction implements ActionInterface {
      */
     public String getRole() throws Exception {
         System.out.println("getRole");
+        System.out.println(appraisal.getId());
         int pidm = loggedInUser.getId();
 
         if (pidm == appraisal.getJob().getEmployee().getId()) {
