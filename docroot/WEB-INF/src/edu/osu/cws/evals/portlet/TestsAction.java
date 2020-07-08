@@ -248,7 +248,7 @@ public class TestsAction implements ActionInterface {
       System.out.println(appraisal.getStatus());
 
       actionHelper.reloadMyAppraisals();
-      actionHelper.getMyTeamActiveAppraisals();
+      actionHelper.setupMyTeamActiveAppraisals();
       return homeAction.display(request, response);
     }
 
