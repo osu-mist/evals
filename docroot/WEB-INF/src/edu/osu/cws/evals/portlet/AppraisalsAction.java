@@ -91,12 +91,6 @@ public class AppraisalsAction implements ActionInterface {
      * @throws Exception
      */
     public void initialize(PortletRequest request) throws Exception {
-        System.out.println("initialize");
-        Enumeration<String> names = request.getParameterNames();
-        while(names.hasMoreElements()) {
-          System.out.println(names.nextElement());
-        }
-        System.out.println(request.getParameter("id"));
         this.request = request;
         this.resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         this.loggedInUser = actionHelper.getLoggedOnUser();
@@ -151,8 +145,6 @@ public class AppraisalsAction implements ActionInterface {
      * @throws Exception
      */
     public String getRole() throws Exception {
-        System.out.println("getRole");
-        System.out.println(appraisal.getId());
         int pidm = loggedInUser.getId();
 
         if (pidm == appraisal.getJob().getEmployee().getId()) {
@@ -162,7 +154,8 @@ public class AppraisalsAction implements ActionInterface {
         Job supervisor = appraisal.getJob().getSupervisor();
         if (supervisor != null && pidm == supervisor.getEmployee().getId()) {
             System.out.println("supervisor role");
-            return ActionHelper.ROLE_SUPERVISOR;
+            if (!appraisal.getStatus().equals(Appraisal.STATUS_REVIEW_DUE) && !appraisal.getStatus().equals(Appraisal.STATUS_REVIEW_OVERDUE))
+              return ActionHelper.ROLE_SUPERVISOR;
         }
 
         Reviewer reviewer  = actionHelper.getReviewer();
