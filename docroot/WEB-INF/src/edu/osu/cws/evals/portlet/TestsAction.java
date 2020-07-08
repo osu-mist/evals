@@ -249,7 +249,7 @@ public class TestsAction implements ActionInterface {
 
       actionHelper.reloadMyAppraisals();
       actionHelper.setupMyTeamActiveAppraisals();
-      actionHelper.refreshContextCache();
+      actionHelper.setAdminPortletData();
       return homeAction.display(request, response);
     }
 
