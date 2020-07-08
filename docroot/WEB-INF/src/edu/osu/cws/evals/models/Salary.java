@@ -33,7 +33,7 @@ public class Salary {
       this.current = 650.;
       this.increase = .5;
       this.sgrpCode = "21011A";
-      this.twoIncrease = 0.;
+      this.twoIncrease = .5;
       this.oneMax = .9;
       this.oneMin = .2;
     }
