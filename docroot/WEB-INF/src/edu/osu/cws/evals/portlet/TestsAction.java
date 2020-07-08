@@ -240,6 +240,7 @@ public class TestsAction implements ActionInterface {
 
       if(Appraisal.STATUS_SIGNATURE_DUE.equals(status) || Appraisal.STATUS_SIGNATURE_OVERDUE.equals(status)) {
         appraisal.setStatus(Appraisal.STATUS_COMPLETED);
+        appraisal.setEvaluationSubmitDate(new Date());
         session.save(appraisal);
       }
 
