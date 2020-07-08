@@ -238,6 +238,11 @@ public class TestsAction implements ActionInterface {
         session.save(appraisal);
       }
 
+      if(Appraisal.STATUS_SIGNATURE_DUE.equals(status) || Appraisal.STATUS_SIGNATURE_OVERDUE.equals(status)) {
+        appraisal.setStatus(Appraisal.STATUS_COMPLETED);
+        session.save(appraisal);
+      }
+
       System.out.println(appraisal.getStatus());
 
       actionHelper.reloadMyAppraisals();
