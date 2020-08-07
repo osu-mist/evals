@@ -154,7 +154,9 @@ public class TestsAction implements ActionInterface {
       // }
 
       String status = appraisal.getStatus();
-      if("goalsDue".equals(status) || "goalsOverdue".equals(status)) {
+      if("goalsDue".equals(status)
+      || "goalsOverdue".equals(status)
+      || Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION.equals(status)) {
         for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
           for (Assessment assessment : goalVersion.getAssessments()) {
             if(assessment.getGoal() == null || assessment.getGoal().isEmpty()) {
