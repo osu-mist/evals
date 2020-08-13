@@ -55,7 +55,7 @@ goal-setting and appraisal tasks.
 
 
 8. Compile EvalS
-    - Run build.sh
+    - Run pre-build.sh
     - A war file will be created and placed in `bundles/deploy/`
     - A running tomcat server will automatically deploy this to `bundles/tomcat-${version}/webapps/`
     - If you turned on `DEPLOY_TO_VM` the warfile will automatically be deployed to the specified VM

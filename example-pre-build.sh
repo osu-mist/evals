@@ -20,4 +20,4 @@ export VM_DIR=directory/to/copy/warfile
 export VM_USR=USER
 export VM_ADDRESS=ADDRESS
 
-sh build_logic.sh
+sh build.sh
