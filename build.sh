@@ -15,7 +15,7 @@ cp -r $EVALS $LIFERAY_SDK/portlets
 # run ant to compile evals
 echo "################################# Compile ##################################################"
 cd $LIFERAY_SDK
-$ANT_HOME
+ant
 ANT_RESULT=$?
 
 if [ $ANT_RESULT -eq 0 ] && [ $DEPLOY_TO_VM = true ]
