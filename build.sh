@@ -10,7 +10,7 @@ COMPILED_WAR=$LIFERAY_DIR/bundles/deploy/$EVALS_WAR
 
 # copy evals files to liferay sdk
 rm -rf $LIFERAY_SDK/portlets/evals
-cp -rf $EVALS $LIFERAY_SDK/portlets
+cp -r $EVALS $LIFERAY_SDK/portlets
 
 # run ant to compile evals
 echo "################################# Compile ##################################################"
