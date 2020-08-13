@@ -46,7 +46,6 @@ goal-setting and appraisal tasks.
         - add ant to path `brew link ant@1.9` (may have to force)
 
 7. Configure EvalS
-    - Clone this repository into `liferay-plugins-sdk-${version}/portlets/`
     - Navigate to `evals/docroot/WEB-INF/src/`
       - Copy `hibernate-sample.cfg.xml` to `hibernate.cfg.xml` and modify contents
       - Copy `evals.sample.properties` to `evals.properties` and modify contents
