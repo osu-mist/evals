@@ -6,3 +6,4 @@ docroot/WEB-INF/classes/
 *.iml
 .idea
 *.pyc
+pre-build.sh

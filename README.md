@@ -12,15 +12,20 @@ goal-setting and appraisal tasks.
 2. Java version 1.7.0_80 is the only version I was successful with
 
 3. Choose and download a [Liferay version](https://sourceforge.net/projects/lportal/files/Liferay%20Portal/)
-    - I had the most success with version 6.1.1-ce-ga2
+    - Version 6.1.1-ce-ga2 is the current version for prod
     - Download liferay-portal-tomcat-${version}
+        - 6.2-ce-ga6 is preferred
     - Download liferay-plugins-sdk-${version}
+        - 6.1.1-ce-ga2 is preferred
     - Extract both folders to the same directory
     - Rename "liferay-portal-tomcat-${version}" to "bundles"
-    - Add `CATALINA_HOME` to your path pointing to your tomcat directory
-      - `export CATALINA_HOME="bundles/tomcat-${version}"`
-    - Use `$CATALINA_HOME/bin/startup.sh` to start the server
-    - Use `$CATALINA_HOME/bin/shutdown.sh` to stop the server
+    - If you are using different versions for tomcat and the SDK make sure the `app.server.dir` in
+      liferay-plugins-sdk-${version}/build.properties has the correct tomcat version
+    - If you are running the server locally or not using a docker container:
+        - Add `CATALINA_HOME` to your path pointing to your tomcat directory
+          - `export CATALINA_HOME="bundles/tomcat-${version}"`
+        - Use `$CATALINA_HOME/bin/startup.sh` to start the server
+        - Use `$CATALINA_HOME/bin/shutdown.sh` to stop the server
 
 4. Test Liferay apache server
     - Open a browser to http://localhost:8080/web/guest/
@@ -34,26 +39,26 @@ goal-setting and appraisal tasks.
     - Run evals/docroot/WEB-INF/src/edu/osu/cws/evals/tests/test-db.sql
     - Run evals/docroot/WEB-INF/src/edu/osu/cws/evals/tests/local-dev-env-data.sql
 
-6. Configure EvalS
-    - Clone this repository into `liferay-plugins-sdk-${version}/portlets/`
-    - Navigate to `evals/docroot/WEB-INF/src/`
-      - Copy `hibernate-sample.cfg.xml` to `hibernate.cfg.xml` and modify contents
-      - Copy `evals.sample.properties` to `evals.properties` and modify contents
-    - Add `evals-config.properties` to `/opt/lp5/`
-    - Navigate to `evals/docroot/WEB-INF/`
-      - Both `liferay-plugin-package.xml` and `liferay-plugin-package.properties` have a `liferay-versions` attribute. Set both these attributes to match the version of liferay you are using.
-
-7. Install Ant version 1.9.6
+6. Install Ant version 1.9.6
     - Current version of Ant does not work with Java 1.7
     - Using brew:
         - `brew install ant@1.9`
         - add ant to path `brew link ant@1.9` (may have to force)
 
+7. Configure EvalS
+    - Navigate to `evals/docroot/WEB-INF/src/`
+      - Copy `hibernate-sample.cfg.xml` to `hibernate.cfg.xml` and modify contents
+      - Copy `evals.sample.properties` to `evals.properties` and modify contents
+    - Navigate to `evals/docroot/WEB-INF/`
+      - Both `liferay-plugin-package.xml` and `liferay-plugin-package.properties` have a `liferay-versions` attribute. Set both these attributes to match the version of liferay you are using.
+    - Copy `evals/example-build.sh` to `evals/build.sh` and set variables according to your configuration
+
+
 8. Compile EvalS
-    - Navigate to `liferay-plugins-sdk-${version}`
-    - Run `ant`
+    - Run pre-build.sh
     - A war file will be created and placed in `bundles/deploy/`
     - A running tomcat server will automatically deploy this to `bundles/tomcat-${version}/webapps/`
+    - If you turned on `DEPLOY_TO_VM` the warfile will automatically be deployed to the specified VM
 
 9. Running EvalS
     - EvalS is a portlet and won't run on its own
@@ -63,6 +68,7 @@ goal-setting and appraisal tasks.
     - On that new page, use the "Add" button again and click "More..."
     - Search for EvalS, then click and drag it onto the page
     - If EvalS is not on the list or it shows an error message, check the logs in `bundles/tomcat-${version}/logs/catalina.out`
+    - If using a docker container use `docker logs CONTAINER_NAME` to get logs
 
 ### Tests
 ---
