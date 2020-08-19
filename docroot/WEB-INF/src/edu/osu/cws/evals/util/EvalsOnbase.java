@@ -93,7 +93,7 @@ public class EvalsOnbase {
     conn.setRequestProperty("Authorization", "Bearer " + bearerToken);
   }
 
-  public void postPDF() throws IOException, MalformedURLException, ParseException {
+  public void postPDF(String pdfName) throws IOException, MalformedURLException, ParseException {
     String boundary = "---" + System.currentTimeMillis() + "---";
 
     HttpsURLConnection conn = openConnection(onbaseDocsUrl);
@@ -105,12 +105,16 @@ public class EvalsOnbase {
     OutputStream outputStream = conn.getOutputStream();
     PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, CHARSET), true);
 
-    String attributes = "{ \"DocumentType\": \"TEST - Sample Paper Form\",\"Comment\": \"This is a sample document.\",\"IndexKey\": \"999999999\"}";
+    JSONObject attributes = new JSONObject();
+    attributes.put("DocumentType", "TEST - Sample Paper Form");
+    attributes.put("Comment", pdfName);
+    attributes.put("IndexKey", "999999999");
+
     writer.append("--" + boundary).append(LINE_FEED);
     writer.append("Content-Disposition: form-data; name=\"attributes\"").append(LINE_FEED);
     writer.append("Content-Type: text/plain; charset=" + CHARSET).append(LINE_FEED);
     writer.append(LINE_FEED);
-    writer.append(attributes).append(LINE_FEED);
+    writer.append(attributes.toString()).append(LINE_FEED);
     writer.flush();
 
     String fileName = "onbase-test.pdf";
