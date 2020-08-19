@@ -227,6 +227,18 @@ public class EvalsPortlet extends GenericPortlet {
         getPortletContext().setAttribute("resourceBundle", resources);
     }
 
+    private EvalsOnbase createOnbase() throws Exception {
+      PropertiesConfiguration config = actionHelper.getEvalsConfig();
+      EvalsOnbase onbase = new EvalsOnbase(
+        config.getString("onbase.clientId"),
+        config.getString("onbase.clientSecret"),
+        config.getString("onbase.oauth2Url"),
+        config.getString("onbase.onbaseDocsUrl")
+      );
+
+      return onbase;
+    }
+
     /**
      * Takes care of initializing portlet variables and storing them in the portletContext.
      * Some of these variables are: permissionRuleMgr, appraisalStepMgr, reviewers, admins and
@@ -276,6 +288,8 @@ public class EvalsPortlet extends GenericPortlet {
                 message += "Stored Ratings in portlet context\n";
                 loadResourceBundle();
                 message += "Stored resource bundle Language.properties in portlet context\n";
+                getPortletContext().setAttribute("onbase", createOnbase());
+                message += "Stored Evals Onbase in portlet context\n";
 
                 // get extra fields to log
                 fields = getExtraLoggingFields(request);
