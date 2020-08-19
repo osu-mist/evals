@@ -3,10 +3,11 @@ package edu.osu.cws.evals.util;
 import javax.net.ssl.HttpsURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.MalformedURLException;
 import java.io.*;
 import javax.xml.bind.DatatypeConverter;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.*;
 
 public class EvalsOnbase {
 
@@ -22,7 +23,11 @@ public class EvalsOnbase {
   private String oauth2Url;
   private String onbaseDocsUrl;
 
-  public EvalsOnbase(String clientId, String clientSecret, String oauth2Url, String onbaseDocsUrl) throws Exception {
+  public EvalsOnbase(String clientId,
+                     String clientSecret,
+                     String oauth2Url,
+                     String onbaseDocsUrl
+  ) throws IOException, MalformedURLException, ParseException {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.oauth2Url = oauth2Url;
@@ -30,19 +35,20 @@ public class EvalsOnbase {
     setBearerToken();
   };
 
-  private HttpsURLConnection openConnection(String urlString) throws Exception {
+  private HttpsURLConnection openConnection(String urlString) throws IOException,
+                                                                     MalformedURLException {
     URL url = new URL(urlString);
     HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
     return conn;
   }
 
-  private void writeBody(HttpsURLConnection conn, String body) throws Exception {
+  private void writeBody(HttpsURLConnection conn, String body) throws IOException {
     OutputStream op = conn.getOutputStream();
     op.write(body.getBytes(CHARSET));
     op.close();
   }
 
-  private JSONObject readResponse(HttpsURLConnection conn) throws Exception {
+  private JSONObject readResponse(HttpsURLConnection conn) throws IOException, ParseException {
     int status = conn.getResponseCode();
 
     InputStream is;
@@ -65,7 +71,7 @@ public class EvalsOnbase {
     return jsonResponse;
   }
 
-  private void setBearerToken() throws Exception {
+  private void setBearerToken() throws IOException, MalformedURLException, ParseException {
     HttpsURLConnection conn = openConnection(oauth2Url);
     conn.setRequestMethod("POST");
     conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -83,11 +89,11 @@ public class EvalsOnbase {
     tokenExpirationDate = jsonResponse.get("expires_in").toString();
   }
 
-  private void setAuthHeader(HttpsURLConnection conn) throws Exception {
+  private void setAuthHeader(HttpsURLConnection conn) {
     conn.setRequestProperty("Authorization", "Bearer " + bearerToken);
   }
 
-  public void postPDF() throws Exception {
+  public void postPDF() throws IOException, MalformedURLException, ParseException {
     String boundary = "---" + System.currentTimeMillis() + "---";
 
     HttpsURLConnection conn = openConnection(onbaseDocsUrl);
@@ -140,7 +146,7 @@ public class EvalsOnbase {
     conn.disconnect();
   }
 
-  public void getDoc() throws Exception {
+  public void getDoc() throws IOException, MalformedURLException, ParseException {
     HttpsURLConnection conn = openConnection(onbaseDocsUrl + "115542");
     setAuthHeader(conn);
 
