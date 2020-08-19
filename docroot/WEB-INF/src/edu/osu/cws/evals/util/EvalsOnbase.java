@@ -1,11 +1,13 @@
 package edu.osu.cws.evals.util;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.MalformedURLException;
 import java.io.*;
+import java.util.Date;
+import java.util.Calendar;
 import javax.xml.bind.DatatypeConverter;
+import javax.net.ssl.HttpsURLConnection;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.*;
 
@@ -18,7 +20,7 @@ public class EvalsOnbase {
   private String clientSecret;
 
   private String bearerToken;
-  private String tokenExpirationDate;
+  private Date tokenExpirationDate;
 
   private String oauth2Url;
   private String onbaseDocsUrl;
@@ -32,7 +34,6 @@ public class EvalsOnbase {
     this.clientSecret = clientSecret;
     this.oauth2Url = oauth2Url;
     this.onbaseDocsUrl = onbaseDocsUrl;
-    setBearerToken();
   };
 
   private HttpsURLConnection openConnection(String urlString) throws IOException,
@@ -86,7 +87,19 @@ public class EvalsOnbase {
     JSONObject jsonResponse = readResponse(conn);
 
     bearerToken = jsonResponse.get("access_token").toString();
-    tokenExpirationDate = jsonResponse.get("expires_in").toString();
+    int expiresIn = Integer.parseInt(jsonResponse.get("expires_in").toString());
+
+    Date date = new Date();
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(date);
+    cal.add(Calendar.SECOND, expiresIn);
+    tokenExpirationDate = cal.getTime();
+  }
+
+  private void checkBearerToken() throws IOException, MalformedURLException, ParseException {
+    if (tokenExpirationDate == null || tokenExpirationDate.compareTo(new Date()) < 0) {
+      setBearerToken();
+    }
   }
 
   private void setAuthHeader(HttpsURLConnection conn) {
@@ -96,6 +109,7 @@ public class EvalsOnbase {
   public void postPDF(String pdfName) throws IOException, MalformedURLException, ParseException {
     String boundary = "---" + System.currentTimeMillis() + "---";
 
+    checkBearerToken();
     HttpsURLConnection conn = openConnection(onbaseDocsUrl);
     conn.setRequestMethod("POST");
     conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
@@ -151,6 +165,7 @@ public class EvalsOnbase {
   }
 
   public void getDoc() throws IOException, MalformedURLException, ParseException {
+    checkBearerToken();
     HttpsURLConnection conn = openConnection(onbaseDocsUrl + "115542");
     setAuthHeader(conn);
 
