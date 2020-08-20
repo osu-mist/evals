@@ -111,34 +111,17 @@ public class EvalsOnbase {
     conn.setRequestProperty("Authorization", "Bearer " + bearerToken);
   }
 
-  public void postPDF(String pdfName) throws IOException, MalformedURLException, ParseException {
-    String boundary = "---" + System.currentTimeMillis() + "---";
-
-    checkBearerToken();
-    HttpsURLConnection conn = openConnection(onbaseDocsUrl);
-    conn.setRequestMethod("POST");
-    conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-    setAuthHeader(conn);
-    conn.setDoOutput(true);
-
-    OutputStream outputStream = conn.getOutputStream();
-    PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, CHARSET), true);
-
-    JSONObject attributes = new JSONObject();
-    attributes.put("DocumentType", "TEST - Sample Paper Form");
-    attributes.put("Comment", pdfName);
-    attributes.put("IndexKey", "999999999");
-
+  private void writeAttribute(PrintWriter writer, String body) throws IOException {
     writer.append("--" + boundary).append(LINE_FEED);
     writer.append("Content-Disposition: form-data; name=\"attributes\"").append(LINE_FEED);
     writer.append("Content-Type: text/plain; charset=" + CHARSET).append(LINE_FEED);
     writer.append(LINE_FEED);
-    writer.append(attributes.toString()).append(LINE_FEED);
+    writer.append(body).append(LINE_FEED);
     writer.flush();
+  }
 
-    String fileName = "onbase-test.pdf";
-    String filePath = "/opt/evals/pdf/" + fileName;
-    File uploadFile = new File(filePath);
+  private void writeFile(PrintWriter writer, OutputStream outputStream, String fileName) throws IOException {
+    File uploadFile = new File(pdfDestination + fileName);
     writer.append("--" + boundary).append(LINE_FEED);
     writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"" + fileName + "\"")
           .append(LINE_FEED);
@@ -158,7 +141,37 @@ public class EvalsOnbase {
     inputStream.close();
     writer.append(LINE_FEED);
     writer.flush();
+  }
 
+  public void postPDF(String pdfName) throws IOException, MalformedURLException, ParseException {
+    boundary = "---" + System.currentTimeMillis() + "---";
+
+    checkBearerToken();
+
+    // setup connection
+    HttpsURLConnection conn = openConnection(onbaseDocsUrl);
+    conn.setRequestMethod("POST");
+    conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+    setAuthHeader(conn);
+    conn.setDoOutput(true);
+
+    // create writer to send multi form data
+    OutputStream outputStream = conn.getOutputStream();
+    PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, CHARSET), true);
+
+    // create attributes text form
+    JSONObject attributes = new JSONObject();
+    attributes.put("DocumentType", "TEST - Sample Paper Form");
+    attributes.put("Comment", pdfName);
+    attributes.put("IndexKey", "999999999");
+
+    // write attributes portion
+    writeAttribute(writer, attributes.toString());
+
+    // write pdf portion
+    writeFile(writer, outputStream, pdfName);
+
+    // finish and close writer
     writer.append(LINE_FEED).flush();
     writer.append("--" + boundary + "--").append(LINE_FEED);
     writer.close();
