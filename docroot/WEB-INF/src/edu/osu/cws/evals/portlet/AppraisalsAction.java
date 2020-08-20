@@ -361,15 +361,22 @@ public class AppraisalsAction implements ActionInterface {
 
         PropertiesConfiguration config;
         try {
-            processUpdateRequest(request.getParameterMap());
 
             if (downloadToNolij()) {
                 config = actionHelper.getEvalsConfig();
                 String nolijDir = config.getString("pdf.nolijDir");
                 String env = config.getString("pdf.env");
                 String suffix = config.getString("pdf.suffixProfessionalFaculty");
-                GeneratePDF(appraisal, nolijDir, env, suffix, true);
+                try {
+                  GeneratePDF(appraisal, nolijDir, env, suffix, true);
+                } catch (Exception e) {
+                  String errorMsg = "Error uploading PDF. Please try again or contact your supervisor if the error persists";
+                  actionHelper.addErrorsToRequest(errorMsg);
+                  return homeAction.display(request, response);
+                }
             }
+
+            processUpdateRequest(request.getParameterMap());
 
             if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR)) {
                 actionHelper.setupMyTeamActiveAppraisals();
@@ -975,9 +982,11 @@ public class AppraisalsAction implements ActionInterface {
         EvalsPDF PdfGenerator = new EvalsPDF(rootDir, appraisal, resource, dirName, env, suffix, ratings);
         String filename = PdfGenerator.createPDF();
 
-        // Insert a record into the nolij_copies table
+        // Insert a record into the nolij_copies table and upload to onbase
         if (insertRecordIntoTable) {
             String onlyFilename = filename.replaceFirst(dirName, "");
+            EvalsOnbase onbase = (EvalsOnbase) actionHelper.getPortletContext().getAttribute("onbase");
+            onbase.postPDF(onlyFilename);
             NolijCopyMgr.add(appraisal.getId(), onlyFilename);
         }
 
