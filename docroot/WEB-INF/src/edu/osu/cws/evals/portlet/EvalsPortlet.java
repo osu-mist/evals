@@ -233,7 +233,8 @@ public class EvalsPortlet extends GenericPortlet {
         config.getString("onbase.clientId"),
         config.getString("onbase.clientSecret"),
         config.getString("onbase.oauth2Url"),
-        config.getString("onbase.onbaseDocsUrl")
+        config.getString("onbase.onbaseDocsUrl"),
+        config.getString("pdf.nolijDir")
       );
 
       return onbase;

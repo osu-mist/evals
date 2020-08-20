@@ -25,15 +25,20 @@ public class EvalsOnbase {
   private String oauth2Url;
   private String onbaseDocsUrl;
 
+  private String boundary;
+  private String pdfDestination;
+
   public EvalsOnbase(String clientId,
                      String clientSecret,
                      String oauth2Url,
-                     String onbaseDocsUrl
+                     String onbaseDocsUrl,
+                     String pdfDestination
   ) throws IOException, MalformedURLException, ParseException {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.oauth2Url = oauth2Url;
     this.onbaseDocsUrl = onbaseDocsUrl;
+    this.pdfDestination = pdfDestination;
   };
 
   private HttpsURLConnection openConnection(String urlString) throws IOException,
