@@ -29,11 +29,13 @@ public class EvalsOnbase {
   private String pdfDestination;
 
   /**
-    * Safe method that fetches session attribute. It handles session being invalid.
+    * Constructor for onbase API requests
     *
-    * @param request           PortletRequest
-    * @param key               Attribute key from session
-    * @return
+    * @param clientId oauth2 client ID
+    * @param clientSecret oauth2 client secret
+    * @param oauth2Url URL for getting oauth2 bearer token
+    * @param onbaseDocsUrl URL for onbase docs API
+    * @param pdfDestination path where PDFs are stored locally
     */
   public EvalsOnbase(String clientId,
                      String clientSecret,
@@ -47,6 +49,14 @@ public class EvalsOnbase {
     this.pdfDestination = pdfDestination;
   };
 
+  /**
+    * Opens an https connection with the URL parameter passed in
+    *
+    * @param urlString URL to open connection with
+    * @return
+    * @throws IOException
+    * @throws MalformedURLException
+    */
   private HttpsURLConnection openConnection(String urlString) throws IOException,
                                                                      MalformedURLException {
     URL url = new URL(urlString);
@@ -54,12 +64,27 @@ public class EvalsOnbase {
     return conn;
   }
 
+  /**
+    * Writes post body data over an https connection
+    *
+    * @param conn Opened https connection
+    * @param body post body to send with request
+    * @throws IOException
+    */
   private void writeBody(HttpsURLConnection conn, String body) throws IOException {
     OutputStream op = conn.getOutputStream();
     op.write(body.getBytes(CHARSET));
     op.close();
   }
 
+  /**
+    * Reads response on an https connection after request has been sent
+    *
+    * @param conn Opened https connection
+    * @return
+    * @throws IOException
+    * @throws ParseException
+    */
   private JSONObject readResponse(HttpsURLConnection conn) throws IOException, ParseException {
     int status = conn.getResponseCode();
 
@@ -83,6 +108,13 @@ public class EvalsOnbase {
     return jsonResponse;
   }
 
+  /**
+    * Makes request to get an oauth2 bearer token
+    *
+    * @throws IOException
+    * @throws MalformedURLException
+    * @throws ParseException
+    */
   private void setBearerToken() throws IOException, MalformedURLException, ParseException {
     HttpsURLConnection conn = openConnection(oauth2Url);
     conn.setRequestMethod("POST");
@@ -107,16 +139,36 @@ public class EvalsOnbase {
     tokenExpirationDate = cal.getTime();
   }
 
+  /**
+    * Checks if bearer token is invalid and retrieves a new one
+    *
+    * @throws IOException
+    * @throws MalformedURLException
+    * @throws ParseException
+    */
   private void checkBearerToken() throws IOException, MalformedURLException, ParseException {
-    if (tokenExpirationDate == null || tokenExpirationDate.compareTo(new Date()) < 0) {
+    if (tokenExpirationDate == null
+        || bearerToken == null
+        || tokenExpirationDate.compareTo(new Date()) < 0) {
       setBearerToken();
     }
   }
 
+  /**
+    * Sets bearer token on https connections authorization header
+    *
+    */
   private void setAuthHeader(HttpsURLConnection conn) {
     conn.setRequestProperty("Authorization", "Bearer " + bearerToken);
   }
 
+  /**
+    * Writes text attributes for multipart post requests
+    *
+    * @param writer PrintWriter for https connection
+    * @param body String to write over connection
+    * @throws IOException
+    */
   private void writeAttribute(PrintWriter writer, String body) throws IOException {
     writer.append("--" + boundary).append(LINE_FEED);
     writer.append("Content-Disposition: form-data; name=\"attributes\"").append(LINE_FEED);
@@ -126,6 +178,14 @@ public class EvalsOnbase {
     writer.flush();
   }
 
+  /**
+    * Writes files for multipart post requests
+    *
+    * @param writer PrintWriter for https connection
+    * @param outputStream OutputStream to write file over
+    * @param body String to write over connection
+    * @throws IOException
+    */
   private void writeFile(PrintWriter writer,
                          OutputStream outputStream,
                          String fileName
@@ -152,6 +212,14 @@ public class EvalsOnbase {
     writer.flush();
   }
 
+  /**
+    * Perform multipart form post for evals PDFs
+    *
+    * @param pdfName name of PDF file to post
+    * @throws IOException
+    * @throws MalformedURLException
+    * @throws ParseException
+    */
   public void postPDF(String pdfName) throws IOException, MalformedURLException, ParseException {
     boundary = "---" + System.currentTimeMillis() + "---";
 
