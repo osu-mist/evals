@@ -120,7 +120,10 @@ public class EvalsOnbase {
     writer.flush();
   }
 
-  private void writeFile(PrintWriter writer, OutputStream outputStream, String fileName) throws IOException {
+  private void writeFile(PrintWriter writer,
+                         OutputStream outputStream,
+                         String fileName
+  ) throws IOException {
     File uploadFile = new File(pdfDestination + fileName);
     writer.append("--" + boundary).append(LINE_FEED);
     writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"" + fileName + "\"")
