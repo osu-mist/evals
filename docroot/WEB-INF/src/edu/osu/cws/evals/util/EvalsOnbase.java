@@ -28,12 +28,18 @@ public class EvalsOnbase {
   private String boundary;
   private String pdfDestination;
 
+  /**
+    * Safe method that fetches session attribute. It handles session being invalid.
+    *
+    * @param request           PortletRequest
+    * @param key               Attribute key from session
+    * @return
+    */
   public EvalsOnbase(String clientId,
                      String clientSecret,
                      String oauth2Url,
                      String onbaseDocsUrl,
-                     String pdfDestination
-  ) throws IOException, MalformedURLException, ParseException {
+                     String pdfDestination) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.oauth2Url = oauth2Url;
