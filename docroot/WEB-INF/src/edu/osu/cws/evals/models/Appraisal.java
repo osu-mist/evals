@@ -66,7 +66,6 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
         tempMap.put(STATUS_GOALS_REACTIVATED, STATUS_GOALS_APPROVED);
         tempMap.put(STATUS_EMPLOYEE_REVIEW_DUE, STATUS_RELEASE_DUE);
         tempMap.put(STATUS_GOALS_APPROVED, STATUS_RESULTS_DUE);
-        tempMap.put(STATUS_GOALS_REQUIRED_MODIFICATION, STATUS_GOALS_OVERDUE);
         nextStatus = Collections.unmodifiableMap(tempMap);
     }
 
