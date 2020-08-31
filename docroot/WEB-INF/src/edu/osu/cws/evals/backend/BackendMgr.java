@@ -351,8 +351,10 @@ public class BackendMgr {
         if (appraisalStartDate == null) //no need to create appraisal at this time.
              return false;
 
+        DateTime trialStartDate = new DateTime(AppraisalMgr.getTrialAppraisal(job).getStartDate());
         //Is this the first annual appraisal?
-        if (appraisalStartDate.equals(job.getInitialEvalStartDate()))
+        if (appraisalStartDate.equals(job.getInitialEvalStartDate())
+         && DateTime.now().minusYears(1).compareTo(trialStartDate) <= 0)
         {
             //don't create it if the job's trial appraisal is still open.
             // The first annual will be created by the web app when the trial one is closed or completed.
