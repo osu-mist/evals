@@ -13,8 +13,8 @@
 #   The other script is supposed to be set as a cronjob under the luminis user.
 
 
-JAVA_HOME=/usr/java/latest
-PORTAL=$CP_ROOT/tc7
+JAVA_HOME=/usr
+PORTAL=$CP_ROOT/$TOMCAT_VERSION
 PORTAL_LIB=$PORTAL/lib
 PORTAL_LIB_EXT=$PORTAL_LIB/ext
 PORTLET_ROOT=$PORTAL/webapps/evals
@@ -40,7 +40,7 @@ CLASSPATH=$CLASSPATH:$LIB_DIR/hibernate3.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/hibernate-jpa-2.0-api-1.0.0.Final.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/javax.inject.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/joda-time-2.2.jar
-CLASSPATH=$CLASSPATH:$LIB_DIR/ojdbc6.jar
+CLASSPATH=$CLASSPATH:$LIB_DIR/ojdbc8.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/esources_en.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/slf4j-api-1.6.1.jar
 CLASSPATH=$CLASSPATH:$LIB_DIR/slf4j-jdk14-1.6.1.jar
