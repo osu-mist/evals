@@ -106,7 +106,7 @@
             /></li>
         </c:if>
         <c:if test="${appraisal.isOpen}">
-            <li>
+            <li style="display:none;">
                 <span><a href="<%=renderResponse.encodeURL(viewPositionDescription.toString())%>" target="_blank">
                 <img class="icon" src="/evals/images/common/copy.png" alt="<liferay-ui:message key="view-position-description"/>"></a>
                 <a href="<%=renderResponse.encodeURL(viewPositionDescription.toString())%>" target="_blank"><liferay-ui:message key="view-position-description"/></a>
