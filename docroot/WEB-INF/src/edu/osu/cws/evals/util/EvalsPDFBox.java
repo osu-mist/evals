@@ -1,6 +1,10 @@
 package edu.osu.cws.evals.util;
 
 import edu.osu.cws.evals.models.*;
+import edu.osu.cws.evals.hibernate.EmployeeMgr;
+import edu.osu.cws.evals.hibernate.JobMgr;
+import edu.osu.cws.evals.hibernate.PermissionRuleMgr;
+import edu.osu.cws.evals.hibernate.AppraisalMgr;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
@@ -42,41 +46,72 @@ public class EvalsPDFBox {
     private static final float OSU_LOGO_HEIGHT = 35.875f;
     private static final float OSU_LOGO_WIDTH = 116.625f;
 
-    public static void createPDF(ResourceBundle resource, String rootPath) throws IOException {
-        PDDocument doc = new PDDocument();
+    ResourceBundle resource;
+
+    PDDocument doc;
+    PDPageContentStream contStream;
+
+    public EvalsPDFBox(ResourceBundle resource, String rootPath, Appraisal appraisal, List<Rating> ratings) throws Exception {
+        this.resource = resource;
+
+        doc = new PDDocument();
         try {
             PDPage page = new PDPage();
             page.setMediaBox(PDRectangle.LETTER);
             doc.addPage(page);
-            PDPageContentStream contStream = new PDPageContentStream(doc, page);
+            contStream = new PDPageContentStream(doc, page);
 
-            writeImage(contStream, doc, page, rootPath + IMAGE_OSU_LOGO, topMargin);
+            Job job = appraisal.getJob();
+            Employee emp = job.getEmployee();
+            PermissionRule permRule = appraisal.getPermissionRule();
+
+            writeImage(page, rootPath + IMAGE_OSU_LOGO, topMargin);
 
             String officeHr = resource.getString("office-hr");
             float headerTextWidth = getTextWidth(officeHr, font, fontSize);
             float headerTextx = page.getMediaBox().getWidth() / 2f - (headerTextWidth / 2);
             float headerTexty = page.getMediaBox().getHeight() - topMargin - OSU_LOGO_HEIGHT;
-            writeText(contStream, font, fontSize, headerTextx, headerTexty, officeHr);
+            writeText(font, fontSize, headerTextx, headerTexty, officeHr);
 
             String jobType = "Professional Faculty";
             String appraisalTitle = resource.getString("appraisal-title");
             float textWidth = getTextWidth(appraisalTitle, fontBold, fontSizeHeaderBold);
             headerTextx = page.getMediaBox().getWidth() - sideMargin - textWidth;
-            writeText(contStream, fontBold, fontSizeHeaderBold, headerTextx, headerTexty, appraisalTitle);
+            writeText(fontBold, fontSizeHeaderBold, headerTextx, headerTexty, appraisalTitle);
             float perfEvalHeight = getTextHeight(fontBold, fontSizeHeaderBold);
-            writeText(contStream, fontBold, fontSizeHeaderBold, headerTextx, headerTexty + perfEvalHeight, jobType);
-            contStream.close();
+            writeText(fontBold, fontSizeHeaderBold, headerTextx, headerTexty + perfEvalHeight, jobType);
 
             float curLineHeight = topMargin + OSU_LOGO_HEIGHT + lineHeight;
 
+            // create table
+            String empName = emp.getLastName() + ", " + emp.getFirstName();
+            String supName = "";
+            if (job.getSupervisor() != null) {
+                supName = job.getSupervisor().getEmployee().getName();
+            }
+            String appraisalTypeKey = "appraisal-type-annual";
+            if (appraisal.getType() != null) {
+                appraisalTypeKey = "appraisal-type-" + appraisal.getType();
+            }
+            String ratingText = "";
+            // boolean displayRating = StringUtils.containsAny(permRule.getEvaluation(), "ev");
+            boolean displayRating = true;
+            if (appraisal.getRating() != null && displayRating) {
+                for (Rating rating : ratings) {
+                    if (appraisal.getRating().equals(rating.getRate())) {
+                        ratingText = rating.getName();
+                    }
+                }
+            }
             String[][][] content = new String[][][]{
-                { { "Employee:", "evals, test" }, { "Org Code Description:", "test orgn description" } },
-                { { "Job Title:", "Evals testing" }, { "Supervisor:", "ruef, alex" } },
-                { { "ID:", "932776660" }, { "Position Class:", "A" }, { "Position No:", "E1" }, { "Type:", "Annual" } },
-                { { "Review Period:", "11/15/19 - 11/14/20" }, { "", "" }, { "Status:", "Signature Due" }, { "Rating:", "Strong Performance" } }
+                { { "employee", empName }, { "ts-org-code-desc", job.getOrgCodeDescription() } },
+                { { "jobTitle", job.getJobTitle() }, { "supervisor", supName } },
+                { { "appraisal-employee-id", emp.getOsuid() }, { "position-class", job.getPositionClass() }, { "position-no", job.getPositionNumber() }, { "appraisal-type-pdf", resource.getString(appraisalTypeKey) } },
+                { { "reviewPeriod", appraisal.getReviewPeriod() }, { "", "" }, { "appraisal-status", resource.getString(appraisal.getViewStatus()) }, { "appraisal-rating", ratingText } }
             };
-            writeTable(doc, page, curLineHeight, content);
+            writeTable(page, curLineHeight, content);
 
+            contStream.close();
             File file = new File("/opt/evals/pdf/" + "testFile.pdf");
             file.createNewFile();
             doc.save(file);
@@ -87,18 +122,17 @@ public class EvalsPDFBox {
         }
     }
 
-    private static void writeImage(PDPageContentStream contStream, PDDocument doc, PDPage page, String path, float y) throws IOException {
+    private void writeImage(PDPage page, String path, float y) throws IOException {
         PDImageXObject pdImage = PDImageXObject.createFromFile(path, doc);
         float initialHeight = page.getMediaBox().getHeight() - y;
 
         contStream.drawImage(pdImage, sideMargin, initialHeight - OSU_LOGO_HEIGHT, OSU_LOGO_WIDTH, OSU_LOGO_HEIGHT);
     }
 
-    private static void writeTable(PDDocument doc, PDPage page, float y, String[][][] content) throws IOException {
+    private void writeTable(PDPage page, float y, String[][][] content) throws IOException {
         float baseRowHeight = 17f;
         float tableWidth = page.getMediaBox().getWidth() - sideMargin * 2;
         float cellMargin = 5f;
-        PDPageContentStream contStream = new PDPageContentStream(doc, page, AppendMode.APPEND, true, true);
         contStream.setLineWidth(.5f);
         float initialHeight = page.getMediaBox().getHeight() - y;
 
@@ -113,15 +147,15 @@ public class EvalsPDFBox {
             if (i < content.length) {
                 float nextx = sideMargin;
                 float baseColWidth = tableWidth / (float)content[i].length;
-                rowHeight = findRowHeight(baseRowHeight, baseColWidth, content[i]);
+                rowHeight = findRowHeight(baseRowHeight, baseColWidth, content[i], resource);
                 for (int j = 0; j <= content[i].length; j++) {
                     if (j == content[i].length || !content[i][j][0].isEmpty()) {
                         // draw column line
                         contStream.drawLine(nextx, nexty, nextx, nexty - rowHeight);
 
                         if (j < content[i].length) {
-                            String text = content[i][j][0] + " ";
-                            writeText(contStream, font, fontSize, textx, texty, text);
+                            String text = resource.getString(content[i][j][0]) + ": ";
+                            writeText(font, fontSize, textx, texty, text);
                             float textWidth = getTextWidth(text, font, fontSize);
 
                             // write bold text
@@ -141,7 +175,7 @@ public class EvalsPDFBox {
                             } else {
                                 boldx += textWidth;
                             }
-                            writeText(contStream, fontBold, fontSizeBold, boldx, boldy, text);
+                            writeText(fontBold, fontSizeBold, boldx, boldy, text);
                         }
                     }
                     textx += baseColWidth;
@@ -152,11 +186,9 @@ public class EvalsPDFBox {
             }
             nexty -= rowHeight;
         }
-
-        contStream.close();
     }
 
-    private static void writeText(PDPageContentStream contStream, PDFont font, float fontSize, float x, float y, String text) throws IOException {
+    private void writeText(PDFont font, float fontSize, float x, float y, String text) throws IOException {
         contStream.setFont(font, fontSize);
         contStream.beginText();
         contStream.moveTextPositionByAmount(x, y);
@@ -164,9 +196,9 @@ public class EvalsPDFBox {
         contStream.endText();
     }
 
-    private static float findRowHeight(float baseRowHeight, float baseColWidth, String[][] content) throws IOException {
+    private static float findRowHeight(float baseRowHeight, float baseColWidth, String[][] content, ResourceBundle resource) throws IOException {
         for (int i = 0; i < content.length; i++) {
-            float textWidth = getTextWidth(content[i][0] + " ", font, fontSize);
+            float textWidth = getTextWidth(resource.getString(content[i][0]) + ": ", font, fontSize);
             float boldTextWidth = getTextWidth(content[i][1], fontBold, fontSizeBold);
 
             if (textWidth + boldTextWidth > baseColWidth) {
