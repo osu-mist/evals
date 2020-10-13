@@ -50,6 +50,9 @@ public class EvalsPDFBox {
     private static float cellMargin = 5f;
 
     private ResourceBundle resource;
+    private String rootPath;
+
+    private Appraisal appraisal;
 
     private PDDocument doc;
     private List<PDPage> pages;
@@ -58,6 +61,8 @@ public class EvalsPDFBox {
 
     public EvalsPDFBox(ResourceBundle resource, String rootPath, Appraisal appraisal, List<Rating> ratings) throws Exception {
         this.resource = resource;
+        this.rootPath = rootPath;
+        this.appraisal = appraisal;
 
         doc = new PDDocument();
         try {
@@ -69,24 +74,8 @@ public class EvalsPDFBox {
             PermissionRule permRule = appraisal.getPermissionRule();
 
             curLine = getPageHeight() - topMargin;
-            writeImage(rootPath + IMAGE_OSU_LOGO, curLine);
-            addToCurLine(OSU_LOGO_HEIGHT);
 
-            String officeHr = resource.getString("office-hr");
-            float headerTextWidth = getTextWidth(officeHr, font, fontSize);
-            float headerTextx = getPageWidth() / 2f - (headerTextWidth / 2);
-            float headerTexty = curLine;
-            writeText(font, fontSize, headerTextx, headerTexty, officeHr);
-
-            String jobType = "Professional Faculty";
-            String appraisalTitle = resource.getString("appraisal-title");
-            float textWidth = getTextWidth(appraisalTitle, fontBold, fontSizeHeaderBold);
-            headerTextx = getPageWidth() - sideMargin - textWidth;
-            writeText(fontBold, fontSizeHeaderBold, headerTextx, headerTexty, appraisalTitle);
-            float perfEvalHeight = getTextHeight(fontBold, fontSizeHeaderBold);
-            writeText(fontBold, fontSizeHeaderBold, headerTextx, headerTexty + perfEvalHeight, jobType);
-
-            addToCurLine(lineHeight);
+            addHeader();
 
             // create table
             String empName = emp.getLastName() + ", " + emp.getFirstName();
@@ -127,6 +116,27 @@ public class EvalsPDFBox {
 
             System.out.println("PDF done");
         }
+    }
+
+    private void addHeader() throws IOException {
+        writeImage(rootPath + IMAGE_OSU_LOGO, curLine);
+        addToCurLine(OSU_LOGO_HEIGHT);
+
+        String officeHr = resource.getString("office-hr");
+        float headerTextWidth = getTextWidth(officeHr, font, fontSize);
+        float headerTextx = getPageWidth() / 2f - (headerTextWidth / 2);
+        float headerTexty = curLine;
+        writeText(font, fontSize, headerTextx, headerTexty, officeHr);
+
+        String jobType = appraisal.getJob().getAppointmentType();
+        String appraisalTitle = resource.getString("appraisal-title");
+        float textWidth = getTextWidth(appraisalTitle, fontBold, fontSizeHeaderBold);
+        headerTextx = getPageWidth() - sideMargin - textWidth;
+        writeText(fontBold, fontSizeHeaderBold, headerTextx, headerTexty, appraisalTitle);
+        float perfEvalHeight = getTextHeight(fontBold, fontSizeHeaderBold);
+        writeText(fontBold, fontSizeHeaderBold, headerTextx, headerTexty + perfEvalHeight, jobType);
+
+        addToCurLine(lineHeight);
     }
 
     private void writeImage(String path, float y) throws IOException {
