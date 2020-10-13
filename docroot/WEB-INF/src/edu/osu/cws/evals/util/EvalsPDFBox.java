@@ -53,6 +53,7 @@ public class EvalsPDFBox {
     private String rootPath;
 
     private Appraisal appraisal;
+    private List<Rating> ratings;
 
     private PDDocument doc;
     private List<PDPage> pages;
@@ -63,47 +64,18 @@ public class EvalsPDFBox {
         this.resource = resource;
         this.rootPath = rootPath;
         this.appraisal = appraisal;
+        this.ratings = ratings;
 
         doc = new PDDocument();
         try {
             pages = new ArrayList<PDPage>();
             addPage();
 
-            Job job = appraisal.getJob();
-            Employee emp = job.getEmployee();
-            PermissionRule permRule = appraisal.getPermissionRule();
-
             curLine = getPageHeight() - topMargin;
 
             addHeader();
 
-            // create table
-            String empName = emp.getLastName() + ", " + emp.getFirstName();
-            String supName = "";
-            if (job.getSupervisor() != null) {
-                supName = job.getSupervisor().getEmployee().getName();
-            }
-            String appraisalTypeKey = "appraisal-type-annual";
-            if (appraisal.getType() != null) {
-                appraisalTypeKey = "appraisal-type-" + appraisal.getType();
-            }
-            String ratingText = "";
-            // boolean displayRating = StringUtils.containsAny(permRule.getEvaluation(), "ev");
-            boolean displayRating = true;
-            if (appraisal.getRating() != null && displayRating) {
-                for (Rating rating : ratings) {
-                    if (appraisal.getRating().equals(rating.getRate())) {
-                        ratingText = rating.getName();
-                    }
-                }
-            }
-            String[][][] content = new String[][][]{
-                { { "employee", empName }, { "ts-org-code-desc", job.getOrgCodeDescription() } },
-                { { "jobTitle", job.getJobTitle() }, { "supervisor", supName } },
-                { { "appraisal-employee-id", emp.getOsuid() }, { "position-class", job.getPositionClass() }, { "position-no", job.getPositionNumber() }, { "appraisal-type-pdf", resource.getString(appraisalTypeKey) } },
-                { { "reviewPeriod", appraisal.getReviewPeriod() }, { "", "" }, { "appraisal-status", resource.getString(appraisal.getViewStatus()) }, { "appraisal-rating", ratingText } }
-            };
-            writeTable(curLine, content);
+            addInfoTable();
 
             writeText(font, fontSize, sideMargin, curLine, "test text");
 
@@ -137,6 +109,39 @@ public class EvalsPDFBox {
         writeText(fontBold, fontSizeHeaderBold, headerTextx, headerTexty + perfEvalHeight, jobType);
 
         addToCurLine(lineHeight);
+    }
+
+    private void addInfoTable() throws IOException {
+        Job job = appraisal.getJob();
+        Employee emp = job.getEmployee();
+        PermissionRule permRule = appraisal.getPermissionRule();
+
+        String empName = emp.getLastName() + ", " + emp.getFirstName();
+        String supName = "";
+        if (job.getSupervisor() != null) {
+            supName = job.getSupervisor().getEmployee().getName();
+        }
+        String appraisalTypeKey = "appraisal-type-annual";
+        if (appraisal.getType() != null) {
+            appraisalTypeKey = "appraisal-type-" + appraisal.getType();
+        }
+        String ratingText = "";
+        // boolean displayRating = StringUtils.containsAny(permRule.getEvaluation(), "ev");
+        boolean displayRating = true;
+        if (appraisal.getRating() != null && displayRating) {
+            for (Rating rating : ratings) {
+                if (appraisal.getRating().equals(rating.getRate())) {
+                    ratingText = rating.getName();
+                }
+            }
+        }
+        String[][][] content = new String[][][]{
+            { { "employee", empName }, { "ts-org-code-desc", job.getOrgCodeDescription() } },
+            { { "jobTitle", job.getJobTitle() }, { "supervisor", supName } },
+            { { "appraisal-employee-id", emp.getOsuid() }, { "position-class", job.getPositionClass() }, { "position-no", job.getPositionNumber() }, { "appraisal-type-pdf", resource.getString(appraisalTypeKey) } },
+            { { "reviewPeriod", appraisal.getReviewPeriod() }, { "", "" }, { "appraisal-status", resource.getString(appraisal.getViewStatus()) }, { "appraisal-rating", ratingText } }
+        };
+        writeTable(curLine, content);
     }
 
     private void writeImage(String path, float y) throws IOException {
