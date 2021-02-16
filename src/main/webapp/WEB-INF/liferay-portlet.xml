@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE liferay-portlet-app PUBLIC "-//Liferay//DTD Portlet Application 7.3.0//EN" "http://www.liferay.com/dtd/liferay-portlet-app_7_3_0.dtd">
+
+<liferay-portlet-app>
+	<portlet>
+		<portlet-name>evals</portlet-name>
+		<icon>/icon.png</icon>
+		<instanceable>true</instanceable>
+		<requires-namespaced-parameters>false</requires-namespaced-parameters>
+		<header-portlet-css>/css/osu_portlets.css</header-portlet-css>
+		<header-portlet-css>/css/osu_theme.css</header-portlet-css>
+		<header-portlet-css>/css/custom.css</header-portlet-css>
+
+		<header-portlet-css>/css/evals.css</header-portlet-css>
+		<header-portlet-css>https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css</header-portlet-css>
+        <header-portal-javascript>https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js</header-portal-javascript>
+        <header-portal-javascript>https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js</header-portal-javascript>
+        <footer-portlet-javascript>/js/jquery.autogrow-textarea.js</footer-portlet-javascript>
+	</portlet>
+	<role-mapper>
+		<role-name>administrator</role-name>
+		<role-link>Administrator</role-link>
+	</role-mapper>
+	<role-mapper>
+		<role-name>guest</role-name>
+		<role-link>Guest</role-link>
+	</role-mapper>
+	<role-mapper>
+		<role-name>power-user</role-name>
+		<role-link>Power User</role-link>
+	</role-mapper>
+	<role-mapper>
+		<role-name>user</role-name>
+		<role-link>User</role-link>
+	</role-mapper>
+</liferay-portlet-app>

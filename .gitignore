@@ -7,3 +7,5 @@ docroot/WEB-INF/classes/
 .idea
 *.pyc
 pre-build.sh
+bin
+build
