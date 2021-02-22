@@ -2,6 +2,7 @@
 
 <div id="accessible-errors" aria-live="assertive" aria-role="alert"></div>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script type="text/javascript">
     function <portlet:namespace/>toggleContent(id){
         var imgPath = '/o/evals-portlet/images/accordion/accordion_arrow_up.png';
