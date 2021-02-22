@@ -23,7 +23,7 @@
         <a class="delete img-txt assessment-delete delete.id.${assessment.id}"
            title="<liferay-ui:message key="appraisal-assessment-delete"/>"
            href="#"><liferay-ui:message key="appraisal-assessment-delete"/></a>
-        <div class="osu-cws-clear-both"></div>
+        <div class="osu-cws-clear-both" style="margin-bottom:0"></div>
     </c:if>
 
     <input type="hidden" class="appraisal-assessment-deleted-${assessment.id}" name="<portlet:namespace />appraisal.assessment.deleted.${assessment.id}"
