@@ -13,8 +13,8 @@
                     <label for="<portlet:namespace />appraisal.review">
                         <liferay-ui:message key="appraisal-${reviewType}-comments"/>
                     </label>
-                    <liferay-ui:input-textarea param="appraisal.review"
-                                               defaultValue="${appraisal.review}" />
+                    <aui:input type="textarea" name="appraisal.review" fieldParam="appraisal.review"
+                                               value="${appraisal.review}" />
                 </c:when>
                 <c:when test="${permissionRule.review == 'v'}">
                     <p class="pass-form-text"><%= CWSUtil.escapeHtml(formAppraisal.getReview()) %></p>

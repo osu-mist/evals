@@ -34,7 +34,7 @@ List appointmentTypes = (List) renderRequest.getAttribute("appointmentTypes");
             <input type="text" id="<portlet:namespace />name" name="<portlet:namespace />name" value="${criterionArea.name}" />
            
             <label for="<portlet:namespace />description"><liferay-ui:message key="description" /></label>
-            <liferay-ui:input-textarea param="description" defaultValue="${criterionArea.description}"/>
+            <aui:input type="textarea" name="description" fieldParam="description" value="${criterionArea.description}"/>
     
             <c:if test="${action == 'add'}">
               <label for="<portlet:namespace />appointmentTypeID"><liferay-ui:message key="appointment-type" /></label>

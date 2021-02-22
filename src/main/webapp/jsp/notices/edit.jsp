@@ -22,7 +22,7 @@
                value="${notice.name}" />
 
         <label for="<portlet:namespace />text"><liferay-ui:message key="text" /></label>
-        <liferay-ui:input-textarea param="text" defaultValue="${notice.text}"/>
+        <aui:input type="textarea" name="text" fieldParam="text" value="${notice.text}"/>
     </fieldset>
 
     <input type="submit" value="<liferay-ui:message key="save" />" />

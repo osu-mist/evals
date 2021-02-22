@@ -187,8 +187,8 @@
                 <h3 class="secret"><liferay-ui:message key="appraisal-goals-legend" /></h3>
                 <legend><liferay-ui:message key="appraisal-goals-legend" /></legend>
                 <label for="<portlet:namespace />appraisal.goalscomments"><liferay-ui:message key="appraisal-goals-comments" /></label>
-                <liferay-ui:input-textarea param="appraisal.goalscomments"
-                    defaultValue="${appraisal.unapprovedGoalsVersion.goalsComments}" />
+                <aui:input type="textarea" name="appraisal.goalscomments"
+                    value="${appraisal.unapprovedGoalsVersion.goalsComments}" />
             </fieldset>
         </c:when>
         <c:when test="${permissionRule.goalComments == 'v'}">
@@ -246,7 +246,7 @@
                     <label for="<portlet:namespace />appraisal.rebuttal">
                         <liferay-ui:message key="appraisal-employee-response-${rebuttalType}"/>
                     </label>
-                    <liferay-ui:input-textarea param="appraisal.rebuttal" defaultValue="${appraisal.rebuttal}"/>
+                    <aui:input type="textarea" name="appraisal.rebuttal" fieldParam="appraisal.rebuttal" value="${appraisal.rebuttal}"/>
                     <c:if test="${empty appraisal.rebuttal}">
                         </div><!-- end pass-appraisal-rebuttal-->
                     </c:if>
@@ -285,7 +285,7 @@
 
     <div class="pass-actions">
         <c:if test="${not empty permissionRule.saveDraft}">
-        <input name="${permissionRule.saveDraft}" type="submit" value="<liferay-ui:message key="${permissionRule.saveDraft}" />">
+        <input name="${permissionRule.saveDraft}" type="submit" value="<liferay-ui:message key="${permissionRule.saveDraft}" />"/>
         </c:if>
 
         <c:if test="${not empty permissionRule.secondarySubmit}">

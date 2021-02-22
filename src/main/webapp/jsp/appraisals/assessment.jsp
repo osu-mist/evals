@@ -32,8 +32,10 @@
         <c:when test="${goalStatus == 'e'}">
             <label for="<portlet:namespace />appraisal.goal.${assessment.id}"><liferay-ui:message key="appraisal-goals" />
                     ${goalCount}</label>
-            <div><liferay-ui:input-textarea param="appraisal.goal.${assessment.id}"
-                                            defaultValue="${assessment.goal}" /></div>
+            <div style="margin-bottom=0"><aui:input
+              type="textarea"
+              name="appraisal.goal.${assessment.id}"
+                                            value="${assessment.goal}" /></div>
         </c:when>
         <c:when test="${goalStatus == 'v'}">
             <fieldset>
@@ -58,8 +60,8 @@
         <c:choose>
             <c:when test="${permissionRule.results == 'e'}">
                 <label for="<portlet:namespace />assessment.employeeResult.${assessment.id}"><liferay-ui:message key="appraisal-employee-results" /></label>
-                <div><liferay-ui:input-textarea param="assessment.employeeResult.${assessment.id}"
-                                                defaultValue="${assessment.employeeResult}" /></div>
+                <div><aui:input label=" " type="textarea" name="assessment.employeeResult.${assessment.id}" fieldParam="assessment.employeeResult.${assessment.id}"
+                                                value="${assessment.employeeResult}" /></div>
             </c:when>
             <c:when test="${permissionRule.results == 'v'}">
                 <fieldset>
@@ -72,8 +74,8 @@
         <c:choose>
             <c:when test="${permissionRule.supervisorResults == 'e'}">
                 <label for="<portlet:namespace />assessment.supervisorResult.${assessment.id}"><liferay-ui:message key="appraisal-result-comments" /></label>
-                <div><liferay-ui:input-textarea param="assessment.supervisorResult.${assessment.id}"
-                                                defaultValue="${assessment.supervisorResult}" /></div>
+                <div><aui:input label=" " type="textarea" name="assessment.supervisorResult.${assessment.id}" fieldParam="assessment.supervisorResult.${assessment.id}"
+                                                value="${assessment.supervisorResult}" /></div>
             </c:when>
             <c:when test="${permissionRule.supervisorResults == 'v'}">
                 <fieldset>

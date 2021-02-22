@@ -7,8 +7,8 @@
                     <label for="<portlet:namespace />appraisal.evaluation">
                         <liferay-ui:message key="appraisal-evaluation" />
                     </label>
-                    <liferay-ui:input-textarea param="appraisal.evaluation"
-                        defaultValue="${appraisal.evaluation}" /><br />
+                    <aui:input type="textarea" name="appraisal.evaluation" fieldParam="appraisal.evaluation"
+                        value="${appraisal.evaluation}" /><br />
                 </c:when>
                 <c:when test="${permissionRule.evaluation == 'v'}">
                     <fieldset>
