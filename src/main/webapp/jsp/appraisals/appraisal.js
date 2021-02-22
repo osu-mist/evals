@@ -133,10 +133,10 @@ jQuery(document).ready(function() {
     o.id = jQuery('#id').val();
 
     // goals comments
-    o.goalsComments = jQuery('#' + portlet_namespace + "appraisal\\.goalscomments").val();
+    o.goalsComments = jQuery('#' + portlet_namespace + "appraisal-goalscomments").val();
 
     // evaluation
-    o.evaluation = jQuery('#' + portlet_namespace + "appraisal\\.evaluation").val();
+    o.evaluation = jQuery('#' + portlet_namespace + "appraisal-evaluation").val();
 
     // rating
     o.rating = jQuery(".appraisal input[name=\"" + portlet_namespace + "appraisal.rating\"]:checked").val();
@@ -145,7 +145,7 @@ jQuery(document).ready(function() {
     o.salaryRecommendation = jQuery('#' + portlet_namespace + "appraisal\\.salary\\.increase").val();
 
     // hr review
-    o.review = jQuery('#' + portlet_namespace + "appraisal\\.review").val();
+    o.review = jQuery('#' + portlet_namespace + "appraisal-review").val();
 
     // employee rebuttal
     o.rebuttal = jQuery('#' + portlet_namespace + 'appraisal\\.rebuttal').val();
@@ -556,7 +556,7 @@ jQuery(document).ready(function() {
   * @return {Boolean}
   */
   function areResultsEmpty() {
-      var isEmpty = jQuery('.lfr-textarea').filter(function(){
+      var isEmpty = jQuery('textarea').filter(function(){
           return jQuery.trim(this.value) == '';
       });
       return isEmpty.length > 0;
