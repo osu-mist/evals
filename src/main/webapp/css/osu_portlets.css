@@ -22,7 +22,8 @@
   font-size: 1.3em;
   margin: .7em 0;
   border-bottom: 4px solid #333;
-  padding-bottom: 6px;
+  padding-bottom: 10px;
+  padding-top: 10px;
 }
 
 .osu-cws h3 {
@@ -109,11 +110,21 @@
 }
 
 .osu-cws label {
-  display: block;
+  /* display: block; */
   clear: both;
   padding-right: 1em;
   color: #666;
   font-weight: bold;
+}
+
+.input-text-wrapper {
+  /* margin-left: 0;
+  margin-right: 0; */
+  display: flex;
+}
+
+.control-label {
+  display: none;
 }
 
 .osu-cws div.required_text {
@@ -161,6 +172,8 @@
   min-height: 6em;
   height: 8em;
   background-image: none;
+  margin-right: .6em;
+  margin-left: -.3em;
 }
 
 .osu-cws input:focus,
@@ -860,7 +873,7 @@
 .osu-cws .actions li {
   float: left;
   display: inline-block;
-  padding: .1em 1.2em;
+  padding: .6em 1.2em;
   border: 1px solid #333;
   background-color: #fff;
   border-radius: 0 0 4px 4px;

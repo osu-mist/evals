@@ -3826,6 +3826,7 @@ border: 1px solid #C0C0C0;
 	float:			right;
 	position:		relative;
 	background: 	transparent url("../images/portlet/action-bar-divider.png") no-repeat;		
+  line-height: 27px;
 }
 
 .portlet-action-menu li li {
