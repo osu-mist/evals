@@ -9,7 +9,5 @@
             <li>${helpLink}</li>
             </c:forEach>
         </ul>
-
-        <aui:input label="Username" name="username" type="textarea" />
     </div>
 </div>
