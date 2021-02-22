@@ -15,7 +15,7 @@
 		<header-portlet-css>https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css</header-portlet-css>
         <header-portal-javascript>https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js</header-portal-javascript>
         <header-portal-javascript>https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js</header-portal-javascript>
-        <footer-portlet-javascript>/js/jquery.autogrow-textarea.js</footer-portlet-javascript>
+        <header-portlet-javascript>/js/jquery.autogrow-textarea.js</header-portlet-javascript>
 	</portlet>
 	<role-mapper>
 		<role-name>administrator</role-name>
