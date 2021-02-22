@@ -23,6 +23,9 @@
                             <th><liferay-ui:message key="overdue"/></th>
                         </c:if>
                         <th><liferay-ui:message key="status" /></th>
+                        <c:if test="${isAdmin == 'true'}">
+                            <th><liferay-ui:message key="delete"/></th>
+                        </c:if>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,7 +45,17 @@
                                 <liferay-ui:message key="${shortAppraisal.viewStatus}" />
                            </a>
                         </td>
-                    </tr>
+                        <c:if test="${isAdmin == 'true'}">
+                            <td><a href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString()%>">
+                                <portlet:param name="id" value="${shortAppraisal.id}"/>
+                                <portlet:param  name="action" value="deleteAppraisal"/>
+                                <portlet:param  name="controller" value="TestsAction"/>
+                              </portlet:actionURL>">
+                                    <liferay-ui:message key="Delete" />
+                              </a>
+                            </td>
+                        </c:if>
+                        </tr>
                 </c:forEach>
                 </tbody>
             </table>

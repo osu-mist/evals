@@ -21,6 +21,9 @@ public class Job extends Evals implements Serializable {
     private Employee employee;
 
     private Job supervisor;
+    private int supPidm;
+    private String supPosn;
+    private String supSuff;
 
     /**
      * Possible values of status are:
@@ -135,7 +138,7 @@ public class Job extends Evals implements Serializable {
     public int hashCode() {
         int result = id;
         result = 31 * result + (employee != null ? employee.hashCode() : 0);
-//        result = 31 * result + (supervisor != null ? supervisor.hashCode() : 0);
+        result = 31 * result + (supervisor != null ? supervisor.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (jobTitle != null ? jobTitle.hashCode() : 0);
         result = 31 * result + (positionNumber != null ? positionNumber.hashCode() : 0);
@@ -161,7 +164,7 @@ public class Job extends Evals implements Serializable {
         return id;
     }
 
-    private void setId(int id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -179,6 +182,37 @@ public class Job extends Evals implements Serializable {
 
     public void setSupervisor(Job supervisor) {
         this.supervisor = supervisor;
+        /*this.supPidm = supervisor.getId();
+        this.supPosn = supervisor.getPositionNumber();
+        this.supSuff = supervisor.getSuffix();*/
+    }
+
+    public void setCurrentSupervisor(Job supervisor) {
+      this.currentSupervisor = supervisor;
+    }
+
+    public int getSupPidm() {
+      return supPidm;
+    }
+
+    public void setSupPidm(int pidm) {
+      this.supPidm = pidm;
+    }
+
+    public String getSupPosn() {
+      return supPosn;
+    }
+
+    public void setSupPosn(String posn) {
+      this.supPosn = posn;
+    }
+
+    public String getSupSuff() {
+      return supSuff;
+    }
+
+    public void setSupSuff(String suff) {
+      this.supSuff = suff;
     }
 
     public String getStatus() {

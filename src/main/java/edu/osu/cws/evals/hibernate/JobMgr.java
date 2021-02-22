@@ -655,4 +655,40 @@ public class JobMgr {
                 .setString("posno", job.getPositionNumber())
                 .uniqueResult();
     }
+
+    public static Job createJob(Employee employee, String appointmentType) {
+      Session session = HibernateUtil.getCurrentSession();
+
+      Job job = new Job(employee, "E1", "00");
+      job.setAppointmentType(appointmentType);
+      job.setStatus("A");
+      job.setJobEcls("AC");
+      job.setBeginDate(new Date());
+      job.setTrialInd(6);
+      job.setAnnualInd(12);
+      job.setPositionClass("A");
+      job.setJobTitle("Evals Testing");
+      job.setTsOrgCode("A");
+
+      Job savedJob = (Job)session.save(job);
+      session.flush();
+
+      return savedJob;
+    }
+
+    public static Job createJob(Employee employee, String appointmentType, Job supervisor) {
+      Job job = createJob(employee, appointmentType);
+      String busName = supervisor.getEmployee().getOnid().substring(0, 4).toUpperCase();
+
+      job.setSupervisor(supervisor);
+      job.setCurrentSupervisor(supervisor);
+      // this is what desperation looks like
+      String query = "update pyvpasj set PYVPASJ_SUPERVISOR_PIDM = " + supervisor.getId() + ", PYVPASJ_SUPERVISOR_POSN = \'" + supervisor.getPositionNumber() + "\', PYVPASJ_SUPERVISOR_SUFF = \'" + supervisor.getSuffix() + "\', PYVPASJ_BCTR_TITLE = \'" + busName + "\' where PYVPASJ_PIDM = " + employee.getId();
+
+      Session session = HibernateUtil.getCurrentSession();
+      session.save(job);
+      session.createSQLQuery(query).executeUpdate();
+
+      return job;
+    }
 }

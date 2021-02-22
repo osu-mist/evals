@@ -74,6 +74,7 @@ public class Mailer implements MailerInterface {
      * @throws Exception
      */
     public boolean sendMail(Appraisal appraisal, EmailType emailType) {
+        System.out.println("sendMail");
         String logShortMessage = "";
         String logLongMessage = "";
 
@@ -86,8 +87,10 @@ public class Mailer implements MailerInterface {
                 return false;
             }
 
+            System.out.println("checking recipients");
             HtmlEmail email = getHtmlEmail();
             if (!setEmailRecipients(appraisal, email, emailType)) {
+                System.out.println("no recipients");
                 return false;
             }
 
@@ -101,7 +104,12 @@ public class Mailer implements MailerInterface {
             }
 
             email.setSubject(subject);
-            email.send();
+            System.out.println("Fake sending email");
+            System.out.println(email.getToAddresses().get(0).getAddress());
+            if (email.getToAddresses().get(0).getAddress().equals("alex.ruef@oregonstate.edu") || email.getToAddresses().get(0).getAddress().equals("ruefa@oregonstate.edu")) {
+                System.out.println("for real sending email");
+                email.send();
+            }
 
             Email evalsEmail = new Email(appraisal.getId(), emailType.getType());
             EmailMgr.add(evalsEmail);
@@ -372,7 +380,8 @@ public class Mailer implements MailerInterface {
             email.addTo(emailAddress);
             email.setHtmlMsg(body);
             email.setSubject(emailBundle.getString("email_supervisor_subject"));
-            email.send();
+            System.out.println("Fake sending email");
+            //email.send();
             EmailMgr.add(emailList);
 
             for (Email evalsEmail : emailList) {
@@ -442,7 +451,8 @@ public class Mailer implements MailerInterface {
             email.addTo(emailAddresses);
             email.setHtmlMsg(body);
             email.setSubject(emailBundle.getString("email_reviewer_subject"));
-            email.send();
+            System.out.println("Fake sending email");
+            //email.send();
 
             String longMsg = "Emails sent to: various reviewers";
             logger.log(Logger.INFORMATIONAL, "Reviewer emails sent", longMsg);
@@ -489,7 +499,8 @@ public class Mailer implements MailerInterface {
             email.addTo(emailAddresses);
             email.setHtmlMsg(body);
             email.setSubject(emailBundle.getString("email_lateReport_subject"));
-            email.send();
+            System.out.println("Fake sending email");
+            //email.send();
 
             String longMsg = "Late report emails sent to: various reviewers";
             logger.log(Logger.INFORMATIONAL, "Late Report email sent", longMsg);

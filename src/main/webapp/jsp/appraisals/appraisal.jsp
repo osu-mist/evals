@@ -43,6 +43,11 @@
     <portlet:param name="action" value="display"/>
     <portlet:param name="controller" value="PositionDescriptionAction"/>
 </portlet:actionURL>
+<portlet:actionURL var="advanceAppraisalAction" escapeXml="false">
+    <portlet:param name="id" value="${appraisal.id}"/>
+    <portlet:param name="action" value="advanceAppraisal"/>
+    <portlet:param name="controller" value="TestsAction"/>
+</portlet:actionURL>
 
 <div id="pass-appraisal-form" class="osu-cws">
 
@@ -307,6 +312,14 @@
         <%@ include file="/jsp/appraisals/appraisal.js"%>
     </script>
     </c:if>
+
+<a style="font-size:large" href="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+    <portlet:param name="id" value="${appraisal.id}" />
+    <portlet:param name="action" value="advanceAppraisal" />
+    <portlet:param name="controller" value="TestsAction" />
+    </portlet:actionURL>">
+<liferay-ui:message key="Advance Evaluation"/>
+</a><br />
 
 <c:if test="${isDemo}">
     <%@ include file="/jsp/appraisals/demoSettings.jsp"%>

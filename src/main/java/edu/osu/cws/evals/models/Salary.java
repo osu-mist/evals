@@ -23,6 +23,21 @@ public class Salary {
 
     private Double oneMin;
 
+    public Salary() {}
+
+    public Salary(int appraisalId) {
+      this.appraisalId = appraisalId;
+      this.low = 500.;
+      this.midPoint = 750.;
+      this.high = 1000.;
+      this.current = 650.;
+      this.increase = .5;
+      this.sgrpCode = "21011A";
+      this.twoIncrease = .5;
+      this.oneMax = .9;
+      this.oneMin = .2;
+    }
+
     public Integer getId() {
         return id;
     }

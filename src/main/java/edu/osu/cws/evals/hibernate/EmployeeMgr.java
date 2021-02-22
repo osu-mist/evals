@@ -5,7 +5,7 @@ import edu.osu.cws.evals.models.Job;
 import edu.osu.cws.evals.util.HibernateUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -115,6 +115,26 @@ public class EmployeeMgr {
             jobs.add(job);
         }
         return jobs;
+    }
+
+    public static Employee createEmployee (String lastName, String firstName, String onid, String email) {
+      Employee emp = new Employee(firstName, lastName, onid, email);
+      emp.setStatus("A");
+      emp.setOsuid(getNewOsuId());
+
+      Session session = HibernateUtil.getCurrentSession();
+      session.save(emp);
+      session.flush();
+
+      return emp;
+    }
+
+    private static String getNewOsuId () {
+      Session session = HibernateUtil.getCurrentSession();
+
+      List<String> employeeList = session.getNamedQuery("employee.getNewOsuid").list();
+
+      return String.valueOf(Integer.parseInt(employeeList.get(0)) + 1);
     }
 
 }

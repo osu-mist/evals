@@ -153,13 +153,16 @@ public class AppraisalsAction implements ActionInterface {
 
         Job supervisor = appraisal.getJob().getSupervisor();
         if (supervisor != null && pidm == supervisor.getEmployee().getId()) {
-            return ActionHelper.ROLE_SUPERVISOR;
+            System.out.println("supervisor role");
+            if (!appraisal.getStatus().equals(Appraisal.STATUS_REVIEW_DUE) && !appraisal.getStatus().equals(Appraisal.STATUS_REVIEW_OVERDUE))
+              return ActionHelper.ROLE_SUPERVISOR;
         }
 
         Reviewer reviewer  = actionHelper.getReviewer();
         if (reviewer != null) {
             String bcName  = appraisal.getJob().getBusinessCenterName();
             if (bcName.equals(reviewer.getBusinessCenterName())) {
+                System.out.println("reviewer role");
                 return ActionHelper.ROLE_REVIEWER;
             }
         }
@@ -331,9 +334,19 @@ public class AppraisalsAction implements ActionInterface {
         Map<String, String> salaryValidationValues = new HashMap<String, String>();
 
         Salary salary = appraisal.getSalary();
-        salaryValidationValues.put("increaseRate2Value", salary.getTwoIncrease().toString());
-        salaryValidationValues.put("increaseRate1MinVal", salary.getOneMin().toString());
-        salaryValidationValues.put("increaseRate1MaxVal", salary.getOneMax().toString());
+        String getTwoIncrease, getOneMin, getOneMax;
+        if (salary == null) {
+          getTwoIncrease = "0";
+          getOneMin = "0";
+          getOneMax = "0";
+        } else {
+          getTwoIncrease = salary.getTwoIncrease().toString();
+          getOneMin = salary.getOneMin().toString();
+          getOneMax = salary.getOneMax().toString();
+        }
+        salaryValidationValues.put("increaseRate2Value", getTwoIncrease);
+        salaryValidationValues.put("increaseRate1MinVal", getOneMin);
+        salaryValidationValues.put("increaseRate1MaxVal", getOneMax);
 
         return salaryValidationValues;
     }

@@ -73,6 +73,21 @@ public class AppraisalMgr {
     }
 
     /**
+     * Deletes appraisal record after calling resetAppraisal
+     * to delete child data
+     *
+     * @param appraisal
+     * @return
+     * @throws Exception
+     */
+     public static void deleteAppraisal(Appraisal appraisal) throws Exception {
+        resetAppraisal(appraisal);
+
+        Session session = HibernateUtil.getCurrentSession();
+        session.delete(appraisal);
+     }
+
+    /**
      * This method will set the given appraisal to an initialized state. Used to reset old
      * appraisals, and initialize new/uninitialized appraisals.
      *

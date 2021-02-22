@@ -3,8 +3,13 @@
 
 <hibernate-mapping auto-import="false" >
 
-    <class name="edu.osu.cws.evals.models.Employee" table="PYVPASE" mutable="false" batch-size="10">
-        <id name="id" column="PYVPASE_PIDM" type="int"/>
+    <class name="edu.osu.cws.evals.models.Employee" table="PYVPASE" mutable="false" batch-size="10"
+           dynamic-insert="true">
+        <id name="id" column="PYVPASE_PIDM" type="int">
+            <generator class="native">
+                <param name="sequence">pass_seq</param>
+            </generator>
+        </id>
 
         <property name="firstName" column="PYVPASE_FIRST_NAME"/>
         <property name="middleName" column="PYVPASE_MI"/>
@@ -27,5 +32,9 @@
     <query name="employee.firstAndLastNameByPidm">
         SELECT new edu.osu.cws.evals.models.Employee(id, firstName, lastName)
         FROM edu.osu.cws.evals.models.Employee where id in (:ids)
+    </query>
+
+    <query name="employee.getNewOsuid">
+      select max(osuid) from edu.osu.cws.evals.models.Employee
     </query>
 </hibernate-mapping>

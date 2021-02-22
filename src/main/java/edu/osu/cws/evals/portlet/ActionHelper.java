@@ -219,6 +219,22 @@ public class ActionHelper {
     }
 
     /**
+     * Force refresh of employee apraisals
+     *
+     * @return List<Appraisal>
+     * @throws Exception
+     */
+    public List<Appraisal> reloadMyAppraisals() throws Exception {
+        PortletSession session = getSession();
+        List<Appraisal> allMyAppraisals;
+
+        allMyAppraisals =
+                AppraisalMgr.getAllMyAppraisals(loggedOnUser.getId(), null, null, false);
+        session.setAttribute(ALL_MY_APPRAISALS, allMyAppraisals);
+        return allMyAppraisals;
+    }
+
+    /**
      * Fetches the supervisor's team active appraisal and stores the list in session. Then it places the list
      * in the requestMap so that the view can access it.
      *
