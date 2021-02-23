@@ -59,7 +59,7 @@ public class EvalsPDF {
     public EvalsPDF(String rootDir, Appraisal appraisal, ResourceBundle resource, String dirName, String env,
                     String suffix, List<Rating> ratings) {
         // this.rootDir = rootDir;
-        this.rootDir = "/opt/liferay/evals/pdf/";
+        this.rootDir = "/opt/evals/pdf/";
         this.appraisal = appraisal;
         this.resource = resource;
         this.dirName = dirName;

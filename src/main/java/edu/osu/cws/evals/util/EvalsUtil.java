@@ -161,7 +161,7 @@ public class EvalsUtil {
 
         // Get the path and name of properties file to load
         String propertyFile = getPropertyFileName(portletRoot);
-        propertyFile = "/opt/liferay/evals/evals.properties";
+        propertyFile = "/opt/evals/evals.properties";
         if (propertyFile != null) {
             return overWriteDefaultConfigs(new PropertiesConfiguration(propertyFile));
         }

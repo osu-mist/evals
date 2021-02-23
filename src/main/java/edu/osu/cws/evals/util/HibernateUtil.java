@@ -44,10 +44,10 @@ public class HibernateUtil {
         System.out.println(hbmDir);
         System.out.println(configFileName);
         System.out.println("----------------------------");
-        File configFile = new File("/opt/liferay/evals/hibernate.cfg.xml");
+        File configFile = new File("/opt/evals/hibernate.cfg.xml");
         hibernateConfig = new Configuration().configure(configFile);
         // hibernateConfig = new Configuration().configure(configFileName);
-        hibernateConfig.addDirectory(new File("/opt/liferay/evals/hbm"));
+        hibernateConfig.addDirectory(new File("/opt/evals/hbm"));
         // hibernateConfig.addDirectory(new File(hbmDir));
         hibernateConfig.addProperties(extraProperties);
     }
