@@ -148,7 +148,7 @@ jQuery(document).ready(function() {
     o.review = jQuery('#' + portlet_namespace + "appraisal-review").val();
 
     // employee rebuttal
-    o.rebuttal = jQuery('#' + portlet_namespace + 'appraisal\\.rebuttal').val();
+    o.rebuttal = jQuery('#' + portlet_namespace + 'appraisal-rebuttal').val();
 
     // button clicked
     o.buttonClicked = jQuery("input[type=submit][clicked=true]").attr('name');
@@ -302,7 +302,6 @@ jQuery(document).ready(function() {
   jQuery("#<portlet:namespace />show-rebuttal").click(function() {
       jQuery("#<portlet:namespace />show-rebuttal").hide();
       jQuery(".pass-appraisal-rebuttal").show();
-      jQuery('textarea').autogrow();
       return false;
   });
 
