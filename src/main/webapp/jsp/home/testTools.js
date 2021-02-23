@@ -1,6 +1,4 @@
 jQuery(document).ready(function() {
-  console.log('eyo');
-
   jQuery("#showCreateEmployee").click(function(event) {
     $("#dialog").dialog();
   });
