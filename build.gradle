@@ -65,6 +65,9 @@ dependencies {
 war {
 	dependsOn buildCSS
 	exclude "**/*.scss"
+    from ('src/main') {
+        into 'src'
+    }
 
 	filesMatching("**/.sass-cache/") {
 		it.path = it.path.replace(".sass-cache/", "")
