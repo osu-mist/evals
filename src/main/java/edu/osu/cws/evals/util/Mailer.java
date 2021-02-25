@@ -84,6 +84,7 @@ public class Mailer implements MailerInterface {
                 logLongMessage = "Appraisal " + appraisal.getId() +
                         " not available, job is not active.";
                 logger.log(Logger.NOTICE,logShortMessage,logLongMessage,logFields);
+                System.out.println("employee job not active, email not sent");
                 return false;
             }
 
@@ -118,6 +119,8 @@ public class Mailer implements MailerInterface {
             logLongMessage = "email of type " + emailType.getType() + " sent regarding appraisal " + appraisal.getId();
             logger.log(Logger.INFORMATIONAL, logShortMessage, logLongMessage, logFields);
         } catch (Exception e) {
+            System.out.println("caught exception, not emailing");
+            e.printStackTrace();
             try {
                 logShortMessage = "Email not sent";
                 String stackTrace = replaceEmails(CWSUtil.stackTraceString(e), "email address removed");
