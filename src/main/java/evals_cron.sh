@@ -4,6 +4,7 @@
 
 export CP_ROOT=/opt/lr6/   #change this to your CP_ROOT
 export CLASSPATH
-SCRIPT=$CP_ROOT/tc7
-SCRIPT=$SCRIPT/webapps/evals/WEB-INF/src/edu/osu/cws/evals/backend/evals_backend.sh
+export TOMCAT_VERSION=tomcat-9.0.37
+SCRIPT=$CP_ROOT/$TOMCAT_VERSION
+SCRIPT=$SCRIPT/webapps/evals/src/java/edu/osu/cws/evals/backend/evals_backend.sh
 $SCRIPT
