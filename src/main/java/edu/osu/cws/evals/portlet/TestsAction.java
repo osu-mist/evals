@@ -143,6 +143,14 @@ public class TestsAction implements ActionInterface {
       return homeAction.display(request, response);
     }
 
+    private Employee getSupervisor(Appraisal appraisal) {
+      if (appraisal.getJob().getSupervisor() != null) {
+        return appraisal.getJob().getSupervisor().getEmployee();
+      } else {
+        return appraisal.getJob().getEmployee();
+      }
+    }
+
     public String advanceAppraisal(PortletRequest request, PortletResponse response) throws Exception {
       int appraisalId = ParamUtil.getInteger(request, "id");
       Appraisal appraisal = AppraisalMgr.getAppraisal(appraisalId);
@@ -178,7 +186,7 @@ public class TestsAction implements ActionInterface {
           if (goalVersion.getGoalsComments() == null || goalVersion.getGoalsComments().isEmpty()) {
             goalVersion.setGoalsComments("autocompleted goals comment");
           }
-          goalVersion.setGoalsApproverPidm(appraisal.getJob().getSupervisor().getEmployee().getId());
+          goalVersion.setGoalsApproverPidm(getSupervisor(appraisal).getId());
           appraisal.setStatus("resultsDue");
         }
         session.save(appraisal);
@@ -212,7 +220,7 @@ public class TestsAction implements ActionInterface {
         }
         appraisal.setRating(1);
         appraisal.setEvaluation("autocompleted evaluation");
-        appraisal.setEvaluator(appraisal.getJob().getSupervisor().getEmployee());
+        appraisal.setEvaluator(getSupervisor(appraisal));
         appraisal.setEvaluationSubmitDate(new Date());
         appraisal.setStatus(Appraisal.STATUS_REVIEW_DUE);
         session.save(appraisal);
@@ -221,7 +229,7 @@ public class TestsAction implements ActionInterface {
       if(Appraisal.STATUS_REVIEW_DUE.equals(status) || Appraisal.STATUS_REVIEW_OVERDUE.equals(status)) {
         appraisal.setReviewSubmitDate(new Date());
         appraisal.setReview("autocompleted review");
-        appraisal.setReviewer(appraisal.getJob().getSupervisor().getEmployee());
+        appraisal.setReviewer(getSupervisor(appraisal));
         appraisal.setStatus(Appraisal.STATUS_RELEASE_DUE);
         session.save(appraisal);
       }

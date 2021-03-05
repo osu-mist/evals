@@ -669,6 +669,7 @@ public class JobMgr {
       job.setPositionClass("A");
       job.setJobTitle("Evals Testing");
       job.setTsOrgCode("A");
+      job.setOrgCodeDescription("orgnCode");
 
       Job savedJob = (Job)session.save(job);
       session.flush();
