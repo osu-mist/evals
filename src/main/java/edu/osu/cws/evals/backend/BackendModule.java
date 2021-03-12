@@ -49,7 +49,8 @@ public class BackendModule extends AbstractModule {
     public Map<String, Configuration> provideMapStringConfiguration() {
         PropertiesConfiguration config = getConfig();
         String hibernateConfig = config.getString("hibernate-cfg-file");
-        HibernateUtil.setHibernateConfig(hibernateConfig, "",
+        HibernateUtil.setHibernateConfig(hibernateConfig,
+                System.getProperty("user.dir"),
                 config.getString("extra-properties-path") +
                 config.getString("extra-properties-file"));
         Session session = HibernateUtil.getCurrentSession();

@@ -411,7 +411,7 @@ public class EvalsPortlet extends GenericPortlet {
         infoMsg = "using hibernate cfg file - " + hibernateConfig;
         message += infoMsg + "\n";
         HibernateUtil.setHibernateConfig(hibernateConfig,
-                getPortletContext().getRealPath("/"),
+                System.getProperty("user.dir"),
                 config.getString("extra-properties-path") +
                         config.getString("extra-properties-file"));
         getPortletContext().setAttribute("environmentProp", config);

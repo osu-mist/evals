@@ -39,16 +39,10 @@ public class HibernateUtil {
     {
         String hbmDir = hbmPathPrefix + Constants.getRootDir() + "edu/osu/cws/evals/hbm";
         Properties extraProperties = getExtraProperties(extraConfigFilePath);
-        // configFileName = "/opt/liferay/evals/hibernate.cfg.xml";
-        System.out.println("----------------------------");
-        System.out.println(hbmDir);
-        System.out.println(configFileName);
-        System.out.println("----------------------------");
-        File configFile = new File("/opt/evals/hibernate.cfg.xml");
+        String configFilePath = hbmPathPrefix + Constants.getRootDir() + configFileName;
+        File configFile = new File(configFilePath);
         hibernateConfig = new Configuration().configure(configFile);
-        // hibernateConfig = new Configuration().configure(configFileName);
-        hibernateConfig.addDirectory(new File("/opt/evals/hbm"));
-        // hibernateConfig.addDirectory(new File(hbmDir));
+        hibernateConfig.addDirectory(new File(hbmDir));
         hibernateConfig.addProperties(extraProperties);
     }
 

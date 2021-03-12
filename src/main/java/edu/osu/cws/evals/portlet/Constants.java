@@ -88,7 +88,9 @@ public class Constants {
     public static final String TMP_DIR_REPORT_CSV = "/tmp/";
 
     // Private constants
-    private static final String ROOT_DIR = "WEB-INF/src/";
+    private static final String ROOT_DIR = "/src/java/";
+    private static final String EVALS_DIR = "/tomcat/webapps/evals";
+    public static final String PDF_DIR = EVALS_DIR + "/src/webapp/";
     private static final String DEFAULT_PROPERTIES_FILE = "backend-config.properties";
 
     public static final String ALLOW_PDF_TO_NOLIJ = "allowPdfToNolij";
@@ -100,8 +102,8 @@ public class Constants {
      * @return
      */
     public static String getRootDir() {
-        if (new File("docroot").exists()) {
-            return "docroot/" + ROOT_DIR;
+        if (new File("tomcat").exists()) {
+            return EVALS_DIR + ROOT_DIR;
         }
 
         return ROOT_DIR;
