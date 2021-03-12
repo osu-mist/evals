@@ -149,19 +149,10 @@ public class EvalsUtil {
      */
     public static PropertiesConfiguration loadEvalsConfig(PortletContext context)
             throws Exception {
-        // If we have a portletContext object, we are called from the web and need to get the path
-        String portletRoot = "";
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
-        System.out.println("IS CONTEXT NULL?");
-        if (context != null) {
-            System.out.println("CONTEXT IS NOT NULL");
-            portletRoot = context.getRealPath("/");
-            System.out.println(portletRoot);
-        }
+        String portletRoot = System.getProperty("user.dir");
 
         // Get the path and name of properties file to load
         String propertyFile = getPropertyFileName(portletRoot);
-        propertyFile = "/opt/evals/evals.properties";
         if (propertyFile != null) {
             return overWriteDefaultConfigs(new PropertiesConfiguration(propertyFile));
         }

@@ -982,7 +982,7 @@ public class AppraisalsAction implements ActionInterface {
     private String GeneratePDF(Appraisal appraisal, String dirName, String env, String suffix,
                                boolean  insertRecordIntoTable) throws Exception {
         // Create PDF
-        String rootDir = actionHelper.getPortletContext().getRealPath("/");
+        String rootDir = System.getProperty("user.dir");
         Map<String, List<Rating>> ratingsMap = (HashMap) actionHelper.getPortletContext().getAttribute("ratings");
         List<Rating> ratings = RatingMgr.getRatings(ratingsMap, appraisal.getAppointmentType());
         EvalsPDF PdfGenerator = new EvalsPDF(rootDir, appraisal, resource, dirName, env, suffix, ratings);

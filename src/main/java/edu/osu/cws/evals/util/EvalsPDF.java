@@ -10,6 +10,7 @@ import edu.osu.cws.util.CWSUtil;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,8 +59,7 @@ public class EvalsPDF {
      */
     public EvalsPDF(String rootDir, Appraisal appraisal, ResourceBundle resource, String dirName, String env,
                     String suffix, List<Rating> ratings) {
-        // this.rootDir = rootDir;
-        this.rootDir = "/opt/evals/pdf/";
+        this.rootDir = rootDir + Constants.PDF_DIR;
         this.appraisal = appraisal;
         this.resource = resource;
         this.dirName = dirName;
@@ -138,6 +138,7 @@ public class EvalsPDF {
         //@todo: escape any text before writing it to the PDF doc??
         String filename = getFileName();
 
+        File pdfFile = new File(filename);
         PdfWriter.getInstance(document, new FileOutputStream(filename));
         document.open();
 
@@ -153,6 +154,7 @@ public class EvalsPDF {
         }
         addCriteriaLegend();
         document.close();
+        pdfFile.setReadable(true, false);
         return filename;
     }
 
