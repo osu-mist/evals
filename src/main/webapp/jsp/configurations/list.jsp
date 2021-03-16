@@ -25,10 +25,10 @@
 
               <img id="<portlet:namespace/>Configuration${configuration.section}ImageToggle" src=
                   <c:if test="${configuration.section != 'due-date'}">
-                      "/o/evals-portlet/images/accordion/accordion_arrow_down.png"
+                      "/o/evals/images/accordion/accordion_arrow_down.png"
                   </c:if>
                   <c:if test="${configuration.section == 'due-date'}">
-                      "/o/evals-portlet/images/accordion/accordion_arrow_up.png"
+                      "/o/evals/images/accordion/accordion_arrow_up.png"
                   </c:if>
               />
               <liferay-ui:message key="${configuration.section}"/>

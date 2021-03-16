@@ -5,9 +5,9 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script type="text/javascript">
     function <portlet:namespace/>toggleContent(id){
-        var imgPath = '/o/evals-portlet/images/accordion/accordion_arrow_up.png';
+        var imgPath = '/o/evals/images/accordion/accordion_arrow_up.png';
         if(jQuery('#'+id).is(":visible")){
-            var imgPath = new String('/o/evals-portlet/images/accordion/accordion_arrow_down.png');
+            var imgPath = new String('/o/evals/images/accordion/accordion_arrow_down.png');
         }
 
         document.getElementById(id+'ImageToggle').src = imgPath;

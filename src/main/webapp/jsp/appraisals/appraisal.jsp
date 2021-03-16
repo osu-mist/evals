@@ -63,7 +63,7 @@
         <c:if test="${not empty displayDownloadPdf}">
             <li> <span class="" >
               <a href="<%=renderResponse.encodeURL(downloadPDFURL.toString())%>">
-              <img id="rjus_null_null" src="/o/evals-portlet/images/pdf.png" alt=""> <span>Download as PDF</span> </a> </span>
+              <img id="rjus_null_null" src="/o/evals/images/pdf.png" alt=""> <span>Download as PDF</span> </a> </span>
             </li>
         </c:if>
         <c:if test="${not empty displayResendNolij}">
@@ -108,7 +108,7 @@
         <c:if test="${appraisal.isOpen}">
             <li style="display:none;">
                 <span><a href="<%=renderResponse.encodeURL(viewPositionDescription.toString())%>" target="_blank">
-                <img class="icon" src="/o/evals-portlet/images/common/copy.png" alt="<liferay-ui:message key="view-position-description"/>"></a>
+                <img class="icon" src="/o/evals/images/common/copy.png" alt="<liferay-ui:message key="view-position-description"/>"></a>
                 <a href="<%=renderResponse.encodeURL(viewPositionDescription.toString())%>" target="_blank"><liferay-ui:message key="view-position-description"/></a>
                 </span>
             </li>
