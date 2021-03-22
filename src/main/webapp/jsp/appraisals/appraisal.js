@@ -455,11 +455,12 @@ jQuery(document).ready(function() {
       var goalLabelFor = newAssessment.find('label:first').attr('for').replace(/\.\d+/, '');
       goalLabelFor += "." + id;
       jQuery(newAssessment.find('label')[0]).attr('for', goalLabelFor);
-      var goalTextAreaId = newAssessment.find('textarea').attr('id').replace(/\.\d+/, '');
+      var goalTextAreaId = newAssessment.find('textarea').attr('id').replace(/\-\d+/, '');
+      goalTextAreaId = goalTextAreaId.replace(/\-goal/, '.goal');
       goalTextAreaId += "." + id;
       newAssessment.find('textarea').attr('id', goalTextAreaId);
       newAssessment.find('textarea').attr('name', goalTextAreaId);
-      newAssessment.find('textarea').attr('class', ''); // clear any class inputs
+      newAssessment.find('textarea').attr('class', 'field form-control');
 
       // assessment criterias checkboxes
       var criteriaNameSpans = jQuery(newAssessment.find(":checkbox")[0]).parent().find("span");
