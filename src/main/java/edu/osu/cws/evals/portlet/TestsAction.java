@@ -103,7 +103,8 @@ public class TestsAction implements ActionInterface {
 
       if("true".equals(parameters.get("reviewer"))) {
         System.out.println("create reviewer");
-        ReviewerMgr.add(employee.getOnid(), parameters.get("businessCenter").substring(0, 4));
+        String busName = employee.getOnid().substring(0, 4).toUpperCase();
+        ReviewerMgr.add(employee.getOnid(), busName);
         actionHelper.updateContextTimestamp();
         actionHelper.setAdminPortletData();
         parameters.put("reviewer", "false");
@@ -153,7 +154,12 @@ public class TestsAction implements ActionInterface {
 
     public String advanceAppraisal(PortletRequest request, PortletResponse response) throws Exception {
       int appraisalId = ParamUtil.getInteger(request, "id");
+      String linkStatus = request.getParameter("appraisalStatus");
       Appraisal appraisal = AppraisalMgr.getAppraisal(appraisalId);
+      if (!appraisal.getStatus().equals(linkStatus)) {
+        return homeAction.display(request, response);
+      }
+
       Session session = HibernateUtil.getCurrentSession();
       // for (GoalVersion goalVersion : appraisal.getGoalVersions()) {
         // for (Assessment assessment : goalVersion.getAssessments()) {
