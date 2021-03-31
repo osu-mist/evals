@@ -24,7 +24,9 @@ public class ErrorHandler extends Evals {
             throws Exception {
         ResourceBundle resource = (ResourceBundle) actionHelper.getPortletContextAttribute("resourceBundle");
         actionHelper.addErrorsToRequest(resource.getString("access-denied"));
-        ((ActionResponse) response).setWindowState(WindowState.NORMAL);
+        if (response instanceof ActionResponse) {
+            ((ActionResponse) response).setWindowState(WindowState.NORMAL);
+        }
         return homeAction.display(request, response);
     }
 
