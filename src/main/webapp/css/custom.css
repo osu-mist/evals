@@ -1,0 +1,4714 @@
+/* This file allows you to override default styles in one central location for easier upgrade and maintenance. */
+	/* This is the main CSS that includes other CSS files. */
+	/* This CSS sets the default styles for the base components. */
+	/* ---------- Browser normalization ---------- */
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td
+	{
+	margin: 0;
+	padding: 0;
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+fieldset,img {
+	border: 0;
+}
+
+address,caption,cite,code,dfn,em,strong,th,var {
+	font-style: normal;
+	font-weight: normal;
+}
+
+ol,ul {
+	list-style: none;
+}
+
+caption,th {
+	text-align: left;
+}
+
+q:before,q:after {
+	content: '';
+}
+
+abbr,acronym {
+	border: 0;
+}
+
+body {
+	background-color: #fff;
+	font: 62.5%/ 1.6em Arial, Helvetica, Verdana, sans-serif;
+}
+
+body {
+	background: #fff;
+	font-size: 11px;
+}
+
+body.portal-popup {
+	background: none;
+	padding: 10px;
+}
+
+body.portal-iframe {
+	padding: 0;
+}
+
+table {
+	clear: both;
+}
+
+abbr,acronym {
+	border-bottom: 1px dotted #000;
+	cursor: help;
+}
+
+blockquote,ul,ol,dl {
+	margin: 1em;
+}
+
+ol,ul,dl {
+	margin-left: 2em;
+}
+
+ol li,ul ol li {
+	list-style: decimal outside;
+}
+
+
+ul ul li {
+	list-style-type: circle;
+}
+
+ol ol li {
+	list-style-type: upper-roman;
+}
+
+dl dd {
+	margin-left: 1em;
+}
+
+th {
+	font-weight: bold;
+}
+
+caption {
+	margin-bottom: 0.5em;
+	text-align: center;
+}
+
+p {
+	margin-bottom: 1em;
+}
+
+/* ---------- Links ---------- */
+a {
+	color: #015c95;
+	text-decoration: underline;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+a:visited {
+	
+}
+
+/* ---------- Headers ---------- */
+h1 {
+	font-size: 1.8em;
+}
+
+h2 {
+	font-size: 1.6em;
+}
+
+h3 {
+	font-size: 1.4em;
+}
+
+h1,h2,h3 {
+	margin: 0;
+}
+
+h4,h5,h6 {
+	font-size: 1.1em;
+}
+
+h1,h2,h3,h4,h5,h6,strong {
+	font-weight: bold;
+}
+
+/* ---------- Text formatting ---------- */
+b,strong {
+	font-weight: bold;
+}
+
+i,em {
+	font-style: italic;
+}
+
+code,pre {
+	font-family: "Courier New", Courier, monospace;
+	white-space: pre;
+}
+
+.important {
+	font-weight: bold;
+}
+
+.nowrap {
+	white-space:nowrap;
+}
+
+/* ---------- Staging area ---------- */
+body.staging {
+	border: 10px solid #f00;
+}
+
+.portal-iframe.staging {
+	border: none;
+}
+
+/* ---------- Main content body ---------- */
+#wrapper {
+	color: #000;
+}
+
+#content-wrapper {
+	width: 100%;
+	margin-top: 15px;
+}
+
+
+.ie .columns-max {
+	width: 100%;
+	position: absolute; /* must be here to stop the portlet frame from losing container height in IE */ 
+}
+
+
+
+.portal-iframe #content-wrapper {
+	width: 100%;
+}
+
+/* ---------- Banner ---------- */
+#banner {
+	background: url("../images/dock/banner-bg.png") repeat-x left top;
+	height: 134px;
+}
+
+#banner h1.logo {
+margin:25px 0 0;
+padding:0;
+position:absolute;
+top:-25px;
+left:-1px;
+}
+
+#banner .logo a {
+float:left;
+margin:0;
+padding:0;
+text-decoration:none;
+}
+
+.ie6 #banner .logo {
+}
+
+/* ---------- Chat Bar or Footer ---------*/
+
+.chat-bar {
+    background: url("../images/common/footer-background.png") repeat-x left top;
+    border: none;
+}
+
+/* ---------- Alerts and popups ---------- */
+.alert-background {
+	background: #000;
+}
+
+.popup-alert-notice {
+	background-color: #ffc;
+	border-bottom-color: #fc0;
+}
+
+.popup-alert-warning {
+	background-color: #fdd;
+	border-bottom-color: #f00;
+}
+
+/* ---------- Portal add content ---------- */
+.portal-add-content {
+	background: #f0f3fA;
+	color: #003659;
+	text-align: left;
+	z-index: 20;
+}
+
+.portal-add-content .portlet-msg-info {
+	background: #ffffff;
+	color: #003659;
+}
+
+.portal-add-content a {
+	text-decoration: none;
+}
+
+/* ---------- Portal tool tips ---------- */
+.portal-tool-tip {
+	background: #fff url(../images/forms/button.png) repeat-x 0 100%;
+	border: 1px solid;
+	border-color: #DEDEDE #BFBFBF #BFBFBF #DEDEDE;
+	color: #1E2529;
+	max-width: 200px;
+	padding: 6px 4px;
+}
+
+/* ---------- Loading animation ---------- */
+.loading-animation {
+	background: url(../images/progress_bar/load_ani.gif) no-repeat top
+		center;
+	margin-top: 10px;
+	padding-top: 40px;
+	text-align: left;
+}
+
+/* ---------- Separator ---------- */
+hr,.separator {
+	border-top: 1px solid #BFBFBF;
+}
+
+/* ---------- Update Manager ---------- */
+.update-available {
+	margin-top: 10px;
+	padding: 2px;
+	text-align: left;
+}
+
+/* ---------- Text highlighting ---------- */
+.highlight {
+	background: #ffc;
+	font-weight: bold;
+	padding: 0 1px;
+}
+
+/* ---------- Main ---------- */
+.ui-wrapper {
+	border: 2px solid #1561A9;
+}
+
+.ui-wrapper input,.ui-wrapper textarea {
+	border: 0;
+}
+
+.ui-dialog-overlay {
+	background: #000;
+	opacity: 0.8;
+	z-index: 400;
+}
+
+.ie .ui-dialog-overlay {
+	filter: alpha(opacity = 80);
+}
+
+.results-grid {
+	border: 1px solid #DEDEDE;
+	border-left: none;
+	border-right: none;
+	padding: 5px 0;
+}
+
+.results-header {
+	background: #727C81;
+}
+
+.results-header th,.results-header td {
+	color: #fff;
+	padding: 5px 10px;
+}
+
+.results-header th a,.results-header td a {
+	color: #fff;
+}
+
+.ui-autocomplete-even,.results-row td {
+	background: #F0F5F7;
+	padding: 5px 10px;
+}
+
+.ui-autocomplete-odd,.results-row.alt td {
+	background: #D3DADD;
+}
+
+.ui-autocomplete-over,.results-row.hover td {
+	background: #A8D6ED;
+}
+
+/* ---------- Dragging/sorting indicators ---------- */
+#content-wrapper #layout-grid.dragging {
+	border-collapse: separate;
+}
+
+#content-wrapper #layout-grid.dragging .lfr-column {
+	border: 3px double #828F95;
+}
+
+.drop-area {
+	background-color: #D3DADD;
+}
+
+.active-area {
+	background: #ffc;
+}
+
+.ui-proxy {
+	cursor: move;
+	opacity: 0.65;
+	position: relative;
+}
+
+.ie .ui-proxy {
+	filter: alpha(opacity = 65);
+}
+
+.ui-proxy.generic-portlet {
+	height: 200px;
+	width: 300px;
+}
+
+.ui-proxy.generic-portlet .portlet-title {
+	padding: 10px;
+}
+
+.ui-proxy.not-intersecting .forbidden-action {
+	background: url(../images/application/forbidden_action.png) no-repeat;
+	display: block;
+	height: 32px;
+	position: absolute;
+	right: -15px;
+	top: -15px;
+	width: 32px;
+}
+
+.ie .ui-proxy.not-intersecting .forbidden-action {
+	right: 2px;
+	top: 2px;
+}
+
+.ui-resizable-proxy {
+	border: 1px dashed #828F95;
+}
+
+.navigation-sort-helper {
+	background: #727C81;
+	margin-top: 1px;
+}
+
+.portlet-sort-helper {
+	
+}
+
+/* ---------- Resizables ---------- */
+.ui-resizable {
+	position: relative;
+}
+
+.ui-resizable-handle {
+	background: transparent url() no-repeat 50% 50%;
+	display: none;
+	font-size: 0.1px;
+	position: absolute;
+}
+
+.ui-resizable .ui-resizable-handle {
+	display: block;
+}
+
+.js .ui-resizable-disabled .ui-resizable-handle {
+	display: none;
+}
+
+.js .ui-resizable-autohide .ui-resizable-handle {
+	display: none;
+}
+
+.ui-resizable-n,.ui-resizable-s {
+	background-image: url(../images/application/handle_horizontal.png);
+	height: 14px;
+	left: 0;
+	right: 0;
+}
+
+.ui-resizable-n {
+	cursor: n-resize;
+	top: 0;
+}
+
+.ui-resizable-s {
+	bottom: 0;
+	cursor: s-resize;
+}
+
+.ui-resizable-e,.ui-resizable-w {
+	background-image: url(../images/application/handle_vertical.png);
+	background-position: center center;
+	bottom: 0;
+	top: 0;
+	width: 14px;
+}
+
+.ui-resizable-e {
+	cursor: e-resize;
+	right: 0;
+}
+
+.ui-resizable-w {
+	cursor: w-resize;
+	left: 0;
+}
+
+.ui-resizable-ne,.ui-resizable-nw {
+	height: 14px;
+	top: 0;
+	width: 14px;
+}
+
+.ui-resizable-ne {
+	background-image: url(../images/application/handle_ne.png);
+	cursor: ne-resize;
+	right: 0;
+}
+
+.ui-resizable-nw {
+	background-image: url(../images/application/handle_nw.png);
+	cursor: nw-resize;
+	left: 0;
+}
+
+.ui-resizable-se,.ui-resizable-sw {
+	bottom: 0;
+	height: 14px;
+	width: 14px;
+}
+
+.ui-resizable-se {
+	background-image: url(../images/application/handle_se.png);
+	cursor: se-resize;
+	right: 0;
+}
+
+.ui-resizable-sw {
+	background-image: url(../images/application/handle_sw.png);
+	cursor: sw-resize;
+	left: 0;
+}
+
+.freeform .portlet-boundary .ui-resizable-handle {
+	margin: 3px;
+}
+
+/* ---------- Slider ---------- */
+.ui-slider {
+	position: relative;
+}
+
+.ui-slider-handle {
+	position: absolute;
+}
+
+.ui-slider-disabled .ui-slider-handle {
+	opacity: 0.5;
+}
+
+.ie .ui-slider-disabled .ui-slider-handle {
+	filter: alpha(opacity = 50);
+}
+
+.ui-slider-range {
+	background: #1E2529;
+	height: 100%;
+	opacity: 0.3;
+	position: absolute;
+	width: 100%;
+}
+
+.ie .ui-slider-range {
+	filter: alpha(opacity = 30);
+}
+
+
+
+/* ---------- Dialog ---------- */
+.ui-dialog {
+	background-color: #BFD6E5;
+	border: 1px solid #7FADCA;
+	position: absolute;
+	margin-top: 97px;
+	margin-left: -5px;
+}
+
+.ui-dialog .ui-dialog-titlebar {
+	background: #7FADCA;
+	color: #FFFFFF;
+	font-size: 14px;
+	font-weight: bold;
+	min-height: 28px;
+	padding: 0;
+	position: relative;
+	z-index: 1;
+}
+
+.ie .ui-dialog .ui-dialog-container {
+	z-index: 1;
+}
+
+.ie6 .ui-dialog .ui-dialog-titlebar {
+	height: 29px;
+}
+
+.ui-dialog.ui-draggable .ui-dialog-titlebar {
+	cursor: move;
+}
+
+.ui-dialog .ui-dialog-titlebar-close {
+	background: url(../images/application/close.png) no-repeat;
+	height: 16px;
+	position: absolute;
+	right: 5px;
+	top: 6px;
+	width: 16px;
+}
+
+.ui-dialog .ui-dialog-titlebar-close span {
+	display: none;
+}
+
+.ui-dialog.has-title .ui-dialog-title {
+	background: url(../images/arrows/04_right_white.png) no-repeat 7px 50%;
+	display: block;
+	font-weight: bold;
+	padding: 5px;
+	padding-left: 20px;
+}
+
+.ui-dialog.ui-resizable .ui-dialog-content {
+	padding: 14px;
+}
+
+.ui-dialog.ui-resizable-disabled .ui-dialog-content {
+	padding: 0;
+}
+
+.ui-dialog .ui-dialog-buttonpane {
+	bottom: 8px;
+	position: absolute;
+	right: 12px;
+	text-align: right;
+	width: 100%;
+}
+
+.ui-dialog .ui-dialog-buttonpane button {
+	margin: 6px;
+}
+
+.ui-dialog.generic-dialog .ui-resizable-handle {
+	
+}
+
+/* ---------- Date picker ---------- */
+#ui-datepicker-div,.ui-datepicker-inline {
+	background: #fff;
+	border: 2px solid #828F95;
+	padding: 3px;
+	width: 185px;
+}
+
+#ui-datepicker-div {
+	display: none;
+}
+
+.ui-datepicker-inline {
+	border: 0;
+	display: block;
+	float: left;
+}
+
+.ui-datepicker-dialog {
+	padding: 5px !important;
+}
+
+img.ui-datepicker-trigger {
+	margin: 2px;
+	vertical-align: middle;
+}
+
+.ui-datepicker-prompt {
+	color: #000;
+	float: left;
+	padding: 2px;
+}
+
+.ie6 .ui-datepicker-prompt {
+	width: 185px;
+}
+
+.ui-datepicker-control,.ui-datepicker-links,.ui-datepicker-header,.ui-datepicker
+	{
+	clear: both;
+	float: left;
+	width: 100%;
+}
+
+.ui-datepicker-control {
+	background: #D3DADD;
+	border-bottom: 1px solid #AEB8BC;
+	margin-bottom: 2px;
+}
+
+.ui-datepicker-links {
+	background: #727C81;
+	margin-bottom: 1px;
+	padding: 5px 0;
+}
+
+.ui-datepicker-links a {
+	color: #fff;
+	display: block;
+	margin: 0 5px;
+}
+
+.ui-datepicker-control,.ui-datepicker-links {
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.ui-datepicker-links label {
+	padding: 2px 5px;
+}
+
+.ui-datepicker-clear,.ui-datepicker-prev {
+	float: left;
+	width: 34%;
+}
+
+.ui-datepicker-prev a,.ui-datepicker-next a {
+	background: url() no-repeat;
+	font-size: 0;
+	height: 16px;
+	line-height: 0;
+	text-indent: -9999em;
+	width: 16px;
+}
+
+.ui-datepicker-prev a {
+	background-image: url(../images/application/datepicker_previous.png);
+}
+
+.ui-datepicker-next a {
+	background-image: url(../images/application/datepicker_next.png);
+}
+
+.ui-datepicker-current {
+	float: left;
+	line-height: 1.3;
+	text-align: center;
+	width: 30%;
+}
+
+.ui-datepicker-close a {
+	background: url(../images/application/close.png) no-repeat;
+	display: block;
+	float: right;
+	height: 16px;
+	margin: 5px 5px 5px 0;
+	text-indent: -9999em;
+	width: 16px;
+}
+
+.ui-datepicker-next {
+	float: right;
+	text-align: right;
+}
+
+.ui-datepicker-header {
+	border-bottom: 1px solid #DEDEDE;
+	font-weight: bold;
+	padding: 5px 0 6px;
+	text-align: center;
+}
+
+.ui-datepicker-header select {
+	background: #727C81;
+	border: 0;
+	color: #fff;
+	font-weight: bold;
+}
+
+.ui-datepicker-header .ui-datepicker-new-month {
+	float: left;
+	margin-left: 5px;
+}
+
+.ui-datepicker-header .ui-datepicker-new-year {
+	float: right;
+	margin-right: 5px;
+}
+
+.ui-datepicker {
+	text-align: center;
+	width: auto;
+}
+
+.ui-datepicker a {
+	display: block;
+	width: 23px;
+}
+
+.ui-datepicker .ui-datepicker-title-row a {
+	color: #1E2529;
+	text-decoration: none;
+}
+
+.ui-datepicker .ui-datepicker-days-row {
+	background: #fff;
+	color: #727C81;
+}
+
+.ui-datepicker-week-col {
+	color: #B5BFC4;
+}
+
+.ui-datepicker-days-cell a {
+	background: #F0F5F7;
+	border: 1px solid #fff;
+}
+
+.ui-datepicker-days-cell a:hover {
+	background-color: #727C81;
+	color: #fff;
+}
+
+.ui-datepicker-current-day a {
+	background-color: #fff;
+	border: 1px solid #727C81;
+	color: #369;
+}
+
+.ui-datepicker-current-day a:hover {
+	background-color: #DFF4FF;
+	border-color: #AEB8BC;
+	color: #06c;
+}
+
+.ui-datepicker .ui-datepicker-unselectable {
+	color: #B5BFC4;
+}
+
+#ui-datepicker-div a,.ui-datepicker-inline a {
+	cursor: pointer;
+}
+
+.ui-datepicker-one-month:after {
+	clear: both;
+	content: ".";
+	display: block;
+	height: 0;
+	visibility: hidden;
+}
+
+.ie .ui-datepicker-one-month {
+	height: 1%;
+}
+
+.ui-datepicker-new-row {
+	clear: left;
+}
+
+.ie6 .ui-datepicker-cover {
+	display: block;
+	filter: mask();
+	height: 200px;
+	left: -4px;
+	position: absolute;
+	top: -4px;
+	width: 193px;
+	z-index: -1;
+}
+
+/* ---------- Color picker ---------- */
+.ui-colorpicker {
+	background-image: url(../images/color_picker/picker_container_bg.png);
+	font: 11px Arial, Helvetica, sans-serif;
+	height: 192px;
+	position: relative;
+	width: 305px;
+}
+
+.ui-colorpicker-color {
+	background-color: #F00;
+	background-image: url(../images/color_picker/picker_bg.png);
+	background-position: center;
+	background-repeat: no-repeat;
+	height: 184px;
+	left: 8px;
+	position: absolute;
+	top: 5px;
+	width: 184px;
+}
+
+.ui-colorpicker-color-handle {
+	background-image: url(../images/color_picker/select.png);
+	height: 11px;
+	position: absolute;
+	width: 11px;
+}
+
+.ui-colorpicker-hue {
+	background-image: url(../images/color_picker/hue.png);
+	height: 186px;
+	left: 200px;
+	position: absolute;
+	top: 3px;
+	width: 18px;
+}
+
+.ui-colorpicker-hue-handle {
+	background-image: url(../images/color_picker/color_indic.png);
+	height: 7px;
+	position: absolute;
+	width: 18px;
+}
+
+.ui-colorpicker-current {
+	background: #fff;
+	border: 2px solid #727C81;
+	height: 60px;
+	position: absolute;
+	right: 10px;
+	top: 31px;
+	width: 60px;
+}
+
+.ui-colorpicker-values {
+	left: 230px;
+	position: absolute;
+	top: 100px;
+	width: 60px;
+}
+
+.ui-colorpicker-values table {
+	width: 100%;
+}
+
+.ui-colorpicker-values table input {
+	margin-bottom: 1px;
+	padding: 3px 1px;
+	width: 100%;
+}
+
+.ui-colorpicker-rgbR,.ui-colorpicker-rgbG,.ui-colorpicker-rgbB {
+	width: 20px;
+}
+
+.ui-colorpicker-hex {
+	width: 40px;
+}
+
+.ui-colorpicker-close {
+	background: url(../images/color_picker/close.png) no-repeat 0 0;
+	cursor: pointer;
+	height: 23px;
+	position: absolute;
+	right: 3px;
+	text-indent: -9999em;
+	top: 3px;
+	width: 23px;
+}
+
+/* ---------- Autocomplete ---------- */
+.ui-autocomplete-results {
+	border: 1px solid;
+	border-color: #BFBFBF #DEDEDE #DEDEDE #BFBFBF;
+	overflow: hidden;
+	padding: 0;
+	z-index: 300;
+}
+
+.ui-autocomplete-results ul {
+	list-style: none;
+	list-style-position: outside;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+
+.ui-autocomplete-results li {
+	cursor: default;
+	display: block;
+	line-height: 16px;
+	margin: 0;
+	overflow: hidden;
+	padding: 2px 5px;
+}
+
+.ui-autocomplete-loading,.ui-autocomplete-loading.focus {
+	background-image: url(../images/application/loading_indicator.gif);
+	background-position: right center;
+	background-repeat: no-repeat;
+}
+
+.ui-autocomplete-results li strong {
+	color: #06c;
+	font-weight: bold;
+}
+
+/* ---------- Tags ---------- */
+.ui-tags {
+	display: block;
+	padding: 5px 0 2px;
+}
+
+.ui-tags:after {
+	clear: both;
+	content: ".";
+	display: block;
+	height: 0;
+	visibility: hidden;
+}
+
+.ie .ui-tags {
+	height: 1%;
+}
+
+.ui-tags.empty {
+	display: none;
+}
+
+.ui-tags .ui-tag {
+	background: #DFF4FF;
+	border: 1px solid #A7CEDF;
+	float: left;
+	margin-bottom: 3px;
+	margin-right: 3px;
+	padding: 3px 20px 3px 6px;
+	padding-right: 20px;
+	position: relative;
+}
+
+.ui-tags .ui-tag:hover {
+	border-color: #AEB8BC;
+}
+
+.ui-tags .ui-tag-delete {
+	display: block;
+	padding: 6px;
+	position: absolute;
+	right: 0;
+	top: 3px;
+}
+
+.ui-tags .ui-tag-delete span {
+	background: url(../images/application/close_small.png) no-repeat 0 0;
+	cursor: pointer;
+	display: block;
+	font-size: 0;
+	height: 7px;
+	text-indent: -9999em;
+	width: 7px;
+}
+
+.ui-tags .ui-tag-delete:hover span {
+	background-position: 0 100%;
+}
+
+.ui-tags-input {
+	width: 200px;
+}
+
+/* This CSS controls the column layout. It is not recommended that you change this file. */
+	/* ---------- Wrapper ---------- */
+#content-wrapper #layout-grid {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+#layout-grid .lfr-column {
+	padding: 5px;
+}
+
+.lfr-grid {
+	width: 100%;
+}
+
+/* ---------- Column widths ---------- */
+#layout-grid.dragging .lfr-column {
+	height: 100px;
+	min-height: 100px;
+}
+
+.lfr-column.ten {
+	width: 10%;
+}
+
+.lfr-column.twenty {
+	width: 20%;
+}
+
+.lfr-column.thirty {
+	width: 30%;
+}
+
+.lfr-column.forty {
+	width: 40%;
+}
+
+.lfr-column.fifty {
+	width: 50%;
+}
+
+.lfr-column.sixty {
+	width: 60%;
+}
+
+.lfr-column.seventy {
+	width: 70%;
+}
+
+.lfr-column.eighty {
+	width: 80%;
+}
+
+.lfr-column.ninety {
+	width: 90%;
+}
+
+/* ---------- 1 column ---------- */
+.columns-1 #column-1,.columns-max #column-1 {
+	clear: both;
+	display: table;
+	padding-left: 0;
+	padding-right: 0;
+	width: 100%;
+}
+
+/* ---------- 2 columns ---------- */
+.columns-2 #column-1 {
+	padding-left: 0;
+}
+
+.columns-2 #column-2 {
+	padding-right: 0;
+}
+
+/* ---------- 3 columns ---------- */
+.columns-3 #column-1 {
+	padding-left: 0;
+}
+
+.columns-3 #column-2 {
+	
+}
+
+.columns-3 #column-3 {
+	padding-right: 0;
+}
+
+/* ---------- 1/2/1 ---------- */
+.columns-1-2-1 #column-1,.columns-1-2-1 #column-4 {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.columns-1-2-1 #column-2 {
+	padding-left: 0;
+}
+
+.columns-1-2-1 #column-3 {
+	padding-right: 0;
+}
+
+/* ---------- 2/2 ---------- */
+.columns-2-2 #column-1,.columns-2-2 #column-2 {
+	padding-left: 0;
+}
+
+.columns-2-2 #column-4 {
+	padding-right: 0;
+}
+
+/* ---------- Freeform ---------- */
+.freeform .lfr-column {
+	position: relative;
+}
+
+.columns-2-2 #column-4 {
+	padding-right: 0;
+}
+
+
+
+
+
+
+/*------ Styles for Navigation Carousel ------*/
+.jcarousel-skin-tango .jcarousel-container-horizontal {
+	width: 99%;
+	padding: 0 10px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.jcarousel-skin-tango .jcarousel-clip-horizontal {
+	width: 99%;
+	height: 17px;
+}
+
+.jcarousel-skin-tango .jcarousel-item {
+	width: 35%;
+	height: 17px;
+}
+
+.jcarousel-skin-tango .jcarousel-item-horizontal {
+	margin-right: 10px;
+}
+
+.jcarousel-skin-tango .jcarousel-item-placeholder {
+	background: #fff;
+	color: #000;
+}
+
+/**
+
+ *  Horizontal Buttons
+
+ */
+.jcarousel-skin-tango .jcarousel-next-horizontal {
+	position: absolute;
+	top: 1px;
+	right: 40px;
+	width: 22px;
+	height: 22px;
+	cursor: pointer;
+	background: transparent url(../images/navigation/right_arrow.png)
+		no-repeat 0 0;
+}
+
+.jcarousel-skin-tango .jcarousel-next-horizontal:hover {
+	background-position: -32px 0;
+	background: transparent url(../images/navigation/right_arrow.png)
+		no-repeat 0 0;
+}
+
+.jcarousel-skin-tango .jcarousel-next-horizontal:active {
+	background-position: -64px 0;
+}
+
+.jcarousel-skin-tango .jcarousel-next-disabled-horizontal,.jcarousel-skin-tango .jcarousel-next-disabled-horizontal:hover,.jcarousel-skin-tango .jcarousel-next-disabled-horizontal:active
+	{
+	cursor: default;
+	background-position: -96px 0;
+}
+
+.jcarousel-skin-tango .jcarousel-prev-horizontal {
+	position: absolute;
+	top: 1px;
+	left: 20px;
+	width: 22px;
+	height: 22px;
+	cursor: pointer;
+	background: transparent url(../images/navigation/left_arrow.png)
+		no-repeat 0 0;
+}
+
+.jcarousel-skin-tango .jcarousel-prev-horizontal:hover {
+	background-position: -32px 0;
+	background: transparent url(../images/navigation/left_arrow.png)
+		no-repeat 0 0;
+}
+
+.jcarousel-skin-tango .jcarousel-prev-horizontal:active {
+	background-position: -64px 0;
+}
+
+.jcarousel-skin-tango .jcarousel-prev-disabled-horizontal,.jcarousel-skin-tango .jcarousel-prev-disabled-horizontal:hover,.jcarousel-skin-tango .jcarousel-prev-disabled-horizontal:active
+	{
+	cursor: default;
+	background-position: -96px 0;
+}
+
+/**
+
+ * This <div> element is wrapped by jCarousel around the list
+
+ * and has the classname "jcarousel-container".
+
+ */
+.jcarousel-container {
+	position: relative;
+}
+
+.jcarousel-clip {
+	z-index: 2;
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
+	position: relative;
+}
+
+.jcarousel-list {
+	z-index: 1;
+	overflow: hidden;
+	left: 0;
+	margin: 0;
+	padding: 0;
+}
+
+/**
+
+ * The buttons are added dynamically by jCarousel before
+
+ * the <ul> list (inside the <div> described above) and
+
+ * have the classnames "jcarousel-next" and "jcarousel-prev".
+
+ */
+.jcarousel-next {
+	z-index: 3;
+	display: none;
+}
+
+.jcarousel-prev {
+	z-index: 3;
+	display: none;
+}
+
+#page_scroll_one {
+	display: inline;
+}
+
+#page_scroll_two {
+	display: inline;
+}
+
+#page_scroll_three {
+	display: inline;
+}
+
+/*------ Navigation portlet ------*/
+.nav-menu li a.ancestor {
+	font-weight: bold;
+}
+
+.nav-menu li a.selected {
+	color: #000;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+.nav-menu ul {
+	padding-left: 10px;
+}
+
+
+
+
+/* This CSS sets the default styles for portlets. */
+	/* ---------- Panel Page ---------- */
+.lfr-panel {
+	margin: 0 auto;
+	width: 90%;
+}
+
+.lfr-panel .portlet-title {
+	font-size: 13px;
+}
+
+.lfr-panel #content-wrapper {
+	margin: 0;
+	width: auto;
+}
+
+.lfr-panel .lfr-add-content h2 span {
+	background-color: #f0f3fA;
+}
+
+
+
+
+
+
+/* ---------- Help messages, general additional information, etc. ---------- */
+.portlet-msg-info {
+	color: #000;
+	display: block;
+	font-weight: bold;
+	margin: 4px 10px 0;
+	padding: 6px;
+	padding-left:30px; 
+    text-align: left;
+}
+
+.portlet-msg-info.pending {
+	background-image: url(../images/common/time.png);
+}
+
+/* ---------- Error messages ---------- */
+.portlet-msg-error {
+	background: #fdd url(../images/messages/error.png) no-repeat 6px 50%;
+	border: 1px solid #f00;
+	display: block;
+	font-weight: bold;
+	margin: 4px 10px 0;
+	padding: 6px 6px 6px 30px;
+	text-align: left;
+}
+
+.osu-cws .portlet-msg-error,
+.osu-cws .portlet-msg-success {
+			padding: 6px 6px 6px 30px;
+}
+
+/* ---------- Warning messages ---------- */
+.portlet-msg-alert {
+	background: #ffc url(../images/messages/alert.png) no-repeat 6px 20%;
+	border: 1px solid #fc0;
+	display: block;
+	font-weight: bold;
+	margin: 4px 10px 0;
+	padding: 6px 6px 6px 30px;
+	text-align: left;
+}
+
+.osu-cws .portlet-msg-alert{
+			padding: 6px 6px 6px 30px;
+}
+
+/* ---------- Success messages ---------- */
+.portlet-msg-success {
+	background: #F4FDEF url(../images/messages/success.png) no-repeat 6px
+		50%;
+	border: 1px solid #ACDFA7;
+	color: #384F34;
+	display: block;
+	font-weight: bold;
+	margin: 4px 10px 0;
+	padding: 6px 6px 6px 30px;
+	text-align: left;
+}
+
+
+
+
+
+/* ---------- Text in a selected cell range ---------- */
+.portlet-section-selected,.portlet-section-selected a {
+	background: #727C81;
+	color: #fff;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+.portlet-section-selected a:hover,.portlet-section-selected a:focus {
+	background-color: #727C81;
+}
+
+
+
+
+
+
+/* ---- Tag Editor styles used in Blogs and Wiki portlet ---- */
+.tagEditor
+{
+	margin: 4px 0;
+	padding: 0;
+}
+
+.tagEditor table td
+{
+	display: inline;
+	background-image: url(/cps/images/misc/minus_small.png);
+	background-color: #eef;
+	background-position: right center;
+	background-repeat: no-repeat;
+	list-style-type: none;
+	padding: 0 18px 0 6px;
+	margin: 0 4px;	
+	cursor: pointer;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+
+.tagEditor table td:hover
+{
+	background-color: #eee;
+}
+
+
+
+
+
+
+/* ---------- Calendar portlet ---------- */
+.portlet-calendar .calendar-container {
+	background-position: 0 99%;
+	background-repeat: repeat-x;
+	border: 1px solid #D7D7D7;
+	overflow: hidden;
+}
+
+.ie .portlet-calendar .calendar-container {
+	background-position: 0 98%;
+}
+
+.portlet-calendar .calendar-day {
+	width: 209px;
+}
+
+.portlet-calendar .calendar-day .day-text {
+	background: #727C81;
+	color: #fff;
+	font-size: 1.6em;
+}
+
+.portlet-calendar .calendar-day .day-number {
+	border: 1px solid #fff;
+	border-bottom: none;
+	font-size: 110px;
+	font-weight: normal;
+	padding-bottom: 12px;
+}
+
+.portlet-calendar .calendar-container .taglib-calendar {
+	background: #fff;
+	border-left: 1px solid #D7D7D7;
+	margin-left: -1px;
+	padding-left: 0;
+}
+
+.taglib-calendar tr.portlet-section-header th,.taglib-calendar tr td {
+	border: none;
+}
+
+.taglib-calendar tr td a {
+	background-color: #F0F5F7;
+	border: 1px solid #fff;
+	border-bottom: none;
+	border-left: none;
+	display: block;
+	height: 15px;
+	padding: 5px 0pt;
+}
+
+.taglib-calendar table td {
+	border-width: 0;
+}
+
+.taglib-calendar tr td a:hover {
+	background-color: #727C81;
+	color: #fff;
+}
+
+.taglib-calendar .calendar-current-day,.taglib-calendar .calendar-current-day a
+	{
+	background-color: #fff;
+}
+
+.taglib-calendar .calendar-current-day a {
+	border: 1px solid #727C81;
+	color: #369;
+	text-decoration: underline;
+}
+
+.portlet-calendar .taglib-calendar tr td.calendar-current-day a:hover,.portlet-calendar .taglib-calendar tr td.calendar-current-day a:focus
+	{
+	background-color: #DFF4FF;
+	border-color: #AEB8BC;
+	color: #06c;
+}
+
+.portlet-calendar .taglib-calendar td.calendar-current-day a span {
+	border: none;
+}
+
+.taglib-calendar tr td.calendar-inactive {
+	background-color: #fff;
+	color: #B5BFC4;
+}
+
+.taglib-calendar tr th {
+	border-bottom-color: #D7D7D7;
+}
+
+.taglib-calendar tr.portlet-section-header th,.taglib-calendar tr td {
+	border-left: none;
+	border-right: none;
+}
+
+.ie .taglib-calendar tr td.first a {
+	border-right: none;
+}
+
+/* ---------- Miscellaneous portlet styles ---------- */
+.journal-template-error .scroll-pane {
+	border: 1px solid #BFBFBF;
+	max-height: 200px;
+	min-height: 50px;
+	overflow: auto;
+	width: 100%;
+}
+
+.journal-template-error .scroll-pane .inner-scroll-pane {
+	min-width: 104%;
+}
+
+.journal-template-error .scroll-pane .error-line {
+	background: #fdd;
+}
+
+.journal-template-error .scroll-pane pre {
+	margin: 0px;
+	white-space: pre;
+}
+
+.journal-template-error .scroll-pane pre span {
+	background: #B5BFC4;
+	border-right: 1px solid #BFBFBF;
+	display: block;
+	float: left;
+	margin-right: 4px;
+	padding-right: 4px;
+	text-align: right;
+	width: 40px;
+}
+
+.message-board-code {
+	background: #fff;
+	font-family: "Courier New", Courier, Monaco, monospace;
+	white-space: pre;
+}
+
+.message-board-code-lines {
+	margin-right: 12px;
+}
+
+.restricted,.restricted td {
+	background: #fdd;
+	border: none;
+}
+
+.restricted * {
+	color: #727C81;
+}
+
+.restricted .col-1 {
+	background-image: url(../images/messages/error.png);
+	background-position: 5px 50%;
+	background-repeat: no-repeat;
+	padding-left: 28px;
+}
+
+
+
+/* ---------- Actions button ---------- */
+
+
+.lfr-actions,.lfr-actions ul {
+	background: #fff url(../images/forms/button.png) repeat-x 0 100%;
+	border: 1px solid;
+	border-color: #DEDEDE #BFBFBF #BFBFBF #DEDEDE;
+}
+
+.lfr-actions ul {
+	bottom: -1px;
+}
+
+.lfr-actions .lfr-trigger,.lfr-actions .lfr-trigger,.lfr-actions .lfr-trigger strong
+	{
+	background: none;
+}
+
+.lfr-actions .lfr-trigger strong span {
+	background: url(../images/common/action.png) no-repeat 5px 50%;
+}
+
+.lfr-actions.left .lfr-trigger strong span {
+	background: url(../images/common/action_right.png) no-repeat 98% 50%;
+}
+
+.lfr-actions .lfr-trigger li {
+	background: transparent;
+	border-bottom: 1px solid #DEDEDE;
+	padding: 2px;
+}
+
+.lfr-actions .lfr-trigger li a {
+	padding: 5px 10px 5px 25px;
+}
+
+.lfr-actions .lfr-trigger li a:hover {
+	background-color: #828F95;
+	color: #fff;
+}
+
+.lfr-actions .lfr-trigger li a img {
+	left: 3px;
+	position: absolute;
+}
+
+.lfr-actions .lfr-trigger li.last {
+	border-bottom: none;
+}
+
+
+
+
+/* This CSS sets the default styles for forms. */
+fieldset {
+	padding: 4px;
+}
+
+.ie fieldset {
+	padding-top: 0;
+}
+
+
+legend {
+	font-weight: bold;
+	padding: 0 6px;
+}
+
+input {
+	background: #fff;
+}
+
+
+
+
+
+
+
+
+input[type="text"],input[type="password"],input[type="file"],input[type="submit"],input[type="button"],input[type="reset"],select,textarea,.textarea
+	{
+	
+	background-repeat: no-repeat;
+	border: 1px solid;
+	border-color: #BFBFBF #DEDEDE #DEDEDE #BFBFBF;
+	font: 1em Arial, Helvetica, Verdana, sans-serif;
+	padding: 5px 1px;
+}
+
+select {
+	padding: 1px;
+}
+
+input[type="image"] {
+	background: transparent none;
+	border: none;
+	padding: 0;
+}
+
+input[type="submit"],input[type="button"],input[type="reset"] {
+	background: #F5F5F5 url(../images/forms/button.png) repeat-x 0 0;
+	border-color: #DEDEDE #BFBFBF #BFBFBF #DEDEDE;
+	color: #34404F;
+	cursor: pointer;
+	font-weight: bold;
+	padding: 5px;
+}
+
+input[type="submit"]:hover,input[type="button"]:hover,input[type="reset"]:hover,input[type="submit"]:focus,input[type="button"]:focus,input[type="reset"]:focus
+	{
+	background: #DFF4FF;
+	border: 1px solid #A7CEDF;
+	color: #369;
+}
+
+/* ---------- IE6 chokes on attribute selectors in a chain, so we separate them into their own rule ---------- */
+.ie6 input.text,input.password,.ie6 input.submit,.ie6 input.file,.ie6 input.button
+	{
+	background-image: url(../images/forms/input_shadow.png);
+	background-repeat: no-repeat;
+	border: 1px solid;
+	border-color: #BFBFBF #DEDEDE #DEDEDE #BFBFBF;
+	font: 1em Arial, Helvetica, Verdana, sans-serif;
+	padding: 5px 1px;
+}
+
+.ie6 input.submit,.ie6 input.button {
+	background: #F5F5F5 url(../images/forms/button.png) repeat-x 0 0;
+	border-color: #DEDEDE #BFBFBF #BFBFBF #DEDEDE;
+	color: #34404F;
+	cursor: pointer;
+	font-weight: bold;
+	padding: 5px;
+}
+
+input.focus,textarea.focus,.ie6 input.focus,.ie6 textarea.focus {
+	background: #ffc none;
+	border: 1px solid #fc0;
+}
+
+	/* ---------- Menus ---------- */
+	/* ---------- General menu settings such as background color, margins, etc. ---------- */
+.portlet-menu,.portlet-menu * {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.portlet-menu {
+	line-height: 1.0;
+}
+
+/* ---------- Normal, unselected menu item ---------- */
+.portlet-menu-item {
+	float: left;
+	position: relative;
+}
+
+/* ---------- Selected menu item ---------- */
+.portlet-menu-item-selected {
+	display: block;
+	position: relative;
+}
+
+/*----------Menu Title---------*/
+
+.portlet-menu-item-title {
+	position: absolute;
+	top: -999em;
+	width: 10em; /* left offset of submenus need to match (see below) */
+	margin-right:14px;
+}
+
+li.portlet-menu-sub-item ul {
+	margin-top:28px;
+	margin-right:0;
+}
+
+/* ---------- Normal, unselected menu item when the mouse hovers over it ---------- */
+.portlet-menu-item:hover {
+	visibility: inherit; /* fixes IE7 'sticky bug' */
+}
+
+
+
+	/* ---------- skyhider ---------- */
+.vertical-skyhider {
+	background-color: #E9F2FA;
+	border-left: 1px solid #E9F2FA;
+	cursor: pointer;
+	height: 100%;
+	position: relative;
+	width: 10px;
+	z-index: 0;
+	vertical-align: middle;
+}
+
+.horizontal-skyhider {
+	background-color: #E9F2FA;
+	border-left: 1px solid #E9F2FA;
+	cursor: pointer;
+	height: 5px;
+	position: relative;
+	width: 100%;
+	z-index: 0;
+	vertical-align: middle;
+	padding: 2px;
+}
+
+/* ---------- End skyhider ---------- */
+
+.portlet-no-data-message {
+    font-family:        Arial, Helvetica, sans-serif;
+    font-size:          12px;
+    font-weight:        normal;
+    color:              #323232;
+    text-align:         center;
+    height:             20px;
+    border:             1px solid #C2CCD3;
+    background-color:   #D9E0EE;
+    padding:            5px 0;   
+}
+
+.portlet-no-data-message-no-border {
+    font-family:        Arial, Helvetica, sans-serif;
+    font-size:          12px;
+    font-weight:        normal;
+    color:              #323232;
+    text-align:         center;
+    height:             20px;
+    background-color:   #D9E0EE;
+    padding:            5px 0;
+}
+
+/* what is this for and why are we using tables ?? :) */
+	/* ---------- Luminis Portlet Table ---------- */
+.portlet-tablecss {
+	border-color: white;
+	border-spacing: 0px;
+	border-style: solid;
+	border-width: 2px;
+	cell-spacing: 0px;
+}
+
+.portlet-tdclass,.portlet-thclass {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+	padding: 2px 0.5em;
+	white-space: nowrap;
+	background-color: #F0F0F6;
+	border-width: 0.2px;
+	border-color: white;
+	border-style: solid;
+	border-bottom: 1px dotted #DDDDDD;
+	border-left: 1px dotted #DDDDDD;
+	border-right: 1px dotted #DDDDDD;
+	border-top: 1px dotted #DDDDDD;
+}
+
+.portlet-tdclass-wrap {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+	padding: 2px 0.5em;
+	background-color: #F0F0F6;
+	border-width: 0.2px;
+	border-color: white;
+	border-style: solid;
+	border-bottom: 1px dotted #DDDDDD;
+	border-left: 1px dotted #DDDDDD;
+	border-right: 1px dotted #DDDDDD;
+	border-top: 1px dotted #DDDDDD;
+}
+
+.portlet-thclass {
+	background-color: #c0c0c0;
+}
+
+/* ---------- End Luminis Portlet Table ---------- */
+
+/* **************************************************
+
+ * Scrolled Image for edit or new image request
+
+ ************************************************** */
+div.scrollable {
+	float: left;
+	position: relative;
+	overflow: hidden;
+	width: 600px;
+	height: 300px;
+}
+
+div.scrollable img {
+	width: 200px;
+	height: 120px;
+}
+
+div.scrollable div.items {
+	position: absolute;
+	height: 20000em;
+}
+
+div.scrollable div.items div {
+	text-align: left;
+	width: 90%;
+	padding: 15px 0px;
+	border: 1px outset #ccc;
+	background-color: #ddd;
+	-moz-border-radius: 5px;
+	margin-bottom: 10px;
+}
+
+div.scrollable div.items div.active {
+	border: 1px inset #ccc;
+	background-color: #fff;
+}
+
+a.prev,a.next,a.prevPage,a.nextPage {
+	display: block;
+	width: 18px;
+	height: 18px;
+	background: url('/cps/images/photo/datepicker_previous.png') no-repeat;
+	float: left;
+	margin: 43px 10px;
+	cursor: pointer;
+}
+
+a.prev:hover,a.next:hover,a.prevPage:hover,a.nextPage:hover {
+	background-position: 0px -18px;
+}
+
+a.disabled {
+	visibility: hidden !important;
+}
+
+a.next,a.nextPage {
+	background-image: url('/cps/images/photo/datepicker_next.png');
+	clear: right;
+}
+
+div.navi {
+	margin-left: 328px;
+	width: 150px;
+	height: 20px;
+}
+
+div.navi a {
+	width: 8px;
+	height: 8px;
+	float: left;
+	margin: 3px;
+	background: url('/cps/images/photo/splitpane_handle-sn.gif') 0 0
+		no-repeat;
+	cursor: pointer;
+}
+
+div.navi a:hover {
+	background-position: 0 -8px;
+}
+
+div.navi a.active {
+	background-position: 0 -16px;
+}
+
+#thumbs {
+	position: absolute;
+	width: 20000em;
+	clear: both;
+	border: 1px solid #222;
+}
+
+a.prev,a.next {
+	margin-top: 118px;
+}
+
+#thumbs div {
+	float: left;
+	width: 200px;
+	height: 300px;
+	background: #333 url('/cps/images/photo/h150.png') repeat-x 0 146px;
+	color: #fff;
+	border-left: 1px solid #333;
+	cursor: pointer;
+}
+
+#thumbs div.hover {
+	background-color: #444;
+}
+
+#thumbs div.active {
+	background-color: #066;
+	cursor: default;
+}
+
+#thumbs h3,#thumbs p,#thumbs span {
+	margin: 13px;
+	font-size: 13px;
+	color: #fff;
+}
+
+/* ------- Dynatree styles START ------ */
+
+/* Album Explorer Tree structure styles */
+.ui-dynatree-container div {
+	height: 		auto !important;
+	width: 			auto;
+	vertical-align: top !important;
+}
+
+div.ui-dynatree-container {
+	width: 			auto;
+	height: 		auto !important;
+	padding: 		3px;
+	border: 		none;
+	white-space: 	nowrap;
+	vertical-align: top !important;
+	font-family:	Arial, Helvetica, sans-serif;
+	font-size: 		11px;
+	font-weight: 	normal;		
+	color: 			#666666;
+	background-color:white;
+	overflow: 		auto;	
+}
+
+/* Style, when control is disabled */
+.ui-dynatree-disabled div.ui-dynatree-container {
+	background-color: silver;
+}
+
+/* Vertical line image */
+
+div.ui-dynatree-container img {
+	width: 			16px;
+	height: 		16px;
+	margin-left: 	3px;
+	vertical-align: top;
+	border-style: 	none;
+}
+
+/* Common icon definitions */
+
+span.ui-dynatree-empty, span.ui-dynatree-vline, span.ui-dynatree-connector, span.ui-dynatree-expander, 
+span.ui-dynatree-icon, span.ui-dynatree-checkbox, span.ui-dynatree-community {
+	width: 			16px;
+	height: 		16px;
+	display: 		inline-block;
+	vertical-align: top;
+	background-repeat: no-repeat;
+	background-position: left;
+}
+
+/* Lines and connectors */
+
+span.ui-dynatree-empty {
+	
+}
+
+span.ui-dynatree-vline {
+	background-image: url('/cps/images/photo/ltL_ns.gif');
+}
+
+span.ui-dynatree-connector {
+	background-image: url('/cps/images/photo/ltL_nes.gif');
+}
+
+.ui-dynatree-lastsib span.ui-dynatree-connector {
+	background-image: url('/cps/images/photo/ltL_ne.gif');
+}
+
+/* Expander icon */
+
+span.ui-dynatree-expander {
+	background-image: url('/cps/images/photo/ltP_nes.gif');
+	cursor: pointer;
+}
+
+.ui-dynatree-lastsib span.ui-dynatree-expander {
+	background-image: url('/cps/images/photo/ltP_ne.gif');
+}
+
+.ui-dynatree-lazy span.ui-dynatree-expander {
+	background-image: url('/cps/images/photo/ltD_nes.gif');
+}
+
+.ui-dynatree-lazy.ui-dynatree-lastsib span.ui-dynatree-expander {
+	background-image: url('/cps/images/photo/ltD_ne.gif');
+}
+
+.ui-dynatree-expanded span.ui-dynatree-expander {
+	background-image: url('/cps/images/photo/ltM_nes.gif');
+}
+
+.ui-dynatree-expanded.ui-dynatree-lastsib span.ui-dynatree-expander {
+	background-image: url('/cps/images/photo/ltM_ne.gif');
+}
+
+/* Checkbox icon */
+
+span.ui-dynatree-checkbox {
+	margin-left: 3px;
+	background-image: url('/cps/images/photo/cbUnchecked.gif');
+}
+
+span.ui-dynatree-checkbox:hover {
+	background-image: url('/cps/images/photo/cbUnchecked_hover.gif');
+}
+
+.ui-dynatree-partsel span.ui-dynatree-checkbox {
+	background-image: url('/cps/images/photo/cbIntermediate.gif');
+}
+
+.ui-dynatree-partsel span.ui-dynatree-checkbox:hover {
+	background-image: url('/cps/images/photo/cbIntermediate_hover.gif');
+}
+
+.ui-dynatree-selected span.ui-dynatree-checkbox {
+	background-image: url('/cps/images/photo/cbChecked.gif');
+}
+
+.ui-dynatree-selected span.ui-dynatree-checkbox:hover {
+	background-image: url('/cps/images/photo/cbChecked_hover.gif');
+}
+
+/* Node type icon */
+
+span.ui-dynatree-icon {
+	margin-left: 3px;
+	background-image: url('/cps/images/photo/ltDoc.gif');
+}
+
+.ui-dynatree-folder span.ui-dynatree-icon {
+	background-image: url('/cps/images/photo/ltFld.gif');
+}
+
+.ui-dynatree-folder.ui-dynatree-expanded  span.ui-dynatree-icon {
+	background-image: url('/cps/images/photo/ltFld_o.gif');
+}
+
+/* If dynatree is configured for community, following icon will be used by dynatree. */
+
+span.ui-dynatree-community {
+	margin-left: 3px;
+	background-image: url('/cps/images/community/community.gif');
+}
+
+.ui-dynatree-folder span.ui-dynatree-community {
+	background-image: url('/cps/images/community/community_tree.gif');
+}
+
+.ui-dynatree-folder.ui-dynatree-expanded  span.ui-dynatree-community {
+	background-image: url('/cps/images/community/community_tree.gif');
+}
+
+/* Node titles */
+/* Chrome: fix broken hit area of node titles */
+span.ui-dynatree-document,span.ui-dynatree-folder {
+    display: 		-moz-inline-box; /* FF 1 and 2 */
+    display: 		inline;     
+}
+
+/* Remove blue color and underline from title links */
+div.ui-dynatree-container a {
+	color: 			#666666;
+	text-decoration:none;
+	vertical-align: top;
+	margin: 		0px;
+	margin-left: 	3px;
+}
+
+div.ui-dynatree-container a:hover {
+	text-decoration:none;
+	color: 			#1E1E1E;
+}
+
+.ui-dynatree-document span {
+	height: 		16px !important;
+}
+
+span.ui-dynatree-document a,span.ui-dynatree-folder a {
+	text-decoration:none;
+	display: 		inline;
+	padding-left: 	3px;
+	padding-right: 	3px;
+	line-height: 	16px !important;
+}
+
+span.ui-dynatree-folder a {
+	font-family:	Arial, Helvetica, sans-serif;
+	font-size: 		11px;
+	font-weight: 	normal;		
+	color: 			#666666;
+}
+
+div.ui-dynatree-container a:focus, span.ui-dynatree-focused a:link {
+	background-color:#EFEBDE;
+}
+
+span.ui-dynatree-expanded a {
+	
+}
+
+span.ui-dynatree-selected a {
+	color: green;
+	font-style: italic;
+}
+
+span.ui-dynatree-active a {
+	background-color: white !important;
+	color: black !important;
+	font-weight: bold;
+}
+
+.ui-dynatree-container DIV {
+	width: 100%;
+	height: 16px;
+}
+
+/* ------- Dynatree styles END ------ */
+
+
+
+/* ---------- Portlet PopWindow ---------- */
+extbluewarning .extblue {
+	border: 1px black solid;
+}
+
+.extbluefade {
+	position: absolute;
+	background-color: #ffffff;
+}
+
+div.extblue {
+	border: 1px #6289B6 solid;
+	position: absolute;
+	background-color: #CAD8EA;
+	padding: 0;
+	width: 300px;
+	text-align: left;
+}
+
+div.extblue .extblueclose {
+	background-color: #CAD8EA;
+	margin: 2px -2px 0 0;
+	cursor: pointer;
+	color: red;
+	text-align: right;
+}
+
+div.extblue .extbluecontainer {
+	background-color: #CAD8EA;
+	padding: 0 5px 5px 5px;
+	color: #000000;
+}
+
+div.extblue .extbluemessage {
+	background-color: #CAD8EA;
+	padding: 0;
+	margin: 0 15px 15px 15px;
+}
+
+div.extblue .extbluebuttons {
+	text-align: center;
+	padding: 0px 0 0 0;
+}
+
+div.extblue button {
+	padding: 1px 4px;
+	margin: 0 10px;
+	background-color: #cccccc;
+}
+/* ---------- End Portlet PopWindow ---------- */
+
+
+
+
+
+/* ---------- Portlet Accordion ---------- */
+.accordion-menu {
+	margin: 		0;
+	color: 			#76797C;
+	font-size: 		11px;
+	line-height: 	18px;
+}
+
+.accordion-content {
+	color: 			#76797C;
+	font-size: 		11px;
+	border-left : 	1px solid #CCCCCC;
+	border-right : 	1px solid #CCCCCC;
+	border-bottom : 1px solid #CCCCCC;
+	background-color: #FFFFFF
+}
+
+.accordion-header {		
+	outline: 		none;
+	font-family:	Arial, Helvetica, sans-serif;
+	font-size: 		12px;
+	color: 			black;	
+	margin-top:		10px;
+	height:			24px;
+}
+
+.accordion-header-content {
+	text-align:		left;
+	font-family:	Arial, Helvetica, sans-serif;
+	font-size: 		12px;
+	color: 			#3B3737;
+	/*position: 		relative;*/
+	font-weight: 	bold;
+}
+
+.accordion-header-left {
+	height:			25px;
+	width: 			3px;
+	align: 			left;
+	background: 	url(../images/portlet/portlet-subhead-bg-closed-l.png) left no-repeat; 
+}
+
+.accordion-header-right {
+	height:			25px;
+	width: 			3px;
+	align: 			right;
+	background: 	url(../images/portlet/portlet-subhead-bg-closed-r.png) right no-repeat;
+}
+
+.accordion-header-middle {
+	height:			25px;
+	width:			100%;
+	background: 	url(../images/portlet/portlet-subhead-bg-closed-c.png) repeat-x;
+}
+
+.accordion-header-content img {
+	vertical-align: middle;
+}
+
+.accordion-header.open {
+	background-color: #72839D;
+	color: #FFFFFF;
+	border: 1px solid #d3d3d3;
+	font-weight: bold;
+	outline: none;
+}
+/* ---------- End Portlet Accordion ---------- */
+
+
+/* --- Portlet Validation error styles (old styles, used sparingly) --- */
+input.validationerror {
+	background: #FFEFEF;
+	color: #b00;
+}
+
+textarea.validationerror {
+	background: #FFEFEF;
+	color: #b00;
+}
+
+.validationerror {
+	background: #ffefef;
+}
+
+
+
+/* this should be set in its own stylesheet */
+/* ---------- Calendar portlet ---------- */
+.portlet-calendar .calendar-container {
+	background-position: 0 99%;
+	background-repeat: repeat-x;
+	border: 1px solid #D7D7D7;
+	overflow: hidden;
+}
+
+.ie .portlet-calendar .calendar-container {
+	background-position: 0 98%;
+}
+
+.portlet-calendar .calendar-day {
+	width: 209px;
+}
+
+.portlet-calendar .calendar-day .day-text {
+	background: #727C81;
+	color: #fff;
+	font-size: 1.6em;
+}
+
+.portlet-calendar .calendar-day .day-number {
+	border: 1px solid #fff;
+	border-bottom: none;
+	font-size: 110px;
+	font-weight: normal;
+	padding-bottom: 12px;
+}
+
+.portlet-calendar .calendar-container .taglib-calendar {
+	background: #fff;
+	border-left: 1px solid #D7D7D7;
+	margin-left: -1px;
+	padding-left: 0;
+}
+
+.taglib-calendar tr.portlet-section-header th,.taglib-calendar tr td {
+	border: none;
+}
+
+.taglib-calendar tr td a {
+	background-color: #F0F5F7;
+	border: 1px solid #fff;
+	border-bottom: none;
+	border-left: none;
+	display: block;
+	height: 15px;
+	padding: 5px 0pt;
+}
+
+.taglib-calendar table td {
+	border-width: 0;
+}
+
+.taglib-calendar tr td a:hover {
+	background-color: #727C81;
+	color: #fff;
+}
+
+.taglib-calendar .calendar-current-day,.taglib-calendar .calendar-current-day a
+	{
+	background-color: #fff;
+}
+
+.taglib-calendar .calendar-current-day a {
+	border: 1px solid #727C81;
+	color: #369;
+	text-decoration: underline;
+}
+
+.portlet-calendar .taglib-calendar tr td.calendar-current-day a:hover,.portlet-calendar .taglib-calendar tr td.calendar-current-day a:focus
+	{
+	background-color: #DFF4FF;
+	border-color: #AEB8BC;
+	color: #06c;
+}
+
+.portlet-calendar .taglib-calendar td.calendar-current-day a span {
+	border: none;
+}
+
+.taglib-calendar tr td.calendar-inactive {
+	background-color: #fff;
+	color: #B5BFC4;
+}
+
+.taglib-calendar tr th {
+	border-bottom-color: #D7D7D7;
+}
+
+.taglib-calendar tr.portlet-section-header th,.taglib-calendar tr td {
+	border-left: none;
+	border-right: none;
+}
+
+.ie .taglib-calendar tr td.first a {
+	border-right: none;
+}
+/* end */
+
+
+
+
+/* ---------- Actions button ---------- */
+.lfr-actions {
+	
+}
+
+.lfr-actions,.lfr-actions ul {
+	background: #fff url(../images/forms/button.png) repeat-x 0 100%;
+	border: 1px solid;
+	border-color: #DEDEDE #BFBFBF #BFBFBF #DEDEDE;
+}
+
+.lfr-actions ul {
+	bottom: -1px;
+}
+
+.lfr-actions .lfr-trigger,.lfr-actions .lfr-trigger,.lfr-actions .lfr-trigger strong
+	{
+	background: none;
+}
+
+.lfr-actions .lfr-trigger strong span {
+	background: url(../images/common/action.png) no-repeat 5px 50%;
+}
+
+.lfr-actions.left .lfr-trigger strong span {
+	background: url(../images/common/action_right.png) no-repeat 98% 50%;
+}
+
+.lfr-actions .lfr-trigger li {
+	background: transparent;
+	border-bottom: 1px solid #DEDEDE;
+	padding: 2px;
+}
+
+.lfr-actions .lfr-trigger li a {
+	padding: 5px 10px 5px 25px;
+}
+
+.lfr-actions .lfr-trigger li a:hover {
+	background-color: #828F95;
+	color: #fff;
+}
+
+.lfr-actions .lfr-trigger li a img {
+	left: 3px;
+	position: absolute;
+}
+
+.lfr-actions .lfr-trigger li.last {
+	border-bottom: none;
+}
+
+
+legend {
+	font-weight: bold;
+	padding: 0 6px;
+}
+
+input {
+	background: #fff;
+}
+
+input[type="text"],input[type="password"],input[type="file"],input[type="submit"],input[type="button"],input[type="reset"],select,textarea,.textarea
+	{
+	
+	background-repeat: no-repeat;
+	border: 1px solid;
+	border-color: #BFBFBF #DEDEDE #DEDEDE #BFBFBF;
+	font: 1em Arial, Helvetica, Verdana, sans-serif;
+	padding: 5px 1px;
+}
+
+select {
+	padding: 1px;
+}
+
+input[type="image"] {
+	background: transparent none;
+	border: none;
+	padding: 0;
+}
+
+input[type="submit"],input[type="button"],input[type="reset"] {
+	background: #F5F5F5 url(../images/forms/button.png) repeat-x 0 0;
+	border-color: #DEDEDE #BFBFBF #BFBFBF #DEDEDE;
+	color: #34404F;
+	cursor: pointer;
+	font-weight: bold;
+	padding: 5px;
+}
+
+input[type="submit"]:hover,input[type="button"]:hover,input[type="reset"]:hover,input[type="submit"]:focus,input[type="button"]:focus,input[type="reset"]:focus
+	{
+	background: #DFF4FF;
+	border: 1px solid #A7CEDF;
+	color: #369;
+}
+
+/* ---------- IE6 chokes on attribute selectors in a chain, so we separate them into their own rule ---------- */
+.ie6 input.text,input.password,.ie6 input.submit,.ie6 input.file,.ie6 input.button
+	{
+	background-image: url(../images/forms/input_shadow.png);
+	background-repeat: no-repeat;
+	border: 1px solid;
+	border-color: #BFBFBF #DEDEDE #DEDEDE #BFBFBF;
+	font: 1em Arial, Helvetica, Verdana, sans-serif;
+	padding: 5px 1px;
+}
+
+.ie6 input.submit,.ie6 input.button {
+	background: #F5F5F5 url(../images/forms/button.png) repeat-x 0 0;
+	border-color: #DEDEDE #BFBFBF #BFBFBF #DEDEDE;
+	color: #34404F;
+	cursor: pointer;
+	font-weight: bold;
+	padding: 5px;
+}
+
+input.focus,textarea.focus,.ie6 input.focus,.ie6 textarea.focus {
+	background: #ffc none;
+	border: 1px solid #fc0;
+}
+
+/* disabled button styling */
+input.button-disable {
+    color:              #C0C0C0;
+}
+
+input.button-disable:hover {
+    background-color:   #FFFFFF;
+    color:              #C0C0C0;
+    border-color:       #DEDEDE #BFBFBF #BFBFBF #DEDEDE;
+}
+
+input.button-disable:focus {
+    background-color:   #FFFFFF;
+    color:              #C0C0C0;
+    border-color:       #DEDEDE #BFBFBF #BFBFBF #DEDEDE;
+}
+
+/* ---------- Special styling for just the Classic theme ---------- */
+body.lfr-has-sidebar {
+	padding-left: 0;
+}
+
+.lfr-has-sidebar #content-wrapper {
+	padding-left: 270px;
+	width: auto;
+}
+
+
+/* ---------- Sortable widget ---------- */
+.sidebar-ui-sortable {
+	float: right;
+	background-color: #FFF;
+	color: #222;
+	padding: 0 5px 5px;
+}
+
+.sidebar-ui-sortable-none {
+	display: none;
+}
+
+dl.sort {
+	color: #222;
+	margin: 10px 0;
+	border: 1px solid #555;
+}
+
+dl.sort dt {
+	background-color: #3D77CB;
+	color: #FFF;
+	cursor: move;
+	height: 2em;
+	line-height: 2;
+	padding: 0 6px;
+	width: 188px !important;
+}
+
+dl.sort dd {
+	background-color: #FFF;
+	margin: 0;
+	padding: 3px 6px;
+	width: 188px !important;
+}
+
+/* ---------- End Sortable widget ---------- */
+
+
+
+
+
+
+
+/* what is this for and should probably go in its own stylesheet */
+	/* ---------- jScrollPane CSS ---------- */
+.jScrollPaneContainer {
+	position: relative;
+	overflow: hidden;
+	z-index: 0;
+}
+
+.jScrollPaneTrack {
+	position: absolute;
+	cursor: pointer;
+	right: 0;
+	top: 0;
+	height: 100%;
+	background: #aaa;
+}
+
+.jScrollPaneDrag {
+	position: absolute;
+	background: #666;
+	cursor: pointer;
+	overflow: hidden;
+}
+
+.jScrollPaneDragTop {
+	position: absolute;
+	top: 0;
+	left: 0;
+	overflow: hidden;
+}
+
+.jScrollPaneDragBottom {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	overflow: hidden;
+}
+
+a.jScrollArrowUp {
+	display: block;
+	position: absolute;
+	z-index: 1;
+	top: 0;
+	right: 0;
+	text-indent: -2000px;
+	overflow: hidden;
+	/*background-color: #666;*/
+	height: 9px;
+}
+
+a.jScrollArrowUp:hover { /*background-color: #f60;*/
+	
+}
+
+a.jScrollArrowDown {
+	display: block;
+	position: absolute;
+	z-index: 1;
+	bottom: 0;
+	right: 0;
+	text-indent: -2000px;
+	overflow: hidden;
+	/*background-color: #666;*/
+	height: 9px;
+}
+
+a.jScrollArrowDown:hover { /*background-color: #f60;*/
+	
+}
+
+a.jScrollActiveArrowButton,a.jScrollActiveArrowButton:hover {
+	/*background-color: #f00;*/
+	
+}
+
+/* -------- End jScrollPane CSS -------- */
+
+
+
+
+
+/* these should probably go in their own stylesheet */
+/* ---- Banner portlet Styles---- */
+.banner-a-content {
+	font-family: Arial, Sans-Serif, Calibri, Georgia ;
+	color: #005C96;
+	font-size: 11px;
+	font-weight: bold;
+	margin: 0.25em 0 0;
+	padding: 0 0 4px;
+}
+.banner-a-content a,.banner-a-content a:visited {
+	color: #00759F;
+	display: block;
+	font-weight: bold;
+}
+
+.banner-a-content a:hover {
+	color: #D1792C;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+/* Banner Advancement Compaign portlet styles start */
+.campaignDetails{
+    background-color:#4d728B;
+    font-size:12px;
+    color:#FFFFFF;
+    padding:20px;
+    white-space:nowrap; 
+    margin-top:5px;
+    border-radius:6px;
+    -moz-border-radius:6px;
+    -webkit-border-radius:6px;
+}
+
+.banner-advancement-campaign-progress-out-left {
+   background: url(/cps/images/banner/prgrsbar-out-lft-end.png) no-repeat transparent; 
+   padding-left: 3px;
+   width:4px;
+}
+
+.banner-advancement-campaign-progress-out-mid {
+   background: url(/cps/images/banner/prgrsbar-out-mid.png) repeat-x transparent;
+   width:100%;  
+}
+
+.banner-advancement-campaign-progress-out-right {
+   background: url(/cps/images/banner/prgrsbar-out-rt-end.png) no-repeat transparent;
+}
+
+.banner-advancement-campaign-progress-out-mid-left {
+   padding-left: 5px; 
+   height: 15px; 
+   width: 7px;
+} 
+
+.banner-advancement-campaign-progress-out-mid-right {
+   height: 15px; 
+   width: 7px;
+   padding-right:11px;
+}
+
+.banner-advancement-campaign-progress-in-left {
+   background: url(/cps/images/banner/prgrsbar-in-lft-end.png) no-repeat transparent; 
+   padding-left: 5px; 
+   height: 15px; 
+   width: 7px;
+}
+
+.banner-advancement-campaign-progress-in-mid {
+   background: url(/cps/images/banner/prgrsbar-in-mid.png) repeat-x transparent;
+}
+
+.banner-advancement-campaign-progress-in-mid-right {
+   background: url(/cps/images/banner/prgrsbar-in-rt-end.png) no-repeat transparent;
+}
+
+.banner-advancement-campaign-progress-in-right {
+   background: url(/cps/images/banner/prgrsbar-in-rt-end.png) no-repeat transparent; 
+   height: 15px; 
+   width: 7px;
+   padding-right:11px;
+}
+/* Banner Advancement Compaign portlet styles end */
+ 
+.id-link{
+	font-family: Arial;
+	color: #005C96;
+	font-weight: bold;
+	font-size: 11px;
+}
+
+.id-link:hover{
+	color:#D1792C;
+	text-decoration: none;
+}
+/* ---- End Banner portlet Styles---- */
+
+
+
+/* Add tools section styling (Community Composite, MyCourses) STARTS. */
+
+.tools-container {
+	background-color:	white;
+	padding:	5px 10px;
+}
+
+.tools-container > :last-child {
+	border-bottom: 	1px solid white;
+}
+
+.tools-container .lfr-portlet-item:hover, .tools-container .lfr-portlet-item.over {
+	border-bottom: 	1px solid #EEEEEE;
+	background-color: white;		
+}
+
+/* These are life-ray defined styles in css.jsp, we are overriding some of them here. */
+
+.lfr-portlet-item {
+	border: 	none;
+	border-bottom: 	1px solid #EEEEEE;
+	color: 			#666666;
+	margin:			0;
+	background-position: 0px 50%;
+	padding: 		0px 0px 0px 20px;
+	white-space: 	nowrap;
+	line-height: 	2.5;	
+}
+
+.lfr-portlet-item,.lfr-portlet-item a, .lfr-portlet-item input {
+	font-family:	Arial, Helvetica, sans-serif;
+	font-size: 		11px;
+	font-weight: 	normal;
+	cursor: 		pointer;		
+}
+
+.lfr-portlet-item p a, .lfr-portlet-item p input {
+	color: 			#005C96;
+	position:	absolute;
+	right: 			0;
+	top: 			0;	
+	float: 			right;
+	font-weight: 	normal;
+}
+
+.lfr-portlet-item p a {
+	text-decoration:underline;
+}
+
+.lfr-portlet-item-data {
+    font-size: 1em;
+    margin: 0;
+    padding-right: 20px;
+    position: relative;
+    width:92%;
+}
+
+.lfr-portlet-item:hover,.lfr-portlet-item.over {
+	border-bottom: 	1px solid #EEEEEE;
+	color: 			#1E1E1E;		
+}
+
+.lfr-portlet-used {
+	color: 			#ccc;
+	cursor: 		default;
+}
+
+.portal-add-content .lfr-portlet-used a, .portal-add-content .lfr-portlet-used input {
+	color: 			#ccc;
+	/*display: 		block;*/
+	text-decoration:none;
+	cursor:			default;
+}
+
+.lfr-content-category {
+	padding: 		5px;
+}
+
+.lfr-content-category > :last-child {
+	border-bottom: 	1px solid #EEEEEE;
+}
+
+.lfr-content-category .lfr-portlet-item:hover, .lfr-content-category .lfr-portlet-item.over {
+	color: 			#1E1E1E;
+	border-bottom: 	1px solid #EEEEEE;
+	background-color: #F0F3FA;		
+}
+
+/* Add tools section styling (Community Composite, MyCourses) ENDS. */
+
+
+/* Styling for portlets in panel type pages starts */
+
+.panel-page-content {
+	width: 85%;
+}
+
+/* Styling for portlets in panel type pages ends */
+
+
+
+/* Styles for the tablesorter and tablessorter_pager */
+
+/* tables */
+table.tablesorter {
+	font-family:arial;
+	margin:0;
+	font-size: 12px;
+	width: 100%;
+	text-align: left;
+}
+
+table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+	background-color: #D9E0EE;
+	font-size: 11px;	
+	font-weight: bold;
+	color: #323232;
+	height:25px;
+}
+table.tablesorter thead tr .header {
+	background-image: none;	
+	cursor: pointer;
+	text-align: left;
+	padding: 0 8px;
+}
+table.tablesorter tbody td {
+	color: #4d4d4d;
+	padding: 5px 8px;
+	background-color: #FFF;
+	vertical-align: middle;
+	border-bottom: 1px solid #ebebeb;
+}
+
+table.tablesorter thead tr .headerSortUp {
+	background-image: url(/cps/images/table/asc.gif);
+	background-position: left;
+	background-repeat:no-repeat;
+	text-align: left;
+	padding-left: 18px;
+}
+table.tablesorter thead tr .headerSortDown {
+	background-image: url(/cps/images/table/desc.gif);
+	background-position: left;
+	background-repeat:no-repeat;
+	text-align: left;
+	padding-left: 18px;
+}
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+	background-color: #C5D0E7;
+}
+
+table.tablesorter .filter {
+	background-color: #A7B6DB;
+    padding:         0px;
+	line-height: 	32px;
+}
+
+table.tablesorter .filter img {
+	vertical-align: middle;
+}
+
+.tableCaption {
+	color: #323232;
+	font-family: Arial;
+	font-size: 11px;
+	background-color: #A7B6DB;
+	width: 100%;
+	text-align: left;
+	font-weight: bold;
+	padding-left: 5px;
+	line-height: 2;
+}
+
+div.tablesorterPager {
+	padding: 10px 0 10px 0;
+	text-align: center;
+}
+div.tablesorterPager span {
+	padding: 0 5px 0 5px;
+}
+div.tablesorterPager img.prev {
+	width: auto;
+	margin-right: 10px;
+}
+div.tablesorterPager img.next {
+	width: auto;
+	margin-left: 10px;
+}
+div.tablesorterPager input {
+	font-size: 10px;
+	width: 50px;
+	border: 1px solid #330000;
+	text-align: center;
+	vertical-align: bottom;
+}
+
+div.tablesorterPager select.pagesize
+{
+	font-size: 10px;
+	width: 40px;
+	border: 1px solid #330000;
+	text-align: center;
+	vertical-align: top;
+}
+
+  
+/* end of table sorter */
+
+/* default values for text align */
+.horizontal-align-default{
+    align: left;
+    text-align: left;
+}
+
+.horizontal-align-reverse {
+    align: right;
+    text-align: right;
+}
+
+.horizontal-float-default{
+	float:left;
+}
+.horizontal-float-reverse{
+    float:right;
+}
+
+.horizontal-padding-default{
+    padding-left:10px;  
+}
+
+.horizontal-padding-reverse{
+    padding-right:10px;  
+}
+
+.label-wrap-default{
+    white-space:nowrap;
+}
+
+/* Drop down options used in media portlets (Photo, File, Video etc) */
+
+.media-option-menu, .media-option-menu * {
+    margin:         0;
+    padding:        0;
+    list-style:     none;
+}
+
+.media-option-menu {
+    line-height:    1.0;
+    float:          right;
+}
+
+.media-option-menu ul {
+    position:       absolute;
+    top:            -999em;
+    right:          0em;
+}
+
+.media-option-menu ul li {
+    line-height:    2;
+    width:          80px;
+    padding:        2px 10px;
+}
+
+.media-option-menu li:hover {
+    visibility:     inherit; /* fixes IE7 'sticky bug' */
+}
+
+.media-option-menu li {
+    float:          right;
+    position:       relative;
+}
+
+.media-option-menu ul li a {
+    text-align:     right;
+    text-decoration: none;
+    float:          right;
+    font-weight:    bold;
+    color:          #FFF;
+}
+
+.media-option-menu li:hover ul,
+.media-option-menu li.sfHover ul {
+    float:          right;
+    top:            1.5em; /* match top ul list item height */
+    z-index:        90;
+}
+
+ul.media-option-menu li:hover li ul,
+ul.media-option-menu li.sfHover li ul {
+    top:            -999em;
+}
+
+ul.media-option-menu li li:hover ul,
+ul.media-option-menu li li.sfHover ul {
+    top:            0;
+}
+
+.media-option-menu li {
+    background:     none;
+    background-color: none;
+}
+
+.media-option-menu li li {
+    background-color: #A7A7A7;
+    border-bottom:  1px solid #FFF;
+}
+
+.media-option-menu li li li {
+    background-color: #A7A7A7;
+    border-bottom:  1px solid #FFF;
+}
+
+.media-option-menu li:hover, .media-option-menu li.sfHover,
+.media-option-menu a:focus, .media-option-menu a:hover, .media-option-menu a:active {
+    background:     #C0C0C0;
+    outline:        0;
+}
+
+/* On mouse over and on mouse click of submenu */
+.media-option-menu ul li:hover, .media-option-menu ul li.sfHover,
+.media-option-menu ul li a:focus, .media-option-menu ul li a:hover, .media-option-menu ul li a:active {
+    background:     #C0C0C0;
+    outline:        0;
+    color:          #0066CC;
+}
+
+ul.media-option-menu li a img {
+    height:         16px;
+    width:          16px;
+}
+
+/* Portlet Manage board tabs (used in Web Logs and Discussion board)*/
+
+.tabContainer {        
+    position:       relative;
+}
+   
+.tabContainer ul {    
+    height:         26px;
+    margin:         0;
+    padding:        0;
+}
+
+.tab {
+    background-color:   #A7B6DB;
+    float:              left;
+    padding-left:       10px;
+    border:             1px solid #A7B6DB;
+    border-bottom:      1px solid #BFBFBF;       
+    list-style:         none;
+    height:             25px;
+    margin-right:       2px;
+    border-radius:          6px 6px 0 0;
+    -moz-border-radius:     6px 6px 0 0;
+    -webkit-border-radius:  6px 6px 0 0;
+}
+
+.tab:hover {
+    background-color:   #D9E0EE;      
+    border:             1px solid #BFBFBF;
+    border-bottom:      1px solid #D9E0EE;
+}
+
+.tab-selected {  
+    background-color:   #D9E0EE;      
+    border:             1px solid #BFBFBF;
+    border-bottom:      1px solid #D9E0EE;
+}
+  
+.tab a {
+   background:          url() 100% 0;
+   color:               #343434 !important;
+   float:               left;
+   line-height:         2.3em;
+   padding-right:       10px;
+   text-decoration:     none !important;        
+   font-weight:         bold;        
+   font-size:           11px !important;        
+   white-space:         nowrap;        
+}
+
+/* style used by Root/html/js/jquery/interface.js */
+.captionClass {
+    font-family: Arial;
+    font-weight: bold;
+    font-size: 12px;
+    color:#646464;
+}
+
+
+/* -------- MAIN CORP THEME STYLES START HERE Do Not Touch or Add! -------- */
+
+
+/* This CSS sets the default styles for the main navigation. */
+	/* ---------- Custom LP5 Navigation Tabs ---------- */
+
+
+.tabs-nav {
+    float: left;
+    padding: 0;
+    margin: -72px 0px 0px 30px;
+    list-style: none;
+}
+
+/* IE */
+
+.ie .tabs-nav {
+position: absolute;
+z-index: 999;
+}
+
+
+.tabs-nav li {
+    float: left;
+    display: block;
+    background: transparent url("../images/navigation/tab-active-left.png") no-repeat top left;
+    height: 28px;
+}
+
+.tabs-nav span {
+   background: transparent url("../images/navigation/tab-active-right.png") no-repeat top right;
+   display: block;
+   padding-left: 2px;
+   padding-right: 2px;
+}
+
+.tabs-nav li a {
+    background: transparent url("../images/navigation/tab-active-center.png") repeat-x top left;
+    font-size: 12px;
+    display: block;
+    padding: 6px 15px 0px 15px;
+    color: #fff;
+    text-decoration: none;
+    height: 22px;
+    margin-right: 2px;
+    margin-left: 2px;
+}
+
+
+li.tabs-selected {
+    background: transparent url("../images/navigation/common-ui-tab-left.png") no-repeat top left;
+    height: 31px;
+}
+
+
+.tabs-selected span a {    
+    font-weight: bold;
+    display: block;
+    margin-left: 2px;
+    margin-right: 2px;
+    height: 30px;
+    color: #005C96;
+    background: transparent url("../images/navigation/common-ui-tab-center.png") repeat-x top left;
+    text-decoration: none;
+}
+
+.tabs-selected span {
+    display: block;
+    background: transparent url("../images/navigation/common-ui-tab-right.png") no-repeat top right;
+    height: 31px;
+}
+
+
+.tabs-nav li:hover  {
+   background: transparent url("../images/navigation/tab-sprite-left.png") no-repeat top left;
+   height: 28px;
+}
+
+.tabs-nav li a:hover  {
+   background: transparent url("../images/navigation/tab-sprite-center.png") repeat-x top left;
+   display: block;
+   margin-left: 2px;
+   margin-right: 2px;
+}
+
+.tabs-nav li span:hover  {
+   background: transparent url("../images/navigation/tab-sprite-right.png") no-repeat top right;
+   display: block;
+}
+
+.tabs-selected:hover span a {
+    font-weight: bold;
+    display: block;
+    margin-left: 2px;
+    margin-right: 2px;
+    height: 30px;
+    color: #005C96;
+    background: transparent url("../images/navigation/common-ui-tab-center.png") repeat-x top left;
+    text-decoration: none;
+}
+
+.tabs-selected:hover span {
+    display: block;
+    background: transparent url("../images/navigation/common-ui-tab-right.png") no-repeat top right !important;
+    height: 31px;
+}
+
+li.tabs-selected:hover {
+    background: transparent url("../images/navigation/common-ui-tab-left.png") no-repeat top left;
+    height: 31px;
+}
+
+
+
+.tabs-hide {
+    display: none;
+}
+
+/* Page Nav And Scroll */
+
+.tabs-container {
+position: relative;
+top: -40px;
+}
+
+.menu_container {
+    height:22px;
+    left:60px;
+    overflow:hidden;
+    position:absolute;
+    width: 87%;
+    z-index: 0;
+}
+
+
+.menu_scroll li .selected,.menu_scroll div,.menu_scroll span {
+    margin: 0px;
+    padding: 0px;
+}
+
+.menu_scroll {
+    background:none repeat scroll 0 0 transparent;
+    float:left;
+    font:14px Arial,Helvetica,sans-serif;
+    height:32px;
+    left:0;
+    margin:0;
+    padding:0;
+    position:absolute;
+    z-index:990;
+    overflow: hidden;
+}
+.menu_scroll ul{
+    list-style: none;
+    padding: 0;
+}
+.menu_scroll li {
+    display: block;
+    float: left;
+    margin-left: 11px;
+    margin-right: 10px;
+    height: 18px;
+    padding-top: 3px;
+}
+
+.menu_scroll li a {
+    padding-right: 14px;
+    padding-left: 0px;
+    text-decoration: none;
+    color: #333333;
+}
+
+.menu_scroll li.selected {
+    background: url(../images/navigation/nav-left.png) no-repeat left top;
+    height: 22px;
+    padding: 0px;
+    padding-left: 3px;
+    margin-left: 1px;
+}
+
+.menu_scroll li.selected a {
+    background: url(../images/navigation/nav-right.png) no-repeat right top;
+    display: block;
+    height: 22px;
+    padding-right: 3px;
+    margin-right: 4px;
+    color: #005C96;
+}
+
+.menu_scroll li.selected span {
+    background: url(../images/navigation/nav-center.png) repeat-x left top;
+    display: block;
+    height: 20px;
+    padding-left: 7px;
+    padding-right: 7px;
+    padding-top: 3px;
+}
+
+.menu_scroll li:hover {
+    background: url(../images/navigation/subnav-left-hover.png) no-repeat left top;
+    height: 22px;
+    padding: 0px;
+    padding-left: 3px;
+    margin-left: 1px;
+}
+
+.menu_scroll li:hover a {
+    background: url(../images/navigation/subnav-right-hover.png) no-repeat right top;
+    display: block;
+    height: 22px;
+    padding-right: 3px;
+    margin-right: 4px;
+    color: #005C96;
+}
+
+.menu_scroll li:hover span {
+    background: url(../images/navigation/subnav-center-hover.png) repeat-x left top;
+    display: block;
+    height: 22px;
+    padding-left: 7px;
+    padding-right: 7px;
+    padding-top: 3px;
+}
+
+
+
+
+
+.arrow_container {
+	padding-top:12px;
+	padding-left: 10px;
+}
+
+.arrow_container span.navigationleft {
+	background:url(../images/navigation/subnav-scroller-sprites.png) no-repeat 0px -46px;
+	width:19px;
+	height:21px;
+	float: left;
+	cursor: pointer;
+}
+
+.arrow_container span.navigationleft.disabled {
+	background:url(../images/navigation/subnav-scroller-sprites.png) no-repeat 0px 0px;
+	width:19px;
+	height:21px;
+	float: left;
+}
+	
+.arrow_container span.navigationright {
+	background:url(../images/navigation/subnav-scroller-sprites.png) no-repeat 0px -69px;
+	width:19px;
+	height:21px;
+	float: left;
+	cursor: pointer;
+}
+
+.arrow_container span.navigationright.disabled {
+	background:url(../images/navigation/subnav-scroller-sprites.png) no-repeat 0px -23px;
+	width:19px;
+	height:21px;
+	float: left;
+}
+
+
+
+/* ----- end Styles for scroll ----- */
+
+
+
+	/* ---------- Portlet wrapper and icons ---------- */
+
+
+.portlet {
+	background: #ffffff;
+	border: 0;
+	margin: 12px;
+}
+
+.portlet-content-wrapper {
+	padding: 10px;
+}
+
+.portlet-content-container {
+	margin: 0;
+	padding: 2px;	
+}
+
+.freeform .portlet {
+	margin-bottom: 0;
+}
+
+body.portlet {
+	border: none;
+}
+
+.portlet-topper {
+	/* background: url(../images/portlet/portlet-header-top-left.png) repeat-x; */
+	line-height: 38px;
+	list-style: none;
+}
+
+.ie .portlet-topper {
+	/* background: url(../images/portlet/portlet-header-top-left.png) repeat-x; */
+	line-height: 38px;
+	list-style: none;
+	position: relative;
+	top: -5px;
+}
+
+
+.portlet-title {
+
+	display: block;
+	color: #005C96;
+	font-weight: bold;
+	min-width: 50%;
+	padding: 4px 0 0 15px;
+	font-size: 13px;
+}
+
+
+.portlet-topper-right {
+	background: url(../images/portlet/portlet-header-top-right.png) 100% 0 no-repeat;
+}
+
+.portlet-content-left {
+	background: url(../images/portlet/portlet-left.png) 0 0 repeat-y;
+}
+
+.portlet-content-right {
+	background: url(../images/portlet/portlet-right.png) 100% 0 repeat-y;
+}
+
+
+.ie .portlet-title {
+	padding-bottom: 5px;
+}
+
+
+.portlet-title img {
+	vertical-align: middle;
+}
+
+.portlet-content-bottom {
+	background: url(../images/portlet/portlet-bottom-center.png) 0 100% repeat-x;
+}
+
+.ie .portlet-content-bottom {
+	background: url(../images/portlet/portlet-bottom-center.png) 0 100% repeat-x;
+	min-height: 20px;
+}
+
+.portlet-left-bottom {
+	background: url(../images/portlet/portlet-bottom-left.png) no-repeat bottom left;
+}
+
+.portlet-content,.portlet-minimized {
+	list-style: none;
+	padding: 5px 7px 10px 7px;
+}
+
+.portlet-minimized .portlet-content {
+	padding: 0;
+}
+
+
+
+.portlet-minimized {
+	background: none;
+}
+
+.portlet-icon-back {
+	background: url(../images/portlet/restore.png) no-repeat 0 50%;
+	padding: 13px 0 3px 30px;
+}
+
+.ie .portlet-icon-back {
+	background: url(../images/portlet/restore.png) no-repeat 0 50%;
+	position: absolute;
+	top: -6px;
+	right: 20px;
+	height: 24px;
+}
+
+.help-icon {
+position: absolute;
+right: 120%;
+top: 2px;
+}
+
+.ie .help-icon {
+position: absolute;
+right: 60px;
+top: 2px;
+}
+
+/* These are needed by JQuery validator to highlight respective error fields */
+textarea.error,input.error,select.error { 
+	border: 1px solid #FF0000; 
+}
+
+label.error {
+	color: #FF0000;
+	font-weight: bold;
+	padding-left: 2px;
+}
+
+
+/* portlet options button replacing icons */
+
+.portlet-icons {
+	margin: 0;
+	position: absolute;
+	right: 10px;
+	top: 8px;
+}
+
+
+
+.lfr-actions.portlet-options {
+	background: none;
+	border: none;
+	float: left;
+}
+
+.lfr-actions.portlet-options .lfr-trigger {
+	padding: 0;
+}
+
+.lfr-actions.portlet-options .lfr-trigger strong {
+	min-width: 0;
+	padding: 1px;
+}
+
+.lfr-actions.portlet-options .lfr-trigger strong span {
+	background-image: url(../images/portlet/options.png);
+	background-position: 0 0;
+	display: block;
+	width: 37px;
+	height: 24px;
+	padding: 0;
+}
+
+.ie .lfr-actions.portlet-options .lfr-trigger strong span {
+	background-image: url(../images/portlet/options.png);
+	background-position: 0 0;
+	display: block;
+	width: 37px;
+	height: 24px;
+	padding: 0;
+	position: absolute;
+	top: 1px;
+	right: 89px;
+}
+
+.visible.portlet-options .lfr-trigger strong span {
+	background-image: url(../images/portlet/options_selected.png);
+}
+
+
+/* Portlet Action Bar */
+
+.action-menu-wrapper { /* Fix for IE z-index problem */
+	position:	relative;
+	top: -8px;
+	left: 0px;
+	z-index:	1;
+	padding-bottom:	24px;
+}
+
+.ie .action-menu-wrapper {
+    top:    -18px;
+}
+
+.action-menu-wrapper ul {
+	position:	absolute;
+	background: url(../images/portlet/action-bar-bg.png) repeat-x;
+	width:     100%;
+}
+
+.action-menu-wrapper li {
+	float: right;
+}
+
+.portlet-menu-item-title li {
+	width: 125px;
+	right: 5%;
+}
+
+.portlet-menu-item:hover ul,.portlet-menu-item.sfHover ul {
+	left: 1%;
+	top: 2.5em; /* match top ul list item height */
+	z-index: 99;
+}
+
+ul.portlet-menu li:hover li ul,ul.portlet-menu li.sfHover li ul {
+	top: -999em;
+}
+
+ul.portlet-menu li li:hover ul,ul.portlet-menu li li.sfHover ul {
+	right: 12em; /* match ul width */
+	top: 0;
+}
+
+ul.portlet-menu li li:hover li ul,ul.portlet-menu li li.sfHover li ul {
+	top: -999em;
+}
+
+ul.portlet-menu li li li:hover ul,ul.portlet-menu li li li.sfHover ul {
+	left: 10em; /* match ul width */
+	top: 0;
+}
+
+
+.portlet-menu {
+	float: right;
+}
+
+.portlet-menu-item-selected {
+	padding: .75em 1em;
+	text-decoration: none;
+}
+
+.portlet-menu-item-selected {
+	/* visited pseudo selector so IE6 applies text colour*/
+	color: #fff;
+	font-weight: bold;
+}
+
+.portlet-menu-item {
+	background: transparent url("../images/portlet/action-bar-divider.png") no-repeat;
+}
+
+.portlet-menu-item li {
+	background: #a7a7a7;
+border: 1px solid #C0C0C0;
+}
+
+.portlet-menu-item li li {
+	background: #a7a7a7;
+border: 1px solid #C0C0C0;
+	right: 0;
+}
+
+.portlet-menu-item:hover,.portlet-menu-item.sfHover,.portlet-menu-item-selected:focus,.portlet-menu-item-selected:hover,.portlet-menu-item-selected:active
+	{
+	background: #C0C0C0;
+}
+
+/*-------------  End Of Portlet Action Bar  ----------------*/
+
+/* New styles for portlet Action menu -- June 26, 2010.*/
+/* Older styles as laid above are maintained as a safety net and will be removed sooner or later */
+/* NEW portlet-action-menu STARTS */
+
+.portlet-action-menu, .portlet-action-menu * {
+	margin:			0;
+	padding:		0;
+	list-style:		none;
+}
+.portlet-action-menu {
+	float:			left;
+	margin-bottom:	1em;
+	line-height:	1.0;
+}
+.portlet-action-menu ul {
+	position:		absolute;
+	top:			-999em;
+	width:			12.5em; /* left offset of submenus need to match (see below) */
+}
+.portlet-action-menu ul li {
+	width:			112%;
+	float:			left;
+}
+
+.portlet-action-menu li {
+	float:			right;
+	position:		relative;
+	background: 	transparent url("../images/portlet/action-bar-divider.png") no-repeat;		
+  line-height: 27px;
+}
+
+.portlet-action-menu li li {
+	background: 	#a7a7a7;
+	border: 		1px solid #FFF;
+	border-bottom: none;
+}
+.portlet-action-menu li li li {
+	background: 	#a7a7a7;
+	right:			1.7em;
+	border: 		1px solid #FFF;
+	border-bottom: none;
+}
+
+.portlet-action-menu li:hover {
+	visibility:		inherit; /* fixes IE7 'sticky bug' */
+}
+
+.portlet-action-menu a {
+	display:		block;
+	position:		relative;
+	padding: 		.75em 1em;
+	text-decoration:none;
+	color: 			#fff;
+	font-weight: 	bold;
+	white-space: 	nowrap;
+	cursor: 		pointer;
+}
+
+.portlet-action-menu li:hover ul,
+.portlet-action-menu li.sfHover ul {
+	right:			1.6em;
+	top:			2.4em; /* match top ul list item height */
+	z-index:		99;
+}
+
+ul.portlet-action-menu li:hover li ul,
+ul.portlet-action-menu li.sfHover li ul {
+	top:			-999em;
+}
+ul.portlet-action-menu li li:hover ul,
+ul.portlet-action-menu li li.sfHover ul {
+	left:			-12.5em; /* match ul width */
+	top:			-1px;
+}
+
+ul.portlet-action-menu li li:hover li ul,
+ul.portlet-action-menu li li.sfHover li ul {
+	top:			-999em;
+}
+ul.portlet-action-menu li li li:hover ul,
+ul.portlet-action-menu li li li.sfHover ul {
+	left:			-12.5em; /* match ul width */
+	top:			0;
+}
+
+.portlet-action-menu li:hover, .portlet-action-menu li.sfHover, 
+.portlet-action-menu a:focus, .portlet-action-menu a:hover, .portlet-action-menu a:active {
+	background: 	#C0C0C0;
+	outline:		0;
+	color:			#0066CC;
+}
+/* NEW portlet-action-menu ENDS */
+
+
+/* Change to portlet options menu z-index */
+
+.lfr-component {
+z-index: 1;
+}
+
+
+
+/*-------------  Portlet Breadcrumb  ---------------*/
+
+.breadcrumb-wrapper {
+padding: 0px 0 0 7px;
+}
+
+/*-------------  End Of Portlet Breadcrumb  ---------------*/
+
+/* Search Styling Starts.*/
+
+.search-div {
+	padding: 		5px;
+	text-align: 	left;
+	vertical-align: middle;
+}
+
+.search-div a { 
+	background: 	url(/cps/images/misc/magnifier_left.png);
+	background-repeat:no-repeat;
+	display: 		inline-block; 
+	height: 		18px; 
+	width: 			18px;
+	margin-left: 	3px;
+	vertical-align: middle;
+}
+
+/* Search Styling Ends.*/
+
+/* Search Style - using jquery plugin STARTS */
+
+/* Default Search style */
+
+.luminis-search-container {
+	padding: 		   2px 5px;
+	text-align: 	   left;
+	float:			   left;
+	text-indent: 	   0;		
+}
+
+.luminis-search {	
+	border: 		   1px solid;
+	border-color: 	   #CCCCCC;
+	background-color:  #FFF;
+	width: 			   16.2em; 
+	height:			   2.1em;	
+	padding:		   0;
+	white-space: 	   nowrap;
+}
+
+.luminis-search input {		
+	border: 		   none;
+	height:			   1.5em;
+	width:			   13.8em;
+	padding-left: 	   2px;
+	padding-top:       5px;
+	padding-bottom:    0px;
+	font-family: 	   Arial, Helvetica, sans-serif;
+	font-size: 		   11px;
+	background-image:  none; 
+}
+
+.luminis-search input.focus {
+    background:     none;
+}
+
+.luminis-search a {
+	background-color:  #FFF;
+	background-repeat: no-repeat;
+	display: 		   inline-block; 
+	margin-left: 	   3px;
+	vertical-align:    bottom;
+	cursor:			   pointer;
+	width:			   1.5em;
+	height:			   1.6em;  
+	font-size:         12px;  
+}
+
+.luminis-search a {
+	background-image:  url('/cps/images/search/luminis-search.png');	
+}
+
+.luminis-search a + a {
+	background-image:  url('/cps/images/search/luminis-filter-cross.png');
+	height:            1.3em;
+}
+
+/* Action bar Search Style */
+
+.luminis-action-bar-search-container {
+    padding:           4px;
+    text-align:        left;
+    float:             left;
+    text-indent:       0;      
+}
+
+.luminis-action-bar-search {    
+    width:             17em;
+    height:            1.7em;      
+    padding:           0;
+    padding-left:      2px;
+    white-space:       nowrap;     
+    background:        url('/cps/images/search/action-bar-search-left.png') left center;
+    background-repeat: no-repeat;
+}
+
+.luminis-action-bar-search input {      
+    border:            none;
+    width:             13.8em;
+    height:            1.4em;
+    padding:           1px;
+    font-family:       Arial, Helvetica, sans-serif;
+    font-size:         12.3px;
+    color:             #FFF;
+    background:        url('/cps/images/search/action-bar-search-center.png') repeat-x left center;
+}    
+
+.luminis-action-bar-search a {
+    background-repeat: no-repeat;
+    display:           inline-block;       
+    vertical-align:    bottom;
+    cursor:            pointer;
+    padding:           9px 8px;
+    height:            0.1em;       
+}
+
+.luminis-action-bar-search a {
+    background-image:  url('/cps/images/search/action-bar-search-right.png');   
+    background-repeat: no-repeat;
+}
+
+.luminis-action-bar-search a + a {
+    background-image:  url('/cps/images/search/action-bar-cross-right.png');  
+    background-repeat: no-repeat;
+    background-color:  #a7a7a7;
+    vertical-align:    middle;
+    margin-bottom:     3px;
+}
+
+.luminis-action-bar-search a:hover {
+    background-image:  url('/cps/images/search/action-bar-search-right.png');        
+    background-repeat: no-repeat;       
+}
+
+.luminis-action-bar-search a + a:hover {
+    background-image:  url('/cps/images/search/action-bar-cross-right.png');
+    background-repeat: no-repeat;       
+}
+
+.luminis-action-bar-search a:focus, .luminis-action-bar-search a:active {
+    background-image:  url('/cps/images/search/action-bar-search-right.png');        
+    background-repeat: no-repeat; 
+}
+
+.luminis-action-bar-search a + a:focus, .luminis-action-bar-search a + a:active {
+    background-image:  url('/cps/images/search/action-bar-cross-right.png');
+    background-repeat: no-repeat;
+}
+
+.search-keyword-container {
+    background-color:#A7B6DB;
+    font-size:      14px;
+    font-weight:    bold;
+    color:          #FFFFFF;
+    padding:        5px 10px;
+    height:         30px;
+    text-align:     left;
+    margin-bottom:  0;
+}
+
+/* Search Style - using jquery plugin ENDS */
+
+/* New filter style */
+
+.luminis-filter-container {
+	padding: 		0;
+	text-align: 	left;
+	float:			right;
+	text-indent: 	0;				
+}
+
+.luminis-filter {	
+	border: 		1px solid;
+	border-color: 	#CCCCCC;
+	background-color: #FFF;
+	width: 			16.2em;
+	height:			2.1em;	
+	padding:		0;
+	white-space: 	nowrap;
+}
+
+.luminis-filter input {		
+	border: 		none;
+	height:			1.5em;
+	width:			13.8em;
+	padding-left: 	2px;
+	padding-top: 	5px;
+	padding-bottom: 0px;
+	font-family: 	Arial, Helvetica, sans-serif;
+	font-size: 		11px;
+	background-image:	none;
+}
+
+.luminis-filter a {
+	background-color:#FFF;
+	background-repeat:no-repeat;
+	display: 		inline-block; 
+	margin-left: 	3px;
+	margin-bottom:  2px;
+	vertical-align: middle;
+	cursor:			pointer;
+	width:			1.5em;
+	height:			1.3em;
+	font-size: 		12px;  
+}
+
+.luminis-filter input.focus {
+    background:     none;
+}
+
+.luminis-filter a {
+	background-image:  url('/cps/images/search/luminis-filter.png');	
+}
+
+.luminis-filter a + a {
+	background-image:  url('/cps/images/search/luminis-filter-cross.png');	
+}
+
+/* ------- Forms ------------*/
+
+/* ------- styles for tableless forms -------*/
+
+.lpForm {
+	padding:3em 0 .5em 0;
+	border-width:0px;
+	border-top:1px #ccc solid;
+}
+
+.lpForm ol {
+	margin:0;
+	padding:0;
+	list-style:none;
+}
+
+.lpForm ol li {
+	padding:.2em 0;
+}
+
+.lpForm ol label {
+	display:block;
+	width:25em;
+	float:left;
+	margin-right:.4em;
+        text-align: right;
+}
+
+.lpForm ol label.required {
+	background:url(images/icon_required.gif) no-repeat center right;
+}
+
+.lpForm ol label.level2 {
+	
+	display:inline;
+	font-size:.75em;
+	font-weight:normal;
+	margin:0;
+	float:none;
+	width:auto;
+}
+
+/*label em {
+	position:absolute;
+	left:30em;
+	margin-top:.25em;
+}*/
+
+.text {
+	width:20em;
+}
+
+textarea { /* Defect1736 - Chrome Browser: Able to expand the text box across all portlets. */
+    resize: none;
+}
+
+.lpForm textarea {
+	margin:0;
+	padding:0;
+	width:20em;
+}
+.lpForm input {
+	margin:0;
+	padding:0;
+}
+.formErrorOneLine {
+	border:1px #eda0a0 solid;
+	background:#fff url(images/form_alert_icon.gif) no-repeat 4px 4px;
+	margin-left:10px;
+	padding:2px 10px 4px 20px;
+	font-size:.7em;
+	color:#db4242;
+	text-align:left;
+	position:absolute;
+	display:inline;
+	white-space:nowrap;
+}
+/* alert box arrow */
+.lpForm .alertArrow {
+	position:relative;
+	top:2px;
+	left:-25px;
+	margin:0px -5px 0px 0px;
+}
+
+
+
+
+
+
+/* -- To be used for Mandatory text fields == */ 
+.portlet-form-field-mandatory {
+	color: #FF0000;
+	font-weight: bold;
+}
+
+.portlet-field-mandatory {
+
+}
+
+.portlet-form-span-mandatory {
+	border: 1px solid #FF0000;
+}
+
+
+
+
+
+
+    /* old forms need to stay in place until we can finish conversion */
+.portlet-form-field-label {
+    font-family: Arial, Verdana, Sans-serif;
+    font-size: 11px;
+    color: #4E4848;		
+}
+
+.portlet-form-input-field {
+	white-space:nowrap;
+	padding: 2px;
+}
+
+.portlet-form-input-field span {
+     display: inline-block; 
+     vertical-align: middle;
+}
+
+/* ---------- Text on a button ---------- */
+.portlet-form-button {
+	align: right;
+}
+
+
+
+
+
+
+/* ----- Styles For Header Menu ----- */
+
+/* --- greeting is no longer needed but left in in case clients want to move it --- */
+
+/* --- #greeting {} --- */
+
+
+#sub_menu {
+	color: #fff;
+	position: absolute;
+	top: 7px;
+	right: 2%;
+}
+
+
+#sub_menu li {
+	margin: 0px;
+	list-style: none;
+	float: left;
+	font-size: 10pt;
+	padding: 2px 8px 0px 0px;
+}
+
+#sub_menu li a {
+	color: #fff;
+	text-decoration: none;
+	padding-left: 30px;
+	padding-right: 5px;
+	border-left: 1px solid #fff;
+}
+
+#sub_menu li a.home {
+	background: url("../images/dock/home.png") no-repeat 8px center;
+	border: none;
+}
+
+
+#sub_menu li a.pref_menu {
+	background:url("../images/dock/gear-icon.png") no-repeat 10px center;
+}
+
+#sub_menu li a.tools_menu {
+	background:url("../images/dock/tools.png") no-repeat 10px center;
+}
+
+
+#sub_menu li a.signOut {
+	background: url("../images/dock/sign_out.png") no-repeat 10px center;
+}
+
+#sub_menu li span {
+	background: url("../images/dock/dd_arrow.png") no-repeat;
+	border: none;
+	padding: 0 5px 0 0;
+	position: relative;
+	top: 5px;
+}
+
+
+
+#pref_appear {
+    background-color: #6699CC;
+    position: absolute;
+    float: right;
+    top: 30px;
+right: 205px;
+    /* for IE */
+    filter:alpha(opacity=80);
+      /* CSS3 standard */
+    opacity:0.8;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    visibility: hidden;
+}
+
+#pref_appear ul {
+    margin: 0;
+    padding: 5px 15px 5px 15px;
+}
+
+
+
+#pref_appear li {
+    list-style: none;
+    float: none;
+}
+
+
+
+#pref_appear li a {
+    font-family: arial;
+    color: #ffffff;
+    text-decoration: none;
+    border: none;
+    padding: 5px;
+}
+
+
+/* for non provisioned users */
+
+#pref_appear_no_prov {
+    background-color: #6699CC;
+    position: absolute;
+    float: right;
+    top: 30px;
+right: 109px;
+    /* for IE */
+    filter:alpha(opacity=80);
+      /* CSS3 standard */
+    opacity:0.8;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    visibility: hidden;
+}
+
+#pref_appear_no_prov ul {
+    margin: 0;
+    padding: 5px 15px 5px 15px;
+}
+
+
+
+#pref_appear_no_prov li {
+    list-style: none;
+    float: none;
+}
+
+
+
+#pref_appear_no_prov li a {
+    font-family: arial;
+    color: #ffffff;
+    text-decoration: none;
+    border: none;
+    padding: 5px;
+}
+
+
+#tools_appear {
+    background-color: #6699CC;
+    position: absolute;
+    float: right;
+    top: 30px;
+right: 105px;
+    /* for IE */
+    filter:alpha(opacity=80);
+      /* CSS3 standard */
+    opacity:0.8;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    visibility: hidden;
+}
+
+
+#tools_appear ul {
+    margin: 0;
+    padding: 5px 15px 5px 15px;
+}
+
+
+
+#tools_appear li {
+    list-style: none;
+    float: none;
+}
+
+
+
+#tools_appear li a {
+    font-family: arial;
+    color: #ffffff;
+    text-decoration: none;
+    border: none;
+    padding: 5px;
+}
+
+
+
+
+/* ---- Styles For Options Menu ---- */
+
+
+#main_menu {
+background: url(../images/dock/page-options-bg-left.png);
+height: 31px;
+width: 94px;
+position: absolute;
+float: right;
+right: 2%;
+top: 100px;
+-moz-border-radius-bottomleft: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -moz-border-radius-bottomright: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+z-index: 5;
+}
+
+.main_options_button {
+    background: url(../images/dock/grey-menu-btn-left.png) no-repeat top left;
+    padding-left:2px;
+    position: absolute;
+    right: 8%;
+    cursor: pointer;
+    -moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+}
+
+.main_options_button div div {
+    background: url(../images/dock/grey-menu-btn-center.png) repeat-x top left;
+    font-size:10pt;
+        padding: 8px;
+        text-decoration: none;
+        color: #fff;
+    font-weight: normal;
+    padding-top: 2px;
+}
+
+.main_options_button div {
+    background: url(../images/dock/grey-menu-btn-right-arrow.png) no-repeat top right;
+    padding-right:16px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+
+
+#main_menu_appear { 
+    background: url(../images/dock/grey-menu-middle.png) repeat-y; 
+    position: absolute;
+    top: 25px;
+    right: 8px;
+    z-index: 2;
+    -moz-border-radius-topleft: 5px;
+    -webkit-border-top-left-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -moz-border-radius-bottomright: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    visibility: hidden;
+    width: 160px;
+}
+
+
+#main_menu_appear div div {
+    font-size:9pt;
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+}
+
+
+#main_menu_appear ul {
+    margin: 0;
+    padding: 10px 10px 5px 10px;
+}
+
+
+
+#main_menu_appear li {
+    list-style: none;
+    padding-bottom: 5px;
+}
+
+
+#main_menu_appear li a {
+    font-family: arial;
+    font-weight: bold;
+    color: #ffffff;
+    text-decoration: none;
+    padding-left: 20px;
+}
+
+
+#main_menu_appear li.add-content {
+    background:url("../images/dock/menu-icon-plus.png") no-repeat;
+}
+
+#main_menu_appear li.layout {
+    background:url("../images/dock/grey-menu-placeholder-icon.png") no-repeat;
+}
+
+#main_menu_appear li.page-settings {
+
+	background:url("../images/dock/grey-menu-placeholder-icon.png") no-repeat;
+
+}
+
+
+/* -------- MAIN CORP THEME STYLES ENDS HERE Do Not Touch or Add! -------- */
+/* -------- Panel Step CSS Starts Here -------- */
+
+.hide-page {
+    display: none;
+}
+
+.show-page {
+    display: block;
+}
+
+.panel-step-table
+{
+    border-collapse: collapse;
+    height: 30px;
+    vertical-align: top;
+}
+
+.panel-step-first
+{
+    background-repeat: no-repeat;
+    background-position: center center;
+    width: 310px;
+}
+
+.panel-step-text {
+    font-weight: bold;
+    font-size: 13px;
+    color: white;
+    padding-left: 10px;
+    padding-bottom: 1px;
+}
+
+.panel-step-1 {
+    background-image: url(/cps/images/steppanel/ltr/step_01.png);
+    background-position: center center;
+}
+
+.panel-step-2 {
+    background-image: url(/cps/images/steppanel/ltr/step_02.png);
+    background-position: center center;
+}
+
+.panel-step-3 {
+    background-image: url(/cps/images/steppanel/ltr/step_03.png);
+    background-position: center center;
+}
+
+.panel-step-4 {
+    background-image: url(/cps/images/steppanel/ltr/step_04.png);
+    background-position: center center;
+}
+
+.panel-step-5 {
+    background-image: url(/cps/images/steppanel/ltr/step_05.png);
+    background-position: center center;
+}
+
+.panel-step-mid {
+    background-image: url(/cps/images/steppanel/ltr/step_bg.png);
+    background-position: center center;
+    background-repeat: repeat-x;
+}
+
+.panel-step-end {
+    background-image: url(/cps/images/steppanel/ltr/step_right_curve.png);
+    background-position: center center;
+    background-repeat: no-repeat;
+    width: 1px;
+    padding-right: 4px;
+}
+
+.panel-button-row
+{
+    padding-right: 2px;
+}
+
+.sub-padding-default
+{
+    padding-left: 20px;
+}
+
+.error-checkbox
+{
+    outline: 1px solid #FF0000;
+}
+
+.ie .error-checkbox
+{
+    border: 1px solid #FF0000;
+}
+/* -------- Panel Step CSS Ends Here -------- */
+
+/* -------- GCF External Systems Logout Modal Dialog CSS -------- */
+/* this is a modal popup that appears after user hits the Luminis Sign Out button if there are open GCF connections */
+/* see http://www.ericmmartin.com/projects/simplemodal/ for styling options */
+
+/* The modal div */
+#gcfLogoutExternalAppsDiv 
+{
+  display:none;
+}
+
+/* The modal div title bar */
+#gcfLogoutExternalAppsTitle
+{
+  background: url(../images/portlet/portlet-header-top-center.png) repeat-x;
+  line-height: 38px;
+  color: #005C96;
+  font-weight: bold;
+  min-width: 50%;
+  padding: 4px 0 0 15px;
+  font-size: 12px;
+}
+
+/* The modal div content */
+#gcfLogoutExternalAppsContent
+{
+  padding: 10px;
+}
+
+/* Overlay */
+#simplemodal-overlay 
+{
+  background-color:#000; 
+  cursor:wait;
+}
+
+/* Container */
+#simplemodal-container 
+{
+  height:250px; 
+  width:450px; 
+  color:#000; 
+  background-color:#FFF; 
+  border:4px solid #999; 
+  padding:0px;
+}
+#simplemodal-container .simplemodal-data 
+{
+  padding:0px;
+}
+#simplemodal-container code 
+{
+  background:#141414; 
+  border-left:3px solid #65B43D; 
+  color:#bbb; 
+  display:block; 
+  font-size:12px; 
+  margin-bottom:12px; 
+  padding:4px 6px 6px;
+}
+#simplemodal-container a 
+{
+  color:#ddd;
+}
+
+/* -------- End GCF External Systems Logout Modal Dialog CSS -------- */
+
+@import url(osu_theme.css);
+@import url(osu_portlets.css);

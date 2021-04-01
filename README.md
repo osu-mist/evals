@@ -9,64 +9,45 @@ goal-setting and appraisal tasks.
 ---
 1. Using a docker container is recommended and can be found [here](https://github.sig.oregonstate.edu/ecs-data/ansible-private-roles/tree/master/roles/evals_liferay_server_setup). Otherwise instructions are as follows.
 
-2. Java version 1.7.0_80 is the only version I was successful with
+2. Install [blade CLI](https://learn.liferay.com/dxp/7.x/en/developing-applications/tooling/blade-cli/installing-and-updating-blade-cli.html) from Liferay
 
-3. Choose and download a [Liferay version](https://sourceforge.net/projects/lportal/files/Liferay%20Portal/)
-    - Version 6.1.1-ce-ga2 is the current version for prod
-    - Download liferay-portal-tomcat-${version}
-        - 6.2-ce-ga6 is preferred
-    - Download liferay-plugins-sdk-${version}
-        - 6.1.1-ce-ga2 is preferred
-    - Extract both folders to the same directory
-    - Rename "liferay-portal-tomcat-${version}" to "bundles"
-    - If you are using different versions for tomcat and the SDK make sure the `app.server.dir` in
-      liferay-plugins-sdk-${version}/build.properties has the correct tomcat version
-    - If you are running the server locally or not using a docker container:
-        - Add `CATALINA_HOME` to your path pointing to your tomcat directory
-          - `export CATALINA_HOME="bundles/tomcat-${version}"`
-        - Use `$CATALINA_HOME/bin/startup.sh` to start the server
-        - Use `$CATALINA_HOME/bin/shutdown.sh` to stop the server
+3. Create a new directory and use blade to initialize a workspace `blade init -v portal-7.3-ga6`
 
-4. Test Liferay apache server
-    - Open a browser to http://localhost:8080/web/guest/
+4. Initialize and run liferay server `blade server init` `blade server run`
+
+5. (Optional) Setup test database or use existing oracle development server
+    - I used [Mamp](https://www.mamp.info/en/) for a quick and dirty mysql server
+    - Run evals/docroot/WEB-INF/src/edu/osu/cws/evals/tests/test-db.sql
+    - Run evals/docroot/WEB-INF/src/edu/osu/cws/evals/tests/local-dev-env-data.sql
+
+6. Test Liferay apache server
+    - Open a browser to http://localhost:8080
     - Depending on the version of liferay you may not be asked to setup an admin account. In that case below is the default login information.
     - Default login information:
       - username: test@liferay.com
       - password: test
 
-5. Setup test database or use existing oracle development server
-    - I used [Mamp](https://www.mamp.info/en/) for a quick and dirty mysql server
-    - Run evals/docroot/WEB-INF/src/edu/osu/cws/evals/tests/test-db.sql
-    - Run evals/docroot/WEB-INF/src/edu/osu/cws/evals/tests/local-dev-env-data.sql
-
-6. Install Ant version 1.9.6
-    - Current version of Ant does not work with Java 1.7
-    - Using brew:
-        - `brew install ant@1.9`
-        - add ant to path `brew link ant@1.9` (may have to force)
-
-7. Configure EvalS
-    - Navigate to `evals/docroot/WEB-INF/src/`
+7. Clone and Configure EvalS
+    - The evals repo should be cloned to $WORKSPACE/modules/evals
+    - Navigate to `evals/src/main/java`
       - Copy `hibernate-sample.cfg.xml` to `hibernate.cfg.xml` and modify contents
       - Copy `evals.sample.properties` to `evals.properties` and modify contents
-    - Navigate to `evals/docroot/WEB-INF/`
-      - Both `liferay-plugin-package.xml` and `liferay-plugin-package.properties` have a `liferay-versions` attribute. Set both these attributes to match the version of liferay you are using.
-    - Copy `evals/example-build.sh` to `evals/build.sh` and set variables according to your configuration
-
 
 8. Compile EvalS
-    - Run pre-build.sh
-    - A war file will be created and placed in `bundles/deploy/`
-    - A running tomcat server will automatically deploy this to `bundles/tomcat-${version}/webapps/`
-    - If you turned on `DEPLOY_TO_VM` the warfile will automatically be deployed to the specified VM
+    - `blade deploy`
+    - This will place a compiled evals.war in $WORKSPACE/bundles/deploy
+    - If the server is running it will automatically be deployed and you can watch this happen by reading the logs
 
 9. Running EvalS
     - EvalS is a portlet and won't run on its own
-    - Open a browser to http://localhost:8080/web/guest/ and login with the user you setup earlier or the default user
-    - The UI can differ depending on the liferay version you are using but the steps should remain the same
-    - Using the "Add" button in the top left corner add a new page
-    - On that new page, use the "Add" button again and click "More..."
-    - Search for EvalS, then click and drag it onto the page
+    - Open a browser to http://localhost:8080 and login with the user you setup earlier or the default user
+    - The UI can differ depending on the liferay version you are using but the steps should remain the same. These steps are for liferay 7.3.5
+    - Click the button next to "Home" to slide-out the side menu
+    - Under site builder -> pages click the "+" button to add a new public page
+    - Use the "Blank" template and name the page evals
+    - You should now be editing the evals page you just created. On the right hand side click the "Fragments and Widgets" button and find evals on that list and drag it to the page.
+    - Once evals shows up correctly on the page you can publish and begin testing evals
+    - Since these settings are stored in the database you only need to do this when setting up a new liferay server
     - If EvalS is not on the list or it shows an error message, check the logs in `bundles/tomcat-${version}/logs/catalina.out`
     - If using a docker container use `docker logs CONTAINER_NAME` to get logs
 
