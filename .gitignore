@@ -1,9 +1,11 @@
 docroot/WEB-INF/classes/
 *~
 *.swp
-*.cfg.xml
-*.properties
+hibernate.cfg.xml
+evals.properties
 *.iml
 .idea
 *.pyc
 pre-build.sh
+bin
+build
