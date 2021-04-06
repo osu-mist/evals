@@ -27,7 +27,6 @@ public class Evals {
     private static Log _log = LogFactoryUtil.getLog(CriterionArea.class);
 
     protected static ResourceBundle bundle = ResourceBundle.getBundle("content.Language");
-    // protected static ResourceBundle bundle = ResourceBundle.getBundle("edu.osu.cws.evals.portlet.Language");
 
     public boolean validate() throws ModelException {
         String validateMethodName;

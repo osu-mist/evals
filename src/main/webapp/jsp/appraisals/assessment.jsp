@@ -32,10 +32,11 @@
         <c:when test="${goalStatus == 'e'}">
             <label for="<portlet:namespace />appraisal.goal.${assessment.id}"><liferay-ui:message key="appraisal-goals" />
                     ${goalCount}</label>
-            <div style="margin-bottom=0"><aui:input
-              type="textarea"
-              name="appraisal.goal.${assessment.id}"
-                                            value="${assessment.goal}" /></div>
+            <div style="margin-bottom=0">
+              <aui:input type="textarea"
+                         name="appraisal.goal.${assessment.id}"
+                         value="${assessment.goal}" />
+            </div>
         </c:when>
         <c:when test="${goalStatus == 'v'}">
             <fieldset>

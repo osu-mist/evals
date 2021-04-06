@@ -9,7 +9,6 @@ package edu.osu.cws.evals.portlet;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-//import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import edu.osu.cws.evals.hibernate.AppraisalStepMgr;
 import edu.osu.cws.evals.hibernate.PermissionRuleMgr;
@@ -225,7 +224,6 @@ public class EvalsPortlet extends GenericPortlet {
      */
     private void loadResourceBundle() throws MissingResourceException{
         ResourceBundle resources = ResourceBundle.getBundle("content.Language");
-        // ResourceBundle resources = ResourceBundle.getBundle("edu.osu.cws.evals.portlet.Language");
         getPortletContext().setAttribute("resourceBundle", resources);
     }
 

@@ -110,7 +110,6 @@
 }
 
 .osu-cws label {
-  /* display: block; */
   clear: both;
   padding-right: 1em;
   color: #666;
@@ -118,8 +117,6 @@
 }
 
 .input-text-wrapper {
-  /* margin-left: 0;
-  margin-right: 0; */
   display: flex;
 }
 
