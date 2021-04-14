@@ -75,12 +75,6 @@
             appraisals
         WHERE
             STATUS in ('reviewDue' , 'reviewOverdue')
-            AND JOB_PIDM =
-            (SELECT PYVPASJ_PIDM from PYVPASJ
-             WHERE JOB_PIDM=PYVPASJ_PIDM
-             AND POSITION_NUMBER=PYVPASJ_POSN
-             AND JOB_SUFFIX=PYVPASJ_SUFF
-             AND PYVPASJ_BCTR_TITLE=:bcName)
     ]]></sql-query>
     <sql-query name="report.allActiveOSU"><![CDATA[
             SELECT
@@ -196,7 +190,6 @@
             edu.osu.cws.evals.models.Appraisal
         WHERE
             status IN ('reviewDue', 'reviewOverdue')
-            AND job.businessCenterName = :bc
     ]]></query>
     <query name="appraisal.getTrialAppraisal"><![CDATA[
         from edu.osu.cws.evals.models.Appraisal
