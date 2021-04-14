@@ -181,4 +181,12 @@ public class ReviewerMgr {
                 .list();
         return results;
     }
+
+    public static List<Reviewer> getReviewers() throws Exception {
+        Session session = HibernateUtil.getCurrentSession();
+        String query = "from edu.osu.cws.evals.models.Reviewer";
+        List<Reviewer> results = (List<Reviewer>) session.createQuery(query)
+                .list();
+        return results;
+    }
 }
