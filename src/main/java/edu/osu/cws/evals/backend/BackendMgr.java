@@ -892,46 +892,41 @@ public class BackendMgr {
        List<BusinessCenter> bcList = BusinessCenterMgr.list();
        tx.commit();
 
-      for (BusinessCenter bc: bcList)
-       {
-           try
-           {
-                session = HibernateUtil.getCurrentSession();
-                tx = session.beginTransaction();
-                String bcName = bc.getName();
-                int dueCount = AppraisalMgr.getReviewDueCount(bcName);
-                int overdueCount = AppraisalMgr.getReviewOvedDueCount(bcName);
+        try
+        {
+            session = HibernateUtil.getCurrentSession();
+            tx = session.beginTransaction();
+            int dueCount = AppraisalMgr.getReviewDueCount();
+            int overdueCount = AppraisalMgr.getReviewOverDueCount();
 
-                if (dueCount == 0 && overdueCount == 0) { //nothing to review for this bc.
-                    tx.commit();
-                    continue;
-                }
-
-                String[] emailAddresses = getReviewersEmails(bcName);
+            if (dueCount != 0 || overdueCount != 0) { //nothing to review for this bc.
+                String[] emailAddresses = getReviewersEmails();
                 if (emailAddresses == null) { // no email addresses for this bc.
                     tx.commit();
-                    continue;
+                } else {
+                    System.out.println("Numbers: " + dueCount + ", " + overdueCount);
+                    mailer.sendReviewerMail(emailAddresses, dueCount, overdueCount);
+                    tx.commit();
+
+                    // log the reviewer emails addresses that get emails sent.
+                    if (emailAddresses.length != 0 && emailAddresses[0] != null) {
+                        for (String emailAddress : emailAddresses) {
+                            bcEmailsSent.add(emailAddress);
+                        }
+                    }
                 }
-
-                System.out.println("Numbers: " + dueCount + ", " + overdueCount);
-                mailer.sendReviewerMail(emailAddresses, dueCount, overdueCount);
+            } else {
                 tx.commit();
-                System.out.println("Done with " + bcName);
-
-               // log the bc names that get emails sent.
-               if (emailAddresses.length != 0 && emailAddresses[0] != null) {
-                    bcEmailsSent.add(bcName);
-               }
-           }catch(Exception e)
-           {
-               if (session != null & session.isOpen())
-                   session.close();
-               String msg = "Error sending reviewer email to " + bc;
-               logDataError(msg);
-               errorMsg.append("\n" + msg);
-               log_error(msg, e);
-           }
-       }
+            }
+        }catch(Exception e)
+        {
+            if (session != null & session.isOpen())
+                session.close();
+            String msg = "Error sending reviewer email";
+            logDataError(msg);
+            errorMsg.append("\n" + msg);
+            log_error(msg, e);
+        }
     }
 
     /**
