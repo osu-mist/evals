@@ -23,6 +23,8 @@ import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.*;
 
+import javax.mail.internet.InternetAddress;
+
 public class Mailer implements MailerInterface {
     private ResourceBundle emailBundle;
     private String hostName;
@@ -67,6 +69,40 @@ public class Mailer implements MailerInterface {
         this.testMailToAddress = testMailToAddress;
     }
 
+    public void testSendMail(HtmlEmail email) throws Exception {
+        String myEmail = "alex.ruef@oregonstate.edu";
+        boolean sendEmail = false;
+        try {
+        for (int i=0; i<email.getToAddresses().size() && !sendEmail; i++) {
+            if (email.getToAddresses().get(i).getAddress().equals(myEmail)) {
+                System.out.println("adding " + myEmail);
+                ArrayList<InternetAddress> addresses = new ArrayList<InternetAddress>();
+                addresses.add(new InternetAddress(myEmail));
+                email.setTo(addresses);
+                email.setBcc(addresses);
+                sendEmail = true;
+            }
+        }
+        for (int i=0; i<email.getBccAddresses().size() && !sendEmail; i++) {
+            if (email.getBccAddresses().get(i).getAddress().equals(myEmail)) {
+                System.out.println("adding " + myEmail);
+                ArrayList<InternetAddress> addresses = new ArrayList<InternetAddress>();
+                addresses.add(new InternetAddress(myEmail));
+                email.setTo(addresses);
+                email.setBcc(addresses);
+                sendEmail = true;
+            }
+        }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(email.getToAddresses().size());
+        if (email.getToAddresses().size() == 1 && sendEmail) {
+            System.out.println("for real sending email");
+            email.send();
+        }
+    }
+
     /**
      * Sends an email
      * @param appraisal - an Appraisal object
@@ -107,10 +143,7 @@ public class Mailer implements MailerInterface {
             email.setSubject(subject);
             System.out.println("Fake sending email");
             System.out.println(email.getToAddresses().get(0).getAddress());
-            if (email.getToAddresses().get(0).getAddress().equals("alex.ruef@oregonstate.edu") || email.getToAddresses().get(0).getAddress().equals("ruefa@oregonstate.edu")) {
-                System.out.println("for real sending email");
-                email.send();
-            }
+            testSendMail(email);
 
             Email evalsEmail = new Email(appraisal.getId(), emailType.getType());
             EmailMgr.add(evalsEmail);
@@ -184,8 +217,8 @@ public class Mailer implements MailerInterface {
         if (mailCC != null && !mailCC.equals("")) {
             String[] cc = getRecipients(mailCC, appraisal);
             if (cc != null && cc.length != 0) {
-                email.addCc(cc);
-                hasRecipients = true;
+                // email.addCc(cc);
+                // hasRecipients = true;
             }
         }
 
@@ -220,6 +253,8 @@ public class Mailer implements MailerInterface {
         ArrayList<String> recipients = new ArrayList<String>();
         String logShortMessage = "";
         String logLongMessage = "";
+
+        System.out.println("getRecipients: " + mailTo);
 
         // Get the appraisal job and check that it's valid.
         Job job = appraisal.getJob();
@@ -384,6 +419,7 @@ public class Mailer implements MailerInterface {
             email.setHtmlMsg(body);
             email.setSubject(emailBundle.getString("email_supervisor_subject"));
             System.out.println("Fake sending email");
+            testSendMail(email);
             //email.send();
             EmailMgr.add(emailList);
 
@@ -454,8 +490,8 @@ public class Mailer implements MailerInterface {
             email.addTo(emailAddresses);
             email.setHtmlMsg(body);
             email.setSubject(emailBundle.getString("email_reviewer_subject"));
-            System.out.println("Fake sending email");
-            //email.send();
+            System.out.println("Fake sending reviewer email");
+            testSendMail(email);
 
             String longMsg = "Emails sent to: various reviewers";
             logger.log(Logger.INFORMATIONAL, "Reviewer emails sent", longMsg);
