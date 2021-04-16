@@ -314,7 +314,7 @@ public class Mailer implements MailerInterface {
         String bodyWrapper = emailBundle.getString("email_body");
         String bodyContent = getStatusMsg(appraisal, emailType);
         return MessageFormat.format(bodyWrapper, addressee,
-                bodyContent, getBusinessCenterDescriptor(appraisal), linkURL, linkURL, helpLinkURL, helpLinkURL);
+                bodyContent, linkURL, linkURL, helpLinkURL, helpLinkURL);
     }
 
 
@@ -347,11 +347,6 @@ public class Mailer implements MailerInterface {
     public void sendSupervisorMail(Employee supervisor, String middleBody,
                                    List<Email> emailList) {
         try {
-            String bcDescritor = getBCDescriptor(supervisor);
-            if (bcDescritor == null) {
-                return;
-            }
-
             String supervisorName = supervisor.getConventionName();
             String emailAddress = supervisor.getEmail();
 
@@ -735,8 +730,7 @@ public class Mailer implements MailerInterface {
      */
     private String reviewDueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_reviewDue_body");
-                String businessCenterName = appraisal.getJob().getBusinessCenterName();
-        int dueCount = AppraisalMgr.getReviewDueCount(businessCenterName);
+        int dueCount = AppraisalMgr.getReviewDueCount();
         return MessageFormat.format(bodyString, dueCount);
     }
 
@@ -748,9 +742,7 @@ public class Mailer implements MailerInterface {
      */
     private String reviewOverdueBody(Appraisal appraisal) throws Exception {
         String bodyString = emailBundle.getString("email_reviewOverdue_body");
-        String businessCenterName = appraisal.getJob().getBusinessCenterName();
-        //AppraisalMgr.getReviewDueCount(businessCenterName);
-        int dueCount = AppraisalMgr.getReviewOvedDueCount(businessCenterName);
+        int dueCount = AppraisalMgr.getReviewOverDueCount();
         return MessageFormat.format(bodyString, dueCount);
     }
 
@@ -952,18 +944,6 @@ public class Mailer implements MailerInterface {
         String bodyString = emailBundle.getString("email_classifiedITNoIncrease_body");
         String sed = new DateTime(appraisal.getSalaryEligibilityDate()).toString("MM/dd");
         return MessageFormat.format(bodyString, employeeName, sed, daysToNotifyEmployee);
-    }
-
-    /**
-     * Fetch the business center descriptor
-     * @param appraisal
-     * @return
-     */
-    private String getBusinessCenterDescriptor(Appraisal appraisal) {
-        Job job = appraisal.getJob();
-        String bcName = job.getBusinessCenterName();
-        String bcKey = "businesscenter_" + bcName + "_descriptor";
-        return emailBundle.getString(bcKey);
     }
 
     /**
