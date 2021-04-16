@@ -193,7 +193,7 @@ public class BackendMgr {
                 // Do we need to create an annual appraisal today?
                 handleAnnualCreation(job);
                 tx.commit();
-            }catch(Exception e)
+            } catch(Exception e)
             {
                if (session != null && session.isOpen())
                    session.close();
@@ -575,7 +575,7 @@ public class BackendMgr {
 
                 sendCompletionReminders(appraisal);
                 tx.commit();
-            }catch(Exception e)
+            } catch(Exception e)
             {
                 if (session != null && session.isOpen())
                     session.close();
@@ -918,7 +918,7 @@ public class BackendMgr {
             } else {
                 tx.commit();
             }
-        }catch(Exception e)
+        } catch(Exception e)
         {
             if (session != null & session.isOpen())
                 session.close();
