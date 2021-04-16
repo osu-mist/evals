@@ -936,12 +936,12 @@ public class BackendMgr {
      * @return
      * @throws Exception
      */
-    private String[] getReviewersEmails(String bcName) throws Exception {
+    private String[] getReviewersEmails() throws Exception {
         ArrayList<String> emailAddresses = new ArrayList<String>();
-        List<Reviewer> reviewers = ReviewerMgr.getReviewers(bcName);
+        List<Reviewer> reviewers = ReviewerMgr.getReviewers();
 
         if (reviewers.size() == 0) {
-            logDataError("No reviewers in BC: " + bcName);
+            logDataError("No reviewers found");
             return null;
         } else {
             for (Reviewer reviewer : reviewers) {
@@ -950,7 +950,7 @@ public class BackendMgr {
         }
 
         System.out.println("There are " + emailAddresses.size() + " reviewers.");
-        System.out.println("first email address = " + emailAddresses.get(0) + ". BC name = " + bcName);
+        System.out.println("first email address = " + emailAddresses.get(0));
         return emailAddresses.toArray(new String[emailAddresses.size()]);
     }
 
@@ -1133,7 +1133,7 @@ public class BackendMgr {
                 if (bcName.equals("OHR")) {
                     emailAddresses = getAdminEmails();
                 } else {
-                    emailAddresses = getReviewersEmails(bcName);
+                    emailAddresses = getReviewersEmails();
                 }
 
                 if (emailAddresses == null) { // no email addresses for the report
