@@ -361,7 +361,7 @@ public class Mailer implements MailerInterface {
 
             String bodyWrapper = emailBundle.getString("email_body");
             String body = MessageFormat.format(bodyWrapper, supervisorName,
-                        middleBody, bcDescritor, linkURL, linkURL, helpLinkURL, helpLinkURL);
+                        middleBody, linkURL, linkURL, helpLinkURL, helpLinkURL);
 
             HtmlEmail email = getHtmlEmail();
             email.addTo(emailAddress);
