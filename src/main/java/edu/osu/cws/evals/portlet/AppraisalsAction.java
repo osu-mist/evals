@@ -158,10 +158,7 @@ public class AppraisalsAction implements ActionInterface {
 
         Reviewer reviewer  = actionHelper.getReviewer();
         if (reviewer != null) {
-            String bcName  = appraisal.getJob().getBusinessCenterName();
-            if (bcName.equals(reviewer.getBusinessCenterName())) {
-                return ActionHelper.ROLE_REVIEWER;
-            }
+            return ActionHelper.ROLE_REVIEWER;
         }
 
         // check admin role first because there are few admins and some jobs have a missing supervisor in the chain

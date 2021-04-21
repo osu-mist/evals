@@ -539,17 +539,6 @@ public class AppraisalsTest {
     public void shouldOnlyCreateAnnualAppraisalIfAndOnlyIfAnnualIndIsSet() {}
 
     @Test(groups={"pending"})
-    public void shouldCorrectlyCountReviewsDueBydBC() throws Exception {
-        assert AppraisalMgr.getReviewDueCount("AABC") == 0;
-        assert AppraisalMgr.getReviewDueCount("UABC") != 0;    }
-
-    @Test(groups={"pending"})
-    public void shouldCorrectlyCountReviewsOverueBydBC() throws Exception {
-        assert AppraisalMgr.getReviewOvedDueCount("AABC") == 0;
-        assert AppraisalMgr.getReviewOvedDueCount("UABC") != 0;
-    }
-
-    @Test(groups={"pending"})
     public void shouldDetectIfAJobHasTrialAppraisal() throws Exception {
         //@todo: test trialAppraisalExists
     }
