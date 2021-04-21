@@ -207,10 +207,6 @@ public class AppraisalsAction implements ActionInterface {
             actionHelper.addErrorsToRequest(resource.getString("appraisal-search-enter-id"));
         } else {
             String bcName = "";
-            if (isReviewer) {
-                bcName = actionHelper.getReviewer().getBusinessCenterName();
-            }
-
             try {
                 appraisals = AppraisalMgr.search(searchTerm, pidm, isSupervisor, bcName);
 
