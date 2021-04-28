@@ -242,6 +242,7 @@ public class EvalsOnbase {
     // create attributes text form
     JSONObject attributes = new JSONObject();
     attributes.put("DocumentType", docType);
+    attributes.put("FileType", "PDF");
     attributes.put("Comment", pdfName);
     attributes.put("IndexKey", employeeId);
 
