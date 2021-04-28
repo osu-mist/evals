@@ -986,7 +986,7 @@ public class AppraisalsAction implements ActionInterface {
         if (insertRecordIntoTable) {
             String onlyFilename = filename.replaceFirst(dirName, "");
             EvalsOnbase onbase = (EvalsOnbase) actionHelper.getPortletContext().getAttribute("onbase");
-            onbase.postPDF(onlyFilename);
+            onbase.postPDF(onlyFilename, appraisal.getJob().getEmployee().getId());
             NolijCopyMgr.add(appraisal.getId(), onlyFilename);
         }
 

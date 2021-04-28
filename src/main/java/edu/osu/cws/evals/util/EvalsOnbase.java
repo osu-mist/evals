@@ -220,7 +220,7 @@ public class EvalsOnbase {
     * @throws MalformedURLException
     * @throws ParseException
     */
-  public void postPDF(String pdfName) throws IOException, MalformedURLException, ParseException {
+  public void postPDF(String pdfName, int employeeId) throws IOException, MalformedURLException, ParseException {
     boundary = "---" + System.currentTimeMillis() + "---";
 
     checkBearerToken();
@@ -240,7 +240,7 @@ public class EvalsOnbase {
     JSONObject attributes = new JSONObject();
     attributes.put("DocumentType", "TEST - Sample Paper Form");
     attributes.put("Comment", pdfName);
-    attributes.put("IndexKey", "999999999");
+    attributes.put("IndexKey", employeeId);
 
     // write attributes portion
     writeAttribute(writer, attributes.toString());
