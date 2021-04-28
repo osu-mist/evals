@@ -27,6 +27,7 @@ public class EvalsOnbase {
 
   private String boundary;
   private String pdfDestination;
+  private String docType;
 
   /**
     * Constructor for onbase API requests
@@ -41,12 +42,14 @@ public class EvalsOnbase {
                      String clientSecret,
                      String oauth2Url,
                      String onbaseDocsUrl,
-                     String pdfDestination) {
+                     String pdfDestination,
+                     String docType) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.oauth2Url = oauth2Url;
     this.onbaseDocsUrl = onbaseDocsUrl;
     this.pdfDestination = pdfDestination;
+    this.docType = docType;
   };
 
   /**
@@ -238,7 +241,7 @@ public class EvalsOnbase {
 
     // create attributes text form
     JSONObject attributes = new JSONObject();
-    attributes.put("DocumentType", "TEST - Sample Paper Form");
+    attributes.put("DocumentType", docType);
     attributes.put("Comment", pdfName);
     attributes.put("IndexKey", employeeId);
 
