@@ -262,15 +262,4 @@ public class EvalsOnbase {
 
     conn.disconnect();
   }
-
-  public void getDoc() throws IOException, MalformedURLException, ParseException {
-    checkBearerToken();
-    HttpsURLConnection conn = openConnection(onbaseDocsUrl + "115542");
-    setAuthHeader(conn);
-
-    JSONObject response = readResponse(conn);
-    System.out.println(response.toString());
-
-    conn.disconnect();
-  }
 }
