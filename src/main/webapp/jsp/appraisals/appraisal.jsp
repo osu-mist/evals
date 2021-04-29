@@ -134,11 +134,11 @@
     <%@ include file="/jsp/appraisals/info.jsp"%>
 
     <c:if test="${showForm}">
+    <!-- sign-appraisal value should be set on click but is not in Firefox. Explicitly setting it here -->
     <form class="appraisal ${appraisal.status}" id="<portlet:namespace />fm"
         action="<portlet:actionURL windowState="<%= WindowState.NORMAL.toString() %>">
         <portlet:param name="action" value="update" />
         <portlet:param name="controller" value="AppraisalsAction" />
-        <!-- This value should be set on click but is not in Firefox. Explicitly setting it here -->
         <c:if test="${permissionRule.submit == 'sign-appraisal'}">
           <portlet:param name="sign-appraisal" value="sign-appraisal" />
         </c:if>
