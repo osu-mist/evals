@@ -80,7 +80,6 @@ public class Constants {
 
     public static final int MAX_ERROR_COUNT = 500;  //# of errors before aborting
     public static final String EMAIL_BUNDLE_FILE = "content.Email";
-    // public static final String EMAIL_BUNDLE_FILE = "edu.osu.cws.evals.portlet.Email";
 
     public static final String PROPERTIES_FILENAME = "evals.properties";
 

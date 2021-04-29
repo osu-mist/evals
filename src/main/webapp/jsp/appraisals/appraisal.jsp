@@ -138,6 +138,10 @@
         action="<portlet:actionURL windowState="<%= WindowState.NORMAL.toString() %>">
         <portlet:param name="action" value="update" />
         <portlet:param name="controller" value="AppraisalsAction" />
+        <!-- This value should be set on click but is not in Firefox. Explicitly setting it here -->
+        <c:if test="${permissionRule.submit == 'sign-appraisal'}">
+          <portlet:param name="sign-appraisal" value="sign-appraisal" />
+        </c:if>
         </portlet:actionURL>" method="post" name="<portlet:namespace />request_form">
 
         <input type="hidden" id="id" name="id" value="${appraisal.id}"/>

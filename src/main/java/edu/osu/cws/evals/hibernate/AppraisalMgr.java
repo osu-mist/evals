@@ -562,8 +562,7 @@ public class AppraisalMgr {
     //@todo: Joan: don't do anything with job.endDate, that's not reliable.
     public static ArrayList<Appraisal> getReviews(String businessCenterName, int maxResults) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
-        Query hibernateQuery = session.getNamedQuery("appraisal.getReviews")
-                .setString("bc", businessCenterName);
+        Query hibernateQuery = session.getNamedQuery("appraisal.getReviews");
         //@todo: Joan: can we set the maxResults before querying the database?
         if (maxResults > 0) {
             hibernateQuery.setMaxResults(maxResults);
@@ -583,7 +582,6 @@ public class AppraisalMgr {
         int reviewCount = 0;
         Session session = HibernateUtil.getCurrentSession();
         List results = session.getNamedQuery("appraisal.reviewCount")
-                .setString("bcName", businessCenterName)
                 .list();
         if (!results.isEmpty()) {
             reviewCount = Integer.parseInt(results.get(0).toString());
@@ -595,8 +593,8 @@ public class AppraisalMgr {
      * @param bcName: name of the business center
      * @return  the number of appraisals that are due for review for a business center.
      */
-    public static int getReviewDueCount(String bcName) throws Exception {
-        return getReviewCountByStatus(bcName, Appraisal.STATUS_REVIEW_DUE);
+    public static int getReviewDueCount() throws Exception {
+        return getReviewCountByStatus(Appraisal.STATUS_REVIEW_DUE);
     }
 
     /**
@@ -607,14 +605,13 @@ public class AppraisalMgr {
      * @return
      * @throws Exception
      */
-    private static int getReviewCountByStatus(String bcName, String status) throws Exception {
+    private static int getReviewCountByStatus(String status) throws Exception {
         Session session = HibernateUtil.getCurrentSession();
         String query = "select count(*) "+
-                "from edu.osu.cws.evals.models.Appraisal where job.businessCenterName = :bc " +
-                "and status in (:status) and job.endDate is NULL";
+                "from edu.osu.cws.evals.models.Appraisal where status in (:status) " +
+                "and job.endDate is NULL";
 
         Object countObj = session.createQuery(query)
-                .setString("bc", bcName)
                 .setString("status", status)
                 .list().get(0);
 
@@ -625,8 +622,8 @@ public class AppraisalMgr {
      * @param bcName: name of the business center
      * @return  the number of appraisals that are overdue for review for a business center.
      */
-    public static int getReviewOvedDueCount(String bcName) throws Exception {
-        return getReviewCountByStatus(bcName, Appraisal.STATUS_REVIEW_OVERDUE);
+    public static int getReviewOverDueCount() throws Exception {
+        return getReviewCountByStatus(Appraisal.STATUS_REVIEW_OVERDUE);
     }
 
     /**

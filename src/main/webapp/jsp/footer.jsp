@@ -57,6 +57,15 @@
                 buttonText = jQuery(this).html();
             }
 
+            // Clicking the link no longer sets the url in this case. set it here
+            if (buttonText === 'Send Evaluation to Nolij') {
+              var actionUrl = Liferay.Util.PortletURL.createActionURL(Liferay.currentURL, {
+                'action': 'resendAppraisalToNolij',
+                'controller': 'AppraisalsAction',
+              });
+              this.href = actionUrl;
+            }
+
             var response = <portlet:namespace/>confirmBox(buttonText);
             if (response) {
                 Liferay.Util.forcePost(this);

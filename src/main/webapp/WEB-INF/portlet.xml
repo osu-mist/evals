@@ -73,9 +73,7 @@
 		<supports>
 			<mime-type>text/html</mime-type>
 		</supports>
-    <!--<resource-bundle>edu.osu.cws.evals.portlet.Language</resource-bundle>-->
     <resource-bundle>content.Language</resource-bundle>
-    <!--<resource-bundle>content.Email</resource-bundle>-->
 		<portlet-info>
 			<title>EvalS</title>
 			<short-title>evals</short-title>

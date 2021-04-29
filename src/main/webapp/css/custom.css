@@ -3543,13 +3543,11 @@ body.portlet {
 }
 
 .portlet-topper {
-	/* background: url(../images/portlet/portlet-header-top-left.png) repeat-x; */
 	line-height: 38px;
 	list-style: none;
 }
 
 .ie .portlet-topper {
-	/* background: url(../images/portlet/portlet-header-top-left.png) repeat-x; */
 	line-height: 38px;
 	list-style: none;
 	position: relative;

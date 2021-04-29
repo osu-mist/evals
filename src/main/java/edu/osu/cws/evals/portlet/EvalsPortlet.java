@@ -9,7 +9,6 @@ package edu.osu.cws.evals.portlet;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-//import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import edu.osu.cws.evals.hibernate.AppraisalStepMgr;
 import edu.osu.cws.evals.hibernate.PermissionRuleMgr;
@@ -225,8 +224,21 @@ public class EvalsPortlet extends GenericPortlet {
      */
     private void loadResourceBundle() throws MissingResourceException{
         ResourceBundle resources = ResourceBundle.getBundle("content.Language");
-        // ResourceBundle resources = ResourceBundle.getBundle("edu.osu.cws.evals.portlet.Language");
         getPortletContext().setAttribute("resourceBundle", resources);
+    }
+
+    private EvalsOnbase createOnbase() throws Exception {
+      PropertiesConfiguration config = actionHelper.getEvalsConfig();
+      EvalsOnbase onbase = new EvalsOnbase(
+        config.getString("onbase.clientId"),
+        config.getString("onbase.clientSecret"),
+        config.getString("onbase.oauth2Url"),
+        config.getString("onbase.onbaseDocsUrl"),
+        config.getString("pdf.nolijDir"),
+        config.getString("onbase.docType")
+      );
+
+      return onbase;
     }
 
     /**
@@ -278,6 +290,8 @@ public class EvalsPortlet extends GenericPortlet {
                 message += "Stored Ratings in portlet context\n";
                 loadResourceBundle();
                 message += "Stored resource bundle Language.properties in portlet context\n";
+                getPortletContext().setAttribute("onbase", createOnbase());
+                message += "Stored Evals Onbase in portlet context\n";
 
                 // get extra fields to log
                 fields = getExtraLoggingFields(request);

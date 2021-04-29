@@ -160,11 +160,8 @@ public class AppraisalsAction implements ActionInterface {
 
         Reviewer reviewer  = actionHelper.getReviewer();
         if (reviewer != null) {
-            String bcName  = appraisal.getJob().getBusinessCenterName();
-            if (bcName.equals(reviewer.getBusinessCenterName())) {
-                System.out.println("reviewer role");
-                return ActionHelper.ROLE_REVIEWER;
-            }
+            System.out.println("reviewer role");
+            return ActionHelper.ROLE_REVIEWER;
         }
 
         // check admin role first because there are few admins and some jobs have a missing supervisor in the chain
@@ -213,10 +210,6 @@ public class AppraisalsAction implements ActionInterface {
             actionHelper.addErrorsToRequest(resource.getString("appraisal-search-enter-id"));
         } else {
             String bcName = "";
-            if (isReviewer) {
-                bcName = actionHelper.getReviewer().getBusinessCenterName();
-            }
-
             try {
                 appraisals = AppraisalMgr.search(searchTerm, pidm, isSupervisor, bcName);
 
@@ -374,15 +367,22 @@ public class AppraisalsAction implements ActionInterface {
 
         PropertiesConfiguration config;
         try {
-            processUpdateRequest(request.getParameterMap());
 
             if (downloadToNolij()) {
                 config = actionHelper.getEvalsConfig();
                 String nolijDir = config.getString("pdf.nolijDir");
                 String env = config.getString("pdf.env");
                 String suffix = config.getString("pdf.suffixProfessionalFaculty");
-                GeneratePDF(appraisal, nolijDir, env, suffix, true);
+                try {
+                  GeneratePDF(appraisal, nolijDir, env, suffix, true);
+                } catch (Exception e) {
+                  String errorMsg = "Error uploading PDF. Please try again or contact your supervisor if the error persists";
+                  actionHelper.addErrorsToRequest(errorMsg);
+                  return homeAction.display(request, response);
+                }
             }
+
+            processUpdateRequest(request.getParameterMap());
 
             if (appraisal.getRole().equals(ActionHelper.ROLE_SUPERVISOR)) {
                 actionHelper.setupMyTeamActiveAppraisals();
@@ -988,9 +988,11 @@ public class AppraisalsAction implements ActionInterface {
         EvalsPDF PdfGenerator = new EvalsPDF(rootDir, appraisal, resource, dirName, env, suffix, ratings);
         String filename = PdfGenerator.createPDF();
 
-        // Insert a record into the nolij_copies table
+        // Insert a record into the nolij_copies table and upload to onbase
         if (insertRecordIntoTable) {
             String onlyFilename = filename.replaceFirst(dirName, "");
+            EvalsOnbase onbase = (EvalsOnbase) actionHelper.getPortletContext().getAttribute("onbase");
+            onbase.postPDF(onlyFilename, appraisal.getJob().getEmployee().getId());
             NolijCopyMgr.add(appraisal.getId(), onlyFilename);
         }
 
