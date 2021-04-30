@@ -1,5 +1,7 @@
 package edu.osu.cws.evals.util;
 
+import edu.osu.cws.evals.models.Employee;
+import edu.osu.cws.evals.models.Job;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.MalformedURLException;
@@ -9,6 +11,7 @@ import java.util.Calendar;
 import javax.xml.bind.DatatypeConverter;
 import javax.net.ssl.HttpsURLConnection;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
 import org.json.simple.parser.*;
 
 public class EvalsOnbase {
@@ -215,6 +218,14 @@ public class EvalsOnbase {
     writer.flush();
   }
 
+  private JSONObject createKeyword(String name, String value) {
+      JSONObject keyword = new JSONObject();
+      keyword.put("name", name);
+      keyword.put("value", value);
+
+      return keyword;
+  }
+
   /**
     * Perform multipart form post for evals PDFs
     *
@@ -223,7 +234,8 @@ public class EvalsOnbase {
     * @throws MalformedURLException
     * @throws ParseException
     */
-  public void postPDF(String pdfName, int employeeId) throws IOException, MalformedURLException, ParseException {
+  public void postPDF(String pdfName, Job job) throws IOException, MalformedURLException, ParseException {
+    Employee employee = job.getEmployee();
     boundary = "---" + System.currentTimeMillis() + "---";
 
     checkBearerToken();
@@ -244,7 +256,14 @@ public class EvalsOnbase {
     attributes.put("DocumentType", docType);
     attributes.put("FileType", "PDF");
     attributes.put("Comment", pdfName);
-    attributes.put("IndexKey", employeeId);
+    attributes.put("IndexKey", employee.getOsuid());
+
+    // add keywords attribute
+    JSONArray keywords = new JSONArray();
+    keywords.add(createKeyword("BIO - OSU ID", String.valueOf(employee.getOsuid())));
+    keywords.add(createKeyword("BIO - Name Last", employee.getLastName()));
+    keywords.add(createKeyword("BIO - Name First", employee.getFirstName()));
+    attributes.put("keywords", keywords);
 
     // write attributes portion
     writeAttribute(writer, attributes.toString());
