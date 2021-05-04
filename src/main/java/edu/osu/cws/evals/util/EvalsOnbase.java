@@ -218,6 +218,13 @@ public class EvalsOnbase {
     writer.flush();
   }
 
+  /**
+    * Create JSONObject for onbase keywords
+    *
+    * @param name Keyword name
+    * @param value Keyword value
+    * @return
+    */
   private JSONObject createKeyword(String name, String value) {
       JSONObject keyword = new JSONObject();
       keyword.put("name", name);
