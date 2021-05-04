@@ -292,6 +292,8 @@ public class EvalsOnbase {
     keywords.add(createKeyword("BIO - OSU ID", String.valueOf(employee.getOsuid())));
     keywords.add(createKeyword("BIO - Name Last", employee.getLastName()));
     keywords.add(createKeyword("BIO - Name First", employee.getFirstName()));
+    keywords.add(createKeyword("Business Center Code", job.getBusinessCenterName()));
+    keywords.add(createKeyword("HR - ECLS - Empl", job.getJobEcls()));
     attributes.put("keywords", keywords);
 
     // write attributes portion
