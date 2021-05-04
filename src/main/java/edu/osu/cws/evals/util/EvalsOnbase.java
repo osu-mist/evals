@@ -30,7 +30,9 @@ public class EvalsOnbase {
 
   private String boundary;
   private String pdfDestination;
-  private String docType;
+
+  private String classifiedDocType;
+  private String rankedDocType;
 
   /**
     * Constructor for onbase API requests
@@ -46,13 +48,15 @@ public class EvalsOnbase {
                      String oauth2Url,
                      String onbaseDocsUrl,
                      String pdfDestination,
-                     String docType) {
+                     String classifiedDocType,
+                     String rankedDocType) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.oauth2Url = oauth2Url;
     this.onbaseDocsUrl = onbaseDocsUrl;
     this.pdfDestination = pdfDestination;
-    this.docType = docType;
+    this.classifiedDocType = classifiedDocType;
+    this.rankedDocType = rankedDocType;
   };
 
   /**
@@ -236,6 +240,24 @@ public class EvalsOnbase {
   /**
     * Perform multipart form post for evals PDFs
     *
+    * @param appointmentType Employees job appointment type
+    * @return
+    */
+  private String getDocType(String appointmentType) {
+      String docType;
+
+      if (appointmentType.startsWith("Classified")) {
+          docType = classifiedDocType;
+      } else {
+          docType = rankedDocType;
+      }
+
+      return docType;
+  }
+
+  /**
+    * Perform multipart form post for evals PDFs
+    *
     * @param pdfName name of PDF file to post
     * @throws IOException
     * @throws MalformedURLException
@@ -260,7 +282,7 @@ public class EvalsOnbase {
 
     // create attributes text form
     JSONObject attributes = new JSONObject();
-    attributes.put("DocumentType", docType);
+    attributes.put("DocumentType", getDocType(job.getAppointmentType()));
     attributes.put("FileType", "PDF");
     attributes.put("Comment", pdfName);
     attributes.put("IndexKey", employee.getOsuid());
