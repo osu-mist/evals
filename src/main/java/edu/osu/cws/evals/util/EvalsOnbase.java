@@ -263,7 +263,7 @@ public class EvalsOnbase {
     * @throws MalformedURLException
     * @throws ParseException
     */
-  public void postPDF(String pdfName, Job job) throws IOException, MalformedURLException, ParseException {
+  public void postPDF(String pdfName, Job job) throws Exception {
     Employee employee = job.getEmployee();
     boundary = "---" + System.currentTimeMillis() + "---";
 
@@ -309,6 +309,12 @@ public class EvalsOnbase {
 
     JSONObject response = readResponse(conn);
     System.out.println(response.toString());
+
+    if (response.containsKey("errors")) {
+        JSONArray errors = (JSONArray)response.get("errors");
+        JSONObject error = (JSONObject)errors.get(0);
+        throw new Exception((String)error.get("detail"));
+    }
 
     conn.disconnect();
   }
