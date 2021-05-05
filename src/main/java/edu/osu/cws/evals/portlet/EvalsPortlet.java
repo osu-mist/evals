@@ -235,7 +235,8 @@ public class EvalsPortlet extends GenericPortlet {
         config.getString("onbase.oauth2Url"),
         config.getString("onbase.onbaseDocsUrl"),
         config.getString("pdf.nolijDir"),
-        config.getString("onbase.docType")
+        config.getString("onbase.classifiedDocType"),
+        config.getString("onbase.rankedDocType")
       );
 
       return onbase;

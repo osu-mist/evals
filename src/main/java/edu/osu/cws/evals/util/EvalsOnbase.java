@@ -1,5 +1,7 @@
 package edu.osu.cws.evals.util;
 
+import edu.osu.cws.evals.models.Employee;
+import edu.osu.cws.evals.models.Job;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.MalformedURLException;
@@ -9,6 +11,7 @@ import java.util.Calendar;
 import javax.xml.bind.DatatypeConverter;
 import javax.net.ssl.HttpsURLConnection;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
 import org.json.simple.parser.*;
 
 public class EvalsOnbase {
@@ -27,7 +30,9 @@ public class EvalsOnbase {
 
   private String boundary;
   private String pdfDestination;
-  private String docType;
+
+  private String classifiedDocType;
+  private String rankedDocType;
 
   /**
     * Constructor for onbase API requests
@@ -43,13 +48,15 @@ public class EvalsOnbase {
                      String oauth2Url,
                      String onbaseDocsUrl,
                      String pdfDestination,
-                     String docType) {
+                     String classifiedDocType,
+                     String rankedDocType) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.oauth2Url = oauth2Url;
     this.onbaseDocsUrl = onbaseDocsUrl;
     this.pdfDestination = pdfDestination;
-    this.docType = docType;
+    this.classifiedDocType = classifiedDocType;
+    this.rankedDocType = rankedDocType;
   };
 
   /**
@@ -216,6 +223,39 @@ public class EvalsOnbase {
   }
 
   /**
+    * Create JSONObject for onbase keywords
+    *
+    * @param name Keyword name
+    * @param value Keyword value
+    * @return
+    */
+  private JSONObject createKeyword(String name, String value) {
+      JSONObject keyword = new JSONObject();
+      keyword.put("name", name);
+      keyword.put("value", value);
+
+      return keyword;
+  }
+
+  /**
+    * Perform multipart form post for evals PDFs
+    *
+    * @param appointmentType Employees job appointment type
+    * @return
+    */
+  private String getDocType(String appointmentType) {
+      String docType;
+
+      if (appointmentType.startsWith("Classified")) {
+          docType = classifiedDocType;
+      } else {
+          docType = rankedDocType;
+      }
+
+      return docType;
+  }
+
+  /**
     * Perform multipart form post for evals PDFs
     *
     * @param pdfName name of PDF file to post
@@ -223,7 +263,8 @@ public class EvalsOnbase {
     * @throws MalformedURLException
     * @throws ParseException
     */
-  public void postPDF(String pdfName, int employeeId) throws IOException, MalformedURLException, ParseException {
+  public void postPDF(String pdfName, Job job) throws Exception {
+    Employee employee = job.getEmployee();
     boundary = "---" + System.currentTimeMillis() + "---";
 
     checkBearerToken();
@@ -241,10 +282,19 @@ public class EvalsOnbase {
 
     // create attributes text form
     JSONObject attributes = new JSONObject();
-    attributes.put("DocumentType", docType);
+    attributes.put("DocumentType", getDocType(job.getAppointmentType()));
     attributes.put("FileType", "PDF");
     attributes.put("Comment", pdfName);
-    attributes.put("IndexKey", employeeId);
+    attributes.put("IndexKey", employee.getOsuid());
+
+    // add keywords attribute
+    JSONArray keywords = new JSONArray();
+    keywords.add(createKeyword("BIO - OSU ID", String.valueOf(employee.getOsuid())));
+    keywords.add(createKeyword("BIO - Name Last", employee.getLastName()));
+    keywords.add(createKeyword("BIO - Name First", employee.getFirstName()));
+    keywords.add(createKeyword("Business Center Code", job.getBusinessCenterName()));
+    keywords.add(createKeyword("HR - ECLS - Empl", job.getJobEcls()));
+    attributes.put("keywords", keywords);
 
     // write attributes portion
     writeAttribute(writer, attributes.toString());
@@ -259,6 +309,12 @@ public class EvalsOnbase {
 
     JSONObject response = readResponse(conn);
     System.out.println(response.toString());
+
+    if (response.containsKey("errors")) {
+        JSONArray errors = (JSONArray)response.get("errors");
+        JSONObject error = (JSONObject)errors.get(0);
+        throw new Exception((String)error.get("detail"));
+    }
 
     conn.disconnect();
   }
