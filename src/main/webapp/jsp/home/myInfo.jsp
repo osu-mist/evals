@@ -50,6 +50,6 @@
         <hr />
     </c:forEach>
 
-    <p><a href="http://oregonstate.edu/admin/hr/bc-locations.html"><liferay-ui:message key="how-to-correct-job-info"/></a></p>
+    <p><a href="https://hr.oregonstate.edu/about-us/contact-information-hr-teams"><liferay-ui:message key="how-to-correct-job-info"/></a></p>
 </div>
 <%@ include file="/jsp/footer.jsp" %>
