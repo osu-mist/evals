@@ -45,6 +45,7 @@ public class Logger {
         message.setFacility(facilityName);
         message.addField("environment", environment);
         if (message.isValid()) {
+            System.out.println(message.getFullMessage());
             Sender.sendMessage(message);
         }
     }
