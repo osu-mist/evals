@@ -1,7 +1,5 @@
 package edu.osu.cws.util;
 
-import org.graylog2.GelfMessage;
-import org.graylog2.GelfUDPSender;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -35,22 +33,6 @@ public class Logger {
     }
 
     /**
-     * send a GELF Message to graylog
-     * @param message
-     * @throws Exception
-     */
-    public void log(GelfMessage message) throws Exception {
-        GelfUDPSender Sender = new GelfUDPSender(logHost);
-        message.setHost(clientHost);
-        message.setFacility(facilityName);
-        message.addField("environment", environment);
-        if (message.isValid()) {
-            System.out.println(message.getFullMessage());
-            Sender.sendMessage(message);
-        }
-    }
-
-    /**
      * generate and log a simple GELF message
      * @param level
      * @param shortMessage
@@ -58,8 +40,7 @@ public class Logger {
      * @throws Exception
      */
     public void log(String level, String shortMessage, String longMessage) throws Exception {
-        GelfMessage message = new GelfMessage(shortMessage, longMessage, new Date().getTime(), level);
-        log(message);
+        System.out.println(longMessage);
     }
 
     /**
@@ -71,12 +52,7 @@ public class Logger {
      * @throws Exception
      */
     public void log(String level, String shortMessage, String longMessage, Map<String,String> fields) throws Exception {
-        GelfMessage message = new GelfMessage(shortMessage, longMessage, new Date().getTime(), level);
-        Set<String> keys = fields.keySet();
-        for (String key : keys) {
-            message.addField(key, fields.get(key));
-        }
-        log(message);
+        System.out.println(longMessage);
     }
 
     /**
@@ -90,14 +66,7 @@ public class Logger {
     public void log(String level, String shortMessage, Exception exception,
                     Map<String,String> fields)  throws Exception {
         String longMessage = CWSUtil.stackTraceString(exception);
-        GelfMessage message = new GelfMessage(shortMessage, longMessage, new Date().getTime(), level);
-
-        Set<String> keys = fields.keySet();
-        for (String key : keys) {
-            message.addField(key, fields.get(key));
-        }
-        log(message);
-
+        System.out.println(longMessage);
     }
 
     /**
@@ -109,7 +78,6 @@ public class Logger {
      */
     public void log(String level, String shortMessage, Exception exception)  throws Exception {
         String longMessage = CWSUtil.stackTraceString(exception);
-        GelfMessage message = new GelfMessage(shortMessage, longMessage, new Date().getTime(), level);
-        log(message);
+        System.out.println(longMessage);
     }
 }

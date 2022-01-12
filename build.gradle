@@ -20,14 +20,12 @@ dependencies {
 
 	portalCommonCSS group: "com.liferay", name: "com.liferay.frontend.css.common"
 	compile group: "commons-logging", name: "commons-logging"
-	compile group: "log4j", name: "log4j"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.util.bridges"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.util.java"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.util.taglib"
 	compile project.files("src/main/webapp/WEB-INF/lib/aopalliance.jar")
 	compile project.files("src/main/webapp/WEB-INF/lib/jta-1.1.jar")
 	compile group: "commons-configuration", name: "commons-configuration", version: "1.6"
-	compile group: "commons-logging", name: "commons-logging"
 	compile group: "org.slf4j", name: "slf4j-api"
 	compile project.files("src/main/webapp/WEB-INF/lib/ojdbc8.jar")
 	compile project.files("src/main/webapp/WEB-INF/lib/jstl-impl.jar")
@@ -50,7 +48,6 @@ dependencies {
 	compile project.files("src/main/webapp/WEB-INF/lib/dom4j-1.6.1.jar")
 	compile group: "org.dbunit", name: "dbunit", version: "2.4.8"
 	compile project.files("src/main/webapp/WEB-INF/lib/mysql.jar")
-	compile group: "com.mangofactory", name: "org.graylog2.gelfj", version: "1.0.2"
 	compile group: "commons-lang", name: "commons-lang"
 	compile project.files("src/main/webapp/WEB-INF/lib/antlr-2.7.6.jar")
 	compile group: "org.hibernate", name: "hibernate-core", version: "3.6.3.Final"
