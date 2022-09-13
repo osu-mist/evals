@@ -425,12 +425,12 @@ public class Job extends Evals implements Serializable {
      */
     public DateTime getNewAnnualStartDate() throws Exception {
         DateTime newStartDate = getInitialEvalStartDate();
-        System.out.println('getNewAnnualStartDate() newStartDate = ' + newStartDate);
+        System.out.println("getNewAnnualStartDate() newStartDate = " + newStartDate);
 
         if (!isWithinInitialPeriod()) {
-            System.out.println('is not within initial period');
+            System.out.println("is not within initial period");
             newStartDate = newStartDate.plusMonths(annualInd);
-            System.out.println('EvalsUtil Current Year = ' + EvalsUtil.getToday().getYear());
+            System.out.println("EvalsUtil Current Year = " + EvalsUtil.getToday().getYear());
             newStartDate = newStartDate.withYear(EvalsUtil.getToday().getYear());
         }
 

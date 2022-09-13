@@ -376,7 +376,7 @@ public class BackendMgr {
             createAppraisal(job, appraisalStartDate, type);
             return true;
         } else {
-            System.out.println('Appraisal already exists within 6 months of appraisalStartDate, not creating');
+            System.out.println("Appraisal already exists within 6 months of appraisalStartDate, not creating");
         }
 
         return false;
