@@ -449,6 +449,7 @@ public class Job extends Evals implements Serializable {
         // Calculate the end date of the 1st annual evaluation
         DateTime initialStartDate = getInitialEvalStartDate();
         DateTime endFirstEval = initialStartDate.plusMonths(annualInd);
+        System.out.println("isWithinInitialPeriod() " + initialStartDate + " - " + endFirstEval);
 
         return !initialStartDate.isAfterNow() && endFirstEval.isAfterNow();
     }
@@ -467,8 +468,10 @@ public class Job extends Evals implements Serializable {
     {
         DateTime dt;
         if (evalDate != null)
+            System.out.println("getInitialEvalStartDate() evalDate = " + evalDate);
             dt = new DateTime(evalDate).withTimeAtStartOfDay();
         else
+            System.out.println("getInitialEvalStartDate() beginDate = " + beginDate);
             dt = new DateTime(beginDate).withTimeAtStartOfDay();
 
         return CWSUtil.getFirstDayOfMonth(dt);
