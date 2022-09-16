@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Iterator;
 
 public class Job extends Evals implements Serializable {
     private static final long serialVersionUID = 2531139600484032442L;
@@ -455,12 +456,15 @@ public class Job extends Evals implements Serializable {
     }
 
     private boolean noAnnualAppraisals() throws Exception {
-        for (Appraisal appraisal : appraisals) {
-            if (appraisal.getType().equals(Appraisal.TYPE_ANNUAL)) {
+        Iterator<Appraisal> itr = getAppraisals().iterator();
+        while(itr.hasNext()) {
+            if (Appraisal.TYPE_ANNUAL.equals(itr.next().getType())) {
+                System.out.println("Job has annual appraisal");
                 return false;
             }
         }
 
+        System.out.println("Job does not have annual appraisal");
         return true;
     }
 
