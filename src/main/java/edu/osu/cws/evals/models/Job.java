@@ -467,12 +467,14 @@ public class Job extends Evals implements Serializable {
     public DateTime getInitialEvalStartDate()
     {
         DateTime dt;
-        if (evalDate != null)
+        if (evalDate != null) {
             System.out.println("getInitialEvalStartDate() evalDate = " + evalDate);
             dt = new DateTime(evalDate).withTimeAtStartOfDay();
-        else
+        }
+        else {
             System.out.println("getInitialEvalStartDate() beginDate = " + beginDate);
             dt = new DateTime(beginDate).withTimeAtStartOfDay();
+        }
 
         return CWSUtil.getFirstDayOfMonth(dt);
     }
