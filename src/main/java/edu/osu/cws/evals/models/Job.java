@@ -451,7 +451,17 @@ public class Job extends Evals implements Serializable {
         DateTime endFirstEval = initialStartDate.plusMonths(annualInd);
         System.out.println("isWithinInitialPeriod() " + initialStartDate + " - " + endFirstEval);
 
-        return !initialStartDate.isAfterNow() && endFirstEval.isAfterNow();
+        return !initialStartDate.isAfterNow() && endFirstEval.isAfterNow() && noAnnualAppraisals();
+    }
+
+    private boolean noAnnualAppraisals() throws Exception {
+        for (Appraisal appraisal : appraisals) {
+            if (appraisal.getType().equals(Appraisal.TYPE_ANNUAL)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public DateTime getAnnualStartDateBasedOnJobBeginDate(int year)
