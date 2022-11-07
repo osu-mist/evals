@@ -482,6 +482,14 @@ public class AppraisalsAction implements ActionInterface {
         // save changes to db
         AppraisalMgr.updateAppraisal(appraisal, loggedInUser);
 
+        // if status is reviewDue, rating is 2 or better, and appointment type is not Classified IT
+        if ((appraisal.getStatus().equals("reviewDue") || appraisal.getStatus().equals("reviewOverdue"))
+            && (appraisal.getRating() <= 2)
+            && !AppointmentType.CLASSIFIED_IT.equals(appraisal.getAppointmentType())) {
+
+            autocompleteReview(appraisal);
+        }
+
         // Send email if needed
         EmailType emailType = getEmailType();
         if (emailType != null) {
@@ -492,6 +500,19 @@ public class AppraisalsAction implements ActionInterface {
                 mailer.sendMail(appraisal, emailType);
             }
         }
+    }
+
+    /**
+     * Certain appointment types don't need to be reviewed by HR and can be auto accepted
+     *
+     * @param appraisal Current appraisal being updated
+     * @throws Exception
+     */
+    private void autocompleteReview(Appraisal appraisal) throws Exception {
+        appraisal.setReviewSubmitDate(new Date());
+        appraisal.setReviewer(appraisal.getJob().getSupervisor().getEmployee());
+        appraisal.setStatus(Appraisal.STATUS_RELEASE_DUE);
+        AppraisalMgr.updateAppraisal(appraisal, loggedInUser);
     }
 
     /**
