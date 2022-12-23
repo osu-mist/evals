@@ -756,7 +756,7 @@ public class AppraisalMgr {
 
         String hql = "select new edu.osu.cws.evals.models.Appraisal ( " +
             "id, job.jobTitle, job.positionNumber, startDate, endDate, type, " +
-            "job.employee.id, job.employee.lastName, job.employee.firstName, " +
+            "job.employee.id, job.employee.osuid, job.employee.lastName, job.employee.firstName, " +
             "evaluationSubmitDate, status, job.businessCenterName, " +
             "job.orgCodeDescription, job.suffix, overdue) from " +
             "edu.osu.cws.evals.models.Appraisal ";
