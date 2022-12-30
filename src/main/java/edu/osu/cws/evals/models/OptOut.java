@@ -7,9 +7,8 @@ import java.util.Arrays;
 
 public class OptOut {
     public static String TYPE_EVAL = "EVAL";
-    public static String TYPE_EMAIL = "EMAIL";
 
-    public static List<String> TYPES = Arrays.asList(TYPE_EVAL, TYPE_EMAIL);
+    public static List<String> TYPES = Arrays.asList(TYPE_EVAL);
 
     private int id;
 
