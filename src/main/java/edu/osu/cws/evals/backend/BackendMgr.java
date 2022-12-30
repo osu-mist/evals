@@ -180,18 +180,22 @@ public class BackendMgr {
                 System.out.print("Got job.. ");
                 System.out.println(job.getSignature());
 
-                //is it in trial period?
-                if (job.withinTrialPeriod())
-                {
-                    System.out.println("Job in trial period.");
-                    handleTrialCreation(job);
-                    tx.commit();
-                    continue;   //done for this job as it is still in trial period.
-                }
+                if (!job.getEmployee().hasOptOut(OptOut.TYPE_EVAL)) {
+                    //is it in trial period?
+                    if (job.withinTrialPeriod())
+                    {
+                        System.out.println("Job in trial period.");
+                        handleTrialCreation(job);
+                        tx.commit();
+                        continue;   //done for this job as it is still in trial period.
+                    }
 
-                //If we get here, the job is not in trial period.
-                // Do we need to create an annual appraisal today?
-                handleAnnualCreation(job);
+                    //If we get here, the job is not in trial period.
+                    // Do we need to create an annual appraisal today?
+                    handleAnnualCreation(job);
+                } else {
+                    System.out.println("Employee has opted out, nothing to create");
+                }
                 tx.commit();
             } catch(Exception e)
             {
@@ -234,29 +238,33 @@ public class BackendMgr {
                 System.out.print("Working with job...");
                 System.out.println(shortJob.getSignature());
 
-                Appraisal lastShortAppraisal = AppraisalMgr.getLastAppraisalByJob(shortJob);
-                if (lastShortAppraisal != null) {
-                    System.out.println("Last appraisal - id: " + lastShortAppraisal.getId() + ", startDate: "
-                            + lastShortAppraisal.getStartDate());
-                    DateTime lastStartDate = new DateTime(lastShortAppraisal.getStartDate());
-                    DateTime appraisalStartDate = lastStartDate.plusYears(1);
+                if (!shortJob.getEmployee().hasOptOut(OptOut.TYPE_EVAL)) {
+                    Appraisal lastShortAppraisal = AppraisalMgr.getLastAppraisalByJob(shortJob);
+                    if (lastShortAppraisal != null) {
+                        System.out.println("Last appraisal - id: " + lastShortAppraisal.getId() + ", startDate: "
+                                + lastShortAppraisal.getStartDate());
+                        DateTime lastStartDate = new DateTime(lastShortAppraisal.getStartDate());
+                        DateTime appraisalStartDate = lastStartDate.plusYears(1);
 
-                    // check if we need to create new annual evaluation
-                    if (createForDate.isAfter(appraisalStartDate) ) {
-                        // Get the full job to check if appraisal exists and/or to create a new one.
-                        job = JobMgr.getJob(shortJob.getEmployee().getId(),
-                                shortJob.getPositionNumber(), shortJob.getSuffix());
-                        if (!AppraisalMgr.appraisalExists(job, appraisalStartDate, Appraisal.TYPE_ANNUAL)) {
-                            String msg = "creating " + Appraisal.TYPE_ANNUAL + " appraisal for " + shortJob.getSignature();
-                            System.out.println(msg);
-                            logger.log(Logger.INFORMATIONAL, msg, "");
-                            createAppraisal(job, appraisalStartDate, Appraisal.TYPE_ANNUAL);
+                        // check if we need to create new annual evaluation
+                        if (createForDate.isAfter(appraisalStartDate) ) {
+                            // Get the full job to check if appraisal exists and/or to create a new one.
+                            job = JobMgr.getJob(shortJob.getEmployee().getId(),
+                                    shortJob.getPositionNumber(), shortJob.getSuffix());
+                            if (!AppraisalMgr.appraisalExists(job, appraisalStartDate, Appraisal.TYPE_ANNUAL)) {
+                                String msg = "creating " + Appraisal.TYPE_ANNUAL + " appraisal for " + shortJob.getSignature();
+                                System.out.println(msg);
+                                logger.log(Logger.INFORMATIONAL, msg, "");
+                                createAppraisal(job, appraisalStartDate, Appraisal.TYPE_ANNUAL);
+                            }
+                        } else {
+                            System.out.println("not time to create new annual evaluation. appraisalStartDate = " + appraisalStartDate);
                         }
                     } else {
-                        System.out.println("not time to create new annual evaluation. appraisalStartDate = " + appraisalStartDate);
+                        System.out.println("Unclassified job hasn't been initialized in EvalS yet.");
                     }
                 } else {
-                    System.out.println("Unclassified job hasn't been initialized in EvalS yet.");
+                    System.out.println("Employee has opted out, nothing to create");
                 }
                 tx.commit();
             } catch(Exception e) {
@@ -541,40 +549,45 @@ public class BackendMgr {
                 System.out.println("Processing appraisal " + ids[i]);
                 appraisal = AppraisalMgr.getAppraisal(ids[i]);
 
-                // if the status contains "Overdue", calculate appraisal.overdue and save it
-                if (appraisal.getStatus().contains(Appraisal.OVERDUE)) {
-                    appraisal.updateOverdue(configMap);
-                    AppraisalMgr.saveOverdue(appraisal);
-                }
-
-                // update salary for classified IT evals
-                if (appraisal.getIsSalaryUsed()) {
-                    boolean salaryNeedsUpdate = shouldUpdateSalaryInfo(appraisal);
-                    if (salaryNeedsUpdate) {
-                        AppraisalMgr.createOrUpdateSalary(appraisal, configMap);
+                if (!appraisal.getJob().getEmployee().hasOptOut(OptOut.TYPE_EVAL)) {
+                    // if the status contains "Overdue", calculate appraisal.overdue and save it
+                    if (appraisal.getStatus().contains(Appraisal.OVERDUE)) {
+                        appraisal.updateOverdue(configMap);
+                        AppraisalMgr.saveOverdue(appraisal);
                     }
 
-                    if (shouldSendITWithHoldWarningEmail(appraisal)) {
-                        sendNoIncreaseReminder(appraisal);
+                    // update salary for classified IT evals
+                    if (appraisal.getIsSalaryUsed()) {
+                        boolean salaryNeedsUpdate = shouldUpdateSalaryInfo(appraisal);
+                        if (salaryNeedsUpdate) {
+                            AppraisalMgr.createOrUpdateSalary(appraisal, configMap);
+                        }
+
+                        if (shouldSendITWithHoldWarningEmail(appraisal)) {
+                            sendNoIncreaseReminder(appraisal);
+                        }
                     }
-                }
 
-                //Do we need to change status?
-                String status = appraisal.getStatus();
-                newStatus = appraisal.getNewStatus(configMap);
+                    //Do we need to change status?
+                    String status = appraisal.getStatus();
+                    newStatus = appraisal.getNewStatus(configMap);
 
-                // Update appraisal status
-                if (newStatus != null) {
-                   System.out.println("Need to update status for " + appraisal.getId() +
-                           " from " + appraisal.getStatus() + " to " + newStatus);
-                    updateAppraisal(appraisal, newStatus);
+                    // Update appraisal status
+                    if (newStatus != null) {
+                    System.out.println("Need to update status for " + appraisal.getId() +
+                            " from " + appraisal.getStatus() + " to " + newStatus);
+                        updateAppraisal(appraisal, newStatus);
+                    } else {
+                        // check if we need to send follow up email
+                        checkFrequencyAndSendMail(appraisal, createForDate, status);
+                    }
+
+                    sendCompletionReminders(appraisal);
                 } else {
-                    // check if we need to send follow up email
-                    checkFrequencyAndSendMail(appraisal, createForDate, status);
+                    System.out.println("Employee is opted out, no updates necessary");
                 }
-
-                sendCompletionReminders(appraisal);
                 tx.commit();
+
             } catch(Exception e)
             {
                 if (session != null && session.isOpen())
@@ -583,9 +596,14 @@ public class BackendMgr {
 
                 // Log data error and try to provide employee pidm
                 String message = "Data error with appraisal " + ids[i];
-                if (appraisal != null && appraisal.getJob() != null &&
-                        appraisal.getJob().getEmployee() != null) {
-                    message += " employee " + appraisal.getJob().getEmployee().getId();
+                try {
+                    if (appraisal != null && appraisal.getJob() != null &&
+                            appraisal.getJob().getEmployee() != null) {
+                        message += " employee " + appraisal.getJob().getEmployee().getId();
+                    }
+                } catch(Exception nestedError)
+                {
+                    message += " error retrieving employee id";
                 }
                 logDataError(message);
 
