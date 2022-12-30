@@ -455,6 +455,13 @@ public class AppraisalMgr {
                     " AND jobs.PYVPASJ_SUPERVISOR_SUFF = :suffix";
         }
 
+        // check for opt outs
+        query += "AND ap.JOB_PIDM not in ("
+        + "select EMPLOYEE_PIDM "
+        + "from OPT_OUTS "
+        + "where TYPE='EVAL' AND "
+        + "DELETER_PIDM is null)";
+
         Query hibQuery = session.createSQLQuery(query)
                 .addScalar("ID", StandardBasicTypes.INTEGER)
                 .addScalar("PYVPASJ_DESC", StandardBasicTypes.STRING)
