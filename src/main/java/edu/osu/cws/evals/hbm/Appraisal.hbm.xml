@@ -189,7 +189,14 @@
         FROM
             edu.osu.cws.evals.models.Appraisal
         WHERE
-            status IN ('reviewDue', 'reviewOverdue')
+            status IN ('reviewDue', 'reviewOverdue') AND
+            job.employee.id not in (
+              select employee.id
+              from edu.osu.cws.evals.models.OptOut
+              where
+                TYPE='EVAL' and
+                DELETER_PIDM is null
+            )
     ]]></query>
     <query name="appraisal.getTrialAppraisal"><![CDATA[
         from edu.osu.cws.evals.models.Appraisal
@@ -256,7 +263,14 @@
         ap.END_DATE < current_date and
         (ap.STATUS not in  (:ignoredStatus)) and
         job.PYVPASJ_BCTR_TITLE in (:bcNames) and
-        job.PYVPASJ_APPOINTMENT_TYPE in (:appointmentTypes)
+        job.PYVPASJ_APPOINTMENT_TYPE in (:appointmentTypes) and
+        ap.JOB_PIDM not in (
+          select EMPLOYEE_PIDM
+          from OPT_OUTS
+          where ap.JOB_PIDM=EMPLOYEE_PIDM and
+            TYPE='EVAL' and
+            DELETER_PIDM is null
+        )
     order by
         job.PYVPASJ_BCTR_TITLE, overdue
     ]]></sql-query>

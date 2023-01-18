@@ -224,10 +224,63 @@ public class AppraisalsAction implements ActionInterface {
             }
         }
 
+        addOptOutsToSearch(appraisals);
+
         actionHelper.addToRequestMap("appraisals", appraisals);
+        actionHelper.addToRequestMap("searchTerm", searchTerm);
+        actionHelper.addToRequestMap("isSupervisor", isSupervisor);
         actionHelper.useMaximizedMenu();
 
         return Constants.JSP_REVIEW_LIST;
+    }
+
+    /**
+     * Fetches opt outs for the searched employee
+     *
+     * @param appraisals List of appraisals fetched by search
+     * @throws Exception
+     */
+    private void addOptOutsToSearch(List<Appraisal> appraisals) throws Exception {
+        List<String> optOutTypes = OptOut.TYPES;
+        Map<String, Boolean> optOutValues = new HashMap<String, Boolean>();
+        // no results if appraisals is empty
+        if (!appraisals.isEmpty()) {
+            List<OptOut> optOuts = OptOutMgr.list(appraisals.get(0).getJob().getEmployee().getId());
+            // fill Map with true/false values from employees optouts list
+            for(String type: optOutTypes) {
+                OptOut optOut = OptOutMgr.getByType(optOuts, type);
+                if (optOut != null && optOut.isActive()) {
+                    optOutValues.put(type, true);
+                } else {
+                    optOutValues.put(type, false);
+                }
+            }
+        }
+
+        actionHelper.addToRequestMap("optOuts", optOutValues);
+        actionHelper.addToRequestMap("optOutTypes", optOutTypes);
+    }
+
+    /**
+     * Handles form submission from reviewList.jsp to update opt outs
+     * returns the current search page
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public String updateOptOuts(PortletRequest request, PortletResponse response) throws Exception {
+        String pidm = ParamUtil.getString(request, "employeeId");
+        Map<String, Boolean> optOutValues = new HashMap<String, Boolean>();
+        // convert "on" values from form to true/false
+        for (String type : OptOut.TYPES) {
+            optOutValues.put(type, "on".equals(ParamUtil.getString(request, "optOut-" + type)));
+        }
+
+        OptOutMgr.updateOptOuts(pidm, optOutValues, actionHelper.getLoggedOnUser());
+
+        return search(request, response);
     }
 
     /**

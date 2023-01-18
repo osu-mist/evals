@@ -261,7 +261,7 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
     }
 
     /**
-     * Constructor used by the getReviews and search method in appraisal mgr to fetch a list
+     * Constructor used by the getReviews method in appraisal mgr to fetch a list
      * of appraisal objects
      *
      * @param id
@@ -285,6 +285,56 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
         employee.setId(employeeId);
         employee.setLastName(lastName);
         employee.setFirstName(firstName);
+
+        Job tempJob = new Job();
+        tempJob.setJobTitle(jobTitle);
+        tempJob.setOrgCodeDescription(orgCodeDescription);
+        tempJob.setEmployee(employee);
+        tempJob.setPositionNumber(positionNumber);
+        tempJob.setBusinessCenterName(bcName);
+        tempJob.setSuffix(suffix);
+
+        this.id = id;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.type = type;
+        this.evaluationSubmitDate = evaluationSubmitDate;
+        this.status = status;
+        this.job = tempJob;
+
+        if (overdue == null) {
+            this.overdue = -999;
+        } else {
+            this.overdue = overdue;
+        }
+    }
+
+    /**
+     * Constructor used by search to get a list of appraisal objects
+     *
+     * @param id
+     * @param jobTitle
+     * @param positionNumber
+     * @param startDate
+     * @param endDate
+     * @param type
+     * @param employeeId
+     * @param employeeOsuId
+     * @param lastName
+     * @param firstName
+     * @param evaluationSubmitDate
+     * @param status
+     * @param orgCodeDescription
+     */
+    public Appraisal(int id, String jobTitle, String positionNumber, Date startDate, Date endDate,
+                     String type, int employeeId, String employeeOsuId, String lastName, String firstName, Date evaluationSubmitDate,
+                     String status, String bcName, String orgCodeDescription, String suffix,
+                     Integer overdue) {
+        Employee employee = new Employee();
+        employee.setId(employeeId);
+        employee.setLastName(lastName);
+        employee.setFirstName(firstName);
+        employee.setOsuid(employeeOsuId);
 
         Job tempJob = new Job();
         tempJob.setJobTitle(jobTitle);
