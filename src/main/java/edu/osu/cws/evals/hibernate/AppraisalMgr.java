@@ -456,7 +456,7 @@ public class AppraisalMgr {
         }
 
         // check for opt outs
-        query += "AND ap.JOB_PIDM not in ("
+        query += " AND ap.JOB_PIDM not in ("
         + "select EMPLOYEE_PIDM "
         + "from OPT_OUTS "
         + "where TYPE='EVAL' AND "
