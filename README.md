@@ -51,6 +51,14 @@ goal-setting and appraisal tasks.
     - If EvalS is not on the list or it shows an error message, check the logs in `bundles/tomcat-${version}/logs/catalina.out`
     - If using a docker container use `docker logs CONTAINER_NAME` to get logs
 
+### Production & Remote Server Deployment
+  1. Remote server must be prepared before evals can be deployed, see wiki for more information
+  2. Copy `deploy-example.sh` and replace export values to match the server you are deploying to
+  3. run the copied sh script with 1 of 3 parameters
+      - all: Deploys both evals and theme
+      - evals: deploys just evals
+      - theme: deploys just the theme
+
 ### Tests
 ---
 
