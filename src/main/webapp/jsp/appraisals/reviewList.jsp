@@ -10,6 +10,16 @@
             message="Search"
         />
     </li>
+    <c:if test="${!empty appraisals && !isSupervisor}">
+        <li id="<portlet:namespace/>show-opt-outs-link">
+            <liferay-ui:icon
+                image="configuration"
+                url="#"
+                label="true"
+                message="Opt Outs"
+            />
+        </li>
+    </c:if>
 </ul>
 
 <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
@@ -24,6 +34,32 @@
         <input type="submit" class="cancel" value="<liferay-ui:message key="cancel" />" id="<portlet:namespace/>cancel" />
     </fieldset>    
 </form>
+
+<c:if test="${!empty appraisals && !isSupervisor}">
+    <form action="<portlet:actionURL windowState="<%= WindowState.MAXIMIZED.toString() %>">
+        <portlet:param name="action" value="updateOptOuts"/>
+        <portlet:param name="controller" value="AppraisalsAction"/>
+        </portlet:actionURL>" id="<portlet:namespace />fm" name="<portlet:namespace />fm" class="updateOptOuts" method="post">
+        <fieldset id="opt-outs-container">
+            <c:forEach var="optOutType" items="${optOutTypes}">
+                <div style="display:block; margin-bottom: 10px;">
+                    <label style="line-height: 25px; width: 150px; vertical-align:middle;">
+                        <liferay-ui:message key="opt-out-friendly-${optOutType}"/>
+                    </label>
+                    <label class="switch" style="margin-bottom:0px;">
+                        <input type="checkbox" name="optOut-${optOutType}" id="${optOutType}" ${optOuts[optOutType] ? "checked" : ""}>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </c:forEach>
+            <input type="hidden" id="<portlet:namespace/>searchTerm" class="narrow" name="<portlet:namespace/>searchTerm" value="${searchTerm}"/>
+            <input type="hidden" id="<portlet:namespace/>employeeId" class="narrow" name="<portlet:namespace/>employeeId" value="${appraisals[0].job.employee.id}"/>
+            <br/>
+            <input type="submit" value="<liferay-ui:message key="Update" />" />
+            <input type="submit" class="cancel" value="<liferay-ui:message key="cancel" />" id="<portlet:namespace/>cancel-opt-out" />
+        </fieldset>
+    </form>
+</c:if>
 
 <c:if test="${!empty appraisals}">
     <table class="taglib-search-iterator">
@@ -67,6 +103,7 @@
 <script type="text/javascript">
 jQuery(document).ready(function() {
   jQuery("#pass-user-add").hide();
+  jQuery("#opt-outs-container").hide();
 
   // When user clicks cancel in add form, hide the form.
   jQuery("#<portlet:namespace/>cancel").click(function() {
@@ -74,10 +111,26 @@ jQuery(document).ready(function() {
     jQuery("#search-parent").show("slow");
     return false;
   });
+  jQuery("#<portlet:namespace/>cancel-opt-out").click(function() {
+    jQuery("#opt-outs-container").hide("slow");
+    return false;
+  });
   // When user clicks cancel in add form, hide the form.
   jQuery("#<portlet:namespace/>appraisal-search-link").click(function() {
     jQuery("#pass-user-add").show("slow");
     jQuery("#search-parent").hide("slow");
+    return false;
+  });
+
+  // show/hide opt outs
+  jQuery('#<portlet:namespace/>show-opt-outs-link').click(function(e) {
+    e.preventDefault();
+    const container = jQuery("#opt-outs-container");
+    if (container.is(':hidden')) {
+        container.show('slow');
+    } else {
+        container.hide('slow');
+    }
   });
 
   // Validate form submission

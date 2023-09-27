@@ -24,6 +24,11 @@
             <one-to-many class="edu.osu.cws.evals.models.Job"/>
         </set>
 
+        <set name="optOuts" batch-size="10">
+            <key column="EMPLOYEE_PIDM"/>
+            <one-to-many class="edu.osu.cws.evals.models.OptOut"/>
+        </set>
+
         <fetch-profile name="employee-with-jobs">
             <fetch association="jobs" style="select"/>
         </fetch-profile>

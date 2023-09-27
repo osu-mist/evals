@@ -38,6 +38,8 @@ public class Employee extends Evals implements Serializable {
 
     private Set<Job> jobs = new HashSet<Job>();
 
+    private Set<OptOut> optOuts = new HashSet<OptOut>();
+
     public String getName() {
         lastName = (lastName == null)? "" : lastName;
         firstName = (firstName == null)? "" : firstName;
@@ -164,6 +166,26 @@ public class Employee extends Evals implements Serializable {
 
     public void setLoadJobs(Boolean loadJobs) {
         this.loadJobs = loadJobs;
+    }
+
+    public Set<OptOut> getOptOuts() {
+        return optOuts;
+    }
+
+    public void setOptOuts(Set<OptOut> optOuts) {
+        this.optOuts = optOuts;
+    }
+
+    public Boolean hasOptOut(String type) {
+        if (type != null && !type.isEmpty()) {
+            for(OptOut optOut : optOuts) {
+                if (type.equals(optOut.getType()) && optOut.isActive()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override
