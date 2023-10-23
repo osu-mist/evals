@@ -382,14 +382,20 @@ public class AppraisalsAction implements ActionInterface {
         Salary salary = appraisal.getSalary();
         String getTwoIncrease, getOneMin, getOneMax;
         if (salary == null) {
-          getTwoIncrease = "0";
-          getOneMin = "0";
-          getOneMax = "0";
+            getTwoIncrease = "0";
+            getOneMin = "0";
+            getOneMax = "0";
+            if (appraisal.getIsOpen()) {
+                actionHelper.addErrorsToRequest("Warning: This evaluation is missing salary data. If this warning persists after a day has passed, please reach out to evals support.");
+            } else {
+                actionHelper.addErrorsToRequest("Notice: This evaluation was completed before salary data was being tracked for this employee.");
+            }
         } else {
-          getTwoIncrease = salary.getTwoIncrease().toString();
-          getOneMin = salary.getOneMin().toString();
-          getOneMax = salary.getOneMax().toString();
+            getTwoIncrease = salary.getTwoIncrease().toString();
+            getOneMin = salary.getOneMin().toString();
+            getOneMax = salary.getOneMax().toString();
         }
+
         salaryValidationValues.put("increaseRate2Value", getTwoIncrease);
         salaryValidationValues.put("increaseRate1MinVal", getOneMin);
         salaryValidationValues.put("increaseRate1MaxVal", getOneMax);

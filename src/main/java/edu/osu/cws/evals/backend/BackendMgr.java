@@ -504,7 +504,9 @@ public class BackendMgr {
      * @throws Exception
      */
     public boolean shouldUpdateSalaryInfo(Appraisal appraisal) throws Exception{
-        if (appraisal.getSalary().getIncrease() != null) {
+        if (appraisal.getSalary() == null) {
+            return true;
+        } else if (appraisal.getSalary().getIncrease() != null) {
             return false;
         }
 
