@@ -12,6 +12,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.type.StandardBasicTypes;
+import org.hibernate.HibernateException;
 import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
@@ -1223,6 +1224,20 @@ public class AppraisalMgr {
         }
 
         return appraisals.get(0);
+    }
+
+    public static boolean bulkUpdateAppraisals(List<Appraisal> appraisals) {
+        Session session = HibernateUtil.getCurrentSession();
+
+        try {
+            for (Appraisal app : appraisals) {
+                session.saveOrUpdate(app);
+            }
+
+            return true;
+        } catch (Exception exception) {
+            return false;
+        }
     }
 
 }

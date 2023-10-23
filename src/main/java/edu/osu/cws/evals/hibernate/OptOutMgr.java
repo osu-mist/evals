@@ -126,4 +126,17 @@ public class OptOutMgr {
     public static OptOut getByType(List<OptOut> optOuts, String type) {
         return optOuts.stream().filter(optOut -> type.equals(optOut.getType())).findFirst().orElse(null);
     }
+
+    public static boolean bulkOptOuts(List<String> pidms, Map<String, Boolean> types, Employee creator) {
+        try {
+            for (String pidm : pidms) {
+                updateOptOuts(pidm, types, creator);
+            }
+        } catch (Exception excp) {
+            excp.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
 }
