@@ -572,3 +572,48 @@ span.evals-prof-faculty-start span.evals-arrow {
 .lfr-textarea, .form .fieldset .lfr-textarea-container textarea {
     max-width: 100%;
 }
+
+.bulk-update-result-header {
+  font-weight: bold;
+  font-size: 14px;
+  border-bottom: black solid .5px;
+  margin-bottom: .5rem;
+}
+.bulk-update-result {
+  display: flex;
+  width: 100%;
+}
+.bulk-update-result > div {
+  padding-right: 1rem;
+  flex-basis: calc(100% / 6);
+}
+.bulk-date-conditionals {
+  display: flex;
+}
+.bulk-date-conditionals > div {
+  display: flex;
+  flex-basis: 50%;
+  padding-right: 1rem;
+}
+.bulk-date-conditionals > div > div {
+  flex-basis: 33%
+}
+.bulk-date-conditionals select, input {
+  min-width: unset !important;
+  width: unset !important;
+}
+.bulk-conditionals {
+  display: flex;
+}
+.bulk-conditionals > div {
+  padding-right: 1rem;
+}
+.bulk-conditionals select, input {
+  min-width: unset !important;
+  width: unset !important;
+}
+.bulk-update-filters {
+  border-bottom: black solid .5px;
+  margin-bottom: 1rem;
+  padding-bottom: .5rem;
+}
