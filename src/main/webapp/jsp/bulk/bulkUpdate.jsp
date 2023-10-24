@@ -66,6 +66,23 @@
                 </div>
             </div>
 
+            <!-- Appointment Type -->
+            <div class="bulk-conditionals">
+                <div>
+                    Appointment Type
+                </div>
+                <div>
+                    <select name="appointmentTypeConditional" value="${appointmentTypeConditional}">
+                        <c:forEach var="conditional" items="${equalityConditionals}">
+                            <option value="${conditional.value}" ${appointmentTypeConditional == conditional.value ? 'selected':''}>${conditional.display}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div>
+                    <input name="appointmentTypeValue" value="${appointmentTypeValue}"/>
+                </div>
+            </div>
+
             <input type="submit" value="Filter"/>
         </form>
     </div>
@@ -114,6 +131,7 @@
         <div>Date Range</div>
         <div>Job</div>
         <div>Org Code</div>
+        <div>Appointment Type</div>
         <div>Type</div>
     </div>
     <c:forEach var="appraisal" items="${appraisals}">
@@ -132,6 +150,9 @@
             </div>
             <div>
                 <c:out value="${appraisal.job.orgCodeDescription}"/>
+            </div>
+            <div>
+                <c:out value="${appraisal.job.appointmentType}"/>
             </div>
             <div>
                 <c:out value="${appraisal.type}"/>

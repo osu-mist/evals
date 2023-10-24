@@ -331,7 +331,7 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
     public Appraisal(int id, String jobTitle, String positionNumber, Date startDate, Date endDate,
                      String type, int employeeId, String lastName, String firstName, Date evaluationSubmitDate,
                      String status, String bcName, String orgCodeDescription, String suffix,
-                     Integer overdue, String tsOrgCode) {
+                     Integer overdue, String tsOrgCode, String appointmentType) {
         Employee employee = new Employee();
         employee.setId(employeeId);
         employee.setLastName(lastName);
@@ -345,6 +345,7 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
         tempJob.setPositionNumber(positionNumber);
         tempJob.setBusinessCenterName(bcName);
         tempJob.setSuffix(suffix);
+        tempJob.setAppointmentType(appointmentType);
 
         this.id = id;
         this.startDate = startDate;
