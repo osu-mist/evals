@@ -112,6 +112,12 @@ public class BulkUpdateAction implements ActionInterface {
             put("type", "string");
             put("conditional", "orgCodeConditional");
             put("value", "orgCodeValue");
+        }},
+        new HashMap<String, String>() {{
+            put("field", "job.appointmentType");
+            put("type", "string");
+            put("conditional", "appointmentTypeConditional");
+            put("value", "appointmentTypeValue");
         }}
     );
     private static List<String> UPDATES = Arrays.asList(
@@ -158,7 +164,8 @@ public class BulkUpdateAction implements ActionInterface {
                 +    "id, job.jobTitle, job.positionNumber, "
                 +    "startDate, endDate, type, job.employee.id, job.employee.lastName, "
                 +    "job.employee.firstName, evaluationSubmitDate, status, "
-                +    "job.businessCenterName, job.orgCodeDescription, job.suffix, overdue, job.tsOrgCode"
+                +    "job.businessCenterName, job.orgCodeDescription, job.suffix, overdue, "
+                +    "job.tsOrgCode, job.appointmentType"
                 + ") "
                 + "FROM edu.osu.cws.evals.models.Appraisal "
                 + "WHERE ";

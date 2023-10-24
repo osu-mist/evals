@@ -45,7 +45,7 @@ public class MockMailer implements MailerInterface {
         reviewOverdueCount = OverDueCount;
     }
 
-    public void sendLateReport(String[] emailAddresses, String filePath, String bcName) {
+    public void sendLateReport(String[] emailAddresses, String filePath) {
         System.out.println("sending late evaluation report");
     }
 
