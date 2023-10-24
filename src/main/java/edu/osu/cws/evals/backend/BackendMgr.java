@@ -23,7 +23,6 @@ public class BackendMgr {
     private int updateCount = 0;
     private int followupEmailCount = 0;
     List<String> bcEmailsSent = new ArrayList<String>(); // BCs that we sent emails to
-    List<String> reportEmailsSent = new ArrayList<String>(); // BCs that we sent late report emails to
     private int openCount = 0; // # of open appraisals
     private int archivedCount = 0;
 
@@ -140,7 +139,7 @@ public class BackendMgr {
         System.out.println("Number of followup emails sent: ............" + followupEmailCount);
         System.out.println("Number of supervisor emails sent: .........." + supervisorEmailsSent);
         System.out.println("Email sent to BCs: ........................." + bcEmailsSent);
-        System.out.println("Late Report email sent to BCs: ............." + reportEmailsSent);
+        System.out.println("Late Report email sent .............");
         System.out.println("Number of errors occurred:..................." + totalErrorCount);
         System.out.println("Job starting at ............................" + startTime);
         System.out.println("Job exiting at ............................." + exitTime);
@@ -1138,53 +1137,45 @@ public class BackendMgr {
         writeLateEvalsCSVFiles(lateEvaluations);
         tx.commit();
 
-        for (String bcName : bcNames) {
-            try {
-                session = HibernateUtil.getCurrentSession();
-                tx = session.beginTransaction();
-                String filePath = getLateReportFilePath(bcName);
+        try {
+            session = HibernateUtil.getCurrentSession();
+            tx = session.beginTransaction();
+            String filePath = getLateReportFilePath("lateReport");
+            System.out.println(filePath);
 
-                // check that the report was written successfully before continuing with the BC
-                if (!new File(filePath).exists()) {
-                    continue;
-                }
-
-                String[] emailAddresses;
-                if (bcName.equals("OHR")) {
-                    emailAddresses = getAdminEmails();
-                } else {
-                    emailAddresses = getReviewersEmails();
-                }
-
-                if (emailAddresses == null) { // no email addresses for the report
-                    tx.commit();
-                    continue;
-                }
-
-                mailer.sendLateReport(emailAddresses, filePath, bcName);
-                tx.commit();
-                System.out.println("Done with report: " + bcName);
-
-                // log the bc names that get emails sent.
-                if (emailAddresses.length != 0 && emailAddresses[0] != null) {
-                    reportEmailsSent.add(bcName);
-                }
-
-                // delete csv report
-                File report = new File(filePath);
-                if (!report.delete()) {
-                    logDataError("\n" + "Failed to delete late evaluations report: " + filePath);
-                }
-            } catch(Exception e) {
-                if (session != null & session.isOpen()) {
-                    session.close();
-                }
-
-                String msg = "Error sending late report email to " + bcName;
-                logDataError(msg);
-                errorMsg.append("\n" + msg);
-                log_error(msg, e);
+            // check that the report was written successfully before continuing with the BC
+            if (!new File(filePath).exists()) {
+                System.out.println("No late report file exists");
+                return;
             }
+
+            String[] emailAddresses = (String[])ArrayUtils.addAll(getAdminEmails(), getReviewersEmails());
+
+            if (emailAddresses == null || emailAddresses.length == 0) { // no email addresses for the report
+                tx.commit();
+                System.out.println("No emails for late report");
+                return;
+            }
+
+            mailer.sendLateReport(emailAddresses, filePath);
+            tx.commit();
+            System.out.println("Done with late report");
+
+
+            // delete csv report
+            File report = new File(filePath);
+            if (!report.delete()) {
+                logDataError("\n" + "Failed to delete late evaluations report: " + filePath);
+            }
+        } catch(Exception e) {
+            if (session != null & session.isOpen()) {
+                session.close();
+            }
+
+            String msg = "Error sending late report email";
+            logDataError(msg);
+            errorMsg.append("\n" + msg);
+            log_error(msg, e);
         }
     }
 
@@ -1249,9 +1240,9 @@ public class BackendMgr {
 
             // Either end of input row, or the next row belongs to a different BC. Need to write the buffer to the
             // bc file and start anew.
-            if (i == lateEvaluations.size() -1 || !bcName.equals(lateEvaluations.get(i + 1)[10].toString())) {
+            if (i == lateEvaluations.size() -1) {
                 // specify filename for the new BC so we can write string buffer to file
-                String filename = getLateReportFilePath(bcName);
+                String filename = getLateReportFilePath("lateReport");
                 PrintWriter out = new PrintWriter(filename);
 
                 StringBuffer buffer = stringWriter.getBuffer();
@@ -1266,16 +1257,6 @@ public class BackendMgr {
             }
         }
         writer.close();
-
-        // Write the admin file.
-        StringBuffer adminBuffer = adminStringWriter.getBuffer();
-        if (adminBuffer.length() != 0) {
-            adminBuffer.insert(0, getLateReportHeaderRow()); // insert header row for admin
-            PrintWriter adminOut = new PrintWriter(getLateReportFilePath("OHR"));
-            adminOut.print(adminBuffer.toString());
-            adminOut.close();
-            adminWriter.close();
-        }
     }
 
     /**

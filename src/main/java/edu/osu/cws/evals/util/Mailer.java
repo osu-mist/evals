@@ -458,9 +458,8 @@ public class Mailer implements MailerInterface {
      *
      * @param emailAddresses
      * @param filePath
-     * @param bcName                    BC name that the report is being sent to.
      */
-    public void sendLateReport(String[] emailAddresses, String filePath, String bcName) {
+    public void sendLateReport(String[] emailAddresses, String filePath) {
         try {
             String body = emailBundle.getString("email_lateReport_body");
             HtmlEmail email = getHtmlEmail();
@@ -473,7 +472,7 @@ public class Mailer implements MailerInterface {
             }
 
             // Create the attachment
-            String filename = "EvalS-lateReport-" + bcName + "-" + month + ".csv";
+            String filename = "EvalS-lateReport-" + month + ".csv";
             EmailAttachment attachment = new EmailAttachment();
             attachment.setPath(filePath);
             attachment.setDisposition(EmailAttachment.ATTACHMENT);
@@ -489,7 +488,7 @@ public class Mailer implements MailerInterface {
             String longMsg = "Late report emails sent to: various reviewers";
             logger.log(Logger.INFORMATIONAL, "Late Report email sent", longMsg);
 
-            Email evalsEmail = new Email(0, "lateReport" + bcName);
+            Email evalsEmail = new Email(0, "lateReport");
             EmailMgr.add(evalsEmail);
         } catch (Exception e) {
             String logLongMessage = "";
