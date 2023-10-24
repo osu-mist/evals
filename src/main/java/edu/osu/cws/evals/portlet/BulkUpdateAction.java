@@ -93,6 +93,31 @@ public class BulkUpdateAction implements ActionInterface {
         Appraisal.STATUS_IN_REVIEW,
         Appraisal.STATUS_EMPLOYEE_REVIEW_DUE
     );
+    private static List<String> activeStatus = Arrays.asList(
+        "'" + Appraisal.STATUS_APPRAISAL_DUE + "'",
+        "'" + Appraisal.STATUS_APPRAISAL_OVERDUE + "'",
+        "'" + Appraisal.STATUS_BACK_ORIG_STATUS + "'",
+        "'" + Appraisal.STATUS_GOALS_APPROVAL_DUE + "'",
+        "'" + Appraisal.STATUS_GOALS_APPROVAL_OVERDUE + "'",
+        "'" + Appraisal.STATUS_GOALS_APPROVED + "'",
+        "'" + Appraisal.STATUS_GOALS_DUE + "'",
+        "'" + Appraisal.STATUS_GOALS_OVERDUE + "'",
+        "'" + Appraisal.STATUS_GOALS_REACTIVATED + "'",
+        "'" + Appraisal.STATUS_GOALS_REACTIVATION_REQUESTED + "'",
+        "'" + Appraisal.STATUS_GOALS_REQUIRED_MODIFICATION + "'",
+        "'" + Appraisal.STATUS_REBUTTAL_READ_DUE + "'",
+        "'" + Appraisal.STATUS_REBUTTAL_READ_OVERDUE + "'",
+        "'" + Appraisal.STATUS_RELEASE_DUE + "'",
+        "'" + Appraisal.STATUS_RELEASE_OVERDUE + "'",
+        "'" + Appraisal.STATUS_RESULTS_DUE + "'",
+        "'" + Appraisal.STATUS_RESULTS_OVERDUE + "'",
+        "'" + Appraisal.STATUS_REVIEW_DUE + "'",
+        "'" + Appraisal.STATUS_REVIEW_OVERDUE + "'",
+        "'" + Appraisal.STATUS_SIGNATURE_DUE + "'",
+        "'" + Appraisal.STATUS_SIGNATURE_OVERDUE + "'",
+        "'" + Appraisal.STATUS_IN_REVIEW + "'",
+        "'" + Appraisal.STATUS_EMPLOYEE_REVIEW_DUE + "'"
+    );
 
     private static List<Map<String, String>> FILTERS = Arrays.asList(
         new HashMap<String, String>() {{
@@ -118,6 +143,12 @@ public class BulkUpdateAction implements ActionInterface {
             put("type", "string");
             put("conditional", "appointmentTypeConditional");
             put("value", "appointmentTypeValue");
+        }},
+        new HashMap<String, String>() {{
+            put("field", "status");
+            put("type", "checkbox");
+            put("conditional", "activeAppraisalsConditional");
+            put("value", "activeAppraisalsValue");
         }}
     );
     private static List<String> UPDATES = Arrays.asList(
@@ -183,16 +214,18 @@ public class BulkUpdateAction implements ActionInterface {
                     String formattedValue;
                     if ("date".equals(fieldMap.get("type"))) {
                         Date date = new SimpleDateFormat("yyyy-MM-dd").parse(value);
-                        formattedValue = new SimpleDateFormat("dd-MMMMM-yyyy").format(date);
+                        formattedValue = "'" + new SimpleDateFormat("dd-MMMMM-yyyy").format(date) + "'"; 
+                    } else if ("status".equals(field)) {
+                        formattedValue = "(" + String.join(", ", activeStatus) + ")";
                     } else {
-                        formattedValue = request.getParameter(fieldMap.get("value"));
+                        formattedValue = "'" + request.getParameter(fieldMap.get("value")) + "'";
                     }
                     if (isFirstConditional) {
                         isFirstConditional = false;
                     } else {
                         query += "AND ";
                     }
-                    query += fieldMap.get("field") + " " + request.getParameter(fieldMap.get("conditional")) + " '" + formattedValue + "' ";
+                    query += fieldMap.get("field") + " " + request.getParameter(fieldMap.get("conditional")) + " " + formattedValue + " ";
                 }
             }
 

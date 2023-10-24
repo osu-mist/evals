@@ -83,6 +83,15 @@
                 </div>
             </div>
 
+            <!-- Active appraisals -->
+            <div>
+                Active Appraisals
+            </div>
+            <div>
+                <input name="activeAppraisalsValue" type="checkbox" ${activeAppraisalsValue == 'true' ? 'checked':''}/>
+                <input name="activeAppraisalsConditional" type="hidden" value="in"/>
+            </div>
+
             <input type="submit" value="Filter"/>
         </form>
     </div>
