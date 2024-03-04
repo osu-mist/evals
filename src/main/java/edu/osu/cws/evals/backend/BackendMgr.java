@@ -637,7 +637,8 @@ public class BackendMgr {
             Email lastEmail = EmailMgr.getLastEmail(appraisal.getId(), reminder);
             boolean haventSentReminder = lastEmail == null;
             boolean isTimeToSendReminder = EvalsUtil.isOverdue(appraisal, config);
-            if (isTimeToSendReminder && haventSentReminder) {
+            boolean hasOptOut = appraisal.getJob().getSupervisor().getEmployee().hasOptOut(OptOut.TYPE_EVAL);
+            if (isTimeToSendReminder && haventSentReminder && !hasOptOut) {
                 mailer.sendMail(appraisal, emailTypeMap.get(reminder));
                 // if one reminder is sent exit out since we don't need to send two reminders
                 return;
