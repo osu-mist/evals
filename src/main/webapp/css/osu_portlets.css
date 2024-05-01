@@ -1,0 +1,1175 @@
+/* Portlet Stylesheet *********************************************************
+* Currently used only be EvalS, but as we develop more portlets, they will be
+* using these styles as well.
+* All new styles must prepend the osu-cws class to avoid any conflicts with other
+* CSS files.
+*******************************************************************************/
+
+/* General OSU Made Portlet Stylings *******************************************/
+
+.osu-cws {
+  font-size: 12px;
+  background-color: #f2f2f2;
+  padding: 5px;
+  -moz-box-shadow: 0 0 3px #999;
+  -webkit-box-shadow: 0 0 3px #999;
+  box-shadow: 0 0 3px #999;
+  padding-bottom: .5em;
+}
+
+.osu-cws h2 {
+  color: #333;
+  font-size: 1.3em;
+  margin: .7em 0;
+  border-bottom: 4px solid #333;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+.osu-cws h3 {
+  font-size: 1.2em;
+}
+
+.osu-cws .portlet-msg-error,
+.osu-cws .portlet-msg-alert,
+.osu-cws .portlet-msg-success {
+	margin: .5em;
+}
+
+.osu-cws .secret { /* used for accessibiliy titles and others */
+  position: absolute;
+  left: -999em;
+}
+
+.osu-cws .align-right {
+  text-align: right;
+}
+
+.osu-cws .larger-font {
+  font-size: 1.2em;
+}
+
+.osu-cws .red-text {
+     color: #cc0000;
+}
+
+/* FORMS **********************************************************************/
+/* Forms including some advance features*/
+
+.osu-cws form {
+  width: 100%;
+}
+
+.osu-cws form + form {
+  border-top: 1px dotted #000;
+  padding-top: 1.2em;
+  margin-top: 1em;
+}
+
+.osu-cws fieldset {
+  border: 1px solid #cccccc;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  margin-bottom: 1em;
+  padding: .3em .3em .5em .8em;
+  background-color: #fff;
+}
+
+.osu-cws legend {
+  background-color: #dbdbdb;
+  padding: .32em 1.4em;
+  margin-left: 1em;
+  margin-bottom: .5em;
+  border: 1px solid #cccccc;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  color: #000;
+  font-weight: bold;
+  letter-spacing: .05em;
+  width: auto;
+  font-size: 1em;
+  line-height: 20px;
+}
+
+/* The following 2 fix an IE7 and IE8 bug with fieldset and legends */
+.ie .osu-cws fieldset {
+  position: relative;
+  margin-top: 25px;
+  padding-top: 20px;
+}
+
+.ie .osu-cws legend {
+  position: absolute;
+  top: -14px;
+}
+
+.osu-cws *:focus {
+  outline: none; /* Prevents blue border in Webkit */
+}
+
+.osu-cws label {
+  clear: both;
+  padding-right: 1em;
+  color: #666;
+  font-weight: bold;
+}
+
+.input-text-wrapper {
+  display: flex;
+}
+
+.control-label {
+  display: none;
+}
+
+.osu-cws div.required_text {
+  font-weight: bold;
+  margin-bottom: .5em;
+}
+
+.osu-cws label.required,
+.osu-cws div.required_text {
+  color: #615042;
+}
+
+.osu-cws label.required:before,
+.osu-cws div.required_text:before {
+  content: "* ";
+  color: #870e01;
+}
+
+.osu-cws input,
+.osu-cws textarea,
+.osu-cws select {
+  background-color: #fff;
+  border: 1px solid #999;
+  min-width: 22em;
+  padding: .2em;
+  min-height: 1em;
+  display: block;
+  margin-bottom: .7em;
+  margin-top: .3em;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-transition: all 0.5s ease-in-out;
+  -moz-transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
+}
+
+.osu-cws input[type=text],
+.osu-cws textarea {
+  min-width: 40em;
+  width: 65%;
+}
+
+.osu-cws textarea {
+  min-height: 6em;
+  height: 8em;
+  background-image: none;
+  margin-right: .6em;
+  margin-left: -.3em;
+}
+
+.osu-cws input:focus,
+.osu-cws textarea:focus,
+.osu-cws select:focus {
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(195, 76, 0, 0.6);
+  border-color: #c34500;
+  background-color: #fff;
+}
+
+.osu-cws input[type=submit],
+.osu-cws input[type=reset] {
+  -webkit-appearance: none; /* removes default iOS styling - for save and cancel buttons*/
+}
+
+.osu-cws .bttn,
+.osu-cws input[type=submit],
+.osu-cws input[type=button].submit,
+.osu-cws input[type=button].cancel,
+.osu-cws input[type=reset],
+.osu-cws input[type=submit][value=Cancel] {
+  padding: 4px 10px;
+  font-size: 13px;
+  line-height: 18px;
+  color: #333333;
+  text-align: center;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+  vertical-align: middle;
+  background-color: #f5f5f5;
+  background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -ms-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
+  background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: linear-gradient(top, #ffffff, #e6e6e6);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#e6e6e6', GradientType=0);
+  border: 1px solid #cccccc;
+  border-bottom-color: #b3b3b3;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  *margin-left: .3em;
+  text-decoration: none;
+  min-width: 10em;
+  font-weight: bold;
+  display: inline-block;
+  margin-right: 2em;
+  float: inherit;
+}
+
+.osu-cws .bttn:hover,
+.osu-cws .bttn:active,
+.osu-cws .bttn:focus,
+.osu-cws input.cancel[type="button"]:hover,
+.osu-cws input.cancel[type="button"]:active,
+.osu-cws input.cancel[type="button"]:focus,
+.osu-cws input[type="reset"]:hover,
+.osu-cws input[type="reset"]:active,
+.osu-cws input[type="reset"]:focus {
+  background-image: none;
+  background-color: #e6e6e6;
+  border-color: #c34500;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(195, 76, 0, 0.6);
+}
+
+.osu-cws input[type="submit"],
+.osu-cws input[type="button"].submit {
+  background-color: #c34500;
+  background-image: -moz-linear-gradient(top, #a23900, #c34500);
+  background-image: -ms-linear-gradient(top, #a23900, #c34500);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#a23900), to(#c34500));
+  background-image: -webkit-linear-gradient(top, #a23900, #c34500);
+  background-image: -o-linear-gradient(top, #a23900, #c34500);
+  background-image: linear-gradient(top, #a23900, #c34500);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#a23900', endColorstr='#c34500', GradientType=0);
+  border-color: #c34500 #c34500 #764800;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.osu-cws input[type="submit"]:hover,
+.osu-cws input[type="submit"]:active,
+.osu-cws input[type="submit"]:focus,
+.osu-cws input.submit[type="button"]:hover,
+.osu-cws input.submit[type="button"]:active,
+.osu-cws input.submit[type="button"]:focus {
+  background-image: none;
+  background-color: #c34500;
+}
+
+.osu-cws .bttn {
+  margin-top: .3em;
+  display: inline-block;
+}
+
+.osu-cws .bttn.small,
+.osu-cws input[type=submit].small,
+.osu-cws input[type=reset].small,
+.osu-cws input.small[type="button"]  {
+  min-width: 3em;
+  width: auto;
+  margin: 0 2px;
+  padding: 1px;
+}
+
+.ie7 .osu-cws .bttn,
+.ie7 .osu-cws input[type=submit],
+.ie7 .osu-cws input[type=button].submit,
+.ie7 .osu-cws input[type=button].cancel,
+.ie7 .osu-cws input[type=reset] {
+  min-width: auto;
+}
+
+.osu-cws legend + fieldset {
+  margin-top: .5em;
+}
+
+.osu-cws fieldset fieldset input,
+.osu-cws input[type="radio"],
+.osu-cws input[type="checkbox"] {
+  min-width: 1em;
+  margin-bottom: .4em;
+  display: inline;
+}
+
+.osu-cws input[type="radio"],
+.osu-cws input[type="checkbox"] {
+  padding: .25em;
+  border: 0;
+}
+
+.osu-cws fieldset.required legend:before {
+  content: "* ";
+  color: #870e01;
+}
+
+.osu-cws input.inline,
+.osu-cws select.inline,
+.osu-cws fieldset.inline label,
+.osu-cws .checkbox-label,
+.osu-cws .radio-label {
+  display: inline;
+}
+
+.osu-cws input[type="radio"] + label,
+.osu-cws input[type="checkbox"] + label {
+  display: inline;
+  font-weight: normal;
+  color: #252525;
+}
+
+.osu-cws input.narrow {
+  width: 15em;
+  min-width: 15em;
+}
+
+.osu-cws input.int {
+  width: 5em;
+  min-width: 5em;
+  margin: 0;
+}
+
+.osu-cws input[type="radio"],
+.osu-cws input[type="checkbox"] {
+  margin-right: .4em; }
+
+.osu-cws input + input {
+  margin-left: .6em;
+}
+
+.osu-cws fieldset fieldset {
+  margin-right: .8em;
+  background: #f2f2f2; /* Old browsers */
+  background: -moz-linear-gradient(top, rgba(255,255,255,1) 20%, rgba(242,242,242,1) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(20%,rgba(255,255,255,1)), color-stop(100%,rgba(242,242,242,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, rgba(255,255,255,1) 20%,rgba(242,242,242,1) 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, rgba(255,255,255,1) 20%,rgba(242,242,242,1) 100%); /* Opera11.10+ */
+  background: -ms-linear-gradient(top, rgba(255,255,255,1) 20%,rgba(242,242,242,1) 100%); /* IE10+ */
+  background: linear-gradient(top, rgba(255,255,255,1) 20%,rgba(242,242,242,1) 100%); /* W3C */
+}
+
+.osu-cws fieldset fieldset legend {
+  margin-left: 15px;
+  font-size: 90%;
+  padding: .5em .3em 0;
+  border: none;
+  background-color: transparent;
+}
+
+.osu-cws fieldset fieldset label {
+  display: block;
+}
+
+.osu-cws .disabled input {
+  background-color: #e1e1e1;
+  font-style: italic;
+}
+
+.osu-cws .disabled label {
+  color: #999;
+}
+
+.osu-cws form.search input[type="text"] {
+  display: inline;
+  width: 20em;
+}
+
+/* Read only inputs style */
+.osu-cws input[type="text"][readonly="readonly"],
+.osu-cws input[type="text"][disabled="disabled"],
+.osu-cws input[type="text"][disabled],
+.osu-cws textarea[readonly="readonly"],
+.osu-cws input[type="text"][readonly="readonly"]:focus,
+.osu-cws textarea[readonly="readonly"]:focus {
+  border: none;
+  pointer-events: none;
+  cursor: default;
+  background-image: none;
+  color: #666;
+  box-shadow: none;
+  background-color: transparent;
+}
+
+/**** Grails fix for inputs inside labels (radio/checkbox) **/
+.osu-cws label > input[type="radio"],
+.osu-cws label > input[type="checkbox"] {
+  float: left; /* Grails output has the text and input inside a label */
+  width: auto;
+  min-width: 1em;
+}
+
+/****** Compact (inline) forms *********/
+.osu-cws .compact label,
+.osu-cws .compact input,
+.osu-cws .compact fieldset fieldset label,
+.osu-cws .compact input[type="text"],
+.osu-cws .compact textarea {
+  min-width: 10em;
+  width: 11em;
+  display: inline-block;
+}
+
+.osu-cws .compact input[type="text"][readonly],
+.osu-cws .compact input[type="text"][readonly="readonly"],
+.osu-cws .compact input[type="text"][disabled],
+.osu-cws .compact input[type="text"][disabled="disabled"] {
+    width: 20em;
+}
+
+.osu-cws .compact input[type="text"][disabled].wider-input,
+.osu-cws .compact input[type="text"][disabled="disabled"].wider-input {
+    width: 40em;
+}
+
+.osu-cws .compact label {
+  text-align: right;
+}
+
+.osu-cws .compact span {
+    display: inline-block;
+    margin-bottom: 0.7em;
+    margin-top: 0.3em;
+    min-height: 1em;
+    padding: 0.2em;
+}
+
+.osu-cws .compact.wider-label label {
+  width: 14em;
+}
+
+.osu-cws .compact .radio-group label,
+.osu-cws .compact .radio-group input {
+  min-width: 0;
+  width: auto;
+}
+
+.osu-cws .compact select {
+  min-width: 2em;
+  display: inline;
+}
+
+.osu-cws .compact input.small[type="button"] {
+  padding: 0 4px;
+  margin-top: 0;
+}
+
+.osu-cws .compact .compact-align {
+  margin-left: 12em;
+}
+
+.osu-cws .compact dl {
+  margin-left: 0;
+}
+
+.osu-cws .compact dt /* just add this line to existing */
+{
+  text-align: right;
+  display: inline-block;
+  width: 11em;
+  color: #666;
+  font-weight: bold;
+}
+
+.osu-cws .compact dd {
+  display: inline-block;
+  padding-bottom: 8px;
+}
+
+/* Two columns in a jiffy *************************
+ *  Ideally applied to two <div> wrappers, one for each column in the form.
+ *  It's best use is to really make a form fit before the fold, save space
+ *  Combine with inline forms to save even more space.
+ *  Can be used in any content, not just forms.
+*/
+.osu-cws .right-col,
+.osu-cws .left-col {
+  width: 46%;
+}
+
+.osu-cws .right-col{
+  float: right;
+  clear: right;
+}
+
+.osu-cws .left-col {
+  float: left;
+  clear: left;
+}
+
+.osu-cws .float-breaker {
+  clear: both;
+  display: block;
+}
+
+/* Tables *********************************************************************/
+
+.osu-cws table {
+  background: #fff;
+  width: 100%;
+  margin: .4em auto;
+}
+
+.osu-cws table.narrow {
+  width: 94%;
+  margin: .5em auto;
+}
+
+.osu-cws caption {
+  font-size: 1.2em;
+  font-weight: bold;
+  text-align: left;
+  padding-left: .5em;
+  margin-bottom: 0;
+}
+
+.osu-cws thead{
+  border-top: 3px solid #252525;
+}
+
+.osu-cws tbody {
+  /* border-bottom: 1px solid #252525; */
+  margin-bottom: .4em;
+}
+
+.osu-cws table tr.results-row.hover td {
+  background-color: transparent;
+}
+
+.osu-cws table tr.results-row td {
+  background-color: #fff;
+}
+
+.osu-cws tr.alt,
+.osu-cws table tr.results-row.alt td {
+  background-color: #f2f2f2;
+}
+
+.osu-cws .accordion-header tbody {
+  border: 0;
+}
+
+.osu-cws table.main {
+  width: 96%;
+}
+
+.osu-cws td + th,
+.osu-cws td + td  {
+  border-left: 1px solid #ddd;
+  padding: 0.2em;
+}
+
+.osu-cws tr + tr,
+.osu-cws tfoot {
+  border-top: 1px solid #ddd;
+}
+
+.osu-cws tfoot {
+  text-align: right;
+}
+
+.osu-cws .more-link span:after {
+  padding-left: 4px;
+  content: "\00BB";
+}
+
+.osu-cws .osu-accordion-header {
+  background: url("../images/portlet/portlet-subhead-bg-closed-c.png") repeat-x scroll 0 0 transparent;
+  height: 20px;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  border: 1px solid #ccc;
+  border-top: none;
+  font-size: 1.25em;
+  padding-top: .2em;
+  padding-left: 1em;
+  color: #3B3737;
+  font-weight: bold;
+}
+
+.osu-cws .osu-accordion-header img {
+  padding-right: 3px; /* adds spacing to the collapse/expand arrow */
+}
+
+.osu-cws .osu-accordion-content,
+.osu-cws .accordion-content,
+.osu-cws .accordion-menu {
+  margin-bottom: 1em;
+}
+
+.ie .osu-cws .accordion-menu,
+.ie .osu-cws .accordion-content,
+.ie .osu-cws .osu-accordion-content {
+  padding-bottom: .8em;
+  margin-bottom: 0;
+}
+
+/* Fixes a spacing issue with the menus that the 5.0.3 update caused */
+.osu-cws .action-menu-wrapper {
+  top: 0; /* repeated for IE below, we need to keep both separate */
+}
+
+.ie .osu-cws .action-menu-wrapper {
+	top: 0; /* yes, we need to repeat in completely separate line the above */
+}
+
+.osu-cws .accordion-content {
+  overflow: hidden;
+}
+
+.osu-cws .accordion-content p {
+  margin: .4em 1em;
+}
+.osu-cws .collapses th {
+  padding-left: 1em;
+}
+
+/* Used to add a small margin to the left of elements */
+.osu-cws .main-margin {
+  margin-left: 8px;
+}
+
+/* Information Pair @todo change #pass-my-info to .info-pair and html later */
+.osu-cws #pass-my-info {
+  background: #f2f2f2;
+  padding: 0 2px;
+  min-width: 255px;
+}
+
+.osu-cws #pass-my-info .section {
+  padding: 6px;
+  margin: 1em 0;
+  background: #fff;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  box-shadow: 0 0 3px #ddd;
+  overflow: auto;
+}
+
+.osu-cws #pass-my-info .col1 {
+  float: left;
+  vertical-align: middle;
+  color: #c34500;
+  width: 30%;
+}
+
+.osu-cws #pass-my-info .col2 {
+  float: left;
+  padding-left: 5px;
+}
+
+.osu-cws #pass-my-info h3 {
+  margin-top: 0.8em;
+}
+
+/* System Messages */
+.osu-cws .portlet-msg-success {
+  margin-bottom: .4em;
+}
+
+/* search fixes */
+.osu-cws .no-results {
+  background-color: #ffffcc;
+  padding: 1em;
+  border: 1px solid #FFCC00;
+  margin-bottom: .5em;
+}
+
+.osu-cws .listing tr {
+  color: #000;
+}
+
+/* TOP MENU */
+.osu-cws .portlet-top-menu {
+    padding-bottom: 36px;
+    position: relative;
+    z-index: 1;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+.osu-cws .portlet-top-menu.action-menu-wrapper ul {
+    background: #FFF;
+    border-bottom: 1px solid #ccc;
+    margin: 0 0 0 0;
+}
+
+.osu-cws .portlet-top-menu .portlet-action-menu ul {
+    -moz-box-shadow: 0 0 3px #666;
+    -webkit-box-shadow:  0 0 3px #666;
+    box-shadow: 0 1px 3px #666;
+}
+
+.osu-cws .portlet-top-menu .portlet-action-menu {
+  height: 36px;
+}
+
+.osu-cws .portlet-action-menu li:hover ul,
+.osu-cws .portlet-action-menu li.sfHover ul {
+      left: 0;
+      top: 36px;
+}
+
+.osu-cws .portlet-top-menu .portlet-action-menu li.pass-roles:hover ul,
+.osu-cws .portlet-top-menu .portlet-action-menu li.pass-roles.sfHover ul {
+      right: 0;
+      left: auto;
+}
+
+.osu-cws .portlet-top-menu .portlet-action-menu li:hover,
+.osu-cws .portlet-top-menu .portlet-action-menu li.sfHover,
+.osu-cws .portlet-top-menu .portlet-action-menu a:focus,
+.osu-cws .portlet-top-menu .portlet-action-menu a:hover,
+.osu-cws .portlet-top-menu .portlet-action-menu a:active {
+    background: none repeat scroll 0 0 #FFF;
+    text-decoration: none;
+}
+
+.ie7 .osu-cws .portlet-top-menu.action-menu-wrapper ul.portlet-action-menu,
+.ie7 .osu-cws .portlet-top-menu.action-menu-wrapper {
+  min-width: 261px;
+}
+
+.osu-cws .portlet-top-menu ul.portlet-action-menu ul {
+    width: 14.8em;
+    overflow: hidden;
+}
+
+.osu-cws .portlet-top-menu .portlet-action-menu li {
+    background: #fff;
+    float: left;
+    border-right: 1px solid #CCC;
+}
+
+.osu-cws .portlet-top-menu .portlet-action-menu li li {
+    float: none;
+    width: auto;
+}
+
+.osu-cws .portlet-top-menu .portlet-action-menu li li+li {
+    border-top: 1px solid #ccc;
+    border-right: 0;
+}
+
+.osu-cws .portlet-top-menu .portlet-action-menu a:hover,
+.osu-cws .portlet-top-menu .portlet-action-menu a:active,
+.osu-cws .portlet-top-menu .portlet-action-menu a:focus,
+.osu-cws .portlet-top-menu .portlet-action-menu a.active,
+.osu-cws .actions li a:focus,
+.osu-cws .actions li a:hover {
+    border-bottom: 3px solid #d85a1a;
+}
+
+.osu-cws .portlet-top-menu .portlet-action-menu li.pass-roles {
+    float: right;
+    border-right: 0;
+    border-left: 1px solid #ccc;
+}
+
+.osu-cws .portlet-top-menu ul.portlet-action-menu li.pass-roles ul {
+    width: 8em;
+    top: auto;
+    left: -999em;
+}
+
+.ie .osu-cws .portlet-top-menu ul.portlet-action-menu ul {
+    border: 1px solid #ccc;
+}
+
+.osu-cws .portlet-top-menu .portlet-action-menu a {
+  white-space: normal; /* overwrites, so long names can break to next line down */
+}
+
+/* Overides the AUI theme for now. */
+
+.osu-cws a, .osu-cws a:hover, .osu-cws a:active, .osu-cws a:focus{
+    color: #c34500 !important;
+}
+
+.osu-cws .actions a{
+    color: #686868 !important;
+}
+
+.osu-cws .actions a span:hover {
+    text-decoration:none;
+}
+
+.osu-cws .portlet-top-menu ul.portlet-action-menu li a {
+    color: #686868 !important;
+    padding: 3px 6px 3px;
+    font-size: 13px;
+    display: block;
+    border-bottom: 3px solid transparent;
+    font-weight: bold;
+}
+
+.osu-cws .portlet-top-menu ul.portlet-action-menu li a {
+    color: #686868 !important;
+}
+
+.osu-cws .portlet-top-menu ul.portlet-action-menu li li a {
+    font-size: 12px;
+}
+
+.osu-cws {
+  font-family: Arial !important;
+}
+
+.osu-cws .accordion-menu.pass-notification.chart-area .google-visualization-table-th.gradient.sort-ascending,
+.osu-cws .accordion-menu.pass-notification.chart-area .google-visualization-table-th.gradient.sort-descending,
+.osu-cws .accordion-menu.pass-notification.chart-area .google-visualization-table-th.gradient.unsorted {
+  background-image: none !important;
+}
+
+
+/* Toggle - Collapse Menus, Regions *******************************************/
+
+.osu-cws a.osu-expanded,
+.osu-cws a.osu-collapsed {
+  display: block;
+  background: url("/o/evals/images/accordion/accordion_arrow_up.png") no-repeat 0 center transparent;
+  padding-left: 14px;
+  color: #333;
+  text-decoration: none;
+}
+
+.osu-cws a.osu-expanded:hover,
+.osu-cws a.osu-expanded:active,
+.osu-cws a.osu-expanded:focus,
+.osu-cws a.osu-collapsed:hover,
+.osu-cws a.osu-collapsed:active,
+.osu-cws a.osu-collapsed:focus {
+  color: #333;
+  text-decoration: underline;
+}
+
+.osu-cws a.osu-collapsed {
+  background-image: url("/o/evals/images/accordion/accordion_arrow_down.png");
+}
+
+
+/* Action Link Bars ***********************************************************/
+
+.osu-cws .actions {
+  margin: -1.15em 0 .8em 0;
+  overflow: hidden;
+}
+
+.osu-cws .actions li {
+  float: left;
+  display: inline-block;
+  padding: .6em 1.2em;
+  border: 1px solid #333;
+  background-color: #fff;
+  border-radius: 0 0 4px 4px;
+  margin: 2px 0 2px 8px;
+}
+
+.ie7 .osu-cws .actions li {
+ margin-top: 0;
+}
+
+.osu-cws .actions li:hover {
+  background-color: #eee;
+}
+
+.osu-cws .actions a {
+  color: #333;
+  text-decoration: none;
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.osu-cws .actions a:hover,
+.osu-cws .actions a:active,
+.osu-cws .actions a:focus {
+  text-shadow: none;
+}
+
+/* Help Links *****************************************************************/
+
+.osu-help-menu-links {
+  padding: .6em;
+  margin: 0;
+  overflow: auto;
+}
+
+.osu-help-menu-links li {
+  float: left;
+  list-style-type: none;
+}
+
+.osu-help-menu-links a {
+  display: block;
+  border-radius: 3px;
+  background-color: #f2f2f2;
+  border: 1px solid #ddd;
+  margin-right: .6em;
+  padding: .3em .5em;
+  text-decoration: none;
+}
+
+.osu-cws .pass-menu-list li{
+  list-style: disc;
+}
+
+/* Pagination *****************************************************************/
+.osu-cws .rows-per-page {
+    margin: 0;
+}
+.osu-cws .pagination li,
+.osu-cws .rows-per-page li {
+    list-style-type: none;
+    margin: 0;
+    float: left;
+    min-height: 2em;
+    padding: 0em 0.18em;
+}
+
+.osu-cws .pagination {
+  display: inline-block;
+  background-color: #fff;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  margin: 0 0 8px;
+}
+
+.osu-cws .pagination li {
+  padding: 0;
+}
+
+.osu-cws .pagination a,
+.osu-cws .pagination .active span {
+  display: inline-block;
+  padding: 6px 10px;
+  text-decoration: none;
+  border-right: 1px solid #ddd;
+  line-height: 14px;
+}
+
+.osu-cws .pagination .active span {
+  font-weight: bold;
+  color: #444;
+  background-color: #f2f2f2;
+}
+
+.osu-cws .pagination a:hover,
+.osu-cws .pagination a:active,
+.osu-cws .pagination a:focus {
+  background: #f2f2f2;
+  color: #444;
+}
+
+.osu-cws .results .resultsPerPage {
+  float: left;
+}
+
+.osu-cws .results .rows-per-page {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.osu-cws .pagination .next a {
+  border: none;
+}
+
+.osu-cws .resultsCount {
+  float: right;
+  color: #555;
+}
+
+.osu-cws .disabled a {
+  color: #666;
+  text-decoration: none;
+  pointer-events: none;
+  cursor: default;
+}
+
+/* used for table th/td to make a column narrow - like the "actions" col */
+.osu-cws .narrow-col {
+  width: 42px;
+}
+
+/* Useful navigation elements ADD, DELETE, VIEW ALL, etc */
+.osu-cws .ul-h-nav {
+  overflow: auto;
+  margin-left: 0;
+}
+
+.osu-cws .ul-h-nav li {
+  float: left;
+  list-style-type: none;
+  border-left: 1px solid #eee;
+  padding-left: 8px;
+}
+
+.osu-cws .ul-h-nav li:first-child {
+  border-left: none;
+}
+
+.osu-cws .img-txt {
+  background-position: center left;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  padding: 2px 8px 2px 18px;
+}
+
+.osu-cws .img-only {
+  background-position: center center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  text-indent: -9999em;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+}
+
+.osu-cws .img-only + .img-only {
+  margin-left: 8px;
+}
+
+.osu-cws .add {
+  background-image: url('../images/arrows/02_plus.png');
+}
+
+.osu-cws .edit {
+  background-image: url('../images/portlet/edit.png');
+}
+
+.osu-cws .view-all {
+  background-image: url('../images/common/page.png');
+}
+
+.osu-cws .delete {
+  background-image: url('../images/arrows/02_x.png');
+}
+
+.osu-cws .accessible-outline {
+  border: 1px solid transparent;
+}
+
+.osu-cws .accessible-outline:hover,
+.osu-cws .accessible-outline:focus {
+    border: 1px solid #c34500;
+}
+
+/* Js information and error styling */
+.osu-cws .js-info {
+  background: url('../images/messages/alert.png') center left no-repeat;
+  padding-left: 18px !important;
+  color: #c34500;
+}
+
+/* JS error styling */
+.osu-cws span.js-error {
+  background: url('../images/messages/exclamation.png') center left no-repeat;
+  padding-left: 18px !important;
+  color: #cc0000;
+}
+
+/* Fixes for positioning of elements in IE
+* Mainly the "gear" dropdown "refresh" link for RSS Feeds
+*/
+.ie .lfr-menu-list,
+.ie .lfr-trigger ul {
+  margin-left: -80px !important; /* IE8 and IE9 */
+  margin-top: 24px;
+}
+
+.ie7 .lfr-menu-list,
+.ie7 .lfr-trigger ul {
+  margin-top: -14px !important;
+}
+
+/* Calendar JQuery UI styling ************************************************
+* Note: this does NOT have the ".osu-cws" prefix, this is because sometimes
+* JQuery positions this element outside of the "osu-cws" portal, it is injected
+* just below the body tag, so we need to style it in its place.
+*/
+#ui-datepicker-div {
+  box-shadow: 1px 1px 8px rgba(0,0,0,.5);
+  border-radius: 3px;
+}
+
+.ui-datepicker-clear {
+  margin: 2px 3px;
+}
+.ui-datepicker-clear a {
+  color: #000;
+}
+
+#ui-datepicker-div .ui-datepicker-days-row a {
+  border-radius: 2px;
+  border: 1px solid #ddd;
+  margin: 2px;
+  text-decoration: none;
+}
+
+#ui-datepicker-div .ui-datepicker-days-row a:hover,
+#ui-datepicker-div .ui-datepicker-days-row a:hover,
+#ui-datepicker-div .ui-datepicker-days-row a:focus {
+  border-color: transparent;
+}
+
+.ui-datepicker-current a:hover,
+.ui-datepicker-current a:active,
+.ui-datepicker-current a:focus {
+  background-color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  display: inline-block;
+  padding: 0 3px;
+  color: #555;
+}
+
+.ui-datepicker-close a {
+  margin: 2px 2px 2px 0;
+}
+
+.ui-datepicker-next a,
+.ui-datepicker-prev a {
+  color: transparent;
+}
+
+.ui-datepicker-prev label {
+  padding: 0 2px;
+  color: #f2f2f2;
+}
+
+.ui-datepicker-today a {
+    background-color: #FFF;
+    color: #336699;
+}
+
+.ui-datepicker-current-day a {
+    background-color: #727C81;
+    color: #FFFFFF;
+    border: 1px solid #DDDDDD;
+    border-radius: 2px 2px 2px 2px;
+    margin: 2px;
+}
+
+/* Accessibility classes and other helpers */
+#accessible-errors {
+  position: absolute;
+  left:-999em;
+}
+
+@media screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait) {
+ #banner {
+   min-width: 1024px;
+ }
+}

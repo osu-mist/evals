@@ -1,0 +1,278 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping auto-import="false" >
+
+    <class name="edu.osu.cws.evals.models.Appraisal" table="appraisals"
+           dynamic-insert="true"
+           dynamic-update="true">
+        <id name="id" type="int" column="ID">
+            <generator class="native">
+                <param name="sequence">pass_seq</param>
+            </generator>
+        </id>
+
+        <property name="startDate" type="date" column="START_DATE"/>
+        <property name="endDate" type="date" column="END_DATE"/>
+        <property name="resultSubmitDate" type="timestamp" column="RESULT_SUBMIT_DATE"/>
+        <property name="evaluation" type="text" column="EVALUATION"/>
+        <property name="evaluationSubmitDate" type="timestamp" column="EVALUATION_SUBMIT_DATE"/>
+        <property name="rating" type="java.lang.Integer" length="1" column="RATING"/>
+        <property name="reviewSubmitDate" type="timestamp" column="REVIEW_SUBMIT_DATE"/>
+        <property name="review" type="text" column="REVIEW"/>
+        <property name="createDate" type="timestamp" column="CREATE_DATE"/>
+        <property name="rebuttal" type="text" column="REBUTTAL"/>
+        <property name="rebuttalDate" type="timestamp" column="REBUTTAL_DATE"/>
+        <property name="employeeSignedDate" type="timestamp" column="EMPLOYEE_SIGNED_DATE"/>
+        <property name="closeOutDate" type="timestamp" column="CLOSEOUT_DATE"/>
+        <property name="status" length="32" column="STATUS"/>
+        <property name="originalStatus" length="32" column="ORIGINAL_STATUS"/>
+        <property name="releaseDate" type="timestamp" column="RELEASE_DATE"/>
+        <property name="supervisorRebuttalRead" type="timestamp" column="SUPERVISOR_REBUTTAL_READ"/>
+        <property name="type" column="TYPE"/>
+        <property name="overdue" type="int" column="OVERDUE"/>
+        <property name="goalsOverdue" type="int" column="GOALS_OVERDUE"/>
+        <property name="goalsApprovalOverdue" type="int" column="GOALS_APPROVAL_OVERDUE"/>
+        <property name="resultsOverdue" type="int" column="RESULTS_OVERDUE"/>
+        <property name="appraisalOverdue" type="int" column="APPRAISAL_OVERDUE"/>
+        <property name="reviewOverdue" type="int" column="REVIEW_OVERDUE"/>
+        <property name="releaseOverdue" type="int" column="RELEASE_OVERDUE"/>
+        <property name="signatureOverdue" type="int" column="SIGNATURE_OVERDUE"/>
+        <property name="rebuttalReadOverdue" type="int" column="REBUTTAL_READ_OVERDUE"/>
+
+        <many-to-one name="job" class="edu.osu.cws.evals.models.Job" not-null="true">
+            <column name="JOB_PIDM"/>
+            <column name="POSITION_NUMBER"/>
+            <column name="JOB_SUFFIX"/>
+        </many-to-one>
+        <many-to-one name="closeOutReason" class="edu.osu.cws.evals.models.CloseOutReason"
+                     column="CLOSEOUT_REASON_ID"
+                     not-null="false"/>
+        <many-to-one name="evaluator" class="edu.osu.cws.evals.models.Employee"
+                     column="EVALUATOR_PIDM"
+                     not-null="false"/>
+        <many-to-one name="reviewer" class="edu.osu.cws.evals.models.Employee"
+                     column="REVIEWER_PIDM"
+                     not-null="false"/>
+        <many-to-one name="closeOutBy" class="edu.osu.cws.evals.models.Employee"
+                     column="CLOSEOUT_PIDM"
+                     not-null="false"/>
+        <set name="goalVersions" inverse="true" cascade="all">
+            <key column="APPRAISAL_ID"/>
+            <one-to-many class="edu.osu.cws.evals.models.GoalVersion" />
+        </set>
+
+        <set name="salaries" inverse="true" cascade="all">
+            <key column="APPRAISAL_ID" not-null="true"/>
+            <one-to-many class="edu.osu.cws.evals.models.Salary" />
+        </set>
+
+    </class>
+    <sql-query name="appraisal.reviewCount"><![CDATA[
+        SELECT
+            count(*)
+        FROM
+            appraisals
+        WHERE
+            STATUS in ('reviewDue' , 'reviewOverdue')
+    ]]></sql-query>
+    <sql-query name="report.allActiveOSU"><![CDATA[
+            SELECT
+                PYVPASJ.PYVPASJ_BCTR_TITLE,
+                appraisals.id,
+                appraisals.status
+            FROM
+                appraisals,
+                PYVPASJ
+            WHERE
+            appraisals.status not in ('completed', 'closed', 'archivedCompleted', 'archivedClosed')
+            AND PYVPASJ.PYVPASJ_PIDM = appraisals.job_pidm
+            AND PYVPASJ.PYVPASJ_POSN = appraisals.position_number
+            AND PYVPASJ.PYVPASJ_SUFF = appraisals.JOB_SUFFIX
+            and PYVPASJ.PYVPASJ_APPOINTMENT_TYPE IN (:appointmentTypes)
+    ]]></sql-query>
+    <sql-query name="report.allActiveBC"><![CDATA[
+            SELECT
+                SUBSTR(PYVPASJ_ORGN_DESC, 1, 3),
+                appraisals.id,
+                appraisals.status,
+                PYVPASJ.PYVPASJ_BCTR_TITLE,
+                PYVPASJ.PYVPASJ_ORGN_CODE_TS,
+                PYVPASJ.PYVPASJ_ORGN_DESC
+            FROM
+                appraisals,
+                PYVPASJ
+            WHERE
+            appraisals.status not in ('completed', 'closed', 'archivedCompleted', 'archivedClosed')
+            AND PYVPASJ.PYVPASJ_PIDM = appraisals.job_pidm
+            AND PYVPASJ.PYVPASJ_POSN = appraisals.position_number
+            AND PYVPASJ.PYVPASJ_SUFF = appraisals.JOB_SUFFIX
+            and PYVPASJ.PYVPASJ_APPOINTMENT_TYPE IN (:appointmentTypes)
+            and PYVPASJ.PYVPASJ_BCTR_TITLE = :bcName
+    ]]></sql-query>
+    <sql-query name="report.allActiveOrgPrefix"><![CDATA[
+            SELECT
+                PYVPASJ.PYVPASJ_ORGN_CODE_TS,
+                appraisals.id,
+                appraisals.status,
+                PYVPASJ.PYVPASJ_ORGN_DESC
+            FROM
+                appraisals,
+                PYVPASJ
+            WHERE
+            appraisals.status not in ('completed', 'closed', 'archivedCompleted', 'archivedClosed')
+            AND PYVPASJ.PYVPASJ_PIDM = appraisals.job_pidm
+            AND PYVPASJ.PYVPASJ_POSN = appraisals.position_number
+            AND PYVPASJ.PYVPASJ_SUFF = appraisals.JOB_SUFFIX
+            AND PYVPASJ.PYVPASJ_APPOINTMENT_TYPE IN (:appointmentTypes)
+            AND PYVPASJ.PYVPASJ_BCTR_TITLE = :bcName
+            AND PYVPASJ.PYVPASJ_ORGN_DESC LIKE :orgPrefix
+    ]]></sql-query>
+    <sql-query name="report.allActiveOrgCode"><![CDATA[
+            SELECT
+                appraisals.id,
+                appraisals.status,
+                PYVPASJ.PYVPASJ_ORGN_DESC,
+                PYVPASJ.PYVPASJ_ORGN_CODE_TS,
+                PYVPASE.PYVPASE_FIRST_NAME,
+                PYVPASE.PYVPASE_LAST_NAME
+            FROM
+                appraisals,
+                PYVPASJ,
+                PYVPASE
+            WHERE
+            appraisals.status not in ('completed', 'closed', 'archivedCompleted', 'archivedClosed')
+            AND PYVPASE.PYVPASE_PIDM = PYVPASJ.PYVPASJ_SUPERVISOR_PIDM
+            AND PYVPASJ.PYVPASJ_PIDM = appraisals.job_pidm
+            AND PYVPASJ.PYVPASJ_POSN = appraisals.position_number
+            AND PYVPASJ.PYVPASJ_SUFF = appraisals.JOB_SUFFIX
+            AND PYVPASJ.PYVPASJ_APPOINTMENT_TYPE IN (:appointmentTypes)
+            AND PYVPASJ.PYVPASJ_BCTR_TITLE = :bcName
+            AND PYVPASJ.PYVPASJ_ORGN_CODE_TS = :tsOrgCode
+    ]]></sql-query>
+    <sql-query name="report.allActiveSupervisor"><![CDATA[
+            SELECT
+                appraisals.id,
+                appraisals.status,
+                PYVPASE.PYVPASE_FIRST_NAME,
+                PYVPASE.PYVPASE_LAST_NAME
+            FROM
+                appraisals,
+                PYVPASJ,
+                PYVPASE
+            WHERE
+                pyvpasj_status = 'A'
+                AND pyvpasj_pidm = pyvpase_pidm
+                AND appraisals.status not in ('completed', 'closed', 'archivedCompleted', 'archivedClosed')
+                AND PYVPASE.PYVPASE_PIDM = appraisals.job_pidm
+                AND PYVPASJ.PYVPASJ_POSN = appraisals.position_number
+                AND PYVPASJ.PYVPASJ_SUFF = appraisals.JOB_SUFFIX
+                AND PYVPASJ.PYVPASJ_APPOINTMENT_TYPE IN (:appointmentTypes)
+                AND PYVPASJ.PYVPASJ_BCTR_TITLE = :bcName
+                AND PYVPASJ.PYVPASJ_ORGN_DESC LIKE 'VMD%'
+            start with
+                pyvpasj_pidm = 1318621 and pyvpasj_posn ='C30134' and pyvpasj_suff = '00'
+            connect by
+                pyvpasj_supervisor_pidm = prior pyvpasj_pidm and
+                pyvpasj_supervisor_posn = prior pyvpasj_posn and
+                pyvpasj_supervisor_suff = prior pyvpasj_suff;
+    ]]></sql-query>
+
+    <query name="appraisal.getReviews"><![CDATA[
+        SELECT new edu.osu.cws.evals.models.Appraisal
+            (
+                id, job.jobTitle, job.positionNumber,
+                startDate, endDate, type, job.employee.id, job.employee.lastName,
+                job.employee.firstName, evaluationSubmitDate, status,
+                job.businessCenterName, job.orgCodeDescription, job.suffix, overdue
+            )
+        FROM
+            edu.osu.cws.evals.models.Appraisal
+        WHERE
+            status IN ('reviewDue', 'reviewOverdue') AND
+            job.employee.id not in (
+              select employee.id
+              from edu.osu.cws.evals.models.OptOut
+              where
+                TYPE='EVAL' and
+                DELETER_PIDM is null
+            )
+    ]]></query>
+    <query name="appraisal.getTrialAppraisal"><![CDATA[
+        from edu.osu.cws.evals.models.Appraisal
+        WHERE
+            job.employee.id = :pidm AND
+            job.positionNumber = :posno AND
+            job.suffix = :suffix AND
+            type = 'trial'
+    ]]></query>
+    <query name="appraisal.saveOverdue"><![CDATA[
+        update edu.osu.cws.evals.models.Appraisal appraisal
+        set
+            overdue = :overdue
+        where
+            id = :id
+    ]]></query>
+    <query name="appraisals.countAppraisalsInJobs"><![CDATA[
+        select
+            count(*)
+        from edu.osu.cws.evals.models.Appraisal appraisal
+        where
+            job in (:jobs) and
+            status not in ('closed', 'archivedClosed', 'archivedCompleted')
+    ]]></query>
+    <query name="appraisal.getLastAppraisalByJob"><![CDATA[
+        select new edu.osu.cws.evals.models.Appraisal(
+            id,
+            startDate,
+            status
+        )
+        from edu.osu.cws.evals.models.Appraisal
+        where
+            job = :job
+        order by startDate desc
+    ]]></query>
+    <sql-query name="report.reportLateEvaluations"><![CDATA[
+    select
+        ap.ID,
+        emp.PYVPASE_LAST_NAME ||  ', ' || emp.PYVPASE_FIRST_NAME as employee,
+        emp.PYVPASE_ID as osuid,
+        job.PYVPASJ_POSN as position_number,
+        supervisorEmployee.PYVPASE_LAST_NAME ||  ', ' || supervisorEmployee.PYVPASE_FIRST_NAME as supervisor,
+        ap.STATUS,
+        job.PYVPASJ_APPOINTMENT_TYPE as appointment_type,
+        TO_CHAR(ap.START_DATE, 'MM/dd/yyyy'),
+        TO_CHAR(ap.END_DATE, 'MM/dd/yyyy'),
+        round(current_date - ap.END_DATE) as overdue,
+        job.PYVPASJ_BCTR_TITLE as business_center
+    from
+        appraisals ap,
+        PYVPASJ job,
+        PYVPASE emp,
+        PYVPASJ supervisorJob,
+        PYVPASE supervisorEmployee
+    where
+        ap.JOB_PIDM=job.PYVPASJ_PIDM and
+        ap.POSITION_NUMBER=job.PYVPASJ_POSN and
+        ap.JOB_SUFFIX=job.PYVPASJ_SUFF and
+        job.PYVPASJ_PIDM=emp.PYVPASE_PIDM and
+        job.PYVPASJ_SUPERVISOR_PIDM=supervisorJob.PYVPASJ_PIDM and
+        job.PYVPASJ_SUPERVISOR_POSN=supervisorJob.PYVPASJ_POSN and
+        job.PYVPASJ_SUPERVISOR_SUFF=supervisorJob.PYVPASJ_SUFF and
+        supervisorJob.PYVPASJ_PIDM=supervisorEmployee.PYVPASE_PIDM and
+        ap.END_DATE < current_date and
+        (ap.STATUS not in  (:ignoredStatus)) and
+        job.PYVPASJ_BCTR_TITLE in (:bcNames) and
+        job.PYVPASJ_APPOINTMENT_TYPE in (:appointmentTypes) and
+        ap.JOB_PIDM not in (
+          select EMPLOYEE_PIDM
+          from OPT_OUTS
+          where ap.JOB_PIDM=EMPLOYEE_PIDM and
+            TYPE='EVAL' and
+            DELETER_PIDM is null
+        )
+    order by
+        job.PYVPASJ_BCTR_TITLE, overdue
+    ]]></sql-query>
+
+</hibernate-mapping>

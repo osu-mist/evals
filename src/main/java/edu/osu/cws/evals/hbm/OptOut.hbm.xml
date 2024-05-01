@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping auto-import="false" >
+
+    <class name="edu.osu.cws.evals.models.OptOut" table="opt_outs">
+        <id name="id" type="int" column="ID">
+            <generator class="native">
+                <param name="sequence">pass_seq</param>
+            </generator>
+        </id>
+
+        <property name="type" column="TYPE"/>
+        <property name="createDate" type="timestamp" column="CREATE_DATE"/>
+        <property name="deleteDate" type="timestamp" column="DELETE_DATE"/>
+
+        <many-to-one name="employee" class="edu.osu.cws.evals.models.Employee"
+                     column="EMPLOYEE_PIDM"
+                     not-null="true"/>
+
+        <many-to-one name="creator" class="edu.osu.cws.evals.models.Employee"
+                     column="CREATOR_PIDM"
+                     not-null="true"/>
+
+        <many-to-one name="deleter" class="edu.osu.cws.evals.models.Employee"
+                     column="DELETER_PIDM"/>
+    </class>
+</hibernate-mapping>
