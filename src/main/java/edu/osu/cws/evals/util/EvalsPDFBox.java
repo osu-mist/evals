@@ -605,7 +605,11 @@ public class EvalsPDFBox {
 
         List<CriterionArea> sortedCriteriaArea = getSortedCriteria();
         for (CriterionArea criterionArea : sortedCriteriaArea) {
-            writeText(font, fontSize, sideMargin + tabSize, curLine, criterionArea.getName());
+            float curLineStart = curLine;
+            writeText(font, fontSize, sideMargin + tabSize, curLine, criterionArea.getName(), false, false, true, 40f);
+            // current line will get pushed down if above text wraps
+            // this resets it so the description lines up with the criteria title
+            addToCurLine(curLine - curLineStart);
             writeText(font, fontSize, getPageWidth() * .3f, curLine, criterionArea.getDescription(), false, false, true);
 
             addToCurLine(lineHeight * 1.5f);
