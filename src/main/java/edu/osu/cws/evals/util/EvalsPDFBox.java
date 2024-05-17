@@ -353,7 +353,6 @@ public class EvalsPDFBox {
         }
 
         addToCurLine(lineHeight * 2);
-        addSignature();
     }
 
     private void addRating() throws IOException {
@@ -488,6 +487,8 @@ public class EvalsPDFBox {
     }
 
     private void addEmployeeResponse() throws IOException {
+        addSignature();
+
         if (appraisal.getRebuttal() != null) {
             String rebuttalType =  "rebuttal";
             if (appraisal.getJob().isUnclassified()) {
