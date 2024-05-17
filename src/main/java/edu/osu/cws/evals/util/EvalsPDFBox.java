@@ -482,21 +482,23 @@ public class EvalsPDFBox {
     }
 
     private void addEmployeeResponse() throws IOException {
-        String rebuttalType =  "rebuttal";
-        if (appraisal.getJob().isUnclassified()) {
-            rebuttalType = "feedback";
+        if (appraisal.getRebuttal() != null) {
+            String rebuttalType =  "rebuttal";
+            if (appraisal.getJob().isUnclassified()) {
+                rebuttalType = "feedback";
+            }
+
+            // add section title
+            addToCurLine();
+            String rebuttalLblText= resource.getString("appraisal-employee-response-" + rebuttalType).toUpperCase();
+            writeText(fontBold, fontSizeBold, sideMargin, curLine, rebuttalLblText, true, true, false);
+            addToCurLine();
+
+            // add employee response
+            writeText(font, fontSize, sideMargin + tabSize, curLine, appraisal.getRebuttal(), false, false, true);
+
+            addToCurLine();
         }
-
-        // add section title
-        addToCurLine();
-        String rebuttalLblText= resource.getString("appraisal-employee-response-" + rebuttalType).toUpperCase();
-        writeText(fontBold, fontSizeBold, sideMargin, curLine, rebuttalLblText, true, true, false);
-        addToCurLine();
-
-        // add employee response
-        writeText(font, fontSize, sideMargin + tabSize, curLine, appraisal.getRebuttal(), false, false, true);
-
-        addToCurLine();
     }
 
     private void addSignature() throws IOException {
