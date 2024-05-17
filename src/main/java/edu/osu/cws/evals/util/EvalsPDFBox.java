@@ -275,19 +275,25 @@ public class EvalsPDFBox {
 
             addAssessmentCriteria(assessment);
 
-            // add employee result
-            String empResultText = resource.getString("appraisal-employee-results");
-            writeText(fontBoldItalic, fontSize, sideMargin + tabSize, curLine, empResultText);
-            addToCurLine(lineHeight);
-            writeText(font, fontSize, sideMargin + tabSize, curLine, assessment.getEmployeeResult(), false, false, true);
-            addToCurLine(lineHeight * 2);
+            if (!assessment.isNewGoal()) {
+                if (displayEmployeeResults) {
+                    // add employee result
+                    String empResultText = resource.getString("appraisal-employee-results");
+                    writeText(fontBoldItalic, fontSize, sideMargin + tabSize, curLine, empResultText);
+                    addToCurLine(lineHeight);
+                    writeText(font, fontSize, sideMargin + tabSize, curLine, assessment.getEmployeeResult(), false, false, true);
+                    addToCurLine(lineHeight * 2);
+                }
 
-            // add supervisor result
-            String supResultText = resource.getString("appraisal-result-comments");
-            writeText(fontBoldItalic, fontSize, sideMargin + tabSize, curLine, supResultText);
-            addToCurLine(lineHeight);
-            writeText(font, fontSize, sideMargin + tabSize, curLine, assessment.getSupervisorResult(), false, false, true);
-            addToCurLine(lineHeight * 2);
+                if (displaySupervisorResults) {
+                    // add supervisor result
+                    String supResultText = resource.getString("appraisal-result-comments");
+                    writeText(fontBoldItalic, fontSize, sideMargin + tabSize, curLine, supResultText);
+                    addToCurLine(lineHeight);
+                    writeText(font, fontSize, sideMargin + tabSize, curLine, assessment.getSupervisorResult(), false, false, true);
+                    addToCurLine(lineHeight * 2);
+                }
+            }
         }
         addToCurLine(lineHeight);
 
