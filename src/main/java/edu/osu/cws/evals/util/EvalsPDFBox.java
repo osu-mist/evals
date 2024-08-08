@@ -509,11 +509,18 @@ public class EvalsPDFBox {
     }
 
     private void addSignature() throws IOException {
+        // create new page if signature box doesn't fit on current page
+        if (curLine < 200f) {
+            addPage();
+            addToCurLine(lineHeight * 2);
+        }
+
         // add border top
         float borderMargin = 10f;
         float borderStartHeight = curLine + borderMargin + fontSize;
         contStream.setLineWidth(.5f);
         contStream.drawLine(sideMargin, borderStartHeight, getPageWidth() - sideMargin, borderStartHeight);
+
         // add border sides if this box will overflow to next page
         if (curLine < 200f) {
             contStream.drawLine(sideMargin, borderStartHeight, sideMargin, 0);
