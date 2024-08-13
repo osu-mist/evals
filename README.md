@@ -59,6 +59,12 @@ goal-setting and appraisal tasks.
       - evals: deploys just evals
       - theme: deploys just the theme
 
+### New liferay mysql database setup
+---
+  1. `CREATE DATABASE lportal CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
+  2. `CREATE USER 'lportal'@'%' IDENTIFIED BY 'PASSWORD';`
+  3. `GRANT ALL PRIVILEGES ON lportal.* TO 'lportal'@'%';`
+
 ### Tests
 ---
 
