@@ -735,6 +735,7 @@ public class EvalsPDFBox {
         contStream.beginText();
         contStream.moveTextPositionByAmount(x, y);
         if (text != null) {
+            text = text.replaceAll("\t", " ");
             if (wordWrap) {
                 String[] wrappedText = WordUtils.wrap(text, Math.round((getPageWidth() - x - sideMargin) / wordWrapConstant), "\n", false).split("\n");
                 for (int i=0; i < wrappedText.length; i++) {
