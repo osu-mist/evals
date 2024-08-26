@@ -1065,7 +1065,7 @@ public class AppraisalsAction implements ActionInterface {
         String rootDir = System.getProperty("user.dir");
         Map<String, List<Rating>> ratingsMap = (HashMap) actionHelper.getPortletContext().getAttribute("ratings");
         List<Rating> ratings = RatingMgr.getRatings(ratingsMap, appraisal.getAppointmentType());
-        EvalsPDF PdfGenerator = new EvalsPDF(rootDir, appraisal, resource, dirName, env, suffix, ratings);
+        EvalsPDFBox PdfGenerator = new EvalsPDFBox(rootDir, appraisal, resource, dirName, env, suffix, ratings);
         String filename = PdfGenerator.createPDF();
 
         // Insert a record into the nolij_copies table and upload to onbase
