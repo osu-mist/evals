@@ -735,7 +735,10 @@ public class EvalsPDFBox {
         contStream.beginText();
         contStream.moveTextPositionByAmount(x, y);
         if (text != null) {
+            // remove tabs that can't be encoded by our font
             text = text.replaceAll("\t", " ");
+            // replace circles ○ that can't be encoded by our font with •
+            text = text.replaceAll("○", "•");
             if (wordWrap) {
                 String[] wrappedText = WordUtils.wrap(text, Math.round((getPageWidth() - x - sideMargin) / wordWrapConstant), "\n", false).split("\n");
                 for (int i=0; i < wrappedText.length; i++) {
