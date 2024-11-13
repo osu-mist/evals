@@ -189,6 +189,22 @@ public class EvalsOnbase {
   }
 
   /**
+    * Writes text attributes for multipart post requests
+    *
+    * @param writer PrintWriter for https connection
+    * @param body String to write over connection
+    * @throws IOException
+    */
+  private void writeParameter(PrintWriter writer, String param, String body) throws IOException {
+    writer.append("--" + boundary).append(LINE_FEED);
+    writer.append("Content-Disposition: form-data; name=\"" + param + "\"").append(LINE_FEED);
+    writer.append("Content-Type: text/plain; charset=" + CHARSET).append(LINE_FEED);
+    writer.append(LINE_FEED);
+    writer.append(body).append(LINE_FEED);
+    writer.flush();
+  }
+
+  /**
     * Writes files for multipart post requests
     *
     * @param writer PrintWriter for https connection
@@ -280,24 +296,9 @@ public class EvalsOnbase {
     OutputStream outputStream = conn.getOutputStream();
     PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, CHARSET), true);
 
-    // create attributes text form
-    JSONObject attributes = new JSONObject();
-    attributes.put("DocumentType", getDocType(job.getAppointmentType()));
-    attributes.put("FileType", "PDF");
-    attributes.put("Comment", pdfName);
-    attributes.put("IndexKey", employee.getOsuid());
-
-    // add keywords attribute
-    JSONArray keywords = new JSONArray();
-    keywords.add(createKeyword("BIO - OSU ID", String.valueOf(employee.getOsuid())));
-    keywords.add(createKeyword("BIO - Name Last", employee.getLastName()));
-    keywords.add(createKeyword("BIO - Name First", employee.getFirstName()));
-    keywords.add(createKeyword("Business Center Code", job.getBusinessCenterName()));
-    keywords.add(createKeyword("HR - ECLS - Empl", job.getJobEcls()));
-    attributes.put("keywords", keywords);
-
-    // write attributes portion
-    writeAttribute(writer, attributes.toString());
+    // Write documentTypeId and indexKey parameters
+    writeParameter(writer, "indexKey", employee.getOsuid());
+    writeParameter(writer, "documentTypeId", getDocType(job.getAppointmentType()));
 
     // write pdf portion
     writeFile(writer, outputStream, pdfName);
