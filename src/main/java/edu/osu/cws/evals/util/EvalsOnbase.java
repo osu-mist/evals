@@ -218,7 +218,7 @@ public class EvalsOnbase {
   ) throws IOException {
     File uploadFile = new File(pdfDestination + fileName);
     writer.append("--" + boundary).append(LINE_FEED);
-    writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"" + fileName + "\"")
+    writer.append("Content-Disposition: form-data; name=\"uploadedDocument\"; filename=\"" + fileName + "\"")
           .append(LINE_FEED);
     writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(fileName))
           .append(LINE_FEED);
