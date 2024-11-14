@@ -735,10 +735,7 @@ public class EvalsPDFBox {
         contStream.beginText();
         contStream.moveTextPositionByAmount(x, y);
         if (text != null) {
-            // remove tabs that can't be encoded by our font
-            text = text.replaceAll("\t", " ");
-            // replace circles ○ that can't be encoded by our font with •
-            text = text.replaceAll("○", "•");
+            text = removeFontIncompatibleCharacters(text);
             if (wordWrap) {
                 String[] wrappedText = WordUtils.wrap(text, Math.round((getPageWidth() - x - sideMargin) / wordWrapConstant), "\n", false).split("\n");
                 for (int i=0; i < wrappedText.length; i++) {
@@ -771,6 +768,18 @@ public class EvalsPDFBox {
             contStream.setLineWidth(1f);
             contStream.drawLine(x, lineHeight, textWidth + x, lineHeight);
         }
+    }
+
+    // replace characters our font cant encode with an encodable version
+    private String removeFontIncompatibleCharacters(String text) {
+        // remove tabs that can't be encoded by our font
+        text = text.replaceAll("\t", " ");
+        // replace circles ○ that can't be encoded by our font with •
+        text = text.replaceAll("○", "•");
+        // replace hyphentwo characters that can't be encoded by our font with regular hyphens
+        text = text.replaceAll("‐", "-");
+
+        return text;
     }
 
     private float findRowHeight(float baseRowHeight, float baseColWidth, String[][] content) throws IOException {
