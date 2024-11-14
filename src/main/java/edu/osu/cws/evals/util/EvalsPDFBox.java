@@ -778,6 +778,8 @@ public class EvalsPDFBox {
         text = text.replaceAll("○", "•");
         // replace hyphentwo characters that can't be encoded by our font with regular hyphens
         text = text.replaceAll("‐", "-");
+        // replace U+F0A7 with •, closest valid character
+        text = text.replaceAll("", "•");
 
         return text;
     }
