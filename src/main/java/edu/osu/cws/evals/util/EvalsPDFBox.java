@@ -27,6 +27,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.encoding.WinAnsiEncoding;
 import org.apache.pdfbox.util.Matrix;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
@@ -735,6 +736,7 @@ public class EvalsPDFBox {
         contStream.beginText();
         contStream.moveTextPositionByAmount(x, y);
         if (text != null) {
+            text = replaceFontIncompatibleCharacters(text);
             text = removeFontIncompatibleCharacters(text);
             if (wordWrap) {
                 String[] wrappedText = WordUtils.wrap(text, Math.round((getPageWidth() - x - sideMargin) / wordWrapConstant), "\n", false).split("\n");
@@ -771,7 +773,7 @@ public class EvalsPDFBox {
     }
 
     // replace characters our font cant encode with an encodable version
-    private String removeFontIncompatibleCharacters(String text) {
+    private String replaceFontIncompatibleCharacters(String text) {
         // remove tabs that can't be encoded by our font
         text = text.replaceAll("\t", " ");
         // replace circles ○ that can't be encoded by our font with •
@@ -782,6 +784,17 @@ public class EvalsPDFBox {
         text = text.replaceAll("", "•");
 
         return text;
+    }
+
+    public static String removeFontIncompatibleCharacters(String text) {
+        StringBuilder fixedText = new StringBuilder();
+        for (int i = 0; i < text.length(); i++) {
+            if (WinAnsiEncoding.INSTANCE.contains(text.charAt(i))) {
+                fixedText.append(text.charAt(i));
+            }
+        }
+
+        return fixedText.toString();
     }
 
     private float findRowHeight(float baseRowHeight, float baseColWidth, String[][] content) throws IOException {
