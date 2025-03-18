@@ -1240,4 +1240,30 @@ public class AppraisalMgr {
         }
     }
 
+    /**
+     * Checks if an employee has an annual evaluation record 
+     *
+     * @param job job of employee
+     * @return boolean true if employee has an annual appraisal for any job
+     */
+    public static boolean hasAnnualAppraisal(Job job) {
+        Session session = HibernateUtil.getCurrentSession();
+
+        // longer query than we need but there is already a constructor for an appraisal with this data
+        String query = "select new edu.osu.cws.evals.models.Appraisal ( " +
+            "id, job.jobTitle, job.positionNumber, startDate, endDate, type, " +
+            "job.employee.id, job.employee.osuid, job.employee.lastName, job.employee.firstName, " +
+            "evaluationSubmitDate, status, job.businessCenterName, " +
+            "job.orgCodeDescription, job.suffix, overdue) " +
+                "from edu.osu.cws.evals.models.Appraisal appraisal " +
+                "where appraisal.job.employee.id = :pidm " +
+                "and appraisal.type = 'annual'"
+        ;
+
+        ArrayList<Appraisal> results = (ArrayList<Appraisal>)session.createQuery(query)
+                .setInteger("pidm", job.getEmployee().getId())
+                .list();
+
+        return results.size() > 0;
+    }
 }
