@@ -359,7 +359,7 @@ public class BackendMgr {
              return false;
 
         //Is this the first annual appraisal?
-        if (appraisalStartDate.equals(job.getInitialEvalStartDate()))
+        if (isFirstAnnualAppraisal(appraisalStartDate, job))
         {
             //don't create it if the job's trial appraisal is still open.
             // The first annual will be created by the web app when the trial one is closed or completed.
@@ -385,6 +385,17 @@ public class BackendMgr {
         }
 
         return false;
+    }
+
+    /** Returns true if this is the first annual appraisal, false otherwise
+     *
+     * @return: isFirst   boolean
+     */
+    private boolean isFirstAnnualAppraisal(DateTime appraisalStartDate, Job job) {
+        boolean startDateEqualsInitialStartDate = appraisalStartDate.equals(job.getInitialEvalStartDate());
+        boolean hasAnnualAppraisal = AppraisalMgr.hasAnnualAppraisal(job);
+
+        return startDateEqualsInitialStartDate && !hasAnnualAppraisal;
     }
 
     /** createForDate: This is an awkward name, can't think of a better one for now.
