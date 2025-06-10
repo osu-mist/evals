@@ -236,9 +236,13 @@ public class BackendMgr {
                 tx = session.beginTransaction();
                 System.out.print("Working with job...");
                 System.out.println(shortJob.getSignature());
+                job = JobMgr.getJob(shortJob.getEmployee().getId(),
+                                    shortJob.getPositionNumber(), shortJob.getSuffix());
+                System.out.print("Got job.. ");
+                System.out.println(job.getSignature());
 
-                if (!shortJob.getEmployee().hasOptOut(OptOut.TYPE_EVAL)) {
-                    Appraisal lastShortAppraisal = AppraisalMgr.getLastAppraisalByJob(shortJob);
+                if (!job.getEmployee().hasOptOut(OptOut.TYPE_EVAL)) {
+                    Appraisal lastShortAppraisal = AppraisalMgr.getLastAppraisalByJob(job);
                     if (lastShortAppraisal != null) {
                         System.out.println("Last appraisal - id: " + lastShortAppraisal.getId() + ", startDate: "
                                 + lastShortAppraisal.getStartDate());
@@ -248,8 +252,6 @@ public class BackendMgr {
                         // check if we need to create new annual evaluation
                         if (createForDate.isAfter(appraisalStartDate) ) {
                             // Get the full job to check if appraisal exists and/or to create a new one.
-                            job = JobMgr.getJob(shortJob.getEmployee().getId(),
-                                    shortJob.getPositionNumber(), shortJob.getSuffix());
                             if (!AppraisalMgr.appraisalExists(job, appraisalStartDate, Appraisal.TYPE_ANNUAL)) {
                                 String msg = "creating " + Appraisal.TYPE_ANNUAL + " appraisal for " + shortJob.getSignature();
                                 System.out.println(msg);
