@@ -274,5 +274,14 @@
     order by
         job.PYVPASJ_BCTR_TITLE, overdue
     ]]></sql-query>
+    <query name="appraisal.getNonCompletedAppraisals"><![CDATA[
+        from edu.osu.cws.evals.models.Appraisal appraisal
+        left join fetch appraisal.goalVersions
+        where
+            appraisal.status not in ('completed', 'archivedCompleted')
+            and appraisal.id not in (select appraisalId from edu.osu.cws.evals.models.NolijCopy)
+        order by appraisal.startDate desc
+    ]]></query>
+
 
 </hibernate-mapping>

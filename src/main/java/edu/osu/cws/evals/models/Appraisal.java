@@ -460,6 +460,34 @@ public class Appraisal extends Evals implements Comparable<Appraisal> {
     }
 
     /**
+     * Constructor for bulk PDF creation
+     */
+    public Appraisal(int id, Date startDate, Date endDate, String status, String type, int rating, Date employeeSignedDate, String appointmentType,
+                     int employeeId, String positionNum, String suffix, String firstName, String lastName) {
+        this.id = id;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = status;
+        this.employeeSignedDate = employeeSignedDate;
+        this.type = type;
+        this.rating = rating;
+        this.goalVersions = goalVersions;
+
+        Employee employee = new Employee();
+        employee.setId(employeeId);
+        employee.setFirstName(firstName);
+        employee.setLastName(lastName);
+
+        Job tempJob = new Job();
+        tempJob.setAppointmentType(appointmentType);
+        tempJob.setEmployee(employee);
+        tempJob.setPositionNumber(positionNum);
+        tempJob.setSuffix(suffix);
+
+        this.job = tempJob;
+    }
+
+    /**
      * Used to copy an appraisal object. This is used by appraisal search or report list appraisal.
      * This is done so that the jsp files don't complain about missing employee or job records in
      * the db.

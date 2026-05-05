@@ -1056,7 +1056,7 @@ public class AppraisalsAction implements ActionInterface {
         }
     }
 
-    private String GeneratePDF(Appraisal appraisal, String dirName, String env, String suffix,
+    public String GeneratePDF(Appraisal appraisal, String dirName, String env, String suffix,
                                boolean  insertRecordIntoTable) throws Exception {
         // Create PDF
         String rootDir = System.getProperty("user.dir");

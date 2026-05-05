@@ -123,6 +123,7 @@ public class EvalsPDFBox {
                 contStream.close();
             }
 
+            System.out.println(fileName);
             File file = new File(fileName);
             file.createNewFile();
             doc.save(file);
@@ -811,6 +812,9 @@ public class EvalsPDFBox {
     }
 
     private static float getTextWidth(String text, PDFont curFont, float curFontSize) throws IOException {
+        if (text == null) {
+            return curFont.getStringWidth("null") / 1000 * curFontSize;
+        }
         return curFont.getStringWidth(text) / 1000 * curFontSize;
     }
 
