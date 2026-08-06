@@ -7,6 +7,7 @@ import edu.osu.cws.evals.models.*;
 import edu.osu.cws.evals.portlet.Constants;
 import edu.osu.cws.evals.util.*;
 import edu.osu.cws.util.Logger;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -83,6 +84,7 @@ public class BackendMgr {
        startTime = new Date();
        try
        {
+          optOutNewEmployees();
           updateAppraisals();
           createAppraisals();
           createUnclassifiedEvaluations();
@@ -527,6 +529,60 @@ public class BackendMgr {
         DateTime dueDate = EvalsUtil.getDueDate(appraisal, config);
         //If the the current date is before or on the appraisal due date, returns true.
         return EvalsUtil.getToday().compareTo(dueDate) <= 0;
+    }
+
+    private void optOutNewEmployees() throws Exception {
+        try {
+            session = HibernateUtil.getCurrentSession();
+            tx = session.beginTransaction();
+
+            // find jobs created after workday transition
+            String hql = "from edu.osu.cws.evals.models.Job job where job.beginDate >= TO_DATE('2026-07-03', 'YYYY-MM-DD') and job.status != 'T'";
+            List<Job> jobs = (List<Job>) session.createQuery(hql).list();
+            List<Integer> pidms = new ArrayList<Integer>();
+            for (Job job : jobs) {
+                pidms.add(job.getEmployee().getId());
+            }
+
+            // check for other jobs with these pidms to make sure this is a new employee and not someone changing positions
+            hql = "from edu.osu.cws.evals.models.Job job where job.employee.id in (:pidms)";
+            List<Job> existingJobs = session.createQuery(hql)
+                .setParameterList("pidms", pidms)
+                .list();
+            Map<Integer, Integer> pidmCount = new HashMap<Integer, Integer>();
+            for (Job job : existingJobs) {
+                Integer curPidm = job.getEmployee().getId();
+                if (pidmCount.containsKey(curPidm)) {
+                    pidmCount.put(curPidm, pidmCount.get(curPidm) + 1);
+                } else {
+                    pidmCount.put(curPidm, 1);
+                }
+            }
+
+            // get admin employee record pidm as the source of the opt out
+            PropertiesConfiguration config = EvalsUtil.loadEvalsConfig(null);
+            int adminPidm = config.getInt("optOut.adminPidm");
+            String adminHql = "from edu.osu.cws.evals.models.Employee employee where employee.id = :adminPidm";
+            List<Employee> empList = session.createQuery(adminHql)
+                .setParameter("adminPidm", adminPidm)
+                .list();
+            Employee admin = empList.get(0);
+
+            // do the opt out for new positions only
+            for (Integer pidm : pidmCount.keySet()) {
+                if (pidmCount.get(pidm) <= 1) {
+                    Map<String, Boolean> optOutValues = new HashMap<String, Boolean>();
+                    optOutValues.put(OptOut.TYPE_EVAL, true);
+                    OptOutMgr.updateOptOuts(String.valueOf(pidm), optOutValues, admin);
+                    System.out.println("Opt out applied for new employee: " + pidm);
+                }
+            }
+
+            tx.commit();
+        } catch (Exception error) {
+            System.out.println("Error occurred in new employee opt outs");
+            error.printStackTrace();
+        }
     }
 
     /**
