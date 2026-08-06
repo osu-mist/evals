@@ -84,8 +84,8 @@ public class BackendMgr {
        try
        {
           updateAppraisals();
-          createAppraisals();
-          createUnclassifiedEvaluations();
+          // createAppraisals();
+          // createUnclassifiedEvaluations();
           archiveAppraisals();
           emailSupervisors();
           emailReviewers();
