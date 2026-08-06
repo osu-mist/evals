@@ -537,7 +537,7 @@ public class BackendMgr {
             tx = session.beginTransaction();
 
             // find jobs created after workday transition
-            String hql = "from edu.osu.cws.evals.models.Job job where job.beginDate >= TO_DATE('2026-07-03', 'YYYY-MM-DD') and job.status != 'T'";
+            String hql = "from edu.osu.cws.evals.models.Job job where job.beginDate > TO_DATE('2026-07-01', 'YYYY-MM-DD') and job.status != 'T'";
             List<Job> jobs = (List<Job>) session.createQuery(hql).list();
             List<Integer> pidms = new ArrayList<Integer>();
             for (Job job : jobs) {
