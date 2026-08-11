@@ -16,6 +16,7 @@ import org.joda.time.Days;
 
 import java.io.*;
 import java.util.*;
+import java.text.SimpleDateFormat;
 
 public class BackendMgr {
     private int totalErrorCount = 0;  //how many errors we have so far?
@@ -84,8 +85,8 @@ public class BackendMgr {
        try
        {
           updateAppraisals();
-          createAppraisals();
-          createUnclassifiedEvaluations();
+          // createAppraisals();
+          // createUnclassifiedEvaluations();
           archiveAppraisals();
           emailSupervisors();
           emailReviewers();
@@ -563,7 +564,7 @@ public class BackendMgr {
                 System.out.println("Processing appraisal " + ids[i]);
                 appraisal = AppraisalMgr.getAppraisal(ids[i]);
 
-                if (!appraisal.getJob().getEmployee().hasOptOut(OptOut.TYPE_EVAL)) {
+                if (!appraisal.getJob().getEmployee().hasOptOut(OptOut.TYPE_EVAL) || !dueDatePastDeprecation(appraisal)) {
                     // if the status contains "Overdue", calculate appraisal.overdue and save it
                     if (appraisal.getStatus().contains(Appraisal.OVERDUE)) {
                         appraisal.updateOverdue(configMap);
@@ -1307,6 +1308,17 @@ public class BackendMgr {
         }
         writer.writeNext(row.toArray(new String[row.size()]));
         adminWriter.writeNext(row.toArray(new String[row.size()]));
+    }
+
+    private boolean dueDatePastDeprecation(Appraisal appraisal) throws Exception {
+        boolean isPast = false;
+
+        Date cutoffDate = new SimpleDateFormat("yyyy-MM-dd").parse("2026-09-30");
+        if (appraisal.getEndDate().after(cutoffDate)) {
+            isPast = true;
+        }
+
+        return isPast;
     }
 
 }
