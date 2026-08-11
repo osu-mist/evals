@@ -1375,7 +1375,7 @@ img.ui-datepicker-trigger {
 
 /* ---------- Warning messages ---------- */
 .portlet-msg-alert {
-	background: #ffc url(../images/messages/alert.png) no-repeat 6px 20%;
+	background: #ffc url(../images/messages/alert.png) no-repeat 6px;
 	border: 1px solid #fc0;
 	display: block;
 	font-weight: bold;

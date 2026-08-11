@@ -1,0 +1,1 @@
+<span class="portlet-msg-alert" style="margin-bottom: 1rem;"><liferay-ui:message key="deprecation-message"/></span>

@@ -38,6 +38,7 @@ PortletContext ctx = portletConfig.getPortletContext();
 ResourceBundle bundle = (ResourceBundle)ctx.getAttribute("resourceBundle");
 %>
 
+<%@ include file="/jsp/notices/deprecation.jsp" %>
 <div class="osu-cws"> <!-- Full wrapper for portlet (closed in footer.jsp) -->
   
 <c:if test="${not empty menuHome}">
