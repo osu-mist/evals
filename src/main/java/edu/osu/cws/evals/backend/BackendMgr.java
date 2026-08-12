@@ -620,7 +620,7 @@ public class BackendMgr {
                 System.out.println("Processing appraisal " + ids[i]);
                 appraisal = AppraisalMgr.getAppraisal(ids[i]);
 
-                if (!appraisal.getJob().getEmployee().hasOptOut(OptOut.TYPE_EVAL) || !dueDatePastDeprecation(appraisal)) {
+                if (!appraisal.getJob().getEmployee().hasOptOut(OptOut.TYPE_EVAL) && !dueDatePastDeprecation(appraisal) && !isOverdue(appraisal)) {
                     // if the status contains "Overdue", calculate appraisal.overdue and save it
                     if (appraisal.getStatus().contains(Appraisal.OVERDUE)) {
                         appraisal.updateOverdue(configMap);
@@ -1375,6 +1375,17 @@ public class BackendMgr {
         }
 
         return isPast;
+    }
+
+    private boolean isOverdue(Appraisal appraisal) throws Exception {
+        boolean overdue = false;
+
+        Date cutoffDate = new SimpleDateFormat("yyyy-MM-dd").parse("2026-08-01");
+        if (appraisal.getEndDate().before(cutoffDate)) {
+            overdue = true;
+        }
+
+        return overdue;
     }
 
 }
